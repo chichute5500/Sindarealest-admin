@@ -135,4 +135,21 @@ async function patchOrder(DB, prices, status = "confirmed") {
   ), "item, order, and audit writes must all be guarded against a concurrent payment");
 }
 
+// D1 rejects statements whose bound-parameter count differs from SQL placeholders.
+// Earlier mocks accepted an extra order ID here, so CI passed while live PATCH returned 503.
+for (const {label,price,status} of [
+  {label:"ordinary unchanged-price update",price:100000,status:"confirmed"},
+  {label:"confirmed order repricing",price:200000,status:"confirmed"},
+  {label:"cancelled transition",price:100000,status:"cancelled"}
+]) {
+  const db=makeDB();
+  const response=await patchOrder(db,[{itemId:"item-1",unitPrice:price}],status);
+  assert.equal(response.status,200,label+" should be accepted in the simulated no-ledger case");
+  assert.equal(db.calls.batches.length,1,label+" should use one atomic batch");
+  for (const {sql,values} of db.calls.batches[0]) {
+    assert.equal(values.length,(sql.match(/\\?/g)||[]).length,
+      label+": SQL must bind exactly one value per placeholder for D1 execution");
+  }
+}
+
 console.log("PASS: order repricing guards financial history and order cancellation refuses pending QR requests, including the concurrent-create race.");

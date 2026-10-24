@@ -154,7 +154,8 @@ export async function onRequestPatch(context) {
       priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id
     ];
     if (priceChanged) orderUpdateValues.push(id,id);
-    if (status !== "cancelled") orderUpdateValues.push(id);
+    // Non-cancelled UPDATE uses a literal status guard with no extra SQL bind.
+    // Binding one more ID here previously made every ordinary order save fail (503).
     if (status === "cancelled") orderUpdateValues.push(id);
     statements.push(context.env.DB.prepare(orderUpdateSql).bind(...orderUpdateValues));
 
