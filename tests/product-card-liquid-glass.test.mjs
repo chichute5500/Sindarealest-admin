@@ -127,7 +127,7 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-const protectedHeroDisplayLock = html.slice(html.lastIndexOf('/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */'));
+const protectedHeroDisplayLock = html.slice(html.lastIndexOf('/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */'));
 assert.ok(html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
   && protectedHeroDisplayLock.includes('#home .hero-visual img{')
   && protectedHeroDisplayLock.includes('object-fit:contain!important;object-position:center!important;padding:0!important;')
@@ -140,9 +140,9 @@ assert.ok(html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!importa
   && protectedHeroDisplayLock.includes('grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;')
   && protectedHeroDisplayLock.includes('grid-column:1!important;')
   && protectedHeroDisplayLock.includes('grid-column:2!important;')
-  && protectedHeroDisplayLock.includes('max-height:210px!important;')
+  && protectedHeroDisplayLock.includes('max-height:330px!important;')
   && protectedHeroDisplayLock.includes('#home .hero-visual-caption{display:none!important}'),
-  "The mobile Hero must place copy and the enlarged alpha-feathered image side-by-side, preserving image colors and avoiding crop/transform while allowing the approved subtle drop shadow.");
+  "The mobile Hero must place copy and the original RGBA PNG side-by-side, preserve source colors, avoid crop/transform, and keep the approved subtle drop shadow.");
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
