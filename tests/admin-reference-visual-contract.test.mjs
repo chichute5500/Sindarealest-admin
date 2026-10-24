@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 const src=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
 const expected=[
   'SD_ADMIN_REFERENCE_PARITY_MOBILE_V1',
+  '.toast{bottom:calc(90px + env(safe-area-inset-bottom))}',
   '--reference-blue:#477eae',
   '.brand-logo {',
   '#main .pagehead h2',

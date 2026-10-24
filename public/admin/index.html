@@ -1048,7 +1048,8 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
     box-shadow:none;
   }
   .mobile-more-panel{bottom:calc(70px + env(safe-area-inset-bottom))}
-  .toast{bottom:calc(76px + env(safe-area-inset-bottom))}
+  /* Keep the alert above the navigation at narrow 320px Android widths (>=8px gap). */
+  .toast{bottom:calc(90px + env(safe-area-inset-bottom))}
   /* Product cards mirror the reference's image-left / information-right rhythm. */
   #main .product-table tbody{gap:7px;padding:8px 0 10px}
   #main .product-table tbody tr{border-radius:13px;padding:7px 10px}
