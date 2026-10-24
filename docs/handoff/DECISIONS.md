@@ -1,3 +1,13 @@
+## DECISION UPDATE — PREVIEW CRAWL POLICY — 2026-10-24
+
+- Non-production branch/hash deployments under `*.sindarealest2.pages.dev` must not expose `Allow: /` or advertise a sitemap. Return `User-agent: *\nDisallow: /\n` for these preview hosts.
+- Preserve the existing `robots.txt` behavior for primary hostname `sindarealest2.pages.dev` and custom domains. This rule changes only `functions/robots.txt.js`; no Cloudflare configuration or Production settings are changed.
+- Test both negative/positive host classes in `tests/robots-txt.test.mjs`; run via the standard `npm test` chain.
+- Current exact-SHA deployment and validation gate results are in `TEST-RESULTS.md`. The separate npm audit failure is caused by transitive `undici` advisories; do not force-downgrade Wrangler or bypass audit without a safe, evidence-backed remediation.
+- Existing owner locks remain authoritative: gallery PAUSED / NOT ACCEPTED, SKU PAUSED, Hero PAUSED, all accepted sections PASS/LOCKED. PR #108 stays OPEN/unmerged; Preview only.
+
+---
+
 ## LATEST CHAT HANDOFF — CONTINUE AUTONOMOUS MULTI-THREAD WORK — 2026-10-24
 
 - Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; branch HEAD before this docs update: `96ab2e59ff9c287833a95f047ff7f2bd15d38f24`.

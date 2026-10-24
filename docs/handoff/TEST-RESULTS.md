@@ -1,3 +1,23 @@
+## EXACT-SHA TEST + DEPLOY RESULT — PREVIEW ROBOTS INDEXING GUARD — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Focused `robots.txt` regression test | PASS | `tests/robots-txt.test.mjs` |
+| Project integrity + full automated test suite in Preview job | PASS | [Preview workflow #40045286312](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286312) |
+| Cloudflare Pages Preview deploy | PASS | [Workflow #40045286312](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286312) |
+| Immutable Preview | PASS | https://18756cf5.sindarealest2.pages.dev/ |
+| Validate workflow dependency-audit gate | FAIL before its test steps | [Workflow #40045286346](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286346) |
+| Hero-guarded visual workflow | SKIPPED | [Workflow #40045286384](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286384) |
+| Live-browser/visual check and owner acceptance | NOT PERFORMED | Not claimed |
+
+- Exact source/test/deployed SHA: `e70246eb05f7e864b21a4ff94c7c321bc9917b9f`. The Preview workflow checked out this SHA, confirmed project `sindarealest2` and Production branch `main`, ran integrity/full tests and deployed to Preview only.
+- Root issue: `robots.txt` previously emitted `Allow: /` and an origin-specific sitemap for all hosts, including public Preview aliases. The fix disallows crawling only on non-primary `*.sindarealest2.pages.dev` hosts. The primary Pages hostname and custom domains preserve existing rules.
+- Separate validate workflow ran `npm audit --audit-level=high` and failed before its integrity/test steps because it now reports 3 transitive `undici` vulnerabilities (including one HIGH) via `miniflare`/`wrangler`. Proposed `npm audit fix --force` would downgrade Wrangler to 4.35.0 (breaking); no such downgrade or audit bypass was applied. The successful Preview workflow's integrity/tests remain independent evidence and do not erase this failed validate gate.
+- The workflow was deployed to https://18756cf5.sindarealest2.pages.dev/ with branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. No Production deployment or `main` edit occurred.
+- Do not inspect Hero or reopen any PASS/LOCKED section. SKU and fullscreen gallery remain PAUSED; PR #108 remains OPEN/unmerged.
+
+---
+
 ## LATEST CHAT HANDOFF — CONTINUE AUTONOMOUS MULTI-THREAD WORK — 2026-10-24
 
 - Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; branch HEAD before this docs update: `96ab2e59ff9c287833a95f047ff7f2bd15d38f24`.

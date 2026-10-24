@@ -1,3 +1,17 @@
+## LATEST VERIFIED UPDATE — PREVIEW ROBOTS INDEXING GUARD — 2026-10-24
+
+- Live source/test commit: `e70246eb05f7e864b21a4ff94c7c321bc9917b9f`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN/unmerged, base `main`. No Production deployment or `main` change.
+- Source-first SEO audit found that `functions/robots.txt.js` returned `Allow: /` and a hostname-derived sitemap for every host, including public branch/hash Preview URLs under `*.sindarealest2.pages.dev`. That permitted crawler indexing of duplicate Preview storefronts.
+- Minimal fix: only non-primary subdomains ending in `.sindarealest2.pages.dev` receive `User-agent: *\nDisallow: /\n`; the primary Pages hostname `sindarealest2.pages.dev` and custom domains preserve the existing allow/admin/api/sitemap policy. Added `tests/robots-txt.test.mjs` to cover Preview, primary hostname and custom-domain behavior, and added it to the `npm test` chain in `package.json`.
+- Regression test: PASS. The Preview-deploy workflow ran project integrity checks and the full automated test suite successfully on the exact SHA, then deployed Preview successfully: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286312.
+- Exact-SHA Preview: https://18756cf5.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Deploy logs confirm Pages project `sindarealest2` and Production branch `main`.
+- Separate `Validate source and tests` run FAILED before project integrity/tests because `npm audit --audit-level=high` now reports 3 transitive `undici` vulnerabilities, including one HIGH, via `miniflare`/`wrangler`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286346. This is a dependency-audit gate failure, not an observed regression-test failure. The suggested `npm audit fix --force` downgrades Wrangler to 4.35.0 (breaking change); no dependency downgrade or audit bypass was made.
+- The Hero-guarded Liquid Glass visual workflow was skipped: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286384. No screenshot, live-browser, real-device, visual, or owner acceptance is claimed. A live network request to the Preview endpoint was not independently verified outside the deployment logs.
+- Locks unchanged: SKU verification PAUSED; fullscreen gallery flicker PAUSED / NOT ACCEPTED; Hero PAUSED BY OWNER; all owner-accepted areas remain PASS/LOCKED. Do not touch/retest these. No Admin/backend/API/auth, product/catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, payment, Production, or `main` changes.
+- Next: continue source-first review only inside the still-authorized SEO/robots scope; do not invent additional fixes or reopen locked storefront areas. Report each gate separately and continue after reporting.
+
+---
+
 ## LATEST CHAT HANDOFF — CONTINUE AUTONOMOUS MULTI-THREAD WORK — 2026-10-24
 
 - Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`; branch HEAD before this docs update: `96ab2e59ff9c287833a95f047ff7f2bd15d38f24`.
