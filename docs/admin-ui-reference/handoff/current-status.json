@@ -1,9 +1,9 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T10:16:00Z",
+  "capturedAtUtc": "2026-10-24T10:21:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "d09ffa3eed66d99e42192085024524c8b6868aec",
+  "branchHeadAtCheckpointStart": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
   "checkpointSemantics": "Live refresh at 2026-10-24T10:16:00Z. Feature branch HEAD d09ffa3eed66d99e42192085024524c8b6868aec; PR #111 remains OPEN/unmerged, main 227622d3e3b7c75724ffa1775b193da71089269a. Current docs-only HEAD runs Validate #5759/#5760 and Admin Preview Playwright #1109 pass on the exact HEAD. Application/source-test SHA 66bdd5e0ba5f41daa1de49c46f485e5042edb831 is unchanged and has its own Validate #5758, Preview #1108 and read-only diagnostic #535 PASS. These test/fixture runs do not prove approved-reference parity or business-write persistence.",
   "codeTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
   "latestProductSourceCommit": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
@@ -450,22 +450,18 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Refresh branch HEAD, main, PR #111 and latest Actions before any subsequent writes; keep PR #111 OPEN/unmerged.",
-    "Continue a same-data approved-reference comparison for the 12 screens; use source/fixture screenshots only as diagnostics, never acceptance proof.",
-    "Continue read-only race/error-path review. A source patch requires a reproducible defect, failing regression first, then exact-SHA Validate and Preview evidence.",
-    "Do not perform authenticated business writes, remote D1/R2 changes, migrations, secrets/Access/DNS operations, or Production deployment."
+    "Refresh live refs and exact-SHA Actions after the current [CF-Pages-Skip] docs-only follow-up commit; keep PR #111 OPEN/unmerged.",
+    "Use [CF-Pages-Skip] at the start of future commit messages on the ADMIN feature branch to avoid the observed automatic primary-project Pages Preview; verify check-runs after each commit.",
+    "Continue same-data reference review and read-only payment/order/warranty concurrency analysis; any source patch must be test-first against a reproduced defect.",
+    "Do not change Cloudflare configuration, Access, DNS or secrets; do not perform business writes, remote D1/R2 changes, migrations or Production deployment."
   ],
   "handoffSync": {
-    "status": "SYNCED",
-    "capturedAtUtc": "2026-10-24T10:16:00Z",
-    "branchHeadAtCheckpointStart": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "branchHead": "d09ffa3eed66d99e42192085024524c8b6868aec",
+    "status": "SYNCED_PENDING_CURRENT_COMMIT_CI",
+    "capturedAtUtc": "2026-10-24T10:21:00Z",
+    "branchHeadAtCheckpointStart": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
     "sourceTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-    "applicationSourceTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-    "validateRunId": 40084641440,
-    "validateRunNumber": 5760,
-    "previewRunId": 40084641400,
-    "previewRunNumber": 1109,
+    "commitIsDocsOnly": true,
+    "commitMessagePrefix": "[CF-Pages-Skip]",
     "filesUpdated": [
       "docs/admin-ui-reference/handoff/START-HERE.md",
       "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
@@ -476,12 +472,11 @@
     ],
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "commitIsDocsOnly": true,
-    "note": "Post-CI live refresh and read-only security/concurrency/UI-source review. Source/test SHA remains 66bdd5e0ba5f41daa1de49c46f485e5042edb831; docs HEAD runs #5759/#5760/#1109 pass at d09ffa3eed66d99e42192085024524c8b6868aec. No new application defect confirmed."
+    "note": "Records the unintended Cloudflare Pages Preview side effect and the observed commit-prefix safeguard. Current commit CI has not yet been checked; refresh refs and CI before further writes."
   },
-  "currentHeadAtCheckpoint": "d09ffa3eed66d99e42192085024524c8b6868aec",
+  "currentHeadAtCheckpoint": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
   "currentHeadValidation": "VALIDATE_5759_AND_5760_PASS_AND_PREVIEW_PLAYWRIGHT_1109_PASS_ON_DOCS_ONLY_HEAD; SOURCE_TEST_SHA_66bdd5e_VALIDATE_5758_PREVIEW_1108_AND_DIAGNOSTIC_535_PASS; NO_NEW_SOURCE_DEFECT_CONFIRMED",
-  "currentHeadValidationReason": "Exact source/test SHA 66bdd5e0ba5f41daa1de49c46f485e5042edb831 passed Validate #5758, Admin Preview Playwright #1108, and diagnostic #535 with an exact-HEAD guard. The screenshot artifact is real source/login captures plus synthetic UI fixtures; business-write QA and approved-reference parity remain unproven.",
+  "currentHeadValidationReason": "Latest previous docs HEAD had Validate #5761/#5762 and Preview #1110 pass. That commit triggered Cloudflare Pages branch Preview in project sindarealest2 because its message lacked [CF-Pages-Skip]; follow-up is docs-only with that prefix, no Cloudflare/Production configuration changes.",
   "liveCheckpoint": {
     "capturedAtUtc": "2026-10-24T10:16:00Z",
     "branchHead": "d09ffa3eed66d99e42192085024524c8b6868aec",
@@ -829,7 +824,7 @@
     "remoteD1SchemaLedger": "NOT_VERIFIED",
     "production": "NOT_PERFORMED"
   },
-  "nextStep": "Continue independent read-only source/concurrency and visual evidence review; no account-owner action currently required.",
+  "nextStep": "Continue the independent read-only reviews after the current docs-only commit checks finish. No account-owner action is required by the evidence observed so far.",
   "acceptanceBoundary": "Progress 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; approved-reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
   "latestSourceTestValidateRun": {
     "id": 40084040238,
@@ -950,7 +945,7 @@
     "aheadBy": 1715,
     "behindBy": 7
   },
-  "latestBranchHead": "d09ffa3eed66d99e42192085024524c8b6868aec",
+  "latestBranchHead": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
   "latestAudit": {
     "capturedAtUtc": "2026-10-24T10:00:37Z",
     "sourceSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
@@ -958,8 +953,8 @@
     "referenceScreenshotEvidenceSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
     "referenceScreenshotEvidence": "Artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498; 16 source login captures across 8 viewport sizes×2 themes; 120 synthetic fixture screenshot entries/112 metrics; approved reference montage inspected; product-gallery visual differences remain; parity NOT_VERIFIED."
   },
-  "branchHead": "d09ffa3eed66d99e42192085024524c8b6868aec",
-  "currentHead": "d09ffa3eed66d99e42192085024524c8b6868aec",
+  "branchHead": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
+  "currentHead": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
   "latestConcurrencyFix": {
     "sourceTestSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
     "summary": "Order cancellation guards order-item writes against a pending QR payment request to avoid partial writes when cancellation is blocked.",
@@ -1110,5 +1105,22 @@
     ],
     "screen5": "Source has the intended mobile cover-plus-horizontal-rail layout, but synthetic artifact fixture evidence conflicts visually; parity remains unverified.",
     "workflowSafety": "Diagnostics exact-branch and exact-HEAD guards verified; isolated Preview deploy targets dedicated non-production Pages project; Production workflow was read only, never invoked."
+  },
+  "latestUnexpectedPrimaryProjectPreview": {
+    "capturedAtUtc": "2026-10-24T10:21:00Z",
+    "triggerCommit": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
+    "project": "sindarealest2",
+    "checkName": "Cloudflare Pages",
+    "checkConclusion": "success",
+    "deploymentId": "48dbe193-503b-4926-ad56-73247acd7a8c",
+    "commitPreviewUrl": "https://48dbe193.sindarealest2.pages.dev",
+    "branchPreviewUrl": "https://feature-admin-isolated-hando.sindarealest2.pages.dev",
+    "isolatedAdminProjectExpected": "sindarealest-admin-preview",
+    "environment": "Preview (as explicitly labelled by check output)",
+    "productionDeployment": "NOT_PERFORMED",
+    "configurationChanged": false,
+    "cause": "The docs-only commit message did not contain the [CF-Pages-Skip] prefix.",
+    "correctiveProcess": "For future commits on the ADMIN branch, prefix commit message with [CF-Pages-Skip] and verify current check-runs; do not change Cloudflare project settings, Access, DNS or secrets.",
+    "note": "This was an unintended Preview deployment in the primary Pages project, not a declared Production deployment. No public/index.html or shared storefront file was changed by the docs commit."
   }
 }
