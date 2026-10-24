@@ -166,7 +166,7 @@ assert.match(adminHtml, /if\(view==='backup'\)\{\$\('#backupBtn'\)\.addEventList
 
 // Preview CSSOM rules can group multiple selectors. Guard against regressions that
 // compare the complete selectorText string to just one member of that list.
-const previewSpec = readFileSync(new URL('./e2e/admin-preview.spec.js', import.meta.url), 'utf8');
+const previewSpec = readFileSync(new URL('./e2e/admin-isolated-preview.spec.js', import.meta.url), 'utf8');
 has('body:has(#loginView:not(.hidden)) .topbar>.brand,', 'grouped login-shell CSS selector list');
 assert.match(previewSpec, /const splitSelectorList = value => \{/, 'Preview diagnostics should parse CSS selector lists');
 assert.match(previewSpec, /splitSelectorList\(rule\.selectorText\)\.includes\(normalizedHideSelector\)/,

@@ -10,7 +10,7 @@ const nextPrompt = readText('../docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT
 const latestStatusDoc = readText('../docs/admin-ui-reference/handoff/LATEST-STATUS.md');
 const screenAudit = readText('../docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md');
 const masterPrompt = readText('../docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md');
-const previewTest = readText('../tests/e2e/admin-preview.spec.js');
+const previewTest = readText('../tests/e2e/admin-isolated-preview.spec.js');
 const previewWorkflow = readText('../.github/workflows/admin-preview-diagnostics.yml');
 
 assert.equal(status.repository, results.repository, 'Handoff status files must identify the same repository.');
