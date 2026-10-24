@@ -24,6 +24,15 @@ function validateBank(body) {
 function upsert(db,key,value) {
   return db.prepare("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(key,String(value ?? ""));
 }
+
+// Follow-on activation writes must execute only when the first statement's
+// compare-and-swap claimed the exact pending image and bank-draft snapshot.
+function guardedUpsert(db,key,value) {
+  return db.prepare(
+    "INSERT INTO settings(key,value,updated_at) SELECT ?,?,datetime('now') WHERE changes()=1 " +
+    "ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at"
+  ).bind(key,String(value ?? ""));
+}
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   try {
@@ -69,14 +78,35 @@ export async function onRequestPut(context) {
       });
       if (checked.error) return fail("Lưu thông tin ngân hàng hợp lệ trước khi kích hoạt: " + checked.error);
       const v = checked.value, key = current.payment_qr_pending_key;
-      await db.batch([
-        upsert(db,"payment_qr_active_key",key), upsert(db,"payment_qr_active","1"),
-        upsert(db,"payment_qr_bank_name",v.bankName), upsert(db,"payment_qr_account_number",v.accountNumber),
-        upsert(db,"payment_qr_account_name",v.accountName), upsert(db,"payment_qr_instructions",v.instructions),
-        upsert(db,"payment_qr_pending_key",""),
-        db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?,'admin','payment_qr_activated','payment_qr',?,?)")
-          .bind(crypto.randomUUID(),key,JSON.stringify({ verifiedByAdmin:true,bankName:v.bankName,accountNumberLast4:v.accountNumber.slice(-4) }))
+      const draft = {
+        bankName: current.payment_qr_draft_bank_name,
+        accountNumber: current.payment_qr_draft_account_number,
+        accountName: current.payment_qr_draft_account_name,
+        instructions: current.payment_qr_draft_instructions,
+      };
+      const activation = await db.batch([
+        db.prepare(
+          "UPDATE settings SET value='',updated_at=datetime('now') " +
+          "WHERE key='payment_qr_pending_key' AND value=? " +
+          "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_draft_bank_name' AND value=?) " +
+          "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_draft_account_number' AND value=?) " +
+          "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_draft_account_name' AND value=?) " +
+          "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_draft_instructions' AND value=?)"
+        ).bind(key,draft.bankName,draft.accountNumber,draft.accountName,draft.instructions),
+        guardedUpsert(db,"payment_qr_active_key",key),
+        guardedUpsert(db,"payment_qr_active","1"),
+        guardedUpsert(db,"payment_qr_bank_name",v.bankName),
+        guardedUpsert(db,"payment_qr_account_number",v.accountNumber),
+        guardedUpsert(db,"payment_qr_account_name",v.accountName),
+        guardedUpsert(db,"payment_qr_instructions",v.instructions),
+        db.prepare(
+          "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+          "SELECT ?,'admin','payment_qr_activated','payment_qr',?,? WHERE changes()=1"
+        ).bind(crypto.randomUUID(),key,JSON.stringify({ verifiedByAdmin:true,bankName:v.bankName,accountNumberLast4:v.accountNumber.slice(-4) }))
       ]);
+      if (Number(activation?.[0]?.meta?.changes || 0) !== 1) {
+        return fail("QR hoặc thông tin ngân hàng vừa thay đổi trong lúc xác nhận. Tải lại cấu hình, kiểm tra ảnh QR và xác minh lại trước khi kích hoạt.",409);
+      }
       return json({ ok:true,active:true,message:"Đã kích hoạt QR sau xác nhận thủ công." });
     }
     if (body.action === "deactivate") {
