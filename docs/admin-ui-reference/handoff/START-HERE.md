@@ -1,3 +1,14 @@
+## Latest checkpoint — 2026-10-24 09:20 ICT
+
+- **Writable branch / exact current source HEAD:** `feature/admin-isolated-handoff-2026-10-20`, `ab0343f963f0f113dc6c88a601c5499ebe15d592`.
+- **Validate #5565:** [SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201672) on exact SHA `ab0343f963f0f113dc6c88a601c5499ebe15d592`.
+- **Preview #498:** [SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632) on the same exact SHA. Exact-HEAD guard logged tested SHA = current branch SHA. Artifact [#498](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632/artifacts/12544236677) is available and was downloaded/inspected.
+- **Latest UI correction:** reproduced compact footer-label mismatch on predecessor SHA `36306c83d70f1b4b0636360f205245e2f335a61e` (expected visible “Xóa”, received “Xóa sản phẩm”). Fixed `public/admin/index.html` to display “Xóa” / “Lưu”, retain descriptive accessible names, and announce “Đang lưu sản phẩm” during save. Added static contract assertions in `tests/admin-liquid-glass-contract.test.mjs`. Preview #498 screenshot at 390×844 shows compact footer controls without horizontal overflow.
+- **Preview read-only evidence:** authenticated Admin GET route contract checks passed 7/7 with HTTP 200; catalog response contained 235 products and image decode check passed. `nonReadOnlyRequests: []`. No business write, persistence acceptance, remote schema/ledger validation, or Production action was performed. These GET checks do not establish exact approved-reference parity.
+- **Current live main:** `227622d3e3b7c75724ffa1775b193da71089269a`. PR #111 remains OPEN/unmerged with head `ab0343f963f0f113dc6c88a601c5499ebe15d592`; PR #108 remains OPEN/unmerged; PR #112 remains OPEN/unmerged/draft. No PR state or base branch was changed.
+- **Acceptance remains:** 12 screens `PARTIAL_NOT_ACCEPTED`; exact visual parity `NOT_VERIFIED`; authenticated backend/business write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`; progress **50% PROVISIONAL**.
+- **Next:** this handoff-only commit will not trigger Preview by path filter. Verify Validate on the new docs HEAD, keep the source/test HEAD above as the latest Preview-verified SHA, then continue A–E independently. Do not create dummy source commits or weaken exact-HEAD guard.
+
 ## Latest checkpoint — 2026-10-24 08:53 ICT
 
 - **Writable branch at checkpoint start:** `feature/admin-isolated-handoff-2026-10-20`, HEAD `3ba0005ea3f896a06ac573f32f975d231d081835`. Validate [#5552](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976) **SUCCESS on that exact SHA**. The run's `validate` job completed successfully.

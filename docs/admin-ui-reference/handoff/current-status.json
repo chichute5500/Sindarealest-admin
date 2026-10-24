@@ -1,21 +1,22 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T01:53:00Z",
+  "capturedAtUtc": "2026-10-24T02:20:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "3ba0005ea3f896a06ac573f32f975d231d081835",
   "checkpointSemantics": "Checkpoint 2026-10-24T01:43:43Z: docs HEAD 381065514663a2c57a9d6d6ca95880b835894bdc passed Validate #5551; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f passed Validate #5540. Preview #493 captured artifact and passed read-only diagnostics but failed exact-HEAD guard after branch advanced during capture. No Preview success on latest source/test SHA.",
   "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-  "latestProductSourceCommit": "6a31cb31d996a8937923d552421674f29d5c14d9",
+  "latestProductSourceCommit": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
   "latestActionsRun": {
-    "id": 40051237976,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
+    "id": 40053201632,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632",
     "status": "completed",
     "conclusion": "success",
-    "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
-    "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
-    "workflow": "Validate source and tests",
-    "runNumber": 5552
+    "sha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "testedSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "workflow": "Admin Preview diagnostic smoke test",
+    "runNumber": 498,
+    "artifactId": 12544236677
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -460,18 +461,17 @@
     "Only fix a concrete reproducible regression, test first, then verify exact-SHA Validate and Preview."
   ],
   "handoffSync": {
-    "status": "SIX_FILE_DOCS_ONLY_SYNC_COMPLETED",
-    "capturedAtUtc": "2026-10-24T01:53:00Z",
-    "branchHeadAtCheckpointStart": "3ba0005ea3f896a06ac573f32f975d231d081835",
-    "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "note": "Six canonical handoff files synchronized in this docs-only commit. Validate #5552 passed on parent SHA 3ba0005ea3f896a06ac573f32f975d231d081835. Verify Validate for the resulting handoff commit; docs-only paths do not trigger Admin Preview.",
+    "status": "PENDING_SIX_FILE_SYNC_COMMIT",
+    "capturedAtUtc": "2026-10-24T02:20:00Z",
+    "branchHeadAtCheckpointStart": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "codeTestSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "nextRequiredAction": "Refresh live HEAD and Actions; Validate #5552 succeeded on parent SHA 3ba0005ea3f896a06ac573f32f975d231d081835. This docs-only commit is not expected to trigger Preview. Continue workstreams A–E, do not create a dummy source commit, and do not weaken the exact-HEAD guard."
+    "nextRequiredAction": "Verify Validate on the docs-only handoff commit; no Preview expected because docs-only paths are excluded. Continue parallel workstreams A–E and do not weaken the exact-HEAD guard."
   },
-  "currentHeadAtCheckpoint": "3ba0005ea3f896a06ac573f32f975d231d081835",
-  "currentHeadValidation": "PASS_VALIDATE_ON_EXACT_HEAD_3ba0005ea3f896a06ac573f32f975d231d081835; SOURCE_TEST_VALIDATE_PASS_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f; PREVIEW_493_FAILED_EXACT_HEAD_GUARD_AFTER_BRANCH_MOVED; NO_PREVIEW_RUN_ON_DOCS_ONLY_HEAD",
-  "currentHeadValidationReason": "Validate #5552 passed on exact docs HEAD 3ba0005ea3f896a06ac573f32f975d231d081835. Latest source/test Validate #5540 passed on 0c441375a212c73ce56f16d4f9673e44c1b8260f. Preview #493 failed its final exact-HEAD guard because the branch moved during capture; docs-only changes are excluded from the Preview path filter, so there is no Preview run for 3ba0005ea3f896a06ac573f32f975d231d081835.",
+  "currentHeadAtCheckpoint": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+  "currentHeadValidation": "PASS_VALIDATE_5565_AND_PREVIEW_498_ON_EXACT_HEAD_ab0343f963f0f113dc6c88a601c5499ebe15d592",
+  "currentHeadValidationReason": "Validate #5565 and Admin Preview #498 both succeeded on exact source/test SHA ab0343f963f0f113dc6c88a601c5499ebe15d592. Preview artifact 12544236677 was inspected; exact-HEAD guard matched tested SHA to current branch HEAD. Seven authenticated read-only Admin GET route checks returned HTTP 200; catalog reported 235 products. This is not exact-reference parity, business-write QA, remote schema/ledger acceptance, or Production validation.",
   "liveCheckpoint": {
     "capturedAtUtc": "2026-10-24T01:43:43Z",
     "branchHead": "381065514663a2c57a9d6d6ca95880b835894bdc",
@@ -515,8 +515,8 @@
   },
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "latestCodeCommitSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-  "testedCommitSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
+  "latestCodeCommitSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+  "testedCommitSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
   "capturedAt": "2026-10-24T01:53:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
   "checks": {
@@ -596,35 +596,10 @@
     "businessDataBoundary": "Orders, customers, warranties and audit-log arrays were empty; this does not prove non-empty business workflows or writes."
   },
   "latestScreenshotArtifact": {
-    "id": 12543031534,
-    "name": "admin-preview-evidence-493",
-    "runId": 40049413302,
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534",
-    "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "sourceCommit": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "sizeBytes": 20839936,
-    "downloadSha256": "sha256:2de7ac40e0deca62ddd446ffc96b16a84726a97e19905677842b3b6fc8a5d5d6",
-    "pngCount": 133,
-    "sourceScreenshotCount": 16,
-    "uiFixtureCaptureEntries": 120,
-    "uiFixtureMetricCount": 112,
-    "horizontalOverflowMetrics": 0,
-    "sourcePageErrors": 0,
-    "sourceConsoleErrors": 0,
-    "failedRequests": 0,
-    "httpErrors": 0,
-    "fixturePageErrors": 0,
-    "fixtureConsoleErrors": 7,
-    "fixtureApiErrors": 0,
-    "attemptedWrites": 0,
-    "unexpectedApiPaths": 0,
-    "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-    "authenticatedReadOnlyRoutes": "7_OF_7_HTTP_200",
-    "liveCatalogCount": 235,
-    "liveImageUrls": 527,
-    "liveImageDecode": "PASS",
-    "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries; no fixture API errors or writes."
+    "runId": 40053201632,
+    "artifactId": 12544236677,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632/artifacts/12544236677",
+    "sha": "ab0343f963f0f113dc6c88a601c5499ebe15d592"
   },
   "remainingIssues": [
     "All 12 screens remain PARTIAL_NOT_ACCEPTED. Screen 7 Timeline is visible in artifact #493 using synthetic UI-only data; exact approved-reference parity and real order actions remain unverified.",
@@ -842,14 +817,14 @@
     }
   ],
   "latestValidateRun": {
-    "id": 40051237976,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
+    "id": 40053201672,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201672",
     "status": "completed",
     "conclusion": "success",
-    "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
-    "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+    "sha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "testedSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
     "workflow": "Validate source and tests",
-    "runNumber": 5552
+    "runNumber": 5565
   },
   "livePrState": {
     "pr111": {
@@ -877,13 +852,17 @@
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a"
   },
   "latestRun": {
-    "id": 40049413302,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
+    "id": 40053201632,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632",
     "status": "completed",
-    "conclusion": "failure",
-    "sha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "runNumber": 493,
-    "artifactId": 12543031534
+    "conclusion": "success",
+    "sha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "testedSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "workflow": "Admin Preview diagnostic smoke test",
+    "runNumber": 498,
+    "artifactId": 12544236677,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632/artifacts/12544236677",
+    "diagnostic": "PASS_EXACT_HEAD_GUARD; AUTHENTICATED_READ_ONLY_GETS_7_OF_7; CATALOG_235_PRODUCTS; NON_READ_ONLY_REQUESTS_ZERO"
   },
   "acceptance": {
     "screens": "ALL_12_PARTIAL_NOT_ACCEPTED",
@@ -896,14 +875,14 @@
   "nextStep": "Refresh live HEAD and Actions after this docs-only sync. Preview #493 failed only its exact-HEAD guard because the branch moved; its artifact was inspected, but current docs HEAD has no Preview success. Continue Screens 4/5/7 audit and keep acceptance partial.",
   "acceptanceBoundary": "All 12 screens PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated backend/business QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
   "latestSourceTestValidateRun": {
-    "id": 40049413343,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343",
+    "id": 40053201672,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201672",
     "status": "completed",
     "conclusion": "success",
-    "sha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
+    "sha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+    "testedSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
     "workflow": "Validate source and tests",
-    "runNumber": 5540
+    "runNumber": 5565
   },
   "latestAuthenticatedReadOnlyRoutes": {
     "runId": 40049413302,
@@ -928,5 +907,6 @@
       "/api/admin/audit-logs"
     ],
     "scope": "Authenticated live Preview, GET routes only; no business writes or persistence verification."
-  }
+  },
+  "targetBranch": "feature/admin-isolated-handoff-2026-10-20"
 }
