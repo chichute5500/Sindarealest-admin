@@ -1909,7 +1909,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
       );
       const expectedDetailColumns = orderDetailViewportWidth >= 360 ? 2 : 1;
-      const itemMetaGridColumns = await page.locator('#orderDetailContent .order-detail-item .order-detail-item-grid').first().evaluate(element =>
+      const itemDetails = page.locator('#orderDetailContent .order-detail-item-details').first();
+      await itemDetails.locator('summary').click();
+      await expect(itemDetails).toHaveAttribute('open', '');
+      const itemMetaGridColumns = await itemDetails.locator('.order-detail-item-grid').evaluate(element =>
         getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
       );
       expect(customerCardColumns, `Customer identity card should keep avatar, contact details, and action in separate columns at ${orderDetailViewportWidth}px`).toBe(3);
