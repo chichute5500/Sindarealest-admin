@@ -359,24 +359,24 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     assert.ok(neutral, "Hero image must preserve the source pixels apart from the explicitly approved drop shadow (" + selector.trim() + ": " + declaration + ").");
   }
 }
-const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */"));
+const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */"));
 assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
   "Hero experiment uses a restrained drop shadow only; the alpha-feathered PNG is not cropped or masked.");
 assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
   "Hero image keeps full opacity and normal color blending; no brightness/multiply blend is permitted.");
-const heroBlendOverride = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
+const heroBlendOverride = html.slice(html.lastIndexOf("/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */"));
 assert.ok(heroBlendOverride.includes('mix-blend-mode:normal!important')
   && heroBlendOverride.includes("mask-image:none!important")
   && !heroBlendOverride.includes("mask-image:radial-gradient(")
   && heroBlendOverride.includes("width:122%!important")
   && heroBlendOverride.includes("max-height:330px!important"),
-  "The mobile alpha-feathered Hero derivative must remain enlarged with no CSS brightness, color blending, or whole-image mask.");
+  "The original mobile Hero PNG must stay enlarged, uncropped, unmasked, and color-preserving.");
 assert.ok(heroBlendOverride.includes("@media(min-width:761px) and (max-width:1000px)")
   && heroBlendOverride.includes("width:113%!important")
   && heroBlendOverride.includes("max-height:540px!important;margin-left:0!important"),
-  "The tablet Hero derivative must be sized in the right column without negative image offsets.");
+  "The original tablet Hero PNG must be centered with no negative image offset.");
 assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
-  "The Hero image must be fully visible with no CSS crop or transform; edge feathering is baked into alpha only.");
+  "The Hero image must be fully visible with no CSS crop or transform; the source PNG alpha remains untouched.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
   "Pseudo-elements that would overlay the owner-supplied image remain disabled.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before{")
@@ -391,7 +391,7 @@ assert.ok(
   heroAssetDisplayLock.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;") &&
   heroAssetDisplayLock.includes("grid-column:1!important;") &&
   heroAssetDisplayLock.includes("grid-column:2!important;") &&
-  heroAssetDisplayLock.includes("max-height:210px!important;") &&
+  heroAssetDisplayLock.includes("max-height:330px!important;") &&
   heroAssetDisplayLock.includes("object-fit:contain!important"),
   "Mobile hero copy and the owner-supplied image must stay in separate side-by-side columns while the enlarged alpha-feathered image remains visible."
 );

@@ -22,7 +22,7 @@ assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
 assert.ok(heroSync.includes("target.hidden=false")
-  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'")
+  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514%20(1).png'")
   && heroSync.includes("target.dataset.productImageStatus='owner-presentation-image-active'"),
   "the authorized Hero experiment must display the owner-supplied PNG with a restrained drop shadow");
 
@@ -46,7 +46,7 @@ function runHeroSync() {
 const activeHero = runHeroSync();
 assert.equal(activeHero.result, true);
 assert.equal(activeHero.target.hidden, false);
-assert.equal(activeHero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png');
+assert.equal(activeHero.target.src, '/images/hero-upload/tb_image_share_1792519964514%20(1).png');
 assert.equal(activeHero.target.dataset.productImageStatus, 'owner-presentation-image-active');
 assert.equal(activeHero.target.alt, 'Đôi giày loafer da cá sấu SinDarealest');
 
