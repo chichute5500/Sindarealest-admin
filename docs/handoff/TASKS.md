@@ -1,3 +1,14 @@
+## CURRENT PRIORITY — HERO PEDESTAL VISUAL MATCH — 2026-10-24
+
+- [ ] **OPEN / NOT OWNER-ACCEPTED:** Compare the actual Hero Preview screenshots from artifact 12556115231 against the supplied reference image. Confirm the CSS pedestal is clearly visible beneath the shoes and matches the reference, not merely that the image itself passes its audit.
+- [ ] Inspect at 360×800, 390×844, 768×1024, 1280×800, 1440×900 in light/dark. Check the oval top, plinth front face, width, vertical placement, shadow/material, shoe contact, and responsive scaling.
+- [ ] Make the smallest CSS-only change needed; never alter/crop/mask the original transparent shoe PNG. Platform must remain behind the product image and not obscure its silhouette.
+- [ ] Run Validate + Preview deploy + Hero-only Playwright audit on the exact same SHA, then inspect the resulting screenshots. Do not mark owner visual acceptance PASS without an actual comparison.
+- Latest source/branch/PR HEAD: `98d45c4acd859ddda2f8067e5bfa336a8ec277ec`; Validate PASS run 40082426093; Preview PASS run 40082426084; Hero audit PASS run 40082426108; artifact 12556115231. These green gates are baseline evidence, not closure of the pedestal visual task.
+- Preserve all existing PASS/LOCK scopes; no merge, no Production/main, no Admin/backend/API/catalog/migration/infra changes.
+
+---
+
 ## QR + FULFILLMENT CONTRACT — STATIC STOREFRONT RECHECK — 2026-10-24
 
 - **Static presentation contract: PASS at source/test level** on storefront source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579`. Test `tests/storefront-payment-product-type-contract.test.mjs` asserts conservative `fulfillmentType` fallback to `unclassified`, per-product badges (not an unauthorized catalog filter), and a fail-closed QR renderer.

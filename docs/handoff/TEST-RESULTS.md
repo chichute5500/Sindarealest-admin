@@ -1,3 +1,13 @@
+## LATEST EXACT-SHA EVIDENCE — 2026-10-24 — HERO PEDESTAL
+
+- SHA `98d45c4acd859ddda2f8067e5bfa336a8ec277ec`: Validate PASS [40082426093](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426093); Cloudflare Pages Preview deploy PASS [40082426084](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426084); Hero-only Playwright audit PASS [40082426108](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426108); isolated gallery audit PASS [40082426085](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426085).
+- Hero screenshot/report artifact: [12556115231](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426108/artifacts/12556115231).
+- Hero audit is green for automated structure/rendering checks, but **visual parity of the CSS pedestal with the supplied reference is NOT VERIFIED / OWNER NOT ACCEPTED**. Treat the pedestal as open until screenshot-by-screenshot comparison and any required fixes are complete.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Do not infer live/visual acceptance from CI status alone. No merge/Production/main change.
+
+---
+
 ## CORRECTION — PREVIEW D1 MIGRATION EVIDENCE — 2026-10-24
 
 - Read-only review of `.github/workflows/deploy-storefront-preview.yml` (blob `15c1c189e4228334acc06e5de290a887a281f49d`) confirms the workflow runs project checks and tests, then `wrangler pages deploy public`, then the authenticated SEO HTTP diagnostic. It does **not** run `wrangler d1 migrations apply`.

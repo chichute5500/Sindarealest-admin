@@ -1,3 +1,38 @@
+# ACTIVE HANDOFF OVERRIDE — HERO PEDESTAL IS STILL OPEN — 2026-10-24
+
+You are continuing the existing SinDarealest2 project. Do not restart or repeat completed work. The immediate user complaint is: **“Phần bệ như ảnh mẫu đâu”** (“Where is the pedestal/platform shown in the reference?”). The user then asked to update handoff files and the prompt. Your first task is to make the Hero platform visibly match the real reference; do not merely report green CI.
+
+## Verified repository state
+- Repo: `chichute5500/Sindarealest-admin`
+- Branch: `fix/liquid-glass-audit-2026-10-19`
+- PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN/unmerged, base `main`.
+- Latest verified branch/PR HEAD before this handoff update: `98d45c4acd859ddda2f8067e5bfa336a8ec277ec` (“Keep Hero product PNG in front of CSS pedestal”). Re-fetch before editing.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426093
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426084
+- Hero-only audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426108; screenshot/report artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426108/artifacts/12556115231
+- Gallery-only audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426085
+
+## Critical truth about current status
+A CSS pedestal currently exists in `public/index.html`: `#home .hero-visual::before` draws the oval top and `::after` draws the front plinth. There are light/dark and mobile/tablet adjustments, and the product PNG is layered above it. However, the owner still says the pedestal is missing relative to the reference. Therefore **the implementation is NOT visually accepted and the task is OPEN**, even though the general Hero Playwright audit passes. That audit does not assert reference-level pedestal parity.
+
+## Immediate work — do not stop at a report
+1. Read `docs/handoff/CURRENT-STATE.md`, `TASKS.md`, `DECISIONS.md`, `TEST-RESULTS.md`, this prompt, and inspect current source around Hero CSS. Fetch current branch/PR HEAD and recent Actions first.
+2. Download/inspect artifact 12556115231. Compare its actual screenshots to the actual user-provided reference image, not to memory or an unrelated generated image. Search available conversation/library files for the reference if it is not mounted; ask the owner to upload only if genuinely unavailable.
+3. Examine the current `::before` and `::after` geometry: whether pseudo-elements are anchored to a positioned containing block; whether their `bottom` offsets align to the shoe soles; whether the front face is visible; whether the PNG/transparent padding makes the platform appear detached or hidden; whether stacking/overflow rules clip it; and whether desktop image sizing changed the reference alignment.
+4. Make the smallest CSS-only correction so the platform clearly resembles the reference: pearl/ice-blue marble oval top, visible front vertical/slanted plinth face, realistic subtle shadow, correct width and shoe contact. Match proportions to the reference rather than arbitrary values. Keep the original transparent PNG untouched—no pixel edits, crop, mask, recolor, or substitute shoe image. Platform stays behind the shoe product.
+5. Verify 360×800, 390×844, 768×1024, 1280×800, 1440×900 in both light/dark. Check copy overlap, product visibility, platform position/contact, clipping, horizontal overflow, console/network errors.
+6. Run full Validate, deploy only the named branch to Cloudflare Pages Preview, run Hero-only Playwright audit against the exact deployed SHA, and inspect fresh screenshot artifacts. A green run alone is not proof of visual match. Repeat a minimal correction cycle if needed.
+7. Only mark the pedestal done after actual reference comparison supports it. The owner may still need to approve the visual. Keep status `OWNER ACCEPTANCE REQUIRED` until that happens.
+
+## Hard boundaries
+- Do not merge PR #108. Never modify `main` or Production.
+- Do not change unrelated Admin/backend/API/auth, catalog/product data, D1/R2/migrations, payment/QR, secrets/bindings, DNS, Cloudflare Access/infrastructure.
+- Do not redo or alter owner-PASS/LOCKED scopes (gallery, icon system, catalog filters, `#order`, warranty, navigation, cart/account, etc.) unless a concrete regression and explicit authorization exist.
+- Re-fetch HEAD before each write; if branch moved, reconcile before editing.
+- Keep the work continuous: progress report is not a stopping point. Report exact evidence and continue until the Hero pedestal is visually checked or a genuinely owner-blocking input is needed.
+- Project is not 100% complete merely because Validate/deploy/audit are green.
+
 # LATEST HANDOFF OVERRIDE — 2026-10-24 — GALLERY UNLOCKED AND FIX VERIFIED
 
 This section supersedes older pause/status statements below where they conflict with this update. Re-fetch PR #108 and branch HEAD before any further edits.
