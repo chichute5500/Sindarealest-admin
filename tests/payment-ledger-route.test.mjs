@@ -90,6 +90,9 @@ function makeDb(options = {}) {
         options.order = { ...(options.order ?? baseOrder), status: "cancelled" };
       }
       if (options.simulateOrderTermsUnconfirmedBeforeTransactionBatch) {
+      if (options.simulatePaymentRequestCancelledBeforeTransactionBatch) {
+        options.paymentRequest = { ...(options.paymentRequest ?? { id: "request-cancel-race", order_id: "order-1" }), status: "cancelled" };
+      }
         options.order = { ...(options.order ?? baseOrder), price_confirmation_required: 1, payment_terms_confirmed_at: null };
       }
       return statements.map((statement, index) => {
@@ -104,7 +107,10 @@ function makeDb(options = {}) {
         const receiptOrderGuard = statement.sql.includes("EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled'")
           && statement.sql.includes("price_confirmation_required=0")
           && statement.sql.includes("payment_terms_confirmed_at IS NOT NULL");
-        const staleReceiptRejected = receivedInsert && receiptOrderGuard
+        const receiptRequestGuard = statement.sql.includes("EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status<>'cancelled')");
+        const staleReceiptRejected = (receivedInsert && receiptOrderGuard
+          && (options.simulateOrderCancelledBeforeTransactionBatch || options.simulateOrderTermsUnconfirmedBeforeTransactionBatch))
+          || (receivedInsert && receiptRequestGuard && options.simulatePaymentRequestCancelledBeforeTransactionBatch);
           && (options.simulateOrderCancelledBeforeTransactionBatch || options.simulateOrderTermsUnconfirmedBeforeTransactionBatch);
         // Simulate the final insert boundary: only SQL that rechecks order state can reject these races.
         const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest || staleReceiptRejected ? 0 : 1;
@@ -203,6 +209,20 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.ok(db.batches[0][0].sql.includes("price_confirmation_required=0")
     && db.batches[0][0].sql.includes("payment_terms_confirmed_at IS NOT NULL"),
     "the receipt INSERT must recheck confirmed price and payment terms");
+}
+
+{
+  const db = makeDb({
+    paymentRequest: { id: "request-cancel-race", order_id: "order-1", status: "pending" },
+    simulatePaymentRequestCancelledBeforeTransactionBatch: true
+  });
+  const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
+    orderId: "order-1", paymentRequestId: "request-cancel-race", direction: "received",
+    amount: 30000, transactionReference: "BANKREF-REQUEST-CANCEL-RACE"
+  })));
+  assert.equal(response.status, 409, "a request cancelled after preflight must not receive a newly recorded transaction");
+  assert.ok(db.batches[0][0].sql.includes("EXISTS (SELECT 1 FROM order_payment_requests WHERE id=? AND order_id=? AND status<>'cancelled')"),
+    "the receipt INSERT must recheck the linked payment request at the write boundary");
 }
 {
   const db = makeDb({ failUnique: true });
