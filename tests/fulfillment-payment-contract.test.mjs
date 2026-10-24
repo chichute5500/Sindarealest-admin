@@ -99,4 +99,11 @@ assert.ok(qrAdminHtml.includes("$('#paymentQrFile').addEventListener('change',e=
 assert.match(qrAdminHtml, /Object\.keys\(normalizedDraft\)\.some\(key=>normalizedDraft\[key\]!==normalizedSaved\[key\]\)/, "QR activation must reject unsaved bank-detail edits");
 assert.ok(qrAdminHtml.indexOf("Thông tin ngân hàng đã thay đổi. Hãy lưu thông tin nháp trước khi kích hoạt QR.") < qrAdminHtml.indexOf("action:'activate',verified:true"), "QR activation must show the unsaved-draft guard before issuing the activation request");
 assert.doesNotMatch(read("../public/admin/index.html"), /data-payment-status=/, "payment status must be read-only in the order form");
+
+const refundUiHtml = read("../public/admin/index.html");
+assert.match(refundUiHtml, /data-action=["']record-refund["']/,
+  "Order Detail must expose an Admin action to record an already-completed refund in the verified payment ledger");
+assert.match(refundUiHtml, /direction:\s*["']refunded["']/,
+  "the refund action must send direction=refunded, not reuse the receipt operation");
+
 console.log("PASS fulfillment/payment contract: explicit classification, token scoping, QR allowlist, verified-only payment ledger and Admin UI regression guards.");
