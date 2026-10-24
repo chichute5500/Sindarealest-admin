@@ -355,3 +355,14 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Actual Preview browser evidence: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840812; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840864; Hero-only Playwright PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840821; artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840821/artifacts/12551645366.
 - All six mobile/tablet/desktop × light/dark contexts pass, no copy overlap, no cropping, source PNG 1488×1888, console/page/same-origin network errors 0, blocked write attempts 0. Only the approved image display rule was scoped for mobile/tablet; asset RGB/data/SKU stays untouched.
 - Next gate is owner visual acceptance on the actual Preview from a physical phone. Keep Hero in `AUTOMATED PASS / OWNER ACCEPTANCE REQUIRED` until the owner confirms; do not claim the project 100%. No merge/main/Production. Gallery stays PASS/LOCKED.
+
+
+## HERO — EXACT-SHA AUTOMATED PASS, REFERENCE/PHONE ACCEPTANCE PENDING — 2026-10-24
+- Validated source/test/Preview SHA: `81abc218535b53f151c2d4d54758ec04d5413ff7`.
+- Root causes fixed: runtime and audit still pointed at deleted `*-blended.png`; the PNG pin in CI still expected old Git blob SHA; several tests locked stale CSS marker/mobile height; browser-audit final count still demanded six after matrix expanded to ten.
+- Full Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645894
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645870
+- Hero audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892; artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892/artifacts/12552544647
+- Ten viewport/theme cases passed. Original PNG is 1200×1600 RGBA, transparent ratio 83.15%, semitransparent edges present, transparent corners, no clipping at source edges; copy overlap 0; console/page/relevant same-origin HTTP/failed request/write counters 0.
+- Exact named design reference file was not available to the assistant, so exact image-reference parity remains NOT VERIFIED. Owner must provide `a_clean_high_end_e_commerce_mobile_app_ui_screens.png` (or confirm an identical file), and physically inspect/accept Preview before Hero is owner-accepted/LOCKED.
+- Keep gallery and other PASS/LOCKED scopes untouched. No merge, no main/Production changes, no overall 100% claim.

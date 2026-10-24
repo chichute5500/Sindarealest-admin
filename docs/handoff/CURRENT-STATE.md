@@ -1061,3 +1061,33 @@ The owner explicitly authorized reopening fullscreen image/gallery flicker and f
 - Review of actual PNG screenshots confirms the shoe image is visible without cropping or overlap in all viewports/themes. **Automated Hero gate is PASS; owner visual acceptance is still REQUIRED.** Do not mark Hero owner-accepted/LOCKED until owner checks the current Preview on a physical phone and explicitly accepts.
 - Scope/safety: PR #108 remains OPEN/unmerged, base `main`; no main/Production change and no merge. No Hero-to-SKU/backend/catalog/database change. No gallery code changes. The shared `public/index.html` path automatically triggered the existing read-only gallery audit once at run https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070751720; it completed PASS without changing gallery source. Do not re-run that workflow; gallery remains PASS/LOCKED.
 - Global project completion is **not 100%**; unrelated PR scope-disposition and other pre-existing blockers remain separate. The following documentation-only commit advances the Git branch HEAD but does not change the validated runtime/test SHA or require a Preview redeploy; re-fetch PR HEAD before future changes.
+
+
+## HERO FINAL AUTOMATED VERIFICATION — 2026-10-24 — EXACT SHA PASS; OWNER REFERENCE/DEVICE ACCEPTANCE STILL PENDING
+
+Latest **runtime/source/test/Preview SHA**: `81abc218535b53f151c2d4d54758ec04d5413ff7`. PR #108 is still OPEN/unmerged against `main`; no Production deployment or main edit.
+
+### Source and assets
+- Storefront now uses the exact uploaded source asset `/images/hero-upload/tb_image_share_1792519964514%20(1).png`; the deleted `*-blended.png` derivative is no longer referenced by the runtime or audit tools.
+- Original PNG blob SHA: `c17cc9058ae3008dc662806d21d2cf8f7d83b8a9`. Verified signature PNG, dimensions 1200×1600, 8-bit RGBA/type 6. The browser alpha scan reports transparent ratio 0.831484375, 9,781 semitransparent pixels, opaque ratio 0.163421354, all four corner alpha values 0, visible shoe bounds left 162/top 267/right 972/bottom 1060. Source pixels were not rewritten.
+- The Hero retains `object-fit:contain`, normal color blending/opacity, no masks/crop/transforms, and the restrained `drop-shadow(0 12px 16px rgba(0,0,0,.18))`. Mobile uses a shared component with copy-left/product-right layout; tablet has its own size adjustment. The duplicate Hero style override was consolidated.
+- Full Validate had revealed stale expected asset SHA/path/CSS markers in existing regression tests; these were corrected to point at the original PNG and current CSS. No assertions were deleted. CI now decodes the PNG alpha channel, rather than relying on its extension/header only.
+- The Hero-only audit now validates the complete declared viewport matrix dynamically. Its workflow path filter points at the raw uploaded asset and includes the Hero regression tests so asset/test changes rerun the audit.
+
+### Exact-SHA gates
+- Validate/full automated suite PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645894
+- Cloudflare Pages Preview deploy PASS, same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645870
+- Isolated Hero Playwright audit PASS, same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892
+- Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Screenshots + full machine-readable report (10 Hero screenshots across light/dark): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892/artifacts/12552544647
+- All 10 cases PASS: mobile 360×800 and 390×844; tablet 768×1024; desktop 1280×800 and 1440×900, each light and dark. Every case reports 1200×1600 image decoded, source/status correct, `object-fit:contain`, approved drop shadow, visible product, copy overlap area 0, no horizontal overflow.
+- Error counters: console errors 0; page errors 0; relevant same-origin HTTP errors 0; same-origin failed requests 0; blocked write attempts 0. Ten external Cloudflare Insights requests are intentionally blocked by the read-only audit allowlist, not application/network failures.
+- The audit originally emitted a false FAIL because its top-level expected result count remained six after adding the required ten viewport/theme combinations. The condition now uses `audit.requiredViewports.length * audit.themes.length`; the same ten contexts all passed and the exact-SHA run is now success.
+
+### Remaining acceptance/blockers — do not claim full reference-based PASS
+- The exact reference file named by the owner `a_clean_high_end_e_commerce_mobile_app_ui_screens.png` was not found in the branch or the files available in this session. Do not mislabel the generated mobile mockup or another screenshot as that asset. Exact visual comparison to the named reference is therefore NOT VERIFIED until the owner supplies that exact file (or an identifiable identical source).
+- The deployed Preview was visually inspected from the Playwright captures in light and dark; the source PNG is visible and text/product do not overlap. Physical-phone acceptance is still OWNER ACTION REQUIRED; ask owner to open the Preview on a real phone and explicitly accept or identify a concrete defect before locking Hero.
+- A shared `public/index.html` path automatically triggered a read-only gallery audit in a prior run; the gallery source was not edited. The existing fullscreen gallery remains out of scope; do not run or modify it unless the owner reopens it.
+- PR #108 remains OPEN/unmerged; changed-file count 302 and existing PR scope-disposition blockers remain. No `main` or Production changes; no merge. Do not mark global project completion 100%.
+
+This is the latest Hero automated outcome and supersedes older failed CI/audit notes above. A following documentation-only commit may advance branch HEAD; it does not change this validated runtime/test/Preview SHA.

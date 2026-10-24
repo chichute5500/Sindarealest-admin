@@ -890,3 +890,14 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - All 6 viewport/theme cases pass; PNG 1488×1888; copy overlap 0; no horizontal overflow; no console/page/HTTP/failed same-origin requests or write attempts. Cloudflare Insights beacon is intentionally blocked in all six sessions.
 - Next action: owner visually checks the deployed Preview on a physical phone and explicitly replies PASS or identifies a concrete visual defect. Until then status is `AUTOMATED PASS / OWNER ACCEPTANCE REQUIRED`, not `OWNER-ACCEPTED PASS / LOCKED`.
 - Preserve fullscreen gallery and all other accepted areas PASS/LOCKED. No merge, no main/Production changes, no catalog/SKU/backend/data changes. Do not state the full PR/project is 100% complete.
+
+
+## HERO — FINAL AUTOMATED GATES PASS; TWO OWNER ACCEPTANCE ITEMS REMAIN — 2026-10-24
+- Runtime/source/test/Preview exact SHA `81abc218535b53f151c2d4d54758ec04d5413ff7`.
+- Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645894
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645870
+- Hero-only browser audit PASS across 10 contexts: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892
+- Artifact (10 PNG screenshots + JSON): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892/artifacts/12552544647
+- Original source file, its SHA, PNG dimensions and alpha were verified; no modified/generated product derivative is used by the storefront.
+- Remaining: (1) exact source image named `a_clean_high_end_e_commerce_mobile_app_ui_screens.png` not found; ask owner to supply/identify it before claiming exact reference comparison. (2) owner physical-phone check on Preview still required before Hero can be OWNER-ACCEPTED PASS / LOCKED.
+- Do not touch gallery or other locked scopes. PR remains OPEN/unmerged; no main/Production changes.

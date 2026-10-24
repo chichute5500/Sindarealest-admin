@@ -1096,3 +1096,20 @@ Runtime/error counts: console 0; page errors 0; same-origin HTTP errors 0; same-
 Initial CI failure root cause: in `tests/storefront-reference-parity.test.mjs`, the `syncHeroProductImage` extraction regex was over-escaped and returned no function body although the actual one-line function in `public/index.html` was correct. Corrected regex: `/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/`. Assertions were retained. Browser audit geometry was corrected to map alpha bounds onto the actual contain-rendered bitmap, and a small mobile/tablet layout adjustment removed measured text overlap. Responsive assertions in both Hero tests were updated, not removed.
 
 Earlier failed attempts and false-positive geometry reports remain historical; this latest exact-SHA result supersedes them. Hero is automated PASS but still requires owner visual acceptance. Do not claim global 100% completion.
+
+
+## HERO FINAL EXACT-SHA TEST/DEPLOY/BROWSER EVIDENCE — 2026-10-24
+| Gate | Result | Evidence |
+|---|---|---|
+| Full Validate/dependency audit/integrity/tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645894 |
+| Cloudflare Pages Preview deployment | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645870 |
+| Hero-only Playwright, actual Preview | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892 |
+| Browser screenshots + JSON report | Uploaded | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892/artifacts/12552544647 |
+| Exact named owner reference parity | NOT VERIFIED | `a_clean_high_end_e_commerce_mobile_app_ui_screens.png` not found in branch/session files |
+| Physical-phone owner acceptance | REQUIRED / PENDING | Owner must check latest Preview and explicitly accept |
+
+The exact source/test/Preview SHA for the successful runs is `81abc218535b53f151c2d4d54758ec04d5413ff7`. All 10 context names passed: `mobile-360-light/dark`, `mobile-390-light/dark`, `tablet-768-light/dark`, `desktop-1280-light/dark`, `desktop-1440-light/dark`.
+- Original source PNG: blob SHA `c17cc9058ae3008dc662806d21d2cf8f7d83b8a9`, 1200×1600, RGBA/type 6, 8-bit.
+- Decoded alpha evidence: transparentRatio 0.831484375; semitransparentPixels 9781; opaqueRatio 0.163421354; four corner alpha values all 0; visible shoe bounds (162,267)–(972,1060), not touching image edges.
+- Each browser result: correct original asset/status, decoded natural dimensions, `object-fit:contain`, approved drop shadow, copyOverlap area 0, no horizontal overflow. Console/page/relevant same-origin HTTP/failed request/write errors all 0. The ten Cloudflare Insights beacon requests were intentionally blocked by audit allowlist.
+- Fixed root causes without weakening tests: runtime/capture/audit target now uses the uploaded source asset rather than deleted derivative; source-file Git blob pin updated; PNG alpha is decoded/tested; stale style and height assertions updated; audit expected result count follows declared matrix length.

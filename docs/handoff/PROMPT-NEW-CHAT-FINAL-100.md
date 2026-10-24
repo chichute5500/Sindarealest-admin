@@ -167,3 +167,21 @@ Last verified runtime/source-test/Preview SHA: `500ccf80bb54c5ff92171809cff24faf
 - Existing non-Hero PASS/LOCKED areas remain locked; no catalog/SKU, database/migrations, backend/API, admin/auth, D1/R2, secrets, Cloudflare Access/infrastructure, DNS, or live payments changes.
 - The Hero audit tooling adds two paths (`scripts/audit-hero-preview.mjs`, `.github/workflows/hero-preview-audit.yml`); PR #108 has 302 changed paths in the live comparison. PR scope disposition and other pre-existing blockers remain separate. Do not claim overall 100% completion.
 - All older failed-Hero checkpoints above are historical and superseded by the exact-SHA evidence in this section. Documentation-only handoff updates do not change the validated runtime/test SHA.
+
+
+# LATEST HERO HANDOFF OVERRIDE — 2026-10-24 — AUTOMATED PASS, OWNER ACCEPTANCE STILL REQUIRED
+
+Always re-fetch branch HEAD and PR #108 before a write. Before this documentation-only update the source/test/Preview SHA was `81abc218535b53f151c2d4d54758ec04d5413ff7`; these checks passed on that exact SHA:
+- Validate/full tests: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645894
+- Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645870
+- Hero-only Playwright audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892
+- Ten screenshots plus JSON: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40076645892/artifacts/12552544647
+
+The storefront uses the uploaded original `public/images/hero-upload/tb_image_share_1792519964514 (1).png` via its URL-encoded public path. The PNG blob SHA is `c17cc9058ae3008dc662806d21d2cf8f7d83b8a9`; dimensions 1200×1600, RGBA/type 6, alpha verified. No product pixels or color data were edited. Stale derivative references, stale test hash/CSS assertions and the hard-coded six-result audit condition were fixed; assertions remain in place.
+
+All 10 browser contexts passed: 360×800, 390×844, 768×1024, 1280×800 and 1440×900, each light/dark. Alpha, image visibility, contain sizing, drop shadow, no copy overlap/no horizontal overflow, and no console/page/relevant HTTP/failed same-origin/write errors are verified. The external Insights beacon is intentionally blocked. A prior failure in run 40076231536 was the obsolete six-results counter despite all ten contexts individually passing; it is superseded by the successful exact-SHA audit above.
+
+**Do not claim reference parity fully accepted yet.** The exact file named `a_clean_high_end_e_commerce_mobile_app_ui_screens.png` is not present in the branch or retrievable session files. Do not relabel a generated mockup as the owner’s exact reference. Request the exact reference image (or an identifiable identical file) to verify direct visual parity, and request owner physical-phone acceptance of Preview before marking Hero OWNER-ACCEPTED PASS / LOCKED.
+
+Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+PR #108: OPEN/unmerged, base main, 302 changed paths. Do not merge, edit main, deploy Production, or modify gallery/other PASS/LOCKED areas. No project-wide 100% claim while reference/device acceptance and existing PR scope blockers remain unresolved.
