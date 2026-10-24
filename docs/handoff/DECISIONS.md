@@ -1,3 +1,16 @@
+## FINAL COMPLETION DECISIONS — OWNER REQUEST — 2026-10-24
+
+1. **100% is an evidence-based acceptance state, not an estimate.** Every required in-scope task must have source/test, exact-SHA deployment, relevant runtime/browser/device evidence, and owner acceptance where required. A skipped workflow or missing real-device check is not PASS.
+2. **Reconcile stale notes against newest evidence.** The latest authenticated Preview diagnostic on source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579` verifies root noindex + Preview-origin canonical/social metadata, robots crawl block, and sitemap suppression. Earlier statements that this endpoint behavior was unverified are historical and superseded.
+3. **PR scope must be audited before any merge decision.** PR #108's 297-file changed-file set is broader than a narrow public storefront UI task. Keep the PR OPEN/unmerged; do not merge, rebase destructively, force-push, or alter restricted files. Classify every changed path and seek explicit approval for any out-of-scope remediation.
+4. **Previously paused visual issues need evidence, not assumptions.** The owner's current request asks to finish outstanding work. Re-evaluate the outstanding Hero/gallery items only through safe, authorized test paths; do not bypass the Hero safety guard. The fullscreen gallery remains PAUSED / NOT ACCEPTED until real mobile slow/rapid tap tests establish no flicker/ghosting and the owner accepts it.
+5. **SKU correctness is fail-closed.** Use a SKU in a route only when authoritative API data sets `skuVerified === true` and the trimmed SKU is non-empty. Otherwise use the product ID/key. No fabricated verification or catalog-data edits.
+6. **Keep accepted scopes frozen.** Icon system, catalog filter, `#order`, warranty form, mobile navigation/cart/account/history, and other owner-PASS sections are not to be restyled/retested without a concrete regression or explicit scope-specific reopening.
+7. **Restricted surfaces stay excluded.** No Admin/backend/API/auth, product/catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, payment flow, `main`, or Production changes without separate explicit owner approval.
+8. **Final report must distinguish** PASS, FAIL, BLOCKED, NOT RUN, SKIPPED BY SAFETY GUARD, and OWNER ACCEPTANCE REQUIRED. If any required gate remains blocked, state the exact evidence/input/action needed and do not claim 100%.
+
+---
+
 ## DECISION UPDATE — PREVIEW SEO RESPONSE + CANONICAL METADATA VERIFIED — 2026-10-24
 
 - Keep the non-blocking post-deploy authenticated HTTP diagnostic. It must verify root `X-Robots-Tag: noindex`, canonical link, `og:url`, `og:image`, `twitter:image` origin; Preview `robots.txt` crawl-block response; and Preview sitemap 404/noindex/no-store response.
