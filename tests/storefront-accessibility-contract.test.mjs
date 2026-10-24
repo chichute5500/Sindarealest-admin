@@ -407,7 +407,7 @@ function makeFeaturedAutoHarness(reducedMotion = false, withPauseButton = true) 
     window: { innerHeight: 800, matchMedia: () => ({ matches: reducedMotion }) },
     document: { hidden: false },
     $: selector => elements[selector] || null,
-    '$': selector => selector === '[data-featured-card]' ? [card] : [],
+    '$$': selector => selector === '[data-featured-card]' ? [card] : [],
     changeFeaturedImage: () => { card.moves = (card.moves || 0) + 1; },
     setInterval(fn, ms) { const timer = { fn, ms }; intervals.push(timer); return timer; },
     clearInterval(timer) { cleared.push(timer); }
