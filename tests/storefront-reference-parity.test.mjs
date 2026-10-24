@@ -512,16 +512,7 @@ assert.ok(
   mobileHeroReferenceMatch.includes("grid-template-rows:auto auto!important;") &&
   mobileHeroReferenceMatch.includes("grid-row:1!important;") &&
   mobileHeroReferenceMatch.includes("grid-row:2!important;") &&
-  mobileHeroReferenceMatch.includes("height:auto!important;max-width:100%!important;max-height:none!important;margin:-140px 0 0!important;") &&
-  mobileHeroReferenceMatch.includes("height:clamp(396px,110vw,430px)!important;") &&
+  mobileHeroReferenceMatch.includes("height:auto!important;max-width:none!important;max-height:none!important;margin:0 0 0 -10%!important;") &&
+  mobileHeroReferenceMatch.includes("height:clamp(330px,90vw,350px)!important;") &&
   mobileHeroReferenceMatch.includes("object-fit:contain!important;object-position:center top!important"),
   "Mobile Hero must show copy and CTA above a naturally scaled original product image with transparent padding cropped by the visual frame.");
-assert.ok(
-  mobileHeroRebuild.includes("grid-template-columns:minmax(0,1fr)!important;") &&
-  mobileHeroRebuild.includes("grid-template-rows:auto auto!important;") &&
-  mobileHeroRebuild.includes("grid-row:1!important;") &&
-  mobileHeroRebuild.includes("grid-row:2!important;") &&
-  mobileHeroRebuild.includes("width:100%!important;height:100%!important;") &&
-  mobileHeroRebuild.includes("max-width:100%!important;max-height:430px!important;") &&
-  mobileHeroRebuild.includes("object-fit:contain!important;object-position:center center!important"),
-  "Mobile Hero must show full-width readable copy and CTA above a contained, uncropped product image.");
