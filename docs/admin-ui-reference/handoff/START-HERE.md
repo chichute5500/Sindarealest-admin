@@ -1,20 +1,15 @@
 # LIVE HANDOFF UPDATE — 2026-10-24 09:36 UTC
 
-**Checkpoint semantics:** live PR #111 HEAD when this update began was `e5736c5542863fc23e5e235f5eaacc8c1374f325`, a documentation-only commit. The latest application/source-test SHA remains `cf340b686e0974ac5602b6ef4594c00e477c8932`. Handoff-only commits after the checkpoint do not alter application source; always refresh live PR HEAD before acting.
+**Checkpoint semantics:** PR #111 HEAD at checkpoint capture was `e5736c5542863fc23e5e235f5eaacc8c1374f325` (documentation-only). Latest application/source-test SHA remains `cf340b686e0974ac5602b6ef4594c00e477c8932`. Always refresh the live PR head before continuing.
 
-**Latest source/test SHA:** `cf340b686e0974ac5602b6ef4594c00e477c8932`.
-- Validate #5688: PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
-- Admin Preview Playwright #1077: PASS on the same source/test SHA — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
-- Docs checkpoint Validate #5721: FAIL — handoff integrity test found `current-status.json.entryPoint` missing; this was metadata-only, not an application regression. The canonical fields have been restored; re-run/inspect validation on the newest HEAD — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444182
-- Admin Preview Playwright #1091: PASS on docs checkpoint `e5736c5542863fc23e5e235f5eaacc8c1374f325` — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444230
-- PR #111: OPEN, unmerged. Keep it open; no merge/rebase/cherry-pick/force-push.
-- Acceptance remains: 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
-
-The order-cancellation race guard is included in source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: order-item updates are guarded against pending QR payment requests. Exact-SHA Validate and Preview runs passed; this is not evidence of authenticated business-write persistence or approved-reference visual parity.
+- Validate #5688 PASS on source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Admin Preview Playwright #1077 PASS on that same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
+- Docs Validate #5721 failed because `current-status.json.entryPoint` was missing; canonical fields have now been restored. Re-run validation on latest HEAD before claiming all-green: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444182
+- Admin Preview Playwright #1091 PASS on docs checkpoint `e5736c5542863fc23e5e235f5eaacc8c1374f325`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444230
+- PR #111 remains OPEN/unmerged. Progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+- Latest source change: order-item updates guard against pending QR payment requests during cancellation. Automated source/test checks passed on the exact source/test SHA; business-write persistence and visual parity remain unproven.
 
 ---
----
-
 # VERIFIED HANDOFF CHECKPOINT — 2026-10-24 09:00 UTC
 
 **Repository:** `chichute5500/Sindarealest-admin`  
