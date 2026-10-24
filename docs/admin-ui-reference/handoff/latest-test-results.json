@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T01:43:43Z",
+  "capturedAtUtc": "2026-10-24T01:53:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "381065514663a2c57a9d6d6ca95880b835894bdc",
+  "branchHeadAtCheckpointStart": "3ba0005ea3f896a06ac573f32f975d231d081835",
   "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "PASS_VALIDATE_ON_EXACT_DOCS_HEAD_381065514663a2c57a9d6d6ca95880b835894bdc; SOURCE_TEST_VALIDATE_PASS_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f; PREVIEW_493_FAILED_EXACT_HEAD_GUARD_AFTER_BRANCH_MOVED",
+  "status": "PASS_VALIDATE_ON_EXACT_HEAD_3ba0005ea3f896a06ac573f32f975d231d081835; SOURCE_TEST_VALIDATE_PASS_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f; PREVIEW_493_FAILED_EXACT_HEAD_GUARD_AFTER_BRANCH_MOVED; NO_PREVIEW_RUN_ON_DOCS_ONLY_HEAD",
   "latestRun": {
     "id": 40049413302,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
@@ -247,8 +247,8 @@
   },
   "latestCodeCommitSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
   "testedCommitSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-  "capturedAt": "2026-10-24T08:24:09+07:00",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
+  "capturedAt": "2026-10-24T01:53:00Z",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
   "checks": {
     "baselineGitState": "NOT_TESTED_BY_PLAYWRIGHT_RUNNER",
     "applicationStartup": "PASS",
@@ -287,9 +287,9 @@
     "responsiveThemeScreenshotMatrix": "CAPTURED_133_PNG_ARTIFACT_112_FIXTURE_METRICS_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f; EXACT_HEAD_GUARD_FAILED",
     "deployedPreviewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f; AUTHENTICATED_READ_ONLY_GETS_7_OF_7; BRANCH_MOVED_BEFORE_GUARD",
     "currentHeadPlaywright": "PASS_LOCAL_RESPONSIVE_THEME_MATRIX_ON_7a57dfa634151ece49d3eb7cb7b2f31cf8f19628; DEPLOYED PREVIEW LOGIN CSS SIGNATURE ONLY; AUTHENTICATED MODULES NOT TESTED",
-    "currentHead": "VALIDATE_PASS_ON_94669674ab0d5e635ac47026ef3c98d362e63002; PREVIEW_NOT_ACCEPTED_EXACT_HEAD",
-    "currentHeadSha": "94669674ab0d5e635ac47026ef3c98d362e63002",
-    "currentHeadValidation": "VALIDATE_PASS; PREVIEW_EXACT_HEAD_NOT_VERIFIED",
+    "currentHead": "VALIDATE_PASS_ON_3ba0005ea3f896a06ac573f32f975d231d081835; PREVIEW_NOT_RUN_ON_DOCS_ONLY_HEAD; LAST_PREVIEW_493_FAILED_EXACT_HEAD_GUARD",
+    "currentHeadSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+    "currentHeadValidation": "VALIDATE_PASS_ON_EXACT_HEAD_3ba0005ea3f896a06ac573f32f975d231d081835; PREVIEW_NOT_RUN_ON_DOCS_ONLY_HEAD",
     "sourceValidationRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40018955519",
     "authenticatedReadOnlyAdminRoutes": "PASS_7_OF_7_HTTP_200",
     "adminReadOnlyApiMutationRequests": "0",
@@ -381,14 +381,14 @@
     "No Production deploy, remote D1/R2/schema/ledger operations, or setup/migration/deploy script execution."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "PASS_VALIDATE_ON_EXACT_DOCS_HEAD_381065514663a2c57a9d6d6ca95880b835894bdc; SOURCE_TEST_VALIDATE_PASS_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f; PREVIEW_493_FAILED_EXACT_HEAD_GUARD_AFTER_BRANCH_MOVED",
+  "currentHeadValidation": "PASS_VALIDATE_ON_EXACT_HEAD_3ba0005ea3f896a06ac573f32f975d231d081835; SOURCE_TEST_VALIDATE_PASS_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f; PREVIEW_493_FAILED_EXACT_HEAD_GUARD_AFTER_BRANCH_MOVED; NO_PREVIEW_RUN_ON_DOCS_ONLY_HEAD",
   "scopeAuditStatus": "B1_CLEANUP_REVIEW_COMPLETE; PRODUCT_ACCEPTANCE_PARTIAL",
   "livePrState": {
     "pr111": {
       "state": "OPEN",
       "merged": false,
       "mergeable": false,
-      "headSha": "94669674ab0d5e635ac47026ef3c98d362e63002",
+      "headSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
     },
     "pr108": {
@@ -408,7 +408,7 @@
     },
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a"
   },
-  "currentHeadValidationReason": "Validate #5551 passes on docs HEAD and #5540 passes on source/test SHA. Preview artifact/read-only diagnostics completed, but exact-HEAD guard failed after branch moved.",
+  "currentHeadValidationReason": "Validate #5552 passed on exact docs HEAD 3ba0005ea3f896a06ac573f32f975d231d081835. Latest source/test Validate #5540 passed on 0c441375a212c73ce56f16d4f9673e44c1b8260f. Preview #493 failed its final exact-HEAD guard because the branch moved during capture; docs-only changes are excluded from the Preview path filter, so there is no Preview run for 3ba0005ea3f896a06ac573f32f975d231d081835.",
   "liveCheckpoint": {
     "capturedAtUtc": "2026-10-24T01:24:00Z",
     "branchHead": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
@@ -434,14 +434,14 @@
     "acceptance": "SCREEN_12_REMAINS_PARTIAL; full parity/authenticated audit data not verified"
   },
   "latestValidateRun": {
-    "id": 40051041487,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487",
+    "id": 40051237976,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
     "status": "completed",
     "conclusion": "success",
-    "sha": "381065514663a2c57a9d6d6ca95880b835894bdc",
-    "testedSha": "381065514663a2c57a9d6d6ca95880b835894bdc",
+    "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+    "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
     "workflow": "Validate source and tests",
-    "runNumber": 5551
+    "runNumber": 5552
   },
   "latestAttempt": {
     "capturedAtUtc": "2026-10-24T01:43:43Z",
@@ -456,14 +456,14 @@
       "runNumber": 5540
     },
     "docsHeadRun": {
-      "id": 40051041487,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487",
+      "id": 40051237976,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
       "status": "completed",
       "conclusion": "success",
-      "sha": "381065514663a2c57a9d6d6ca95880b835894bdc",
-      "testedSha": "381065514663a2c57a9d6d6ca95880b835894bdc",
+      "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+      "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
       "workflow": "Validate source and tests",
-      "runNumber": 5551
+      "runNumber": 5552
     },
     "previewRun": {
       "id": 40049413302,
@@ -483,13 +483,13 @@
   },
   "handoffSync": {
     "status": "SIX_FILE_DOCS_ONLY_SYNC_COMPLETED",
-    "capturedAtUtc": "2026-10-24T01:43:43Z",
-    "branchHeadAtCheckpointStart": "381065514663a2c57a9d6d6ca95880b835894bdc",
+    "capturedAtUtc": "2026-10-24T01:53:00Z",
+    "branchHeadAtCheckpointStart": "3ba0005ea3f896a06ac573f32f975d231d081835",
     "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "note": "Six canonical handoff files updated. This commit is docs-only; refresh live HEAD and Actions after commit. Docs-only changes do not trigger Admin Preview.",
+    "note": "Six canonical handoff files synchronized in this docs-only commit. Validate #5552 passed on parent SHA 3ba0005ea3f896a06ac573f32f975d231d081835. Verify Validate for the resulting handoff commit; docs-only paths do not trigger Admin Preview.",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "nextRequiredAction": "Refresh live branch HEAD and Validate after this handoff commit; Preview #493 failed its exact-HEAD guard, so continue independent safe work."
+    "nextRequiredAction": "Refresh live HEAD and Actions; Validate #5552 succeeded on parent SHA 3ba0005ea3f896a06ac573f32f975d231d081835. This docs-only commit is not expected to trigger Preview. Continue workstreams A–E, do not create a dummy source commit, and do not weaken the exact-HEAD guard."
   },
   "latestProductSourceCommit": "6a31cb31d996a8937923d552421674f29d5c14d9",
   "latestDiagnosticArtifact": {
@@ -525,24 +525,24 @@
   },
   "checkpointSemantics": "Checkpoint 2026-10-24T01:43:43Z: docs HEAD 381065514663a2c57a9d6d6ca95880b835894bdc passed Validate #5551; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f passed Validate #5540. Preview #493 captured artifact and passed read-only diagnostics but failed exact-HEAD guard after branch advanced during capture. No Preview success on latest source/test SHA.",
   "latestActionsRun": {
-    "id": 40051041487,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487",
+    "id": 40051237976,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
     "status": "completed",
     "conclusion": "success",
-    "sha": "381065514663a2c57a9d6d6ca95880b835894bdc",
-    "testedSha": "381065514663a2c57a9d6d6ca95880b835894bdc",
+    "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+    "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
     "workflow": "Validate source and tests",
-    "runNumber": 5551
+    "runNumber": 5552
   },
   "latestValidateAttempt": {
-    "id": 40051041487,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487",
+    "id": 40051237976,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
     "status": "completed",
     "conclusion": "success",
-    "sha": "381065514663a2c57a9d6d6ca95880b835894bdc",
-    "testedSha": "381065514663a2c57a9d6d6ca95880b835894bdc",
+    "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+    "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
     "workflow": "Validate source and tests",
-    "runNumber": 5551
+    "runNumber": 5552
   },
   "latestPreviewAttempt": {
     "id": 40049413302,
@@ -568,8 +568,8 @@
     "previewStatus": "SUCCESS",
     "summary": "Changed the long commercial-SKU placeholder to 'SKU chính thức' so it fits the 320px mobile field more cleanly; added Playwright assertion. Validate and Preview passed on exact SHA; artifact 421 confirms screenshot."
   },
-  "currentHeadAtCheckpoint": "381065514663a2c57a9d6d6ca95880b835894bdc",
-  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
+  "currentHeadAtCheckpoint": "3ba0005ea3f896a06ac573f32f975d231d081835",
+  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
   "latestReviewFinding": {
     "status": "SCREEN7_TIMELINE_VISIBLE; PREVIEW_EXACT_HEAD_GUARD_FAILED_DUE_BRANCH_MOVED",
     "sourceTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
@@ -675,13 +675,13 @@
     },
     {
       "name": "Responsive/reference artifact review",
-      "status": "artifact #470 inspected",
-      "testedSha": "448e7d2b5840825e36c3215071260983badb9e39",
+      "status": "Artifact #493 downloaded/inspected; Screens 4/5/7 compared at 390x844 light; no new reproducible source mismatch confirmed.",
+      "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
       "screenshots": 132,
       "fixtureCaptureEntries": 120,
       "fixtureMetrics": 112,
       "horizontalOverflowMetrics": 0,
-      "scope": "synthetic fixtures only; exact reference parity NOT_VERIFIED"
+      "scope": "Synthetic fixtures only; visual review is not exact approved-reference parity."
     },
     {
       "name": "Backup/Restore static safety audit",
@@ -692,8 +692,8 @@
     },
     {
       "name": "Branch/PR/CI integrity",
-      "status": "live checked",
-      "headAtCapture": "1c6c461be88b0e0c06c53894702e86338a23a205",
+      "status": "Live state refreshed: Validate #5552 SUCCESS on feature HEAD at checkpoint start; no Preview run on docs-only HEAD.",
+      "headAtCapture": "3ba0005ea3f896a06ac573f32f975d231d081835",
       "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
       "pr111": "OPEN_UNMERGED",
       "pr108": "OPEN_UNMERGED_READ_ONLY",
@@ -701,7 +701,7 @@
     },
     {
       "name": "Handoff integrity",
-      "status": "restored required entryPoint and nextChatPrompt fields in both JSON records"
+      "status": "Six canonical paths and JSON entryPoint/nextChatPrompt verified; progress remains 50% PROVISIONAL and all seven rules are preserved."
     },
     {
       "name": "Payment receipt atomic-state guard",
@@ -722,6 +722,13 @@
       "previewRun": 40046825046,
       "artifactId": 12541717769,
       "summary": "Regression failed first with HTTP 201 instead of 409 for a settled QR request. Fixed preflight and atomic INSERT to require status='pending'; tests cover settled before preflight and status changing between preflight and batch."
+    },
+    {
+      "name": "API/security static audit",
+      "status": "Read-only source review of Admin handlers and session middleware; all protected handlers inspected call requireAdmin; login/logout are intentional exceptions.",
+      "sourceSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
+      "liveMutationRequests": 0,
+      "acceptance": "Static-only; authenticated business workflows and writes NOT_TESTED"
     }
   ],
   "acceptance": {
@@ -736,14 +743,14 @@
   "nextChatInstructions": "Continue directly on GitHub; refresh live state first; apply all seven rules and work in parallel. Use only feature/admin-isolated-handoff-2026-10-20. No merge, Production deployment, Access/secrets/DNS changes, remote business writes, migrations/seed/import/setup scripts, or changes to main/storefront/PR #108/#112.",
   "actions": {
     "latestSuccessful": {
-      "id": 40051041487,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487",
+      "id": 40051237976,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
       "status": "completed",
       "conclusion": "success",
-      "sha": "381065514663a2c57a9d6d6ca95880b835894bdc",
-      "testedSha": "381065514663a2c57a9d6d6ca95880b835894bdc",
+      "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+      "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
       "workflow": "Validate source and tests",
-      "runNumber": 5551
+      "runNumber": 5552
     },
     "latestAttempt": {
       "capturedAtUtc": "2026-10-24T01:43:43Z",
@@ -758,14 +765,14 @@
         "runNumber": 5540
       },
       "docsHeadRun": {
-        "id": 40051041487,
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487",
+        "id": 40051237976,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
         "status": "completed",
         "conclusion": "success",
-        "sha": "381065514663a2c57a9d6d6ca95880b835894bdc",
-        "testedSha": "381065514663a2c57a9d6d6ca95880b835894bdc",
+        "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+        "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
         "workflow": "Validate source and tests",
-        "runNumber": 5551
+        "runNumber": 5552
       },
       "previewRun": {
         "id": 40049413302,
@@ -796,14 +803,14 @@
     "runNumber": 5540
   },
   "latestDocsHeadValidation": {
-    "id": 40051041487,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051041487",
+    "id": 40051237976,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
     "status": "completed",
     "conclusion": "success",
-    "sha": "381065514663a2c57a9d6d6ca95880b835894bdc",
-    "testedSha": "381065514663a2c57a9d6d6ca95880b835894bdc",
+    "sha": "3ba0005ea3f896a06ac573f32f975d231d081835",
+    "testedSha": "3ba0005ea3f896a06ac573f32f975d231d081835",
     "workflow": "Validate source and tests",
-    "runNumber": 5551
+    "runNumber": 5552
   },
   "latestSourceTestValidation": {
     "id": 40049413343,
