@@ -84,16 +84,45 @@ async function tap(locator, mobile) {
   if (mobile) await locator.tap({ timeout: 10000 });
   else await locator.click({ timeout: 10000 });
 }
+async function activateAndVerifyCounter(page, activate, delta, label) {
+  const beforeText = String(await page.locator('#sdFullscreenCount').textContent() || '').trim();
+  const beforeMatch = beforeText.match(/(\d+)\s*\/\s*(\d+)/);
+  if (!beforeMatch) throw new Error(label + ': could not parse the current photo counter: ' + beforeText);
+  const beforeIndex = Number(beforeMatch[1]);
+  const total = Number(beforeMatch[2]);
+  const expectedIndex = ((beforeIndex - 1 + delta + total) % total) + 1;
+  const expectedText = String(expectedIndex).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  await activate();
+  await page.waitForFunction((expected) => {
+    const node = document.querySelector('#sdFullscreenCount');
+    return String(node?.textContent || '').trim() === expected.text;
+  }, { text: expectedText }, { timeout: 3000 });
+  const afterText = String(await page.locator('#sdFullscreenCount').textContent() || '').trim();
+  return { before: beforeText, after: afterText, expected: expectedText, delta, total };
+}
 async function inspectAnimationGeometry(page, label) {
   const measured = await page.evaluate(() => {
     const imageNodes = [
       document.querySelector('#sdFullscreenImage'),
       document.querySelector('#sdFullscreenImageNext')
     ].filter(Boolean);
-    const animations = imageNodes.flatMap((image) => image.getAnimations()
-      .filter((animation) => String(animation.animationName || '').indexOf('sdFullscreen') === 0));
+    const transitionClasses = [
+      ['sd-slide-out-left', 'sdFullscreenOutLeft'],
+      ['sd-slide-out-right', 'sdFullscreenOutRight'],
+      ['sd-slide-in-left', 'sdFullscreenInLeft'],
+      ['sd-slide-in-right', 'sdFullscreenInRight']
+    ];
+    const activeClasses = imageNodes.map((image) => ({
+      id: image.id,
+      classes: transitionClasses.filter((item) => image.classList.contains(item[0])).map((item) => item[0])
+    }));
+    const animations = imageNodes.flatMap((image) => {
+      const expectedNames = transitionClasses.filter((item) => image.classList.contains(item[0])).map((item) => item[1]);
+      return image.getAnimations().filter((animation) =>
+        expectedNames.includes(String(animation.animationName || '')) && animation.playState === 'running');
+    });
     const mediaReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!animations.length) return { found: false, reducedMotion: mediaReduce, names: [], durationsMs: [], frames: [] };
+    if (!animations.length) return { found: false, reducedMotion: mediaReduce, names: [], durationsMs: [], frames: [], activeClasses };
     const names = animations.map((animation) => String(animation.animationName || ''));
     const durationsMs = animations.map((animation) => Number(animation.effect && animation.effect.getTiming().duration));
     animations.forEach((animation) => animation.pause());
@@ -134,6 +163,7 @@ async function inspectAnimationGeometry(page, label) {
       reducedMotion: mediaReduce,
       names,
       durationsMs,
+      activeClasses,
       frames
     };
   });
@@ -145,6 +175,7 @@ async function inspectAnimationGeometry(page, label) {
     : 0;
   const issues = [];
   if (measured.reducedMotion) issues.push('Unexpected prefers-reduced-motion=reduce in a no-preference audit context.');
+  if (measured.names.length !== 2) issues.push('Expected exactly two animations attached to the current outgoing/incoming slide classes; found ' + measured.names.length + ': ' + measured.names.join(', ') + '.');
   if (measured.durationsMs.some((duration) => !Number.isFinite(duration) || duration < 250 || duration > 350)) {
     issues.push('CSS animation duration is not the expected 300ms: ' + measured.durationsMs.join(', ') + 'ms.');
   }
@@ -157,6 +188,7 @@ async function inspectAnimationGeometry(page, label) {
     reducedMotion: measured.reducedMotion,
     animationNames: measured.names,
     animationDurationsMs: measured.durationsMs,
+    activeLayerClasses: measured.activeClasses,
     frameSamples: measured.frames.length,
     maxOverlapPx: Number(maxOverlap.toFixed(3)),
     maxGapPx: Number(maxGap.toFixed(3)),
@@ -169,17 +201,26 @@ async function inspectAnimationGeometry(page, label) {
   assert.equal(issues.length, 0, label + ': ' + issues.join(' '));
   return result;
 }
-async function measureTransition(page, activate, label) {
-  await activate();
+async function measureTransition(page, activate, delta, label) {
+  const counterProgress = await activateAndVerifyCounter(page, activate, delta, label);
   await page.waitForFunction(() => {
+    const transitionClasses = [
+      ['sd-slide-out-left', 'sdFullscreenOutLeft'],
+      ['sd-slide-out-right', 'sdFullscreenOutRight'],
+      ['sd-slide-in-left', 'sdFullscreenInLeft'],
+      ['sd-slide-in-right', 'sdFullscreenInRight']
+    ];
     const images = [
       document.querySelector('#sdFullscreenImage'),
       document.querySelector('#sdFullscreenImageNext')
     ].filter(Boolean);
-    return images.some((image) => Array.from(image.getAnimations()).some((animation) =>
-      String(animation.animationName || '').indexOf('sdFullscreen') === 0));
+    return images.some((image) => transitionClasses.some((item) =>
+      image.classList.contains(item[0]) &&
+      Array.from(image.getAnimations()).some((animation) =>
+        animation.animationName === item[1] && animation.playState === 'running')));
   }, null, { timeout: 8000 });
   const result = await inspectAnimationGeometry(page, label);
+  result.counterProgress = counterProgress;
   await page.waitForFunction(() => {
     const viewer = document.querySelector('#sdFullscreenViewer');
     const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
@@ -302,12 +343,13 @@ async function runViewport(viewport) {
 
     const next = page.locator('#sdFullscreenNext');
     const prev = page.locator('#sdFullscreenPrev');
-    await measureTransition(page, () => tap(next, viewport.mobile), viewport.name + ' slow next');
-    await measureTransition(page, () => tap(prev, viewport.mobile), viewport.name + ' slow previous');
+    await measureTransition(page, () => tap(next, viewport.mobile), 1, viewport.name + ' slow next');
+    await measureTransition(page, () => tap(prev, viewport.mobile), -1, viewport.name + ' slow previous');
 
-    await tap(next, viewport.mobile);
-    await tap(next, viewport.mobile);
-    await tap(prev, viewport.mobile);
+    const rapidCounterSequence = [];
+    rapidCounterSequence.push(await activateAndVerifyCounter(page, () => tap(next, viewport.mobile), 1, viewport.name + ' rapid tap 1 next'));
+    rapidCounterSequence.push(await activateAndVerifyCounter(page, () => tap(next, viewport.mobile), 1, viewport.name + ' rapid tap 2 next'));
+    rapidCounterSequence.push(await activateAndVerifyCounter(page, () => tap(prev, viewport.mobile), -1, viewport.name + ' rapid tap 3 previous'));
     await page.waitForFunction(() => {
       const viewer = document.querySelector('#sdFullscreenViewer');
       const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
@@ -332,12 +374,14 @@ async function runViewport(viewport) {
         imageSources: images.map((image) => image.getAttribute('src') || '')
       };
     });
-    assert.equal(rapid.activeCount, 1, viewport.name + ': rapid next-next-previous taps must settle on exactly one active image.');
+    assert.equal(rapid.activeCount, 1, viewport.name + ': rapid taps must settle on exactly one active image.');
     assert.equal(rapid.brokenActiveCount, 0, viewport.name + ': rapid taps must not expose an undecoded active image.');
     assert.equal(rapid.staleTransitionClasses, 0, viewport.name + ': rapid taps must clear stale transition classes.');
+    assert.equal(rapid.counter.trim(), rapidCounterSequence[2].after, viewport.name + ': final counter must match the third verified tap.');
     report.transitions.push({
       label: viewport.name + ' rapid next-next-previous',
       status: 'PASS_STABLE_FINAL_STATE',
+      counterSequence: rapidCounterSequence,
       activeImageCount: rapid.activeCount,
       brokenActiveImageCount: rapid.brokenActiveCount,
       staleTransitionClassCount: rapid.staleTransitionClasses,
