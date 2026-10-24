@@ -105,5 +105,11 @@ assert.match(refundUiHtml, /data-action=["']record-refund["']/,
   "Order Detail must expose an Admin action to record an already-completed refund in the verified payment ledger");
 assert.match(refundUiHtml, /direction:\s*["']refunded["']/,
   "the refund action must send direction=refunded, not reuse the receipt operation");
+assert.match(refundUiHtml, /không thực hiện chuyển tiền/i,
+  "the refund UI must explicitly say it records the ledger only and does not move money");
+assert.match(refundUiHtml, /amount>netReceived/,
+  "the refund UI must reject amounts above the verified net receipt before sending");
+assert.match(refundUiHtml, /maxRefundAmount=Number\.isSafeInteger\(netReceived\)&&netReceived>0\?netReceived:0/,
+  "refund entry must be disabled for orders with no positive verified net receipts");
 
 console.log("PASS fulfillment/payment contract: explicit classification, token scoping, QR allowlist, verified-only payment ledger and Admin UI regression guards.");

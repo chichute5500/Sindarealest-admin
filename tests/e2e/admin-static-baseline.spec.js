@@ -1931,6 +1931,11 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#main .pagehead h2')).toHaveText('Chi tiết đơn hàng');
       await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id', 'UI-ONLY-ORDER');
       await expect(page.locator('#orderDetailBackdrop')).toHaveCount(0);
+      const refundEntry = page.locator('#orderDetailContent [data-refund-entry="UI-ONLY-ORDER"]');
+      await expect(refundEntry, 'Screen 7 includes a refund ledger form inside the collapsed payment disclosure').toHaveCount(1);
+      await expect(refundEntry.locator('[data-action="record-refund"]'),
+        'Orders with no verified receipts must not enable refund recording').toBeDisabled();
+      await expect(refundEntry.locator('[data-refund-amount]')).toBeDisabled();
       const orderTimeline = page.locator('#orderDetailContent .order-detail-timeline');
       await expect(orderTimeline, 'reference Screen 7 includes a timeline in the order detail view').toBeVisible();
       await expect(orderTimeline).toContainText('Timeline');
