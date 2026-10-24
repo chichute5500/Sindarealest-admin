@@ -391,9 +391,9 @@ assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before,")
   && heroPedestalStyles.includes("clip-path:polygon(1% 0,99% 0,94% 100%,6% 100%)")
   && heroPedestalStyles.includes("bottom:27%;")
   && heroPedestalStyles.includes("width:136%;height:8%;bottom:27%")
-  && heroPedestalStyles.includes("width:145%;height:9%;bottom:27%;transform:translateX(-50%) rotate(-2deg)")
+  && heroPedestalStyles.includes("width:145%;height:9%;bottom:30%;transform:translateX(-50%) rotate(-3deg)")
   && heroPedestalStyles.includes("width:130%;height:7%;bottom:20%")
-  && heroPedestalStyles.includes("width:138%;height:7%;bottom:20%;transform:translateX(-50%) rotate(-2deg)"),
+  && heroPedestalStyles.includes("width:138%;height:7%;bottom:23%;transform:translateX(-50%) rotate(-3deg)"),
   "The marble oval and slanted plinth stay visible and responsive; a legacy blur-only rule cannot override the platform.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
   "No page caption may cover any portion of the supplied image.");
