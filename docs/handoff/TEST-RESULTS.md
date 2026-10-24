@@ -1,3 +1,23 @@
+## EXACT-SHA VALIDATION — EFFECTIVE ADMIN NOINDEX REGRESSION — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| npm audit | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843359 |
+| Project integrity checks | PASS | Same Validate run |
+| Full automated tests | PASS | Same Validate run |
+| Preview deployment | PASS on code/test SHA `de5b4efd95ad08cee5582520e74b5dd591c9d51a` | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843460 |
+| Immutable Preview | Deployed | https://164c0deb.sindarealest2.pages.dev/ |
+| Liquid Glass visual workflow | SKIPPED | Hero guard |
+| External HTTP/browser/device acceptance | NOT VERIFIED | No successful independent endpoint/browser check |
+
+- Regression now asserts `public/admin/index.html` contains `<meta name="robots" content="noindex,nofollow">`, rather than assuming `public/_headers` is effective on a Pages Functions response.
+- Static href audit on `public/index.html`: 34 href occurrences, 15 unique values; 7 non-empty internal fragment links all resolve; no literal `href="#" ` or `javascript:` placeholders found.
+- Cloudflare Pages docs caution: `_headers` rules are not applied to Pages Functions-generated responses. Preview root noindex remains NOT VERIFIED because root response is middleware-transformed and source HTML has no robots meta. Do not claim the robots disallow guarantees de-indexing; do not change shared middleware/headers without explicit authorization.
+- Prior code/test SHA `94df81d` also passed Validate and Preview deploy; dependency audit fix `undici: 7.30.1` remains intact.
+- PR #108 OPEN/unmerged; Production untouched.
+
+---
+
 ## LATEST REGRESSION PRECISION — ADMIN META ROBOTS — 2026-10-24
 
 - Test-only SHA: `de5b4efd95ad08cee5582520e74b5dd591c9d51a`.

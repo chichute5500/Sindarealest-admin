@@ -1,3 +1,14 @@
+## LATEST VERIFIED RESULT — EFFECTIVE ADMIN NOINDEX TEST — 2026-10-24
+
+- Test-only SHA `de5b4efd95ad08cee5582520e74b5dd591c9d51a` has Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843359 and Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843460.
+- Preview URL: https://164c0deb.sindarealest2.pages.dev/.
+- Regression asserts the actual Admin HTML meta robots directive. This avoids assuming the `public/_headers` `X-Robots-Tag` rule is applied to Pages Functions responses.
+- Additional source-only link audit of `public/index.html`: 34 href occurrences, 15 unique href values; all 7 non-empty internal fragments resolve; no literal `href="#" ` or `javascript:` placeholders.
+- Unresolved separate follow-up: Preview root is transformed by `functions/_middleware.js`, has no page-level robots meta, and external header behavior was not verified. Do not change shared middleware/response headers, Cloudflare Access or infrastructure without explicit authorization. Keep the issue documented; do not claim guaranteed Preview de-indexing.
+- Keep PR #108 OPEN/unmerged, Preview only. SKU, fullscreen gallery flicker, Hero and all owner-locked sections remain unchanged.
+
+---
+
 ## LATEST TASK RESULT — MAKE ROBOTS TEST ASSERT THE EFFECTIVE ADMIN SIGNAL — 2026-10-24
 
 - Tightened `tests/robots-txt.test.mjs`: it now reads `public/admin/index.html` and asserts the actual HTML `<meta name="robots" content="noindex,nofollow">`, instead of asserting only that a rule exists in `public/_headers`.
