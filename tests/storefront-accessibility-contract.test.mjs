@@ -376,6 +376,68 @@ assert.equal(reducedArt.intervals.length, 0, 'reduced-motion must continue to di
 assert.equal(reducedArt.elements['#artPause'].disabled, true, 'reduced-motion users must not be offered an autoplay-resume action');
 assert.match(reducedArt.elements['#artPause'].attributes['aria-label'], /tắt theo cài đặt giảm chuyển động/);
 assert.equal(typeof reducedArt.elements['#artNext'].listeners.click, 'function', 'manual next control must remain available with reduced motion enabled');
+ 
+// The featured-product image carousel is separate from the Collections slideshow.
+// It auto-advances every three seconds, so it must have its own persistent pause control.
+assert.match(html, /id="featuredAutoplayToggle" aria-label="Tạm dừng tự động chuyển ảnh" aria-pressed="false"/,
+  'the featured carousel must expose a visible, named pause control in its section header');
+assert.ok(html.includes("$('#featuredAutoplayToggle')?.addEventListener('click',()=>setFeaturedAutoplayPaused(!featuredAutoplayPaused))"),
+  'the featured pause control must be wired to the persistent autoplay state');
+assert.ok(html.includes("if(!pauseButton||reduceMotion||featuredAutoplayPaused)return;"),
+  'featured autoplay must not start without its pause control or when paused/reduced-motion is active');
+const featuredAutoStart = html.indexOf('let featuredPausedUntil=0, featuredAutoplayPaused=false;');
+const featuredAutoEnd = html.indexOf("let selectedCategory='all';", featuredAutoStart);
+assert.ok(featuredAutoStart >= 0 && featuredAutoEnd > featuredAutoStart,
+  'featured autoplay state and pause/resume helpers must be isolated for regression testing');
+const featuredAutoCode = html.slice(featuredAutoStart, featuredAutoEnd);
+function makeFeaturedAutoHarness(reducedMotion = false, withPauseButton = true) {
+  const elements = {};
+  const button = {
+    attributes: {}, listeners: {}, disabled: false, title: '', innerHTML: '',
+    setAttribute(name, value) { this.attributes[name] = String(value); },
+    addEventListener(type, fn) { this.listeners[type] = fn; }
+  };
+  const section = { getBoundingClientRect: () => ({ top: 0, bottom: 100 }) };
+  elements['#featured'] = section;
+  if (withPauseButton) elements['#featuredAutoplayToggle'] = button;
+  const intervals = [], cleared = [];
+  const card = {};
+  const context = {
+    featuredTimer: null,
+    window: { innerHeight: 800, matchMedia: () => ({ matches: reducedMotion }) },
+    document: { hidden: false },
+    $: selector => elements[selector] || null,
+    $: selector => selector === '[data-featured-card]' ? [card] : [],
+    changeFeaturedImage: () => { card.moves = (card.moves || 0) + 1; },
+    setInterval(fn, ms) { const timer = { fn, ms }; intervals.push(timer); return timer; },
+    clearInterval(timer) { cleared.push(timer); }
+  };
+  vm.runInNewContext(featuredAutoCode, context, { timeout: 1000 });
+  context.setupFeaturedAutoplay();
+  return { context, elements, button, intervals, cleared, card };
+}
+const featuredAuto = makeFeaturedAutoHarness();
+assert.equal(featuredAuto.intervals.length, 1, 'featured autoplay must start one interval when motion is allowed');
+assert.equal(featuredAuto.intervals[0].ms, 3000, 'featured carousel must retain its existing three-second cadence');
+assert.equal(featuredAuto.button.attributes['aria-pressed'], 'false');
+assert.equal(featuredAuto.button.attributes['aria-label'], 'Tạm dừng tự động chuyển ảnh');
+featuredAuto.context.setFeaturedAutoplayPaused(true);
+assert.equal(featuredAuto.cleared.length, 1, 'pausing featured autoplay must clear the active interval');
+assert.equal(featuredAuto.context.featuredTimer, null);
+assert.equal(featuredAuto.button.attributes['aria-pressed'], 'true');
+assert.equal(featuredAuto.button.attributes['aria-label'], 'Tiếp tục tự động chuyển ảnh');
+featuredAuto.context.setFeaturedAutoplayPaused(false);
+assert.equal(featuredAuto.intervals.length, 2, 'resuming must create one fresh interval');
+assert.equal(featuredAuto.context.featuredTimer, featuredAuto.intervals[1]);
+featuredAuto.intervals[1].fn();
+assert.equal(featuredAuto.card.moves, 1, 'the resumed carousel interval must continue advancing visible cards');
+const reducedFeatured = makeFeaturedAutoHarness(true);
+assert.equal(reducedFeatured.intervals.length, 0, 'reduced-motion must keep featured autoplay disabled');
+assert.equal(reducedFeatured.button.disabled, true);
+assert.match(reducedFeatured.button.attributes['aria-label'], /tắt theo cài đặt giảm chuyển động/);
+const missingFeaturedPause = makeFeaturedAutoHarness(false, false);
+assert.equal(missingFeaturedPause.intervals.length, 0, 'featured autoplay must fail closed when its pause control is missing');
+
 
 
 // The cart consultation path must not claim a product list was copied when
