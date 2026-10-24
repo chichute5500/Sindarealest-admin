@@ -904,6 +904,12 @@ body:has(#loginView:not(.hidden)) .loginwrap{
     backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:var(--shadow)
   }
 }
+@media(max-width:359px){
+  .order-detail-page-actions{grid-template-columns:minmax(88px,1fr) minmax(0,1.6fr)}
+  .order-detail-page-actions>.btn[data-action=order-detail-to-row]{
+    width:100%;min-width:0;padding-inline:5px;white-space:normal;line-height:1.25;overflow-wrap:anywhere
+  }
+}
 
 /* Compact, truthful order timestamps provide the reference timeline without inventing audit history. */
 .order-detail-timeline .panelhead{padding:5px 12px}
