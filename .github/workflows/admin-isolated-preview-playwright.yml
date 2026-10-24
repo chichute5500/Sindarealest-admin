@@ -9,7 +9,7 @@ on:
       - "functions/**"
       - "tests/e2e/admin-isolated-preview.spec.js"
       - ".github/workflows/admin-preview-diagnostics.yml"
-      - ".github/workflows/admin-preview-playwright.yml"
+      - ".github/workflows/admin-isolated-preview-playwright.yml"
       - "package.json"
       - "scripts/admin-preview-provenance-readonly.mjs"
       - "tests/admin-preview-provenance.test.mjs"

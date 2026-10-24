@@ -21,6 +21,11 @@ export function sanitizedDeployments(data) {
   }));
 }
 
+export function safeApiErrorCodes(errors) {
+  return (Array.isArray(errors) ? errors : []).map(e => Number(e?.code))
+    .filter(v => Number.isSafeInteger(v) && v > 0).slice(0,5);
+}
+
 export function assessDeployments(deployments, targetAlias = ALIAS, expectedSha = '') {
   const target = hostOf(targetAlias);
   if (!target || !target.endsWith('.' + PROJECT + '.pages.dev') || !shaValid(expectedSha))
@@ -43,10 +48,14 @@ export async function main(env = process.env) {
   else if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_API_TOKEN)
     result = { status: 'NOT_VERIFIED_MISSING_CREDENTIALS', expectedSha: sha };
   else {
-    const url = 'https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID) + '/pages/projects/' + PROJECT + '/deployments?env=preview&per_page=100&page=1';
+    const url = 'https://api.cloudflare.com/client/v4/accounts/' + encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID) + '/pages/projects/' + PROJECT + '/deployments';
     try {
       const response = await fetch(url, { method: 'GET', headers: { Authorization: 'Bearer ' + env.CLOUDFLARE_API_TOKEN }, signal: AbortSignal.timeout(15000) });
-      if (!response.ok) result = { status: 'NOT_VERIFIED_API_HTTP_ERROR', httpStatus: response.status, expectedSha: sha };
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        result = { status: 'NOT_VERIFIED_API_HTTP_ERROR', httpStatus: response.status,
+          expectedSha: sha, apiErrorCodes: safeApiErrorCodes(payload?.errors) };
+      }
       else {
         const data = await response.json();
         result = data?.success === true && Array.isArray(data.result) ? assessDeployments(data.result, ALIAS, sha) : { status: 'NOT_VERIFIED_API_RESPONSE', expectedSha: sha };
