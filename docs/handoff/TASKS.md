@@ -931,3 +931,20 @@ Source/test/deployed commit: `681fbd203f495a1eb94fb01699f04b87c5516154` (documen
 - Fullscreen gallery: **OWNER-ACCEPTED PASS / LOCKED**, automatic read-only audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491472 PASS; no modifications to gallery semantics or design.
 - Existing independent blockers remain: mixed PR #108 scope-disposition owner decision; authorized read-only Preview D1 migration 0008 proof; authoritative product `skuVerified` flags. Restricted Admin/API/data/infrastructure/payments/main/Production stay untouched.
 
+---
+
+## LATEST OWNER-REFERENCE MOBILE HERO REBUILD — 2026-10-24
+
+- Stacked Hero mobile CSS removed; canonical side-by-side copy/shoe layout and marble oval+face implemented. The original shoe RGBA PNG is unchanged. Owner reference photo now available directly in the October 24 user conversation.
+- Technical gates complete for `5134981e0c670212c030486e6b14bffa1e790adc`: Validate PASS; branch Preview PASS; 10/10 Hero screenshots and browser regression PASS; automatically triggered isolated Gallery read-only audit PASS. See exact links below.
+Exact runtime/test/Preview SHA: `5134981e0c670212c030486e6b14bffa1e790adc`.
+- Full Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900150 — PASS.
+- Preview-only deploy (base main untouched): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900201 — PASS.
+- Hero-only read-only Playwright: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154 — PASS in all 10 contexts, 360×800, 390×844, 768×1024, 1280×800, 1440×900 × light/dark.
+- Browser artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154/artifacts/12566992164 (ten screenshots and JSON).
+- Automatic gallery-only read-only audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900160 — PASS. The gallery remains OWNER ACCEPTED/LOCKED and was not modified.
+- Approved nonproduction Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+
+- **Hero owner approval STILL OPEN.** Older mobile screenshot rejected; latest mobile screenshot is visually much closer to owner's target but not a pixel-identical guarantee. Do not reintroduce a vertically stacked Hero, large alpha-padding frame, or duplicate CSS blocks.
+- Preserve all previously owner-accepted storefront sections, Gallery especially. PR #108 remains OPEN/unmerged; no main/Production deployment. Existing unrelated signoff blockers remain separate.
+

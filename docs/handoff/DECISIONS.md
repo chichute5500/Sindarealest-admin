@@ -383,3 +383,19 @@ Source/test/deployed commit: `681fbd203f495a1eb94fb01699f04b87c5516154` (documen
 
 Decision status is implementation verified, **not** owner-accepted. Keep PR #108 unmerged, main/Production untouched, and owner-PASS/LOCKED fullscreen gallery unchanged. An exact reference image and owner physical-phone approval are still distinct outstanding gates; CI and Chromium cannot replace them.
 
+---
+
+## LATEST OWNER-REFERENCE MOBILE HERO REBUILD — 2026-10-24
+
+The new owner-supplied reference is authoritative over older test string expectations or earlier CSS experiments. Mobile Hero shall have a compact single-row layout with readable editorial copy on the left and visible original crocodile-loafer alpha pixels on the right; plinth behind the shoes. Remove contradictory old mobile-only Hero blocks instead of adding another `!important` override. Preserve HTML IDs, CTA links, original hero PNG bytes, product/catalog data, backend, Admin, all locked styles, and tablet/desktop. The canonical final mobile CSS is marked `/* Mobile Hero — owner reference, single authoritative layout. */` at the end of public/index.html. New browser assertions check proportional frame height and placement, copy intersections, horizontal clipping and marble oval/front geometry.
+
+Exact runtime/test/Preview SHA: `5134981e0c670212c030486e6b14bffa1e790adc`.
+- Full Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900150 — PASS.
+- Preview-only deploy (base main untouched): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900201 — PASS.
+- Hero-only read-only Playwright: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154 — PASS in all 10 contexts, 360×800, 390×844, 768×1024, 1280×800, 1440×900 × light/dark.
+- Browser artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154/artifacts/12566992164 (ten screenshots and JSON).
+- Automatic gallery-only read-only audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900160 — PASS. The gallery remains OWNER ACCEPTED/LOCKED and was not modified.
+- Approved nonproduction Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+
+Automated acceptance is not customer approval: the owner previously rejected a green-CI screenshot. Mark Hero as awaiting owner's direct visual judgment, not OWNER ACCEPTED/LOCKED. PR #108 stays open, no Production/main changes.
+

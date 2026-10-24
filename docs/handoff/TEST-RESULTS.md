@@ -1142,3 +1142,20 @@ Source/test/deployed commit: `681fbd203f495a1eb94fb01699f04b87c5516154` (documen
 - Isolated gallery audit triggered automatically by shared HTML path: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491472 PASS. Existing gallery owner acceptance stays LOCKED.
 - Hero status: **OWNER ACCEPTANCE REQUIRED**, original exact reference unavailable for direct comparison in this session; no 100% project declaration. PR scope, authoritative SKU and Preview D1 0008 remain separate authorization blockers.
 
+---
+
+## LATEST OWNER-REFERENCE MOBILE HERO REBUILD — 2026-10-24
+
+Exact runtime/test/Preview SHA: `5134981e0c670212c030486e6b14bffa1e790adc`.
+- Full Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900150 — PASS.
+- Preview-only deploy (base main untouched): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900201 — PASS.
+- Hero-only read-only Playwright: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154 — PASS in all 10 contexts, 360×800, 390×844, 768×1024, 1280×800, 1440×900 × light/dark.
+- Browser artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154/artifacts/12566992164 (ten screenshots and JSON).
+- Automatic gallery-only read-only audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900160 — PASS. The gallery remains OWNER ACCEPTED/LOCKED and was not modified.
+- Approved nonproduction Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+
+- New alpha-aware browser composition checks reject if mobile Hero height exceeds 245px, visible shoe falls below the copy rather than floating beside it, horizontal shoe pixels exceed viewport, painted copy text intersects the PNG alpha bounds, or marble top/front is missing or detached. The PNG retains 1200×1600 alpha source and the approved drop-shadow/contain behavior.
+- Actual last round browser screenshots at 360px and 390px were visually opened and checked. The reference-first layout is a significant improvement versus the owner's rejected second image; exact marble texture remains an approximation in CSS, not a copied photo. No cross-origin writes; no app-origin network, JS console, or page errors reported in Hero audit.
+- Fullscreen Gallery was only re-audited because the same shared HTML path triggered that existing workflow; it passed and remains owner accepted/locked.
+- Owner visual acceptance is outstanding; do not assert pixel-identical parity or project 100% completion based only on tests.
+

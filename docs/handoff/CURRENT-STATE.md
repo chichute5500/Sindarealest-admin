@@ -1135,3 +1135,23 @@ The already owner-accepted fullscreen gallery remains PASS/LOCKED. Its isolated 
 
 **Status:** source tests PASS, exact-SHA Preview PASS, browser geometry/error audit PASS, manual screenshot self-review PASS; **OWNER VISUAL ACCEPTANCE REQUIRED**. The owner's exact reference file is still not available for direct pixel-level parity comparison in this session; do not infer it from generated imagery. Ask the owner to inspect the current Preview on their physical phone (light/dark) and explicitly say PASS before locking Hero. The project is **not confirmed 100%** due to owner Hero acceptance and separate PR #108 scope decision, authoritative SKU flags, and authorized read-only Preview D1 migration 0008 proof. PR #108 stays OPEN/unmerged, base main; no Production/main changes.
 
+---
+
+## LATEST OWNER-REFERENCE MOBILE HERO REBUILD — 2026-10-24
+
+The owner explicitly provided two side-by-side ground truth screenshots: first is the actual target design and second is the unacceptable phone state. The previous source/test/CI-green claim was **VISUALLY REJECTED**. This work supersedes the obsolete owner-pending vertical Hero experiment but still requires final owner acceptance of the newest Preview.
+
+Confirmed root cause: three duplicate Hero-mobile layout groups at the end of `public/index.html`, plus the older `#home` mobile override, were fighting with `!important` and stretching a 1200×1600 RGBA shoe PNG whose alpha mask is ~83% transparent. The prior layout stacked copy first and a 310–330px tall empty image box below, wasting the first screen. The owner target explicitly requires the three-line serif copy on the left with the raised loafer pair over a broad marble platform on the right, on the same hero row.
+
+The duplicate Hero-only mobile CSS groups were removed, preserving preexisting tablet styles and unrelated owner-accepted regions. There is now one final `/* Mobile Hero — owner reference, single authoritative layout. */` block, with one narrow-phone adjustment. It uses a 58:42 grid, a compact 216–230px Hero, an absolutely positioned transparent PNG (`object-fit:contain`, original bytes untouched) anchored by measured alpha visible bounds, and a larger stone-oval with separate 24px marble-effect front face. No product pixels, catalog SKU/API, Admin, D1/R2, gallery, CSS unrelated to Hero, or Production were modified. Tests and browser audit were updated to explicitly reject the old stacked composition, copy/shoe overlap, missing pedestal, clipped shoes, and oversized vertical Hero. Comparing the actual audit screenshot at 390px directly to the user's first reference shows that composition/proportions are now materially closer; it is not a pixel-identical reproduction, especially for the marble texture.
+
+Exact runtime/test/Preview SHA: `5134981e0c670212c030486e6b14bffa1e790adc`.
+- Full Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900150 — PASS.
+- Preview-only deploy (base main untouched): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900201 — PASS.
+- Hero-only read-only Playwright: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154 — PASS in all 10 contexts, 360×800, 390×844, 768×1024, 1280×800, 1440×900 × light/dark.
+- Browser artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900154/artifacts/12566992164 (ten screenshots and JSON).
+- Automatic gallery-only read-only audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111900160 — PASS. The gallery remains OWNER ACCEPTED/LOCKED and was not modified.
+- Approved nonproduction Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+
+The screenshot self-review found no overlapping copy/shoe pixels, and the 390px shoe alpha bounds were x=200.3–376.9 while the mobile Hero height was 222.3px. The Hero browser audit reports no hard failures in ten contexts. This is **AUTOMATED PASS + SELF-REVIEW**, not owner visual acceptance. The user explicitly does not accept generic CI-green summaries as visual signoff; only the user may mark Hero OWNER PASS/LOCKED after viewing this source SHA. PR #108 stays OPEN/unmerged, base main, Production untouched. Separate owner-only PR-scope/D1-proof/SKU flag blockers remain.
+
