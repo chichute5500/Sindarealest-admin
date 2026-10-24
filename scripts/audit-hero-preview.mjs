@@ -377,6 +377,16 @@ try {
             if (left < -1 || left + p.width > m.viewport.width + 1) fail('Tablet marble pedestal extends outside the viewport.');
           }
         }
+        if (m.viewport.width >= 761) {
+          const maxHeight=m.viewport.width>=1001?680:575;
+          if(!m.heroRect || m.heroRect.height>maxHeight || m.heroRect.height<430) fail('Desktop/tablet Hero is oversized or collapsed.');
+          if(!m.pedestal || m.pedestal.face.clipPath!=='none' || !String(m.pedestal.face.maskImage).includes('linear-gradient'))
+            fail('Desktop/tablet Hero uses a detached polygon platform instead of the shared curved stone shelf.');
+          if(!m.contactShadow || m.contactShadow.display==='none'||!m.contactShadow.background.includes('radial-gradient'))
+            fail('Desktop/tablet Hero lacks the shared dual shoe-contact shadow.');
+          if(m.visibleProductRect && m.heroRect && (m.visibleProductRect.top<m.heroRect.top-5 || m.visibleProductRect.bottom>m.heroRect.bottom+5))
+            fail('Desktop/tablet shoe pixels extend outside the bounded Hero.');
+        }
         if (m.viewport.width >= 1001) {
           const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;
           if (ratio < 0.70 || ratio > 0.80) fail('Desktop Hero PNG is being squeezed by a mismatched CSS box ratio.');

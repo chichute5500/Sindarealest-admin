@@ -541,3 +541,14 @@ assert.ok(mobileHeroReferenceMatch.includes("clip-path:none!important;")
   && mobileHeroReferenceMatch.includes("filter:blur(1.6px)!important;"),
   "Marble needs a rounded stone shelf fading into the background, subtle mineral texture and tight contact shadows.");
 assert.ok(mobileHeroReferenceMatch.includes("mask-image:linear-gradient(to bottom,#000 0%,#000 50%,rgba(0,0,0,.70) 72%,transparent 100%)!important;"),"The broad marble shelf must fade into the page rather than terminate as a floating disk.");
+
+const sharedHeroStyles=html.slice(html.lastIndexOf("/* Cross-device Hero design system: desktop and tablet inherit the same broad,"));
+assert.ok(sharedHeroStyles.includes("@media(min-width:761px){")
+  && sharedHeroStyles.includes("height:clamp(535px,43vw,620px)!important;")
+  && sharedHeroStyles.includes("width:clamp(620px,46vw,700px)!important;")
+  && sharedHeroStyles.includes("border-radius:0 0 22% 22% / 0 0 12% 12%!important;")
+  && sharedHeroStyles.includes("at 41% 82%")
+  && sharedHeroStyles.includes("at 78% 40%")
+  && sharedHeroStyles.includes("@media(min-width:761px) and (max-width:1000px)")
+  && sharedHeroStyles.includes("height:clamp(455px,60vw,550px)!important;"),
+  "Desktop/tablet Hero must use a compact layout and the same continuous marble shelf and two contact shadows as mobile.");
