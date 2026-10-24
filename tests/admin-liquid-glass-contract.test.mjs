@@ -313,6 +313,7 @@ assert.ok(adminHtml.indexOf('id="pPrice"') < adminHtml.indexOf('id="productPanel
 assert.ok(adminHtml.indexOf('id="pStock"') < adminHtml.indexOf('id="productPanelGallery"'), 'stock belongs to the basic info panel before the images tab');
 assert.ok(adminHtml.indexOf('id="productPanelGallery"') < adminHtml.indexOf('id="productPanelPricing"'), 'images tab appears before the other tab');
 has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
+has("for(const panel of $('.editor-tab-panel'))panel.hidden=panel.dataset.productPanel!==name", 'all editor tab panels are iterated without throwing when the editor opens');
 has("const editorContent=$('#backdrop .editorcontent');if(editorContent)editorContent.scrollTop=0", 'switching editor tabs resets the shared scroll position so the selected panel starts at its heading');
 has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
 has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
