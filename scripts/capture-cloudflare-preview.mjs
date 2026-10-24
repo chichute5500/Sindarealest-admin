@@ -623,14 +623,19 @@ async function auditHeroImage(page, label) {
     const hidden = Boolean(imageElement?.hidden);
     const frameStyle = frame ? getComputedStyle(frame) : null;
     const frameCollapsed = !frame || frameStyle.display === 'none' || frame.getBoundingClientRect().width < 1 || frame.getBoundingClientRect().height < 1;
-    const temporarilyHiddenByOwnerRequest = Boolean(imageElement)
-      && hidden && !source && status === 'temporarily-disabled-owner-request' && frameCollapsed;
-    return { actualImage: source, status, hidden, frameCollapsed, temporarilyHiddenByOwnerRequest };
+    const frameVisible = Boolean(frame) && frameStyle.display !== 'none'
+      && frame.getBoundingClientRect().width > 1 && frame.getBoundingClientRect().height > 1;
+    const ownerPresentationImageActive = Boolean(imageElement) && !hidden
+      && source.endsWith('/images/hero-upload/tb_image_share_1792519964514-blended.png')
+      && status === 'owner-presentation-image-active' && imageElement.complete
+      && imageElement.naturalWidth > 0 && frameVisible;
+    return { actualImage: source, status, hidden, frameCollapsed, frameVisible, ownerPresentationImageActive,
+      naturalWidth: imageElement?.naturalWidth || 0, naturalHeight: imageElement?.naturalHeight || 0 };
   });
-  const pass = result.temporarilyHiddenByOwnerRequest === true;
-  const status = pass ? 'PASS_HERO_TEMPORARILY_HIDDEN_OWNER_REQUEST' : 'FAIL';
+  const pass = result.ownerPresentationImageActive === true;
+  const status = pass ? 'PASS_HERO_PRESENTATION_IMAGE_VISIBLE' : 'FAIL';
   audit.heroImageChecks.push({ context: label, status, pass, result });
-  if (!pass) audit.hardFailures.push('Hero must have no image source and its visual frame must collapse during the owner-requested pause at ' + label + '.');
+  if (!pass) audit.hardFailures.push('Hero must show the decoded owner-provided presentation image inside a visible frame at ' + label + '.');
 }
 async function auditImageElements(page, label) {
   const broken = await page.evaluate(() => Array.from(document.images).filter((img) => {

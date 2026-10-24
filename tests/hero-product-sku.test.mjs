@@ -6,13 +6,11 @@ const heroSyncMatch = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\
 assert.ok(heroSyncMatch, "The hero image synchronization function must remain present.");
 const heroSync = heroSyncMatch[1];
 
-assert.ok(heroSync.includes("target.hidden=true")
-  && heroSync.includes("target.removeAttribute('src')")
-  && heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'")
-  && heroSync.includes("target.onerror=null"),
-  "The owner-requested temporary Hero pause must clear the image source and hide the element.");
-assert.doesNotMatch(heroSync, /target\\.src=url|target\\.hidden=false/,
-  "The paused Hero must not load or show the image.");
+assert.ok(heroSync.includes("target.hidden=false")
+  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'")
+  && heroSync.includes("target.dataset.productImageStatus='owner-presentation-image-active'")
+  && heroSync.includes("target.alt='Đôi giày loafer da cá sấu SinDarealest'"),
+  "The owner-authorized Hero experiment must show the owner-supplied blended PNG with descriptive alt text.");
 assert.ok(html.includes('id="heroProductImage"'),
   "The existing Hero image element must remain available for responsive styling.");
 
@@ -73,7 +71,7 @@ assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("width:130%!important")
   && heroEdgeTreatment.includes("max-height:330px!important"),
   "The derived Hero shoes must be enlarged while alpha edges blend into the page and the original RGB stays unchanged.");
-assert.ok(html.includes("filter:none!important;-webkit-mask:none!important;mask:none!important"));
+assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important;-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
 assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
 assert.ok(html.includes("#home .hero-visual::before{")
@@ -91,12 +89,8 @@ assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!impor
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
 assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
-  && liveCapture.includes("temporarilyHiddenByOwnerRequest"),
-  "The live audit must verify the owner-requested hidden Hero state.");
-assert.ok(liveCapture.includes("status === 'temporarily-disabled-owner-request'")
-  && liveCapture.includes("!source")
-  && liveCapture.includes("frameCollapsed"),
-  "The live audit must require no image source and a collapsed visual frame.");
+  && liveCapture.includes("ownerPresentationImageActive"),
+  "The live audit must verify the authorized visible Hero presentation image.");
 
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
 console.log("PASS: owner-requested temporary Hero-hidden state is enforced.");
