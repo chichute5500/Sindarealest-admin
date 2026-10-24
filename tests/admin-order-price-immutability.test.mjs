@@ -103,6 +103,9 @@ async function patchOrder(DB, prices, status = "confirmed") {
   const orderUpdate = db.calls.batches[0].find(statement => statement.sql.startsWith("UPDATE orders SET status=?"));
   assert.ok(orderUpdate?.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"),
     "the order cancellation UPDATE must atomically require no pending QR request");
+  assert.ok(db.calls.batches[0].every(statement =>
+    statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')")
+  ), "every cancellation batch write (item, order, and audit) must guard against a concurrently created pending QR request");
 }
 
 {
