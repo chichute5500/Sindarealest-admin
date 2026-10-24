@@ -3717,11 +3717,12 @@ html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html
 }
 
 
-/* Reference comparison refinement: desktop product scale was materially smaller than the source mockup. */
+/* Reference comparison refinement: enlarge desktop product area through layout sizing, without transforming or filtering source pixels. */
 @media(min-width:1001px){
   #home .hero-visual img{
-    transform:scale(1.22)!important;
-    transform-origin:center center!important;
+    width:122%!important;
+    max-width:none!important;
+    margin-left:-11%!important;
   }
 }
 </style>
