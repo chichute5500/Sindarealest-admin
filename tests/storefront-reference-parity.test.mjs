@@ -518,8 +518,8 @@ assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr
 assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
   && mobileHeroReferenceMatch.includes("bottom:26px!important;")
   && mobileHeroReferenceMatch.includes("height:25px!important;")
-  && mobileHeroReferenceMatch.includes("bottom:11px!important;")
-  && mobileHeroReferenceMatch.includes("height:16px!important;"),
+  && mobileHeroReferenceMatch.includes("bottom:-4px!important;")
+  && mobileHeroReferenceMatch.includes("height:38px!important;"),
   "Mobile pedestal top/front must form a compact marble display below the shoe soles.");
 assert.ok(mobileHeroReferenceMatch.includes("filter:drop-shadow(0 5px 5px rgba(14,30,42,.10)) drop-shadow(0 2px 2px rgba(8,19,29,.16))!important;")
   && mobileHeroReferenceMatch.includes("#home .hero-visual-glow{")
@@ -535,8 +535,9 @@ assert.ok(heroPedestalStyles.includes("Tablet Hero pedestal stays under the shoe
   "Tablet pedestal must remain entirely within the Hero presentation without clipping its right edge.");
 
 assert.ok(mobileHeroReferenceMatch.includes("clip-path:none!important;")
-  && mobileHeroReferenceMatch.includes("border-radius:0 0 46% 46% / 0 0 58% 58%!important;")
+  && mobileHeroReferenceMatch.includes("border-radius:0 0 22% 22% / 0 0 12% 12%!important;")
   && mobileHeroReferenceMatch.includes("Irregular faint mineral veins")
-  && mobileHeroReferenceMatch.includes("rgba(183,207,222,.98)")
+  && mobileHeroReferenceMatch.includes("rgba(203,224,236,.75)")
   && mobileHeroReferenceMatch.includes("filter:blur(1.6px)!important;"),
-  "Marble needs a rounded stone rim, subtle mineral texture and tight contact shadow instead of a polygon tray.");
+  "Marble needs a rounded stone shelf fading into the background, subtle mineral texture and tight contact shadows.");
+assert.ok(mobileHeroReferenceMatch.includes("mask-image:linear-gradient(to bottom,#000 0%,#000 50%,rgba(0,0,0,.70) 72%,transparent 100%)!important;"),"The broad marble shelf must fade into the page rather than terminate as a floating disk.");

@@ -119,5 +119,5 @@ assert.ok(canonicalMobile.includes("#home .hero-visual-glow{")
 console.log("PASS: owner-authorized Hero presentation PNG and restrained drop-shadow experiment are enforced.");
 
 assert.ok(canonicalMobile.includes('clip-path:none!important;')
-  && canonicalMobile.includes('border-radius:0 0 46% 46% / 0 0 58% 58%!important;'),
+  && canonicalMobile.includes('border-radius:0 0 22% 22% / 0 0 12% 12%!important;'),
   'The mobile marble face must be curved rather than polygonal.');

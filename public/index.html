@@ -3796,7 +3796,7 @@ html.dark #home .hero-visual::before{
     transform:translateX(-50%)!important;
     width:56vw!important;max-width:218px!important;
     height:25px!important;min-height:0!important;
-    border-radius:50%!important;border:1px solid rgba(196,214,226,.38)!important;
+    border-radius:50%!important;border:1px solid rgba(196,214,226,.21)!important;
     /* Irregular faint mineral veins and natural soft reflection. */
     background:
       radial-gradient(ellipse 39% 37% at 33% 29%,rgba(255,255,255,.82) 0%,rgba(255,255,255,0) 100%),
@@ -3809,19 +3809,21 @@ html.dark #home .hero-visual::before{
   #home .hero-visual::after{
     content:""!important;display:block!important;position:absolute!important;
     inset:auto!important;top:auto!important;
-    left:50%!important;bottom:11px!important;
+    left:50%!important;bottom:-4px!important;
     transform:translateX(-50%)!important;
-    width:54vw!important;max-width:210px!important;
-    height:16px!important;
-    border:1px solid rgba(173,195,211,.34)!important;border-top:0!important;
-    /* Round stone cylinder below the upper oval; no separate trapezoid. */
+    width:56vw!important;max-width:218px!important;
+    height:38px!important;
+    border:0!important;
+    /* The reference is a broad marble shelf fading into the background, not a floating disc. */
     clip-path:none!important;
-    border-radius:0 0 46% 46% / 0 0 58% 58%!important;
+    border-radius:0 0 22% 22% / 0 0 12% 12%!important;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 50%,rgba(0,0,0,.70) 72%,transparent 100%)!important;
+    mask-image:linear-gradient(to bottom,#000 0%,#000 50%,rgba(0,0,0,.70) 72%,transparent 100%)!important;
     background:
-      linear-gradient(90deg,rgba(110,148,175,.11),transparent 15% 76%,rgba(121,153,176,.15)),
-      linear-gradient(112deg,transparent 0 30%,rgba(115,154,176,.035) 31%,transparent 33% 70%,rgba(130,160,184,.035) 71%,transparent 73%),
-      linear-gradient(180deg,rgba(240,248,252,.96) 0%,rgba(217,233,242,.98) 48%,rgba(183,207,222,.98) 100%)!important;
-    box-shadow:0 7px 11px rgba(30,66,91,.075),inset 0 1px 0 rgba(255,255,255,.64)!important;
+      linear-gradient(110deg,transparent 0 32%,rgba(111,153,177,.045) 33%,transparent 35% 71%,rgba(110,147,171,.035) 72%,transparent 73%),
+      linear-gradient(93deg,rgba(139,168,187,.09),transparent 15% 85%,rgba(127,160,180,.07)),
+      linear-gradient(180deg,rgba(240,248,252,.97) 0%,rgba(224,237,245,.95) 45%,rgba(203,224,236,.75) 74%,rgba(203,224,236,0) 100%)!important;
+    box-shadow:0 4px 10px rgba(30,66,91,.05),inset 0 1px 0 rgba(255,255,255,.60)!important;
     z-index:0!important;pointer-events:none!important;
   }
   /* Two independent physically located contact shadows: front loafer and upright loafer. 
@@ -3857,8 +3859,9 @@ html.dark #home .hero-visual::before{
   }
   html.dark #home .hero-visual::after{
     background:
-      linear-gradient(90deg,rgba(31,63,84,.20),transparent 17% 75%,rgba(26,58,81,.27)),
-      linear-gradient(180deg,rgba(141,176,201,.96),rgba(91,128,154,.97) 55%,rgba(70,105,131,.98))!important;
+      linear-gradient(110deg,transparent 0 32%,rgba(24,55,78,.09) 33%,transparent 35% 71%,rgba(26,62,84,.06) 72%,transparent 73%),
+      linear-gradient(93deg,rgba(31,63,84,.17),transparent 15% 85%,rgba(26,58,81,.20)),
+      linear-gradient(180deg,rgba(148,181,204,.97),rgba(118,155,181,.95) 44%,rgba(83,122,150,.75) 74%,rgba(83,122,150,0) 100%)!important;
     border-color:rgba(128,161,185,.38)!important;
   }
 }
