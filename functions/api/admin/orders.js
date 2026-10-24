@@ -126,10 +126,14 @@ export async function onRequestPatch(context) {
     const priceGuardSql =
       " AND NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?)" +
       " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
+    const cancellationRequestGuardSql =
+      " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
     for (const update of priceUpdates) {
-      const sql = "UPDATE order_items SET unit_price=?,line_total=? WHERE id=? AND order_id=?" + (priceChanged ? priceGuardSql : "");
+      const itemGuardSql = priceChanged ? priceGuardSql : (status === "cancelled" ? cancellationRequestGuardSql : "");
+      const sql = "UPDATE order_items SET unit_price=?,line_total=? WHERE id=? AND order_id=?" + itemGuardSql;
       const values = [update.unitPrice,update.lineTotal,update.itemId,id];
       if (priceChanged) values.push(id,id);
+      else if (status === "cancelled") values.push(id);
       statements.push(context.env.DB.prepare(sql).bind(...values));
     }
 
