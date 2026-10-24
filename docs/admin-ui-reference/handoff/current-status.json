@@ -1,10 +1,10 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T09:41:00Z",
+  "capturedAtUtc": "2026-10-24T10:00:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
-  "checkpointSemantics": "2026-10-24 08:55 UTC: QR upload atomicity and feature workflow/spec path isolation included in source/test SHA 0469930f6836d5f8d87b155a538e1d68776e3913. Validate and Admin Preview Playwright both pass. Live read-only diagnostics from older SHA must not be attributed to this SHA.",
+  "branchHeadAtCheckpointStart": "e7d974c87af1889ccceae459beeb08d45d7da6ec",
+  "checkpointSemantics": "Live handoff refresh at 2026-10-24 10:00 UTC. PR #111 HEAD at refresh start e7d974c87af1889ccceae459beeb08d45d7da6ec; application/source-test SHA cf340b686e0974ac5602b6ef4594c00e477c8932. Validate #5688 and Admin Preview Playwright #1077 both PASS on the source/test SHA; Validate #5733 and Admin Preview Playwright #1097 pass on docs-only SHA 5f7a9d94858a02faaea003e2a9ea6386d507121f. Refresh live metadata after handoff commits.",
   "codeTestSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
   "latestProductSourceCommit": "cf340b686e0974ac5602b6ef4594c00e477c8932",
   "latestActionsRun": {
@@ -918,7 +918,7 @@
     "missingRequireAdminConfirmed": 0,
     "notes": "Login/logout are intentional session endpoints; unsupported methods return 405. Read-only static audit, not a live authorization penetration test."
   },
-  "status": "VALIDATE_5688_PASS_AND_PREVIEW_PLAYWRIGHT_1077_PASS_ON_EXACT_SOURCE_TEST_SHA",
+  "status": "LIVE_HANDOFF_REFRESHED; VALIDATE_5688_AND_ADMIN_PREVIEW_PLAYWRIGHT_1077_PASS_ON_SOURCE_TEST_SHA",
   "latestValidateAttemptUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40072885703",
   "latestPreviewAttemptUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40072885497",
   "currentChange": {
@@ -988,5 +988,14 @@
     "conclusion": "success",
     "sha": "5f7a9d94858a02faaea003e2a9ea6386d507121f",
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082797249"
+  },
+  "latestValidationRun": {
+    "id": 40081623892,
+    "runNumber": 5688,
+    "workflow": "Validate source and tests",
+    "status": "completed",
+    "conclusion": "success",
+    "sha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892"
   }
 }
