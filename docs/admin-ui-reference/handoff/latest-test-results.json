@@ -1,28 +1,26 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T11:16:00Z",
+  "capturedAtUtc": "2026-10-24T12:35:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
-  "codeTestSha": "c277c5a2f99114856ec78594823f71b0c9010cf0",
+  "branchHeadAtCheckpointStart": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
+  "codeTestSha": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "REFUND_UI_FIX_TEST_FIRST_AND_EXACT_SHA_VALIDATE_PREVIEW_DIAGNOSTIC_PASS",
+  "status": "ISOLATED_ADMIN_PREVIEW_PLAYWRIGHT_AND_VALIDATE_PASS_DEPLOYMENT_SHA_PROVENANCE_UNVERIFIED",
   "latestRun": {
-    "id": 40088894818,
-    "runNumber": 544,
-    "workflow": "Admin Preview diagnostic smoke test",
+    "id": 40093657775,
+    "runNumber": 1127,
+    "workflow": "Test isolated Admin Preview (read-only)",
     "status": "completed",
     "conclusion": "success",
-    "sha": "c277c5a2f99114856ec78594823f71b0c9010cf0",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088894818",
-    "artifactId": 12557934045,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088894818/artifacts/12557934045"
+    "sha": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40093657775"
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_EXACT_SHA_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "npmTest": "PASS_ON_EXACT_SHA_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
-    "testedSha": "c277c5a2f99114856ec78594823f71b0c9010cf0",
+    "testedSha": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
     "projectIntegrity": "PASS_ON_EXACT_SHA_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "localStaticPlaywright": "PASS_SOURCE_RESPONSIVE_THEME_AND_FIXTURE_MATRIX_ON_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "responsiveThemeScreenshotMatrix": "PASS_16_SOURCE_LOGIN_IMAGES_120_FIXTURE_ENTRIES_112_METRICS_ARTIFACT_12556733771_ON_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
@@ -55,7 +53,11 @@
     "cancelledOrderTerminalRegression": "PASS",
     "authenticatedReadOnlyRoutes": "7/7 HTTP 200",
     "catalogCount": 235,
-    "decodedImageUrls": 527
+    "decodedImageUrls": 527,
+    "validate5808": "PASS",
+    "isolatedAdminPreview1127": "PASS",
+    "deploymentSourceShaProvenance": "NOT_VERIFIED",
+    "remotePreviewD1SchemaLedger": "NOT_VERIFIED"
   },
   "historicalRuns": [
     {

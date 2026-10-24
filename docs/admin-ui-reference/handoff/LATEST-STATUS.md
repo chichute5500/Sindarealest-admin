@@ -1,3 +1,46 @@
+# LATEST STATUS — SINDAREALEST ADMIN
+
+**Updated:** 2026-10-24T12:35:00Z UTC  
+**Branch:** `feature/admin-isolated-handoff-2026-10-20`  
+**Code/test SHA:** `c0c649022e0459c7d23f20ed46f9d750c52892d8`  
+**PR #111:** OPEN / unmerged
+
+## Latest evidence
+
+| Check | Result | Exact SHA / link |
+|---|---|---|
+| Validate source and tests | PASS | `c0c649022e0459c7d23f20ed46f9d750c52892d8` — [#5808](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40093657792) |
+| Isolated Admin Preview Playwright, read-only | PASS | `c0c649022e0459c7d23f20ed46f9d750c52892d8` — [#1127](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40093657775) |
+| Earlier Preview runner setup | Failed, resolved | [#1126](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40091858514) failed because `@playwright/test` was missing; explicit installation added and #1127 passed |
+
+#1127 passed repository/branch guard, dependency install, source validation, regression tests, Playwright runner and Chromium installation, read-only isolated Preview tests, final branch SHA guard and evidence upload. The companion Validate workflow passed on the same SHA.
+
+## Explicit limitations
+
+- Passing Preview URL check **does not prove deployment source SHA**; deployed-source provenance is NOT_VERIFIED.
+- All 12 screens remain **PARTIAL_NOT_ACCEPTED**.
+- Approved-reference parity: **NOT_VERIFIED**.
+- Authenticated business-write/persistence QA: **NOT_TESTED**.
+- Remote Preview D1 schema/ledger: **NOT_VERIFIED**.
+- Production deployment: **NOT_PERFORMED**.
+- #1127 was read-only; it did not perform real business writes.
+
+## Progress
+
+**50% PROVISIONAL — unchanged.** Increase only when an acceptance criterion is completed with evidence tied to the exact tested SHA. Do not count historical screenshots or fixture-only results as live parity evidence.
+
+## Next
+
+1. Inspect #1127 logs/artifact and spec for a reliable non-mutating deployed-build identity check.
+2. Continue approved-reference screen acceptance; test-first for reproducible defects.
+3. Preserve branch isolation, update all handoff files after evidence-backed stages, and continue work after reporting.
+
+## Guardrails
+
+Only write to `feature/admin-isolated-handoff-2026-10-20`; PR #111 stays open/unmerged; PR #108 is read-only; PR #112 untouched. No merge/rebase/cherry-pick/force-push, no Production or unapproved Preview deploy, no remote D1/R2/schema/ledger writes or migrations, no secrets/Access/DNS changes, and no Access bypass. Commit messages must start with `[CF-Pages-Skip]`.
+
+---
+
 # POST-CI LIVE HANDOFF — 2026-10-24 10:41 UTC
 
 **Verified code/test checkpoint:** `2f2c631c328d3658c0911a9066b39d0d513ff0b9` on `feature/admin-isolated-handoff-2026-10-20`. Live `main` ref is `227622d3e3b7c75724ffa1775b193da71089269a`. PR #111 is OPEN/unmerged, and its HEAD matches the feature branch. PR API currently reports base ref `main` with base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, while the live `main` ref is `227622d3e3b7c75724ffa1775b193da71089269a`; comparing the commits shows `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` is one commit behind `main`. Treat this as stale/inconsistent PR base metadata, not a verified main-ref change. Do not merge/rebase; refresh API state before any future PR-level decision.

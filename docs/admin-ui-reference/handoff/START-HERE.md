@@ -1,3 +1,71 @@
+# SINDAREALEST ADMIN — LIVE HANDOFF
+
+**Checkpoint updated:** 2026-10-24T12:35:00Z (UTC). **Repository:** [chichute5500/Sindarealest-admin](https://github.com/chichute5500/Sindarealest-admin). **Writable branch:** `feature/admin-isolated-handoff-2026-10-20`.
+
+## Current verified state
+
+- **Branch HEAD at start of handoff update:** `c0c649022e0459c7d23f20ed46f9d750c52892d8`. This is the exact code/test SHA that ran the isolated Admin Preview Playwright workflow.
+- **Validate workflow:** PASS on `c0c649022e0459c7d23f20ed46f9d750c52892d8`, run [#5808](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40093657792).
+- **Isolated Admin Preview Playwright:** PASS on `c0c649022e0459c7d23f20ed46f9d750c52892d8`, run [#1127](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40093657775). Job: read-only; regression tests, Chromium and isolated Preview checks passed; final exact-branch-HEAD guard passed; safe evidence uploaded.
+- The prior run [#1126](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40091858514) failed because `@playwright/test` was not installed. The explicit install step was added in `c0c649022e0459c7d23f20ed46f9d750c52892d8`; #1127 is the successful rerun. Do not treat #1126 as a current blocker.
+- **Important limitation:** run #1127 verifies the isolated Preview URL is reachable and the configured read-only checks pass. It does **not** prove the deployed site was built from `c0c649022e0459c7d23f20ed46f9d750c52892d8`; deployment provenance remains **NOT_VERIFIED**. No deployment was triggered by this workflow.
+- **PR #111:** OPEN, unmerged, head `c0c649022e0459c7d23f20ed46f9d750c52892d8`; API reports 496 changed files, +46,507 / -224. Do not merge/rebase/cherry-pick/force-push. Refresh PR/base refs before any PR-level decision. PR #108 remains read-only; PR #112 remains open/draft and untouched.
+
+## Acceptance boundary — do not inflate progress
+
+- Progress: **50% PROVISIONAL**.
+- All 12 screens: **PARTIAL_NOT_ACCEPTED**.
+- Approved-reference visual/behavior parity: **NOT_VERIFIED**.
+- Authenticated business-write and persistence QA: **NOT_TESTED**.
+- Remote Preview D1 schema/ledger: **NOT_VERIFIED**.
+- Preview deployed-source SHA provenance: **NOT_VERIFIED**.
+- Production deployment: **NOT_PERFORMED**.
+- No real business writes were performed by run #1127; it is read-only QA.
+
+## What has been verified in the isolated workflow
+
+1. Guarded repository and branch; checked out exact feature-branch source.
+2. Dependency install and source validation passed.
+3. Regression tests passed.
+4. Playwright test runner installed explicitly, Chromium installed, isolated Admin Preview read-only test passed.
+5. Final remote feature-branch SHA guard passed; safe test evidence uploaded.
+6. Companion Validate workflow passed on the same SHA.
+
+## Next actions — continue without repeating completed work
+
+1. Inspect the exact #1127 job logs/artifact and workflow/test implementation; determine whether existing build/runtime metadata can establish deployed-source provenance without deploying or modifying Cloudflare. Do not infer provenance from a passing URL check.
+2. Continue screen-by-screen acceptance against the approved reference using existing source and evidence. Fix only reproducible defects: reproduce → add regression test → patch → validate on exact SHA.
+3. Keep read-only QA distinct from authenticated write/persistence QA. Do not issue business writes merely to create evidence; only proceed through an authorized, safe test path.
+4. Keep all handoff files synchronized after evidence-backed stages; progress remains 50% until acceptance criteria materially change.
+
+## Mandatory seven operating rules
+
+1. Parallelize independent, safe workstreams where tools allow; avoid duplicating work or conflicting writes.
+2. Report only verified outcomes with exact SHA and links, then continue useful work; a report is not a reason to stop.
+3. On a blocker, preserve concrete evidence and switch to another useful independent task rather than retrying the same path without new evidence.
+4. Test-first: reproduce a concrete defect, add a regression test, then patch and verify.
+5. Tie every result to an exact SHA. Distinguish synthetic fixtures/read-only GETs from authenticated business-write/persistence QA.
+6. Stop only when a real owner-only action is required. Never ask for a nonexistent “Run workflow” button; do not trigger deployments without explicit authorization.
+7. Preserve branch and environment isolation exactly as listed below.
+
+## Hard safety boundaries
+
+- Write only to `feature/admin-isolated-handoff-2026-10-20`; use expected-SHA guarded updates. All handoff commits must start with `[CF-Pages-Skip]` and check the resulting Actions set for unintended Cloudflare Pages deployment checks.
+- PR #111 stays OPEN/unmerged. PR #108 is read-only. PR #112 is untouched. Never modify `main` or storefront branches.
+- No merge, rebase, cherry-pick, force-push; no Production deploy; no manual Preview deploy without explicit owner request.
+- No remote D1/R2/schema/ledger writes, migrations, setup scripts, secrets, Cloudflare Access/DNS changes, Access bypass, or fabricated commits/evidence.
+- Never claim that synthetic screenshots prove approved-reference parity or that a passing Preview URL proves deployed SHA provenance.
+
+## Canonical files
+
+- [START-HERE.md](START-HERE.md)
+- [PROMPT-NEXT-CHAT.md](PROMPT-NEXT-CHAT.md)
+- [LATEST-STATUS.md](LATEST-STATUS.md)
+- [current-status.json](current-status.json)
+- [latest-test-results.json](latest-test-results.json)
+
+---
+
 # LIVE HANDOFF — 2026-10-24 11:16 UTC
 
 **Verified source/test SHA:** `c277c5a2f99114856ec78594823f71b0c9010cf0` on `feature/admin-isolated-handoff-2026-10-20`.
