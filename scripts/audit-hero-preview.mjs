@@ -256,6 +256,16 @@ try {
         }, { theme });
 
         const m = result.metrics;
+        // Preserve a Hero-only PNG even when a visual assertion fails, so the failure is inspectable.
+        try {
+          const filename = label + '-hero.png';
+          await page.locator('#home').screenshot({
+            path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000,
+          });
+          result.screenshot = filename;
+        } catch (error) {
+          result.failures.push('Hero screenshot capture failed: ' + String(error.message || error).slice(0, 400));
+        }
         const fail = (message) => result.failures.push(message);
         if (!m.source.endsWith(expectedAssetPath) || m.currentSrcPath !== expectedAssetPath) fail('Wrong Hero PNG source.');
         if (m.status !== 'owner-presentation-image-active') fail('Hero presentation-image status is not active.');
@@ -271,11 +281,6 @@ try {
         if (!imageResponses.some((entry) => entry.status === 200)) fail('The Hero PNG did not return HTTP 200.');
         if (audit.readOnlyViolations.some((entry) => entry.context === label)) fail('A write/non-GET request was attempted and blocked.');
         if (audit.sameOriginHttpErrors.some((entry) => entry.context === label && entry.url === expectedAssetPath)) fail('The Hero PNG response returned an HTTP error.');
-        const filename = label + '-hero.png';
-        await page.locator('#home').screenshot({
-          path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000,
-        });
-        result.screenshot = filename;
         result.imageResponse = imageResponses;
       } catch (error) {
         result.failures.push(String(error.message || error).slice(0, 700));
