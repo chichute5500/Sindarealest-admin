@@ -372,7 +372,9 @@ const sitemapText = await sitemapResponse.text();
 assert.equal(sitemapResponse.status,200);
 assert.match(sitemapText,/https:\/\/shop\.example\/sanpham\/sneaker\/SD-SN001/);
 const robotsText = await (await robots({request:new Request('https://shop.example/robots.txt')})).text();
-assert.match(robotsText,/Disallow: \/admin\//);
+// Admin is crawlable so the existing X-Robots-Tag: noindex, nofollow header can be seen.
+assert.doesNotMatch(robotsText,/Disallow: \/admin\//);
+assert.match(robotsText,/Disallow: \/api\//);
 assert.match(robotsText,/Sitemap: https:\/\/shop\.example\/sitemap\.xml/);
 
 const demoWarrantyCode = 'SDW-' + 'A'.repeat(24);
