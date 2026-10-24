@@ -1,4 +1,4 @@
-## LATEST VERIFIED UPDATE — PREVIEW ROBOTS INDEXING GUARD — 2026-10-24
+## LATEST VERIFIED UPDATE — PREVIEW ROBOTS CRAWL GUARD — 2026-10-24
 
 - Live source/test commit: `e70246eb05f7e864b21a4ff94c7c321bc9917b9f`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN/unmerged, base `main`. No Production deployment or `main` change.
 - Source-first SEO audit found that `functions/robots.txt.js` returned `Allow: /` and a hostname-derived sitemap for every host, including public branch/hash Preview URLs under `*.sindarealest2.pages.dev`. That permitted crawler indexing of duplicate Preview storefronts.
@@ -9,6 +9,8 @@
 - The Hero-guarded Liquid Glass visual workflow was skipped: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045286384. No screenshot, live-browser, real-device, visual, or owner acceptance is claimed. A live network request to the Preview endpoint was not independently verified outside the deployment logs.
 - Locks unchanged: SKU verification PAUSED; fullscreen gallery flicker PAUSED / NOT ACCEPTED; Hero PAUSED BY OWNER; all owner-accepted areas remain PASS/LOCKED. Do not touch/retest these. No Admin/backend/API/auth, product/catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, payment, Production, or `main` changes.
 - Next: continue source-first review only inside the still-authorized SEO/robots scope; do not invent additional fixes or reopen locked storefront areas. Report each gate separately and continue after reporting.
+
+- Scope/SEO limitation: this change is a `robots.txt` crawl directive, not an `X-Robots-Tag: noindex` response header. Google documents that a disallowed URL may still appear in results if its URL is known from external links. Therefore claim only that Preview crawling is disallowed for compliant crawlers; do not claim guaranteed de-indexing. A stronger noindex/access-control change would require a separately authorized, carefully scoped review of shared response/hosting behavior.
 
 ---
 

@@ -6,6 +6,8 @@
 - Current exact-SHA deployment and validation gate results are in `TEST-RESULTS.md`. The separate npm audit failure is caused by transitive `undici` advisories; do not force-downgrade Wrangler or bypass audit without a safe, evidence-backed remediation.
 - Existing owner locks remain authoritative: gallery PAUSED / NOT ACCEPTED, SKU PAUSED, Hero PAUSED, all accepted sections PASS/LOCKED. PR #108 stays OPEN/unmerged; Preview only.
 
+- Scope/SEO limitation: this change is a `robots.txt` crawl directive, not an `X-Robots-Tag: noindex` response header. Google documents that a disallowed URL may still appear in results if its URL is known from external links. Therefore claim only that Preview crawling is disallowed for compliant crawlers; do not claim guaranteed de-indexing. A stronger noindex/access-control change would require a separately authorized, carefully scoped review of shared response/hosting behavior.
+
 ---
 
 ## LATEST CHAT HANDOFF — CONTINUE AUTONOMOUS MULTI-THREAD WORK — 2026-10-24

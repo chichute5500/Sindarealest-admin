@@ -1,4 +1,4 @@
-## EXACT-SHA TEST + DEPLOY RESULT — PREVIEW ROBOTS INDEXING GUARD — 2026-10-24
+## EXACT-SHA TEST + DEPLOY RESULT — PREVIEW ROBOTS CRAWL GUARD — 2026-10-24
 
 | Gate | Result | Evidence |
 |---|---|---|
@@ -15,6 +15,8 @@
 - Separate validate workflow ran `npm audit --audit-level=high` and failed before its integrity/test steps because it now reports 3 transitive `undici` vulnerabilities (including one HIGH) via `miniflare`/`wrangler`. Proposed `npm audit fix --force` would downgrade Wrangler to 4.35.0 (breaking); no such downgrade or audit bypass was applied. The successful Preview workflow's integrity/tests remain independent evidence and do not erase this failed validate gate.
 - The workflow was deployed to https://18756cf5.sindarealest2.pages.dev/ with branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. No Production deployment or `main` edit occurred.
 - Do not inspect Hero or reopen any PASS/LOCKED section. SKU and fullscreen gallery remain PAUSED; PR #108 remains OPEN/unmerged.
+
+- Scope/SEO limitation: this change is a `robots.txt` crawl directive, not an `X-Robots-Tag: noindex` response header. Google documents that a disallowed URL may still appear in results if its URL is known from external links. Therefore claim only that Preview crawling is disallowed for compliant crawlers; do not claim guaranteed de-indexing. A stronger noindex/access-control change would require a separately authorized, carefully scoped review of shared response/hosting behavior.
 
 ---
 

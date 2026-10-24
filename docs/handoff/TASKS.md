@@ -1,4 +1,4 @@
-## LATEST TASK RESULT — PREVIEW ROBOTS INDEXING GUARD — 2026-10-24
+## LATEST TASK RESULT — PREVIEW ROBOTS CRAWL GUARD — 2026-10-24
 
 - Fixed the confirmed unlocked SEO defect in `functions/robots.txt.js`: all non-primary `*.sindarealest2.pages.dev` Preview hostnames are now disallowed from crawling; the primary Pages hostname and custom domains keep prior crawl rules.
 - Added regression coverage in `tests/robots-txt.test.mjs` (Preview blocked, production Pages hostname and custom production domain preserved); wired it into `package.json`.
@@ -6,6 +6,8 @@
 - Separate validate workflow #40045286346 FAILED at the dependency audit step before its test steps ran. It currently reports 3 transitive `undici` advisories, one HIGH; forced remediation would downgrade Wrangler to 4.35.0 and was not applied. Do not state global CI is all-green.
 - Preview: https://18756cf5.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
 - Visual workflow #40045286384 SKIPPED by the existing Hero guard. No manual browser/device acceptance or owner acceptance claimed. PR #108 remains OPEN/unmerged, Preview only.
+
+- Scope/SEO limitation: this change is a `robots.txt` crawl directive, not an `X-Robots-Tag: noindex` response header. Google documents that a disallowed URL may still appear in results if its URL is known from external links. Therefore claim only that Preview crawling is disallowed for compliant crawlers; do not claim guaranteed de-indexing. A stronger noindex/access-control change would require a separately authorized, carefully scoped review of shared response/hosting behavior.
 
 ---
 
