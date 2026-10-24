@@ -1,3 +1,25 @@
+## EXACT-SHA RESULT — ROBOTS/NOINDEX ALIGNMENT + DEPENDENCY AUDIT — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| npm audit, including HIGH threshold | PASS, 0 vulnerabilities | Validate workflow below |
+| Project integrity checks | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543955 |
+| Full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543955 |
+| robots regression | PASS | Includes ordinary/dotted Preview hosts, primary/custom host policy, Admin noindex header and retained API disallow |
+| Cloudflare Pages Preview deployment | PASS on exact SHA `94df81d6442d278ef288b424858fe60a4ecb0b9c` | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543822 |
+| Immutable Preview | Deployed | https://43117270.sindarealest2.pages.dev/ |
+| Liquid Glass visual workflow | SKIPPED | Hero guard; do not bypass |
+| External live HTTP verification | NOT VERIFIED | Preview hostname resolution failed in the current runtime |
+| Browser/device and owner acceptance | NOT CLAIMED | CI/deploy are not visual acceptance |
+
+- Preview robots behavior: branch/hash preview hostnames return `Disallow: /`; a terminal-dot spelling no longer passes the suffix check.
+- Production/custom robots behavior: `/admin/` is crawlable so crawlers can observe existing `X-Robots-Tag: noindex, nofollow`; `/api/` remains disallowed; canonical sitemap declaration is preserved.
+- Dependency remediation commit `ce7631c8acf97edefbffae073dadb30d3528f992` pins the transitive `undici` override to `7.30.1`; audit/integrity/tests/deploy passed there and again on current source/test SHA.
+- An earlier intermediate commit `854a4bcf` failed because a legacy integration test still expected `Disallow: /admin/`; test assertion corrected in `94df81d`, which has green exact-SHA gates.
+- PR #108 remains OPEN/unmerged; no Production deploy or `main` change.
+
+---
+
 ## EXACT-SHA VALIDATION — ROBOTS TRAILING-DOT GUARD + DEPENDENCY AUDIT — 2026-10-24
 
 | Gate | Result | Evidence |

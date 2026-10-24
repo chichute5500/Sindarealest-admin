@@ -1,3 +1,16 @@
+## LATEST VERIFIED UPDATE — ROBOTS/NOINDEX SIGNAL ALIGNMENT — 2026-10-24
+
+- Current code/test SHA: `94df81d6442d278ef288b424858fe60a4ecb0b9c`. Validate PASS (audit, integrity, full automated tests): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543955. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543822. Immutable Preview: https://43117270.sindarealest2.pages.dev/ ; alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- SEO issue fixed: production/custom-domain `robots.txt` no longer disallows `/admin/`, because `public/_headers` already sends `X-Robots-Tag: noindex, nofollow` on `/admin/*`. Crawlers must be allowed to fetch that response in order to see its noindex directive. `/api/` remains disallowed. Preview hosts still return `Disallow: /`.
+- The Preview crawl guard also strips one trailing DNS dot before hostname classification, preventing `preview.sindarealest2.pages.dev.` from bypassing the Preview suffix check. Regression tests cover regular and dotted Preview names, production/custom domains, Admin noindex alignment, and retained API disallow.
+- Dependency audit blocker resolved without a Wrangler downgrade: commit `ce7631c8acf97edefbffae073dadb30d3528f992` adds `overrides.undici = 7.30.1`. Audit, integrity, full tests and Preview deployment passed at that SHA and again at the later exact code/test SHA `94df81d`.
+- CI history: commit `854a4bcf` first exposed one stale expectation in `tests/storefront-operations.test.mjs`; that assertion was updated in `94df81d`. The final Validate and Preview runs above are green on the same SHA.
+- Direct live HTTP checks were attempted but this runtime could not resolve the Preview hostnames. Do not claim external runtime verification, browser/device visual acceptance, or owner acceptance. Liquid Glass visual workflow was skipped by the existing Hero guard.
+- PR #108 remains OPEN/unmerged, base `main`; Production and `main` are untouched.
+- Locks unchanged: SKU verification PAUSED; fullscreen gallery flicker PAUSED / NOT ACCEPTED; Hero PAUSED BY OWNER; all accepted sections PASS/LOCKED. Do not reopen. Continue safe independent work after reporting.
+
+---
+
 ## LATEST VERIFIED UPDATE — PREVIEW ROBOTS TRAILING-DOT GUARD + DEPENDENCY AUDIT — 2026-10-24
 
 - Exact storefront source/test commit: `75556d97f1a2e92882ec2a6ee3c9df55f5e3bedd`; CI validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154504; Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154500; immutable Preview: https://91080d1e.sindarealest2.pages.dev/.

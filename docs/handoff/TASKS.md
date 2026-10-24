@@ -1,3 +1,16 @@
+## LATEST TASK RESULT — ALIGN ROBOTS CRAWL WITH EXISTING ADMIN NOINDEX — 2026-10-24
+
+- Found a real SEO conflict: `public/_headers` sets `X-Robots-Tag: noindex, nofollow` for `/admin/*`, but production/custom-domain `robots.txt` also blocked `/admin/`. A crawler blocked by robots.txt cannot read the noindex header; the explicit noindex instruction could therefore be ignored.
+- Fixed `functions/robots.txt.js`: production and custom domains now retain `Allow: /`, `Disallow: /api/`, and the origin-specific sitemap, but no longer disallow `/admin/`. Existing `X-Robots-Tag: noindex, nofollow` remains unchanged. Non-primary Pages Preview hostnames still return `Disallow: /`.
+- Host classification strips one terminal DNS dot before matching `.sindarealest2.pages.dev`; regression covers both ordinary and terminal-dot Preview URLs.
+- Regression/integration coverage: `tests/robots-txt.test.mjs` and updated `tests/storefront-operations.test.mjs` assert Admin can be crawled for its noindex header while API and Preview restrictions remain.
+- Exact code/test SHA `94df81d6442d278ef288b424858fe60a4ecb0b9c`: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543955; Preview deployment PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543822; Preview https://43117270.sindarealest2.pages.dev/.
+- Dependency audit is now green with `undici 7.30.1` override; no Wrangler downgrade and no audit bypass. At intermediate SHA `854a4bcf`, CI caught a stale integration assertion; the assertion was corrected and exact-SHA validation/deploy passed on `94df81d`.
+- Live HTTP could not be verified because the environment failed to resolve the Preview hostname. Visual workflow skipped via Hero guard; no visual/device or owner acceptance.
+- PR #108 OPEN/unmerged. Keep main/Production untouched; SKU, fullscreen gallery flicker and Hero remain paused; all accepted areas remain locked.
+
+---
+
 ## LATEST TASK RESULT — PREVIEW ROBOTS TERMINAL-DOT BYPASS — 2026-10-24
 
 - Found and fixed an edge case in the unlocked `robots.txt` crawl guard: `new URL(...).hostname` preserves one terminal DNS dot, so a Preview hostname with that spelling bypassed the suffix match.

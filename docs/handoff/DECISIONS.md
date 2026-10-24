@@ -1,3 +1,14 @@
+## DECISION — ADMIN NOINDEX MUST BE CRAWL-VISIBLE — 2026-10-24
+
+- For production/custom domains, do not disallow `/admin/` in `robots.txt` while `public/_headers` already sets `X-Robots-Tag: noindex, nofollow` there. Crawlers must be able to fetch the response to observe the explicit noindex directive. This is an SEO policy adjustment only; no Admin source/auth/API behavior was changed.
+- Continue to disallow `/api/` in normal production/custom-domain rules. Continue to block all crawl paths on non-primary `*.sindarealest2.pages.dev` Preview hosts. Normalize one terminal DNS dot before checking the Preview hostname suffix.
+- Dependency security: keep `overrides.undici = 7.30.1` under existing `wrangler: 4.149.0`; exact-SHA npm audit/integrity/tests passed. Do not force-downgrade Wrangler to `4.35.0` or bypass audit.
+- `robots.txt` alone does not guarantee de-indexing. The Preview response/header strategy remains a separately scoped review; do not alter middleware/shared response headers, Access, infrastructure, or Production without authorization.
+- No direct live HTTP response or visual/device acceptance has been verified in this environment.
+- PR #108 remains OPEN/unmerged; no Production or `main` changes. Hero, SKU verification and fullscreen gallery flicker remain paused; owner-accepted sections stay locked.
+
+---
+
 ## DECISION — ROBOTS PREVIEW HOST NORMALIZATION + AUDIT REMEDIATION — 2026-10-24
 
 - Preview crawl guard compares a hostname after removing one terminal DNS dot, preventing a FQDN spelling from bypassing the `.sindarealest2.pages.dev` suffix check. The production Pages hostname and custom-domain rules remain unchanged.
