@@ -1531,7 +1531,25 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await expect(page.locator('#backdrop')).toBeHidden();
         await openEditor(variant);
       }
+      // Reproduce a real tab-switch scenario: the previous panel was scrolled, then Gallery is opened.
+      await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = Math.min(300, el.scrollHeight); });
       await page.locator('#productTabGallery').click();
+      const galleryTabSwitchGeometry = await page.evaluate(() => {
+        const content = document.querySelector('#backdrop .editorcontent');
+        const tabs = document.querySelector('#productEditorTabs');
+        const heading = document.querySelector('#productPanelGallery > .sectionlabel');
+        if (!content || !tabs || !heading) throw new Error('Product gallery tab-switch geometry is incomplete');
+        return {
+          scrollTop: content.scrollTop,
+          tabsBottom: tabs.getBoundingClientRect().bottom,
+          galleryHeadingTop: heading.getBoundingClientRect().top
+        };
+      });
+      expect(galleryTabSwitchGeometry.scrollTop,
+        'Switching to Gallery must reset the shared editor scroll position').toBe(0);
+      expect(galleryTabSwitchGeometry.galleryHeadingTop,
+        'Gallery heading must remain below the sticky tabs after switching from a scrolled panel: ' +
+        JSON.stringify(galleryTabSwitchGeometry)).toBeGreaterThanOrEqual(galleryTabSwitchGeometry.tabsBottom - 1);
       await expect(page.locator('#imageDropZone')).toBeVisible();
       await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = el.scrollHeight; });
       // Exercise local object-URL thumbnails with synthetic images only; do not save the product.
