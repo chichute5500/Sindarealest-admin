@@ -1,3 +1,16 @@
+## LIVE FINAL-AUDIT DECISIONS — 2026-10-24
+
+1. **PR #108 remains OPEN and unmerged.** Live GitHub reported 298 changed paths. [PR-SCOPE-REVIEW.md](PR-SCOPE-REVIEW.md) records all paths and path-level dispositions. This review does not approve merging or automatically reverting/splitting files.
+2. **Do not claim 100%.** The deployed source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579` passes Validate, Preview deployment and authenticated Preview HTTP diagnostics, but browser/device visual acceptance is not established.
+3. **Hero stays paused and guarded.** The existing Liquid Glass capture path requires Hero coverage; do not run or bypass it. Existing alternative visual workflows target owner-locked `#order` or catalog filters and must not be dispatched.
+4. **Gallery stays PAUSED / NOT ACCEPTED.** No gallery source or tests changed during this audit. Owner acceptance requires actual mobile-phone slow/rapid navigation and thumbnail switching without residual flicker/ghosting.
+5. **SKU contract is split by evidence level.** Client URL generation uses SKU only with `skuVerified === true` and a non-empty trimmed SKU, otherwise the product key/ID; that contract is tested. Actual SKU-by-product truth and applied migration state remain NOT RUN/BLOCKED. A legacy helper path can infer verification from SKU shape if both flags are missing; do not change that restricted shared helper or catalog/API/migration without explicit scoped approval.
+6. **Preserve owner PASS/LOCKed areas.** Do not retest/restyle catalog filters, `#order`, icon system/Liquid Glass, mobile cart/account/navigation/history, warranty form/lookup, or other accepted areas without concrete regression evidence and authorization.
+7. **No restricted changes.** No Admin/backend/API/auth, product/catalog data, database/migration, secrets/bindings, deployment infrastructure, Access, DNS, payment, `main`, or Production edits/deploys are authorized by this audit.
+8. **Evidence labels remain separate:** Validate PASS; Preview deploy PASS; authenticated Preview HTTP PASS (all on source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579`); visual workflow SKIPPED BY SAFETY GUARD; browser/device acceptance NOT RUN; gallery and authoritative per-product SKU verification BLOCKED; overall completion below 100%.
+
+---
+
 ## FINAL COMPLETION DECISIONS — OWNER REQUEST — 2026-10-24
 
 1. **100% is an evidence-based acceptance state, not an estimate.** Every required in-scope task must have source/test, exact-SHA deployment, relevant runtime/browser/device evidence, and owner acceptance where required. A skipped workflow or missing real-device check is not PASS.
