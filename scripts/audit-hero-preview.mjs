@@ -318,7 +318,7 @@ try {
         if (m.hidden || !m.complete || m.naturalWidth < 1 || m.naturalHeight < 1) fail('Hero PNG is hidden, undecoded, or has zero natural dimensions.');
         if (!m.imageVisible || !m.frameVisible) fail('Hero image or frame is not visible.');
         if (m.objectFit !== 'contain') fail('Hero image object-fit is not contain.');
-        if (width >= 1001) {
+        if (m.viewport.width >= 1001) {
           const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;
           if (ratio < 0.70 || ratio > 0.80) fail('Desktop Hero PNG is being squeezed by a mismatched CSS box ratio.');
           if (!m.visibleProductRect || m.visibleProductRect.width < 320) fail('Desktop Hero product is too small for the reference-led layout.');
