@@ -13,7 +13,7 @@ export function validatePreviewUrl(value) {
   return url;
 }
 
-export function assessPreviewSeoResponse(path, response, body = "") {
+export function assessPreviewSeoResponse(path, response, body = "", expectedOrigin = "") {
   const contentType = response.headers.get("content-type") || "";
   const robotsTag = response.headers.get("x-robots-tag") || "";
   const cacheControl = response.headers.get("cache-control") || "";
@@ -24,15 +24,25 @@ export function assessPreviewSeoResponse(path, response, body = "") {
   }
 
   if (path === "/") {
-    if (response.status !== 200 || !/text\/html/i.test(contentType)) {
+    if (response.status !== 200 || !/text\\/html/i.test(contentType)) {
       return { ...common, result: "UNEXPECTED_ROOT_RESPONSE", note: "Preview root did not return HTML 200." };
     }
-    if (!/\bnoindex\b/i.test(robotsTag)) {
+    if (!/\\bnoindex\\b/i.test(robotsTag)) {
       return { ...common, result: "MISSING_NOINDEX", note: "Preview root response lacks an observable X-Robots-Tag noindex directive." };
     }
-    return { ...common, result: "PASS", note: "Preview root response carries X-Robots-Tag noindex." };
+    if (expectedOrigin) {
+      const expectedTags = [
+        '<link rel="canonical" href="' + expectedOrigin + '/">',
+        '<meta property="og:url" content="' + expectedOrigin + '/">',
+        '<meta property="og:image" content="' + expectedOrigin + '/og-sindarealest.jpg">',
+        '<meta name="twitter:image" content="' + expectedOrigin + '/og-sindarealest.jpg">',
+      ];
+      if (expectedTags.some((tag) => !body.includes(tag))) {
+        return { ...common, result: "ROOT_METADATA_MISMATCH", note: "Preview root canonical/Open Graph/Twitter image URLs do not match the deployed Preview origin." };
+      }
+    }
+    return { ...common, result: "PASS", note: "Preview root carries noindex and origin-correct canonical/social metadata." };
   }
-
   if (path === "/robots.txt") {
     if (response.status === 200 && /text\/plain/i.test(contentType)
         && body === "User-agent: *\nDisallow: /\n") {
@@ -82,7 +92,7 @@ export async function runPreviewSeoDiagnostic({ previewUrl, env = process.env, f
         signal: AbortSignal.timeout(15000),
       });
       const body = await response.text();
-      report.checks.push(assessPreviewSeoResponse(path, response, body));
+      report.checks.push(assessPreviewSeoResponse(path, response, body, base.origin));
     } catch {
       report.checks.push({ path, result: "FETCH_FAILED", note: "Preview endpoint could not be fetched; no response body or credential was logged." });
     }

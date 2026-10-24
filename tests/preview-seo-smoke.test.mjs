@@ -8,10 +8,21 @@ assert.throws(() => validatePreviewUrl("https://fix-liquid-glass-audit-2026.sind
 assert.throws(() => validatePreviewUrl("https://example.com/"), /Refused URL/);
 
 const response = (status, headers = {}) => new Response("", { status, headers });
+const previewOrigin = "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev";
+const rootMetadata = [
+  '<link rel="canonical" href="' + previewOrigin + '/">',
+  '<meta property="og:url" content="' + previewOrigin + '/">',
+  '<meta property="og:image" content="' + previewOrigin + '/og-sindarealest.jpg">',
+  '<meta name="twitter:image" content="' + previewOrigin + '/og-sindarealest.jpg">',
+].join("");
 assert.equal(assessPreviewSeoResponse("/", response(200, {
   "Content-Type": "text/html; charset=utf-8",
   "X-Robots-Tag": "noindex",
-})).result, "PASS");
+}), rootMetadata, previewOrigin).result, "PASS");
+assert.equal(assessPreviewSeoResponse("/", response(200, {
+  "Content-Type": "text/html; charset=utf-8",
+  "X-Robots-Tag": "noindex",
+}), rootMetadata.replace(previewOrigin, "https://wrong.example"), previewOrigin).result, "ROOT_METADATA_MISMATCH");
 assert.equal(assessPreviewSeoResponse("/", response(200, {
   "Content-Type": "text/html; charset=utf-8",
 })).result, "MISSING_NOINDEX");
