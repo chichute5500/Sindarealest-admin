@@ -1,0 +1,39 @@
+name: Admin Fix Preview Read-only Playwright
+
+on:
+  push:
+    branches: [fix/playwright-preview-safety-2026-10-20]
+    paths:
+      - 'tests/e2e/admin-preview-readonly.spec.js'
+      - 'scripts/admin-preview-url.mjs'
+      - '.github/workflows/admin-preview-readonly.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-fix-preview-readonly
+  cancel-in-progress: true
+
+jobs:
+  preview-readonly:
+    name: Read-only Admin Preview smoke (no credentials, no writes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ADMIN_PREVIEW_READONLY_URL: https://fix-product-update-d1-diagno.sindarealest2.pages.dev/admin/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Validate public Preview URL and run read-only checks
+        run: npx playwright test tests/e2e/admin-preview-readonly.spec.js
+      - name: Never print credentials or response bodies
+        if: always()
+        run: echo "Read-only smoke used no secrets and issued no write requests."

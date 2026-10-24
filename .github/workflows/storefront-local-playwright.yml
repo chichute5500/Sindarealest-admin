@@ -1,0 +1,72 @@
+name: Storefront Local Playwright
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storefront-local-playwright-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  local-storefront:
+    name: Local Pages browser smoke (no secrets, no remote writes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Wrangler, Playwright and browser
+        run: |
+          npm install
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Start isolated local Pages server (no Cloudflare credentials)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages dev public --ip 127.0.0.1 --port 8788 > /tmp/sindarealest-pages-dev.log 2>&1 &
+          echo "$!" > /tmp/sindarealest-pages-dev.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8788/ >/dev/null; then
+              echo "PASS: local Pages server is ready."
+              exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/sindarealest-pages-dev.pid)" 2>/dev/null; then
+              cat /tmp/sindarealest-pages-dev.log
+              echo "::error::Local Pages server exited before becoming ready."
+              exit 1
+            fi
+            sleep 1
+          done
+          cat /tmp/sindarealest-pages-dev.log
+          echo "::error::Timed out waiting for local Pages server."
+          exit 1
+
+      - name: Run browser smoke checks
+        run: npx playwright test tests/e2e/storefront-local.spec.js
+        env:
+          STOREFRONT_TEST_URL: http://127.0.0.1:8788/
+
+      - name: Stop local Pages server
+        if: always()
+        shell: bash
+        run: |
+          if [ -f /tmp/sindarealest-pages-dev.pid ]; then
+            kill "$(cat /tmp/sindarealest-pages-dev.pid)" 2>/dev/null || true
+          fi
+          if [ -f /tmp/sindarealest-pages-dev.log ]; then
+            tail -n 80 /tmp/sindarealest-pages-dev.log
+          fi
