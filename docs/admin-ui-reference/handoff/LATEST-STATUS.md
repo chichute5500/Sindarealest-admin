@@ -1,3 +1,51 @@
+# VERIFIED HANDOFF CHECKPOINT — 2026-10-24 08:55 UTC
+
+**Repository:** `chichute5500/Sindarealest-admin`  
+**Writable branch:** `feature/admin-isolated-handoff-2026-10-20`  
+**Latest application/test SHA:** `0469930f6836d5f8d87b155a538e1d68776e3913`  
+**Validate #5664:** PASS — [run 40079854170](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40079854170)  
+**Admin Preview Playwright #1069:** PASS — [run 40079854185](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40079854185)  
+**PR #111:** OPEN, unmerged, GitHub reports `mergeable=true`, `mergeable_state=clean`; head `0469930f6836d5f8d87b155a538e1d68776e3913`, base `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
+
+## Work completed since previous checkpoint
+
+1. Fixed the QR upload partial-write risk: pending QR pointer and audit row are committed in one D1 batch; if persistence fails, only the newly staged random R2 object is cleaned up. Test-first regression covers success/failure and preservation of the active QR.
+2. Isolated feature-only workflow paths to avoid clobbering files with different intent on `main`:
+   - Deployment workflow: `.github/workflows/deploy-admin-isolated-preview.yml`, pinned to `sindarealest-admin-preview` and exact approved branch.
+   - Feature E2E spec: `tests/e2e/admin-isolated-preview.spec.js`; diagnostics invoke this file.
+   - `main`'s shared workflow/spec remain untouched. The earlier test failures were investigated; one was a stale assertion about the merged PR tree, not a source defect.
+3. Current head `0469930f6836d5f8d87b155a538e1d68776e3913` passes Validate #5664 and Admin Preview Playwright #1069. Earlier read-only diagnostics #527 passed on SHA `b6d68ef9cd5ba8e72fcf4c2175e6b7674d039018`; that evidence is **not** falsely attributed to the current SHA unless the newer run confirms it.
+
+## Acceptance boundary — unchanged
+
+- Progress: **50% PROVISIONAL**.
+- All 12 screens: `PARTIAL_NOT_ACCEPTED`; approved-reference parity: `NOT_VERIFIED`.
+- Authenticated business-write/persistence QA: `NOT_TESTED`.
+- Remote D1 schema/ledger: `NOT_VERIFIED`.
+- Production: `NOT_PERFORMED`.
+- Do not treat fixture screenshots, unit tests or read-only GET checks as proof of business writes.
+
+## Mandatory safety and operating rules
+
+- Only write to `feature/admin-isolated-handoff-2026-10-20`.
+- Keep PR #111 open/unmerged. PR #108 and #112 are read-only.
+- No merge/rebase/cherry-pick/force-push; no changes to `main` or storefront branches.
+- No Production deployment, remote D1/R2 writes, schema/migrations, secrets, Cloudflare Access or DNS changes; never bypass Access.
+- Parallelize independent safe streams. When a stream is blocked, record evidence and switch to another useful stream. Report verified outcomes and continue; stop only for an actual user action requirement.
+- Test-first for source fixes; tie evidence to exact SHA and separate local fixtures/read-only GETs from authenticated business-write QA.
+- Do not create fake commits to trigger Preview. Docs-only commits are not new tested application SHAs.
+
+## Next actions for the next chat
+
+1. Refresh branch HEAD, `main`, PR #111/#108/#112 and recent Actions before making claims.
+2. Continue independent read-only audit of admin payment/order/warranty concurrency and error paths; only make a fix after a reproducible defect plus regression test.
+3. Continue approved-reference screen-by-screen visual/interaction comparison using the newest available Preview evidence; do not claim parity without direct reference comparison.
+4. If source changes, require test-first red/green and exact-SHA Validate + Preview; check that the workflow's exact-HEAD guard did not reject the run.
+5. Keep PR #111 open/unmerged and do not change deployment targets from `sindarealest-admin-preview`.
+
+**No user action is currently required. Continue working rather than waiting for a new prompt.**
+
+---
 # VERIFIED CHECKPOINT — 2026-10-24 07:35 UTC
 
 **Repo:** `chichute5500/Sindarealest-admin`  

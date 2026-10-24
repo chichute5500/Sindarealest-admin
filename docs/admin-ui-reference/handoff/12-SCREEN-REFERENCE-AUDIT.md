@@ -396,3 +396,12 @@ Fixture/test PASS does not mean final visual parity or authenticated backend PAS
 - Warranty issuance: new regression verified the atomic insert must recheck the order is still `completed`. Initial test-only SHA failed for the intended reason; after fixing the guarded INSERT, Validate #40070485935 and Preview #40070485982 passed on exact SHA `0d4eb3a8f5611ed1e712bba295598a021a6f4137`.
 - These results are source/unit/fixture and read-only Preview evidence, not proof of real warranty issuance, order changes or payment persistence. Keep Screen 7 and all 12 screens `PARTIAL_NOT_ACCEPTED`; exact parity `NOT_VERIFIED`; business-write QA `NOT_TESTED`; remote D1 `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 - Continue the screen-by-screen reference audit and keep the PR/conflict safety restrictions unchanged.
+
+
+## Verified handoff update — 2026-10-24 08:55 UTC
+
+- Current tested application SHA `0469930f6836d5f8d87b155a538e1d68776e3913`: Validate #5664 PASS and Admin Preview Playwright #1069 PASS. See [Validate]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/40079854170 ) and [Preview]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/40079854185 ).
+- QR upload atomicity fix is in the tested source: pending pointer + audit row use one D1 batch; failed persistence cleans only the newly staged R2 object. Regression covers failure/success and active QR preservation.
+- PR #111 is OPEN/unmerged and GitHub reports mergeable/clean. Feature-only workflow and E2E spec have unique paths; `main` remains untouched.
+- Progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; approved-reference parity NOT_VERIFIED; business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+- Next: parallel read-only concurrency/error-path audit plus approved-reference UI comparison; any source fix must be test-first and exact-SHA validated. No user action is needed now.
