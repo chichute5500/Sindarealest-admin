@@ -377,14 +377,22 @@ assert.ok(heroBlendOverride.includes("@media(min-width:761px) and (max-width:100
   "The original tablet Hero PNG must be centered with no negative image offset.");
 assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
   "The Hero image must be fully visible with no CSS crop or transform; the source PNG alpha remains untouched.");
-assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
-  "Pseudo-elements that would overlay the owner-supplied image remain disabled.");
-assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before{")
-  && heroAssetDisplayLock.includes("inset:-8% -10%!important;")
-  && heroAssetDisplayLock.includes("z-index:0!important;")
-  && heroAssetDisplayLock.includes("filter:blur(16px)!important;")
-  && heroAssetDisplayLock.includes("position:relative!important;z-index:1!important;"),
-  "The satin halo must stay behind the shoe image; it does not brighten, blur, or mask the image itself.");
+assert.ok(heroAssetDisplayLock.includes("#home.hero:after{content:none!important;display:none!important;background:none!important}")
+  && !heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
+  "Only the outer Hero decoration is disabled; the pedestal front-face pseudo-element remains available.");
+const heroPedestalStyles = html.slice(html.lastIndexOf("/* Reference Hero pedestal:"));
+assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before,")
+  && !heroAssetDisplayLock.includes("inset:-8% -10%!important;")
+  && !heroAssetDisplayLock.includes("filter:blur(16px)!important;")
+  && heroAssetDisplayLock.includes("position:relative!important;z-index:1!important;")
+  && heroPedestalStyles.includes("#home .hero-visual::before,")
+  && heroPedestalStyles.includes("#home .hero-visual::after{")
+  && heroPedestalStyles.includes("radial-gradient(ellipse at 30% 28%")
+  && heroPedestalStyles.includes("clip-path:polygon(1% 0,99% 0,94% 100%,6% 100%)")
+  && heroPedestalStyles.includes("bottom:20%;")
+  && heroPedestalStyles.includes("width:136%;height:8%;bottom:20%")
+  && heroPedestalStyles.includes("width:145%;height:9%;bottom:12%"),
+  "The marble oval and slanted plinth stay visible and responsive; a legacy blur-only rule cannot override the platform.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
   "No page caption may cover any portion of the supplied image.");
 assert.ok(

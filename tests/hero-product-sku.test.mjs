@@ -78,12 +78,19 @@ assert.ok(heroEdgeTreatment.includes("@media(min-width:761px) and (max-width:100
 assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important")
   && html.includes("-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
-assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
-assert.ok(html.includes("#home .hero-visual::before{")
-  && html.includes("z-index:0!important;")
-  && html.includes("filter:blur(16px)!important;")
+assert.ok(html.includes("#home.hero:after{content:none!important;display:none!important;background:none!important}")
+  && !html.includes("#home .hero-visual::after,#home.hero:after"),
+  "Only the outer Hero decoration is disabled; the CSS pedestal front face must not be suppressed.");
+const heroPedestalStyles = html.slice(html.lastIndexOf("/* Reference Hero pedestal:"));
+assert.ok(heroPedestalStyles.includes("#home .hero-visual::before,")
+  && heroPedestalStyles.includes("#home .hero-visual::after{")
+  && heroPedestalStyles.includes("radial-gradient(ellipse at 30% 28%")
+  && heroPedestalStyles.includes("clip-path:polygon(1% 0,99% 0,94% 100%,6% 100%)")
+  && heroPedestalStyles.includes("bottom:20%;")
+  && heroPedestalStyles.includes("width:136%;height:8%;bottom:20%")
+  && heroPedestalStyles.includes("width:145%;height:9%;bottom:12%")
   && html.includes("position:relative!important;z-index:1!important;"),
-  "The hero presentation asset must be untouched above a separate background halo.");
+  "Hero keeps an explicit pearl-marble oval, visible slanted plinth face, responsive sizing, and the original shoe PNG in front.");
 assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;")
   && html.includes("grid-column:1!important;")
   && html.includes("grid-column:2!important;")
