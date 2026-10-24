@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { inflateSync } from 'node:zlib';
 
 // Pin the owner-supplied hero PNG bytes, not just its path or CSS behavior.
 const ownerSuppliedHeroBytes = readFileSync(new URL('../public/images/hero-upload/tb_image_share_1792519964514 (1).png', import.meta.url));
@@ -8,8 +9,79 @@ const ownerSuppliedHeroGitBlobSha = createHash('sha1')
   .update(`blob ${ownerSuppliedHeroBytes.length}\0`)
   .update(ownerSuppliedHeroBytes)
   .digest('hex');
-assert.equal(ownerSuppliedHeroGitBlobSha, 'd62bc2d190a9b0f94d1a20a7ab8f6cc891d3fa20',
+assert.equal(ownerSuppliedHeroGitBlobSha, 'c17cc9058ae3008dc662806d21d2cf8f7d83b8a9',
   'The newly supplied Hero replacement asset must remain byte-for-byte unchanged.');
+
+// Decode the actual source PNG alpha channel, including PNG row filters; do not rely on the .png extension.
+const heroPng = ownerSuppliedHeroBytes;
+assert.deepEqual([...heroPng.subarray(0, 8)], [137,80,78,71,13,10,26,10], "Hero source must be a valid PNG.");
+let pngOffset = 8, pngWidth = 0, pngHeight = 0, pngBitDepth = 0, pngColorType = 0, pngInterlace = -1;
+const pngIdat = [];
+while (pngOffset + 12 <= heroPng.length) {
+  const chunkLength = heroPng.readUInt32BE(pngOffset);
+  const chunkType = heroPng.toString("ascii", pngOffset + 4, pngOffset + 8);
+  const chunkStart = pngOffset + 8, chunkEnd = chunkStart + chunkLength;
+  assert.ok(chunkEnd + 4 <= heroPng.length, "Hero PNG chunks must remain within the source file.");
+  if (chunkType === "IHDR") {
+    pngWidth = heroPng.readUInt32BE(chunkStart);
+    pngHeight = heroPng.readUInt32BE(chunkStart + 4);
+    pngBitDepth = heroPng[chunkStart + 8];
+    pngColorType = heroPng[chunkStart + 9];
+    pngInterlace = heroPng[chunkStart + 12];
+  } else if (chunkType === "IDAT") pngIdat.push(heroPng.subarray(chunkStart, chunkEnd));
+  pngOffset = chunkEnd + 4;
+  if (chunkType === "IEND") break;
+}
+assert.equal(pngWidth, 1200, "The source Hero PNG width must stay 1200.");
+assert.equal(pngHeight, 1600, "The source Hero PNG height must stay 1600.");
+assert.equal(pngBitDepth, 8, "The source Hero PNG bit depth must stay 8.");
+assert.equal(pngColorType, 6, "The source Hero PNG must contain an RGBA alpha channel.");
+assert.equal(pngInterlace, 0, "Source Hero PNG must be non-interlaced for deterministic alpha validation.");
+const pngStride = pngWidth * 4;
+const scanlines = inflateSync(Buffer.concat(pngIdat));
+assert.equal(scanlines.length, pngHeight * (pngStride + 1), "Decoded PNG size must match an RGBA image.");
+const paeth = (a,b,c) => {
+  const p=a+b-c, pa=Math.abs(p-a), pb=Math.abs(p-b), pc=Math.abs(p-c);
+  return pa<=pb&&pa<=pc?a:pb<=pc?b:c;
+};
+let scanOffset=0, priorRow=Buffer.alloc(pngStride);
+let transparent=0, semiTransparent=0, opaque=0;
+let minX=pngWidth,minY=pngHeight,maxX=-1,maxY=-1;
+let tl=255,tr=255,bl=255,br=255;
+for(let y=0;y<pngHeight;y++){
+  const filter=scanlines[scanOffset++];
+  assert.ok(filter>=0&&filter<=4,"Hero PNG row filter must be valid.");
+  const row=Buffer.from(scanlines.subarray(scanOffset,scanOffset+pngStride));
+  scanOffset+=pngStride;
+  for(let i=0;i<pngStride;i++){
+    const left=i>=4?row[i-4]:0,up=priorRow[i],upperLeft=i>=4?priorRow[i-4]:0;
+    let predictor=0;
+    if(filter===1)predictor=left;
+    else if(filter===2)predictor=up;
+    else if(filter===3)predictor=Math.floor((left+up)/2);
+    else if(filter===4)predictor=paeth(left,up,upperLeft);
+    row[i]=(row[i]+predictor)&255;
+  }
+  if(y===0){tl=row[3];tr=row[pngStride-1]}
+  if(y===pngHeight-1){bl=row[3];br=row[pngStride-1]}
+  for(let x=0;x<pngWidth;x++){
+    const alpha=row[x*4+3];
+    if(alpha===0)transparent++;else if(alpha===255)opaque++;else semiTransparent++;
+    if(alpha>16){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y}
+  }
+  priorRow=row;
+}
+const pixelCount=pngWidth*pngHeight;
+assert.deepEqual([tl,tr,bl,br],[0,0,0,0],"All four Hero PNG corners must be fully transparent.");
+assert.ok(transparent/pixelCount>0.2,"Hero PNG must have substantial transparent background.");
+assert.ok(opaque/pixelCount>0.1,"Hero PNG must retain substantial opaque shoe detail.");
+assert.ok(semiTransparent>0,"Hero PNG must retain anti-aliased alpha edges.");
+assert.ok(minX>0&&minY>0&&maxX<pngWidth-1&&maxY<pngHeight-1,"Shoe pixels must not touch or be clipped by the canvas edges.");
+console.log("PASS: original Hero PNG alpha verified",JSON.stringify({
+ width:pngWidth,height:pngHeight,transparentRatio:Number((transparent/pixelCount).toFixed(4)),
+ semitransparentPixels:semiTransparent,opaqueRatio:Number((opaque/pixelCount).toFixed(4)),
+ visibleBounds:{left:minX,top:minY,right:maxX,bottom:maxY}
+}));
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const desktopLight = readFileSync(new URL('../public/images/liquid-glass-light.svg', import.meta.url), 'utf8');
@@ -185,7 +257,7 @@ assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="asyn
 const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
 assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-presentation-image-active'")
   && heroSync.includes("target.hidden=false")
-  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'"),
+  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514%20(1).png'"),
   'The owner-authorized Hero experiment must load the standalone presentation PNG without depending on catalog SKU data.');
 assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
   'The homepage Hero presentation image must not be gated by or misrepresented as a catalog SKU record.');

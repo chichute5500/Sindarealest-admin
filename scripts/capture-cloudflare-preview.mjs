@@ -626,7 +626,7 @@ async function auditHeroImage(page, label) {
     const frameVisible = Boolean(frame) && frameStyle.display !== 'none'
       && frame.getBoundingClientRect().width > 1 && frame.getBoundingClientRect().height > 1;
     const ownerPresentationImageActive = Boolean(imageElement) && !hidden
-      && source.endsWith('/images/hero-upload/tb_image_share_1792519964514-blended.png')
+      && source.endsWith('/images/hero-upload/tb_image_share_1792519964514%20(1).png')
       && status === 'owner-presentation-image-active' && imageElement.complete
       && imageElement.naturalWidth > 0 && frameVisible;
     return { actualImage: source, status, hidden, frameCollapsed, frameVisible, ownerPresentationImageActive,

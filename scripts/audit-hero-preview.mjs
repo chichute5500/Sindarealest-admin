@@ -5,7 +5,7 @@ import { buildCloudflareAccessHeaders } from './cloudflare-access-service-token.
 import { isApprovedPreviewExternalRead } from './preview-external-read-allowlist.mjs';
 
 const expectedBranch = 'fix/liquid-glass-audit-2026-10-19';
-const expectedAssetPath = '/images/hero-upload/tb_image_share_1792519964514-blended.png';
+const expectedAssetPath = '/images/hero-upload/tb_image_share_1792519964514%20(1).png';
 const requestedUrl = process.env.PREVIEW_URL || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/';
 const expectedSha = String(process.env.GITHUB_SHA || '').trim();
 const branch = String(process.env.GITHUB_REF_NAME || '').trim();
@@ -47,8 +47,10 @@ const audit = {
   previewUrl: preview.origin,
   assetPath: expectedAssetPath,
   requiredViewports: [
+    { name: 'mobile-360', width: 360, height: 800 },
     { name: 'mobile-390', width: 390, height: 844 },
     { name: 'tablet-768', width: 768, height: 1024 },
+    { name: 'desktop-1280', width: 1280, height: 800 },
     { name: 'desktop-1440', width: 1440, height: 900 },
   ],
   themes: ['light', 'dark'],
@@ -189,6 +191,7 @@ try {
             && imageStyle.visibility !== 'hidden' && Number.parseFloat(imageStyle.opacity || '1') > 0
             && imageRect.width > 1 && imageRect.height > 1;
           let alphaBounds = null;
+          let alphaStats = null;
           try {
             const canvas = document.createElement('canvas');
             canvas.width = image.naturalWidth;
@@ -197,22 +200,28 @@ try {
             ctx.drawImage(image, 0, 0);
             const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
+            let transparentPixels = 0, semitransparentPixels = 0, opaquePixels = 0;
             for (let index = 3, pixel = 0; index < pixels.length; index += 4, pixel++) {
-              if (pixels[index] > 16) {
-                const x = pixel % canvas.width;
-                const y = Math.floor(pixel / canvas.width);
-                if (x < minX) minX = x;
-                if (x > maxX) maxX = x;
-                if (y < minY) minY = y;
-                if (y > maxY) maxY = y;
+              const alpha = pixels[index];
+              if (alpha === 0) transparentPixels++; else if (alpha === 255) opaquePixels++; else semitransparentPixels++;
+              if (alpha > 16) {
+                const x = pixel % canvas.width, y = Math.floor(pixel / canvas.width);
+                if (x < minX) minX=x; if (x > maxX) maxX=x; if (y < minY) minY=y; if (y > maxY) maxY=y;
               }
             }
+            const totalPixels = canvas.width * canvas.height;
             if (maxX >= minX && maxY >= minY) {
-              alphaBounds = {
-                left: minX / canvas.width, right: (maxX + 1) / canvas.width,
-                top: minY / canvas.height, bottom: (maxY + 1) / canvas.height,
-              };
+              alphaBounds = {left:minX/canvas.width,right:(maxX+1)/canvas.width,top:minY/canvas.height,bottom:(maxY+1)/canvas.height};
             }
+            alphaStats = {
+              width:canvas.width,height:canvas.height,
+              transparentPixels,transparentRatio:transparentPixels/totalPixels,
+              semitransparentPixels,opaquePixels,opaqueRatio:opaquePixels/totalPixels,
+              visibleBounds:maxX>=minX&&maxY>=minY?{left:minX,top:minY,right:maxX,bottom:maxY}:null,
+              corners:{topLeft:pixels[3],topRight:pixels[(canvas.width-1)*4+3],
+                bottomLeft:pixels[((canvas.height-1)*canvas.width)*4+3],
+                bottomRight:pixels[(totalPixels-1)*4+3]},
+            };
           } catch (error) {
             alphaBounds = { error: String(error.message || error).slice(0, 200) };
           }
@@ -284,7 +293,7 @@ try {
             objectFit: imageStyle.objectFit,
             objectPosition: imageStyle.objectPosition,
             filter: imageStyle.filter,
-            imageRect, frameRect, copyRect, visibleProductRect, alphaBounds, copyOverlap,
+            imageRect, frameRect, copyRect, visibleProductRect, alphaBounds, alphaStats, copyOverlap,
             productWithinHorizontalViewport: !visibleProductRect || (visibleProductRect.left >= -1 && visibleProductRect.right <= window.innerWidth + 1),
             expectedThemeApplied: rootDark === (args.theme === 'dark'),
             viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth },
@@ -314,6 +323,11 @@ try {
         if (!m.productWithinHorizontalViewport) fail('Visible shoe pixels extend beyond the viewport horizontally.');
         if (m.copyOverlap && m.copyOverlap.area > 1) fail('Visible shoe pixels overlap Hero copy.');
         if (!m.alphaBounds || m.alphaBounds.error) fail('Could not inspect the PNG alpha silhouette in-browser.');
+        if (!m.alphaStats || m.alphaStats.transparentRatio < 0.2) fail('Hero PNG lacks substantial transparent background.');
+        if (!m.alphaStats || m.alphaStats.opaqueRatio < 0.1) fail('Hero PNG lacks substantial opaque shoe pixels.');
+        if (!m.alphaStats || m.alphaStats.semitransparentPixels < 1) fail('Hero PNG lacks anti-aliased alpha edges.');
+        if (m.alphaStats && Object.values(m.alphaStats.corners).some(alpha => alpha !== 0)) fail('Hero PNG corners are not transparent; source may contain a rectangular background.');
+        if (m.alphaStats && (!m.alphaStats.visibleBounds || m.alphaStats.visibleBounds.left <= 0 || m.alphaStats.visibleBounds.top <= 0 || m.alphaStats.visibleBounds.right >= m.alphaStats.width - 1 || m.alphaStats.visibleBounds.bottom >= m.alphaStats.height - 1)) fail('Visible shoe pixels touch the source PNG border and may be clipped.');
         if (!m.noHorizontalPageOverflow) fail('Hero layout creates horizontal page overflow.');
         if (!imageResponses.some((entry) => entry.status === 200)) fail('The Hero PNG did not return HTTP 200.');
         if (audit.readOnlyViolations.some((entry) => entry.context === label)) fail('A write/non-GET request was attempted and blocked.');
@@ -353,7 +367,7 @@ console.log(JSON.stringify({
   contexts: audit.results.map((item) => ({
     context: item.context, pass: item.pass, failures: item.failures,
     naturalWidth: item.metrics?.naturalWidth, naturalHeight: item.metrics?.naturalHeight,
-    objectFit: item.metrics?.objectFit, filter: item.metrics?.filter,
+    alphaStats: item.metrics?.alphaStats, objectFit: item.metrics?.objectFit, filter: item.metrics?.filter,
     copyOverlap: item.metrics?.copyOverlap, screenshot: item.screenshot,
   })),
   consoleErrors: audit.consoleErrors.length,

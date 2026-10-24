@@ -7,10 +7,10 @@ assert.ok(heroSyncMatch, "The hero image synchronization function must remain pr
 const heroSync = heroSyncMatch[1];
 
 assert.ok(heroSync.includes("target.hidden=false")
-  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'")
+  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514%20(1).png'")
   && heroSync.includes("target.dataset.productImageStatus='owner-presentation-image-active'")
   && heroSync.includes("target.alt='Đôi giày loafer da cá sấu SinDarealest'"),
-  "The owner-authorized Hero experiment must show the owner-supplied blended PNG with descriptive alt text.");
+  "The Hero must use the original owner-supplied RGBA PNG with descriptive alt text.");
 assert.ok(html.includes('id="heroProductImage"'),
   "The existing Hero image element must remain available for responsive styling.");
 
@@ -42,7 +42,7 @@ for (const [, selector, declarations] of heroImageRules) {
   }
   assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied hero asset must never be cropped.");
 }
-assert.ok(html.includes("/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */"));
+assert.ok(html.includes("/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */"));
 const edgeProcessor = readFileSync(new URL("../scripts/process-hero-edge.py", import.meta.url), "utf8");
 assert.ok(edgeProcessor.includes("FEATHER_RADIUS = 48")
   && edgeProcessor.includes('padded_source.putalpha(new_alpha)')
@@ -63,7 +63,7 @@ assert.doesNotMatch(edgeProcessor, /^PLATFORM\s*=\s*\[/m,
   "Hero feathering must not use an approximate polygon to define the platform silhouette.");
 assert.doesNotMatch(edgeProcessor, /MinFilter|PLATFORM_EDGE_RADIUS|PLATFORM_INNER_BLUR/,
   "The rejected polygon-derived platform edge band must remain removed.");
-const heroEdgeTreatment = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
+const heroEdgeTreatment = html.slice(html.lastIndexOf("/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */"));
 assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("#home .hero-visual{")
   && heroEdgeTreatment.includes("mask-image:none!important")
@@ -73,7 +73,7 @@ assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   "The derived Hero shoes must remain enlarged while alpha edges blend into the page and original RGB stays unchanged.");
 assert.ok(heroEdgeTreatment.includes("@media(min-width:761px) and (max-width:1000px)")
   && heroEdgeTreatment.includes("width:113%!important")
-  && heroEdgeTreatment.includes("max-height:540px!important;margin-left:0!important"),
+  && heroEdgeTreatment.includes("max-height:540px!important;margin-left:0!important;margin-right:0!important"),
   "Tablet Hero sizing must preserve the entire transparent PNG in the right column with clear separation from copy.");
 assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important")
   && html.includes("-webkit-mask:none!important;mask:none!important"));
@@ -87,7 +87,7 @@ assert.ok(html.includes("#home .hero-visual::before{")
 assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;")
   && html.includes("grid-column:1!important;")
   && html.includes("grid-column:2!important;")
-  && html.includes("width:88%!important;height:auto!important;max-width:100%!important;max-height:210px!important;")
+  && html.includes("width:122%!important;height:auto!important;max-width:none!important;max-height:330px!important;")
   && html.includes("object-fit:contain!important;object-position:center!important;")
   && html.includes("margin:0!important;"),
   "On mobile, hero copy and image must use separate side-by-side columns while the full source-derived image stays centered and clear.");
