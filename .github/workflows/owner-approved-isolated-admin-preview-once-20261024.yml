@@ -19,7 +19,8 @@ jobs:
     name: Deploy approved SHA to isolated non-production Preview
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/admin-isolated-handoff-2026-10-20' && github.event.head_commit.message == '[CF-Pages-Skip] deploy: authorized isolated Admin Preview 564ea556e6dee745eaaa491ee033a2a8cfbb595c' }}
+    if: >-
+      ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/admin-isolated-handoff-2026-10-20' && github.event.head_commit.message == '[CF-Pages-Skip] deploy: authorized isolated Admin Preview 564ea556e6dee745eaaa491ee033a2a8cfbb595c' }}
     env:
       APPROVED_SOURCE_SHA: 564ea556e6dee745eaaa491ee033a2a8cfbb595c
       PREVIEW_PROJECT: sindarealest-admin-preview
