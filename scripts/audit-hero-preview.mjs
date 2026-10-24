@@ -52,6 +52,7 @@ const audit = {
     { name: 'tablet-768', width: 768, height: 1024 },
     { name: 'phone-desktop-mode-980', width: 980, height: 800, hasTouch: true },
     { name: 'desktop-1280', width: 1280, height: 800 },
+    { name: 'desktop-1365', width: 1365, height: 768 },
     { name: 'desktop-1440', width: 1440, height: 900 },
   ],
   themes: ['light', 'dark'],
@@ -328,6 +329,11 @@ try {
             path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000,
           });
           result.screenshot = filename;
+          if (viewport.hasTouch) {
+            await page.screenshot({
+              path:path.join(outputDir,label+'-full-page.png'),fullPage:true,animations:'disabled',timeout:30000,
+            });
+          }
         } catch (error) {
           result.failures.push('Hero screenshot capture failed: ' + String(error.message || error).slice(0, 400));
         }
@@ -384,7 +390,7 @@ try {
           if(colSizes.length!==2)
             fail('Touch desktop mode must expose two usable product columns, not four tiny cards.');
         }
-        if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < 320)) fail('Tablet Hero product is too small compared with the reference-led layout.');
+        if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < 280 || m.visibleProductRect.width > 400)) fail('Tablet/touch desktop Hero product must have a realistic, bounded size.');
         if (m.viewport.width >= 761 && m.viewport.width <= 1000) {
           const p=m.pedestal?.oval;
           if (!p||!Number.isFinite(p.left)||!Number.isFinite(p.width)) fail('Tablet marble pedestal geometry unavailable.');
@@ -406,8 +412,10 @@ try {
         if (m.viewport.width >= 1001) {
           const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;
           if (ratio < 0.70 || ratio > 0.80) fail('Desktop Hero PNG is being squeezed by a mismatched CSS box ratio.');
-          const minimumProductWidth = m.viewport.width >= 1400 ? 440 : 400;
-          if (!m.visibleProductRect || m.visibleProductRect.width < minimumProductWidth) fail('Desktop Hero product is too small compared with the source reference at this viewport.');
+          const minimumProductWidth = m.viewport.width >= 1400 ? 380 : 350;
+          const maximumProductWidth = m.viewport.width >= 1400 ? 460 : 435;
+          if (!m.visibleProductRect || m.visibleProductRect.width < minimumProductWidth || m.visibleProductRect.width > maximumProductWidth)
+            fail('Desktop Hero product must be scaled realistically (not cropped by header or exaggerated).');
         }
         if (!String(m.filter).includes('drop-shadow')) fail('Hero image is missing the restrained drop shadow.');
         if (!m.expectedThemeApplied) fail('Requested light/dark theme was not applied.');
