@@ -1,3 +1,16 @@
+## LATEST REGRESSION PRECISION — ADMIN META ROBOTS — 2026-10-24
+
+- Test-only SHA: `de5b4efd95ad08cee5582520e74b5dd591c9d51a`.
+- Change: `tests/robots-txt.test.mjs` verifies `public/admin/index.html` contains `<meta name="robots" content="noindex,nofollow">`. It no longer relies only on the existence of the `public/_headers` rule, because Cloudflare Pages says `_headers` is not applied to Pages Functions-generated responses.
+- Validate run for this SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843359 (was in progress at handoff update; refresh result).
+- Preview deploy run for this SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40048843460 (was in progress at handoff update; refresh result).
+- Last fully verified code/test SHA before this test-only change: `94df81d6442d278ef288b424858fe60a4ecb0b9c`; Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543955; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047543822.
+- Preview noindex behavior for the middleware-generated root is NOT VERIFIED. `robots.txt` disallows Preview crawling but is not a guaranteed de-indexing directive. No shared middleware/response-header changes made without explicit authorization.
+- External HTTP and browser/device visual verification remain NOT VERIFIED. Liquid Glass visual workflow skipped by Hero guard.
+- PR #108 OPEN/unmerged, base `main`; Production untouched.
+
+---
+
 ## EXACT-SHA RESULT — ROBOTS/NOINDEX ALIGNMENT + DEPENDENCY AUDIT — 2026-10-24
 
 | Gate | Result | Evidence |
