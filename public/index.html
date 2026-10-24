@@ -604,6 +604,20 @@ html:not(.dark){--sd-icon-glass-bg:rgba(255,255,255,.46);--sd-icon-glass-bg-hove
 .slide-controls button:focus-visible,.featured-arrow:focus-visible,.detail-zoom-btn:focus-visible,.detail-gallery-arrow:focus-visible,.sd-fullscreen-close:focus-visible,.sd-fullscreen-arrow:focus-visible,.detail-favorite-btn:focus-visible,.account-action-icon:focus-visible,#mobileBottomNav .mobile-tab:focus-visible{outline:2px solid var(--sd-icon-press-color);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.icon-btn svg,.service-icon svg,.slide-controls button svg,.featured-arrow svg,.detail-zoom-btn svg,.detail-gallery-arrow svg,.sd-fullscreen-close svg,.sd-fullscreen-arrow svg,.detail-favorite-btn svg,.account-action-icon svg,#mobileBottomNav .mobile-tab svg,.slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,.detail-favorite-btn,.account-action-icon,#mobileBottomNav .mobile-tab{transition:none!important}}
 </style>
+<style id="sd-fullscreen-crossfade-preload-trial-2026-10-24">
+/* Trial: opacity-only incoming fade over an opaque outgoing frame. */
+#sdFullscreenViewer .sd-fullscreen-image{
+  animation:none!important;
+  transform:none!important;
+  transition:opacity 250ms ease-in-out!important;
+  will-change:opacity!important;
+}
+#sdFullscreenViewer .sd-fullscreen-image.is-active{opacity:1!important;z-index:2!important}
+#sdFullscreenViewer .sd-fullscreen-image:not(.is-active){opacity:0!important;z-index:1!important}
+#sdFullscreenViewer .sd-fullscreen-image.sd-fade-in{z-index:3!important}
+#sdFullscreenViewer .sd-fullscreen-image.sd-no-transition{transition:none!important;animation:none!important}
+@media(prefers-reduced-motion:reduce){#sdFullscreenViewer .sd-fullscreen-image{transition:none!important}}
+</style>
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -903,7 +917,7 @@ html:not(.dark){--sd-icon-glass-bg:rgba(255,255,255,.46);--sd-icon-glass-bg-hove
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const ZALO='https://zalo.me/0827049192';
-let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, favorites=[], localOrderHistory=[], localShippingAddress=null, accountAddressWardRequest=0, toastTimer=null, artTimer=null, featuredTimer=null, artIndex=0, currentSlideSrc='', detailTimer=null, detailSwapTimer=null, fullscreenSwapTimer=null, detailAnimationTimer=null, fullscreenAnimationTimer=null, detailTransitionId=0, fullscreenTransitionId=0, fullscreenActiveLayer=0, detailIndex=0, detailImages=[];
+let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, favorites=[], localOrderHistory=[], localShippingAddress=null, accountAddressWardRequest=0, toastTimer=null, artTimer=null, featuredTimer=null, artIndex=0, currentSlideSrc='', detailTimer=null, detailSwapTimer=null, fullscreenSwapTimer=null, detailAnimationTimer=null, fullscreenAnimationTimer=null, detailTransitionId=0, fullscreenTransitionId=0, fullscreenActiveLayer=0, fullscreenFadePendingLayer=-1, detailIndex=0, detailImages=[];
 const FAVORITES_STORAGE_KEY='sd-favorites';
 const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history';
 const LOCAL_ADDRESS_KEY='sd-shipping-address';
@@ -963,7 +977,7 @@ function sizeFullscreenFrame(imageOverride){
  frame.style.height=Math.max(1,Math.round(nh*scale))+'px';
 }
 // Product photos are always rendered from their original pixels; never infer and remove a white canvas.
-const FULLSCREEN_SLIDE_MS=300;
+const FULLSCREEN_FADE_MS=250;
 const fullscreenPreloadCache=new Map();
 function preloadFullscreenPhotos(index=detailIndex,all=false){
  if(!detailImages.length||typeof Image!=='function')return;
@@ -977,11 +991,29 @@ function preloadFullscreenPhotos(index=detailIndex,all=false){
   if(typeof image.decode==='function')image.decode().catch(()=>{});
  }
 }
-function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing')}
+function clearFullscreenSlideClasses(img){if(img)img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing','sd-fade-in','sd-fade-out','sd-no-transition')}
+function setFullscreenLayerState(img,active){
+ if(!img)return;
+ img.classList.add('sd-no-transition');
+ img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing','sd-fade-in','sd-fade-out');
+ if(active)img.classList.add('is-active');else img.classList.remove('is-active');
+ void img.offsetWidth;
+ img.classList.remove('sd-no-transition');
+}
+function commitFullscreenFade(){
+ if(fullscreenFadePendingLayer<0)return;
+ clearTimeout(fullscreenAnimationTimer);fullscreenAnimationTimer=null;
+ const images=fullscreenImages(),active=images[fullscreenFadePendingLayer],inactive=images.find(img=>img!==active);
+ setFullscreenLayerState(active,true);
+ setFullscreenLayerState(inactive,false);
+ fullscreenActiveLayer=active&&active.id==='sdFullscreenImageNext'?1:0;
+ fullscreenFadePendingLayer=-1;
+}
 function setFullscreenPhoto(src,direction='left',instant=false){
- clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);
+ commitFullscreenFade();
+ clearTimeout(fullscreenSwapTimer);clearTimeout(fullscreenAnimationTimer);fullscreenAnimationTimer=null;
  const transitionId=++fullscreenTransitionId,images=fullscreenImages(),active=activeFullscreenImage(),incoming=images.find(img=>img!==active),frame=$('#sdFullscreenFrame'),next=imgPath(src||'');
- // Keep one consistent decoded directional slide on desktop and mobile.
+ // Keep the whole album warming in the browser cache; only transition after the incoming DOM image is decoded.
  preloadFullscreenPhotos(Math.max(0,detailImages.indexOf(src)));
  if(!active||!incoming||!frame)return;
  const imageIndex=Math.max(0,detailImages.indexOf(src))+1;
@@ -993,7 +1025,8 @@ function setFullscreenPhoto(src,direction='left',instant=false){
  images.forEach(clearFullscreenSlideClasses);
  const activeSrc=active.getAttribute('src')||'';
  if(activeSrc===next&&active.complete&&active.naturalWidth){
-  active.classList.add('is-active');incoming.classList.remove('is-active');syncImageAccessibility(active);sizeFullscreenFrame(active);window.__sdUpdateDetailWatermark?.();return;
+  setFullscreenLayerState(active,true);setFullscreenLayerState(incoming,false);
+  syncImageAccessibility(active);sizeFullscreenFrame(active);window.__sdUpdateDetailWatermark?.();return;
  }
  const finishLoad=()=>{
   if(transitionId!==fullscreenTransitionId)return;
@@ -1003,33 +1036,43 @@ function setFullscreenPhoto(src,direction='left',instant=false){
   const revealDecodedImage=()=>{
    if(transitionId!==fullscreenTransitionId)return;
    if(instant||!active.complete||!active.naturalWidth){
-    incoming.classList.add('is-active');active.classList.remove('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
-    syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();return;
+    setFullscreenLayerState(incoming,true);setFullscreenLayerState(active,false);
+    fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;fullscreenFadePendingLayer=-1;
+    syncImageAccessibility(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();return;
    }
-   // Both layers are fully loaded and decoded before the directional slide starts.
-   active.classList.add(direction==='right'?'sd-slide-out-right':'sd-slide-out-left');
-   incoming.classList.add(direction==='right'?'sd-slide-in-left':'sd-slide-in-right');
+   // Fade only the decoded incoming image over a still-opaque outgoing image.
+   // This avoids a blank compositor frame while keeping the previous photo visible underneath.
+   incoming.classList.add('sd-fade-in');
+   void incoming.offsetWidth;
+   incoming.classList.add('is-active');
+   fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
+   fullscreenFadePendingLayer=fullscreenActiveLayer;
+   syncImageAccessibility(incoming);
    fullscreenAnimationTimer=setTimeout(()=>{
-    if(transitionId!==fullscreenTransitionId)return;
-    incoming.classList.add('is-active');active.classList.remove('is-active');fullscreenActiveLayer=incoming.id==='sdFullscreenImageNext'?1:0;
-    syncImageAccessibility(incoming);clearFullscreenSlideClasses(active);clearFullscreenSlideClasses(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
-   },FULLSCREEN_SLIDE_MS+20);
+    if(transitionId!==fullscreenTransitionId||fullscreenFadePendingLayer!==fullscreenActiveLayer)return;
+    setFullscreenLayerState(active,false);
+    incoming.classList.remove('sd-fade-in','sd-fade-out');
+    incoming.classList.add('is-active');
+    fullscreenFadePendingLayer=-1;fullscreenAnimationTimer=null;
+    syncImageAccessibility(incoming);sizeFullscreenFrame(incoming);window.__sdUpdateDetailWatermark?.();
+   },FULLSCREEN_FADE_MS+30);
   };
   const rejectDecodedImage=()=>{
    if(transitionId!==fullscreenTransitionId)return;
-   // A failed decode is not a successful transition: keep the last decoded photo visible.
-   incoming.classList.remove('is-active');
-   clearFullscreenSlideClasses(incoming);
-   active.classList.add('is-active');
-   syncImageAccessibility(active);
-   window.__sdUpdateDetailWatermark?.();
+   setFullscreenLayerState(incoming,false);setFullscreenLayerState(active,true);
+   syncImageAccessibility(active);window.__sdUpdateDetailWatermark?.();
   };
   let decoded;
   try{decoded=typeof incoming.decode==='function'?incoming.decode():Promise.resolve()}
   catch{decoded=Promise.reject()}
   Promise.resolve(decoded).then(revealDecodedImage,rejectDecodedImage);
  };
- const failLoad=()=>{if(transitionId!==fullscreenTransitionId)return;incoming.onload=null;incoming.onerror=null;clearFullscreenSlideClasses(incoming);active.classList.add('is-active');syncImageAccessibility(active);window.__sdUpdateDetailWatermark?.()};
+ const failLoad=()=>{
+  if(transitionId!==fullscreenTransitionId)return;
+  incoming.onload=null;incoming.onerror=null;
+  setFullscreenLayerState(incoming,false);setFullscreenLayerState(active,true);
+  syncImageAccessibility(active);window.__sdUpdateDetailWatermark?.();
+ };
  if((incoming.getAttribute('src')||'')===next&&incoming.complete&&incoming.naturalWidth){finishLoad();return}
  incoming.onload=finishLoad;incoming.onerror=failLoad;incoming.src=next;
  if(incoming.complete&&incoming.naturalWidth)finishLoad();
@@ -1114,6 +1157,7 @@ function clearGalleryTransitionClasses(img){
 }
 function closeFullscreenImage(){
  const viewer=$('#sdFullscreenViewer');if(!viewer.classList.contains('open'))return;
+ commitFullscreenFade();
  clearTimeout(fullscreenSwapTimer);fullscreenSwapTimer=null;
  clearTimeout(detailSwapTimer);detailSwapTimer=null;
  clearTimeout(detailAnimationTimer);detailAnimationTimer=null;

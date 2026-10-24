@@ -22,8 +22,10 @@ assert.match(detailTransition, /if\(transitionId!==detailTransitionId\)return/);
 assert.equal((html.match(/id="sdFullscreenImage"/g) || []).length, 1);
 assert.equal((html.match(/id="sdFullscreenImageNext"/g) || []).length, 1);
 assert.match(html, /function setFullscreenPhoto\(/);
-assert.doesNotMatch(html, /sd-mobile-fade-(?:out|in)|FULLSCREEN_MOBILE_FADE_MS|sdFullscreenMobileFade/,
-  'Fullscreen transitions use the directional slide rather than a crossfade.');
+assert.match(html, /<style id="sd-fullscreen-crossfade-preload-trial-2026-10-24">[\s\S]*transition:opacity 250ms ease-in-out!important/,
+  'Fullscreen photos must use the isolated opacity-crossfade trial.');
+assert.match(html, /function commitFullscreenFade\(\)/,
+  'A new tap must commit an in-progress fade before reusing the previous image layer.');
 assert.match(html, /function preloadFullscreenPhotos\(index=detailIndex,all=false\)/);
 assert.match(html, /const indices=all\?detailImages\.map\(\(_,photoIndex\)=>photoIndex\)/);
 assert.match(html, /preloadFullscreenPhotos\(detailIndex,true\)/,
@@ -32,23 +34,22 @@ assert.match(html, /image\.fetchPriority=photoIndex===index\?'high':'low'/);
 assert.doesNotMatch(html, /@media\(max-width:760px\)\{\.sd-fullscreen-image\{animation:none!important;transition:none!important;transform:none!important/);
 
 const fullscreenMobileSwap = html.slice(html.indexOf('function setFullscreenPhoto('), html.indexOf('function renderFullscreenThumbs(', html.indexOf('function setFullscreenPhoto(')));
-assert.match(fullscreenMobileSwap, /if\(instant\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/,
-  'Initial display or missing outgoing image must still use a safe decoded-image activation path.');
-assert.match(fullscreenMobileSwap, /active\.classList\.add\(direction==='right'\?'sd-slide-out-right':'sd-slide-out-left'\)/);
-assert.match(fullscreenMobileSwap, /incoming\.classList\.add\(direction==='right'\?'sd-slide-in-left':'sd-slide-in-right'\)/);
+assert.match(fullscreenMobileSwap, /if\(instant\|\|!active\.complete\|\|!active\.naturalWidth\)\{[\s\S]*?setFullscreenLayerState\(incoming,true\);setFullscreenLayerState\(active,false\)/,
+  'Initial display or a missing outgoing image must swap only after the incoming image is decoded.');
+assert.match(fullscreenMobileSwap, /incoming\.classList\.add\('sd-fade-in'\);\s*void incoming\.offsetWidth;\s*incoming\.classList\.add\('is-active'\)/);
+assert.match(fullscreenMobileSwap, /fullscreenFadePendingLayer=fullscreenActiveLayer/);
+assert.match(fullscreenMobileSwap, /setTimeout\([\s\S]*?setFullscreenLayerState\(active,false\)/,
+  'The outgoing photo must remain opaque below the incoming fade until cleanup.');
+assert.match(fullscreenMobileSwap, /commitFullscreenFade\(\);[\s\S]*?fullscreenFadePendingLayer=-1/);
 
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
 assert.match(html, /let decoded;[\s\S]*?try\{decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)\}[\s\S]*?catch\{decoded=Promise\.reject\(\)\}/, 'Decode failures must be handled without revealing an unconfirmed image.');
 assert.match(html, /Promise\.resolve\(decoded\)\.then\(revealDecodedImage,rejectDecodedImage\)/);
 assert.match(html, /const rejectDecodedImage=\(\)=>\{[\s\S]*?incoming\.classList\.remove\('is-active'\)[\s\S]*?active\.classList\.add\('is-active'\)/);
-const fullscreenTravelCss = html.slice(html.indexOf('@keyframes sdFullscreenOutLeft'), html.indexOf('.sd-fullscreen-close', html.indexOf('@keyframes sdFullscreenOutLeft')));
-assert.match(fullscreenTravelCss, /@keyframes sdFullscreenOutLeft\{from\{opacity:1;transform:translateX\(0\)[\s\S]*?to\{opacity:1;transform:translateX\(-100%\)/,
-  'The outgoing photo must travel a full frame so transparent pixels cannot overlap the incoming photo.');
-assert.match(fullscreenTravelCss, /@keyframes sdFullscreenOutRight\{from\{opacity:1;transform:translateX\(0\)[\s\S]*?to\{opacity:1;transform:translateX\(100%\)/);
-assert.match(fullscreenTravelCss, /@keyframes sdFullscreenInRight\{from\{opacity:1;transform:translateX\(100%\)/);
-assert.match(fullscreenTravelCss, /@keyframes sdFullscreenInLeft\{from\{opacity:1;transform:translateX\(-100%\)/);
-assert.doesNotMatch(fullscreenTravelCss, /translateX\(-?18%\)/,
-  'Fullscreen photo layers must not use a short overlapping slide; transparent PNGs would reveal the previous image.');
+assert.match(html, /#sdFullscreenViewer \.sd-fullscreen-image\{[\s\S]*?transition:opacity 250ms ease-in-out!important/,
+  'Fullscreen photos must use opacity-only motion instead of transform/keyframe motion.');
+assert.match(html, /#sdFullscreenViewer \.sd-fullscreen-image\.sd-no-transition\{transition:none!important/,
+  'Rapid taps and initial activation must normalize layers without replaying a second fade.');
 assert.match(html, /@keyframes sdGalleryOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-22%\) scale\(\.985\);filter:blur\(0\)\}\}/);
 assert.match(html, /@keyframes sdGalleryInRight\{from\{opacity:1;transform:translateX\(22%\) scale\(\.985\);filter:blur\(0\)\}/);
 assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
@@ -87,7 +88,7 @@ console.log('PASS: gallery changes preload/decode before outgoing animation; ful
 
 
 // Execute the actual fullscreen transition function with deterministic load/decode timing.
-const fullscreenRuntimeStart = html.indexOf('const FULLSCREEN_SLIDE_MS=300;');
+const fullscreenRuntimeStart = html.indexOf('const FULLSCREEN_FADE_MS=250;');
 const fullscreenRuntimeEnd = html.indexOf('function renderFullscreenThumbs(', fullscreenRuntimeStart);
 assert.ok(fullscreenRuntimeStart >= 0 && fullscreenRuntimeEnd > fullscreenRuntimeStart,
   'The fullscreen runtime fixture must isolate the current transition implementation.');
@@ -117,7 +118,7 @@ function createFullscreenHarness() {
     if (initialSrc) attributes.set('src', initialSrc);
     return {
       id, complete: Boolean(initialSrc), naturalWidth: initialSrc ? 320 : 0,
-      naturalHeight: initialSrc ? 240 : 0, alt: '', onload: null, onerror: null,
+      naturalHeight: initialSrc ? 240 : 0, alt: '', onload: null, onerror: null, get offsetWidth() { return 320; },
       classList: mockClassList(active ? ['is-active'] : []),
       get src() { return source; },
       set src(value) {
@@ -158,6 +159,7 @@ function createFullscreenHarness() {
     "function setTimeout(callback, delay) { const id = context.nextTimerId++; context.timers.set(id, { callback, delay }); return id; }",
     "let fullscreenTransitionId = 0;",
     "let fullscreenActiveLayer = 0;",
+    "let fullscreenFadePendingLayer = -1;",
     "function $(selector) { return context.$(selector); }",
     "function fullscreenImages() { return images; }",
     "function activeFullscreenImage() { return images[fullscreenActiveLayer ? 1 : 0]; }",
@@ -175,8 +177,8 @@ function createFullscreenHarness() {
     images, decodeQueue, timers,
     run: (source, instant = false) => sandbox.setFullscreenPhoto(source, 'left', instant),
     finishAnimation: () => {
-      const item = [...timers.entries()].find(([, timer]) => timer.delay >= 300);
-      assert.ok(item, 'A timed image transition should remain pending until the fade completes.');
+      const item = [...timers.entries()].find(([, timer]) => timer.delay >= 270);
+      assert.ok(item, 'The pending cleanup timer should remain until the incoming image is fully opaque.');
       timers.delete(item[0]);
       item[1].callback();
       context.fullscreenActiveLayer = 1;
@@ -203,11 +205,13 @@ function assertExactlyOneActivePhoto(images, expected) {
   assert.equal(gallery.decodeQueue.length, 1);
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
-  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
-  assert.equal(gallery.images[0].classList.contains('sd-slide-out-left'), true);
-  assert.equal(gallery.images[1].classList.contains('sd-slide-in-right'), true);
+  assert.equal(gallery.images[0].classList.contains('is-active'), true,
+    'The outgoing layer must remain opaque under the incoming fade.');
+  assert.equal(gallery.images[1].classList.contains('is-active'), true,
+    'The decoded incoming layer must fade above the outgoing layer.');
+  assert.equal(gallery.images[1].classList.contains('sd-fade-in'), true);
   assert.equal(gallery.timers.size, 1,
-    'After decode, mobile must run the directional slide before committing the active layer.');
+    'After decode, the opacity fade must remain pending before old-layer cleanup.');
   gallery.finishAnimation();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
   assert.equal(gallery.images[1].getAttribute('src'), 'new.jpg');
@@ -228,11 +232,32 @@ function assertExactlyOneActivePhoto(images, expected) {
   gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
   gallery.decodeQueue[1].resolve(); await flushGalleryMicrotasks();
-  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
-  assert.equal(gallery.images[1].classList.contains('sd-slide-in-right'), true);
+  assert.equal(gallery.images[0].classList.contains('is-active'), true,
+    'The outgoing photo must remain active during the opacity fade.');
+  assert.equal(gallery.images[1].classList.contains('is-active'), true,
+    'The latest decoded incoming photo must be active during the opacity fade.');
+  assert.equal(gallery.images[1].classList.contains('sd-fade-in'), true);
   gallery.finishAnimation();
   assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
   assert.equal(gallery.images[1].getAttribute('src'), 'newer.jpg',
     'A stale decode must never replace the latest requested next/previous photo.');
 }
-console.log('PASS: fullscreen runtime preserves the current frame, atomically swaps decoded mobile layers, rejects failed decodes, and ignores stale competing transitions.');
+{
+  const gallery = createFullscreenHarness();
+  gallery.run('new.jpg'); gallery.loadIncoming(gallery.images[1]);
+  gallery.decodeQueue[0].resolve(); await flushGalleryMicrotasks();
+  assert.equal(gallery.images.filter(image => image.classList.contains('is-active')).length, 2,
+    'Both decoded layers may be active during crossfade while the old photo remains opaque below.');
+  gallery.run('newer.jpg');
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[1]);
+  assert.equal(gallery.images[1].getAttribute('src'), 'new.jpg',
+    'An interrupted fade must commit the latest requested decoded image before reusing the other layer.');
+  gallery.loadIncoming(gallery.images[0]);
+  gallery.decodeQueue[1].resolve(); await flushGalleryMicrotasks();
+  assert.equal(gallery.images[1].classList.contains('is-active'), true);
+  assert.equal(gallery.images[0].classList.contains('is-active'), true);
+  gallery.finishAnimation();
+  assertExactlyOneActivePhoto(gallery.images, gallery.images[0]);
+  assert.equal(gallery.images[0].getAttribute('src'), 'newer.jpg');
+}
+console.log('PASS: fullscreen fade retains an opaque outgoing photo, ignores failed/stale decodes, commits interrupted fades, and settles on exactly one active image.');

@@ -100,107 +100,131 @@ async function activateAndVerifyCounter(page, activate, delta, label) {
   const afterText = String(await page.locator('#sdFullscreenCount').textContent() || '').trim();
   return { before: beforeText, after: afterText, expected: expectedText, delta, total };
 }
-async function inspectAnimationGeometry(page, label) {
+async function inspectFadeOpacity(page, label) {
   const measured = await page.evaluate(() => {
     const imageNodes = [
       document.querySelector('#sdFullscreenImage'),
       document.querySelector('#sdFullscreenImageNext')
     ].filter(Boolean);
-    const transitionClasses = [
-      ['sd-slide-out-left', 'sdFullscreenOutLeft'],
-      ['sd-slide-out-right', 'sdFullscreenOutRight'],
-      ['sd-slide-in-left', 'sdFullscreenInLeft'],
-      ['sd-slide-in-right', 'sdFullscreenInRight']
-    ];
+    const incoming = imageNodes.find((image) => image.classList.contains('sd-fade-in'));
+    const outgoing = incoming ? imageNodes.find((image) => image !== incoming) : null;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const transitions = incoming ? incoming.getAnimations().filter((transition) =>
+      String(transition.transitionProperty || '') === 'opacity' && transition.playState === 'running') : [];
     const activeClasses = imageNodes.map((image) => ({
       id: image.id,
-      classes: transitionClasses.filter((item) => image.classList.contains(item[0])).map((item) => item[0])
+      classes: ['is-active','sd-fade-in','sd-fade-out','sd-no-transition'].filter((name) => image.classList.contains(name)),
+      opacity: Number(getComputedStyle(image).opacity),
+      zIndex: getComputedStyle(image).zIndex
     }));
-    const animations = imageNodes.flatMap((image) => {
-      const expectedNames = transitionClasses.filter((item) => image.classList.contains(item[0])).map((item) => item[1]);
-      return image.getAnimations().filter((animation) =>
-        expectedNames.includes(String(animation.animationName || '')) && animation.playState === 'running');
-    });
-    const mediaReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!animations.length) return { found: false, reducedMotion: mediaReduce, names: [], durationsMs: [], frames: [], activeClasses };
-    const names = animations.map((animation) => String(animation.animationName || ''));
-    const durationsMs = animations.map((animation) => Number(animation.effect && animation.effect.getTiming().duration));
-    animations.forEach((animation) => animation.pause());
+    if (!incoming || !outgoing || !transitions.length) {
+      return { found: false, reducedMotion, transitionCount: transitions.length, durationsMs: [], frames: [], activeClasses };
+    }
+    const durationsMs = transitions.map((transition) => Number(transition.effect && transition.effect.getTiming().duration));
+    transitions.forEach((transition) => transition.pause());
     const progress = [0, 0.25, 0.5, 0.75, 0.99];
     const frames = [];
     for (const amount of progress) {
-      animations.forEach((animation) => {
-        const duration = Number(animation.effect && animation.effect.getTiming().duration);
-        const endTime = Number.isFinite(duration) ? Math.max(0, duration - 0.01) : 0;
-        animation.currentTime = Math.min(duration * amount, endTime);
+      transitions.forEach((transition) => {
+        const duration = Number(transition.effect && transition.effect.getTiming().duration);
+        transition.currentTime = Number.isFinite(duration) ? Math.max(0, Math.min(duration * amount, duration - 0.01)) : 0;
       });
       void document.body.offsetWidth;
-      const first = imageNodes[0].getBoundingClientRect();
-      const second = imageNodes[1].getBoundingClientRect();
-      const frame = document.querySelector('#sdFullscreenFrame');
-      const rect = frame.getBoundingClientRect();
-      const innerLeft = rect.left + frame.clientLeft;
-      const innerRight = innerLeft + frame.clientWidth;
-      const left = first.left <= second.left ? first : second;
-      const right = first.left <= second.left ? second : first;
       frames.push({
         progress: amount,
-        overlapPx: Number(Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left)).toFixed(3)),
-        gapPx: Number(Math.max(0, right.left - left.right).toFixed(3)),
-        frameWidth: frame.clientWidth,
-        coveredWidth: Number(Math.max(0,
-          Math.min(innerRight, Math.max(first.right, second.right)) -
-          Math.max(innerLeft, Math.min(first.left, second.left))).toFixed(3))
+        incomingOpacity: Number(getComputedStyle(incoming).opacity),
+        outgoingOpacity: Number(getComputedStyle(outgoing).opacity),
+        incomingActive: incoming.classList.contains('is-active'),
+        outgoingActive: outgoing.classList.contains('is-active'),
+        incomingAboveOutgoing: Number(getComputedStyle(incoming).zIndex) > Number(getComputedStyle(outgoing).zIndex)
       });
     }
-    animations.forEach((animation) => {
-      const duration = Number(animation.effect && animation.effect.getTiming().duration);
-      animation.currentTime = Number.isFinite(duration) ? Math.max(0, duration - 0.01) : 0;
-      animation.play();
+    const duration = durationsMs[0];
+    transitions.forEach((transition) => {
+      transition.currentTime = Number.isFinite(duration) ? Math.max(0, duration * 0.5) : 0;
+      transition.pause();
     });
     return {
       found: true,
-      reducedMotion: mediaReduce,
-      names,
+      reducedMotion,
+      transitionCount: transitions.length,
+      transitionProperty: transitions.map((transition) => String(transition.transitionProperty || '')),
       durationsMs,
+      incomingId: incoming.id,
+      outgoingId: outgoing.id,
       activeClasses,
       frames
     };
   });
-  if (!measured.found) throw new Error(label + ': CSS gallery animation objects were not found. Reduced motion=' + measured.reducedMotion + '.');
-  const maxOverlap = measured.frames.length ? Math.max.apply(null, measured.frames.map((frame) => frame.overlapPx)) : Infinity;
-  const maxGap = measured.frames.length ? Math.max.apply(null, measured.frames.map((frame) => frame.gapPx)) : Infinity;
-  const minCoverage = measured.frames.length
-    ? Math.min.apply(null, measured.frames.map((frame) => frame.coveredWidth / Math.max(1, frame.frameWidth)))
-    : 0;
+  if (!measured.found) throw new Error(label + ': incoming CSS opacity transition was not running; reduced motion=' + measured.reducedMotion + ', transitions=' + measured.transitionCount + '.');
+
+  const outgoingValues = measured.frames.map((frame) => frame.outgoingOpacity);
+  const incomingValues = measured.frames.map((frame) => frame.incomingOpacity);
+  const minimumOutgoingOpacity = Math.min.apply(null, outgoingValues);
+  const maximumOutgoingOpacity = Math.max.apply(null, outgoingValues);
+  const incomingStartsHidden = incomingValues[0] <= 0.08;
+  const incomingEndsVisible = incomingValues[incomingValues.length - 1] >= 0.90;
+  const incomingMonotonic = incomingValues.every((opacity, i) => i === 0 || opacity + 0.025 >= incomingValues[i - 1]);
   const issues = [];
   if (measured.reducedMotion) issues.push('Unexpected prefers-reduced-motion=reduce in a no-preference audit context.');
-  if (measured.names.length !== 2) issues.push('Expected exactly two animations attached to the current outgoing/incoming slide classes; found ' + measured.names.length + ': ' + measured.names.join(', ') + '.');
-  if (measured.durationsMs.some((duration) => !Number.isFinite(duration) || duration < 250 || duration > 350)) {
-    issues.push('CSS animation duration is not the expected 300ms: ' + measured.durationsMs.join(', ') + 'ms.');
+  if (measured.transitionCount !== 1) issues.push('Expected one incoming opacity transition; found ' + measured.transitionCount + '.');
+  if (measured.transitionProperty.some((property) => property !== 'opacity')) issues.push('Unexpected non-opacity transition: ' + measured.transitionProperty.join(', ') + '.');
+  if (measured.durationsMs.some((duration) => !Number.isFinite(duration) || duration < 240 || duration > 260)) {
+    issues.push('Expected a 250ms opacity transition; found ' + measured.durationsMs.join(', ') + 'ms.');
   }
-  if (maxOverlap > 1.5) issues.push('Image-layer overlap reached ' + maxOverlap + ' CSS px.');
-  if (maxGap > 1.5) issues.push('Image-layer gap reached ' + maxGap + ' CSS px.');
-  if (minCoverage < 0.985) issues.push('Combined image-layer frame coverage fell to ' + (minCoverage * 100).toFixed(2) + '%.');
+  if (minimumOutgoingOpacity < 0.985 || maximumOutgoingOpacity > 1.015) {
+    issues.push('Outgoing photo was not held fully opaque during the fade: ' + outgoingValues.join(', ') + '.');
+  }
+  if (!incomingStartsHidden || !incomingEndsVisible || !incomingMonotonic) {
+    issues.push('Incoming opacity did not progress monotonically from hidden to visible: ' + incomingValues.join(', ') + '.');
+  }
+  if (measured.frames.some((frame) => !frame.incomingActive || !frame.outgoingActive || !frame.incomingAboveOutgoing)) {
+    issues.push('Both decoded layers must remain active during the crossfade, with incoming above outgoing.');
+  }
+
   const result = {
     label,
-    samplingMode: 'CSSAnimation timeline sampled at 0/25/50/75/99 percent',
+    samplingMode: 'paused CSS opacity transition sampled at 0/25/50/75/99 percent; midpoint screenshot captured',
     reducedMotion: measured.reducedMotion,
-    animationNames: measured.names,
-    animationDurationsMs: measured.durationsMs,
+    transitionProperty: measured.transitionProperty,
+    transitionDurationsMs: measured.durationsMs,
+    incomingImageId: measured.incomingId,
+    outgoingImageId: measured.outgoingId,
     activeLayerClasses: measured.activeClasses,
     frameSamples: measured.frames.length,
-    maxOverlapPx: Number(maxOverlap.toFixed(3)),
-    maxGapPx: Number(maxGap.toFixed(3)),
-    minFrameCoveragePercent: Number((minCoverage * 100).toFixed(2)),
-    measuredFrames: measured.frames,
+    minimumOutgoingOpacity: Number(minimumOutgoingOpacity.toFixed(3)),
+    maximumOutgoingOpacity: Number(maximumOutgoingOpacity.toFixed(3)),
+    incomingOpacityAt0Percent: Number(incomingValues[0].toFixed(3)),
+    incomingOpacityAt99Percent: Number(incomingValues[incomingValues.length - 1].toFixed(3)),
+    measuredOpacityFrames: measured.frames,
     status: issues.length ? 'FAIL' : 'PASS',
     issues
   };
   report.transitions.push(result);
+
+  const safeLabel = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const screenshot = 'gallery-transition-mid-' + safeLabel + '.png';
+  await page.locator('#sdFullscreenViewer').screenshot({ path: path.join(outputDir, screenshot) });
+  report.screenshots.push({ file: screenshot, selector: '#sdFullscreenViewer', label, phase: '50-percent-opacity-transition', status: 'CAPTURED_GALLERY_TRANSITION_ONLY' });
+
+  await page.evaluate(() => {
+    const imageNodes = [
+      document.querySelector('#sdFullscreenImage'),
+      document.querySelector('#sdFullscreenImageNext')
+    ].filter(Boolean);
+    imageNodes.flatMap((image) => image.getAnimations().filter((transition) =>
+      String(transition.transitionProperty || '') === 'opacity' && transition.playState === 'paused'))
+      .forEach((transition) => {
+        const duration = Number(transition.effect && transition.effect.getTiming().duration);
+        transition.currentTime = Number.isFinite(duration) ? Math.max(0, duration - 0.01) : 0;
+        transition.play();
+      });
+  });
+
   assert.equal(issues.length, 0, label + ': ' + issues.join(' '));
   return result;
 }
+
 async function measureTransition(page, activate, delta, label) {
   const counterProgress = await activateAndVerifyCounter(page, activate, delta, label);
   await page.waitForFunction(() => {
@@ -219,7 +243,7 @@ async function measureTransition(page, activate, delta, label) {
       Array.from(image.getAnimations()).some((animation) =>
         animation.animationName === item[1] && animation.playState === 'running')));
   }, null, { timeout: 8000 });
-  const result = await inspectAnimationGeometry(page, label);
+  const result = await inspectFadeOpacity(page, label);
   result.counterProgress = counterProgress;
   await page.waitForFunction(() => {
     const viewer = document.querySelector('#sdFullscreenViewer');
@@ -446,7 +470,8 @@ async function main() {
   for (const viewport of viewports) await runViewport(viewport);
   assert.equal(report.pageErrors.length, 0, 'Unexpected JavaScript page errors were observed during gallery audit.');
   assert.equal(report.readOnlyViolations.length, 0, 'No non-GET/HEAD requests may be attempted.');
-  assert.equal(report.screenshots.length, viewports.length);
+  assert.equal(report.screenshots.length, viewports.length * 3,
+    'Each viewport must capture two in-transition frames and one settled fullscreen frame.');
   assert.equal(report.transitions.length, viewports.length * 3);
   report.status = 'PASS';
   report.passed = true;
@@ -462,7 +487,9 @@ main().catch((error) => {
   report.finishedAtUtc ||= new Date().toISOString();
   await writeReport().catch(() => {});
   if (process.env.GITHUB_STEP_SUMMARY) {
-    const max = (key) => report.transitions.length ? Math.max.apply(null, report.transitions.map((item) => item[key])) : 'not measured';
+    const numeric = (key) => report.transitions.map((item) => item[key]).filter((value) => Number.isFinite(value));
+    const max = (key) => { const values = numeric(key); return values.length ? Math.max.apply(null, values) : 'not measured'; };
+    const min = (key) => { const values = numeric(key); return values.length ? Math.min.apply(null, values) : 'not measured'; };
     const lines = [
       '## Fullscreen gallery isolated Preview browser audit',
       '',
@@ -470,14 +497,14 @@ main().catch((error) => {
       '- Scope: fullscreen product gallery only; Hero and locked sections were not captured.',
       '- Workflow SHA: ' + (report.workflowHeadSha || 'unknown'),
       '- Public/deployed SHA: ' + (report.deployedPreviewSha || report.publicSourceSha || 'unverified'),
-      '- Gallery-only screenshots: ' + report.screenshots.length,
+      '- Gallery-only screenshots, including midpoint transitions: ' + report.screenshots.length,
       '- Transition measurements: ' + report.transitions.length,
-      '- Maximum image-layer overlap: ' + max('maxOverlapPx') + ' CSS px',
-      '- Maximum image-layer gap: ' + max('maxGapPx') + ' CSS px',
+      '- Minimum outgoing-image opacity during incoming fade: ' + min('minimumOutgoingOpacity'),
+      '- Incoming-image opacity at 99% progress: ' + max('incomingOpacityAt99Percent'),
       '- Page errors: ' + report.pageErrors.length,
       '- Blocked same-origin write attempts: ' + report.readOnlyViolations.length,
       '',
-      'Screenshots and sanitized JSON evidence are attached as the workflow artifact.',
+      'Midpoint transition screenshots and sanitized JSON evidence are attached as the workflow artifact.',
       ''
     ];
     await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, lines.join('\n')).catch(() => {});

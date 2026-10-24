@@ -53,7 +53,7 @@ assert.ok(html.includes("$('#sdFullscreenViewer').classList.contains('open')"), 
 
 
 const fullscreenTransitionStart = html.indexOf('function setFullscreenPhoto(');
-const fullscreenTimingConstant = html.lastIndexOf('const FULLSCREEN_SLIDE_MS=300', fullscreenTransitionStart);
+const fullscreenTimingConstant = html.lastIndexOf('const FULLSCREEN_FADE_MS=250', fullscreenTransitionStart);
 assert.notEqual(fullscreenTimingConstant, -1, 'The fullscreen transition duration constant must be declared before the transition handler.');
 const fullscreenTransition = html.slice(
   fullscreenTimingConstant,
@@ -77,13 +77,16 @@ assert.match(html, /\.sd-fullscreen-image\.sd-slide-out-left\{animation:sdFullsc
 assert.match(html, /\.sd-fullscreen-image\.sd-slide-in-right\{animation:sdFullscreenInRight 300ms/);
 assert.match(html, /function activeFullscreenImage\(\)/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
-assert.match(html, /incoming\.classList\.add\('is-active'\);active\.classList\.remove\('is-active'\)/, 'The incoming decoded layer must activate before the old layer deactivates.');
+assert.match(html, /incoming\.classList\.add\('sd-fade-in'\);[\s\S]*?void incoming\.offsetWidth;incoming\.classList\.add\('is-active'\)/, 'The decoded incoming photo must be revealed through a CSS opacity transition.');
 assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
 assert.match(html, /html:not\(\.dark\) \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:normal!important\}/, 'Light fullscreen images must not blend with the outgoing image layer, which creates a ghosted double-image effect.');
 assert.match(html, /html\.dark \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:normal!important\}/,
   'Dark fullscreen product photos must preserve their real source colours without light-mode blending.');
-assert.match(fullscreenTransition, /const FULLSCREEN_SLIDE_MS=300/);
+assert.match(fullscreenTransition, /const FULLSCREEN_FADE_MS=250/);
 assert.match(fullscreenTransition, /incoming\.onload=finishLoad/);
+assert.match(fullscreenTransition, /fullscreenFadePendingLayer=fullscreenActiveLayer/);
+assert.match(fullscreenTransition, /function commitFullscreenFade\(\)/);
+assert.match(fullscreenTransition, /setFullscreenLayerState\(active,false\)/);
 assert.match(fullscreenTransition, /fullscreenAnimationTimer=setTimeout/);
 assert.doesNotMatch(fullscreenTransition, /\b(?:150|230|620)\b/, 'Fullscreen transitions must not use conflicting legacy timings.');
 assert.doesNotMatch(html, /id="artPrev"[^>]*>‹/);
