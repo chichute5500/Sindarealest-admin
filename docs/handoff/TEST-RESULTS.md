@@ -1,3 +1,31 @@
+## LIVE FINAL-AUDIT GATE MATRIX — 2026-10-24
+
+> Supersedes conflicting older status summaries below. Exact code/test evidence remains tied to source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579`; documentation-only commits do not constitute a new source build.
+
+| Gate | Status | Evidence / limitation |
+|---|---|---|
+| npm audit, project integrity, full automated tests | PASS | [Validate run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815), exact SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579` |
+| Cloudflare Pages Preview deployment | PASS | [Deploy run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918), exact SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579`; immutable URL https://837f73ba.sindarealest2.pages.dev/ |
+| Authenticated Preview root response | PASS | HTTP 200; `X-Robots-Tag: noindex`; canonical and social URL metadata use Preview origin |
+| Authenticated Preview robots.txt | PASS | HTTP 200; `User-agent: *\nDisallow: /\n`; no sitemap advertised |
+| Authenticated Preview sitemap | PASS | HTTP 404; `X-Robots-Tag: noindex, nofollow`; `Cache-Control: no-store` |
+| Liquid Glass visual workflow | SKIPPED BY SAFETY GUARD | [Run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984980); Hero capture required by current guarded path |
+| Browser/device visual parity | NOT RUN / NOT CLAIMED | HTTP and source tests are not screenshots or owner visual acceptance |
+| Hero visual evidence | BLOCKED | No authorized safe Hero-excluded workflow identified; do not bypass Hero guard or run workflows aimed at locked surfaces |
+| Mobile fullscreen gallery no-flicker | BLOCKED / OWNER ACCEPTANCE REQUIRED | Gallery remains PAUSED / NOT ACCEPTED; actual phone slow/rapid navigation and thumbnail checks required once owner reopens acceptance |
+| SKU URL-generation contract | PASS (source/test) | Strict client condition tested in `tests/product-route-canonical.test.mjs`; ID/key fallback when flag false/missing/blank |
+| Live authoritative SKU data and migration state | NOT RUN / BLOCKED | Not verified by live API/catalog data during this audit; no catalog/API/migration edits authorized |
+| PR #108 complete path inventory | PASS — path classification | 298 paths in [scope report](PR-SCOPE-REVIEW.md); classifications do not approve every code hunk |
+| Scope separation / merge decision | BLOCKED — OWNER DECISION REQUIRED | Do not merge PR #108; restricted mixed-scope changes require explicit owner disposition |
+| Tests/deploy on latest docs-only branch HEAD | NOT RUN | Source remains `8a4cc6066436f040e7900709e8dd2047ab7ab579`; no storefront source/tests changed during this docs-only audit |
+
+### Runtime safety notes
+- A legacy helper in `functions/_lib.js` can classify SKU from its string shape if both `sku_verified` and `skuVerified` are absent/null. The migration declares `sku_verified INTEGER NOT NULL DEFAULT 0`, but the applied live schema/data were not independently verified. Treat this as a conditional risk requiring authorized evidence, not a confirmed live defect.
+- The Hero visual workflow was skipped; never relabel it PASS. Current `non-hero-preview-audit.yml` is specifically for the locked `#order` section. `catalog-filter-preview-audit.yml` requires explicit input plus an unlock variable and targets another owner-locked area. Neither is a permissible fallback without owner authorization.
+- Do not run Production workflows, merge the PR, access or modify restricted source/data, or alter owner-accepted/locked UI.
+
+---
+
 ## FINAL GATE MATRIX — CURRENT BASELINE AND REQUIRED LAST MILE — 2026-10-24
 
 ### Latest verified source/test SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`
