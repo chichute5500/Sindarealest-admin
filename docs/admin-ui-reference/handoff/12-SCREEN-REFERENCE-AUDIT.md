@@ -1,15 +1,12 @@
-# LIVE HANDOFF UPDATE — 2026-10-24 09:30 UTC
+# LIVE HANDOFF UPDATE — 2026-10-24 09:41 UTC
 
-**Handoff SHA semantics:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` was the live branch HEAD at the start of this documentation sync. The handoff-only commits made afterward change documentation/status snapshots only; they do not change source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`. Always fetch the live PR head before starting the next action; never treat the checkpoint-start SHA as the current live HEAD.
+**Checkpoint semantics:** PR #111 HEAD at this checkpoint was `5f7a9d94858a02faaea003e2a9ea6386d507121f`, a documentation-only snapshot. The latest application/source-test SHA remains `cf340b686e0974ac5602b6ef4594c00e477c8932`; refresh live PR metadata before further work.
 
-**Live branch HEAD:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` (documentation-only commit updating `current-status.json`).  
-**Latest source/test SHA:** `cf340b686e0974ac5602b6ef4594c00e477c8932` (order cancellation race guard).  
-**PR #111:** OPEN, unmerged; do not merge/rebase.  
-**Validate #5688:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892  
-**Admin Preview Playwright #1077:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888  
-**Scope boundary:** progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
-
-Recent source change at `cf340b686e0974ac5602b6ef4594c00e477c8932`: cancellation now also guards order-item writes against a pending QR payment request, closing the partial-write race in which order cancellation was blocked but associated item writes could still proceed. Exact-SHA Validate and Admin Preview Playwright both passed on this source/test SHA. These are automated source/Playwright results, not proof of authenticated business writes or visual parity. Keep all seven operating rules and safety restrictions below intact.
+- Validate #5688 PASS on application/source-test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Admin Preview Playwright #1077 PASS on that same source/test SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
+- Handoff integrity fix verified: Validate #5733 and Admin Preview Playwright #1097 PASS on docs-only SHA `5f7a9d94858a02faaea003e2a9ea6386d507121f` after restoring canonical handoff pointers.
+- Visual evidence remains synthetic fixture captures from an older SHA; approved-reference parity remains NOT_VERIFIED. Keep all 12 screens PARTIAL_NOT_ACCEPTED.
+- Overall acceptance remains 50% PROVISIONAL; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
 
 ---
 
