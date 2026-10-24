@@ -1,5 +1,20 @@
 import { productCategoryRouteSlug } from "./_lib.js";
 export async function onRequestGet({ request, env }) {
+  const requestUrl = new URL(request.url);
+  const hostname = requestUrl.hostname.replace(/\.$/, "");
+  const previewHost = hostname.endsWith(".sindarealest2.pages.dev")
+    && hostname !== "sindarealest2.pages.dev";
+  if (previewHost) {
+    return new Response("Sitemap unavailable on Preview hosts", {
+      status: 404,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Robots-Tag": "noindex, nofollow",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
   if (!env?.DB) return new Response("Sitemap temporarily unavailable", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   try {
     const url = new URL(request.url), origin = url.origin;

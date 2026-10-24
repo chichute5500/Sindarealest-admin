@@ -18,6 +18,20 @@ const DB = {
   },
 };
 
+// Preview hostnames must not emit a sitemap containing Preview-origin product URLs.
+for (const previewUrl of [
+  "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/sitemap.xml",
+  "https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev./sitemap.xml",
+]) {
+  const previewResponse = await sitemap({
+    request: new Request(previewUrl),
+    env: { DB: { prepare() { throw new Error("Preview sitemap must not query the product database"); } } },
+  });
+  assert.equal(previewResponse.status, 404);
+  assert.equal(previewResponse.headers.get("X-Robots-Tag"), "noindex, nofollow");
+  assert.equal(await previewResponse.text(), "Sitemap unavailable on Preview hosts");
+}
+
 const response = await sitemap({
   request: new Request("https://shop.example/sitemap.xml"),
   env: { DB },
