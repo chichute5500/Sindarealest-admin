@@ -1,38 +1,34 @@
-# LIVE HANDOFF — 2026-10-24 10:55 UTC
+# LIVE HANDOFF — 2026-10-24 11:16 UTC
 
-**Live docs branch HEAD:** `17024987fa3cf0e5760ab2c38bc71237a6899baa` on `feature/admin-isolated-handoff-2026-10-20`.
-**Code/test SHA:** `2f2c631c328d3658c0911a9066b39d0d513ff0b9` (the commits after it are documentation-only).
+**Verified source/test SHA:** `c277c5a2f99114856ec78594823f71b0c9010cf0` on `feature/admin-isolated-handoff-2026-10-20`.
 **Live `main` ref:** `227622d3e3b7c75724ffa1775b193da71089269a`.
-**PR #111:** [OPEN/unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), head matches the feature branch. Current PR API diff is **494 files, +46,350 / -223**. API base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` is one commit behind the live `main` ref. Do not merge/rebase; this is a live metadata/diff risk requiring fresh review before any PR-level decision.
-PR #108 remains open/read-only; PR #112 remains open/draft and must not be edited.
+**PR #111:** [OPEN/unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111); HEAD matches the feature branch. Current PR API diff: **495 files, +46429 / -224**. PR API base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` is one commit behind live `main`. Do not merge/rebase/cherry-pick/force-push; refresh refs and inspect the full diff before any PR-level decision. PR #108 remains read-only; PR #112 remains open/draft and must not be edited.
 
+## Exact-SHA validation
 
-Canonical next-chat prompt: [PROMPT-NEXT-CHAT.md](PROMPT-NEXT-CHAT.md).
+- Validate #5794 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088894808
+- Validate #5795 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088897260
+- Admin Preview Playwright #1124 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088897224
+- Read-only diagnostic #544 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088894818
+- Artifact `admin-preview-evidence-544`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088894818/artifacts/12557934045
+- Diagnostic #544 verified exact SHA/branch HEAD at the end, 7/7 authenticated admin GET endpoints HTTP 200, catalog 235 products, 527 persisted image URLs decoded, no product mutation requests, and no non-read-only requests. Orders/customers/warranties/audit-log arrays were empty; no authenticated business-write or persistence QA occurred.
+- All 12 screen statuses remain `PARTIAL_NOT_ACCEPTED`; source/fixture screenshots are not approved-reference parity proof.
 
-Before acting, **fetch live GitHub state first**; do not trust historical checkpoint data without refreshing refs and Actions.
+## Test-first order status fix
 
-Begin with the canonical entry point: [START-HERE.md](START-HERE.md).
+- Regression-only commit `aa3eaa11357beef74570766ccce54caaec217e0c` added the test to the test chain. Validate #5786 failed as intended because a cancelled order could be changed to `completed` (actual HTTP 200, expected 409): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088310630.
+- Fix is present on exact source/test SHA `c277c5a2f99114856ec78594823f71b0c9010cf0`: Admin PATCH now rejects reopening an already-cancelled order; the final UPDATE atomically requires the row not be cancelled for non-cancelled target states; item price writes are also guarded against a concurrent cancellation; audit insertion is gated on a successful order update.
+- Regression covers both an already-cancelled order and a cancellation racing with a stale status update. Test output: `PASS: cancelled orders cannot be reopened, including a concurrent cancellation race.`
+- Validate #5794/#5795 and Preview #1124 pass on this SHA. Diagnostic #544 passed with no writes.
 
----
-## Exact-SHA CI and read-only Preview evidence
+## Screen evidence and acceptance boundary
 
-- Validate #5775 PASS on docs HEAD `17024987fa3cf0e5760ab2c38bc71237a6899baa`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40087512136
-- Validate #5776 PASS on docs HEAD `17024987fa3cf0e5760ab2c38bc71237a6899baa`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40087515035
-- Admin Preview Playwright #1116 PASS on docs HEAD `17024987fa3cf0e5760ab2c38bc71237a6899baa`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40087515101
-- Last authenticated read-only diagnostic: #538 PASS on code/test SHA `2f2c631c328d3658c0911a9066b39d0d513ff0b9`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472
-- Diagnostic artifact `admin-preview-evidence-538`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771
-- Diagnostic #538: 7/7 admin GET endpoints HTTP 200, catalog 235 products, 527 persisted image URLs decoded, zero mutation requests, exact branch HEAD guard passed. No authenticated business-write or persistence QA was performed.
-- Latest docs HEAD has no Cloudflare Pages check; all commit messages in the current handoff chain use `[CF-Pages-Skip]`. Production was not deployed.
+- Screen 4 Product Editor: static tests cover editor tabs, keyboard behavior, form validation, responsive geometry and theme; approved-reference parity remains `NOT_VERIFIED`.
+- Screen 5 Product Gallery: source uses a featured cover and horizontal thumbnail rail at 320/360px; fixtures test rail-only overflow, thumbnail reachability, sticky footer, tab round-trip, focus after removal and no writes before explicit save. Same-data parity remains `NOT_VERIFIED`.
+- Screen 7 Order Detail: refund UI only records an already-transferred, bank-statement-verified refund and explicitly says it does not transfer money. Fixture-only checks do not establish authenticated ledger persistence.
+- Read-only audit of QR creation, receipt/refund guards, order repricing/cancellation, warranty issuance and claim-token consumption found no additional reproducible defect.
 
-## Screen 4 / 5 / 7 review
-
-- **Screen 4 — Product Editor:** source and static Playwright cover tab semantics/keyboard navigation, form validation, responsive editor geometry and theme checks. These are source/fixture tests, not approved-reference parity.
-- **Screen 5 — Product Gallery:** source has a featured cover plus horizontal thumbnail rail on narrow viewports (320px/360px). Static Playwright checks document width, rail-only horizontal overflow, last-thumbnail reachability, sticky footer visibility, tab round-trip, image removal/focus, and no write before explicit save. These are synthetic six-image fixtures; same-data parity against the approved reference is still NOT_VERIFIED.
-- **Screen 7 — Order Detail:** refund-recording UI only records a refund already transferred and bank-statement-verified; it explicitly says it does not transfer money. Fixture tests cover disabled state without receipts, enabled state at 7,800,000 VND synthetic net receipts, and local rejection of over-limit input with zero write requests. Real authenticated ledger mutation/persistence remains NOT_TESTED.
-- Read-only source review of payment/refund atomic guard, QR request creation, order cancellation/repricing, warranty issuance and claim-token consumption found no new reproducible defect. Do not patch source without a new failing regression.
-
-## Acceptance boundary — unchanged
-
+**Acceptance boundary (unchanged):**
 - Progress: **50% PROVISIONAL**.
 - All 12 screens: **PARTIAL_NOT_ACCEPTED**.
 - Approved-reference parity: **NOT_VERIFIED**.
@@ -40,6 +36,9 @@ Begin with the canonical entry point: [START-HERE.md](START-HERE.md).
 - Remote Preview D1 schema/ledger: **NOT_VERIFIED**.
 - Production: **NOT_PERFORMED**.
 
+Canonical entry: [START-HERE.md](START-HERE.md). Next-chat prompt: [PROMPT-NEXT-CHAT.md](PROMPT-NEXT-CHAT.md). Before acting, fetch live GitHub state first; do not rely on historical checkpoint data without refreshing refs.
+
+---
 
 ## Operational finding — unintended primary-project Preview deploy
 
