@@ -858,3 +858,15 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - Hero is PAUSED BY OWNER. Do not inspect/capture/edit Hero or run any visual workflow that includes it. Keep all other locked scopes closed.
 - Start the next safe, explicitly unlocked backlog task only. If none is clear, ask the owner to specify the new task; do not manufacture a task or retest accepted sections.
 - PR #108 stays OPEN/unmerged. Preview only; no Production/main changes or restricted-scope edits.
+
+ 
+## GALLERY FLICKER FIX — OWNER REOPENED AND VERIFIED IN CHROMIUM — 2026-10-24
+
+- Owner explicitly unlocked fullscreen gallery flicker. This override applies only to fullscreen gallery; do not reopen Hero or other PASS/LOCKED sections.
+- Root cause fixed in source commit 866acdb350a5ba665251ed4f8acb5c2875810e5c: slide keyframes had only ±18% movement, leaving incoming/outgoing stacked photo layers overlapping. Transparent pixels could reveal the old photo as a ghost. Four directional keyframes now traverse ±100% of the frame; regression test rejects the old 18% behavior.
+- Current verified Preview deployment/audit SHA: 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0; https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856463. Preview deployment PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856516. Isolated Playwright gallery audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458. Artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458/artifacts/12546610921.
+- The gallery-only browser audit uses a real six-photo product in mobile 360×800, mobile 390×844 and desktop 1440×900. At CSS animation progress 0/25/50/75/99%, the two live, class-matched animations are 300 ms; measured overlap=0 px, gap=0 px and combined frame coverage=100%. Counter checks: slow next 01/06→02/06; slow previous 02/06→01/06; rapid taps 01/06→02/06→03/06→02/06. Final state exactly one active decoded image, zero stale transition classes, no page/console/same-origin HTTP errors, and no write requests.
+- Remaining acceptance gate: owner must check this exact Preview on a physical phone, both slow taps and repeated rapid taps, and confirm no flicker/ghosting/blank gap and correct counter. Do not claim physical-device PASS until then.
+- Preserve previous gallery code, no rollback. PR #108 stays OPEN/unmerged; no main/Production/restricted-scope changes.
+

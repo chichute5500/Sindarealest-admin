@@ -1009,3 +1009,20 @@ Guardrails: Hero PAUSED BY OWNER—never inspect/edit/test/capture. `#order` OWN
 - Hero remains PAUSED BY OWNER: never inspect, capture, edit, or include in visual workflows. Other locked visual audits must remain guarded.
 - Next work: continue only the next safe, unlocked task from the handoff/task backlog. If no clearly authorized unlocked task is identifiable, ask the owner for the new task instead of inventing scope. Do not test accepted areas just to reconfirm them.
 - Preserve repo `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, PR #108 OPEN/unmerged, base `main`. No Production deploy, no changes to `main`, Admin/backend/API/auth, catalog/product data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, or live payment.
+
+ 
+## OWNER REOPENED FULLSCREEN GALLERY — FIX AND BROWSER EVIDENCE — 2026-10-24
+
+The owner explicitly authorized reopening fullscreen image/gallery flicker and fixing its root cause on this branch. This supersedes the older pause directive only for fullscreen gallery; all other owner-accepted/locked scopes remain locked.
+
+- Root cause addressed in public/index.html: the outgoing and incoming fullscreen photo layers previously travelled only ±18% while occupying the same frame and using stacked z-index values. Transparent pixels in product photos could expose the outgoing image through the incoming layer, creating a ghost/flicker impression. All four directional slide keyframes now travel a full ±100% frame, so the photo boxes move side-by-side rather than overlap.
+- Source fix + regression test: commit 866acdb350a5ba665251ed4f8acb5c2875810e5c. Regression assertions prohibit 18% fullscreen motion and require ±100% outgoing/incoming movement.
+- Exact current Preview/audit commit: 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0; Preview URL https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- CI Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856463.
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856516.
+- Isolated gallery-only browser audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458. Artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458/artifacts/12546610921.
+- Verified browser evidence for a real six-image Preview product in mobile 360×800, mobile 390×844, desktop 1440×900: every next/previous transition counter matched the expected index; rapid next-next-previous counter sequence was 01/06 → 02/06 → 03/06 → 02/06; exactly two animations matched the currently active slide classes, each 300 ms; sampling at 0%, 25%, 50%, 75%, 99% showed 0 CSS-pixel layer overlap, 0 CSS-pixel gap, and 100% frame coverage. Final rapid-tap state had exactly one active loaded/decoded photo and no stale transition classes. No page errors, console errors, same-origin HTTP errors, or write attempts were reported.
+- Browser audit intentionally blocked the cross-origin Cloudflare Insights beacon; no external requests beyond the established read-only allowlist were permitted. It captured only #sdFullscreenViewer, not Hero or other locked sections.
+- Status matrix: source/regression tests PASS; Validate PASS; Preview deploy PASS; deterministic Chromium gallery audit PASS; physical-device flicker/ghosting acceptance REQUIRED. Do not claim 100% or a fully verified physical-device GPU/compositor fix until the owner checks the phone.
+- Branch/PR state before this documentation update: branch and PR #108 HEAD 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0; PR #108 OPEN/unmerged; 300 changed paths; main and Production untouched. The next commit is documentation-only and must not trigger a storefront deploy.
+

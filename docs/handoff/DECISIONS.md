@@ -323,3 +323,15 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Current gallery slide + full-album preload source/test commits remain in Preview, with CI and deployment PASS, but the visual issue is **not accepted** because the owner still observed flicker. Mark PAUSED / NOT ACCEPTED, not PASS. Do not continue editing or request a phone retest unless the owner reopens it.
 - All other owner-accepted areas remain PASS/LOCKED; do not repeat audits or reopen them. See CURRENT-STATE.md and TASKS.md for the inventory.
 - If no clearly authorized unlocked task is available, ask the owner what new task to do. Preserve PR #108 open/unmerged and all project safety boundaries.
+
+ 
+## DEC-012 — Fullscreen gallery layer overlap root-cause fix (2026-10-24)
+
+- Owner explicitly reopened only the fullscreen product-gallery flicker scope.
+- Cause: the four slide keyframes moved each image only ±18% while the image layers overlapped in the same frame. With transparent pixels this exposed the outgoing photo under the incoming photo. Fix: each direction now travels the complete frame (±100%) while preserving opacity and the 300 ms easing. This removes overlap geometrically instead of hiding symptoms with blur or opacity.
+- Code/regression commit: 866acdb350a5ba665251ed4f8acb5c2875810e5.
+- Exact Preview/current automated audit SHA: 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0; https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856463; Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856516; gallery-only Chromium audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458; artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458/artifacts/12546610921.
+- Acceptance evidence: real multi-photo Preview product, mobile 360×800 / 390×844 and desktop 1440×900; frame samples at 0/25/50/75/99%; exactly two animations tied to currently active slide classes, both 300 ms; overlap 0 px, gap 0 px, coverage 100%; checked next/previous counter after each tap including rapid next-next-previous; settled exactly one active decoded photo and no stale classes. No page or console errors, no same-origin HTTP errors, no write attempts. Hero and locked areas were not captured.
+- Automated gates do not emulate the owner’s actual phone GPU/compositor. Final status remains OWNER PHONE ACCEPTANCE REQUIRED until this Preview is checked physically. No merge/Production permission is implied.
+

@@ -1,3 +1,26 @@
+# LATEST HANDOFF OVERRIDE — 2026-10-24 — GALLERY UNLOCKED AND FIX VERIFIED
+
+This section supersedes older pause/status statements below where they conflict with this update. Re-fetch PR #108 and branch HEAD before any further edits.
+
+- Repository: chichute5500/Sindarealest-admin
+- Branch: fix/liquid-glass-audit-2026-10-19
+- PR #108 is OPEN and unmerged; do not merge. Preview only; main and Production untouched.
+- Verified live branch/PR HEAD before this documentation-only update: 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0.
+- Full source-code fix commit for gallery: 866acdb350a5ba665251ed4f8acb5c2875810e5c. This source commit changes the fullscreen gallery slide keyframes from ±18% to ±100% frame travel and adds the regression assertion; all public/ source is unchanged after that code commit.
+- Exact Preview deployment verified from the latest audit commit: 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0 at https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856463
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856516
+- Isolated gallery-only browser audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458
+- Audit artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458/artifacts/12546610921
+- The audit tests a real six-photo Preview product at mobile 360×800, mobile 390×844, and desktop 1440×900. At CSS-animation progress 0/25/50/75/99%, both live slide animations are 300 ms, max image-box overlap is 0 CSS px, max gap is 0 CSS px, and combined frame coverage is 100%. Each next/previous counter moves to its exact expected index. Rapid next-next-previous sequence is 01/06→02/06→03/06→02/06; after settling exactly one image is active, it is decoded, and no stale transition classes remain. Browser audit reported zero page errors, console errors, same-origin HTTP errors, or attempted write requests. Cloudflare Insights beacon is intentionally blocked by the audit’s cross-origin read allowlist.
+- Root cause addressed: outgoing/incoming photo layers previously moved only 18% of the frame while layered over each other. Transparent pixels could reveal the outgoing image through the incoming image and look like ghosting. Full-frame ±100% slide movement removes the geometric layer overlap rather than masking it with blur/opacity.
+- Status: source regression test PASS, full validation PASS, exact Preview deploy PASS, isolated Chromium gallery audit PASS. Physical-device acceptance is still required before declaring the flicker fully gone on the owner’s phone; Chromium cannot verify the phone GPU/compositor.
+- Owner reopened gallery scope explicitly on 2026-10-24. This supersedes the older gallery PAUSED instruction; preserve that older note as history, not current status. Other PASS/LOCK scopes, including Hero, remain locked.
+- The branch adds two paths beyond the previous 298-path inventory, so PR #108 now reports 300 changed paths. The additions are the isolated audit script and its workflow. Do not repeat the full inventory unless the diff changes.
+- Immediate owner check only after code/test/Preview/audit gates: open the exact Preview on a physical phone, open the six-photo product gallery, slowly tap next/previous, then tap next-next-previous repeatedly. Confirm no flicker, old-image ghosting, blank gaps, or incorrect counter. Until that confirmation, label physical-device acceptance REQUIRED, not PASS.
+
+---
+
 # LIVE HANDOFF REFRESH — 2026-10-24 — VERIFIED CURRENT STATE
 
 - Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`.

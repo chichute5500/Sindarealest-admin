@@ -1035,3 +1035,25 @@ Owner decision: PASS AND LOCK received 2026-10-23. The catalog filter chip heigh
 - Source commit `be27230919462aabbb86c8a9b4a2369375dd752f`; regression-test commit `87cef74f427ff7178e984e3bd836152948f1d974`. Tests cover source contracts/runtime behavior, including full-album preload and decoded directional transitions; they do not establish visual acceptance.
 - Owner says flicker persists and explicitly pauses this work. Mark gallery **PAUSED / NOT ACCEPTED**. Do not make further gallery changes or ask for retest until reopened.
 - Preserve other accepted areas as PASS/LOCKED without repeating tests or reopening them. Hero and guarded visual scopes remain off limits. Continue only a clearly authorized, unlocked task.
+
+ 
+## FULLSCREEN GALLERY ROOT-CAUSE FIX — EXACT-SHA TEST EVIDENCE — 2026-10-24
+
+Source code + regression test commit: 866acdb350a5ba665251ed4f8acb5c2875810e5.
+Exact branch/Preview audit commit: 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0.
+Preview URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+
+- Validate source/tests PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856463
+- Preview deployment PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856516
+- Isolated Chromium fullscreen-gallery audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458
+- Browser artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458/artifacts/12546610921
+
+Browser target was actual Preview catalog product sneakers-new-sneaker-contrast with six photos. Tested viewport sizes: mobile 360×800; mobile 390×844; desktop 1440×900.
+- Next: counter 01/06→02/06; previous: 02/06→01/06.
+- Rapid next-next-previous sequence verified one click at a time: 01/06→02/06→03/06→02/06 on all viewports.
+- At animation progress 0%, 25%, 50%, 75%, 99%, CSS animations tied specifically to the live outgoing/incoming classes measured 300 ms each, image-layer overlap was 0 CSS px, gap was 0 CSS px and combined coverage of the viewer frame was 100%.
+- Settled post-rapid state had exactly one active image, active image was loaded/decoded, and zero stale transition classes.
+- Console/page errors: 0; same-origin HTTP errors: 0; attempted write requests: 0. The external Cloudflare Insights beacon was blocked by policy in all viewport sessions; this is recorded as intentional and is not an app error.
+- Screenshots capture only #sdFullscreenViewer; Hero and other locked sections are excluded.
+- Physical-device verification has NOT RUN. Browser evidence supports the geometry/code fix but cannot prove that the owner’s phone GPU/compositor no longer shows flicker. Required final acceptance: open the exact Preview on a physical phone; slowly tap next/previous and repeatedly tap next-next-previous; confirm no flash, ghost, blank gap or counter mismatch.
+

@@ -416,3 +416,16 @@ Conversely, bringing the shared middleware/functions into a storefront-only patc
 ## Safety boundary
 
 This review is documentation-only. It does not modify runtime code, admin/backend behavior, D1/R2, secrets, Cloudflare Access policy, or Production. It does not approve merging PR #108.
+
+ 
+## DELTA FROM ORIGINAL 298-PATH INVENTORY — GALLERY AUDIT ADDED — 2026-10-24
+
+The original complete 298-path review remains intact. Two additional paths were added specifically for the owner-authorized fullscreen-gallery verification work, bringing the live PR #108 changed-file count to 300:
+
+1. scripts/audit-fullscreen-gallery-preview.mjs — read-only Playwright browser test restricted to the fullscreen product viewer, real Preview product gallery, counter correctness, decoded image state, and animation geometry.
+2. .github/workflows/gallery-preview-audit.yml — runs the gallery-only audit on the authorized fix branch, first verifies Cloudflare Pages Preview deployment metadata and exact commit SHA, blocks same-origin non-GET/HEAD requests and unapproved cross-origin requests, and captures only #sdFullscreenViewer. It does not capture Hero or other locked sections and does not deploy Production.
+
+Evidence for gallery audit SHA 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856463; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856516; isolated browser audit PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058856458. The full-frame gallery code fix is in source commit 866acdb350a5ba665251ed4f8acb5c2875810e5.
+
+This delta adds two test/evidence-only paths; it does not reduce the original out-of-scope/restricted-scope risks already recorded in the 298-path inventory. PR #108 remains OPEN/unmerged; do not merge or deploy Production based on this gallery pass.
+
