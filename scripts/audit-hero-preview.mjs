@@ -197,7 +197,7 @@ try {
           const frontStyle = getComputedStyle(frame,'::after');
           const pedestal={oval:{content:topStyle.content,filter:topStyle.filter,background:topStyle.backgroundImage,
             left:Number.parseFloat(topStyle.left),top:Number.parseFloat(topStyle.top),width:Number.parseFloat(topStyle.width),height:Number.parseFloat(topStyle.height)},
-            face:{content:frontStyle.content,top:Number.parseFloat(frontStyle.top),width:Number.parseFloat(frontStyle.width)}};
+            face:{content:frontStyle.content,top:Number.parseFloat(frontStyle.top),width:Number.parseFloat(frontStyle.width),height:Number.parseFloat(frontStyle.height),clipPath:frontStyle.clipPath,borderRadius:frontStyle.borderRadius}};
           const imageVisible = !image.hidden && imageStyle.display !== 'none'
             && imageStyle.visibility !== 'hidden' && Number.parseFloat(imageStyle.opacity || '1') > 0
             && imageRect.width > 1 && imageRect.height > 1;
@@ -336,8 +336,17 @@ try {
             fail('Marble pedestal is suppressed by stale glow rules.');
           else if(pl.oval.top/m.frameRect.height<.65||pl.oval.top/m.frameRect.height>.90
             ||pl.face.top<=pl.oval.top||pl.face.top-pl.oval.top-pl.oval.height>10
-            ||pl.oval.width<m.heroRect.width*.52||pl.oval.width>m.heroRect.width*.68)
+            ||pl.oval.width<m.heroRect.width*.50||pl.oval.width>m.heroRect.width*.68)
             fail('Marble top/front are detached or incorrectly scaled.');
+        }
+        if (m.viewport.width <= 390) {
+          const st=m.pedestal;
+          if (!st || st.face.clipPath !== 'none' || !String(st.face.borderRadius).includes('46%')
+              || !Number.isFinite(st.face.height) || st.face.height < 14 || st.face.height > 19
+              || st.face.top < st.oval.top + st.oval.height - 4
+              || st.face.top > st.oval.top + st.oval.height + 4) {
+            fail('Mobile stone face must be a shallow curved rim physically joined to the oval top.');
+          }
         }
         if (m.viewport.width <= 390) {
           const imageTopOffset=m.imageRect.top-m.frameRect.top;

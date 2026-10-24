@@ -3792,58 +3792,74 @@ html.dark #home .hero-visual::before{
   #home .hero-visual::before{
     content:""!important;display:block!important;position:absolute!important;
     inset:auto!important;top:auto!important;
-    left:50%!important;bottom:27px!important;
+    left:50%!important;bottom:26px!important;
     transform:translateX(-50%)!important;
-    width:58vw!important;max-width:226px!important;
-    height:28px!important;min-height:0!important;
-    border-radius:50%!important;border:1px solid rgba(203,221,234,.60)!important;
-    background:linear-gradient(150deg,transparent 0 39%,rgba(114,158,182,.07) 40%,transparent 41% 75%,rgba(130,165,186,.06) 76%,transparent 77%),radial-gradient(ellipse at 34% 20%,rgba(255,255,255,.98),rgba(240,248,252,.96) 49%,rgba(202,223,235,.91) 100%)!important;
+    width:56vw!important;max-width:218px!important;
+    height:25px!important;min-height:0!important;
+    border-radius:50%!important;border:1px solid rgba(196,214,226,.38)!important;
+    /* Irregular faint mineral veins and natural soft reflection. */
+    background:
+      radial-gradient(ellipse 39% 37% at 33% 29%,rgba(255,255,255,.82) 0%,rgba(255,255,255,0) 100%),
+      linear-gradient(147deg,transparent 0 39%,rgba(112,146,167,.045) 40%,transparent 42% 70%,rgba(121,155,175,.035) 72%,transparent 74%),
+      linear-gradient(100deg,rgba(249,252,254,.98) 0%,rgba(237,246,251,.97) 23%,rgba(223,236,244,.96) 48%,rgba(239,247,251,.97) 69%,rgba(211,228,239,.96) 100%)!important;
     filter:none!important;
-    box-shadow:0 9px 17px rgba(34,67,90,.15),inset 0 2px 3px rgba(255,255,255,.98)!important;
+    box-shadow:0 4px 9px rgba(41,76,100,.08),inset 0 1px 1px rgba(255,255,255,.85),inset 0 -1px 2px rgba(119,153,175,.09)!important;
     z-index:0!important;pointer-events:none!important;
   }
   #home .hero-visual::after{
     content:""!important;display:block!important;position:absolute!important;
     inset:auto!important;top:auto!important;
-    left:50%!important;bottom:10px!important;
+    left:50%!important;bottom:11px!important;
     transform:translateX(-50%)!important;
-    width:56vw!important;max-width:217px!important;
-    height:24px!important;
-    border:1px solid rgba(185,206,220,.64)!important;border-top:0!important;
-    clip-path:polygon(1% 0,99% 0,95% 100%,5% 100%)!important;
-    background:linear-gradient(112deg,transparent 0 27%,rgba(123,160,185,.06) 28%,transparent 29% 70%,rgba(123,160,185,.07) 71%,transparent 72%),linear-gradient(180deg,rgba(238,247,252,.96),rgba(194,217,231,.92))!important;
-    box-shadow:0 11px 17px rgba(36,77,103,.11),inset 0 1px 0 rgba(255,255,255,.92)!important;
+    width:54vw!important;max-width:210px!important;
+    height:16px!important;
+    border:1px solid rgba(173,195,211,.34)!important;border-top:0!important;
+    /* Round stone cylinder below the upper oval; no separate trapezoid. */
+    clip-path:none!important;
+    border-radius:0 0 46% 46% / 0 0 58% 58%!important;
+    background:
+      linear-gradient(90deg,rgba(110,148,175,.11),transparent 15% 76%,rgba(121,153,176,.15)),
+      linear-gradient(112deg,transparent 0 30%,rgba(115,154,176,.035) 31%,transparent 33% 70%,rgba(130,160,184,.035) 71%,transparent 73%),
+      linear-gradient(180deg,rgba(240,248,252,.96) 0%,rgba(217,233,242,.98) 48%,rgba(183,207,222,.98) 100%)!important;
+    box-shadow:0 7px 11px rgba(30,66,91,.075),inset 0 1px 0 rgba(255,255,255,.64)!important;
     z-index:0!important;pointer-events:none!important;
   }
   /* Two independent physically located contact shadows: front loafer and upright loafer. 
      Use the existing decorative node, above the stone oval and below the original PNG. */
   #home .hero-visual-glow{
     content:""!important;display:block!important;position:absolute!important;
-    top:auto!important;right:auto!important;left:50%!important;bottom:36px!important;
-    width:58vw!important;max-width:226px!important;height:29px!important;min-height:0!important;
+    top:auto!important;right:auto!important;left:50%!important;bottom:33px!important;
+    width:56vw!important;max-width:218px!important;height:24px!important;min-height:0!important;
     margin:0!important;padding:0!important;
     transform:translateX(-50%)!important;opacity:1!important;visibility:visible!important;
     border:0!important;border-radius:50%!important;box-shadow:none!important;
-    filter:blur(2px)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+    filter:blur(1.6px)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
     background:
-      radial-gradient(ellipse 31% 34% at 40% 81%,rgba(18,35,49,.38) 0%,rgba(38,65,83,.21) 38%,transparent 78%),
-      radial-gradient(ellipse 19% 38% at 79% 30%,rgba(18,34,48,.36) 0%,rgba(32,56,74,.18) 40%,transparent 78%)!important;
+      radial-gradient(ellipse 28% 26% at 41% 82%,rgba(18,34,46,.33) 0%,rgba(26,49,65,.15) 43%,transparent 82%),
+      radial-gradient(ellipse 15% 27% at 78% 40%,rgba(17,32,45,.30) 0%,rgba(30,54,69,.13) 45%,transparent 83%),
+      radial-gradient(ellipse 53% 38% at 56% 61%,rgba(38,64,82,.045),transparent 96%)!important;
     z-index:1!important;pointer-events:none!important;
   }
   #home .hero-visual-caption{display:none!important}
   html.dark #home .hero-visual-glow{
     background:
-      radial-gradient(ellipse 31% 34% at 40% 81%,rgba(0,10,20,.53) 0%,rgba(0,15,29,.30) 38%,transparent 78%),
-      radial-gradient(ellipse 19% 38% at 79% 30%,rgba(0,11,22,.50) 0%,rgba(1,20,34,.28) 40%,transparent 78%)!important;
+      radial-gradient(ellipse 28% 26% at 41% 82%,rgba(0,10,20,.45) 0%,rgba(0,15,28,.22) 43%,transparent 82%),
+      radial-gradient(ellipse 15% 27% at 78% 40%,rgba(0,8,18,.43) 0%,rgba(0,15,28,.20) 45%,transparent 83%),
+      radial-gradient(ellipse 53% 38% at 56% 61%,rgba(0,12,24,.065),transparent 96%)!important;
   }
   #home .hero-visual img[hidden]{display:none!important}
   html.dark #home .hero-visual::before{
-    border-color:rgba(168,197,218,.65)!important;
-    background:radial-gradient(ellipse at 34% 20%,rgba(214,235,248,.98),rgba(140,176,200,.96) 52%,rgba(71,110,138,.98) 100%)!important;
+    border-color:rgba(150,183,205,.42)!important;
+    background:
+      radial-gradient(ellipse 39% 37% at 33% 29%,rgba(224,239,249,.32),transparent 100%),
+      linear-gradient(147deg,transparent 0 39%,rgba(29,53,73,.08) 40%,transparent 42% 70%,rgba(33,61,79,.055) 72%,transparent 74%),
+      linear-gradient(100deg,rgba(186,209,225,.97),rgba(150,180,202,.96) 24%,rgba(110,145,168,.97) 52%,rgba(139,170,193,.96) 76%,rgba(91,128,153,.98))!important;
   }
   html.dark #home .hero-visual::after{
-    background:linear-gradient(180deg,rgba(147,184,207,.98),rgba(67,107,139,.98))!important;
-    border-color:rgba(145,182,207,.6)!important;
+    background:
+      linear-gradient(90deg,rgba(31,63,84,.20),transparent 17% 75%,rgba(26,58,81,.27)),
+      linear-gradient(180deg,rgba(141,176,201,.96),rgba(91,128,154,.97) 55%,rgba(70,105,131,.98))!important;
+    border-color:rgba(128,161,185,.38)!important;
   }
 }
 @media(max-width:390px){

@@ -516,16 +516,16 @@ assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr
   && mobileHeroReferenceMatch.includes("opacity:1!important;mix-blend-mode:normal!important;"),
   "Mobile reference must use a short horizontal layout and undistorted transparent product asset.");
 assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
-  && mobileHeroReferenceMatch.includes("bottom:27px!important;")
-  && mobileHeroReferenceMatch.includes("height:28px!important;")
-  && mobileHeroReferenceMatch.includes("bottom:10px!important;")
-  && mobileHeroReferenceMatch.includes("height:24px!important;"),
+  && mobileHeroReferenceMatch.includes("bottom:26px!important;")
+  && mobileHeroReferenceMatch.includes("height:25px!important;")
+  && mobileHeroReferenceMatch.includes("bottom:11px!important;")
+  && mobileHeroReferenceMatch.includes("height:16px!important;"),
   "Mobile pedestal top/front must form a compact marble display below the shoe soles.");
 assert.ok(mobileHeroReferenceMatch.includes("filter:drop-shadow(0 5px 5px rgba(14,30,42,.10)) drop-shadow(0 2px 2px rgba(8,19,29,.16))!important;")
   && mobileHeroReferenceMatch.includes("#home .hero-visual-glow{")
-  && mobileHeroReferenceMatch.includes("bottom:36px!important;")
-  && mobileHeroReferenceMatch.includes("at 40% 81%")
-  && mobileHeroReferenceMatch.includes("at 79% 30%")
+  && mobileHeroReferenceMatch.includes("bottom:33px!important;")
+  && mobileHeroReferenceMatch.includes("at 41% 82%")
+  && mobileHeroReferenceMatch.includes("at 78% 40%")
   && mobileHeroReferenceMatch.includes("z-index:1!important;pointer-events:none!important;"),
   "Realistic mobile ground contact needs two separate shadows above the marble surface and below the shoes.");
 
@@ -533,3 +533,10 @@ assert.ok(heroPedestalStyles.includes("Tablet Hero pedestal stays under the shoe
   && heroPedestalStyles.includes("#home .hero-visual::before{left:40%!important;width:100%!important}")
   && heroPedestalStyles.includes("#home .hero-visual::after{left:40%!important;width:95%!important}"),
   "Tablet pedestal must remain entirely within the Hero presentation without clipping its right edge.");
+
+assert.ok(mobileHeroReferenceMatch.includes("clip-path:none!important;")
+  && mobileHeroReferenceMatch.includes("border-radius:0 0 46% 46% / 0 0 58% 58%!important;")
+  && mobileHeroReferenceMatch.includes("Irregular faint mineral veins")
+  && mobileHeroReferenceMatch.includes("rgba(183,207,222,.98)")
+  && mobileHeroReferenceMatch.includes("filter:blur(1.6px)!important;"),
+  "Marble needs a rounded stone rim, subtle mineral texture and tight contact shadow instead of a polygon tray.");

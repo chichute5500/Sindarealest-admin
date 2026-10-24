@@ -106,14 +106,18 @@ assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
 
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
 assert.ok(canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
-  && canonicalMobile.includes("bottom:27px!important;")
-  && canonicalMobile.includes("bottom:10px!important;")
+  && canonicalMobile.includes("bottom:26px!important;")
+  && canonicalMobile.includes("bottom:11px!important;")
   && heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;"),
   "The mobile Hero uses a single compact, visible platform beneath the unchanged shoe PNG.");
 assert.ok(canonicalMobile.includes("#home .hero-visual-glow{")
-  && canonicalMobile.includes("at 40% 81%")
-  && canonicalMobile.includes("at 79% 30%")
+  && canonicalMobile.includes("at 41% 82%")
+  && canonicalMobile.includes("at 78% 40%")
   && canonicalMobile.includes("drop-shadow(0 5px 5px rgba(14,30,42,.10))")
   && canonicalMobile.includes("drop-shadow(0 2px 2px rgba(8,19,29,.16))"),
   "A mobile contact-shadow layer must ground both shoes without changing the original PNG pixels.");
 console.log("PASS: owner-authorized Hero presentation PNG and restrained drop-shadow experiment are enforced.");
+
+assert.ok(canonicalMobile.includes('clip-path:none!important;')
+  && canonicalMobile.includes('border-radius:0 0 46% 46% / 0 0 58% 58%!important;'),
+  'The mobile marble face must be curved rather than polygonal.');
