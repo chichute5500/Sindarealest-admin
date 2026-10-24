@@ -25,7 +25,7 @@ assert.equal(dottedPreview.response.status, 200);
 assert.equal(dottedPreview.body, "User-agent: *\nDisallow: /\n");
 assert.doesNotMatch(dottedPreview.body, /Allow: \/|Sitemap:/);
 
-// The production Pages hostname must let crawlers see the Admin noindex response header.
+// The production Pages hostname must let crawlers fetch Admin HTML and see its meta robots noindex directive.
 // It still disallows API crawling and retains the canonical sitemap declaration.
 const primary = await responseBody("https://sindarealest2.pages.dev/robots.txt");
 assert.match(primary.body, /Allow: \/\n/);
