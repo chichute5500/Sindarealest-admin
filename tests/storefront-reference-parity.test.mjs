@@ -287,8 +287,8 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     assert.ok(neutral, "Hero image must preserve the source pixels apart from the explicitly approved drop shadow (" + selector.trim() + ": " + declaration + ").");
   }
 }
-const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Hero experiment: restore the owner-provided alpha-feathered PNG and add a restrained drop shadow without cropping or recoloring the shoes. */"));
-assert.ok(heroAssetDisplayLock.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
+const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */"));
+assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
   "Hero experiment uses a restrained drop shadow only; the alpha-feathered PNG is not cropped or masked.");
 assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
   "Hero image keeps full opacity and normal color blending; no brightness/multiply blend is permitted.");

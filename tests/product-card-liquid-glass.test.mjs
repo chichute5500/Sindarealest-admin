@@ -127,8 +127,9 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-const protectedHeroDisplayLock = html.slice(html.lastIndexOf('/* Hero experiment: restore the owner-provided alpha-feathered PNG and add a restrained drop shadow without cropping or recoloring the shoes. */'));
-assert.ok(protectedHeroDisplayLock.includes('#home .hero-visual img{')
+const protectedHeroDisplayLock = html.slice(html.lastIndexOf('/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */'));
+assert.ok(html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
+  && protectedHeroDisplayLock.includes('#home .hero-visual img{')
   && protectedHeroDisplayLock.includes('object-fit:contain!important;object-position:center!important;padding:0!important;')
   && protectedHeroDisplayLock.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
   && protectedHeroDisplayLock.includes('mix-blend-mode:normal!important;opacity:1!important;')
