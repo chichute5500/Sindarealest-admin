@@ -240,24 +240,34 @@ async function runViewport(viewport) {
     assert.equal(response && response.status(), 200, 'Authenticated Preview homepage must return HTTP 200.');
     await page.waitForSelector('#catalogGrid [data-open-product]', { state: 'attached', timeout: 45000 });
     await page.waitForTimeout(2800);
-    const ids = await page.locator('#catalogGrid [data-open-product]').evaluateAll((nodes) =>
-      nodes.map((node) => node.getAttribute('data-open-product')).filter(Boolean).slice(0, 24));
     let selected = null;
-    for (const id of ids) {
-      if (!/^[a-z0-9][a-z0-9-]*$/i.test(String(id))) continue;
-      const card = page.locator('#catalogGrid [data-open-product="' + id + '"]').first();
-      await card.scrollIntoViewIfNeeded();
-      await tap(card, viewport.mobile);
-      await page.waitForFunction(() => document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 8000 });
-      const count = await page.locator('#detailThumbs .detail-thumb').count();
-      if (count >= 2) {
-        selected = { id: String(id), photoCount: count };
-        break;
+    // Walk ordinary catalog pagination (not category filters) until a real multi-photo product is found.
+    for (let catalogPage = 0; catalogPage < 15 && !selected; catalogPage += 1) {
+      const ids = await page.locator('#catalogGrid [data-open-product]').evaluateAll((nodes) =>
+        nodes.map((node) => node.getAttribute('data-open-product')).filter(Boolean));
+      for (const id of ids) {
+        if (!/^[a-z0-9][a-z0-9-]*$/i.test(String(id))) continue;
+        const card = page.locator('#catalogGrid [data-open-product="' + id + '"]').first();
+        await card.scrollIntoViewIfNeeded();
+        await tap(card, viewport.mobile);
+        await page.waitForFunction(() => document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 8000 });
+        const count = await page.locator('#detailThumbs .detail-thumb').count();
+        if (count >= 2) {
+          selected = { id: String(id), photoCount: count };
+          break;
+        }
+        await page.locator('#detailClose').click();
+        await page.waitForFunction(() => !document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 8000 });
       }
-      await page.locator('#detailClose').click();
-      await page.waitForFunction(() => !document.querySelector('#productOverlay')?.classList.contains('open'), null, { timeout: 8000 });
+      if (!selected) {
+        const nextPage = page.locator('#pagination button[data-page="next"]');
+        if (await nextPage.count() === 0 || await nextPage.isDisabled()) break;
+        await nextPage.scrollIntoViewIfNeeded();
+        await tap(nextPage, viewport.mobile);
+        await page.waitForTimeout(100);
+      }
     }
-    assert.ok(selected, 'No real Preview catalog product with multiple gallery photos was found among the first 24 product cards.');
+    assert.ok(selected, 'No real Preview catalog product with multiple gallery photos was found after traversing up to 15 ordinary catalog pages.');
     report.targetProducts.push({ viewport: viewport.name, id: selected.id, photoCount: selected.photoCount });
 
     await page.locator('#detailZoom').click();
