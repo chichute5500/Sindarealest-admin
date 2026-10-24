@@ -111,7 +111,6 @@ function makeDb(options = {}) {
         const staleReceiptRejected = (receivedInsert && receiptOrderGuard
           && (options.simulateOrderCancelledBeforeTransactionBatch || options.simulateOrderTermsUnconfirmedBeforeTransactionBatch))
           || (receivedInsert && receiptRequestGuard && options.simulatePaymentRequestCancelledBeforeTransactionBatch);
-          && (options.simulateOrderCancelledBeforeTransactionBatch || options.simulateOrderTermsUnconfirmedBeforeTransactionBatch);
         // Simulate the final insert boundary: only SQL that rechecks order state can reject these races.
         const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest || staleReceiptRejected ? 0 : 1;
         return { success: true, meta: { changes } };
