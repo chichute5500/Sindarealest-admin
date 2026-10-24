@@ -90,7 +90,7 @@ jobs:
       - name: Diagnose configured deployed Admin Preview (read-only)
         id: preview
         if: ${{ !cancelled() && steps.project-check.outcome == 'success' && steps.unit-tests.outcome == 'success' && env.ADMIN_TEST_URL != '' }}
-        run: npx playwright test tests/e2e/admin-preview.spec.js --reporter=line,html
+        run: npx playwright test tests/e2e/admin-isolated-preview.spec.js --reporter=line,html
 
       - name: Verify branch HEAD still matches the tested SHA
         if: always()
