@@ -537,10 +537,10 @@ assert.ok(heroPedestalStyles.includes("Tablet Hero pedestal stays under the shoe
 assert.ok(mobileHeroReferenceMatch.includes("clip-path:none!important;")
   && mobileHeroReferenceMatch.includes("border-radius:0 0 22% 22% / 0 0 12% 12%!important;")
   && mobileHeroReferenceMatch.includes("Irregular faint mineral veins")
-  && mobileHeroReferenceMatch.includes("rgba(203,224,236,.75)")
+  && mobileHeroReferenceMatch.includes("rgba(203,224,236,.52)")
   && mobileHeroReferenceMatch.includes("filter:blur(1.6px)!important;"),
   "Marble needs a rounded stone shelf fading into the background, subtle mineral texture and tight contact shadows.");
-assert.ok(mobileHeroReferenceMatch.includes("mask-image:linear-gradient(to bottom,#000 0%,#000 50%,rgba(0,0,0,.70) 72%,transparent 100%)!important;"),"The broad marble shelf must fade into the page rather than terminate as a floating disk.");
+assert.ok(mobileHeroReferenceMatch.includes("mask-image:linear-gradient(to bottom,#000 0%,#000 32%,rgba(0,0,0,.76) 55%,rgba(0,0,0,.32) 78%,transparent 100%)!important;"),"The broad marble shelf must fade into the page rather than terminate as a floating disk.");
 
 const sharedHeroStyles=html.slice(html.lastIndexOf("/* Cross-device Hero design system: desktop and tablet inherit the same broad,"));
 assert.ok(sharedHeroStyles.includes("@media(min-width:761px){")
@@ -568,3 +568,11 @@ assert.ok(sharedHeroStyles.includes("width:78%!important;max-width:505px!importa
   && sharedHeroStyles.includes("#home .hero-visual::before{left:50%!important;")
   && sharedHeroStyles.includes("#home .hero-visual::after{left:50%!important;"),
   "Shortened desktop Hero must shrink/recenter the marble shelf and preserve the tablet center.");
+
+assert.ok(sharedHeroStyles.includes("linear-gradient(to bottom,#000 0%,#000 32%,rgba(0,0,0,.76) 55%,rgba(0,0,0,.32) 78%,transparent 100%)")
+  && sharedHeroStyles.includes("rgba(203,224,236,.52)")
+  && sharedHeroStyles.includes("rgba(83,122,150,.50)")
+  && sharedHeroStyles.includes("border:1px solid rgba(196,214,226,.14)!important;")
+  && mobileHeroReferenceMatch.includes("rgba(239,248,253,.92)")
+  && mobileHeroReferenceMatch.includes("rgba(83,122,150,.50)"),
+  "Mobile, tablet and PC must softly blend the lower marble shelf into the icy-blue web background in light and dark without hiding the stone top or shoe contact shadows.");
