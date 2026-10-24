@@ -44,7 +44,7 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
   };
 }
 
-async function patchOrder(DB, prices) {
+async function patchOrder(DB, prices, status = "confirmed") {
   return updateAdminOrder({
     request: new Request("https://shop.example/api/admin/orders", {
       method: "PATCH",
@@ -56,7 +56,7 @@ async function patchOrder(DB, prices) {
       },
       body: JSON.stringify({
         id: "order-1",
-        status: "confirmed",
+        status,
         termsConfirmed: true,
         paymentTermsNote: "Điều kiện đã xác nhận",
         prices
@@ -78,6 +78,13 @@ async function patchOrder(DB, prices) {
   const response = await patchOrder(db, [{ itemId: "item-1", unitPrice: 200000 }]);
   assert.equal(response.status, 409, "a repricing attempt must be refused after any verified receipt/refund ledger entry");
   assert.equal(db.calls.batches.length, 0, "a verified payment ledger must prevent every order/item/audit write");
+}
+
+{
+  const db = makeDB({ hasPendingRequest: true });
+  const response = await patchOrder(db, [{ itemId: "item-1", unitPrice: 100000 }], "cancelled");
+  assert.equal(response.status, 409, "cancelling an order with a pending QR request must be refused until the request is explicitly cancelled");
+  assert.equal(db.calls.batches.length, 0, "a pending QR request must prevent an order cancellation write");
 }
 
 {
