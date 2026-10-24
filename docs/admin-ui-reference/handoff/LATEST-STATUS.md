@@ -1,31 +1,31 @@
-## Latest checkpoint — 2026-10-24 08:22 ICT
+## Latest checkpoint — 2026-10-24 08:24 ICT
 
 - Repository: `chichute5500/Sindarealest-admin`; writable branch: `feature/admin-isolated-handoff-2026-10-20`.
-- **Live HEAD at handoff start:** `6a31cb31d996a8937923d552421674f29d5c14d9`. Commit: [6a31cb3 — align order timeline and compact detail panels](https://github.com/chichute5500/Sindarealest-admin/commit/6a31cb31d996a8937923d552421674f29d5c14d9).
-- **Validate #40049172277: SUCCESS** on exact HEAD `6a31cb31d996a8937923d552421674f29d5c14d9`: dependency audit, project integrity, and automated tests passed. [Run details](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172277).
-- **Admin Preview #40049172286: IN PROGRESS** on exact HEAD `6a31cb31d996a8937923d552421674f29d5c14d9`. Repository checks and automated tests passed; Chromium installation was still running at last inspection. Do not claim Preview success until the run finishes, exact-HEAD guard succeeds, and its artifact is inspected. [Run details](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286).
-- Latest source work includes order timeline/detail-panel UI alignment. Previous test-first payment hardening requires continued review: receipt INSERT rechecks order cancellation, price/terms confirmation, and linked QR request status at the atomic write boundary. A prior regression reproduced a stale/settled QR request accepting a new linked receipt; the fix checks that the request remains `pending` at insert time. Keep all payment checks test-only; no real ledger writes.
+- **Current source/test SHA:** `0c441375a212c73ce56f16d4f9673e44c1b8260f`; commit [0c44137 — expand order item details before measuring grid](https://github.com/chichute5500/Sindarealest-admin/commit/0c441375a212c73ce56f16d4f9673e44c1b8260f). This test-only correction follows a reproducible Preview failure on parent source SHA `6a31cb31d996a8937923d552421674f29d5c14d9`.
+- **Latest prior Validate:** [#40049172277 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172277) on parent SHA `6a31cb31d996a8937923d552421674f29d5c14d9). **Latest prior Preview:** [#40049172286 FAILURE](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286) on that same parent SHA. The failure was the screenshot test reading computed grid columns inside a closed `<details>` element (expected 2 at 360px, got 1 because the hidden grid's computed style was `none`), not a source CSS regression. The test now opens the item details and measures the visible grid.
+- **Current exact-SHA CI:** Validate [#40049413343](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343) and Admin Preview [#40049413302](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302) are **IN PROGRESS** on exact SHA `0c441375a212c73ce56f16d4f9673e44c1b8260f`. At last check, Validate was at project-integrity checks and Preview was at repository checks. Re-fetch both before relying on them; Preview must finish with exact-HEAD guard and artifact inspection.
+- **Payment safety work already on branch:** test-first guards reject receipts when the order is cancelled or its price/payment terms are no longer confirmed; linked QR receipts require the request to remain `pending` at atomic INSERT. Regression tests cover QR cancellation/settlement races between preflight and batch. Do not perform real ledger writes.
 - **No acceptance uplift:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact approved-reference parity `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Overall project estimate remains 50% provisional.
-- **Isolation:** `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged; PR #108 OPEN/read-only; PR #112 OPEN/draft. Do not merge, deploy Production, change Access/secrets/shared Cloudflare configuration, seed/import, invoke Restore, or write real business data. Work only on the permitted feature branch.
-- **Six-file handoff sync is documentation-only.** Its resulting SHA is not the tested source SHA; the latest Validate/Preview evidence above belongs to `6a31cb31d996a8937923d552421674f29d5c14d9`. A new Preview may not auto-run for docs-only changes. Do not invent a source change just to trigger CI.
+- **Isolation:** `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged; PR #108 OPEN/read-only; PR #112 OPEN/draft. No Production deployment, Access bypass, secrets/shared Cloudflare changes, seed/import, Restore, or real-data writes. Only use the permitted feature branch.
+- This six-file handoff commit is docs-only; it does not change the source/test SHA or satisfy the pending Preview run. Do not create dummy source commits to trigger CI.
 
 ## Seven mandatory operating rules
 
-1. **Parallelize real independent work.** Run safe, independent tracks concurrently where possible (UI/reference audit, regression-test review, API safety review, CI/artifact verification, handoff integrity); do not serialize unrelated work behind one slow check.
-2. **Report and continue.** A progress report is not a stop condition. After reporting, continue useful safe work until the user must act or all safe work is exhausted.
-3. **Handle blockers explicitly.** Record the exact blocker and evidence, then continue other independent work. Never repeat the same failed action without new evidence.
-4. **Test-first for reproducible regressions.** Add/confirm a failing regression test before changing source; avoid speculative CSS or business logic edits.
-5. **Tie claims to exact evidence.** Name the SHA, workflow/run, conclusion, exact-HEAD guard, artifact and inspected evidence. Distinguish local/synthetic fixtures from authenticated remote/backend behavior. Never treat an older SHA's green run as latest HEAD passing.
-6. **Stop only for genuine user action.** Examples: a required account/UI operation, permission grant, or explicit business decision. If needed, state the exact action; do not ask the user to hunt for a nonexistent “Run workflow” button.
-7. **Protect project boundaries.** Only the permitted feature branch; never modify `main` or storefront/shared branches/settings; do not merge/cherry-pick/force-push/sync PRs #111/#108/#112; do not touch PR #112; no Production deployment, Access bypass, secret changes, remote D1/R2/schema/business-data writes, migrations/setup scripts, seed/import, or TinyFish.
+1. **Parallelize real independent work:** run safe, independent tracks concurrently (UI/reference audit, regression tests, API safety, CI/artifact verification, handoff integrity); do not serialize unrelated work behind one slow check.
+2. **Report and continue:** a progress report is not a stop condition. Continue useful safe work after reporting until user action is genuinely required or safe work is exhausted.
+3. **Handle blockers explicitly:** record exact blocker/evidence and keep independent work moving. Never repeat the same failed action without new evidence.
+4. **Test-first for reproducible regressions:** add/confirm a failing regression test before source changes; avoid speculative CSS/business logic edits.
+5. **Tie claims to exact evidence:** record SHA, workflow/run, conclusion, exact-HEAD guard, artifact and inspected evidence. Distinguish local/synthetic fixtures from authenticated remote/backend behavior. Older green runs do not prove latest HEAD passes.
+6. **Stop only for genuine user action:** e.g. account/UI action, permission grant, or explicit business decision. State the exact required action; do not ask the user to find a nonexistent “Run workflow” button.
+7. **Protect boundaries:** only this feature branch; never modify `main`, storefront/shared branches/settings; do not merge/cherry-pick/force-push/sync PRs #111/#108/#112; do not touch PR #112; no Production deployment, Access bypass, secrets changes, remote D1/R2/schema/business writes, migrations/setup scripts, seed/import, or TinyFish.
 
-## Next actions — continue without waiting passively
+## Next actions — do not wait passively
 
-1. Refresh run #40049172286 and inspect all steps/logs; if successful, inspect artifact and exact-HEAD guard for `6a31cb31d996a8937923d552421674f29d5c14d9`.
-2. In parallel, inspect the latest payment route/test diff and route invariants (receipt request state, cancellation races, refund net cap, audit/summary updates); add a regression test before any further source fix.
-3. Continue a separate read-only audit of the next unaccepted UI screen/reference; do not repeat already-fixed Screen 9 toast or Screen 12 mobile activity layout without new evidence.
-4. Refresh PR #111/#108/#112 and `main` before any branch-sensitive action. Keep them unmerged.
-5. When a genuine source/test defect is fixed, let watched-path CI trigger naturally and verify Validate + Preview on the same exact SHA. Update the handoff files again after evidence is final.
+1. Refresh Validate #40049413343 and Preview #40049413302; inspect logs and exact-HEAD guard. If Preview passes, inspect artifact screenshots/metrics and record the result on exact SHA `0c441375a212c73ce56f16d4f9673e44c1b8260f`.
+2. In parallel, continue a read-only payment-route audit: request status guards, cancellation races, refund net cap, audit/summary updates; test any reproducible gap before source changes.
+3. Continue reference audit on a different unaccepted screen; do not repeat the Screen 9 toast or Screen 12 mobile activity work without new evidence.
+4. Refresh branch HEAD, `main`, and PR #111/#108/#112 before branch-sensitive actions; keep all PRs unmerged.
+5. After exact-SHA CI finishes, update all six handoff files with the actual conclusion and artifact evidence. Keep the seven rules in the next-chat prompt.
 
 ---
 ---
