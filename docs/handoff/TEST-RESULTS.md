@@ -1174,3 +1174,19 @@ Runtime/Preview source SHA: `6b446660772b1899c44c523d21535c65cc3b7eb5`. Technica
 - Validate source + tests run may still be in progress at write; verify actual completed conclusion before any PASS statement.
 - Gallery-only audit was triggered automatically by shared HTML source and succeeded without modifying the previously owner-locked Gallery.
 
+---
+
+## 2026-10-25 MOBILE HERO MARBLE GROUNDING FINAL TECHNICAL CHECKPOINT
+
+Implementation and exact browser-tested runtime SHA: `2d7dd48284bb06897a82e01fc65e477368a8eabf`.
+- Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Full Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309949 — PASS.
+- Branch-only Cloudflare Pages Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309923 — PASS.
+- Hero-only exact-SHA live browser audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309935 — PASS, 10/10 contexts (mobile 360/390, tablet 768, desktop 1280/1440 × light/dark), hardFailures: [].
+- Screenshot artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309935/artifacts/12569791520; mobile 360/390 light and dark reviewed manually, along with target screenshot from owner's October 24 conversation.
+- Gallery-only read-only regression: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309905 — in progress at checkpoint; check final conclusion independently, do not count as a PASS before completion.
+
+- Actual current screenshots visually inspected after the final raised-surface commit: 360px and 390px light/dark. At 390px the marble oval computed top is 160.297 CSS px (relative to the visual frame), height 25px; softened face top is 188.297px, height 38px, connecting without a visible front tray edge; shoe PNG natural dimensions remain 1200×1600. At 360px equivalent oval top=154px, face top=182px. All audit hard failures empty; no source alpha/copy intersection or viewport horizontal overflow.
+- Fullscreen Gallery is unchanged; its read-only regression may still be in progress at this checkpoint and cannot be represented as passed before conclusion.
+- The owner's visual reference remains the acceptance standard. CSS is a deliberate approximation of photographed real marble, not a claim of exact texture/pixel identity. **OWNER ACCEPTANCE PENDING.**
+

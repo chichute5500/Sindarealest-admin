@@ -1171,3 +1171,21 @@ Runtime/Preview source SHA: `6b446660772b1899c44c523d21535c65cc3b7eb5`. Technica
 
 **Status: automated technical PASS; owner visual acceptance PENDING.** Never re-open or edit the OWNER PASS/LOCKED Gallery, catalog, navigation, #order or backend; PR #108 remains OPEN/unmerged, base main; no Production. Project 100% still blocked on owner signoff and separately recorded PR/D1/SKU authorization.
 
+---
+
+## 2026-10-25 MOBILE HERO MARBLE GROUNDING FINAL TECHNICAL CHECKPOINT
+
+**Mobile Hero marble platform correction — technical implementation complete, owner acceptance pending.** Owner said previous CSS pedestal still looked unreal and the shoes appeared to float. Root cause confirmed by direct reference-to-Preview screenshot inspection: previous CSS built a bright, rigid elliptical top over a separate polygon/trapezoidal face; the upright loafer bottom remained visually several pixels above the top of the support surface. The owner reference uses a broad, softly lit mineral shelf blending into the ice-blue background with both shoes in visible contact. Preserve the owner original 1200×1600 RGBA shoe PNG pixel-for-pixel.
+
+We first replaced the polygon face with a rounded shallow stone edge and softer nonuniform mineral light gradients, then broadened the marble front and faded its lower portion naturally into the page instead of showing an isolated floating disc. Tight two-point contact shadows remain positioned separately beneath the front and upright loafers, and the global picture drop shadow is restrained. Final geometry raises the marble **oval top from mobile bottom:26px to bottom:35px**, so the upright shoe rests on the same plane as the horizontal shoe without shifting or distorting either original shoe. The face projects to bottom:-4px with height:38px, rounded lower edge, soft opacity mask and natural mineral contrast in light/dark; the 25px oval top and 24px precise contact field stay behind the source image. CSS changes remain confined to the canonical owner-reference mobile Hero block plus Hero-only verification scripts. No catalog/gallery/locked sections, image pixels, admin, backend, security, product data, main or Production changes.
+
+Implementation and exact browser-tested runtime SHA: `2d7dd48284bb06897a82e01fc65e477368a8eabf`.
+- Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Full Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309949 — PASS.
+- Branch-only Cloudflare Pages Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309923 — PASS.
+- Hero-only exact-SHA live browser audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309935 — PASS, 10/10 contexts (mobile 360/390, tablet 768, desktop 1280/1440 × light/dark), hardFailures: [].
+- Screenshot artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309935/artifacts/12569791520; mobile 360/390 light and dark reviewed manually, along with target screenshot from owner's October 24 conversation.
+- Gallery-only read-only regression: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309905 — in progress at checkpoint; check final conclusion independently, do not count as a PASS before completion.
+
+**Status:** code/test/Preview/10-context audit PASS; owner's physical-phone aesthetic acceptance still REQUIRED; do not call pixel-identical or mark whole site 100%. PR #108 OPEN/unmerged, base main. The screenshot shows notably improved shoe-platform contact and a broad front that does not end as a hard outlined tray, but reference-level subjective approval belongs to owner.
+

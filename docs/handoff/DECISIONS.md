@@ -413,3 +413,19 @@ Runtime/Preview source SHA: `6b446660772b1899c44c523d21535c65cc3b7eb5`. Technica
 
 Owner visual signoff remains a separate gate. PR #108 stays open and none of the owner-locked sections may be changed to claim pass.
 
+---
+
+## 2026-10-25 MOBILE HERO MARBLE GROUNDING FINAL TECHNICAL CHECKPOINT
+
+Decision: avoid endless stronger gradients and arbitrary shoe translation. Keep two-column original Hero and its untouched owner PNG. Realistic stone geometry requires a continuous support surface: upper oval is raised to seat the upright shoe and front shoe simultaneously; rounded front face is enlarged downward and softly masked into background with subtle mineral variation; independent accurate contact shadows lie between the stone and shoe image. Do not reintroduce earlier hard-edge pseudo-element polygon, separate floating disk, oversized empty transparent image canvas, or fake pass based on CI alone.
+
+Implementation and exact browser-tested runtime SHA: `2d7dd48284bb06897a82e01fc65e477368a8eabf`.
+- Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Full Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309949 — PASS.
+- Branch-only Cloudflare Pages Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309923 — PASS.
+- Hero-only exact-SHA live browser audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309935 — PASS, 10/10 contexts (mobile 360/390, tablet 768, desktop 1280/1440 × light/dark), hardFailures: [].
+- Screenshot artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309935/artifacts/12569791520; mobile 360/390 light and dark reviewed manually, along with target screenshot from owner's October 24 conversation.
+- Gallery-only read-only regression: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117309905 — in progress at checkpoint; check final conclusion independently, do not count as a PASS before completion.
+
+The authoring/result is technical PASS, not owner aesthetic acceptance. Do not modify LOCKED Gallery or deploy to main/Production; PR #108 stays OPEN.
+
