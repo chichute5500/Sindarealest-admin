@@ -106,8 +106,8 @@ assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
 
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
 assert.ok(canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
-  && canonicalMobile.includes("bottom:20px!important;")
-  && canonicalMobile.includes("bottom:4px!important;")
+  && canonicalMobile.includes("bottom:27px!important;")
+  && canonicalMobile.includes("bottom:10px!important;")
   && heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;"),
   "The mobile Hero uses a single compact, visible platform beneath the unchanged shoe PNG.");
 console.log("PASS: owner-authorized Hero presentation PNG and restrained drop-shadow experiment are enforced.");
