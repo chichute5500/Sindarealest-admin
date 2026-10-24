@@ -77,7 +77,7 @@ assert.match(html, /\.sd-fullscreen-image\.sd-slide-out-left\{animation:sdFullsc
 assert.match(html, /\.sd-fullscreen-image\.sd-slide-in-right\{animation:sdFullscreenInRight 300ms/);
 assert.match(html, /function activeFullscreenImage\(\)/);
 assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incoming\.src=next/);
-assert.match(html, /incoming\.classList\.add\('sd-fade-in'\);[\s\S]*?void incoming\.offsetWidth;incoming\.classList\.add\('is-active'\)/, 'The decoded incoming photo must be revealed through a CSS opacity transition.');
+assert.match(html, /incoming\.classList\.add\('sd-fade-in'\);[\s\S]*?void incoming\.offsetWidth;\s*incoming\.classList\.add\('is-active'\)/, 'The decoded incoming photo must be revealed through a CSS opacity transition.');
 assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
 assert.match(html, /html:not\(\.dark\) \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:normal!important\}/, 'Light fullscreen images must not blend with the outgoing image layer, which creates a ghosted double-image effect.');
 assert.match(html, /html\.dark \.sd-fullscreen-frame \.sd-fullscreen-image\{mix-blend-mode:normal!important\}/,
