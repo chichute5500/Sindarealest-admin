@@ -74,8 +74,9 @@ export async function onRequestPatch(context) {
   if (!id || !statuses.includes(status)) return fail("Trạng thái đơn hàng không hợp lệ.");
   if (body?.prices !== undefined && (!Array.isArray(body.prices) || body.prices.length > 50)) return fail("Danh sách giá cần xác nhận không hợp lệ.");
   try {
-    const existing = await context.env.DB.prepare("SELECT id FROM orders WHERE id=?").bind(id).first();
+    const existing = await context.env.DB.prepare("SELECT id,status FROM orders WHERE id=?").bind(id).first();
     if (!existing) return fail("Không tìm thấy đơn hàng.", 404);
+    if (existing.status === "cancelled" && status !== "cancelled") return fail("Đơn đã hủy không thể mở lại hoặc tiếp tục xử lý.", 409);
     // A cancelled order cannot accept a verified receipt while its QR request remains pending.
     // Require explicit QR cancellation before cancelling the order, then recheck at UPDATE time below.
     if (status === "cancelled") {
@@ -144,7 +145,7 @@ export async function onRequestPatch(context) {
       "payment_terms_confirmed_by=CASE WHEN ?=1 THEN 'admin' WHEN ?=1 THEN '' ELSE payment_terms_confirmed_by END," +
       "payment_terms_note=CASE WHEN ?=1 THEN ? ELSE payment_terms_note END,updated_at=datetime('now') WHERE id=?" +
       (priceChanged ? priceGuardSql : "") +
-      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : "");
+      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'");
     const orderUpdateValues = [
       status,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
       priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id
@@ -175,11 +176,11 @@ export async function onRequestPatch(context) {
       ).bind(crypto.randomUUID(),id,auditDetails,id));
     } else {
       statements.push(context.env.DB.prepare(
-        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'order_updated', 'order', ?, ?)"
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'order_updated', 'order', ?, ? WHERE changes()=1"
       ).bind(crypto.randomUUID(),id,auditDetails));
     }
     const batchResults = await context.env.DB.batch(statements);
-    if ((priceChanged || status === "cancelled") && Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
+    if (Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
       if (priceChanged) return fail("Giá không thể thay đổi vì đơn đã phát sinh giao dịch hoặc yêu cầu QR đang chờ. Không có thay đổi nào được lưu; hãy hủy yêu cầu QR hoặc đối soát giao dịch trước.",409);
       return fail("Không thể hủy đơn vì yêu cầu QR đang chờ hoặc đơn vừa thay đổi. Hãy hủy yêu cầu QR trước rồi tải lại đơn.",409);
     }
