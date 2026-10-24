@@ -1,3 +1,53 @@
+# VERIFIED HANDOFF CHECKPOINT — 2026-10-24 09:00 UTC
+
+**Repository:** `chichute5500/Sindarealest-admin`  
+**Writable branch:** `feature/admin-isolated-handoff-2026-10-20`  
+**Latest verified branch HEAD:** `d5f4b06a28d0a682891580b5e646a3bc064fd68a` (documentation-only handoff sync)  
+**Application/source-test SHA:** `0469930f6836d5f8d87b155a538e1d68776e3913`  
+**Validate #5666:** PASS — [run 40080139131](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40080139131)  
+**Admin Preview Playwright #1070:** PASS — [run 40080139090](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40080139090)  
+**PR #111:** OPEN, unmerged; GitHub reports `mergeable=true`, `mergeable_state=clean`. Do not merge.
+
+## What changed and is verified
+
+1. QR upload partial-write risk fixed test-first: pending QR pointer and audit row are committed in one D1 batch; if persistence fails, cleanup removes only the newly staged random R2 object. Regression checks success/failure and preserves active QR.
+2. Feature-only deploy workflow renamed to `.github/workflows/deploy-admin-isolated-preview.yml`; it remains pinned to `sindarealest-admin-preview` and the approved feature branch.
+3. Feature-only E2E spec renamed to `tests/e2e/admin-isolated-preview.spec.js`; `.github/workflows/admin-preview-diagnostics.yml` invokes it. Shared `main` workflow/spec are untouched.
+4. Earlier red CI runs were investigated. The “old file must not exist” assertions were invalid in the merged PR tree because `main`'s versions legitimately exist there. Those stale assertions were removed; current Validate and Preview Playwright pass.
+5. PR #111 now reports clean/mergeable with no overlapping changed paths against the currently changed paths on `main`. The branch remains 7 commits behind and 1,675 ahead; do not rebase or merge under the project rules.
+
+## Acceptance limits — do not inflate
+
+- Progress remains **50% PROVISIONAL**.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`; approved-reference parity `NOT_VERIFIED`.
+- Authenticated business-write/persistence QA: `NOT_TESTED`.
+- Remote Preview D1 schema/ledger: `NOT_VERIFIED`.
+- Production: `NOT_PERFORMED`.
+- Prior live read-only Preview evidence (older exact SHA) checked 7/7 Admin GET routes HTTP 200, 235 products and 527 image URLs decoded; do not attribute those older diagnostics to SHA `d5f4b06a28d0a682891580b5e646a3bc064fd68a` without a new diagnostic run.
+- Unit tests, synthetic fixture screenshots, Playwright, and read-only GET checks are not proof of real business writes.
+
+## Mandatory safety rules
+
+- Write only to `feature/admin-isolated-handoff-2026-10-20`.
+- PR #111 remains OPEN/unmerged. PR #108 and #112 are read-only.
+- No merge/rebase/cherry-pick/force-push; no edits to `main` or storefront branches.
+- No Production deployment, remote D1/R2 writes, migrations/schema/ledger changes, secrets, Cloudflare Access or DNS changes; never bypass Access.
+- Test-first for source fixes; exact SHA for every result; separate local fixtures/read-only GETs from authenticated business-write QA.
+- Parallelize independent safe work. Report verified outcomes and continue; stop only for actual user action. Do not ask for nonexistent “Run workflow” button.
+- No fake commits to trigger Preview. Docs-only commits are not source changes.
+
+## Continue immediately — no user action currently needed
+
+1. Parallel stream A: read-only review of payment/order/warranty concurrency and failure paths. Find a reproducible defect before changing code.
+2. Parallel stream B: compare approved reference and latest artifact screenshots at matching viewports/themes. Do not claim pixel parity unless directly checked.
+3. Parallel stream C: keep reviewing PR #111 checks/branch-only workflow isolation without merging/rebasing.
+4. If source changes, add/reproduce regression first and require Validate + Preview on exact same application SHA. Verify exact-HEAD guard.
+5. Keep progress and acceptance statuses unchanged until evidence justifies an update.
+
+**Entry point:** `docs/admin-ui-reference/handoff/START-HERE.md`  
+**Next-chat prompt:** `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`
+
+---
 # VERIFIED HANDOFF CHECKPOINT — 2026-10-24 08:55 UTC
 
 **Repository:** `chichute5500/Sindarealest-admin`  
