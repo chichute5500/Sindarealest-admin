@@ -1884,6 +1884,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(orderTimeline).toContainText('Timeline');
       await expect(orderTimeline).toContainText('Đặt hàng');
       await expect(orderTimeline).toContainText('Cập nhật gần nhất');
+      const orderPanelHeadings = await page.locator('#orderDetailContent').evaluate(root =>
+        Array.from(root.children).map(child => child.querySelector('.panelhead h3')?.textContent?.trim() || '')
+      );
+      const productPanelIndex = orderPanelHeadings.findIndex(label => label.startsWith('Sản phẩm trong đơn'));
+      const timelinePanelIndex = orderPanelHeadings.indexOf('Timeline');
+      expect(timelinePanelIndex, 'reference Screen 7 places Timeline after the product list')
+        .toBeGreaterThan(productPanelIndex);
       if (page.viewportSize()?.width === 390) {
         const timelineGeometry = await orderTimeline.evaluate(element => {
           const rect = element.getBoundingClientRect();
