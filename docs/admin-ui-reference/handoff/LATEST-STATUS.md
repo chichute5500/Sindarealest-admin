@@ -1,3 +1,45 @@
+## LIVE HANDOFF — 2026-10-24 04:32 UTC
+
+**Current branch HEAD:** `f085698531ae413f311d1a01336f1cfc8059ab4c` on `feature/admin-isolated-handoff-2026-10-20`. PR #111 is still OPEN and unmerged at this SHA. This checkpoint is based on live GitHub reads.
+
+### Latest exact-SHA CI evidence
+- **Validate #5589: PASS** on `f085698531ae413f311d1a01336f1cfc8059ab4c`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404344. Repository checks and automated tests passed.
+- **Admin Preview #508: FAIL** on that same `f085698531ae413f311d1a01336f1cfc8059ab4c`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311. The failure is isolated to Playwright screenshot-matrix capture: `expect(locator).toBeVisible()` for `#backdrop` expected visible, but actual state was hidden after a 5-second timeout; one test failed. Do not describe Preview #508 as passing.
+- Preview #508 artifact is available: [admin-preview-evidence-508]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311/artifacts/12548301227 ). The run passed exact-branch guard, checked out the exact SHA, passed repo checks/tests, passed deployed read-only ADMIN GET diagnostic for `/api/admin/session`, `orders`, `customers`, `warranties`, `audit-logs`, `settings`, and `payment-qr`, recorded no non-read-only requests, passed the final exact-HEAD guard, and uploaded the artifact. The failure occurred in the local screenshot matrix, not in those read-only API checks.
+- Prior known-good source/test evidence remains **Validate #5579 + Preview #503 PASS** on `83e5c865e756a9df87c877380d4c506ae85ed8e5`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268. This is a different, older SHA and must not be applied to current HEAD.
+- **Immediate next action:** inspect artifact #508 and the failing Playwright assertion; reproduce why `#backdrop` is hidden at the relevant test step. Add/adjust a regression test only after establishing expected UI behavior. Do not blindly change source or loosen the assertion. If it is an intentional state transition, encode that explicitly; otherwise fix the reproduced defect and rerun Validate + Preview on the exact same source/test SHA.
+
+### Live branch / PR state
+- `main`: `227622d3e3b7c75724ffa1775b193da71089269a`.
+- PR #111: OPEN, unmerged, HEAD `f085698531ae413f311d1a01336f1cfc8059ab4c`.
+- PR #108: OPEN, unmerged, read-only; current HEAD `371dd14067903947e47305c02961fca4b3dd1655`.
+- PR #112: OPEN, unmerged, draft; HEAD `87b794996aa9be065fb27616de4b1b1e69e8e94e`.
+
+### Acceptance status — unchanged
+- Overall progress: **50% PROVISIONAL**.
+- 12 screens: `PARTIAL_NOT_ACCEPTED`.
+- Exact approved-reference parity: `NOT_VERIFIED`.
+- Authenticated backend/business-write QA: `NOT_TESTED` (Preview read-only GET checks do not count as write QA).
+- Remote D1 schema/ledger: `NOT_VERIFIED`.
+- Production: `NOT_PERFORMED`.
+
+### Seven mandatory operating rules
+1. Parallelize independent safe workstreams; one blocker must not stop other work.
+2. Report verified progress and continue working after the report.
+3. State blockers with evidence and switch streams; do not repeat actions without new evidence.
+4. Test-first: reproduce a concrete defect, establish/add a regression test, then patch.
+5. Tie every result to its exact SHA; separate fixtures, read-only API diagnostics, and authenticated business writes.
+6. Stop only for genuine account-owner action; never ask for a nonexistent “Run workflow” control.
+7. Preserve isolation: write only to `feature/admin-isolated-handoff-2026-10-20`; no merge/rebase/cherry-pick/force-push; no Production deploy; no Cloudflare Access/secrets/DNS changes or bypass; no remote D1/R2/schema/ledger/business writes or migration/seed/import/setup scripts; do not modify `main`, storefront branches, PR #108 or #112; keep PR #111 open/unmerged; never weaken the exact-HEAD guard or create dummy source commits.
+
+### Continue next
+1. Download/inspect artifact #508; locate the Playwright test that expected `#backdrop` visible and read the adjacent test/setup code.
+2. Determine whether hidden backdrop is expected due to panel navigation or is a real regression; prove with a focused test before touching source.
+3. Run independent read-only security/order/payment review in parallel; avoid repeating the already-completed broad route-auth scan.
+4. Update these handoff files after new evidence and keep source/test SHA distinct from any docs-only handoff commit.
+
+---
+
 ## Live checkpoint — 2026-10-24 03:41 UTC
 
 - **Verified docs HEAD:** `fcc623e2ce281b3e7e2be823d3aeda52fec47a9d` on `feature/admin-isolated-handoff-2026-10-20`; PR #111 is OPEN/unmerged at this SHA. This checkpoint precedes the next docs-only handoff sync.
