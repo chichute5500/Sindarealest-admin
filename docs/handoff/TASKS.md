@@ -1,3 +1,15 @@
+## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
+- [x] Verify live branch/PR #108 HEAD and four handoff files; keep PR OPEN, main/Production untouched.
+- [x] Revise compact Hero CSS only (shoes + mineral ellipse + masked front face + independent localized contact shadows) while preserving original transparent product PNG and Gallery.
+- [x] Validate exact SHA `a8731583a87ef2dc8b776b6f33897329f5ff0f37` PASS [40125522389](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522389), Cloudflare Pages branch Preview PASS [40125522119](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522119).
+- [x] Audit 360/390/768/touch-980/1280/1365/1440 in light and dark: **14/14 PASS** on exact source SHA `a8731583a87ef2dc8b776b6f33897329f5ff0f37` [40125522114](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522114); screenshots in [artifact 12573155896](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522114/artifacts/12573155896).
+- [x] Isolated Gallery browser regression PASS [40125522161](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522161), without touching locked Gallery code. Do not confuse this with separate owner mobile acceptance.
+- [ ] **OWNER ACCEPTANCE REQUIRED:** visually compare branch Preview to owner-supplied target on actual desktop and real phone including desktop-site mode; check luxury appearance, sole contact and realistic depth. 14/14 automated checks do not close this gate.
+- [ ] No merge, no Production, no unrelated changes; historical mixed-scope PR #108 review remains independent.
+- Note: original V2 commit `2ec6309a` failed Hero-only browser audit; fixed by V3 `a8731583`. Never conflate their workflow results.
+
+---
+
 ## CURRENT PRIORITY — HERO PEDESTAL VISUAL MATCH — 2026-10-24
 
 - [ ] **OPEN / NOT OWNER-ACCEPTED:** Compare the actual Hero Preview screenshots from artifact 12556115231 against the supplied reference image. Confirm the CSS pedestal is clearly visible beneath the shoes and matches the reference, not merely that the image itself passes its audit.

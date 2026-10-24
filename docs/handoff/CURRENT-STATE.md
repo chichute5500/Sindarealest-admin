@@ -1,3 +1,16 @@
+## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
+> The latest Hero-specific checkpoint supersedes older "Hero paused" and tall reference sizing notes below; these remain historical, not current instructions.
+
+- Live branch/PR #108 source HEAD before this documentation-only commit: `a8731583a87ef2dc8b776b6f33897329f5ff0f37`. PR #108 OPEN, unmerged, base `main`. Production/main untouched.
+- Owner requested a compact, premium shoe-on-plinth Hero across desktop (1280/1365/1440), tablet (768), mobile (360/390) and touch desktop (980), both themes. Only Hero CSS in `public/index.html` and the Hero-only visual audit's legacy bounds were changed. Original 1200×1600 RGBA source PNG pixels untouched, Gallery code and all other storefront functionality untouched.
+- Compact source/test SHA `a8731583a87ef2dc8b776b6f33897329f5ff0f37`. Validate **PASS**: [run 40125522389](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522389). Preview deploy **PASS**: [run 40125522119](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522119). Hero-only Playwright audit **14/14 PASS**: [run 40125522114](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522114), [actual screenshot artifact 12573155896](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522114/artifacts/12573155896). Gallery-only regression **PASS**: [run 40125522161](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522161).
+- V2 precursor `2ec6309a` passed Validate and Preview but **Hero audit FAILED** against legacy heights/polygon rules; it is superseded by V3 `a8731583`. This failure must not be reported as PASS.
+- Current audit measured Hero heights 216px (360), 222px (390), 340px (768), 372px (touch 980), 415px (desktop 1280/1365/1440). Every theme/size passes overlap, clipping, mobile product alpha, contact shadow, stone/plinth joining, no horizontal overflow and browser/network guards.
+- The screenshot set was visually inspected: compact desktop, tighter tablet composition, two shoes positioned on the top ellipse and a fading stone face. **OWNER AESTHETIC ACCEPTANCE IS STILL REQUIRED**, especially real-device desktop-site and exact owner reference parity. Do not infer a final design approval from 14/14 technical PASS.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/. Keep PR #108 OPEN; do not merge, edit main/Production, locked Gallery, Admin, backend/API, catalog, payments, D1/R2, secrets or infrastructure.
+
+---
+
 ## LATEST OWNER HANDOFF — HERO REFERENCE PEDESTAL — 2026-10-24
 > This section supersedes older conflicting Hero status text below. Verify live branch/PR HEAD and exact-SHA Actions before further edits.
 

@@ -1,3 +1,19 @@
+## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
+| Check | Result | Evidence |
+|---|---|---|
+| Source/test SHA | `a8731583a87ef2dc8b776b6f33897329f5ff0f37` | Two modified paths: `public/index.html`, `scripts/audit-hero-preview.mjs` |
+| Full Validate | **PASS** | [run 40125522389](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522389) |
+| Exact-SHA Cloudflare Preview deploy | **PASS** | [run 40125522119](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522119) |
+| Hero Chromium audit: 7 viewports × 2 themes | **14/14 PASS** | [run 40125522114](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522114) / [artifact 12573155896](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522114/artifacts/12573155896) |
+| Fullscreen Gallery isolated browser regression | **PASS** | [run 40125522161](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522161) |
+| Original shoe image integrity | **PASS (automated alpha/dimensions + file unchanged)** | Hero Playwright PNG 1200×1600 and image unchanged on source commit |
+| Owner aesthetic acceptance / exact owner reference | **REQUIRED / NOT CLAIMED** | Owner must review practical device appearance |
+| PR #108 merged/Production | **NO (intentionally)** | Kept OPEN / unmerged |
+
+Earlier V2 `2ec6309a` passed Validate/Preview but Hero audit failed [run 40125160446](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125160446). V3 corrected the actual pedestal clip shape, adjusted compact heights, resized PC shoes, and updated stale audit bounds without disabling copy-overlap, shoe-plane contact or browser safety checks. Older results below are historical.
+ 
+---
+
 ## LATEST EXACT-SHA EVIDENCE — 2026-10-24 — HERO PEDESTAL
 
 - SHA `98d45c4acd859ddda2f8067e5bfa336a8ec277ec`: Validate PASS [40082426093](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426093); Cloudflare Pages Preview deploy PASS [40082426084](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426084); Hero-only Playwright audit PASS [40082426108](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426108); isolated gallery audit PASS [40082426085](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082426085).

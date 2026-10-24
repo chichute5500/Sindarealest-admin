@@ -1,3 +1,12 @@
+## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
+1. The owner's latest request **unlocks Hero visual refinement only**; preserve locked Gallery and unrelated storefront/Admin/backend scope.
+2. Adopt compact Hero V3 at source SHA `a8731583a87ef2dc8b776b6f33897329f5ff0f37`: desktop 415px high; tablet 340px; touch-desktop 372px; mobile 216–222px. The old Hero automated minimum-height bounds were incompatible with the owner's explicit "shorter Hero" request and were updated while retaining strict size/contact/no-overflow checks.
+3. Stone shelf uses a curved top and a front face masked into the background (no detached polygon cut). Preserve the supplied 1200×1600 transparent shoe PNG intact. QA screenshots validate placement, but **do not claim owner aesthetic acceptance**.
+4. Exact-SHA gates: Validate PASS 40125522389, Preview PASS 40125522119, Hero 14/14 PASS 40125522114, Gallery-only PASS 40125522161; inspect [Hero visual artifact](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125522114/artifacts/12573155896) before any further edits.
+5. Keep PR #108 OPEN/unmerged, avoid Production/main, accepted Gallery and all restricted API/Admin/catalog/payment/DB/infrastructure edits. Any later changes require exact-SHA revalidation and actual owner visual approval.
+
+---
+
 ## CORRECTION — PREVIEW D1 MIGRATION EVIDENCE — 2026-10-24
 
 - Read-only review of `.github/workflows/deploy-storefront-preview.yml` (blob `15c1c189e4228334acc06e5de290a887a281f49d`) confirms the workflow runs project checks and tests, then `wrangler pages deploy public`, then the authenticated SEO HTTP diagnostic. It does **not** run `wrangler d1 migrations apply`.
