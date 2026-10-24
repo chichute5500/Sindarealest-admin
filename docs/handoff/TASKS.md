@@ -978,3 +978,19 @@ Implementation and exact browser-tested runtime SHA: `2d7dd48284bb06897a82e01fc6
 
 - **OWNER CHECK:** inspect newest Preview mobile light/dark against provided reference; only explicit owner PASS can lock Hero. Preserve already approved Gallery and unrelated scoped work, PR #108 OPEN; no merge/main/Production.
 
+---
+
+## LATEST DESKTOP / TABLET HERO RESPONSIVE SYNCHRONIZATION — 2026-10-25
+
+- Desktop abnormal Hero height (990px), tiny/sunken left composition and disconnected pedestal: **corrected** using shared 761px+ responsive Hero CSS.
+- Tablet Hero uses the same curved mineral shelf and dual localized contact shadows instead of old polygon. 360/390 mobile screens are pixel-identical to previous technical screenshot baseline; no mobile regression.
+Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (documentation-only commit follows). Preview URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Full Validate https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306907 — PASS.
+- Branch-only Cloudflare Pages Preview deployment https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306903 — PASS.
+- Hero-only read-only browser audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935 — PASS all 10 contexts (360/390/768/1280/1440 × light/dark), including new nonmobile upper height and grounded marble checks.
+- Exact screenshot/JSON artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935/artifacts/12569313226; visually inspected 1280px and 1440px light/dark and tablet 768px.
+- Read-only LOCKED Fullscreen Gallery audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306905 — PASS, no Gallery code changed.
+
+- Gallery remains OWNER ACCEPTED/LOCKED and passed its isolated read-only audit. PR #108 stays OPEN/unmerged, main and Production unchanged.
+- Only outstanding design acceptance gate: actual owner visual PASS on current Preview, especially desktop/tablet. Other project blockers are tracked separately.
+

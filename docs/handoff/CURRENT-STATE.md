@@ -1189,3 +1189,22 @@ Implementation and exact browser-tested runtime SHA: `2d7dd48284bb06897a82e01fc6
 
 **Status:** code/test/Preview/10-context audit PASS; owner's physical-phone aesthetic acceptance still REQUIRED; do not call pixel-identical or mark whole site 100%. PR #108 OPEN/unmerged, base main. The screenshot shows notably improved shoe-platform contact and a broad front that does not end as a hard outlined tray, but reference-level subjective approval belongs to owner.
 
+---
+
+## LATEST DESKTOP / TABLET HERO RESPONSIVE SYNCHRONIZATION — 2026-10-25
+
+Owner reported that the PC Hero looked unusual and questioned whether responsive cross-device synchronization was possible. We opened exact previous-Preview screenshot at 1280px, 1440px and tablet 768px: PC Hero measured ~990px tall with source PNG box 900px tall, content sunk far down and a disconnected trapezoidal podium, despite the repaired mobile layout. Actual desktop visual symptoms were therefore confirmed instead of relying on earlier 10/10 green audit.
+
+One new final scoped `@media(min-width:761px)` CSS design-system block in `public/index.html` now applies the **same original PNG, mineral marble top/front geometry, dark/light palette and separate localized contact shadows** to tablet + desktop, using responsive size rather than copying phone geometry. Desktop: bounded Hero height `clamp(535px,43vw,620px)`, source PNG `clamp(620px,46vw,700px)` absolutely placed within visual, readable 43–60px headline, 14–16px description and 50px CTA. Tablet 761–1000px: 455–550px Hero and tablet-specific centered product/platform positions. Browser screenshots now show copy and product side-by-side vertically balanced, source shoes seated over broad marble shelf, no huge whitespace or trapezoid; dark mode matches the same architectural treatment.
+
+**Critical regression check:** the exact new 390px light and 360px dark mobile Hero PNG screenshots were compared pixel-for-pixel to the previous accepted technical source and were byte-identical at the rendered pixel level; CSS only targets min-width 761px. No source PNG bytes, products, Catalog, Admin, backend, D1, Gallery, PR/base or Production changed.
+
+Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (documentation-only commit follows). Preview URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Full Validate https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306907 — PASS.
+- Branch-only Cloudflare Pages Preview deployment https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306903 — PASS.
+- Hero-only read-only browser audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935 — PASS all 10 contexts (360/390/768/1280/1440 × light/dark), including new nonmobile upper height and grounded marble checks.
+- Exact screenshot/JSON artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935/artifacts/12569313226; visually inspected 1280px and 1440px light/dark and tablet 768px.
+- Read-only LOCKED Fullscreen Gallery audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306905 — PASS, no Gallery code changed.
+
+**Current acceptance:** implementation, technical audit, exact-SHA Preview and image self-review PASS. Final owner physical-device/visual acceptance of desktop/tablet/mobile remains distinct and pending. PR #108 remains OPEN, unmerged against main. Do not mark whole project 100% or claim owner-accepted Hero without owner confirmation. Other PR/D1/SKU owner-only blockers remain independent.
+

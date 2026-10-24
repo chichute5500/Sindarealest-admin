@@ -1190,3 +1190,20 @@ Implementation and exact browser-tested runtime SHA: `2d7dd48284bb06897a82e01fc6
 - Fullscreen Gallery is unchanged; its read-only regression may still be in progress at this checkpoint and cannot be represented as passed before conclusion.
 - The owner's visual reference remains the acceptance standard. CSS is a deliberate approximation of photographed real marble, not a claim of exact texture/pixel identity. **OWNER ACCEPTANCE PENDING.**
 
+---
+
+## LATEST DESKTOP / TABLET HERO RESPONSIVE SYNCHRONIZATION — 2026-10-25
+
+Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (documentation-only commit follows). Preview URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Full Validate https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306907 — PASS.
+- Branch-only Cloudflare Pages Preview deployment https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306903 — PASS.
+- Hero-only read-only browser audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935 — PASS all 10 contexts (360/390/768/1280/1440 × light/dark), including new nonmobile upper height and grounded marble checks.
+- Exact screenshot/JSON artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935/artifacts/12569313226; visually inspected 1280px and 1440px light/dark and tablet 768px.
+- Read-only LOCKED Fullscreen Gallery audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306905 — PASS, no Gallery code changed.
+
+- Prior actual desktop light screenshot: 1440px Hero `height:990px`, source image rectangle 675×900, left copy low; platform face `clip-path:polygon(...)` detached and old image shadow. This was an untested aesthetics failure despite technical green checks.
+- Post-fix screenshot opened at 1280×800, 1440×900 and 768×1024 in light and dark; much shorter and editorially balanced; product and stone share grounded visual design; no visible horizontal overflow, 10/10 browser PASS.
+- Mobile screenshots at 390px light and 360px dark checked via PIL ImageChops pixel-level comparisons and were exactly identical (no change at all from prior baseline). Site and original PNG source unaffected.
+- The expanded Playwright audit checks nonmobile Hero height, shared curved/fading stone geometry, visible contact-shadow node and shoe alpha bounds. These were not earlier aesthetics assertions; now enforced at the browser level.
+- OWNER AESTHETIC APPROVAL PENDING — green CI does not replace owner's inspection.
+

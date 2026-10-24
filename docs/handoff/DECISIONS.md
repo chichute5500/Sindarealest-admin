@@ -429,3 +429,18 @@ Implementation and exact browser-tested runtime SHA: `2d7dd48284bb06897a82e01fc6
 
 The authoring/result is technical PASS, not owner aesthetic acceptance. Do not modify LOCKED Gallery or deploy to main/Production; PR #108 stays OPEN.
 
+---
+
+## LATEST DESKTOP / TABLET HERO RESPONSIVE SYNCHRONIZATION — 2026-10-25
+
+Decision: synchronize the Hero visual LANGUAGE, not literal phone dimensions, across breakpoints. Keep one protected unchanged original PNG, the marble mineral material and its fade, two physically located contact shadows, consistent light/dark themes, and source-preserving `object-fit:contain` across mobile/tablet/desktop. Desktop must never return to 900px portrait-PNG box or near-1000px total Hero; tablet must not inherit an isolated trapezoid. Final code has one specific `Cross-device Hero design system` block after canonical mobile block; never override or re-stack mobile CSS to change desktop. Tests now enforce max desktop/tablet Hero bounds, shared stone face and contact shadows, and no image clipping.
+
+Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (documentation-only commit follows). Preview URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Full Validate https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306907 — PASS.
+- Branch-only Cloudflare Pages Preview deployment https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306903 — PASS.
+- Hero-only read-only browser audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935 — PASS all 10 contexts (360/390/768/1280/1440 × light/dark), including new nonmobile upper height and grounded marble checks.
+- Exact screenshot/JSON artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306935/artifacts/12569313226; visually inspected 1280px and 1440px light/dark and tablet 768px.
+- Read-only LOCKED Fullscreen Gallery audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40118306905 — PASS, no Gallery code changed.
+
+No Gallery, Catalog, Admin, backend, database or Production changes. Owner visual acceptance stays open, PR #108 unmerged.
+
