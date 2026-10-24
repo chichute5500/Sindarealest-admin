@@ -86,6 +86,12 @@ function makeDb(options = {}) {
         };
         options.orderItems = [{ fulfillment_type: "made_to_order", quantity: 1, line_total: 200000 }];
       }
+      if (options.simulateOrderCancelledBeforeTransactionBatch) {
+        options.order = { ...(options.order ?? baseOrder), status: "cancelled" };
+      }
+      if (options.simulateOrderTermsUnconfirmedBeforeTransactionBatch) {
+        options.order = { ...(options.order ?? baseOrder), price_confirmation_required: 1, payment_terms_confirmed_at: null };
+      }
       return statements.map((statement, index) => {
         const stalePaymentRequestInsert = Boolean(options.simulateOrderChangedBeforeBatch && index === 0
           && statement.sql.includes("INSERT INTO order_payment_requests")
@@ -93,8 +99,15 @@ function makeDb(options = {}) {
         const auditWithoutRequest = Boolean(options.simulateOrderChangedBeforeBatch && index === 1
           && statement.sql.includes("payment_request_created")
           && statement.sql.includes("WHERE EXISTS (SELECT 1 FROM order_payment_requests WHERE id=?"));
-        // The stale-snapshot case simulates a concurrent order repricing immediately before the insert statement runs.
-        const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest ? 0 : 1;
+        const receivedInsert = index === 0 && statement.sql.includes("INSERT INTO order_payment_transactions")
+          && statement.values?.includes("received");
+        const receiptOrderGuard = statement.sql.includes("EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled'")
+          && statement.sql.includes("price_confirmation_required=0")
+          && statement.sql.includes("payment_terms_confirmed_at IS NOT NULL");
+        const staleReceiptRejected = receivedInsert && receiptOrderGuard
+          && (options.simulateOrderCancelledBeforeTransactionBatch || options.simulateOrderTermsUnconfirmedBeforeTransactionBatch);
+        // Simulate the final insert boundary: only SQL that rechecks order state can reject these races.
+        const changes = atomicRefundRejected || (cancellationRace && index === 0) || stalePaymentRequestInsert || auditWithoutRequest || staleReceiptRejected ? 0 : 1;
         return { success: true, meta: { changes } };
       });
     },
@@ -166,6 +179,30 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.ok(db.batches[0].some(s => s.sql.includes("INSERT INTO order_payment_transactions")));
   assert.ok(db.batches[0].some(s => s.sql.includes("UPDATE orders SET payment_status=CASE")));
   assert.ok(db.batches[0].some(s => s.values?.includes("payment_received_verified")), "audit action is passed as a bound value in the batched statement");
+}
+
+{
+  const db = makeDb({ simulateOrderCancelledBeforeTransactionBatch: true });
+  const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
+    orderId: "order-1", direction: "received", amount: 30000, transactionReference: "BANKREF-CANCEL-RACE"
+  })));
+  assert.equal(response.status, 409, "a concurrent order cancellation must block the receipt at the atomic insert boundary");
+  const statements = db.batches[0];
+  assert.ok(statements[0].sql.includes("EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled'"),
+    "the receipt INSERT must recheck that the order is not cancelled");
+  assert.ok(statements.slice(1).every(s => s.sql.includes("EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)"),
+    "order status and audit writes must be skipped when the receipt insert is rejected");
+}
+
+{
+  const db = makeDb({ simulateOrderTermsUnconfirmedBeforeTransactionBatch: true });
+  const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
+    orderId: "order-1", direction: "received", amount: 30000, transactionReference: "BANKREF-TERMS-RACE"
+  })));
+  assert.equal(response.status, 409, "a concurrent removal of price/terms confirmation must block the receipt at the atomic insert boundary");
+  assert.ok(db.batches[0][0].sql.includes("price_confirmation_required=0")
+    && db.batches[0][0].sql.includes("payment_terms_confirmed_at IS NOT NULL"),
+    "the receipt INSERT must recheck confirmed price and payment terms");
 }
 {
   const db = makeDb({ failUnique: true });
