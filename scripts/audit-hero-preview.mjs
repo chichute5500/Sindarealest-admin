@@ -323,7 +323,8 @@ try {
         if (m.viewport.width >= 1001) {
           const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;
           if (ratio < 0.70 || ratio > 0.80) fail('Desktop Hero PNG is being squeezed by a mismatched CSS box ratio.');
-          if (!m.visibleProductRect || m.visibleProductRect.width < 320) fail('Desktop Hero product is too small for the reference-led layout.');
+          const minimumProductWidth = m.viewport.width >= 1400 ? 440 : 400;
+          if (!m.visibleProductRect || m.visibleProductRect.width < minimumProductWidth) fail('Desktop Hero product is too small compared with the source reference at this viewport.');
         }
         if (!String(m.filter).includes('drop-shadow')) fail('Hero image is missing the restrained drop shadow.');
         if (!m.expectedThemeApplied) fail('Requested light/dark theme was not applied.');
