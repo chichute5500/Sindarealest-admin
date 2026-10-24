@@ -1,17 +1,17 @@
-## Live checkpoint — 2026-10-24 03:35 UTC
+## Live checkpoint — 2026-10-24 03:39 UTC
 
-- **Current source/test HEAD:** `83e5c865e756a9df87c877380d4c506ae85ed8e5` on `feature/admin-isolated-handoff-2026-10-20`; PR #111 is OPEN/unmerged and points to this exact SHA.
-- **Validate #5579: PASS** on exact SHA `83e5c865e756a9df87c877380d4c506ae85ed8e5`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682257
-- **Admin Preview #503: PASS** on the same exact SHA; exact-HEAD guard passed: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268. Artifact #503 (133 PNGs; expires 2026-11-07): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268/artifacts/12546093261
-- **Screen 7 regression resolved:** Preview #502 reproduced the timeline overlapping the fixed action row at 390×844 (timeline bottom 715.64px; action row top 710px). The fix compacted the timeline spacing. Preview #503 now passes the Playwright matrix; the captured 390×844 screenshot shows Timeline above the fixed action row with spacing, and metadata reports 0 page errors, 0 console errors, 0 failed requests and 0 HTTP errors.
-- **Fixture boundary:** the screenshot matrix uses synthetic UI-ONLY fixture data and blocks non-GET requests. It proves local rendering/regression behavior, not authenticated business writes, real customer data, remote D1 schema/ledger state or Production behavior. The deployed diagnostic only verifies the login CSS signature.
-- **Live refs:** `main` = `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged at `83e5c865e756a9df87c877380d4c506ae85ed8e5`; PR #108 OPEN/unmerged/read-only at `9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0`; PR #112 OPEN/unmerged/draft at `87b794996aa9be065fb27616de4b1b1e69e8e94e`.
-- **Progress and acceptance unchanged:** 50% PROVISIONAL; all 12 screens `PARTIAL_NOT_ACCEPTED`; exact approved-reference parity `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- **Verified docs HEAD:** `8468be144921b52bf78fb61451984215904e8e0a` on `feature/admin-isolated-handoff-2026-10-20`; PR #111 is OPEN/unmerged at this SHA. This checkpoint precedes the next docs-only handoff sync.
+- **Validate #5581: PASS** on exact docs HEAD `8468be144921b52bf78fb61451984215904e8e0a`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059113552. Repository integrity, dependency audit and automated tests passed.
+- **Source/test Preview #503: PASS** on parent source/test SHA `83e5c865e756a9df87c877380d4c506ae85ed8e5`; exact-HEAD guard passed: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268. Artifact #503 (133 PNGs): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268/artifacts/12546093261
+- **Screen 7 regression resolved on source/test SHA `83e5c865e756a9df87c877380d4c506ae85ed8e5`:** Preview #502 reproduced the timeline overlapping the fixed action row at 390×844 (timeline bottom 715.64px; action row top 710px). The timeline spacing was compacted; Preview #503 passed the Playwright matrix. The inspected 390×844 screenshot shows Timeline above the fixed action row. Artifact metadata reports 0 page errors, 0 console errors, 0 failed requests and 0 HTTP errors.
+- **Fixture boundary:** screenshots use synthetic UI-ONLY fixture data and block non-GET requests. This verifies local rendering/regression behavior only; it does not prove authenticated business writes, real customer data, remote D1 schema/ledger state or Production behavior. Deployed diagnostic is limited to the login CSS signature.
+- **Live refs at this checkpoint:** `main` = `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged at `8468be144921b52bf78fb61451984215904e8e0a`; PR #108 OPEN/unmerged/read-only at `9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0`; PR #112 OPEN/unmerged/draft at `87b794996aa9be065fb27616de4b1b1e69e8e94e`.
+- **Progress/acceptance unchanged:** 50% PROVISIONAL; all 12 screens `PARTIAL_NOT_ACCEPTED`; exact approved-reference parity `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
 
 ### Continue next
-1. Refresh branch HEAD, PR #111/#108/#112 and Actions after this docs-only handoff commit; the source/test Preview evidence above belongs only to `83e5c865e756a9df87c877380d4c506ae85ed8e5`.
-2. Continue the remaining reference-driven screen audit. Patch only a concrete reproduced mismatch, add a regression test first, then Validate and Preview the exact same source/test SHA.
-3. Continue independent read-only order/payment invariants and CI/security audits; do not repeat the completed broad admin-route auth scan without new evidence.
+1. Refresh live branch HEAD, main, PR #111/#108/#112 and Actions after this docs-only handoff sync. Do not mistake docs HEAD `8468be144921b52bf78fb61451984215904e8e0a` for the source/test Preview SHA `83e5c865e756a9df87c877380d4c506ae85ed8e5`.
+2. Continue the remaining reference-driven screen audit. Patch only a concrete reproduced mismatch, add a failing regression test first, then Validate and Preview the exact same source/test SHA.
+3. Continue independent read-only order/payment invariants and CI/security checks; do not repeat the completed broad admin-route auth scan without new evidence.
 4. Authenticated business workflows still require an authorized Preview path. Never bypass Cloudflare Access or change secrets; continue safe fixture/static checks if access is unavailable.
 
 ### Seven mandatory rules and safety boundaries
