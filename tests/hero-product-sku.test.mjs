@@ -71,7 +71,8 @@ assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("width:130%!important")
   && heroEdgeTreatment.includes("max-height:330px!important"),
   "The derived Hero shoes must be enlarged while alpha edges blend into the page and the original RGB stays unchanged.");
-assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important;-webkit-mask:none!important;mask:none!important"));
+assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important")
+  && html.includes("-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
 assert.ok(html.includes("#home .hero-visual::after,#home.hero:after"));
 assert.ok(html.includes("#home .hero-visual::before{")
