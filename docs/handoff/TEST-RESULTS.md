@@ -1074,3 +1074,25 @@ Browser target was actual Preview catalog product sneakers-new-sneaker-contrast 
 - Preview deployment FAILED: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424463
 - Isolated visual workflow SKIPPED due to failed prerequisite: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424491
 - Conclusion: **Hero visual result unverified; do not call it fixed or ask owner to accept it yet.** Investigate whether source-function extraction regex misses the one-line synchronizer or whether the implementation differs; repair narrowly and rerun the full pipeline. Preview visual artifacts/screenshots have not been validated for this attempt.
+
+## EXACT-SHA HERO VALIDATION — FINAL AUTOMATED PASS — 2026-10-24 13:36 ICT
+
+Validated runtime/source-test SHA: `500ccf80bb54c5ff92171809cff24faf130c695e`.
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Dependency audit, project integrity, full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840812 |
+| Predeploy integrity + test gate, Cloudflare Pages Preview deployment, read-only SEO diagnostic | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840864 |
+| Hero-only Playwright audit of actual Preview | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840821 |
+| Screenshots and machine-readable Hero audit JSON | Uploaded | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070840821/artifacts/12551645366 |
+| Owner physical-phone visual acceptance | REQUIRED / PENDING | Owner must inspect Preview; do not mark Hero owner-accepted yet. |
+
+Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+
+Six PASS contexts: `mobile-390-light`, `mobile-390-dark`, `tablet-768-light`, `tablet-768-dark`, `desktop-1440-light`, `desktop-1440-dark`. The actual PNG decoded at 1488×1888 in every context, expected source and active status matched, `object-fit:contain` and `drop-shadow(0 12px 16px rgba(0,0,0,.18))` matched, copy-overlap area was 0 in every context, horizontal overflow was false, and Hero image/frame were visible.
+
+Runtime/error counts: console 0; page errors 0; same-origin HTTP errors 0; same-origin failed requests 0; read-only violations/write attempts 0. The six `https://static.cloudflareinsights.com/beacon.min.js` requests were explicitly blocked by the allowlist and logged as expected, not application errors.
+
+Initial CI failure root cause: in `tests/storefront-reference-parity.test.mjs`, the `syncHeroProductImage` extraction regex was over-escaped and returned no function body although the actual one-line function in `public/index.html` was correct. Corrected regex: `/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/`. Assertions were retained. Browser audit geometry was corrected to map alpha bounds onto the actual contain-rendered bitmap, and a small mobile/tablet layout adjustment removed measured text overlap. Responsive assertions in both Hero tests were updated, not removed.
+
+Earlier failed attempts and false-positive geometry reports remain historical; this latest exact-SHA result supersedes them. Hero is automated PASS but still requires owner visual acceptance. Do not claim global 100% completion.
