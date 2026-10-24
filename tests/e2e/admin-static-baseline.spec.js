@@ -2041,6 +2041,29 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.locator('[data-order-row="UI-ONLY-ORDER"] [data-action="view-order-details"]:visible').first().click();
       await expect(page.locator('.order-detail-page')).toBeVisible();
     }, true);
+    // Positive eligibility path uses an explicit UI-only paid order; the test never confirms or submits a refund.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator('[data-view="orders"]:visible').first().click();
+    await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
+    const paidFixtureRow = page.locator('[data-order-row="UI-ONLY-ORDER-3"]');
+    await expect(paidFixtureRow).toBeVisible();
+    await paidFixtureRow.locator('[data-action="view-order-details"]:visible').first().click();
+    await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id', 'UI-ONLY-ORDER-3');
+    const paidPaymentDetails = page.locator('#orderDetailContent .order-detail-extra').first();
+    await paidPaymentDetails.locator('summary').click();
+    const paidRefundEntry = page.locator('#orderDetailContent [data-refund-entry="UI-ONLY-ORDER-3"]');
+    const paidRefundButton = paidRefundEntry.locator('[data-action="record-refund"]');
+    await expect(paidRefundButton, 'Verified positive net receipts enable the refund ledger form').toBeEnabled();
+    await expect(paidRefundEntry.locator('[data-refund-amount]')).toHaveAttribute('max', '7800000');
+    await expect(paidRefundEntry).toContainText('không thực hiện chuyển tiền');
+    const writesBeforeInvalidRefund = attemptedWrites.length;
+    await paidRefundEntry.locator('[data-refund-amount]').fill('7800001');
+    await paidRefundEntry.locator('[data-refund-reference]').fill('REFUND-UI-001');
+    await paidRefundButton.click();
+    await expect(page.locator('#toast')).toContainText('không vượt số tiền thực nhận thuần còn lại');
+    expect(attemptedWrites.length, 'An over-limit refund must be rejected locally without attempting an API write').toBe(writesBeforeInvalidRefund);
+    await page.locator('[data-action="back-to-orders"]:visible').first().click();
+    await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
     await captureView('customers', 'customers', async variant => {
       // Reference screen #8: synthetic, client-side search only; mutation endpoints remain blocked.
       await expect(page.getByLabel('Tìm tên, số điện thoại, email hoặc địa chỉ')).toBeVisible();

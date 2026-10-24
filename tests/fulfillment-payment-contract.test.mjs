@@ -109,6 +109,8 @@ assert.match(refundUiHtml, /không thực hiện chuyển tiền/i,
   "the refund UI must explicitly say it records the ledger only and does not move money");
 assert.match(refundUiHtml, /amount>netReceived/,
   "the refund UI must reject amounts above the verified net receipt before sending");
+assert.match(refundUiHtml, /!Number\.isSafeInteger\(netReceived\)\|\|netReceived<=0/,
+  "the refund UI must fail closed if verified net receipts are missing, malformed or non-positive");
 assert.match(refundUiHtml, /maxRefundAmount=Number\.isSafeInteger\(netReceived\)&&netReceived>0\?netReceived:0/,
   "refund entry must be disabled for orders with no positive verified net receipts");
 
