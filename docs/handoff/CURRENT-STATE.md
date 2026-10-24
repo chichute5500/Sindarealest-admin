@@ -1,3 +1,14 @@
+## LATEST VERIFIED UPDATE — NOINDEX TEST COMMENT PRECISION — 2026-10-24
+
+- Exact source/test SHA: `913e66f8cd6d0c8271564339ec8ec4fb3d8ceb44`. Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052542260. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052542264. Immutable Preview: https://11ee3942.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Latest test-only comment corrections in `tests/robots-txt.test.mjs` and `tests/storefront-operations.test.mjs` accurately state that Admin noindex is expressed by the HTML `<meta name="robots" content="noindex,nofollow">`, not by assuming `public/_headers` applies to Pages Function responses. Runtime behavior is unchanged by this commit.
+- Preview sitemap guard and primary-host regression remain green: non-primary Preview hosts (including terminal-dot hostname) return 404 + `X-Robots-Tag: noindex, nofollow` before DB query; exact primary `sindarealest2.pages.dev` and custom domains retain sitemap behavior.
+- Independent fetch attempts to root, `robots.txt`, and `sitemap.xml` were intercepted by Cloudflare Access and returned the Access login page. The actual app endpoint responses/headers remain NOT VERIFIED externally. Do not interpret the Access page's HTTP 200 as a storefront PASS.
+- Root Preview noindex remains a separate unresolved question because middleware transforms the homepage response. Do not change shared middleware/headers, Access or infrastructure without explicit authorization.
+- PR #108 OPEN/unmerged, base `main`; Production and main untouched. Hero, SKU verification and fullscreen gallery flicker remain paused; accepted sections remain locked.
+
+---
+
 ## LATEST VERIFIED UPDATE — PRIMARY SITEMAP HOST REGRESSION — 2026-10-24
 
 - Exact source/test SHA: `7392f46a0be22b0d9487f67b5fda662951f19a1b`. Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052308996. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052309040. Immutable Preview: https://1ae6fd12.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.

@@ -1,3 +1,14 @@
+## LATEST TASK RESULT — CORRECT NOINDEX TEST DESCRIPTIONS — 2026-10-24
+
+- Corrected stale comments in `tests/robots-txt.test.mjs` and `tests/storefront-operations.test.mjs`: Admin's effective noindex signal is the HTML meta robots directive, not an assumed response header from `public/_headers`.
+- This is test-comment-only; no storefront runtime behavior changed.
+- Exact SHA `913e66f8cd6d0c8271564339ec8ec4fb3d8ceb44`: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052542260; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052542264; immutable Preview https://11ee3942.sindarealest2.pages.dev/.
+- Current SEO test coverage includes Preview robots/sitemap guards, terminal-dot hostname normalization, primary Pages sitemap allowed, and custom-domain sitemap allowed.
+- External fetcher is blocked by Cloudflare Access login; app endpoint response is not verified. Do not change Access/shared middleware without explicit authorization.
+- PR #108 OPEN/unmerged, no Production/main edits; paused/locked scopes unchanged.
+
+---
+
 ## LATEST TASK RESULT — COVER PRIMARY SITEMAP HOST CLASSIFICATION — 2026-10-24
 
 - Added a regression test proving the exact primary hostname `sindarealest2.pages.dev` remains allowed by the new Preview-only sitemap guard and emits primary-origin home/product URLs.

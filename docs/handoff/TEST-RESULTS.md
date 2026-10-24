@@ -1,3 +1,19 @@
+## EXACT-SHA RESULT — NOINDEX COMMENT PRECISION — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| npm audit, integrity, full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052542260 |
+| Preview deploy | PASS on `913e66f8cd6d0c8271564339ec8ec4fb3d8ceb44` | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052542264 |
+| Immutable Preview | Deployed | https://11ee3942.sindarealest2.pages.dev/ |
+| Visual workflow | SKIPPED | Hero guard |
+| Independent endpoint/header verification | NOT VERIFIED | External fetcher reached Cloudflare Access login, not app content |
+
+- Test comments now identify Admin's HTML meta robots noindex directive accurately.
+- Preview sitemap guard and primary/custom-host sitemap regressions remain covered.
+- No live visual/device/owner acceptance claimed. PR #108 OPEN/unmerged; Production/main untouched.
+
+---
+
 ## EXACT-SHA RESULT — PRIMARY SITEMAP HOST REGRESSION — 2026-10-24
 
 | Gate | Result | Evidence |

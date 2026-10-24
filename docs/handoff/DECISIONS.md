@@ -1,3 +1,12 @@
+## DECISION UPDATE — TEST COMMENTS MUST MATCH EFFECTIVE NOINDEX SOURCE — 2026-10-24
+
+- Refer to `public/admin/index.html`'s document-level `<meta name="robots" content="noindex,nofollow">` as Admin's crawl-visible noindex signal. Do not claim `public/_headers` alone proves a Pages Function response carries `X-Robots-Tag`.
+- Latest source/test SHA `913e66f8cd6d0c8271564339ec8ec4fb3d8ceb44` passed Validate and Preview deploy. Immutable Preview: `https://11ee3942.sindarealest2.pages.dev/`.
+- External direct fetches to the Preview were redirected by Cloudflare Access to the login page. Treat live app headers/body as NOT VERIFIED; don't bypass Access or change its policy.
+- Preview root noindex remains unverified because middleware transforms the root. No middleware/shared header changes without explicit authorization. PR #108 remains OPEN/unmerged, Production/main untouched.
+
+---
+
 ## DECISION UPDATE — COVER BOTH PREVIEW AND PRIMARY SITEMAP HOSTS — 2026-10-24
 
 - Sitemap guard applies only to non-primary `*.sindarealest2.pages.dev` hosts. Keep `sindarealest2.pages.dev` and custom domains working. Regression tests must cover primary, custom, regular Preview, and terminal-dot Preview hostnames.
