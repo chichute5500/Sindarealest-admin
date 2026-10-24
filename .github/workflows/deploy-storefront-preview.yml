@@ -63,9 +63,20 @@ jobs:
         run: npm install --no-save --no-package-lock --no-audit --no-fund wrangler@4.149.0
 
       - name: Deploy only the named fix branch as a Preview
+        id: deploy_preview
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "fix/liquid-glass-audit-2026-10-19"
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           npx wrangler pages deploy public             --project-name="$CLOUDFLARE_PAGES_PROJECT"             --branch="$GITHUB_REF_NAME"             --commit-hash="$GITHUB_SHA"             --commit-message="$(git log -1 --format=%s)"
+
+
+      - name: Read-only Preview SEO response diagnostic
+        if: steps.deploy_preview.outcome == 'success'
+        continue-on-error: true
+        env:
+          PREVIEW_URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: node scripts/verify-preview-seo.mjs
