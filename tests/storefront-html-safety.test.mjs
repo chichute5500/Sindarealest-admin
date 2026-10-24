@@ -14,22 +14,17 @@ const heroSection = html.slice(heroSectionStart, heroSectionEnd);
 assert.match(heroSection, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
   "the Hero must keep the confirmed three-line brand headline hierarchy");
 assert.match(heroSection, /<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">/,
-  "the hero image element must remain available for responsive styling without hardcoding an HTML source");
-assert.doesNotMatch(heroSection, /<img id="heroProductImage"[^>]*\bsrc=/,
-  "the hero image source must be assigned by the runtime synchronizer");
+  "the Hero image source remains runtime-assigned to the owner-supplied presentation PNG");
 
 const heroSyncStart = html.indexOf("function syncHeroProductImage()");
 const heroSyncEnd = html.indexOf("function renderFeatured()", heroSyncStart + "function syncHeroProductImage()".length);
 assert.ok(heroSyncStart >= 0 && heroSyncEnd > heroSyncStart,
   "the Hero image synchronization function must remain present");
 const heroSync = html.slice(heroSyncStart, heroSyncEnd);
-assert.ok(heroSync.includes("target.hidden=true")
-  && heroSync.includes("target.removeAttribute('src')")
-  && heroSync.includes("target.dataset.productImageStatus='temporarily-disabled-owner-request'")
-  && heroSync.includes("target.onerror=null"),
-  "the Hero must remain hidden without a source during the owner-requested pause");
-assert.doesNotMatch(heroSync, /target\\.src=url|target\\.hidden=false/,
-  "the temporarily paused Hero must not assign or display its image");
+assert.ok(heroSync.includes("target.hidden=false")
+  && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'")
+  && heroSync.includes("target.dataset.productImageStatus='owner-presentation-image-active'"),
+  "the authorized Hero experiment must display the owner-supplied PNG with a restrained drop shadow");
 
 function makeHeroTarget() {
   const attributes = {};
@@ -48,14 +43,12 @@ function runHeroSync() {
   });
   return { result, target };
 }
-const pausedHero = runHeroSync();
-assert.equal(pausedHero.result, true);
-assert.equal(pausedHero.target.hidden, true);
-assert.equal(pausedHero.target.src, '');
-assert.equal(pausedHero.target.dataset.productImageStatus, 'temporarily-disabled-owner-request');
-assert.equal(pausedHero.target.onerror, null);
-assert.equal('productSku' in pausedHero.target.dataset, false);
-assert.equal('sourceProductImage' in pausedHero.target.dataset, false);
+const activeHero = runHeroSync();
+assert.equal(activeHero.result, true);
+assert.equal(activeHero.target.hidden, false);
+assert.equal(activeHero.target.src, '/images/hero-upload/tb_image_share_1792519964514-blended.png');
+assert.equal(activeHero.target.dataset.productImageStatus, 'owner-presentation-image-active');
+assert.equal(activeHero.target.alt, 'Đôi giày loafer da cá sấu SinDarealest');
 
 const helperStart = html.indexOf("const escapeHtml=");
 const helperEnd = html.indexOf("function showToast(", helperStart);

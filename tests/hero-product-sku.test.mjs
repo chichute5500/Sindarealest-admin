@@ -31,7 +31,7 @@ for (const [, selector, declarations] of heroImageRules) {
     if (!effect) continue;
     const property = effect[2].toLowerCase();
     const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
-    const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
+    const neutral = ((property === "filter" && value === "drop-shadow(0 12px 16px rgba(0,0,0,.18))") || ((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
       || (property.startsWith("mask") && value.startsWith("radial-gradient("))
       || (property === "mix-blend-mode" && (value === "normal" || value === "multiply"))
       || (property === "opacity" && value === "1")
@@ -93,4 +93,4 @@ assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
   "The live audit must verify the authorized visible Hero presentation image.");
 
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
-console.log("PASS: owner-requested temporary Hero-hidden state is enforced.");
+console.log("PASS: owner-authorized Hero presentation PNG and restrained drop-shadow experiment are enforced.");

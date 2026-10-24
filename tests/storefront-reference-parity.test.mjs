@@ -289,9 +289,9 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     assert.ok(neutral, "Hero image must remain visually untouched (" + selector.trim() + ": " + declaration + ").");
   }
 }
-const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Owner-supplied Hero presentation asset: retain shoe RGB/detail; feathered-alpha derivative is a separate file. */"));
-assert.ok(heroAssetDisplayLock.includes("filter:none!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
-  "Hero image must not use CSS filters or CSS masks; the separate PNG already has alpha-feathered platform/canvas edges.");
+const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Hero experiment: restore the owner-provided alpha-feathered PNG and add a restrained drop shadow without cropping or recoloring the shoes. */"));
+assert.ok(heroAssetDisplayLock.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
+  "Hero experiment uses a restrained drop shadow only; the alpha-feathered PNG is not cropped or masked.");
 assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
   "Hero image keeps full opacity and normal color blending; no brightness/multiply blend is permitted.");
 const heroBlendOverride = html.slice(html.lastIndexOf('<style id="hero-image-blend-owner-asset">'));
