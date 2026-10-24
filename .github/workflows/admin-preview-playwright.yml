@@ -1,0 +1,101 @@
+name: Admin isolated Preview Playwright
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - "public/admin/**"
+      - "functions/**"
+      - "tests/e2e/admin-isolated-preview.spec.js"
+      - ".github/workflows/admin-preview-diagnostics.yml"
+      - ".github/workflows/admin-preview-playwright.yml"
+      - "package.json"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admin-isolated-preview-playwright-${{ github.event.pull_request.head.ref || github.ref }}-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Test isolated Admin Preview (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      ADMIN_TEST_URL: "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/"
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      EXPECTED_FEATURE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Guard repository and intended branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REPOSITORY}" = "chichute5500/Sindarealest-admin"
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            test "${{ github.event.pull_request.head.repo.full_name }}" = "chichute5500/Sindarealest-admin"
+            test "${{ github.event.pull_request.head.ref }}" = "feature/admin-isolated-handoff-2026-10-20"
+          elif [[ "${GITHUB_EVENT_NAME}" == "push" || "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            test "${GITHUB_REF}" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          fi
+          test "${ADMIN_TEST_URL}" = "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/"
+          test -n "${ADMIN_TEST_PASSWORD}" || { echo "::error::Missing ADMIN_TEST_PASSWORD secret"; exit 1; }
+
+      - name: Check out exact feature source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install project dependencies
+        run: npm install --no-fund
+
+      - name: Validate source
+        run: npm run check
+
+      - name: Run regression tests
+        run: npm test
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Test isolated Preview, read-only
+        run: npx playwright test tests/e2e/admin-isolated-preview.spec.js --reporter=line,html
+
+      - name: Verify feature branch still points to tested SHA
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(git ls-remote origin "refs/heads/feature/admin-isolated-handoff-2026-10-20" | awk '{print $1}')"
+          echo "Expected tested feature SHA: ${EXPECTED_FEATURE_SHA}"
+          echo "Current feature branch SHA: ${remote_sha}"
+          test -n "${remote_sha}"
+          if [[ "${remote_sha}" != "${EXPECTED_FEATURE_SHA}" ]]; then
+            echo "::error::Feature branch moved during this run; evidence is not latest-HEAD acceptance evidence."
+            exit 1
+          fi
+
+      - name: Upload safe test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-isolated-preview-playwright-${{ github.run_number }}
+          path: |
+            artifacts/admin-preview-evidence/
+            test-results/
+            playwright-report/
+          if-no-files-found: warn
+          retention-days: 14
