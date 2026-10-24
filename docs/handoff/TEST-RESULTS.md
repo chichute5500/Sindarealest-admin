@@ -1066,3 +1066,11 @@ Browser target was actual Preview catalog product sneakers-new-sneaker-contrast 
 - Cloudflare Pages Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047
 - Isolated Playwright gallery audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963
 - Final gallery status: **PASS / LOCKED**. Earlier “physical-device verification NOT RUN / owner acceptance required” entries are historical and superseded by this dated acceptance. No implication that the full PR is approved to merge or Production.
+
+
+## HERO PRESENTATION EXPERIMENT — LATEST FAILED VALIDATION — 2026-10-24 13:10 ICT
+- Validation run FAILED: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424485
+- Failure location: `tests/storefront-reference-parity.test.mjs:186`; assertion: “The owner-authorized Hero experiment must load the standalone presentation PNG without depending on catalog SKU data.” Earlier tests in `npm test`, including `tests/hero-product-sku.test.mjs`, passed before this assertion failed.
+- Preview deployment FAILED: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424463
+- Isolated visual workflow SKIPPED due to failed prerequisite: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424491
+- Conclusion: **Hero visual result unverified; do not call it fixed or ask owner to accept it yet.** Investigate whether source-function extraction regex misses the one-line synchronizer or whether the implementation differs; repair narrowly and rerun the full pipeline. Preview visual artifacts/screenshots have not been validated for this attempt.

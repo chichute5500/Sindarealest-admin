@@ -434,3 +434,9 @@ This delta adds two test/evidence-only paths; it does not reduce the original ou
 ## OWNER ACCEPTANCE UPDATE — FULLSCREEN GALLERY — 2026-10-24
 - Owner phone acceptance is now **PASS** for fullscreen gallery flicker/ghosting, following the Preview implementation at SHA `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87` and PASS results for validation https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016, Preview deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047, and isolated Playwright audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963.
 - This closes the gallery visual-acceptance gate only; it does not alter the 300-path inventory or resolve the separate PR scope-disposition concerns. PR #108 remains OPEN/unmerged. No main/Production changes or reopening of other locked areas.
+
+
+## HERO EXPERIMENT STATUS UPDATE — 2026-10-24 13:10 ICT
+- Owner authorized a narrow Hero image composition experiment. It does not change the existing PR scope inventory or authorize other locked areas.
+- Latest validation failure: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424485, `tests/storefront-reference-parity.test.mjs:186`. Latest Preview deploy failure: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424463. Isolated visual audit skipped: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424491.
+- Status: Hero **IN PROGRESS / NOT PASS**. Fix test/source mismatch and obtain validation + Preview deploy + isolated visual audit before owner acceptance. Gallery remains owner PASS/LOCKED. PR #108 remains OPEN/unmerged; no main/Production changes.

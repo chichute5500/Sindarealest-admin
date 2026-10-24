@@ -144,3 +144,40 @@ Chỉ ghi **100% hoàn thành** khi không còn required item nào FAIL/BLOCKED/
 - Owner physically checked the latest Preview on their phone and replied **“Pass”**. The fullscreen product-gallery flicker/ghosting task is now **OWNER-ACCEPTED PASS / LOCKED**; do not re-test or modify it unless explicitly reopened.
 - Accepted implementation SHA: `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87`. Validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016; Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047; isolated gallery browser audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963.
 - Re-fetch live PR #108 and branch HEAD before further work. PR #108 remains OPEN/unmerged. Do not merge, alter main/Production, reopen Hero, or change any other PASS/LOCKED section. Continue only with an independently actionable, authorized unresolved task; do not invent work or claim total project completion while PR scope disposition and other documented blockers remain unresolved.
+
+
+# IMMEDIATE CONTINUATION — HERO EXPERIMENT FAILED CI, MUST FIX AND FINISH
+
+You are continuing SinDarealest2 repository `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, PR #108. Last observed PR head: `053c36bfa48f49dbc3cc62f79740a77bb4251cad`; re-fetch branch/PR HEAD before edits. PR is OPEN/unmerged.
+
+## User's latest authorized scope
+Owner explicitly said to try the supplied Hero design approach: use the existing transparent/alpha-feathered loafer PNG, avoid distortion/cropping, use `object-fit:contain`, and apply a restrained `drop-shadow`. This is permission to work on Hero only for this experiment. It does not authorize editing backend/API, catalog SKU data, migrations, main/Production, or any other PASS/LOCKED area.
+
+## Current source experiment
+- `public/index.html` assigns `/images/hero-upload/tb_image_share_1792519964514-blended.png`, sets alt text, sets `data-product-image-status=owner-presentation-image-active`, and hides the image only if its load fails.
+- CSS uses `object-fit:contain` and `filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))`; no image asset rewrite or SKU claim.
+- Regression tests and Preview capture audit were adjusted, but the latest attempt is not green.
+
+## Exact failure evidence — begin here
+- Validation FAILED: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424485
+- Preview deployment FAILED: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424463
+- Isolated visual workflow SKIPPED: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40067424491
+- Failure is at `tests/storefront-reference-parity.test.mjs:186`: assertion “The owner-authorized Hero experiment must load the standalone presentation PNG without depending on catalog SKU data.” See full job logs. The likely issue is test extraction/regex mismatch; prove it by inspecting actual HTML and the exact regex result before editing. Do not simply remove or weaken checks.
+- Prior failed attempts also exist at SHAs `b4bb876e41229d0aea59e107602cd646254caccf`, `1c29ae0d3d896b7a9b0ad1e7d10176941bade5dd`, `48351f05e26bfecc0dc8db9dd24f7f89b13a3238`, `2cbdfd5eef546c0d5561840943fe68019976ed55`, `cd208a1426b06a2f10ec4c4e5291b43f5c0b0070`. Read their logs only if it helps identify recurring mistakes.
+
+## Required work — continue after reporting, do not stop at a status update
+1. Fetch current PR #108 and branch HEAD; confirm latest code and files.
+2. Read the failed validation job log and inspect `tests/storefront-reference-parity.test.mjs` around line 186 and `public/index.html` around `syncHeroProductImage`. Determine whether regex is extracting the correct function body; fix the root cause or narrowly correct the test expectation.
+3. Run full source validation/tests; fix every regression caused by this experiment. Never delete unrelated tests or weaken global protections to get green.
+4. Confirm Preview deploy passes at the same SHA.
+5. Run the isolated Hero visual/browser audit on actual Preview at mobile, tablet, desktop and required light/dark themes. Verify the real PNG returns successfully, decodes to non-zero natural dimensions, is visible, does not distort/crop/overlap text, and the drop shadow looks natural. Inspect screenshots/artifacts and page/console/network errors. The Hero audit must not accidentally capture or mutate other locked UI.
+6. If any layout or visual issue appears, make a scoped fix and repeat the pipeline. Do not ask the owner to inspect until automated gates and screenshots are satisfactory.
+7. Update all six handoff files with final evidence and exact status. If all automated checks pass, request owner visual acceptance; do not claim PASS before owner accepts. If blocked by unavailable tooling, record exact blocker and continue with other authorized actionable checks instead of stopping at generic report.
+
+## Guardrails
+- Do not merge PR #108. Do not edit `main` or Production.
+- Do not change the gallery flicker implementation: it is owner PASS/LOCKED.
+- Do not reopen catalog filters, order trust section, warranty form, icon system, or any other accepted/locked section.
+- Do not change backend/API/SKU/catalog/database/migrations or invent SKU identity for the Hero presentation image.
+- Do not mark the whole project 100% complete; PR scope disposition and other documented blockers remain separate.
+- After each report, continue the next authorized step. Only stop when owner action/acceptance is required or there is a concrete external blocker, and state it precisely.

@@ -341,3 +341,10 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Owner explicitly confirmed **“Pass”** after the Preview phone check. Record fullscreen gallery flicker/ghosting as **OWNER-ACCEPTED PASS / LOCKED**; this supersedes earlier notes saying physical-device acceptance was still pending.
 - Accepted implementation SHA: `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87`. Validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016; Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047; isolated browser audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963.
 - No further gallery changes without an explicit reopen. This is not permission to merge PR #108, change main/Production, or unlock Hero/other PASS-LOCKED scopes.
+
+
+## HERO EXPERIMENT DECISION — AUTHORIZED BUT NOT ACCEPTED — 2026-10-24 13:10 ICT
+- Owner explicitly requested trying a Hero composition approach inspired by transparent product PNG + `object-fit:contain` + restrained `drop-shadow`. This reopens Hero only for the scoped experiment, superseding older Hero pause notes only for this work. It is not acceptance of the result.
+- The current attempt restores the existing owner-provided PNG, does not modify the image or associate it with a catalog SKU, and uses a soft drop shadow. Automated validation currently fails in `tests/storefront-reference-parity.test.mjs:186`; deployment also fails and the isolated visual audit is skipped. Therefore Hero remains **NOT PASS / IN PROGRESS**.
+- Required before owner review: source/test green, Preview deploy green, isolated screenshot/browser audit green across required viewports/themes, image decode confirmed, no new console/page/network errors, screenshot review. Owner acceptance required after that.
+- Existing gallery flicker fix remains PASS/LOCKED. No PR merge or Production changes.
