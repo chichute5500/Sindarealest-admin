@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T09:32:00Z",
+  "capturedAtUtc": "2026-10-24T09:36:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
   "codeTestSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "VALIDATE_5688_PASS_AND_ADMIN_PREVIEW_PLAYWRIGHT_1077_PASS_ON_EXACT_SOURCE_TEST_SHA; ORDER_CANCELLATION_ITEM_WRITE_RACE_GUARDED",
+  "status": "SOURCE_TEST_VALIDATE_5688_AND_PREVIEW_1077_PASS; DOCS_HEAD_VALIDATE_5721_FAILED_HANDOFF_ENTRYPOINT_METADATA; ENTRYPOINT_RESTORED; VALIDATE_5729_RUNNING",
   "latestRun": {
     "id": 40081623888,
     "runNumber": 1077,
@@ -745,14 +745,13 @@
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40080139131"
   },
   "latestDocsHeadValidation": {
-    "id": 40062404344,
-    "runNumber": 5589,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404344",
-    "workflow": "Validate source and tests",
+    "id": 40082444182,
+    "runNumber": 5721,
     "status": "completed",
-    "conclusion": "success",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c"
+    "conclusion": "failure",
+    "sha": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444182",
+    "failure": "handoff-integrity.test.mjs found current-status.json.entryPoint missing; the canonical field has been restored in follow-up docs commit and revalidation is running."
   },
   "latestSourceTestValidation": {
     "id": 40081623892,
@@ -819,5 +818,21 @@
     "aheadBy": 1675,
     "behindBy": 7
   },
-  "branchHead": "fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94"
+  "branchHead": "fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94",
+  "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+  "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+  "latestCurrentHeadValidation": {
+    "id": 40082686453,
+    "runNumber": 5729,
+    "status": "in_progress",
+    "sha": "31582c6f67516fbeb5dacbacecfe6909ca09074e",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082686453"
+  },
+  "latestCurrentHeadPreview": {
+    "id": 40082686461,
+    "runNumber": 1095,
+    "status": "pending",
+    "sha": "31582c6f67516fbeb5dacbacecfe6909ca09074e",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082686461"
+  }
 }
