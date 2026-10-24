@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T09:30:00Z",
+  "capturedAtUtc": "2026-10-24T09:32:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
@@ -412,13 +412,13 @@
     "summary": "QR upload pending pointer/audit are atomic and failed persistence cleans only the staged R2 object. Isolated deployment workflow and E2E spec use unique paths separate from main."
   },
   "latestValidateRun": {
-    "id": 40080139131,
-    "runNumber": 5666,
+    "id": 40081623892,
+    "runNumber": 5688,
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d5f4b06a28d0a682891580b5e646a3bc064fd68a",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40080139131"
+    "sha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892"
   },
   "latestAttempt": {
     "capturedAtUtc": "2026-10-24T09:00:00Z",
@@ -482,13 +482,13 @@
   },
   "checkpointSemantics": "2026-10-24 08:55 UTC: QR upload atomicity and feature workflow/spec path isolation included in source/test SHA 0469930f6836d5f8d87b155a538e1d68776e3913. Validate and Admin Preview Playwright both pass. Live read-only diagnostics from older SHA must not be attributed to this SHA.",
   "latestActionsRun": {
-    "id": 40080139090,
-    "runNumber": 1070,
+    "id": 40081623888,
+    "runNumber": 1077,
     "workflow": "Admin Preview Playwright",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d5f4b06a28d0a682891580b5e646a3bc064fd68a",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40080139090"
+    "sha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888"
   },
   "latestValidateAttempt": {
     "id": 40080139131,
@@ -734,7 +734,7 @@
       "reason": "Preview exact-HEAD guard failed after branch advanced during capture."
     }
   },
-  "progressBasis": "No acceptance increase: automated tests and Preview Playwright pass; screenshot evidence does not prove approved-reference parity and authenticated business writes remain untested.",
+  "progressBasis": "Automated source tests and Preview Playwright pass on exact source/test SHA. These checks do not establish authenticated business-write persistence or approved-reference parity.",
   "latestSourceTestValidateRun": {
     "id": 40080139131,
     "runNumber": 5666,
