@@ -390,7 +390,7 @@ try {
           if(colSizes.length!==2)
             fail('Touch desktop mode must expose two usable product columns, not four tiny cards.');
         }
-        if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < 280 || m.visibleProductRect.width > 400)) fail('Tablet/touch desktop Hero product must have a realistic, bounded size.');
+        if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < Math.max(225, m.viewport.width*.27) || m.visibleProductRect.width > 400)) fail('Tablet/touch desktop Hero product must have a realistic, bounded size.');
         if (m.viewport.width >= 761 && m.viewport.width <= 1000) {
           const p=m.pedestal?.oval;
           if (!p||!Number.isFinite(p.left)||!Number.isFinite(p.width)) fail('Tablet marble pedestal geometry unavailable.');
@@ -406,8 +406,10 @@ try {
             fail('Rear shoe must be supported by a deeper perspective oval and localized contact shadow at every nonmobile breakpoint.');
         }
         if (m.viewport.width >= 761) {
-          const maxHeight=m.viewport.width>=1001?485:575;
-          if(!m.heroRect || m.heroRect.height>maxHeight || m.heroRect.height<(m.viewport.width>=1001?400:430)) fail('Desktop/tablet Hero is oversized or collapsed.');
+          const maxHeight=m.viewport.width>=1001?450:425;
+          // Owner-approved compact Hero: 340px tablet, ~372px touch desktop, <=415px PC.
+          const minHeight=m.viewport.width>=1001?385:320;
+          if(!m.heroRect || m.heroRect.height>maxHeight || m.heroRect.height<minHeight) fail('Desktop/tablet Hero is oversized or collapsed.');
           if(!m.pedestal || m.pedestal.face.clipPath!=='none' || !String(m.pedestal.face.maskImage).includes('linear-gradient'))
             fail('Desktop/tablet Hero uses a detached polygon platform instead of the shared curved stone shelf.');
           if(!m.contactShadow || m.contactShadow.display==='none'||!m.contactShadow.background.includes('radial-gradient'))
