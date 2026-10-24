@@ -67,6 +67,8 @@ for (const {width,height,theme} of matrix) {
       await page.locator('#password').fill(testPassword);
       await page.locator('#loginForm button[type=submit]').click();
       await expect(page.locator('#appView')).toBeVisible({timeout:30000});
+      // Hide the transient login toast before recording reference-comparison screenshots.
+      await expect(page.locator('#toast')).not.toHaveClass(/show/,{timeout:7000});
       for(const [screen,view] of screens){
         await page.evaluate(v=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view===v);if(!nav)throw new Error('Missing Admin navigation button '+v);nav.click()},view);
         await page.waitForTimeout(500);
@@ -88,7 +90,12 @@ for (const {width,height,theme} of matrix) {
         report.screens.push({screen:name,status:'UNAVAILABLE_NOT_ACCEPTED',reason:'No editable product UI row'});
       await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='orders');if(!nav)throw Error('Order view navigation missing');nav.click()});
       await page.waitForTimeout(500);
-      const detail=page.locator('[data-action="view-order-details"]:visible').first();
+      const requiredQaOrder=(process.env.QA_EXPECT_ORDER_ID||'').trim();
+      if(requiredQaOrder&&!/^qa_[0-9]{8,16}_order$/.test(requiredQaOrder))throw Error('Invalid QA-owned order identity');
+      const detail=requiredQaOrder
+        ? page.locator('[data-action="view-order-details"][data-id="'+requiredQaOrder+'"]:visible').first()
+        : page.locator('[data-action="view-order-details"]:visible').first();
+      if(requiredQaOrder) await expect(detail,'Must find the run-owned isolated QA order before marking 12-screen acceptance PASS').toBeVisible({timeout:15000});
       if(await detail.count()){
         await detail.click();
         await expect(page.locator('.order-detail-page')).toBeVisible();
@@ -98,7 +105,8 @@ for (const {width,height,theme} of matrix) {
       }
       expect(report.nonAuthMutationRequests,'Read-only QA must not make business writes').toEqual([]);
       const captures=report.screens.filter(s=>s.status==='CAPTURED_NOT_ACCEPTED');
-      expect(captures.length,'At least 10 real screens should be available').toBeGreaterThanOrEqual(10);
+      if(process.env.QA_EXPECT_ORDER_ID)expect(captures.length,'All 12 real Admin screens must be captured whenever isolated QA order fixtures are present').toBe(12);
+      else expect(captures.length,'At least 10 real screens should be available without synthetic data').toBeGreaterThanOrEqual(10);
     } finally {
       writeFileSync(join(folder,'manifest.json'),JSON.stringify(report,null,2)+'\n');
       await context.close();

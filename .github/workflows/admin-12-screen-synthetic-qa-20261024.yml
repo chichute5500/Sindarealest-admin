@@ -6,6 +6,7 @@ on:
       - feature/admin-isolated-handoff-2026-10-20
     paths:
       - ".github/workflows/admin-12-screen-synthetic-qa-20261024.yml"
+      - "tests/e2e/admin-12-screen-live-qa.spec.js"
       - "scripts/qa-admin-d1-synthetic-lifecycle.mjs"
       - "tests/e2e/admin-qa-write-persistence.spec.js"
 

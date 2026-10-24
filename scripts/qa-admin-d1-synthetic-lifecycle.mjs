@@ -114,7 +114,7 @@ async function main(){
    if(persisted.length!==1||persisted[0].title!==verifiedTitle||Number(persisted[0].price)!==123456||Number(persisted[0].stock)!==2)
       throw Error('Exact isolated D1 QA row did not persist expected API changes');
    journal.authenticatedAdminSaveVerified=true; journal.d1ReadbackVerified=true; save();
-   const child=spawnSync('npx',['playwright','test','tests/e2e/admin-12-screen-live-qa.spec.js','--workers=2','--reporter=line,html'],{stdio:'inherit',env:process.env,timeout:900000});
+   const child=spawnSync('npx',['playwright','test','tests/e2e/admin-12-screen-live-qa.spec.js','--workers=2','--reporter=line,html'],{stdio:'inherit',env:{...process.env,QA_EXPECT_ORDER_ID:rec.order},timeout:900000});
    if(child.error||child.status!==0)throw Error('12-screen Playwright not fully green; exit '+String(child.status));
   }catch(e){error=e;console.error('[QA_SCREEN_RESULT] '+e.message)}
   finally{try{await cleanup(db)}catch(cleanupErr){console.error('[QA_CLEANUP_ERROR] '+cleanupErr.message);error=error||cleanupErr}}
