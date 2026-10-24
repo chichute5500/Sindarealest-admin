@@ -338,3 +338,11 @@ Fixture/test PASS does not mean final visual parity or authenticated backend PAS
 
 ## Screen 8 mobile CSS regression found and fixed
 - Preview run [#39895792200](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39895792200) failed its Playwright screenshot matrix because the desktop customer identity block was not explicitly hidden alongside the compact mobile summary. The source contract now asserts the missing CSS rule. Re-run exact-SHA Validate and Preview before treating Screen 8 layout as passing.
+
+
+## Latest Screen 7 and backend race checkpoint — 2026-10-24
+
+- Screen 7: Playwright first reproduced the 320×640 action bar defect (primary button 28.6875px; secondary 235.3125px). CSS fix limited to ≤359px adjusts column proportions and wraps secondary action; exact-SHA Validate #5590 + Preview #517 passed, and artifact 517 screenshot was inspected.
+- Warranty issuance: new regression verified the atomic insert must recheck the order is still `completed`. Initial test-only SHA failed for the intended reason; after fixing the guarded INSERT, Validate #40070485935 and Preview #40070485982 passed on exact SHA `0d4eb3a8f5611ed1e712bba295598a021a6f4137`.
+- These results are source/unit/fixture and read-only Preview evidence, not proof of real warranty issuance, order changes or payment persistence. Keep Screen 7 and all 12 screens `PARTIAL_NOT_ACCEPTED`; exact parity `NOT_VERIFIED`; business-write QA `NOT_TESTED`; remote D1 `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- Continue the screen-by-screen reference audit and keep the PR/conflict safety restrictions unchanged.

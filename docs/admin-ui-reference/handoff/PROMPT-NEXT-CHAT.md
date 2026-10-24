@@ -1,3 +1,33 @@
+# CURRENT VERIFIED CHECKPOINT — 2026-10-24
+
+**Allowed branch:** `feature/admin-isolated-handoff-2026-10-20`  
+**Exact source/test SHA:** `cac4999611feacecf80e9e980a8ace0dd45e6f3d`  
+**Validate #5590:** PASS — [run 40070858136](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136)  
+**Admin Preview #517:** SUCCESS on the same SHA — [run 40070858169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169)  
+**Screenshot artifact:** [admin-preview-evidence-517](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629)
+
+## Verified changes in this checkpoint
+
+1. **Warranty concurrency guard:** test-first regression reproduced a race where an order could change from `completed` between the preflight read and issuance. The atomic `INSERT` now rechecks `orders.status='completed'`. Regression test, `npm run check`, and `npm test` pass. Earlier exact-source evidence: Validate [40070485935](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070485935) and Preview [40070485982](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070485982), SHA `0d4eb3a8f5611ed1e712bba295598a021a6f4137`.
+2. **Screen 7 at 320×640:** a test-only commit reproduced primary action width `28.6875px` with the secondary action taking `235.3125px` ([failing Preview run 40070706843](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070706843)). The narrow-width CSS now allocates a minimum width to “Cập nhật” and wraps the secondary action. The exact-SHA test and screenshot matrix pass on `cac4999611feacecf80e9e980a8ace0dd45e6f3d`; artifact 517 was downloaded and `order-detail__320x640__light.png` visually inspected.
+
+## Scope and acceptance limits
+
+- Authenticated Preview **read-only** checks: 7/7 Admin GET routes returned HTTP 200. Product list: 235 products; 527 relative image URLs decoded; list pagination, filters, and product detail/editor loading passed. No product mutations or Admin writes were made by the diagnostic.
+- The screenshot matrix and fixtures are local/synthetic UI evidence. Orders, customers, warranties and audit-log responses were empty in the live read-only check. No authenticated business-write/persistence QA is claimed; remote D1 schema/ledger remains unverified.
+- Progress remains **50% PROVISIONAL**. All 12 reference screens remain `PARTIAL_NOT_ACCEPTED`; approved-reference parity `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+- PR #111 stays OPEN/unmerged and GitHub reports it is not mergeable yet. PR #108 is read-only; PR #112 remains separate/draft. Do not merge, rebase, cherry-pick, force-push, modify `main`/storefront, run remote D1 writes/migrations, or deploy Production. Never alter Cloudflare Access, secrets or DNS.
+
+## Continue immediately
+
+1. Continue the next independent reference-driven UI audit using artifact 517; only add a fix after a reproducible discrepancy and regression test.
+2. Keep PR #111 conflict analysis read-only until a safe, branch-isolated resolution is demonstrable; do not merge/rebase to clear the “dirty” state.
+3. Continue read-only checks and report business-write QA as blocked/not tested until an explicitly authorized safe test path exists.
+
+This checkpoint supersedes stale status/next-step text below; historical records remain for traceability.
+
+---
+
 ## LIVE HANDOFF — 2026-10-24 04:32 UTC
 
 **Current branch HEAD:** `f085698531ae413f311d1a01336f1cfc8059ab4c` on `feature/admin-isolated-handoff-2026-10-20`. PR #111 is still OPEN and unmerged at this SHA. This checkpoint is based on live GitHub reads.

@@ -1,30 +1,37 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T04:32:00Z",
+  "capturedAtUtc": "2026-10-24T06:39:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-  "checkpointSemantics": "Live checkpoint 2026-10-24T04:32:00Z: branch/PR #111 HEAD f085698531ae413f311d1a01336f1cfc8059ab4c. Validate #5589 PASS on exact SHA. Preview #508 FAIL on exact same SHA: screenshot matrix Playwright assertion for #backdrop expected visible but actual hidden after 5 seconds (1 test failed). Read-only deployed ADMIN GET diagnostic passed, nonReadOnlyRequests=[]; exact-HEAD guard passed; artifact 12548301227 uploaded. Previous Preview #503 PASS belongs only to older SHA 83e5c865e756a9df87c877380d4c506ae85ed8e5.",
-  "codeTestSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-  "latestProductSourceCommit": "f085698531ae413f311d1a01336f1cfc8059ab4c",
+  "branchHeadAtCheckpointStart": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+  "checkpointSemantics": "Verified checkpoint 2026-10-24T06:39:00Z: Validate #5590 and Preview #517 both PASS on source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d; artifact #517 inspected. Warranty issuance atomic status guard and Screen 7 narrow mobile action fix are verified. Handoff commit will be docs-only; source/test SHA remains cac4999611feacecf80e9e980a8ace0dd45e6f3d. All business and reference acceptance boundaries unchanged.",
+  "codeTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+  "latestProductSourceCommit": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
   "latestActionsRun": {
-    "id": 40062404311,
-    "runNumber": 508,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311",
+    "id": 40070858169,
+    "runNumber": 517,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
     "workflow": "Admin Preview diagnostic smoke test",
     "status": "completed",
-    "conclusion": "failure",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "artifactId": 12548301227,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311/artifacts/12548301227",
-    "failedStep": "Capture real source screenshots across responsive and theme matrix",
-    "failure": "Playwright expect(locator).toBeVisible() failed for #backdrop; expected visible, actual hidden; timeout 5000ms; one test failed",
-    "otherEvidence": "exact branch guard passed; checkout exact SHA passed; repository checks and automated tests passed; deployed read-only ADMIN GET diagnostic passed for /api/admin/session, orders, customers, warranties, audit-logs, settings, payment-qr; nonReadOnlyRequests=[]; exact-HEAD post-run guard passed; artifact upload passed"
+    "conclusion": "success",
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "artifactId": 12551172629,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629",
+    "screenshotCount": 16,
+    "fixtureScreenshotCount": 120,
+    "fixtureMetricCount": 112,
+    "pageErrors": 0,
+    "sourceConsoleErrors": 0,
+    "failedRequests": 0,
+    "httpErrors": 0,
+    "failedStep": null,
+    "failure": null,
+    "otherEvidence": "Repository checks and npm tests passed; local source Playwright responsive/theme matrix passed; the dedicated deployed Preview diagnostic returned PASS_LOGIN_CSS_SIGNATURE; authenticated live Preview read-only diagnostics returned HTTP 200 for /api/admin/session, orders, customers, warranties, audit-logs, settings and payment-qr; product list read-only check found 235 products, 527 relative image URLs decoded, pagination/search/category/publication filters and detail editor passed; product mutation/admin read-only mutation requests were zero; branch exact-HEAD post-run guard passed. Business write QA remains NOT_TESTED."
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "No acceptance increase; Preview #508 failed on current SHA.",
+  "progressBasis": "No acceptance increase: changes are protected by source/tests and synthetic screenshot evidence; actual business-write QA and exact-reference acceptance are still not proven.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -191,14 +198,14 @@
     }
   },
   "latestProductChange": {
-    "status": "PRODUCT_EDITOR_NARROW_MOBILE_SKU_PLACEHOLDER_REFINED; VALIDATE_PASS; PREVIEW_PASS",
-    "sourceAndTestSha": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
-    "validateRunId": 39951430535,
-    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430535",
-    "previewRunId": 39951430461,
-    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39951430461",
-    "previewStatus": "SUCCESS",
-    "summary": "Changed the long commercial-SKU placeholder to 'SKU chính thức' so it fits the 320px mobile field more cleanly; added Playwright assertion. Validate and Preview passed on exact SHA; artifact 421 confirms screenshot."
+    "status": "WARRANTY_ISSUANCE_RACE_GUARD_AND_SCREEN_7_NARROW_MOBILE_ACTION_FIXED; EXACT_SHA_VALIDATE_AND_PREVIEW_PASS",
+    "sourceAndTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "validateRunId": 40070858136,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
+    "previewRunId": 40070858169,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
+    "artifactId": 12551172629,
+    "summary": "Atomic warranty issuance now rechecks order status='completed'. At ≤359px the Screen 7 primary action retains at least 88px and the secondary action at least 120px; test assertions and screenshot evidence pass."
   },
   "screenStatuses": {
     "1_login": {
@@ -227,7 +234,7 @@
     },
     "7_order_detail": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Artifact 423 shows stacked summary/customer/items/payment cards with lower content accessed by scroll; synthetic order only, real order data/actions and exact-reference parity remain unverified."
+      "gap": "Screen 7 action bar bug reproduced test-first at 320×640 (primary width 28.7px), fixed with ≤359px two-column layout and secondary button wrapping; Validate #5590 and Preview #517 pass and artifact 517 screenshot inspected. Real order data/actions and exact approved-reference parity remain unverified."
     },
     "8_customers": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -235,7 +242,7 @@
     },
     "9_warranty_support": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Mobile toast positioning remains covered, but the latest synthetic warranty screenshot still contains a stale success toast from the preceding retry test; clear this capture-state leak next. Live warranty/support operations remain untested."
+      "gap": "Atomic warranty issuance guard now rechecks the order remains completed; regression and exact-SHA Validate/Preview pass. Real warranty issuance/support persistence remains untested."
     },
     "10_website_settings": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -459,49 +466,58 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Inspect artifact #508 and locate the failing Playwright assertion for #backdrop.",
-    "Reproduce expected UI state and add/fix regression test before source edits.",
-    "Continue independent read-only order/payment/security audit.",
-    "Rerun Validate and Preview on same exact source/test SHA after any source fix; preserve branch isolation."
+    "Continue direct reference-driven comparison of remaining Admin screens using artifact admin-preview-evidence-517; fix only a reproducible mismatch with a regression test.",
+    "Keep PR #111 open/unmerged; analyze its dirty merge state read-only. Do not merge/rebase/cherry-pick/force-push or modify main/storefront.",
+    "Continue read-only Preview verification. Authenticated business writes/persistence remain NOT_TESTED; remote D1 schema/ledger remains NOT_VERIFIED.",
+    "Preserve all 12 screens as PARTIAL_NOT_ACCEPTED and overall progress at 50% PROVISIONAL until acceptance evidence improves."
   ],
   "handoffSync": {
-    "status": "SIX_FILE_DOCS_ONLY_SYNC_COMPLETED",
-    "capturedAtUtc": "2026-10-24T02:34:00Z",
-    "branchHeadAtCheckpointStart": "83a64e2c53ed3a24da0cc214f06163e38f3ab345",
-    "codeTestSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
-    "note": "All six canonical handoff files were synchronized in commit 83a64e2c53ed3a24da0cc214f06163e38f3ab345; Validate #5566 passed on that exact docs HEAD. This follow-up only records sync completion; verify Validate on the resulting docs HEAD. Docs-only commits do not trigger Admin Preview.",
-    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
-    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "nextRequiredAction": "Refresh live HEAD and Actions; verify Validate on the latest docs-only HEAD. Latest source/test Preview-verified SHA remains ab0343f963f0f113dc6c88a601c5499ebe15d592 (Preview #498 SUCCESS). Continue workstreams A–E. Do not create dummy source commits or weaken exact-HEAD guard."
+    "status": "IN_PROGRESS_DOCS_ONLY_SYNC_AFTER_EXACT_SHA_PASS",
+    "sourceTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "validateRunId": 40070858136,
+    "previewRunId": 40070858169,
+    "filesUpdated": [
+      "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
+      "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+      "docs/admin-ui-reference/handoff/START-HERE.md",
+      "docs/admin-ui-reference/handoff/current-status.json",
+      "docs/admin-ui-reference/handoff/latest-test-results.json"
+    ],
+    "commitIsDocsOnly": true
   },
-  "currentHeadAtCheckpoint": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-  "currentHeadValidation": "VALIDATE_5589_PASS_ON_f085698531ae413f311d1a01336f1cfc8059ab4c; PREVIEW_508_FAIL_ON_f085698531ae413f311d1a01336f1cfc8059ab4c_BACKDROP_EXPECTED_VISIBLE_ACTUAL_HIDDEN",
-  "currentHeadValidationReason": "Validate #5589 passed but Preview #508 failed screenshot matrix on exact current HEAD f085698531ae413f311d1a01336f1cfc8059ab4c; #backdrop visibility assertion timed out after 5s. Read-only GET diagnostics passed and artifact is available. Need inspect artifact and reproduce expected backdrop state before changing source.",
+  "currentHeadAtCheckpoint": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+  "currentHeadValidation": "VALIDATE_5590_PASS_AND_PREVIEW_517_SUCCESS_ON_CAC4999611FEACECF80E9E980A8ACE0DD45E6F3D",
+  "currentHeadValidationReason": "Both Validate and Admin Preview completed successfully on the exact same source/test SHA. Preview checked exact branch HEAD before upload. Its source screenshot matrix is local and synthetic; deployed diagnostics were read-only only.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-24T04:32:00Z",
-    "branchHead": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-    "validateRunId": 40062404344,
+    "capturedAtUtc": "2026-10-24T06:39:00Z",
+    "branchHead": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "validateRunId": 40070858136,
     "validateConclusion": "success",
-    "previewRunId": 40062404311,
-    "previewConclusion": "failure",
-    "previewFailure": "backdrop expected visible, actual hidden",
-    "artifactId": 12548301227
+    "previewRunId": 40070858169,
+    "previewConclusion": "success",
+    "artifactId": 12551172629,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629"
   },
   "latestReviewFinding": {
-    "status": "PREVIEW_508_SCREENSHOT_MATRIX_FAILURE_BACKDROP_HIDDEN",
-    "sourceTestSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "validateRunId": 40062404344,
-    "previewRunId": 40062404311,
-    "artifactId": 12548301227,
-    "summary": "One Playwright test failed: #backdrop expected visible but was hidden after 5 seconds. Inspect test/setup and artifact; don't loosen assertion without understanding intended state."
+    "status": "WARRANTY_ISSUANCE_STATUS_RACE_FIXED_AND_ORDER_DETAIL_320PX_ACTION_FIXED",
+    "sourceTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "validateRunId": 40070858136,
+    "previewRunId": 40070858169,
+    "artifactId": 12551172629,
+    "findings": [
+      "Warranty issue atomic INSERT rechecks that the order remains status='completed'; regression first failed on test-only SHA 7f1306a95e9cac6fb37bfffd46c04a14eb1bbdfa, then source/test run passed on 0d4eb3a8f5611ed1e712bba295598a021a6f4137.",
+      "Order detail 320x640 regression measured primary action width 28.6875px and secondary width 235.3125px on test-only SHA 0652b7e274360cf801c08f7e4eac045e9d700784. Narrow-width CSS grid fix now passes regression on exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Artifact #517 screenshot inspected."
+    ],
+    "summary": "Validate #5590 and Preview #517 passed on exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Preview artifact #517 confirms 320x640 action-bar geometry is corrected. No user/business data writes were performed."
   },
   "snapshotCapturedBeforeHandoffSync": true,
-  "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "latestCodeCommitSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
-  "testedCommitSha": "ab0343f963f0f113dc6c88a601c5499ebe15d592",
+  "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+  "latestCodeCommitSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+  "testedCommitSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
   "capturedAt": "2026-10-24T01:53:00Z",
-  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40051237976",
+  "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
   "checks": {
     "playwright": "PASS_ON_EXACT_SHA_b45d7f8d46d43d89f5e2330676009f5db778c379",
     "automatedTests": "PASS_ON_EXACT_SHA_0c441375a212c73ce56f16d4f9673e44c1b8260f",
@@ -579,17 +595,16 @@
     "businessDataBoundary": "Orders, customers, warranties and audit-log arrays were empty; this does not prove non-empty business workflows or writes."
   },
   "latestScreenshotArtifact": {
-    "id": 12548301227,
-    "name": "admin-preview-evidence-508",
-    "runId": 40062404311,
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311/artifacts/12548301227",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "sourceCommit": "f085698531ae413f311d1a01336f1cfc8059ab4c",
+    "id": 12551172629,
+    "name": "admin-preview-evidence-517",
+    "runId": 40070858169,
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "sourceCommit": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
     "expired": false,
-    "createdAt": "2026-10-24T04:29:02Z",
-    "expiresAt": "2026-11-07T04:29:00Z",
-    "failure": "Screenshot matrix failed on #backdrop visibility assertion"
+    "createdAt": "2026-10-24T06:38:44Z",
+    "inspection": "Downloaded and visually inspected order-detail__320x640__light.png after fix; primary update action is usable and secondary action wraps within button."
   },
   "remainingIssues": [
     "All 12 screens remain PARTIAL_NOT_ACCEPTED. Screen 7 Timeline is visible in artifact #493 using synthetic UI-only data; exact approved-reference parity and real order actions remain unverified.",
@@ -598,90 +613,102 @@
     "Remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED; migration 0009, PRE/PRO, product-image/R2 persistence and AI image grouping remain DEFERRED_BY_OWNER."
   ],
   "latestDiagnosticArtifact": {
-    "id": 12543031534,
-    "name": "admin-preview-evidence-493",
-    "runId": 40049413302,
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534",
-    "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "sourceCommit": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "sizeBytes": 20839936,
-    "downloadSha256": "sha256:2de7ac40e0deca62ddd446ffc96b16a84726a97e19905677842b3b6fc8a5d5d6",
+    "id": 12551172629,
+    "name": "admin-preview-evidence-517",
+    "runId": 40070858169,
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "sourceCommit": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "expired": false,
+    "createdAt": "2026-10-24T06:38:44Z",
+    "inspection": "Downloaded and visually inspected order-detail__320x640__light.png after fix; primary update action is usable and secondary action wraps within button.",
+    "sizeBytes": 20813684,
+    "downloadSha256": "sha256:2d685b9d9be3bc720e6c148cdc63b51b389a55b450cb2e715fd9a39986cc12ff",
     "pngCount": 133,
     "sourceScreenshotCount": 16,
     "uiFixtureCaptureEntries": 120,
     "uiFixtureMetricCount": 112,
-    "horizontalOverflowMetrics": 0,
-    "sourcePageErrors": 0,
+    "pageErrors": 0,
     "sourceConsoleErrors": 0,
     "failedRequests": 0,
     "httpErrors": 0,
-    "fixturePageErrors": 0,
     "fixtureConsoleErrors": 7,
     "fixtureApiErrors": 0,
     "attemptedWrites": 0,
     "unexpectedApiPaths": 0,
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
-    "authenticatedReadOnlyRoutes": "7_OF_7_HTTP_200",
-    "liveCatalogCount": 235,
-    "liveImageUrls": 527,
-    "liveImageDecode": "PASS",
-    "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries; no fixture API errors or writes."
+    "authenticatedReadOnlyRoutes": "7_OF_7_HTTP_200"
   },
   "latestValidateAttempt": {
-    "id": 40062404344,
-    "runNumber": 5589,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404344",
+    "id": 40070858136,
+    "runNumber": 5590,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c"
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d"
   },
   "latestPreviewAttempt": {
-    "id": 40062404311,
-    "runNumber": 508,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311",
+    "id": 40070858169,
+    "runNumber": 517,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
     "workflow": "Admin Preview diagnostic smoke test",
     "status": "completed",
-    "conclusion": "failure",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "artifactId": 12548301227,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311/artifacts/12548301227",
-    "failedStep": "Capture real source screenshots across responsive and theme matrix",
-    "failure": "Playwright expect(locator).toBeVisible() failed for #backdrop; expected visible, actual hidden; timeout 5000ms; one test failed",
-    "otherEvidence": "exact branch guard passed; checkout exact SHA passed; repository checks and automated tests passed; deployed read-only ADMIN GET diagnostic passed for /api/admin/session, orders, customers, warranties, audit-logs, settings, payment-qr; nonReadOnlyRequests=[]; exact-HEAD post-run guard passed; artifact upload passed"
+    "conclusion": "success",
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "artifactId": 12551172629,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629",
+    "screenshotCount": 16,
+    "fixtureScreenshotCount": 120,
+    "fixtureMetricCount": 112,
+    "pageErrors": 0,
+    "sourceConsoleErrors": 0,
+    "failedRequests": 0,
+    "httpErrors": 0,
+    "failedStep": null,
+    "failure": null,
+    "otherEvidence": "Repository checks and npm tests passed; local source Playwright responsive/theme matrix passed; the dedicated deployed Preview diagnostic returned PASS_LOGIN_CSS_SIGNATURE; authenticated live Preview read-only diagnostics returned HTTP 200 for /api/admin/session, orders, customers, warranties, audit-logs, settings and payment-qr; product list read-only check found 235 products, 527 relative image URLs decoded, pagination/search/category/publication filters and detail editor passed; product mutation/admin read-only mutation requests were zero; branch exact-HEAD post-run guard passed. Business write QA remains NOT_TESTED."
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-24T04:32:00Z",
+    "capturedAtUtc": "2026-10-24T06:39:00Z",
     "sourceTestRun": {
-      "id": 40062404344,
-      "runNumber": 5589,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404344",
+      "id": 40070858136,
+      "runNumber": 5590,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
       "workflow": "Validate source and tests",
       "status": "completed",
       "conclusion": "success",
-      "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-      "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c"
+      "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+      "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d"
     },
     "previewRun": {
-      "id": 40062404311,
-      "runNumber": 508,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311",
+      "id": 40070858169,
+      "runNumber": 517,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
       "workflow": "Admin Preview diagnostic smoke test",
       "status": "completed",
-      "conclusion": "failure",
-      "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-      "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-      "artifactId": 12548301227,
-      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311/artifacts/12548301227",
-      "failedStep": "Capture real source screenshots across responsive and theme matrix",
-      "failure": "Playwright expect(locator).toBeVisible() failed for #backdrop; expected visible, actual hidden; timeout 5000ms; one test failed",
-      "otherEvidence": "exact branch guard passed; checkout exact SHA passed; repository checks and automated tests passed; deployed read-only ADMIN GET diagnostic passed for /api/admin/session, orders, customers, warranties, audit-logs, settings, payment-qr; nonReadOnlyRequests=[]; exact-HEAD post-run guard passed; artifact upload passed"
-    }
+      "conclusion": "success",
+      "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+      "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+      "artifactId": 12551172629,
+      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629",
+      "screenshotCount": 16,
+      "fixtureScreenshotCount": 120,
+      "fixtureMetricCount": 112,
+      "pageErrors": 0,
+      "sourceConsoleErrors": 0,
+      "failedRequests": 0,
+      "httpErrors": 0,
+      "failedStep": null,
+      "failure": null,
+      "otherEvidence": "Repository checks and npm tests passed; local source Playwright responsive/theme matrix passed; the dedicated deployed Preview diagnostic returned PASS_LOGIN_CSS_SIGNATURE; authenticated live Preview read-only diagnostics returned HTTP 200 for /api/admin/session, orders, customers, warranties, audit-logs, settings and payment-qr; product list read-only check found 235 products, 527 relative image URLs decoded, pagination/search/category/publication filters and detail editor passed; product mutation/admin read-only mutation requests were zero; branch exact-HEAD post-run guard passed. Business write QA remains NOT_TESTED."
+    },
+    "exactSameSha": true
   },
-  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311",
+  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
   "previewRuntimeCheckpoint": {
     "status": "USER_CONFIRMED_PRODUCTS_VISIBLE",
     "capturedAtUtc": "2026-10-23T17:04:27.950Z",
@@ -697,7 +724,7 @@
     "next": "Read-only verify product GET/list, images, detail/edit and pagination; fix only reproducible defects; exact-SHA validation and isolated Preview",
     "doNotRepeat": "Do not re-run product import/seed or ask user to re-check product visibility"
   },
-  "nextChatInstructions": "Continue directly on GitHub; refresh live state first; apply all seven rules and work in parallel. Use only feature/admin-isolated-handoff-2026-10-20. No merge, Production deployment, Access/secrets/DNS changes, remote business writes, migrations/seed/import/setup scripts, or changes to main/storefront/PR #108/#112.",
+  "nextChatInstructions": "Resume from exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Validate #5590 and Preview #517 pass; inspect artifact #12551172629 if needed. Continue independently without asking user to restate context. Keep PR #111 open/unmerged and all safety guardrails. Screens/acceptance remain partial.",
   "screen10CompactCopyFix": {
     "sourceTestSha": "43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3",
     "testFirstCommitSha": "4dadbccce7a15620baaafbf7e996ef4976a312a3",
@@ -798,49 +825,61 @@
     }
   ],
   "latestValidateRun": {
-    "id": 40062404344,
-    "runNumber": 5589,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404344",
+    "id": 40070858136,
+    "runNumber": 5590,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c"
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d"
   },
   "livePrState": {
     "pr111": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "f085698531ae413f311d1a01336f1cfc8059ab4c"
+      "mergeable": false,
+      "headSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
     },
     "pr108": {
       "state": "OPEN",
       "merged": false,
-      "headSha": "371dd14067903947e47305c02961fca4b3dd1655",
+      "mergeable": false,
+      "headSha": "500ccf80bb54c5ff92171809cff24faf130c695e",
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
       "readOnly": true
     },
     "pr112": {
       "state": "OPEN",
       "merged": false,
       "draft": true,
-      "headSha": "87b794996aa9be065fb27616de4b1b1e69e8e94e"
-    },
-    "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a"
+      "mergeable": true,
+      "headSha": "87b794996aa9be065fb27616de4b1b1e69e8e94e",
+      "baseSha": "227622d3e3b7c75724ffa1775b193da71089269a"
+    }
   },
   "latestRun": {
-    "id": 40062404311,
-    "runNumber": 508,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311",
+    "id": 40070858169,
+    "runNumber": 517,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
     "workflow": "Admin Preview diagnostic smoke test",
     "status": "completed",
-    "conclusion": "failure",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "artifactId": 12548301227,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311/artifacts/12548301227",
-    "failedStep": "Capture real source screenshots across responsive and theme matrix",
-    "failure": "Playwright expect(locator).toBeVisible() failed for #backdrop; expected visible, actual hidden; timeout 5000ms; one test failed",
-    "otherEvidence": "exact branch guard passed; checkout exact SHA passed; repository checks and automated tests passed; deployed read-only ADMIN GET diagnostic passed for /api/admin/session, orders, customers, warranties, audit-logs, settings, payment-qr; nonReadOnlyRequests=[]; exact-HEAD post-run guard passed; artifact upload passed"
+    "conclusion": "success",
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "artifactId": 12551172629,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629",
+    "screenshotCount": 16,
+    "fixtureScreenshotCount": 120,
+    "fixtureMetricCount": 112,
+    "pageErrors": 0,
+    "sourceConsoleErrors": 0,
+    "failedRequests": 0,
+    "httpErrors": 0,
+    "failedStep": null,
+    "failure": null,
+    "otherEvidence": "Repository checks and npm tests passed; local source Playwright responsive/theme matrix passed; the dedicated deployed Preview diagnostic returned PASS_LOGIN_CSS_SIGNATURE; authenticated live Preview read-only diagnostics returned HTTP 200 for /api/admin/session, orders, customers, warranties, audit-logs, settings and payment-qr; product list read-only check found 235 products, 527 relative image URLs decoded, pagination/search/category/publication filters and detail editor passed; product mutation/admin read-only mutation requests were zero; branch exact-HEAD post-run guard passed. Business write QA remains NOT_TESTED."
   },
   "acceptance": {
     "screens": "12 screens PARTIAL_NOT_ACCEPTED",
@@ -849,17 +888,17 @@
     "remoteD1SchemaLedger": "NOT_VERIFIED",
     "production": "NOT_PERFORMED"
   },
-  "nextStep": "Inspect Preview #508 artifact and failing Playwright test: #backdrop expected visible but hidden. Do not weaken test without proving intended state. Then test-first fix and exact-SHA Validate + Preview.",
-  "acceptanceBoundary": "All 12 screens PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated backend/business QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
+  "nextStep": "Continue screen-by-screen reference comparison from artifact #517 and read-only PR conflict analysis; no need for user action at this checkpoint.",
+  "acceptanceBoundary": "All 12 screens PARTIAL_NOT_ACCEPTED; exact approved reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
   "latestSourceTestValidateRun": {
-    "id": 40062404344,
-    "runNumber": 5589,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404344",
+    "id": 40070858136,
+    "runNumber": 5590,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c"
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d"
   },
   "latestAuthenticatedReadOnlyRoutes": {
     "runId": 40049413302,
@@ -919,29 +958,33 @@
     }
   },
   "latestSourceTestValidation": {
-    "id": 40062404344,
-    "runNumber": 5589,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404344",
+    "id": 40070858136,
+    "runNumber": 5590,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c"
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d"
   },
   "latestPreviewValidation": {
-    "id": 40062404311,
-    "runNumber": 508,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311",
+    "id": 40070858169,
+    "runNumber": 517,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
     "workflow": "Admin Preview diagnostic smoke test",
     "status": "completed",
-    "conclusion": "failure",
-    "sha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "testedSha": "f085698531ae413f311d1a01336f1cfc8059ab4c",
-    "artifactId": 12548301227,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40062404311/artifacts/12548301227",
-    "failedStep": "Capture real source screenshots across responsive and theme matrix",
-    "failure": "Playwright expect(locator).toBeVisible() failed for #backdrop; expected visible, actual hidden; timeout 5000ms; one test failed",
-    "otherEvidence": "exact branch guard passed; checkout exact SHA passed; repository checks and automated tests passed; deployed read-only ADMIN GET diagnostic passed for /api/admin/session, orders, customers, warranties, audit-logs, settings, payment-qr; nonReadOnlyRequests=[]; exact-HEAD post-run guard passed; artifact upload passed"
+    "conclusion": "success",
+    "sha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "artifactId": 12551172629,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629",
+    "screenshotCount": 16,
+    "fixtureScreenshotCount": 120,
+    "fixtureMetricCount": 112,
+    "pageErrors": 0,
+    "sourceConsoleErrors": 0,
+    "failedRequests": 0,
+    "httpErrors": 0
   },
   "staticSecurityAudit": {
     "capturedAtUtc": "2026-10-24T02:42:00Z",
@@ -949,5 +992,18 @@
     "adminApiFilesInspected": 22,
     "missingRequireAdminConfirmed": 0,
     "notes": "Login/logout are intentional session endpoints; unsupported methods return 405. Read-only static audit, not a live authorization penetration test."
+  },
+  "status": "VALIDATE_5590_PASS_AND_PREVIEW_517_SUCCESS_ON_CAC4999611FEACECF80E9E980A8ACE0DD45E6F3D; WARRANTY_ISSUANCE_ORDER_STATUS_RACE_GUARDED; SCREEN_7_320PX_ACTION_GEOMETRY_FIXED",
+  "latestValidateAttemptUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
+  "latestPreviewAttemptUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
+  "currentChange": {
+    "status": "WARRANTY_ISSUANCE_RACE_GUARD_AND_SCREEN_7_NARROW_MOBILE_ACTION_FIXED; EXACT_SHA_VALIDATE_AND_PREVIEW_PASS",
+    "sourceAndTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
+    "validateRunId": 40070858136,
+    "validateRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
+    "previewRunId": 40070858169,
+    "previewRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
+    "artifactId": 12551172629,
+    "summary": "Atomic warranty issuance now rechecks order status='completed'. At ≤359px the Screen 7 primary action retains at least 88px and the secondary action at least 120px; test assertions and screenshot evidence pass."
   }
 }
