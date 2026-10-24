@@ -26,14 +26,27 @@ export async function onRequestPost(context) {
     }
     const transactionId=crypto.randomUUID();
     const statements=[
-      // Recheck the remaining net receipts inside the same atomic D1 batch to block concurrent over-refunds.
-      db.prepare("INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) SELECT ?,?,?,?,?,?,?,'admin' WHERE ? != 'refunded' OR ? <= (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)").bind(transactionId,orderId,requestId||null,direction,amount,reference,note,direction,amount,orderId),
+      // Recheck order state for receipts and remaining net receipts for refunds at the atomic D1 write boundary.
+      db.prepare(
+        "INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) " +
+        "SELECT ?,?,?,?,?,?,?,'admin' WHERE (? != 'refunded' OR ? <= " +
+        "(SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?))" +
+        (direction === "received"
+          ? " AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled' AND price_confirmation_required=0 AND total IS NOT NULL AND payment_terms_confirmed_at IS NOT NULL)"
+          : "")
+      ).bind(
+        transactionId,orderId,requestId||null,direction,amount,reference,note,
+        direction,amount,orderId,...(direction === "received" ? [orderId] : [])
+      ),
       db.prepare("UPDATE order_payment_requests SET status=CASE WHEN (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE payment_request_id=?)>=amount THEN 'settled' ELSE status END,updated_at=datetime('now') WHERE id=? AND status='pending' AND EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)").bind(requestId,requestId,transactionId),
       db.prepare("UPDATE orders SET payment_status=CASE WHEN total IS NOT NULL AND total>=0 AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)>=total AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)>0 THEN 'paid' WHEN (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)<=0 AND EXISTS(SELECT 1 FROM order_payment_transactions WHERE order_id=? AND direction='refunded') THEN 'refunded' WHEN (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)>0 THEN 'pending' ELSE 'unpaid' END,updated_at=datetime('now') WHERE id=? AND EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)").bind(orderId,orderId,orderId,orderId,orderId,orderId,transactionId),
       db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?,'admin',?,'order',?,? WHERE EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)").bind(crypto.randomUUID(),direction==="received"?"payment_received_verified":"payment_refund_verified",orderId,JSON.stringify({transactionId,requestId:requestId||null,direction,amount,reference,note}),transactionId)
     ];
     const results=await db.batch(statements);
-    if(Number(results?.[0]?.meta?.changes)===0)return fail("Số tiền hoàn vượt khoản đã nhận còn lại sau khi đối chiếu. Không ghi nhận giao dịch.",409);
+    if(Number(results?.[0]?.meta?.changes)===0) {
+      if(direction==="refunded")return fail("Số tiền hoàn vượt khoản đã nhận còn lại sau khi đối chiếu. Không ghi nhận giao dịch.",409);
+      return fail("Đơn hàng hoặc điều kiện thanh toán vừa thay đổi. Không ghi nhận khoản nhận; hãy tải lại đơn và kiểm tra trạng thái.",409);
+    }
     return json({ok:true,transactionId,message:direction==="received"?"Đã ghi nhận khoản tiền Admin đã đối chiếu thực tế.":"Đã ghi nhận khoản hoàn tiền đã đối chiếu thực tế."},201);
   } catch(error) {
     if(/UNIQUE constraint/i.test(String(error?.message||"")))return fail("Mã giao dịch này đã được ghi nhận trước đó.",409);

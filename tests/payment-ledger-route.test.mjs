@@ -75,7 +75,7 @@ function makeDb(options = {}) {
       batches.push(statements.map(s => ({ sql: s.sql, values: s.values })));
       if (options.failUnique) throw new Error("UNIQUE constraint failed: order_payment_transactions.transaction_reference");
       const atomicRefundRejected = Boolean(options.atomicRefundGuardReject
-        && statements[0]?.sql.includes("WHERE ? != 'refunded' OR ? <="));
+        && statements[0]?.sql.includes("WHERE (? != 'refunded' OR ? <="));
       const cancellationRace = Boolean(options.cancelUpdateHasNoChanges
         && statements[0]?.sql.includes("UPDATE order_payment_requests SET status='cancelled'"));
       if (options.simulateOrderChangedBeforeBatch) {
@@ -158,7 +158,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(response.status, 409, "concurrent refunds must not exceed the net receipt ledger");
   assert.equal(db.batches.length, 1);
   const statements = db.batches[0];
-  assert.match(statements[0].sql, /INSERT INTO order_payment_transactions[\s\S]*SELECT[\s\S]*WHERE \? != 'refunded' OR \? <=/);
+  assert.ok(statements[0].sql.includes("WHERE (? != 'refunded' OR ? <="), "the refund guard must remain atomic and parenthesized");
   assert.ok(statements.slice(1).every(statement => /EXISTS \(SELECT 1 FROM order_payment_transactions WHERE id=\?\)/.test(statement.sql)),
     "status updates and audit writes must be gated on successful ledger insertion");
 }
