@@ -516,7 +516,7 @@ assert.ok(
   mobileHeroReferenceMatch.includes("height:clamp(310px,85vw,330px)!important;") &&
   mobileHeroReferenceMatch.includes("object-fit:contain!important;object-position:center center!important"),
   "Mobile Hero must keep the original contained image at a balanced, compact size below the copy.");
-assert.ok(heroAssetDisplayLock.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
+assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
   && heroAssetDisplayLock.includes("radial-gradient(ellipse at 30% 28%")
   && mobileHeroReferenceMatch.includes("width:84%!important;height:11%!important;bottom:43%!important;")
   && mobileHeroReferenceMatch.includes("width:81%!important;height:9%!important;bottom:34%!important;"),
