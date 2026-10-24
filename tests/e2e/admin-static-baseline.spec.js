@@ -682,6 +682,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#backdrop')).toBeVisible();
     await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'false');
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
+    // Reference screen 4 uses a back affordance, not an X close icon, before returning to the product list.
+    await expect(page.locator('#editorClose')).toHaveAttribute('aria-label', 'Quay lại danh sách sản phẩm');
+    await expect(page.locator('#editorClose svg path').first()).toHaveAttribute('d', 'M15 18 9 12 15 6');
     await expect(page.locator('#pTitle')).toBeFocused();
     const assertProductTabsFit = async viewportWidth => {
       const layout = await page.locator('#productEditorTabs .editor-tab').evaluateAll(tabs =>
