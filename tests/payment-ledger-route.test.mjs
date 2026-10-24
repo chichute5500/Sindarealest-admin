@@ -86,6 +86,16 @@ function makeDb(options = {}) {
         };
         options.orderItems = [{ fulfillment_type: "made_to_order", quantity: 1, line_total: 200000 }];
       }
+      // Simulate a QR receiver/config rotation after preflight reads but before the atomic insert.
+      if (options.simulateQrConfigChangedBeforeBatch) {
+        options.settings = [
+          { key: "payment_qr_active", value: "1" },
+          { key: "payment_qr_active_key", value: "qr-550e8400-e29b-41d4-a716-446655440001.png" },
+          { key: "payment_qr_bank_name", value: "Ngân hàng mới" },
+          { key: "payment_qr_account_number", value: "9876543210" },
+          { key: "payment_qr_account_name", value: "NGUYEN VAN B" },
+        ];
+      }
       if (options.simulateOrderCancelledBeforeTransactionBatch) {
         options.order = { ...(options.order ?? baseOrder), status: "cancelled" };
       }
@@ -302,6 +312,16 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.ok(db.batches[0].some(s => s.sql.includes("INSERT INTO order_payment_requests")));
   assert.ok(db.batches[0].some(s => s.sql.includes("payment_request_created")));
   assert.doesNotMatch(JSON.stringify(db.batches[0]), /amount=(?:30000|100000)/, "QR config/ledger must not mutate QR image payload");
+}
+
+// QR config can rotate between preflight and D1 batch. A stale request must not be reported as created.
+{
+  const db = makeDb({ simulateQrConfigChangedBeforeBatch: true });
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
+    orderId: "order-1", paymentOption: "deposit"
+  })));
+  assert.equal(response.status, 409, "a concurrent QR/receiver configuration change must reject the stale payment request");
+  assert.equal(db.batches.length, 1, "the QR snapshot must be rechecked at the final atomic write boundary");
 }
 
 // An order can change after request preflight but before the atomic insert. Never commit a QR amount from the stale snapshot.
