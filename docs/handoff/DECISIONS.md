@@ -1,3 +1,12 @@
+## DECISION UPDATE — FEATURED PRODUCT CAROUSEL AUTOPLAY — 2026-10-24
+
+- Every automatically advancing `#featured` carousel must expose a persistent pause/resume control, not rely only on temporary hover/focus pauses.
+- Preserve the 3-second cadence and manual arrow controls when autoplay is enabled; clear the timer on pause; resume with one fresh interval; disable autoplay under `prefers-reduced-motion`; fail closed if the control is missing.
+- Implemented at `ecc541c5132bf7fc4bf3923ce1d35700ff437e6e`; CI https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994774; Preview deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994784; Preview https://1bae4b87.sindarealest2.pages.dev/.
+- Scope is limited to `#featured`; the owner-locked Collections slideshow, fullscreen gallery, Hero and other PASS/LOCKED scopes were not changed.
+
+---
+
 ## DECISION UPDATE — PRODUCT CARD ACTIVATION SEMANTICS — 2026-10-24
 
 - Do not place `div` or `h3` flow-content elements inside a native `button`.

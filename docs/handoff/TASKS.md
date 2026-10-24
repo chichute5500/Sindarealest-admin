@@ -1,3 +1,15 @@
+## LATEST TASK RESULT — FEATURED PRODUCT CAROUSEL PAUSE/RESUME — 2026-10-24
+
+- Concrete defect fixed: the `#featured` product-image carousel auto-advanced every 3 seconds with no persistent user pause control; pointer/focus only paused it temporarily.
+- Added a visible accessible pause/resume control, accurate `aria-pressed` and Vietnamese labels, and a reduced-motion disabled state. The autoplay timer is cleared on pause and recreated once on resume. Autoplay will not start when the control is missing.
+- Added runtime regression tests in `tests/storefront-accessibility-contract.test.mjs`.
+- CI PASS at exact SHA `ecc541c5132bf7fc4bf3923ce1d35700ff437e6e`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994774.
+- Preview deploy PASS at exact SHA `ecc541c5132bf7fc4bf3923ce1d35700ff437e6e`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994784; immutable Preview https://1bae4b87.sindarealest2.pages.dev/.
+- This is the featured-product carousel, not the paused fullscreen product-gallery flicker or locked Collections slideshow. No Hero, `#order`, catalog filter, warranty, or accepted-section edits.
+- No manual visual/device acceptance claimed. Continue autonomous report-then-continue protocol.
+
+---
+
 ## LATEST TASK RESULT — PRODUCT CARD KEYBOARD ACCESSIBILITY — 2026-10-24
 
 - Concrete markup defect fixed: flow-content descendants were nested inside a native product-card `button`.

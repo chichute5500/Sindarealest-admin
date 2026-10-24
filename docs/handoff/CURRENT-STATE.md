@@ -1,3 +1,19 @@
+## LATEST VERIFIED HANDOFF — FEATURED CAROUSEL AUTOPLAY ACCESSIBILITY — 2026-10-24
+
+- Final source + regression-test SHA: `ecc541c5132bf7fc4bf3923ce1d35700ff437e6e`.
+- Concrete defect: `#featured` product-image cards advanced automatically every 3 seconds, but there was no persistent pause/resume control. The old hover/focus pause was only temporary (6 seconds).
+- Added a visible header toggle using the existing icon-button style, with Vietnamese accessible labels, `aria-pressed`, play/pause glyphs, and permanent stop/resume. Reduced-motion disables autoplay and disables the toggle; if the pause control is missing, autoplay fails closed. Existing 3-second cadence and manual next/previous arrows remain.
+- Regression coverage added to `tests/storefront-accessibility-contract.test.mjs`: starts one timer, pause clears it, resume creates one fresh timer, resumed timer advances visible cards, reduced-motion prevents autoplay, and missing control prevents autoplay.
+- Exact-SHA CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994774. Exact-SHA Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994784.
+- Immutable Preview: https://1bae4b87.sindarealest2.pages.dev/; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy logs confirm exact `ecc541c5132bf7fc4bf3923ce1d35700ff437e6e`, Pages project `sindarealest2`, Production branch `main`; Preview only.
+- Hero and locked `#order` visual workflows were SKIPPED by guards. No manual visual/device acceptance is claimed.
+- Intermediate run `0c9a823` failed because the new test harness had a duplicate mock selector key; `4d502b9` fixed the replacement attempt but retained the single-`$` selector. Final `ecc541c5132bf7fc4bf3923ce1d35700ff437e6e` corrects both the production selector (`$$`) and the mock key; tests and deploy pass.
+- Dependency audit still reports 3 MODERATE `undici` advisories via `miniflare`/`wrangler`; CI threshold is high. `npm audit fix --force` would downgrade Wrangler to 4.35.0 (breaking change), so no dependency/config change was made.
+- PR #108 remains OPEN/unmerged. SKU verification and fullscreen gallery flicker remain paused; Hero and all accepted scopes remain locked.
+
+---
+
 ## LATEST VERIFIED HANDOFF — PRODUCT CARD KEYBOARD ACCESSIBILITY — 2026-10-24
 
 - Final source + regression-test SHA: `d59892143b5000f48b4b4b940545509f4cb6980a`.

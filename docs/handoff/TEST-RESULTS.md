@@ -1,3 +1,16 @@
+## LATEST EXACT-SHA TEST + DEPLOY RESULT — FEATURED CAROUSEL AUTOPLAY ACCESSIBILITY — 2026-10-24
+
+- Final source/test SHA: `ecc541c5132bf7fc4bf3923ce1d35700ff437e6e`.
+- CI PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994774. Full project integrity checks and automated tests passed, including runtime pause/resume, reduced-motion and missing-control cases.
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40042994784. Immutable Preview https://1bae4b87.sindarealest2.pages.dev/; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Deploy logs confirm exact source SHA, project `sindarealest2`, Production branch `main`; no Production deployment.
+- Intermediate test-harness failures were investigated and corrected; final run is green.
+- Hero/`#order` visual workflows were skipped by safety guards. No manual visual acceptance claimed.
+- Dependency audit reports 3 moderate `undici` advisories through `miniflare`/`wrangler`; no high/critical advisories. Forced remediation would downgrade Wrangler to 4.35.0, so dependency/config files were left unchanged.
+- PR #108 OPEN/unmerged; no Production/main changes. SKU and fullscreen gallery flicker remain paused; Hero and accepted scopes remain locked.
+
+---
+
 ## LATEST EXACT-SHA TEST + DEPLOY RESULT — PRODUCT CARD KEYBOARD ACCESSIBILITY — 2026-10-24
 
 - Final source/test SHA: `d59892143b5000f48b4b4b940545509f4cb6980a`.
