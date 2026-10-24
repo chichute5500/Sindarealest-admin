@@ -105,4 +105,10 @@ assert.ok(liveCapture.includes("async function auditHeroImage(page, label)")
   "The live audit must verify the authorized visible Hero presentation image.");
 
 assert.doesNotMatch(liveCapture, /skuUnavailableFallback|SD-GL052 is not present in the public verified product payload/);
+const finalMobileHero = html.slice(html.lastIndexOf("/* Mobile Hero reference-match v2:"));
+assert.ok(finalMobileHero.includes("height:clamp(310px,85vw,330px)!important;")
+  && finalMobileHero.includes("width:84%!important;height:11%!important;bottom:43%!important;")
+  && finalMobileHero.includes("width:81%!important;height:9%!important;bottom:34%!important;")
+  && heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;"),
+  "Final mobile Hero must balance size and restore the unblurred marble top.");
 console.log("PASS: owner-authorized Hero presentation PNG and restrained drop-shadow experiment are enforced.");

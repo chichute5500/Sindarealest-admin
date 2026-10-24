@@ -187,6 +187,11 @@ try {
           const copyRect = rect(copy);
           const frameRect = rect(frame);
           const imageStyle = getComputedStyle(image);
+          const topStyle = getComputedStyle(frame,'::before');
+          const frontStyle = getComputedStyle(frame,'::after');
+          const pedestal={oval:{content:topStyle.content,filter:topStyle.filter,background:topStyle.backgroundImage,
+            top:Number.parseFloat(topStyle.top),width:Number.parseFloat(topStyle.width),height:Number.parseFloat(topStyle.height)},
+            face:{content:frontStyle.content,top:Number.parseFloat(frontStyle.top),width:Number.parseFloat(frontStyle.width)}};
           const imageVisible = !image.hidden && imageStyle.display !== 'none'
             && imageStyle.visibility !== 'hidden' && Number.parseFloat(imageStyle.opacity || '1') > 0
             && imageRect.width > 1 && imageRect.height > 1;
@@ -293,7 +298,7 @@ try {
             objectFit: imageStyle.objectFit,
             objectPosition: imageStyle.objectPosition,
             filter: imageStyle.filter,
-            imageRect, frameRect, copyRect, visibleProductRect, alphaBounds, alphaStats, copyOverlap,
+            imageRect, frameRect, copyRect, visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal,
             productWithinHorizontalViewport: !visibleProductRect || (visibleProductRect.left >= -1 && visibleProductRect.right <= window.innerWidth + 1),
             expectedThemeApplied: rootDark === (args.theme === 'dark'),
             viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth },
@@ -319,6 +324,15 @@ try {
         if (!m.imageVisible || !m.frameVisible) fail('Hero image or frame is not visible.');
         if (m.objectFit !== 'contain') fail('Hero image object-fit is not contain.');
         if (m.viewport.width <= 390 && m.visibleProductRect && m.visibleProductRect.width < (m.viewport.width <= 360 ? 150 : 165)) fail('Mobile Hero product is too small compared with the reference image.');
+        if(m.viewport.width<=390){
+          const pl=m.pedestal;
+          if(!pl||pl.oval.content==='none'||pl.oval.filter!=='none'||pl.oval.background==='none'||!Number.isFinite(pl.oval.top)||!Number.isFinite(pl.face.top))
+            fail('Marble pedestal is suppressed by stale glow rules.');
+          else if(pl.oval.top/m.frameRect.height<.36||pl.oval.top/m.frameRect.height>.53
+            ||pl.face.top<=pl.oval.top||pl.face.top-pl.oval.top-pl.oval.height>10
+            ||pl.oval.width<m.frameRect.width*.7||pl.oval.width>m.frameRect.width*.95)
+            fail('Marble top/front are detached or incorrectly scaled.');
+        }
         if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < 320)) fail('Tablet Hero product is too small compared with the reference-led layout.');
         if (m.viewport.width >= 1001) {
           const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;

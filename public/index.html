@@ -3699,6 +3699,15 @@ html.dark #home .hero-visual::after{border-color:rgba(144,181,207,.58);backgroun
 
 #home.hero:after{content:none!important;display:none!important;background:none!important}
 
+/* Reinstate the real pedestal: the earlier important inset/blur/glow suppressed this oval. */
+#home .hero-visual::before{
+  inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;
+  background:linear-gradient(167deg,transparent 0 28%,rgba(139,169,189,.16) 29%,transparent 30% 55%,rgba(139,169,189,.12) 56%,transparent 57%),radial-gradient(ellipse at 30% 28%,rgba(255,255,255,.98),rgba(238,247,252,.96) 45%,rgba(204,222,235,.96) 100%)!important;
+}
+html.dark #home .hero-visual::before{
+  background:linear-gradient(167deg,transparent 0 28%,rgba(116,157,187,.20) 29%,transparent 30% 55%,rgba(116,157,187,.14) 56%,transparent 57%),radial-gradient(ellipse at 30% 28%,rgba(213,234,248,.96),rgba(137,171,196,.98) 48%,rgba(74,111,139,.98) 100%)!important;
+}
+
 /* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */
 #home .hero-visual img{position:relative!important;z-index:1!important;object-fit:contain!important;transform:none!important;opacity:1!important;mix-blend-mode:normal!important;mask-image:none!important;-webkit-mask:none!important;mask:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
 #home .hero-visual::before,
@@ -3773,15 +3782,15 @@ html.dark #home .hero-visual::after{border-color:rgba(144,181,207,.58);backgroun
   #home .hero-description{width:100%!important;max-width:34em!important;margin:0!important;font-size:clamp(12px,3.3vw,14px)!important;line-height:1.6!important}
   #home .hero-actions{display:flex!important;flex-wrap:wrap!important;width:100%!important;margin:14px 0 0!important;gap:10px!important}
   #home .hero-actions .pill-btn{min-height:42px!important;max-width:100%!important;padding:10px 16px!important;font-size:12px!important;white-space:nowrap!important}
-  #home .hero-visual{position:relative!important;grid-column:1!important;grid-row:2!important;justify-self:stretch!important;align-self:start!important;display:block!important;width:100%!important;max-width:100%!important;height:clamp(360px,100vw,390px)!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  #home .hero-visual img{position:relative!important;z-index:1!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:390px!important;margin:0!important;padding:0!important;object-fit:contain!important;object-position:center center!important;transform:none!important;mix-blend-mode:normal!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
-  #home .hero-visual::before{width:92%!important;height:9%!important;bottom:23%!important;transform:translateX(-50%) rotate(-2deg)!important}
-  #home .hero-visual::after{width:88%!important;height:7%!important;bottom:15%!important;transform:translateX(-50%) rotate(-2deg)!important}
+  #home .hero-visual{position:relative!important;grid-column:1!important;grid-row:2!important;justify-self:stretch!important;align-self:start!important;display:block!important;width:100%!important;max-width:100%!important;height:clamp(310px,85vw,330px)!important;min-height:0!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  #home .hero-visual img{position:relative!important;z-index:1!important;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:330px!important;margin:0!important;padding:0!important;object-fit:contain!important;object-position:center center!important;transform:none!important;mix-blend-mode:normal!important;opacity:1!important;border-radius:0!important;box-shadow:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
+  #home .hero-visual::before{width:84%!important;height:11%!important;bottom:43%!important;transform:translateX(-50%) rotate(-2deg)!important}
+  #home .hero-visual::after{width:81%!important;height:9%!important;bottom:34%!important;transform:translateX(-50%) rotate(-2deg)!important}
   #home .hero-visual-caption{display:none!important}
 }
 @media(max-width:390px){
   #home.hero.wrap{padding:18px 13px 10px!important}
   #home .hero h1{font-size:clamp(27px,7.4vw,30px)!important}
   #home .hero-description{font-size:12px!important}
-  #home .hero-visual{height:390px!important}
+  #home .hero-visual{height:clamp(310px,85vw,330px)!important}
 }
