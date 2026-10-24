@@ -219,11 +219,20 @@ try {
           let visibleProductRect = null;
           let copyOverlap = null;
           if (alphaBounds && !alphaBounds.error) {
+            // object-fit:contain may letterbox the bitmap inside a wider CSS box. Map PNG alpha
+            // coordinates to the actual rendered bitmap, not the entire img element's bounding box.
+            const scale = Math.min(imageRect.width / image.naturalWidth, imageRect.height / image.naturalHeight);
+            const bitmapRect = {
+              left: imageRect.left + (imageRect.width - image.naturalWidth * scale) / 2,
+              top: imageRect.top + (imageRect.height - image.naturalHeight * scale) / 2,
+              width: image.naturalWidth * scale,
+              height: image.naturalHeight * scale,
+            };
             visibleProductRect = {
-              left: imageRect.left + alphaBounds.left * imageRect.width,
-              right: imageRect.left + alphaBounds.right * imageRect.width,
-              top: imageRect.top + alphaBounds.top * imageRect.height,
-              bottom: imageRect.top + alphaBounds.bottom * imageRect.height,
+              left: bitmapRect.left + alphaBounds.left * bitmapRect.width,
+              right: bitmapRect.left + alphaBounds.right * bitmapRect.width,
+              top: bitmapRect.top + alphaBounds.top * bitmapRect.height,
+              bottom: bitmapRect.top + alphaBounds.bottom * bitmapRect.height,
             };
             visibleProductRect.width = visibleProductRect.right - visibleProductRect.left;
             visibleProductRect.height = visibleProductRect.bottom - visibleProductRect.top;
