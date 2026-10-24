@@ -13,6 +13,13 @@ assert.match(preview.response.headers.get("Content-Type"), /text\/plain/i);
 assert.equal(preview.body, "User-agent: *\nDisallow: /\n");
 assert.doesNotMatch(preview.body, /Allow: \/|Sitemap:/);
 
+// A terminal DNS dot is an alternate spelling of a fully qualified hostname;
+// it must not bypass the Preview crawl guard.
+const dottedPreview = await responseBody("https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev./robots.txt");
+assert.equal(dottedPreview.response.status, 200);
+assert.equal(dottedPreview.body, "User-agent: *\nDisallow: /\n");
+assert.doesNotMatch(dottedPreview.body, /Allow: \/|Sitemap:/);
+
 // The project's production Pages hostname must retain the existing crawl rules and sitemap.
 const primary = await responseBody("https://sindarealest2.pages.dev/robots.txt");
 assert.match(primary.body, /Allow: \/\n/);
@@ -25,4 +32,4 @@ const custom = await responseBody("https://shop.example/robots.txt");
 assert.match(custom.body, /Allow: \/\n/);
 assert.match(custom.body, /Sitemap: https:\/\/shop\.example\/sitemap\.xml/);
 
-console.log("PASS: robots.txt blocks non-production Pages previews while retaining production crawl rules.");
+console.log("PASS: robots.txt blocks Preview hostnames, including terminal-dot variants, while retaining production crawl rules.");

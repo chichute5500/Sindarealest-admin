@@ -1,7 +1,10 @@
 export async function onRequestGet({ request }) {
   const url = new URL(request.url);
-  const previewHost = url.hostname.endsWith(".sindarealest2.pages.dev")
-    && url.hostname !== "sindarealest2.pages.dev";
+  // DNS FQDN notation permits a terminal dot. Normalize it for host classification
+  // so it cannot bypass the preview-only crawl guard.
+  const hostname = url.hostname.replace(/\.$/, "");
+  const previewHost = hostname.endsWith(".sindarealest2.pages.dev")
+    && hostname !== "sindarealest2.pages.dev";
   const headers = {
     "Content-Type": "text/plain; charset=utf-8",
     "Cache-Control": "public, max-age=3600",
