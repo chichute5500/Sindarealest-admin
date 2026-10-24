@@ -1,0 +1,325 @@
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { chromium } from 'playwright';
+import { buildCloudflareAccessHeaders } from './cloudflare-access-service-token.mjs';
+import { isApprovedPreviewExternalRead } from './preview-external-read-allowlist.mjs';
+
+const expectedBranch = 'fix/liquid-glass-audit-2026-10-19';
+const expectedAssetPath = '/images/hero-upload/tb_image_share_1792519964514-blended.png';
+const requestedUrl = process.env.PREVIEW_URL || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/';
+const expectedSha = String(process.env.GITHUB_SHA || '').trim();
+const branch = String(process.env.GITHUB_REF_NAME || '').trim();
+const outputDir = path.resolve('artifacts/hero-preview-audit');
+
+function requirePreviewUrl(value) {
+  const url = new URL(value);
+  if (url.protocol !== 'https:'
+      || url.hostname !== 'fix-liquid-glass-audit-2026.sindarealest2.pages.dev'
+      || url.pathname !== '/' || url.search || url.hash || url.username || url.password) {
+    throw new Error('Refused: Hero audit is restricted to the approved non-production Preview alias.');
+  }
+  return url;
+}
+function safeUrl(raw) {
+  try {
+    const url = new URL(raw);
+    return url.origin === preview.origin ? url.pathname : url.origin + url.pathname;
+  } catch {
+    return '[unparseable-url]';
+  }
+}
+function intersect(a, b) {
+  const width = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+  const height = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  return { width, height, area: width * height };
+}
+
+const preview = requirePreviewUrl(requestedUrl);
+if (branch !== expectedBranch || !/^[a-f0-9]{40}$/i.test(expectedSha)) {
+  throw new Error('Refused: expected the exact authorized fix branch and a full source SHA.');
+}
+await fs.mkdir(outputDir, { recursive: true });
+const accessHeaders = buildCloudflareAccessHeaders();
+const audit = {
+  auditType: 'hero-only-preview-browser-audit',
+  sourceSha: expectedSha,
+  branch,
+  previewUrl: preview.origin,
+  assetPath: expectedAssetPath,
+  requiredViewports: [
+    { name: 'mobile-390', width: 390, height: 844 },
+    { name: 'tablet-768', width: 768, height: 1024 },
+    { name: 'desktop-1440', width: 1440, height: 900 },
+  ],
+  themes: ['light', 'dark'],
+  results: [],
+  consoleErrors: [],
+  pageErrors: [],
+  sameOriginHttpErrors: [],
+  sameOriginFailedRequests: [],
+  blockedExternalRequests: [],
+  readOnlyViolations: [],
+  expectedBlockedExternalWarnings: [],
+  capturedAt: new Date().toISOString(),
+};
+const browser = await chromium.launch({ headless: true });
+try {
+  for (const viewport of audit.requiredViewports) {
+    for (const theme of audit.themes) {
+      const label = viewport.name + '-' + theme;
+      const context = await browser.newContext({
+        viewport: { width: viewport.width, height: viewport.height },
+        deviceScaleFactor: 1,
+        colorScheme: theme,
+        reducedMotion: 'reduce',
+      });
+      const page = await context.newPage();
+      const imageResponses = [];
+      const blockedForContext = [];
+      await context.addInitScript((selectedTheme) => {
+        try { localStorage.setItem('sd-theme-mode', selectedTheme); } catch {}
+      }, theme);
+
+      await page.route('**/*', async (route) => {
+        const request = route.request();
+        let url;
+        try { url = new URL(request.url()); } catch {
+          audit.readOnlyViolations.push({ context: label, url: '[unparseable-url]', method: request.method() });
+          await route.abort('blockedbyclient');
+          return;
+        }
+        if (url.origin === preview.origin) {
+          if (!['GET', 'HEAD'].includes(request.method().toUpperCase())) {
+            audit.readOnlyViolations.push({ context: label, url: safeUrl(request.url()), method: request.method() });
+            await route.abort('blockedbyclient');
+            return;
+          }
+          await route.continue({ headers: { ...request.headers(), ...accessHeaders } });
+          return;
+        }
+        if (isApprovedPreviewExternalRead(request.url(), request.method())) {
+          await route.continue();
+          return;
+        }
+        const blocked = { context: label, origin: url.origin, path: url.pathname, method: request.method() };
+        audit.blockedExternalRequests.push(blocked);
+        blockedForContext.push(blocked);
+        await route.abort('blockedbyclient');
+      });
+
+      page.on('response', (response) => {
+        let url;
+        try { url = new URL(response.url()); } catch { return; }
+        if (url.origin === preview.origin && response.status() >= 400) {
+          audit.sameOriginHttpErrors.push({
+            context: label, status: response.status(), url: safeUrl(response.url()),
+          });
+        }
+        if (url.origin === preview.origin && url.pathname === expectedAssetPath) {
+          imageResponses.push({ status: response.status(), path: url.pathname });
+        }
+      });
+      page.on('requestfailed', (request) => {
+        let url;
+        try { url = new URL(request.url()); } catch { return; }
+        if (url.origin === preview.origin) {
+          audit.sameOriginFailedRequests.push({
+            context: label, url: safeUrl(request.url()), failure: request.failure()?.errorText || 'unknown',
+          });
+        }
+      });
+      page.on('console', (message) => {
+        if (message.type() !== 'error') return;
+        const text = message.text().slice(0, 500);
+        if (/cloudflareinsights|ERR_BLOCKED_BY_CLIENT/i.test(text)) {
+          audit.expectedBlockedExternalWarnings.push({ context: label, message: text });
+        } else {
+          audit.consoleErrors.push({ context: label, message: text, url: safeUrl(message.location()?.url || preview.origin) });
+        }
+      });
+      page.on('pageerror', (error) => {
+        audit.pageErrors.push({ context: label, message: String(error.message || error).slice(0, 500) });
+      });
+
+      let result = { context: label, viewport, theme, pass: false, failures: [] };
+      try {
+        const response = await page.goto(preview.href, { waitUntil: 'domcontentloaded', timeout: 45000 });
+        result.documentStatus = response?.status() ?? null;
+        if (!response || !response.ok()) throw new Error('Preview document did not return HTTP 2xx.');
+        await page.waitForFunction((assetPath) => {
+          const image = document.querySelector('#heroProductImage');
+          return Boolean(image && !image.hidden
+            && (image.getAttribute('src') || '').endsWith(assetPath)
+            && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0);
+        }, expectedAssetPath, { timeout: 25000 });
+        await page.locator('#heroProductImage').evaluate((image) => image.decode());
+        await page.waitForFunction(() => {
+          const splash = document.querySelector('#welcomeSplash');
+          if (!splash) return true;
+          const style = getComputedStyle(splash);
+          return splash.hidden || style.display === 'none' || style.visibility === 'hidden'
+            || Number.parseFloat(style.opacity || '1') < 0.01;
+        }, null, { timeout: 12000 });
+        await page.evaluate((selectedTheme) => {
+          const root = document.documentElement;
+          root.dataset.themeMode = selectedTheme;
+          root.classList.toggle('dark', selectedTheme === 'dark');
+          root.classList.remove('theme-transitioning');
+          const meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.content = selectedTheme === 'dark' ? '#061522' : '#eaf3fb';
+        }, theme);
+        await page.waitForTimeout(300);
+
+        result.metrics = await page.evaluate((args) => {
+          const image = document.querySelector('#heroProductImage');
+          const frame = document.querySelector('#home .hero-visual');
+          const copy = document.querySelector('#home .hero-copy');
+          const hero = document.querySelector('#home.hero');
+          const rect = (element) => {
+            if (!element) return null;
+            const r = element.getBoundingClientRect();
+            return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+          };
+          if (!image || !frame || !copy || !hero) return { structurePresent: false };
+          const imageRect = rect(image);
+          const copyRect = rect(copy);
+          const frameRect = rect(frame);
+          const imageStyle = getComputedStyle(image);
+          const imageVisible = !image.hidden && imageStyle.display !== 'none'
+            && imageStyle.visibility !== 'hidden' && Number.parseFloat(imageStyle.opacity || '1') > 0
+            && imageRect.width > 1 && imageRect.height > 1;
+          let alphaBounds = null;
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(image, 0, 0);
+            const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
+            for (let index = 3, pixel = 0; index < pixels.length; index += 4, pixel++) {
+              if (pixels[index] > 16) {
+                const x = pixel % canvas.width;
+                const y = Math.floor(pixel / canvas.width);
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+              }
+            }
+            if (maxX >= minX && maxY >= minY) {
+              alphaBounds = {
+                left: minX / canvas.width, right: (maxX + 1) / canvas.width,
+                top: minY / canvas.height, bottom: (maxY + 1) / canvas.height,
+              };
+            }
+          } catch (error) {
+            alphaBounds = { error: String(error.message || error).slice(0, 200) };
+          }
+          let visibleProductRect = null;
+          let copyOverlap = null;
+          if (alphaBounds && !alphaBounds.error) {
+            visibleProductRect = {
+              left: imageRect.left + alphaBounds.left * imageRect.width,
+              right: imageRect.left + alphaBounds.right * imageRect.width,
+              top: imageRect.top + alphaBounds.top * imageRect.height,
+              bottom: imageRect.top + alphaBounds.bottom * imageRect.height,
+            };
+            visibleProductRect.width = visibleProductRect.right - visibleProductRect.left;
+            visibleProductRect.height = visibleProductRect.bottom - visibleProductRect.top;
+            copyOverlap = (() => {
+              const width = Math.max(0, Math.min(visibleProductRect.right, copyRect.right) - Math.max(visibleProductRect.left, copyRect.left));
+              const height = Math.max(0, Math.min(visibleProductRect.bottom, copyRect.bottom) - Math.max(visibleProductRect.top, copyRect.top));
+              return { width, height, area: width * height };
+            })();
+          }
+          const rootDark = document.documentElement.classList.contains('dark');
+          return {
+            source: image.getAttribute('src') || '',
+            currentSrcPath: (() => { try { return new URL(image.currentSrc).pathname; } catch { return ''; } })(),
+            status: image.dataset.productImageStatus || '',
+            hidden: image.hidden,
+            complete: image.complete,
+            naturalWidth: image.naturalWidth,
+            naturalHeight: image.naturalHeight,
+            imageVisible,
+            frameVisible: getComputedStyle(frame).display !== 'none' && frameRect.width > 1 && frameRect.height > 1,
+            objectFit: imageStyle.objectFit,
+            objectPosition: imageStyle.objectPosition,
+            filter: imageStyle.filter,
+            imageRect, frameRect, copyRect, visibleProductRect, alphaBounds, copyOverlap,
+            productWithinHorizontalViewport: !visibleProductRect || (visibleProductRect.left >= -1 && visibleProductRect.right <= window.innerWidth + 1),
+            expectedThemeApplied: rootDark === (args.theme === 'dark'),
+            viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth },
+            noHorizontalPageOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
+          };
+        }, { theme });
+
+        const m = result.metrics;
+        const fail = (message) => result.failures.push(message);
+        if (!m.source.endsWith(expectedAssetPath) || m.currentSrcPath !== expectedAssetPath) fail('Wrong Hero PNG source.');
+        if (m.status !== 'owner-presentation-image-active') fail('Hero presentation-image status is not active.');
+        if (m.hidden || !m.complete || m.naturalWidth < 1 || m.naturalHeight < 1) fail('Hero PNG is hidden, undecoded, or has zero natural dimensions.');
+        if (!m.imageVisible || !m.frameVisible) fail('Hero image or frame is not visible.');
+        if (m.objectFit !== 'contain') fail('Hero image object-fit is not contain.');
+        if (!String(m.filter).includes('drop-shadow')) fail('Hero image is missing the restrained drop shadow.');
+        if (!m.expectedThemeApplied) fail('Requested light/dark theme was not applied.');
+        if (!m.productWithinHorizontalViewport) fail('Visible shoe pixels extend beyond the viewport horizontally.');
+        if (m.copyOverlap && m.copyOverlap.area > 1) fail('Visible shoe pixels overlap Hero copy.');
+        if (!m.alphaBounds || m.alphaBounds.error) fail('Could not inspect the PNG alpha silhouette in-browser.');
+        if (!m.noHorizontalPageOverflow) fail('Hero layout creates horizontal page overflow.');
+        if (!imageResponses.some((entry) => entry.status === 200)) fail('The Hero PNG did not return HTTP 200.');
+        if (audit.readOnlyViolations.some((entry) => entry.context === label)) fail('A write/non-GET request was attempted and blocked.');
+        if (audit.sameOriginHttpErrors.some((entry) => entry.context === label && entry.url === expectedAssetPath)) fail('The Hero PNG response returned an HTTP error.');
+        const filename = label + '-hero.png';
+        await page.locator('#home').screenshot({
+          path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000,
+        });
+        result.screenshot = filename;
+        result.imageResponse = imageResponses;
+      } catch (error) {
+        result.failures.push(String(error.message || error).slice(0, 700));
+      }
+      result.pass = result.failures.length === 0;
+      result.blockedExternalRequestCount = blockedForContext.length;
+      audit.results.push(result);
+      await context.close();
+    }
+  }
+} finally {
+  await browser.close();
+}
+audit.hardFailures = [
+  ...audit.results.filter((item) => !item.pass).map((item) => item.context + ': ' + item.failures.join('; ')),
+  ...audit.pageErrors.map((item) => item.context + ': page error: ' + item.message),
+  ...audit.consoleErrors.map((item) => item.context + ': console error: ' + item.message),
+  ...audit.sameOriginHttpErrors.filter((item) => item.url === '/' || item.url === expectedAssetPath)
+    .map((item) => item.context + ': HTTP ' + item.status + ' ' + item.url),
+  ...audit.sameOriginFailedRequests.filter((item) => item.url === '/' || item.url === expectedAssetPath)
+    .map((item) => item.context + ': failed request ' + item.url + ' (' + item.failure + ')'),
+  ...audit.readOnlyViolations.map((item) => item.context + ': blocked non-read request ' + item.method + ' ' + item.url),
+];
+audit.passed = audit.results.length === 6
+  && audit.results.every((item) => item.pass)
+  && audit.hardFailures.length === 0;
+audit.completedAt = new Date().toISOString();
+await fs.writeFile(path.join(outputDir, 'hero-audit.json'), JSON.stringify(audit, null, 2) + '\n');
+console.log(JSON.stringify({
+  passed: audit.passed,
+  sourceSha: audit.sourceSha,
+  previewUrl: audit.previewUrl,
+  contexts: audit.results.map((item) => ({
+    context: item.context, pass: item.pass, failures: item.failures,
+    naturalWidth: item.metrics?.naturalWidth, naturalHeight: item.metrics?.naturalHeight,
+    objectFit: item.metrics?.objectFit, filter: item.metrics?.filter,
+    copyOverlap: item.metrics?.copyOverlap, screenshot: item.screenshot,
+  })),
+  consoleErrors: audit.consoleErrors.length,
+  pageErrors: audit.pageErrors.length,
+  relevantHttpErrors: audit.hardFailures.filter((item) => /HTTP /.test(item)).length,
+  sameOriginFailedRequests: audit.sameOriginFailedRequests.length,
+  blockedExternalRequests: audit.blockedExternalRequests.length,
+  readOnlyViolations: audit.readOnlyViolations.length,
+  report: 'artifacts/hero-preview-audit/hero-audit.json',
+}));
+if (!audit.passed) process.exitCode = 1;
