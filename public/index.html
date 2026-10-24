@@ -3732,6 +3732,13 @@ html.dark #home .hero-visual::after{border-color:rgba(144,181,207,.58);backgroun
 }
 
 
+
+/* Tablet Hero scale correction: account for the transparent margins inside the original PNG. */
+@media(min-width:761px) and (max-width:1000px){
+  #home .hero-visual{height:650px!important;min-height:650px!important;overflow:visible!important}
+  #home .hero-visual img{width:auto!important;height:auto!important;max-width:none!important;max-height:650px!important;object-fit:contain!important;object-position:center!important}
+}
+
 /* Mobile Hero rebuild: readable copy first, complete product presentation second.
    This final mobile-only override restores an unclipped copy-first layout; desktop/tablet rules remain untouched. */
 @media(max-width:760px){
