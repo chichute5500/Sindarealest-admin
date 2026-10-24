@@ -1,6 +1,16 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 ## Read this and continue the project immediately
 
+## Latest verified live findings — 2026-10-24 17:35 UTC
+
+- Current source and regression test SHA `904962ed1b4f94f14ba133ebf23227a40f098696`. **Live Preview remains on app SHA `564ea556e6dee745eaaa491ee033a2a8cfbb595c`**; source fix not deployed.
+- Real Admin PATCH order pricing/terms **503** reproduced in [QA #40115863792](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40115863792). Found extra SQL bind for non-cancelled order updates; removed at `68439bcd8d75e17930af275dc0f55acc5ff1c6a4`, bound-count regression corrected and PASS on `904962ed1b4f94f14ba133ebf23227a40f098696`. [QA #40116556468](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40116556468) still FAILS this live test because it exercises **old deployed code**, with two successful run-owned cleanup passes and other QA/screens PASS. **Do not call live order save accepted**.
+- 12-screen prior screenshots contained identical mislabeled Customers/Orders image on mobile. New heading wait, screenshot SHA256 and duplicate-image checks produced [read-only PASS #40116556561](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40116556561), artifact [#12570155268](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40116556561/artifacts/12570155268); **not pixel parity** to approved reference.
+- Exact-SHA push/PR Validate and Playwright and Preview diagnostic PASS: #40116556533, #40116560310, #40116560321, #40116560350, #40116556616. No new deploy authorized. Acceptance remains **50% PROVISIONAL**, all 12 `PARTIAL_NOT_ACCEPTED`, reference `NOT_VERIFIED`, Production unchanged.
+- Next user-only gating action: explicit authorization for **isolated Preview-only redeployment** of corrected app source, followed by real QA rerun; without authorization continue safe offline tests only. Keep original PR #111 OPEN, #108 read-only, #112 draft untouched. Before any write, **fetch live** branch HEAD, PR and Actions and use expected-SHA guard.
+
+
+
 Continue directly in GitHub repository `chichute5500/Sindarealest-admin`; canonical entry point [START-HERE.md](START-HERE.md), latest records [LATEST-STATUS.md](LATEST-STATUS.md), [12-SCREEN-REFERENCE-AUDIT.md](12-SCREEN-REFERENCE-AUDIT.md), [current-status.json](current-status.json), [latest-test-results.json](latest-test-results.json). **Do not ask user to paste the conversation.** The user wants execution, concurrent safe investigations, concise evidence-based reports, then automatic continuation within the current turn. Stop only for actual owner-only action.
 
 ### Verified checkpoint (2026-10-24 16:40 UTC)

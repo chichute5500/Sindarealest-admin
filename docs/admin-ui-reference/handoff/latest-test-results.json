@@ -1,21 +1,22 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T16:40:36Z",
+  "capturedAtUtc": "2026-10-24T17:35:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
-  "codeTestSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+  "branchHeadAtCheckpointStart": "904962ed1b4f94f14ba133ebf23227a40f098696",
+  "codeTestSha": "904962ed1b4f94f14ba133ebf23227a40f098696",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "48_SCREEN_CAPTURES_PRODUCT_AND_WARRANTY_QA_WRITE_PASS_BACKUP_GET_PASS_NO_QA_REMAINS_PARITY_NOT_ACCEPTED",
   "latestRun": {
-    "id": 40112502171,
+    "id": 40116556468,
     "workflow": "Owner-approved synthetic D1 QA and complete 12-screen captures",
     "status": "completed",
-    "conclusion": "success",
-    "sha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171",
-    "artifactId": 12567645472
+    "conclusion": "failure",
+    "sha": "904962ed1b4f94f14ba133ebf23227a40f098696",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40116556468",
+    "artifactId": 12569750356,
+    "failure": "QA-owned Admin order price/terms PATCH returns HTTP 503 on stale deployed Preview; two cleanup passes verified zero rows"
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_EXACT_SHA_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
@@ -204,7 +205,7 @@
     },
     "8_customers": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Synthetic retry recovery passes current suite; live customer backend not tested."
+      "gap": "Former Customers screenshot duplicated Orders; heading wait and SHA256 uniqueness regression PASS on exact source SHA. Reference parity NOT_VERIFIED."
     },
     "9_warranty_support": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -241,8 +242,8 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
-  "testedCommitSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+  "latestCodeCommitSha": "904962ed1b4f94f14ba133ebf23227a40f098696",
+  "testedCommitSha": "904962ed1b4f94f14ba133ebf23227a40f098696",
   "capturedAt": "2026-10-24T01:53:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
   "checks": {
@@ -1147,5 +1148,33 @@
     ],
     "progressPercent": 50,
     "progressStatus": "PROVISIONAL"
+  },
+  "latestDiscoveredOrderAndVisualEvidence": {
+    "observedAtUtc": "2026-10-24T17:35:00Z",
+    "sourceAndTestSha": "904962ed1b4f94f14ba133ebf23227a40f098696",
+    "deployedApplicationSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
+    "codeCi": "VALIDATE_AND_PR_PLAYWRIGHT_ALL_PASS",
+    "validatePushRunId": 40116556533,
+    "validatePrRunId": 40116560310,
+    "previewPrRunId": 40116560321,
+    "isolatedPreviewPrRunId": 40116560350,
+    "diagnosticRunId": 40116556616,
+    "visualEvidenceRunId": 40116556561,
+    "visualEvidenceArtifactId": 12570155268,
+    "correctScreenNavigationAndUniqueCapture": "QA_TEST_PASS_NOT_APPROVED_REFERENCE_PARITY",
+    "previousMislabeledScreenshot": "390x844 light Customers screenshot duplicated Orders before async view completion",
+    "liveOrderQaRunId": 40116556468,
+    "liveOrderQaStatus": "FAIL_HTTP_503_STALE_DEPLOYED_APP",
+    "firstRedOrderQaRunId": 40115863792,
+    "sourceBug": "orderUpdateValues pushed redundant bound parameter on non-cancelled UPDATE",
+    "sourceFixCommit": "68439bcd8d75e17930af275dc0f55acc5ff1c6a4",
+    "sourceFixRegressions": "PASS_ON_SOURCE_SHA_NOT_DEPLOYED",
+    "productWriteAndD1": "PASS_QA_ONLY",
+    "warrantyClaimWriteAndD1": "PASS_QA_ONLY",
+    "backupRead": "PASS_GET_ONLY",
+    "cleanup": "ZERO_QA_ROWS_SEVEN_TABLES_DOUBLE_VERIFIED",
+    "noDeployOrProductionMutation": true,
+    "approvalNeeded": "NEW_EXPLICIT_OWNER_AUTH_FOR_ISOLATED_PREVIEW_REDEPLOY",
+    "acceptance": "50% PROVISIONAL; 12 partial screens; visual parity not verified; order write not accepted; production not performed"
   }
 }
