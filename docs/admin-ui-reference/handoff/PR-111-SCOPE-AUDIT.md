@@ -1,13 +1,14 @@
 # PR #111 SCOPE / PROVENANCE AUDIT
 
-## Live checkpoint
+## Live checkpoint — 2026-10-24 10:48 UTC
 - Repository: `chichute5500/Sindarealest-admin`.
-- PR #111 OPEN/unmerged; branch `feature/admin-isolated-handoff-2026-10-20`; checkpoint HEAD `c5677623d9723f266cda40ba32f18b12ef862f1f`; main/base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`.
-- PR API snapshot: **394 changed files, +39,201 / -212**. Re-fetch live state before acting.
-- Source/test SHA `bb001c7d047a94058a6c028a6748e5849a19442b`: Validate [#39888898010](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898010) SUCCESS; Preview [#39888898083](https://github.com/chichute5500/Sindarealest-admin/actions/runs/39888898083) SUCCESS on exact same SHA.
-- PR #108 OPEN/unmerged and READ-ONLY; last observed head `051c8db495282abbf5e6a97f332b64d9ff263e1e`; 286 files, +20,545 / -394.
+- Feature branch HEAD: `40badfd95a100bc8124b4252eb042ceb03eadc6b`; live `main` ref: `227622d3e3b7c75724ffa1775b193da71089269a`.
+- PR #111: [OPEN/unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111); head matches feature branch; base ref `main`; API base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`; current PR API diff snapshot: **494 files, +46349 / -223**.
+- **Base metadata discrepancy:** live `main` is one commit ahead of PR API base SHA. Do not merge/rebase; refresh live refs and inspect the PR diff before any PR-level decision. PR API currently reports mergeable/clean, but that is not permission to merge.
+- PR #108 remains OPEN/unmerged and READ-ONLY; PR #112 remains OPEN/draft and must not be edited.
+- This document's categorized census below is a **historical snapshot** from an earlier 394-path diff, not a current breakdown of the live 494-path diff. Do not treat those old category counts as current; recompute from live PR file pages before using them for a new cleanup decision.
 
-## Changed-path census — 394 paths
+## Changed-path census — 394 paths (historical snapshot; not current live PR diff)
 
 | Area | Files | Disposition |
 |---|---:|---|
