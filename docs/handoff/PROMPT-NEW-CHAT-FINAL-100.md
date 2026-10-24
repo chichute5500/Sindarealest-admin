@@ -220,3 +220,29 @@ All 10 browser contexts passed: 360×800, 390×844, 768×1024, 1280×800 and 144
 
 Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
 PR #108: OPEN/unmerged, base main, 302 changed paths. Do not merge, edit main, deploy Production, or modify gallery/other PASS/LOCKED areas. No project-wide 100% claim while reference/device acceptance and existing PR scope blockers remain unresolved.
+
+# HERO MOBILE REFERENCE-FIX — VERIFIED 2026-10-24
+
+Latest runtime/test/Preview source SHA: `39337ab66bf411c8ca354c5a09670724226584c8`. PR #108 remains OPEN/unmerged; do not merge, touch main/Production, or modify other locked areas.
+
+## Root causes fixed
+- The prior mobile image rule used `margin-top:-140px`, shifting shoe pixels into the CTA/copy area and cropping the product at the frame edge.
+- The previous 330px frame still clipped the bottom of the product/plinth at 360–390px.
+- `tests/storefront-reference-parity.test.mjs` retained an obsolete assertion referencing undefined `mobileHeroRebuild`, causing CI to fail with ReferenceError.
+
+## Final implementation
+- Mobile image retains natural aspect ratio and uses the original owner-supplied RGBA PNG unchanged.
+- Removed negative vertical margin; kept the image horizontally enlarged to 120% and centered via `margin-left:-10%`.
+- Final mobile visual frame: `height:clamp(360px,100vw,390px)`; narrow mobile frame 390px, so the full visible product/plinth fits.
+- Updated the two Hero-related regression tests and removed the stale undefined-variable assertion.
+
+## Exact-SHA evidence
+- Validate/source tests PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40103752991
+- Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40103752988
+- Hero-only live Preview Playwright audit PASS (10 contexts): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40103753008
+- Screenshot/report artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40103753008/artifacts/12563713172
+- Captured contexts: 360x800, 390x844, 768x1024, 1280x800 and 1440x900, light and dark. All 10 passed; copy overlap area 0; no horizontal page overflow; image request HTTP 200; console/page errors 0; same-origin HTTP/failed-request errors 0; read-only violations 0.
+- Manually opened the actual Playwright screenshots for mobile 360 and 390. The full shoe pair and plinth are visible, and no longer overlap the copy/CTA or get clipped at the bottom.
+
+## Remaining gate
+Automated checks and screenshot self-review PASS for this exact source SHA. Owner's physical-phone visual acceptance remains PENDING; do not label Hero OWNER-ACCEPTED or LOCKED until the owner explicitly accepts the Preview. Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
