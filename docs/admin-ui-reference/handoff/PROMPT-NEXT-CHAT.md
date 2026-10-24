@@ -2,17 +2,16 @@
 
 Continue directly on GitHub repository `chichute5500/Sindarealest-admin`. Do not ask the user to repeat context. Verify live state first and continue useful work after reporting.
 
-## Live verified checkpoint — 2026-10-24 09:30 UTC
-
-**Handoff SHA semantics:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` was the live branch HEAD at the start of this documentation sync. The handoff-only commits made afterward change documentation/status snapshots only; they do not change source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`. Always fetch the live PR head before starting the next action; never treat the checkpoint-start SHA as the current live HEAD.
+## Live checkpoint — 2026-10-24 09:36 UTC
 
 - Writable branch: `feature/admin-isolated-handoff-2026-10-20`.
-- Current branch HEAD: `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` (documentation-only update to current-status.json).
-- Latest source/test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932` — cancellation race guard for order-item writes.
-- Validate #5688 PASS on source/test SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
-- Admin Preview Playwright #1077 PASS on the same source/test SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
-- PR #111 OPEN/unmerged; do not merge, rebase, cherry-pick, or force-push. Write only to the feature branch. PR #108/#112 and storefront/main are read-only.
-- Recent fix: order cancellation's order-item updates now also guard against a pending QR payment request, avoiding a partial state where cancellation is rejected but item writes might proceed. Test/Validate and Preview Playwright pass at exact SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`.
+- PR #111 was OPEN/unmerged at checkpoint capture; refresh PR metadata and branch HEAD before further action.
+- Latest application/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
+- Validate #5688 PASS on that exact source/test SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Admin Preview Playwright #1077 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
+- Latest docs checkpoint at capture: `e5736c5542863fc23e5e235f5eaacc8c1374f325`. Validate #5721 failed because `current-status.json` lacked required `entryPoint`; Preview Playwright #1091 passed. The canonical field has now been restored; re-run/inspect validation on the newest HEAD before claiming all-green.
+- Recent source fix: order-item updates are blocked if cancellation is requested while a pending QR payment request exists, closing a partial-write race. Source/test exact-SHA checks passed.
+- Progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; approved-reference parity NOT_VERIFIED; authenticated business-write/persistence QA NOT_TESTED; remote Preview D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
 
 ## Mandatory seven operating rules
 
