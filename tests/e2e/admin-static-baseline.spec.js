@@ -1980,6 +1980,19 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           'Screen 7 primary order action should remain visible in the 390×844 reference viewport without scrolling: ' +
           JSON.stringify(actionGeometry)).toBe(true);
       }
+      if (orderDetailViewportWidth <= 359) {
+        const actionWidths = await page.locator('.order-detail-page-actions').evaluate(container => {
+          const primary = container.querySelector('.btn.primary')?.getBoundingClientRect();
+          const secondary = container.querySelector('[data-action="order-detail-to-row"]')?.getBoundingClientRect();
+          return { primary: primary?.width ?? 0, secondary: secondary?.width ?? 0, viewport: window.innerWidth };
+        });
+        expect(actionWidths.primary,
+          'At 320px, Screen 7 primary action must not collapse into a narrow vertical button: ' +
+          JSON.stringify(actionWidths)).toBeGreaterThanOrEqual(88);
+        expect(actionWidths.secondary,
+          'At 320px, Screen 7 secondary action must remain wide enough to read and tap: ' +
+          JSON.stringify(actionWidths)).toBeGreaterThanOrEqual(120);
+      }
       if (orderDetailViewportWidth <= 820) {
         await expect(page.locator('.mobiletabs')).toBeVisible();
       } else {
