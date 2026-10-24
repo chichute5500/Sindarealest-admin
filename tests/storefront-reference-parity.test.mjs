@@ -182,7 +182,7 @@ const hero = html.slice(heroStart, heroEnd);
 assert.ok(hero.includes('<img id="heroProductImage"'), 'The real product image remains dynamically populated.');
 assert.ok(hero.includes('<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">'),
   'The hero starts hidden in static markup so the approved presentation asset can be assigned by runtime; catalog SKU availability is not a gate.');
-const heroSync = html.match(/function syncHeroProductImage\\(\\)\\{([\\s\\S]*?)\\}\\s*function renderFeatured/)?.[1] || '';
+const heroSync = html.match(/function syncHeroProductImage\(\)\{([\s\S]*?)\}\s*function renderFeatured/)?.[1] || '';
 assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-presentation-image-active'")
   && heroSync.includes("target.hidden=false")
   && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'"),
