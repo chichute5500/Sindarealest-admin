@@ -68,8 +68,8 @@ async function verifyDeployedPreview(url, publicSha, currentHead) {
   assert.equal(proof.requestedPreviewUrl, url.origin);
   assert.equal(proof.deployment.environment, 'preview');
   assert.equal(proof.deployment.branch, EXPECTED_BRANCH);
-  assert.equal(String(proof.deployment.commitHash || '').toLowerCase(), publicSha,
-    'Preview deployment SHA must exactly equal the latest public/index.html source SHA.');
+  assert.equal(String(proof.deployment.commitHash || '').toLowerCase(), currentHead,
+    'The live Preview deployment SHA must exactly equal this browser-audit workflow commit.');
   const aliasMatch = (proof.deployment.aliases || []).some((alias) => {
     try { return new URL(alias).origin === url.origin; } catch { return false; }
   });
@@ -369,7 +369,8 @@ async function main() {
   const deployment = await verifyDeployedPreview(previewUrl, publicSha, headSha);
   report.deployedPreviewSha = deployment.deployment.commitHash;
   report.deploymentVerified = true;
-  assert.equal(report.deployedPreviewSha, publicSha);
+  assert.equal(report.deployedPreviewSha, headSha,
+    'The deployment SHA must equal the tested workflow commit, whose public tree was checked against the last source commit.');
   await writeReport();
 
   browser = await chromium.launch({ headless: true });

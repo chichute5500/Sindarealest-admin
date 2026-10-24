@@ -52,8 +52,21 @@ jobs:
           EXPECTED_DEPLOYMENT_BRANCH: fix/liquid-glass-audit-2026-10-19
         run: |
           set -euo pipefail
-          export EXPECTED_DEPLOYMENT_SHA="$(git log -1 --format=%H -- public/index.html)"
-          node scripts/verify-cloudflare-preview-deployment.mjs
+          export EXPECTED_DEPLOYMENT_SHA="$GITHUB_SHA"
+          verified=0
+          for attempt in $(seq 1 18); do
+            if node scripts/verify-cloudflare-preview-deployment.mjs > /tmp/preview-verify.log 2>&1; then
+              cat /tmp/preview-verify.log
+              verified=1
+              break
+            fi
+            echo "Preview alias has not yet reached this exact commit; retry $attempt/18."
+            sleep 10
+          done
+          if [ "$verified" -ne 1 ]; then
+            cat /tmp/preview-verify.log
+            exit 1
+          fi
 
       - name: Run gallery-only browser audit
         run: node scripts/audit-fullscreen-gallery-preview.mjs
