@@ -680,6 +680,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await chooseTheme(variant.theme);
     await page.locator('[data-action="edit"]:visible').first().click();
     await expect(page.locator('#backdrop')).toBeVisible();
+    expect(pageErrors, 'Opening Product Editor must not throw a browser JavaScript error').toEqual([]);
     await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'false');
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
     // Reference screen 4 uses a back affordance, not an X close icon, before returning to the product list.
