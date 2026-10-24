@@ -76,6 +76,14 @@ export async function onRequestPatch(context) {
   try {
     const existing = await context.env.DB.prepare("SELECT id FROM orders WHERE id=?").bind(id).first();
     if (!existing) return fail("Không tìm thấy đơn hàng.", 404);
+    // A cancelled order cannot accept a verified receipt while its QR request remains pending.
+    // Require explicit QR cancellation before cancelling the order, then recheck at UPDATE time below.
+    if (status === "cancelled") {
+      const pendingRequest = await context.env.DB.prepare(
+        "SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' LIMIT 1"
+      ).bind(id).first();
+      if (pendingRequest) return fail("Không thể hủy đơn khi yêu cầu QR còn chờ. Hãy hủy yêu cầu QR trước rồi thử lại.", 409);
+    }
     const itemResult = await context.env.DB.prepare("SELECT id,quantity,unit_price FROM order_items WHERE order_id=?").bind(id).all();
     const items = itemResult.results || [];
     const itemMap = new Map(items.map(item => [item.id, { ...item, unit_price: item.unit_price === null || item.unit_price === undefined ? null : Number(item.unit_price) }]));
@@ -131,12 +139,14 @@ export async function onRequestPatch(context) {
       "payment_terms_confirmed_at=CASE WHEN ?=1 THEN ? WHEN ?=1 THEN NULL ELSE payment_terms_confirmed_at END," +
       "payment_terms_confirmed_by=CASE WHEN ?=1 THEN 'admin' WHEN ?=1 THEN '' ELSE payment_terms_confirmed_by END," +
       "payment_terms_note=CASE WHEN ?=1 THEN ? ELSE payment_terms_note END,updated_at=datetime('now') WHERE id=?" +
-      (priceChanged ? priceGuardSql : "");
+      (priceChanged ? priceGuardSql : "") +
+      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : "");
     const orderUpdateValues = [
       status,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
       priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id
     ];
     if (priceChanged) orderUpdateValues.push(id,id);
+    if (status === "cancelled") orderUpdateValues.push(id);
     statements.push(context.env.DB.prepare(orderUpdateSql).bind(...orderUpdateValues));
 
     const auditDetails = JSON.stringify({
@@ -150,16 +160,24 @@ export async function onRequestPatch(context) {
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
         "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
         "WHERE NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?) " +
-        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
+        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') " +
+        "AND changes()=1"
       ).bind(crypto.randomUUID(),id,auditDetails,id,id));
+    } else if (status === "cancelled") {
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
+        "WHERE changes()=1 AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
+      ).bind(crypto.randomUUID(),id,auditDetails,id));
     } else {
       statements.push(context.env.DB.prepare(
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'order_updated', 'order', ?, ?)"
       ).bind(crypto.randomUUID(),id,auditDetails));
     }
     const batchResults = await context.env.DB.batch(statements);
-    if (priceChanged && Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
-      return fail("Giá không thể thay đổi vì đơn đã phát sinh giao dịch hoặc yêu cầu QR đang chờ. Không có thay đổi nào được lưu; hãy hủy yêu cầu QR hoặc đối soát giao dịch trước.",409);
+    if ((priceChanged || status === "cancelled") && Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
+      if (priceChanged) return fail("Giá không thể thay đổi vì đơn đã phát sinh giao dịch hoặc yêu cầu QR đang chờ. Không có thay đổi nào được lưu; hãy hủy yêu cầu QR hoặc đối soát giao dịch trước.",409);
+      return fail("Không thể hủy đơn vì yêu cầu QR đang chờ hoặc đơn vừa thay đổi. Hãy hủy yêu cầu QR trước rồi tải lại đơn.",409);
     }
     await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (termsConfirmed ? " · Đã xác nhận điều kiện" : ""), url: "/admin/" });
     return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, message: allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
