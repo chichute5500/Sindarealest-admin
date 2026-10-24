@@ -1,5 +1,20 @@
 # LIVE HANDOFF UPDATE — 2026-10-24 10:00 UTC
 
+**Verified source/test checkpoint:** branch `feature/admin-isolated-handoff-2026-10-20` was at `66bdd5e0ba5f41daa1de49c46f485e5042edb831` before this docs-only sync; PR #111 is OPEN/unmerged, live `main` ref is `227622d3e3b7c75724ffa1775b193da71089269a`. This commit updates handoff files only; refresh live branch/PR/Actions HEAD before the next operation.
+
+- **QR-payment race fixed test-first.** Regression-only commit `de95760eafc4740ffb20a66b283b71b2c57290b7` made Validate #5756 fail precisely: payment-request creation returned HTTP 201 instead of expected 409 when QR/account settings rotated between preflight and write. Fix + test commit `66bdd5e0ba5f41daa1de49c46f485e5042edb831` adds atomic checks for active status, QR key, bank name, account number and account name at INSERT. Validate #5758 PASS and Admin Preview Playwright #1108 PASS on the exact same source/test SHA.
+- **Read-only Preview diagnostic PASS on the same SHA:** [run #535](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565); [artifact admin-preview-evidence-535](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498). The workflow's exact-HEAD guard passed. Authenticated dashboard/product UI and 7/7 GET-only admin endpoints returned expected responses; catalog reported 235 products and all 527 stored image URLs decoded. No product mutation requests were sent. Orders, customers, warranties and audit-log arrays were empty.
+- **Screenshot evidence:** artifact contains 16 source login captures (8 viewports × light/dark) and 120 synthetic UI-fixture screenshot entries (116 unique module captures), plus 112 UI fixture metrics and the approved mobile-reference collage. The source/login and fixture captures reported no horizontal overflow; the fixture browser recorded seven expected simulated HTTP 503 retry-path console entries, with zero page errors/API fixture errors and zero attempted writes/unexpected paths. This is source/fixture evidence, not authenticated end-to-end parity proof.
+- **Reference comparison:** visually inspected the approved 12-screen montage and current source fixture contact sheet. The product-gallery fixture still uses synthetic placeholders/grid thumbnails versus the reference's image-led view and horizontal thumbnail rail; fixtures cannot establish actual live data presentation. Keep all 12 screens PARTIAL_NOT_ACCEPTED and parity NOT_VERIFIED.
+- **Acceptance unchanged:** 50% PROVISIONAL; authenticated business-write/persistence QA NOT_TESTED; remote Preview D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED. No remote writes, migration, deploy, merge or PR base change occurred.
+
+## Canonical handoff
+Read `docs/admin-ui-reference/handoff/START-HERE.md` first, then `PROMPT-NEXT-CHAT.md`. Fetch live state before acting; source/test SHA and documentation-only branch HEAD must remain distinct.
+
+---
+
+# LIVE HANDOFF UPDATE — 2026-10-24 10:00 UTC
+
 **Live state at refresh start:** PR #111 was OPEN/unmerged, branch HEAD `e7d974c87af1889ccceae459beeb08d45d7da6ec`. Latest application/source-test SHA remains `cf340b686e0974ac5602b6ef4594c00e477c8932`.
 
 - Validate #5688 PASS on source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892

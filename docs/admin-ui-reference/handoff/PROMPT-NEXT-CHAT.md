@@ -2,16 +2,17 @@
 
 Continue directly on GitHub repository `chichute5500/Sindarealest-admin`. Do not ask the user to repeat context. Verify live state first and continue useful work after reporting.
 
-## Live checkpoint — 2026-10-24 10:00 UTC
+## Live checkpoint — 2026-10-24 10:00 UTC (refreshed)
 
-- Writable branch: `feature/admin-isolated-handoff-2026-10-20`; refresh live PR metadata/HEAD after this handoff-only commit.
-- PR #111 is OPEN/unmerged; do not merge, rebase, cherry-pick, or force-push.
-- Branch HEAD at refresh start: `e7d974c87af1889ccceae459beeb08d45d7da6ec` (docs/source history may advance with this handoff sync). Application/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
-- Validate #5688 PASS on that exact SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
-- Admin Preview Playwright #1077 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
-- Handoff metadata was repaired after Validate #5721 found missing `handoffSync.entryPoint` / `handoffSync.nextChatPrompt`. Validate #5733 and Admin Preview Playwright #1097 both PASS on docs-only SHA `5f7a9d94858a02faaea003e2a9ea6386d507121f`.
-- Recent source fix: order-item updates are blocked if cancellation is requested while a pending QR payment request exists, closing a partial-write race.
-- Progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; approved-reference parity NOT_VERIFIED; authenticated business-write/persistence QA NOT_TESTED; remote Preview D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Source/test checkpoint SHA: `66bdd5e0ba5f41daa1de49c46f485e5042edb831`; this handoff refresh is a docs-only commit following that SHA, so refresh live HEAD before subsequent writes.
+- PR #111 remains OPEN/unmerged. Do not merge, rebase, cherry-pick, or force-push. Live `main` ref at this checkpoint: `227622d3e3b7c75724ffa1775b193da71089269a`.
+- Validate #5758 PASS on exact source/test SHA `66bdd5e0ba5f41daa1de49c46f485e5042edb831`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238
+- Admin Preview Playwright #1108 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292
+- Admin Preview diagnostic #535 PASS on the same SHA; authenticated read-only routes 7/7, product catalog 235 rows, 527 image URLs decoded, zero mutation requests, and exact branch HEAD guard PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565
+- Screenshot/evidence artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498. 16 real source login captures across 8 viewport sizes and 2 themes; 120 synthetic UI-fixture screenshot entries/112 metrics. Reference parity remains NOT_VERIFIED because fixture screenshots use synthetic data and are not pixel-equivalent accepted screen captures.
+- QR receiver-rotation race: test-first red run #5756 (201 instead of 409) followed by SQL guard fix; regression passes in Validate #5758.
+- Acceptance remains 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+- **Next:** fetch live state; continue screen-by-screen approved-reference review and read-only payment/order/warranty review. Source changes still require a new reproducible defect, regression first, then exact-SHA Validate + Preview evidence.
 
 ## Mandatory seven operating rules
 
@@ -35,16 +36,17 @@ Continue directly on GitHub repository `chichute5500/Sindarealest-admin`. Do not
 
 ## Latest verified CI — 2026-10-24 10:00 UTC
 
-- Validate #5688 PASS on exact application/source-test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
-- Admin Preview Playwright #1077 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
-- Validate #5733 and Admin Preview Playwright #1097 PASS on docs-only SHA `5f7a9d94858a02faaea003e2a9ea6386d507121f`; this validates handoff integrity fields, not business acceptance.
+- Validate #5758 PASS on exact source/test SHA `66bdd5e0ba5f41daa1de49c46f485e5042edb831`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238
+- Admin Preview Playwright #1108 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292
+- Admin Preview diagnostic #535 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565; evidence artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498. Source screenshot matrix, remote login/dashboard/catalog check, 7 read-only endpoint checks and exact-HEAD guard all passed.
+- Validate #5756 on test-only commit `de95760eafc4740ffb20a66b283b71b2c57290b7` failed as intended: regression reproduced the stale-QR race (actual 201; expected 409). The fix is present in `66bdd5e0ba5f41daa1de49c46f485e5042edb831` and passed Validate.
+- Do not describe read-only GET results or synthetic fixtures as business-write/persistence QA.
 
 ## Next actions — continue without asking the user
 
-1. Refresh PR #111, branch HEAD, main, and Actions after any new commits.
-2. Parallel stream A: continue read-only payment/order/warranty concurrency review, including cancellation/payment-request/receipt idempotency and warranty issuance gates. Change source only after a new reproducible defect and regression.
-3. Parallel stream B: obtain valid screenshots on the latest source SHA and compare all 12 screens against the approved reference at matching viewports/themes. Do not claim parity from synthetic fixture artifacts alone.
-4. Parallel stream C: audit workflow/PR isolation and exact-HEAD guard; do not dispatch a deployment or touch remote state.
-5. After verified progress, update `START-HERE.md`, this prompt, `LATEST-STATUS.md`, `current-status.json`, `latest-test-results.json`, and the screen audit. Keep source/test SHA separate from documentation-only HEAD.
+1. Refresh live PR #111, branch HEAD, `main`, and Actions after this docs-only commit; preserve PR #111 OPEN/unmerged.
+2. Continue approved-reference review for all 12 screens at matching viewport/theme. Use artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498; fixtures do not count as acceptance, and parity remains NOT_VERIFIED.
+3. Continue read-only payment/order/warranty race review. Reproduce a new concrete defect and add regression test before any source change.
+4. Maintain the boundary: authenticated business-write/persistence QA NOT_TESTED; remote Preview D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED. Never touch remote writes/secrets/Access/DNS or dispatch a deployment.
 
-**Canonical entry point:** `docs/admin-ui-reference/handoff/START-HERE.md`
+**Canonical entry point:** `docs/admin-ui-reference/handoff/START-HERE.md`.
