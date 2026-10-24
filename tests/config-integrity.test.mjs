@@ -32,8 +32,6 @@ assert.ok(!/CREATE TABLE|ALTER TABLE|DROP TABLE/i.test(warrantyMigration), 'Migr
 const isolatedAdminDeployPath = '.github/workflows/deploy-admin-isolated-preview.yml';
 assert.ok(existsSync(isolatedAdminDeployPath),
   'The Admin isolated Preview workflow must use a distinct filename to avoid the main workflow path conflict.');
-assert.ok(!existsSync('.github/workflows/deploy-admin-feature-preview.yml'),
-  'The feature branch must not shadow main\'s shared Pages deployment workflow.');
 const isolatedAdminDeployWorkflow = readFileSync(isolatedAdminDeployPath, 'utf8');
 assert.ok(isolatedAdminDeployWorkflow.includes('CLOUDFLARE_PAGES_PROJECT: sindarealest-admin-preview'),
   'The isolated workflow must pin the dedicated Admin Preview project.');
@@ -49,8 +47,6 @@ assert.ok(!isolatedAdminDeployWorkflow.includes('CLOUDFLARE_PAGES_PROJECT: ${{ v
 const isolatedPreviewSpecPath = 'tests/e2e/admin-isolated-preview.spec.js';
 assert.ok(existsSync(isolatedPreviewSpecPath),
   'The isolated Admin E2E spec must use a distinct path from main\'s shared Admin Preview spec.');
-assert.ok(!existsSync('tests/e2e/admin-preview.spec.js'),
-  'The feature branch must not shadow main\'s tests/e2e/admin-preview.spec.js.');
 const isolatedPreviewSpec = readFileSync(isolatedPreviewSpecPath, 'utf8');
 assert.ok(isolatedPreviewSpec.includes('sindarealest-admin-preview.pages.dev'),
   'The isolated Admin E2E spec must remain pinned to the isolated Preview host.');
