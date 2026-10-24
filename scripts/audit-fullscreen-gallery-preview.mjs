@@ -84,6 +84,24 @@ async function tap(locator, mobile) {
   if (mobile) await locator.tap({ timeout: 10000 });
   else await locator.click({ timeout: 10000 });
 }
+async function assertFullscreenSettled(page, label) {
+  await page.waitForTimeout(450);
+  const state = await page.evaluate(() => {
+    const viewer = document.querySelector('#sdFullscreenViewer');
+    const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
+    return { viewerOpen: !!viewer && viewer.classList.contains('open'),
+      images: images.map((image) => ({ id: image.id, active: image.classList.contains('is-active'),
+        fadeIn: image.classList.contains('sd-fade-in'), fadeOut: image.classList.contains('sd-fade-out'),
+        decoded: image.complete && image.naturalWidth > 0, opacity: getComputedStyle(image).opacity })) };
+  });
+  const active = state.images.filter((image) => image.active);
+  const staleFade = state.images.filter((image) => image.fadeIn || image.fadeOut);
+  assert.equal(state.viewerOpen, true, label + ': fullscreen viewer unexpectedly closed; state=' + JSON.stringify(state));
+  assert.equal(active.length, 1, label + ': expected exactly one active photo after fade; state=' + JSON.stringify(state));
+  assert.equal(active[0].decoded, true, label + ': active photo is not decoded; state=' + JSON.stringify(state));
+  assert.equal(staleFade.length, 0, label + ': stale fade classes remain after settling; state=' + JSON.stringify(state));
+}
+
 async function activateAndVerifyCounter(page, activate, delta, label) {
   const beforeText = String(await page.locator('#sdFullscreenCount').textContent() || '').trim();
   const beforeMatch = beforeText.match(/(\d+)\s*\/\s*(\d+)/);
@@ -364,14 +382,7 @@ async function runViewport(viewport) {
     rapidCounterSequence.push(await activateAndVerifyCounter(page, () => tap(next, viewport.mobile), 1, viewport.name + ' rapid tap 1 next'));
     rapidCounterSequence.push(await activateAndVerifyCounter(page, () => tap(next, viewport.mobile), 1, viewport.name + ' rapid tap 2 next'));
     rapidCounterSequence.push(await activateAndVerifyCounter(page, () => tap(prev, viewport.mobile), -1, viewport.name + ' rapid tap 3 previous'));
-    await page.waitForFunction(() => {
-      const viewer = document.querySelector('#sdFullscreenViewer');
-      const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
-      return viewer && viewer.classList.contains('open')
-        && images.filter((image) => image.classList.contains('is-active')).length === 1
-        && images.every((image) => !image.classList.contains('sd-fade-in'))
-        && images.some((image) => image.classList.contains('is-active') && image.complete && image.naturalWidth > 0);
-    }, null, { timeout: 8000 });
+    await assertFullscreenSettled(page, viewport.name + ' rapid next-next-previous');
     const rapid = await page.evaluate(() => {
       const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
       return {
