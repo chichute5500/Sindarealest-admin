@@ -1,3 +1,41 @@
+# CURRENT VERIFIED CHECKPOINT — 2026-10-24 07:11 UTC
+
+**Repository:** `chichute5500/Sindarealest-admin`  
+**Writable branch:** `feature/admin-isolated-handoff-2026-10-20`  
+**Exact source/test SHA:** `e55088d89632ff84ec68715cdee3ef64c1a9e964`  
+**Validate #5636:** PASS — [run 40072885703](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40072885703)  
+**Admin Preview #521:** SUCCESS on the same SHA — [run 40072885497](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40072885497)  
+**Evidence artifact:** [admin-preview-evidence-521](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40072885497/artifacts/12552355429)
+
+## Verified code and tests
+
+1. **QR upload atomicity:** new test-first regression failed on SHA `2b274f8054f93a3506c6d5e7e0a94220aaafe2ec`; CI #5634 and Preview #520 showed the handler performed zero D1 batches and the pointer/audit were separate writes. Fix on the tested SHA `e55088d89632ff84ec68715cdee3ef64c1a9e964` uses one D1 batch for the pending-key upsert plus audit record, and deletes only the just-staged random R2 object if that batch fails. Regression checks both success and failure paths; active QR key/status must stay unchanged on failure.
+2. **QR activation race guard:** existing QR activation uses a compare-and-swap on pending key and bank-draft snapshot; follow-on settings/audit writes are guarded by `changes()=1`. A local SQLite simulation verified stale pending key changes cause zero follow-on writes, while unchanged valid state activates successfully. This is a local simulation, not remote D1 access.
+3. **Warranty issuance race:** atomic warranty insert rechecks the order remains `completed` at write time.
+4. **Screen 7 narrow phone layout:** Playwright previously reproduced the primary order button at 28.7px on 320px; the narrow CSS and regression assertions are retained.
+
+## Live Preview evidence and boundaries
+
+- Exact-SHA Validate and Preview both pass on `e55088d89632ff84ec68715cdee3ef64c1a9e964`.
+- Preview local source screenshot matrix: 16 source screenshots, 120 synthetic UI-fixture screenshots, 112 fixture layout metrics; source page errors, source console errors, failed requests and HTTP errors are zero. Fixture tests use synthetic IDs and block all non-GET requests; seven fixture console entries are expected from simulated retry-path failures.
+- Deployed diagnostic result: `PASS_LOGIN_CSS_SIGNATURE`. Read-only authenticated Preview checks returned HTTP 200 for all 7 Admin GET routes: session, orders, customers, warranties, audit logs, settings and payment QR. Product list: 235 rows; 527 relative image URLs decoded; pagination, search/category/publication filters and detail editor passed. No business mutation requests were sent.
+- **No real business-write/persistence test is claimed.** Remote D1 schema/ledger remains `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`.
+- Overall progress remains **50% PROVISIONAL**. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; approved-reference parity remains `NOT_VERIFIED`; Production remains `NOT_PERFORMED`.
+
+## PR #111 blocker
+
+PR #111 remains **OPEN and unmerged**. Its branch is seven commits behind current `main`; the independently added `.github/workflows/deploy-admin-feature-preview.yml` exists on both sides with incompatible deployment targets: the feature version pins `sindarealest-admin-preview`, whereas `main` targets `sindarealest2`. Do not replace one with the other, merge/rebase/cherry-pick, force-push, or write to `main`/storefront. Conflict resolution remains read-only until a branch-only solution is validated and verified.
+
+## Continue immediately
+
+1. Keep working on independent read-only PR/conflict analysis and reference-driven Admin screen comparison using artifact #521; make no speculative visual changes.
+2. Continue test-first source reviews for concurrency/error paths and run exact-SHA Validate + Preview after any source change.
+3. Preserve all safety rules: no production deploy, remote D1/R2 writes or migrations, secrets/Access/DNS changes, or Access bypass. Do not make a docs-only commit while a Preview exact-HEAD guard is in progress.
+
+**Single entry point:** `docs/admin-ui-reference/handoff/START-HERE.md`  
+**Next-chat instructions:** `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`
+
+---
 # CURRENT VERIFIED CHECKPOINT — 2026-10-24
 
 **Allowed branch:** `feature/admin-isolated-handoff-2026-10-20`  
