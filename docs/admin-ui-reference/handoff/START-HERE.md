@@ -1,5 +1,12 @@
 # SINDAREALEST ADMIN — LIVE HANDOFF
 
+## CHECKPOINT — 2026-10-25: EXACT VIEWPORT PNG EVIDENCE + VISUAL FINDINGS
+
+- Prior head `41637e02cfe676b7512a5a0b67e28ea83df78bd8`: **7/7 workflow conclusions SUCCESS**: Validate #40124576175/#40124572854, Playwright #40124576202/#40124576136, diagnostic #40124572623, isolated read-only 12-screen #40124572733, synthetic D1+cleanup #40124572580. Last QA log confirms cleanup ran twice with zero run-owned rows across seven tables; QA screenshot artifact #12572298914 and read-only artifact #12572785300.
+- Extracted approved `admin-mobile-reference.png` and latest QA screenshots for manual qualitative comparison. Findings (login controls, Dashboard revenue-empty state, Gallery upload vs settled state, Customers fixture counts, fullPage capture mismatch) are tracked in [WEIGHTED-ACCEPTANCE.md](WEIGHTED-ACCEPTANCE.md) / [weighted-acceptance.json](weighted-acceptance.json). **Reference parity still 0/12 accepted**; weighted evidenced score 32/100 (not project completion).
+- This new code revision fixes capture reproducibility: screenshot PNGs must be exactly 390×844 or 1280×800 for each matrix; `fullPage:false` and PNG IHDR dimensions enforced. Unlike prior full-scroll PNG files, this yields comparable viewport images. New SHA CI remains to be verified after commit. No Admin runtime code/deploy changes.
+
+
 ## CHECKPOINT — 2026-10-25: WEIGHTED ACCEPTANCE + QA EVIDENCE HARDENING
 
 - New [weighted acceptance table](WEIGHTED-ACCEPTANCE.md) and [machine-readable rubric](weighted-acceptance.json): **32/100 evidence-weighted criteria have verified QA**, **68/100 not accepted**, **0/12 approved-reference visual parity signed off**. The historic `50% PROVISIONAL` remains unchanged and is NOT a computed completion percentage.

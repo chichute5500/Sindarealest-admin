@@ -297,5 +297,40 @@
   ],
   "evidencedWeight": 32,
   "unacceptedWeight": 68,
-  "screensAcceptedAgainstApprovedReference": 0
+  "screensAcceptedAgainstApprovedReference": 0,
+  "visualInspection": {
+    "approvedReferenceAsset": "docs/admin-ui-reference/admin-mobile-reference.png",
+    "referenceNature": "1024x1536 composite design with 12 mobile conceptual screens",
+    "evidenceSource": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40124572580/artifacts/12572298914",
+    "baselineScreenshotsSha": "41637e02cfe676b7512a5a0b67e28ea83df78bd8",
+    "comparisonStatus": "QUALITATIVE_PARTIAL_NOT_ACCEPTED",
+    "findings": [
+      {
+        "screen": "01_login",
+        "type": "CONTROL_DIFFERENCE",
+        "finding": "The concept includes remember-login and forgot-password controls; actual login intentionally does not show these controls. Security/auth implications require deliberate design decision."
+      },
+      {
+        "screen": "02_dashboard",
+        "type": "STATE_DIFFERENCE",
+        "finding": "Concept shows a revenue trend graph; live screenshot correctly shows a no-revenue-data state instead of fabricated sales."
+      },
+      {
+        "screen": "05_product_gallery",
+        "type": "STATE_DIFFERENCE",
+        "finding": "Concept shows an active upload progress state; six-photo fixture shows static existing photos, not an in-flight upload."
+      },
+      {
+        "screen": "08_customers",
+        "type": "DATA_MISMATCH",
+        "finding": "Concept has six populated customer examples; isolated QA capture has a single run-owned customer fixture."
+      },
+      {
+        "screen": "04_product_editor",
+        "type": "EVIDENCE_CAPTURE_DEFECT",
+        "finding": "Previous fullPage screenshots included scrolling product list behind the editor; viewport-only PNG capture added to enable controlled comparison."
+      }
+    ],
+    "nextAction": "Capture exact same viewport/dataset/theme; do not claim pixel parity or owner acceptance from synthetic QA screenshots."
+  }
 }

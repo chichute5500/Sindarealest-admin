@@ -129,6 +129,8 @@ assert.equal(rubric.screensAcceptedAgainstApprovedReference,0,'No 12-screen refe
 assert.ok(!rubric.sections[0].criteria.some(c=>c.status==='PASS_EVIDENCED'),'Screenshot capture must not count as approved visual parity');
 assert.ok(captureSpec.includes('QA_DEPLOYED_APP_SHA') && captureSpec.includes("deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST'"),'Screenshot evidence must not pin an old deployed application SHA');
 assert.ok(captureSpec.includes('No screenshot may pass with document horizontal overflow'),'Capture test must fail for page overflow');
+assert.ok(captureSpec.includes('fullPage:false') && !captureSpec.includes('fullPage:true'),'12-screen reference capture must stay viewport matched');
+assert.ok(captureSpec.includes('readUInt32BE(16)') && captureSpec.includes('readUInt32BE(20)'),'Capture must verify actual PNG pixel dimensions');
 assert.ok(startHere.includes('weighted-acceptance.json')&&nextPrompt.includes('weighted-acceptance.json')&&latestStatusDoc.includes('weighted-acceptance.json')&&screenAudit.includes('weighted-acceptance.json'),'All four handoff Markdown files must reference the weighted rubric');
 assert.equal(status.weightedAcceptance.evidencedWeight,rubric.evidencedWeight,'current-status must match weighted rubric');
 assert.equal(results.weightedAcceptance.evidencedWeight,rubric.evidencedWeight,'latest-test-results must match weighted rubric');

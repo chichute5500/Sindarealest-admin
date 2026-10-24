@@ -62,3 +62,15 @@
 | owner_12_screen_final_signoff | NOT_ACCEPTED | 5 | Owner has not approved exact same-data reference parity |
 
 **Bước kế tiếp:** tăng kiểm thử và đối chiếu Dashboard/Customers/editor/Gallery ở cả desktop/mobile; thực hiện Restore POST và QR/R2 chỉ trên môi trường dùng một lần có bảo đảm cô lập; chạy lại đánh giá trọng số sau khi có bằng chứng mới.
+
+## Trực tiếp quan sát ảnh mẫu và ảnh QA — 2026-10-25
+
+Đã trích xuất ảnh thiết kế chuẩn từ [artifact Gallery](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122361977/artifacts/12571935719), cùng 48 ảnh QA trên commit `41637e02cfe676b7512a5a0b67e28ea83df78bd8`. Đây là đối chiếu **định tính**, chưa phải so cùng trạng thái dữ liệu:
+
+- Login: mẫu có 'Ghi nhớ đăng nhập' và 'Quên mật khẩu'; bản chạy không có. Không thêm chức năng đăng nhập nhạy cảm chỉ để trông giống mẫu.
+- Dashboard: mẫu có biểu đồ doanh thu; màn hình thực tế hiển thị trạng thái không có số liệu. Không bịa dữ liệu doanh thu.
+- Gallery: mẫu minh họa quá trình tải ảnh; fixture Gallery chụp trạng thái có sẵn sáu ảnh. Không đánh đồng hai trạng thái.
+- Khách hàng: mẫu có sáu ví dụ; QA live chỉ có một hồ sơ thử nghiệm, do đó chưa cùng dữ liệu để so pixel.
+- **Lỗi bằng chứng đã xác định:** ảnh `fullPage` của editor/Gallery có cả danh sách sản phẩm phía dưới modal, nhiều PNG dài hơn viewport. Bài kiểm thử được sửa để chụp đúng viewport 390×844 hoặc 1280×800 và đọc trực tiếp PNG dimensions; yêu cầu CI mới PASS để xác nhận.
+
+Không có màn hình nào được tự nâng lên trạng thái chấp nhận tương đồng thiết kế.

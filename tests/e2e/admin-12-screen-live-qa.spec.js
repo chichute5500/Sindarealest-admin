@@ -27,7 +27,7 @@ for (const {width,height,theme} of matrix) {
     if (!testPassword) throw new Error('ADMIN_TEST_PASSWORD missing; do not bypass Access');
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
-    const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',viewport:{width,height},theme,
+    const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},theme,
       evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],observedAtUtc:new Date().toISOString()};
     const context=await browser.newContext({viewport:{width,height},colorScheme:theme,serviceWorkers:'block',reducedMotion:'reduce'});
     const page=await context.newPage();
@@ -65,9 +65,14 @@ for (const {width,height,theme} of matrix) {
         });
         expect(m.horizontalOverflow,'No screenshot may pass with document horizontal overflow: '+name+' at '+width+'px').toBe(false);
         const nameFile=name+'.png';
-        const screenshot=await page.screenshot({path:join(folder,nameFile),fullPage:true,animations:'disabled'});
+        // Capture exactly the nominated viewport, not the entire scrollable page.
+        // Only equal-sized PNGs can be directly aligned with a reference viewport.
+        const screenshot=await page.screenshot({path:join(folder,nameFile),fullPage:false,animations:'disabled'});
+        const measuredWidth=screenshot.readUInt32BE(16),measuredHeight=screenshot.readUInt32BE(20);
+        expect(measuredWidth,'Screenshot pixel width must match intended viewport: '+name).toBe(width);
+        expect(measuredHeight,'Screenshot pixel height must match intended viewport: '+name).toBe(height);
         report.screens.push({screen:name,status:'CAPTURED_NOT_ACCEPTED',file:nameFile,
-          sha256:createHash('sha256').update(screenshot).digest('hex'),metrics:m});
+          sha256:createHash('sha256').update(screenshot).digest('hex'),pixelDimensions:{width:measuredWidth,height:measuredHeight},metrics:m});
       }
       if((await page.evaluate(()=>document.documentElement.dataset.adminTheme))!==theme)
         await page.locator('#adminThemeToggle').click();
