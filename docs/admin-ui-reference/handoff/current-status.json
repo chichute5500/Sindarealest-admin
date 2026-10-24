@@ -1420,19 +1420,39 @@
     "newChangesCiState": "PENDING_NEW_SHA_WORKFLOW"
   },
   "latestViewportCapture": {
-    "previouslyVerifiedSha": "41637e02cfe676b7512a5a0b67e28ea83df78bd8",
-    "last7Workflows": "7/7 SUCCESS",
-    "latestSyntheticQA": 40124572580,
-    "syntheticQAArtifact": 12572298914,
-    "readOnlyScreensRun": 40124572733,
-    "readOnlyScreensArtifact": 12572785300,
-    "previewDiagnosticsRun": 40124572623,
-    "cleanup": "TWICE_ZERO_RUN_OWNED_ROWS",
-    "approvedReference": "QUALITATIVE_COMPARISON_ONLY",
-    "newExactViewportCapture": "CODE_COMMITTED_PENDING_NEW_HEAD_CI",
-    "screenshotSizesExpected": [
-      "390x844",
-      "1280x800"
-    ]
+    "verifiedCodeTestSha": "40137cbdb7ac2c473cde981cd8214c28b00a6ef5",
+    "newExactViewportCapture": "PASS_VERIFIED_48_IMAGES",
+    "workflowConclusions": "7_OF_7_SUCCESS",
+    "validateRuns": [
+      40125207752,
+      40125202730
+    ],
+    "previewRuns": [
+      40125207756,
+      40125207740
+    ],
+    "diagnosticsRun": 40125202720,
+    "readOnlyCaptureRun": 40125202712,
+    "syntheticCaptureRun": 40125202714,
+    "syntheticArtifactId": 12573100551,
+    "matrix": {
+      "screenCount": 12,
+      "viewports": [
+        "390x844",
+        "1280x800"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "imageCount": 48,
+      "incorrectDimensions": 0,
+      "duplicateImageHash": 0
+    },
+    "manifests": "4/4 12 screens CAPTURED_NOT_ACCEPTED",
+    "cleanup": "TWO_PASSES_ZERO_QA_ROWS_IN_SEVEN_TABLES",
+    "visualReferenceAcceptance": "0_OF_12_NOT_VERIFIED",
+    "rubricEvidenceWeight": 32,
+    "note": "Screenshot test does not independently check deployed Cloudflare application SHA; accepted screenshots do not imply visual pixel parity."
   }
 }

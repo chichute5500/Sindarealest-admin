@@ -332,5 +332,40 @@
       }
     ],
     "nextAction": "Capture exact same viewport/dataset/theme; do not claim pixel parity or owner acceptance from synthetic QA screenshots."
+  },
+  "exactViewportEvidence": {
+    "testedCodeSha": "40137cbdb7ac2c473cde981cd8214c28b00a6ef5",
+    "runId": 40125202714,
+    "artifactId": 12573100551,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551",
+    "status": "PASS_48_DISTINCT_MATCHING_PNG_DIMENSIONS",
+    "pixelMatrix": [
+      {
+        "viewport": "390x844",
+        "themes": 2,
+        "images": 24
+      },
+      {
+        "viewport": "1280x800",
+        "themes": 2,
+        "images": 24
+      }
+    ],
+    "screenshotCounts": {
+      "total": 48,
+      "duplicateSha256": 0,
+      "wrongPixelDimensions": 0
+    },
+    "manifests": {
+      "count": 4,
+      "imagesPerManifest": 12,
+      "acceptanceStatus": "CAPTURED_NOT_ACCEPTED"
+    },
+    "syntheticDataCleanup": {
+      "independentPasses": 2,
+      "remainingOwnedRows": 0,
+      "tableCount": 7
+    },
+    "visualSignoff": "NOT_VERIFIED"
   }
 }

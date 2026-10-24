@@ -1,5 +1,14 @@
 # LATEST STATUS — SINDAREALEST ADMIN
 
+## EXACT-HEAD VERIFIED — 2026-10-25: 7/7 PASS, 48 EXACT-VIEWPORT SCREENSHOTS
+
+- Code/test SHA `40137cbdb7ac2c473cde981cd8214c28b00a6ef5` **7/7 GitHub Actions SUCCESS**: Validate #40125207752/#40125202730; Admin Playwright #40125207756; isolated Playwright #40125207740; read-only 12-screen #40125202712; diagnostics #40125202720; synthetic D1 QA #40125202714.
+- [Verified screenshot/QA artifact #12573100551](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551) downloaded and independently inspected: **48/48 PNG**, zero duplicate SHA256, all **24 mobile images exactly 390×844** and all **24 desktop images exactly 1280×800**. Four manifests each show 12 CAPTURED_NOT_ACCEPTED; PNG captures do not independently verify deployment bytes.
+- Authenticated run-owned QA PASS on source SHA above; workflow logs show **two separate cleanup passes, both verified zero remaining run-owned rows in seven QA tables**. No Production, main, config, secrets, or deploy workflow changes.
+- Approved-reference visual parity **0/12 accepted**; evidence rubric **32/100** (NOT project completion), old 50% PROVISIONAL remains historical. Real QR/R2 integration, payment/refund settlement, completely disposable Restore POST, owner final signoff remain unaccepted.
+- This is a docs-only follow-up; verify fresh head/CI before calling docs commit checked.
+
+
 ## CHECKPOINT — 2026-10-25: EXACT VIEWPORT PNG EVIDENCE + VISUAL FINDINGS
 
 - Prior head `41637e02cfe676b7512a5a0b67e28ea83df78bd8`: **7/7 workflow conclusions SUCCESS**: Validate #40124576175/#40124572854, Playwright #40124576202/#40124576136, diagnostic #40124572623, isolated read-only 12-screen #40124572733, synthetic D1+cleanup #40124572580. Last QA log confirms cleanup ran twice with zero run-owned rows across seven tables; QA screenshot artifact #12572298914 and read-only artifact #12572785300.

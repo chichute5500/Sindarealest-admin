@@ -74,3 +74,7 @@
 - **Lỗi bằng chứng đã xác định:** ảnh `fullPage` của editor/Gallery có cả danh sách sản phẩm phía dưới modal, nhiều PNG dài hơn viewport. Bài kiểm thử được sửa để chụp đúng viewport 390×844 hoặc 1280×800 và đọc trực tiếp PNG dimensions; yêu cầu CI mới PASS để xác nhận.
 
 Không có màn hình nào được tự nâng lên trạng thái chấp nhận tương đồng thiết kế.
+
+## Bằng chứng viewport mới đã kiểm chứng
+
+[Artifact #12573100551](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551) có 48 PNG đúng kích thước: 24 ảnh 390×844 và 24 ảnh 1280×800, đủ 12 màn hình × 2 theme, không trùng hash. QA D1 cách ly dọn sạch hai lần. Đây KHÔNG phải ký nghiệm thu visual parity.
