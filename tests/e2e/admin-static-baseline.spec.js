@@ -1651,6 +1651,31 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         }
         await page.locator('#imageGrid .image-rail').evaluate(el => { el.scrollLeft = 0; });
 
+        // Reproduce tab round-trip after the Gallery panel contains a full, scrollable set of images.
+        await page.locator('#backdrop .editorcontent').evaluate(el => { el.scrollTop = Math.min(300, el.scrollHeight); });
+        await page.locator('#productTabDetails').click();
+        await page.locator('#productTabGallery').click();
+        const populatedGalleryTabGeometry = await page.evaluate(() => {
+          const content = document.querySelector('#backdrop .editorcontent');
+          const tabs = document.querySelector('#productEditorTabs');
+          const heading = document.querySelector('#productPanelGallery > .sectionlabel');
+          if (!content || !tabs || !heading) throw new Error('Populated Gallery tab-roundtrip geometry is incomplete');
+          return {
+            scrollTop: content.scrollTop,
+            tabsBottom: tabs.getBoundingClientRect().bottom,
+            galleryHeadingTop: heading.getBoundingClientRect().top,
+            galleryImageCount: document.querySelectorAll('#imageGrid .imageitem').length
+          };
+        });
+        expect(populatedGalleryTabGeometry.galleryImageCount,
+          'Tab-roundtrip regression must use the populated gallery fixture').toBe(6);
+        expect(populatedGalleryTabGeometry.scrollTop,
+          'Returning to Gallery after scrolling the prior panel must reset the shared editor scroll position: ' +
+          JSON.stringify(populatedGalleryTabGeometry)).toBe(0);
+        expect(populatedGalleryTabGeometry.galleryHeadingTop,
+          'Gallery heading must remain below sticky tabs after switching back: ' +
+          JSON.stringify(populatedGalleryTabGeometry)).toBeGreaterThanOrEqual(populatedGalleryTabGeometry.tabsBottom - 1);
+
         // The reference includes narrow phones at 320px and 360px, not only 390px.
         // Capture actual gallery renders and assert that the page/dialog stay in bounds
         // while the thumbnail rail alone owns horizontal scrolling.
