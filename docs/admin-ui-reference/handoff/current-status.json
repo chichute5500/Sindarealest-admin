@@ -1,24 +1,24 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T12:35:00Z",
+  "capturedAtUtc": "2026-10-24T15:09:54.221Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
-  "checkpointSemantics": "Live branch HEAD at checkpoint start c0c649022e0459c7d23f20ed46f9d750c52892d8. Validate #5808 and isolated Admin Preview Playwright #1127 PASS on exact SHA c0c649022e0459c7d23f20ed46f9d750c52892d8. Run #1127 is read-only and exact branch HEAD guard passed; does not prove deployed source SHA. Progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; reference parity NOT_VERIFIED; authenticated business-write/persistence QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
-  "codeTestSha": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
+  "branchHeadAtCheckpointStart": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+  "checkpointSemantics": "Latest exact-tested source SHA dbc951c213c7da453ed3410f91d8eb712c0bc89e; all six checks PASS. Cloudflare Pages reports isolated alias mapped to earlier deployment SHA 863b2d5b0a3f7d92b9b66587980f995184deb2e5, 226 commits behind; no deployment performed. Reference parity, authenticated business writes and remote D1 remain unverified.",
+  "codeTestSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
   "latestProductSourceCommit": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
   "latestActionsRun": {
-    "id": 40093657775,
-    "runNumber": 1127,
-    "workflow": "Test isolated Admin Preview (read-only)",
+    "id": 40104728057,
+    "runNumber": 1,
+    "workflow": "Admin isolated Preview Playwright (read-only)",
     "status": "completed",
     "conclusion": "success",
-    "sha": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40093657775"
+    "sha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40104728057"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL: Validate #5808 and isolated Admin Preview Playwright #1127 PASS on exact SHA c0c649022e0459c7d23f20ed46f9d750c52892d8; deployment provenance, approved-reference parity and authenticated write/persistence remain unverified.",
+  "progressBasis": "50% PROVISIONAL: all CI checks pass but isolated Cloudflare deployment metadata reports an older commit. All 12 screens partial; no same-data visual parity or business-write QA.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -44,7 +44,7 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
+      "headSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
       "changedFiles": 496,
       "additions": 46507,
       "deletions": 224,
@@ -474,25 +474,25 @@
     "No Production deploy, remote D1/R2 writes, business writes, migrations, secrets/Access/DNS changes, or edits to main/storefront/PR #108/#112."
   ],
   "handoffSync": {
-    "capturedAtUtc": "2026-10-24T11:16:00Z",
+    "capturedAtUtc": "2026-10-24T15:09:54.221Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
     "docsHeadAtCheckpoint": "c277c5a2f99114856ec78594823f71b0c9010cf0",
-    "codeTestSha": "c277c5a2f99114856ec78594823f71b0c9010cf0",
+    "codeTestSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-    "pr111Head": "c277c5a2f99114856ec78594823f71b0c9010cf0",
+    "pr111Head": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
     "pr111State": "OPEN_UNMERGED",
     "pr111BaseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
     "pr111ChangedFiles": 495,
     "pr111Additions": 46429,
     "pr111Deletions": 224,
     "validateRunIds": [
-      40088894808,
-      40088897260
+      40104728038,
+      40104730979
     ],
-    "previewRunId": 40088897224,
-    "diagnosticRunId": 40088894818,
-    "diagnosticArtifactId": 12557934045,
+    "previewRunId": 40104728057,
+    "diagnosticRunId": 40104728097,
+    "diagnosticArtifactId": 12563399560,
     "commitMessagePrefix": "[CF-Pages-Skip]",
     "latestRepairNote": "Test-first cancelled-order status guard reproduced red then fixed; current exact-SHA tests and read-only diagnostic pass."
   },
@@ -518,8 +518,8 @@
   },
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "latestCodeCommitSha": "c277c5a2f99114856ec78594823f71b0c9010cf0",
-  "testedCommitSha": "c277c5a2f99114856ec78594823f71b0c9010cf0",
+  "latestCodeCommitSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+  "testedCommitSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
   "capturedAt": "2026-10-24T01:53:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
   "checks": {
@@ -825,15 +825,13 @@
     "headSha": "0469930f6836d5f8d87b155a538e1d68776e3913"
   },
   "latestRun": {
-    "id": 40088894818,
-    "runNumber": 544,
-    "workflow": "Admin Preview diagnostic smoke test",
+    "id": 40104728057,
+    "runNumber": 1,
+    "workflow": "Admin isolated Preview Playwright (read-only)",
     "status": "completed",
     "conclusion": "success",
-    "sha": "c277c5a2f99114856ec78594823f71b0c9010cf0",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088894818",
-    "artifactId": 12557934045,
-    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40088894818/artifacts/12557934045"
+    "sha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40104728057"
   },
   "acceptance": {
     "progress": "50% PROVISIONAL",
@@ -1171,5 +1169,26 @@
   "approvedReferenceParity": "NOT_VERIFIED",
   "authenticatedBusinessWritePersistence": "NOT_TESTED",
   "remotePreviewD1SchemaLedger": "NOT_VERIFIED",
-  "productionDeployment": "NOT_PERFORMED"
+  "productionDeployment": "NOT_PERFORMED",
+  "latestVerifiedAudit": {
+    "capturedAtUtc": "2026-10-24T15:09:54.221Z",
+    "sourceAndTestSha": "dbc951c213c7da453ed3410f91d8eb712c0bc89e",
+    "validateRunId": 40104728038,
+    "isolatedPreviewRunId": 40104728057,
+    "diagnosticRunId": 40104728097,
+    "diagnosticArtifactId": 12563399560,
+    "pr111State": "OPEN_UNMERGED_CLEAN",
+    "deployedShaReportedByCloudflare": "863b2d5b0a3f7d92b9b66587980f995184deb2e5",
+    "deployedShaMetadataState": "REPORTED_SHA_MISMATCH",
+    "deploymentId": "d6fe9eb8-0447-4c9f-8aa6-1ae7cd1b1183",
+    "deploymentCreatedAtUtc": "2026-10-23T16:36:25.612Z",
+    "reportedDeployedCommitBehindHead": 226,
+    "servedBytesProvenance": "NOT_VERIFIED",
+    "businessWrites": "NOT_TESTED",
+    "remoteD1SchemaLedger": "NOT_VERIFIED",
+    "fixtureScreenshotEntries": 120,
+    "fixtureMetrics": 112,
+    "horizontalOverflowObservations": 0,
+    "fixtureWriteRequests": 0
+  }
 }
