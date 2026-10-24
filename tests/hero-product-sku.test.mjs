@@ -87,8 +87,8 @@ assert.ok(heroPedestalStyles.includes("#home .hero-visual::before,")
   && heroPedestalStyles.includes("radial-gradient(ellipse at 30% 28%")
   && heroPedestalStyles.includes("clip-path:polygon(1% 0,99% 0,94% 100%,6% 100%)")
   && heroPedestalStyles.includes("bottom:20%;")
-  && heroPedestalStyles.includes("width:136%;height:8%;bottom:20%")
-  && heroPedestalStyles.includes("width:145%;height:9%;bottom:12%")
+  && heroPedestalStyles.includes("width:136%;height:8%;bottom:27%")
+  && heroPedestalStyles.includes("width:145%;height:9%;bottom:22%")
   && html.includes("position:relative!important;z-index:1!important;"),
   "Hero keeps an explicit pearl-marble oval, visible slanted plinth face, responsive sizing, and the original shoe PNG in front.");
 assert.ok(html.includes("grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;")
