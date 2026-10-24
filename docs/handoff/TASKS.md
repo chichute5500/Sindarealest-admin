@@ -1,3 +1,13 @@
+## LATEST TASK RESULT — COVER PRIMARY SITEMAP HOST CLASSIFICATION — 2026-10-24
+
+- Added a regression test proving the exact primary hostname `sindarealest2.pages.dev` remains allowed by the new Preview-only sitemap guard and emits primary-origin home/product URLs.
+- Existing sitemap tests now cover three classes: non-primary Preview hostname (404/noindex; no DB query), terminal-dot Preview hostname (same), and the exact primary Pages hostname plus a custom domain (sitemap remains available).
+- Exact source/test SHA `7392f46a0be22b0d9487f67b5fda662951f19a1b`: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052308996; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052309040; Preview https://1ae6fd12.sindarealest2.pages.dev/.
+- External endpoint attempts were intercepted by Cloudflare Access login; live app headers/body remain unverified. Do not change Access or shared middleware without explicit authorization.
+- PR #108 OPEN/unmerged; Production and main untouched. SKU, gallery flicker, Hero stay paused; accepted areas locked.
+
+---
+
 ## LATEST TASK RESULT — PREVENT PREVIEW SITEMAP URL LEAKAGE — 2026-10-24
 
 - Found that `robots.txt` blocked crawl on Preview hostnames, but a direct request to `/sitemap.xml` still generated up to 2,000 product URLs using that Preview origin.

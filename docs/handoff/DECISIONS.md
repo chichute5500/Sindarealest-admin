@@ -1,3 +1,12 @@
+## DECISION UPDATE — COVER BOTH PREVIEW AND PRIMARY SITEMAP HOSTS — 2026-10-24
+
+- Sitemap guard applies only to non-primary `*.sindarealest2.pages.dev` hosts. Keep `sindarealest2.pages.dev` and custom domains working. Regression tests must cover primary, custom, regular Preview, and terminal-dot Preview hostnames.
+- Exact SHA `7392f46a0be22b0d9487f67b5fda662951f19a1b` passed Validate and Preview deployment. The new change adds only primary-host sitemap regression coverage; the actual guard is in `functions/sitemap.xml.js`.
+- External fetches of the deployed Preview are intercepted by Cloudflare Access and resolve to the Access login page. Do not claim this verifies the deployed robots/sitemap/homepage responses. No Access changes authorized.
+- Preview root noindex behavior remains unresolved/NOT VERIFIED; do not alter shared middleware or infrastructure without explicit authorization. PR #108 remains OPEN/unmerged; no Production or main changes.
+
+---
+
 ## DECISION UPDATE — DO NOT PUBLISH PREVIEW-ORIGIN SITEMAPS — 2026-10-24
 
 - Non-primary `*.sindarealest2.pages.dev` hosts must not emit a product sitemap containing Preview-origin URLs. `functions/sitemap.xml.js` now returns 404 + `X-Robots-Tag: noindex, nofollow` + `Cache-Control: no-store` before querying the DB; normalize one terminal DNS dot when classifying hosts.

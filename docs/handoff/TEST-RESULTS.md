@@ -1,3 +1,21 @@
+## EXACT-SHA RESULT — PRIMARY SITEMAP HOST REGRESSION — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| npm audit, integrity, full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052308996 |
+| Sitemap host regression | PASS | Primary host allowed; custom domain allowed; normal and terminal-dot Preview hosts return 404/noindex before DB access |
+| Preview deploy | PASS on `7392f46a0be22b0d9487f67b5fda662951f19a1b` | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052309040 |
+| Immutable Preview | Deployed | https://1ae6fd12.sindarealest2.pages.dev/ |
+| Visual workflow | SKIPPED | Hero guard |
+| External live endpoint verification | NOT VERIFIED | External fetcher was redirected to Cloudflare Access login |
+
+- Preview-origin sitemap guard remains tested; primary and custom-domain sitemap output remains covered.
+- Access login HTTP 200 is not proof of the storefront response. Do not mark live robots/sitemap/header behavior PASS based on that result.
+- Root Preview noindex remains an open follow-up requiring explicit scope authorization before shared middleware/Access changes.
+- PR #108 OPEN/unmerged, base main; Production and main untouched.
+
+---
+
 ## EXACT-SHA RESULT — PREVIEW SITEMAP GUARD — 2026-10-24
 
 | Gate | Result | Evidence |
