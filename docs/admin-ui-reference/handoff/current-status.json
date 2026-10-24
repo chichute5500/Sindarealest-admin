@@ -1,24 +1,26 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T10:21:00Z",
+  "capturedAtUtc": "2026-10-24T10:41:30Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
-  "checkpointSemantics": "Live refresh at 2026-10-24T10:16:00Z. Feature branch HEAD d09ffa3eed66d99e42192085024524c8b6868aec; PR #111 remains OPEN/unmerged, main 227622d3e3b7c75724ffa1775b193da71089269a. Current docs-only HEAD runs Validate #5759/#5760 and Admin Preview Playwright #1109 pass on the exact HEAD. Application/source-test SHA 66bdd5e0ba5f41daa1de49c46f485e5042edb831 is unchanged and has its own Validate #5758, Preview #1108 and read-only diagnostic #535 PASS. These test/fixture runs do not prove approved-reference parity or business-write persistence.",
-  "codeTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-  "latestProductSourceCommit": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+  "branchHeadAtCheckpointStart": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+  "checkpointSemantics": "Live refresh at 2026-10-24T10:41:30Z. Feature branch code/test SHA 2f2c631c328d3658c0911a9066b39d0d513ff0b9; main ref 227622d3e3b7c75724ffa1775b193da71089269a; PR #111 OPEN/unmerged with HEAD matching the feature branch. PR API base SHA 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 is one commit behind the live main ref 227622d3e3b7c75724ffa1775b193da71089269a; record as a base metadata discrepancy and do not merge/rebase. Validate #5769/#5770, Admin Preview Playwright #1114 and read-only diagnostic #538 all PASS on the exact source/test SHA. Read-only diagnostic: 7/7 admin GET endpoints HTTP 200, catalog 235 products, 527 image URLs decoded, zero writes and exact HEAD guard PASS. Order Detail refund UI is fixture-tested only; approved-reference parity and authenticated business-write/persistence QA remain unverified.",
+  "codeTestSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+  "latestProductSourceCommit": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
   "latestActionsRun": {
-    "id": 40084037565,
-    "runNumber": 535,
+    "id": 40086638472,
+    "runNumber": 538,
     "workflow": "Admin Preview diagnostic smoke test",
     "status": "completed",
     "conclusion": "success",
-    "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472",
+    "artifactId": 12556733771,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "Validate #5688 and Admin Preview Playwright #1077 passed on exact application/source-test SHA cf340b686e0974ac5602b6ef4594c00e477c8932. After restoring required handoff pointers, Validate #5733 and Admin Preview Playwright #1097 both passed on docs-only checkpoint SHA 5f7a9d94858a02faaea003e2a9ea6386d507121f. Visual parity and authenticated business-write QA remain unproven.",
+  "progressBasis": "50% PROVISIONAL: current code/test SHA 2f2c631c328d3658c0911a9066b39d0d513ff0b9 passed Validate #5769/#5770, Preview Playwright #1114 and read-only diagnostic #538. Source/fixture screenshots and read-only GET checks do not establish approved-reference parity or business-write persistence.",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -38,13 +40,13 @@
       "baseHeadAtCheckpoint": "227622d3e3b7c75724ffa1775b193da71089269a"
     },
     "111": {
-      "state": "open",
+      "state": "OPEN",
       "merged": false,
       "mergeable": true,
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+      "headSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
       "changedFiles": 494,
       "additions": 45701,
       "deletions": 223,
@@ -59,7 +61,8 @@
       "artifactId": 12541480929,
       "mergeable_state": "clean",
       "latestValidation": "PASS",
-      "latestPreview": "PASS"
+      "latestPreview": "PASS",
+      "baseMetadataDiscrepancy": "PR API base.sha 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 is one commit behind live main ref 227622d3e3b7c75724ffa1775b193da71089269a. No merge or rebase was performed."
     },
     "112": {
       "state": "OPEN",
@@ -218,7 +221,7 @@
     },
     "7_order_detail": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "320×640 primary action width defect was reproduced (28.7px) and fixed; exact-SHA Preview #521 and Validate #5636 also pass after QR upload atomicity fix. Real order writes and approved-reference parity remain unverified."
+      "gap": "Order Detail now exposes a verified-refund ledger form; fixture-only Playwright verifies the control is disabled with no receipts, enabled when the synthetic order has 7,800,000 VND net receipts, and rejects over-limit input locally with zero write requests. Regression was reproduced test-first at 1708edf55395fc525e2ea37a386d49da5583f264, then fixed and passed on exact source/test SHA 2f2c631c328d3658c0911a9066b39d0d513ff0b9. Real authenticated refund writes/persistence and approved-reference parity remain unverified; keep PARTIAL_NOT_ACCEPTED."
     },
     "8_customers": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -450,16 +453,30 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Refresh live refs and exact-SHA Actions after the current [CF-Pages-Skip] docs-only follow-up commit; keep PR #111 OPEN/unmerged.",
-    "Use [CF-Pages-Skip] at the start of future commit messages on the ADMIN feature branch to avoid the observed automatic primary-project Pages Preview; verify check-runs after each commit.",
-    "Continue same-data reference review and read-only payment/order/warranty concurrency analysis; any source patch must be test-first against a reproduced defect.",
-    "Do not change Cloudflare configuration, Access, DNS or secrets; do not perform business writes, remote D1/R2 changes, migrations or Production deployment."
+    "Refresh live refs and exact-SHA checks after this docs-only handoff sync. PR #111 stays OPEN/unmerged; no merge/rebase/cherry-pick/force-push.",
+    "Continue same-data approved-reference comparison for all 12 screens; especially resolve Screen 5 gallery evidence. Fixture screenshots do not prove parity.",
+    "Continue safe read-only review and test-first workflow. Real refund writes/persistence require a separately authorized business QA plan; never execute a real financial transaction as a UI test.",
+    "Use [CF-Pages-Skip] at the beginning of every ADMIN branch commit message and verify that no Cloudflare Pages check/deployment appeared; do not change Cloudflare settings, Access, DNS or secrets.",
+    "No Production deployment, remote D1/R2 writes, migrations, business writes, or edits to main/storefront/PR #108/#112."
   ],
   "handoffSync": {
-    "status": "SYNCED_PENDING_CURRENT_COMMIT_CI",
-    "capturedAtUtc": "2026-10-24T10:21:00Z",
-    "branchHeadAtCheckpointStart": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
-    "sourceTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "status": "SOURCE_TEST_SHA_VERIFIED; DOCS_ONLY_FOLLOWUP_PENDING_CI",
+    "capturedAtUtc": "2026-10-24T10:41:30Z",
+    "branchHeadAtCheckpointStart": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "sourceTestSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "applicationSourceTestSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "currentMainRef": "227622d3e3b7c75724ffa1775b193da71089269a",
+    "pr111Head": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "pr111State": "OPEN_UNMERGED",
+    "pr111BaseShaFromApi": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "baseMetadataDiscrepancy": "PR base.sha 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 is one commit behind live main ref 227622d3e3b7c75724ffa1775b193da71089269a; no merge/rebase performed.",
+    "validationRunIds": [
+      40086638501,
+      40086641043
+    ],
+    "previewRunId": 40086641087,
+    "diagnosticRunId": 40086638472,
+    "diagnosticArtifactId": 12556733771,
     "commitIsDocsOnly": true,
     "commitMessagePrefix": "[CF-Pages-Skip]",
     "filesUpdated": [
@@ -472,11 +489,11 @@
     ],
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "note": "Records the unintended Cloudflare Pages Preview side effect and the observed commit-prefix safeguard. Current commit CI has not yet been checked; refresh refs and CI before further writes."
+    "note": "Records test-first refund UI fix + exact-SHA CI/read-only diagnostic evidence, the prior unintended primary-project Preview deployment, and current PR base metadata discrepancy. Refresh refs/checks before further writes."
   },
-  "currentHeadAtCheckpoint": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
-  "currentHeadValidation": "VALIDATE_5759_AND_5760_PASS_AND_PREVIEW_PLAYWRIGHT_1109_PASS_ON_DOCS_ONLY_HEAD; SOURCE_TEST_SHA_66bdd5e_VALIDATE_5758_PREVIEW_1108_AND_DIAGNOSTIC_535_PASS; NO_NEW_SOURCE_DEFECT_CONFIRMED",
-  "currentHeadValidationReason": "Latest previous docs HEAD had Validate #5761/#5762 and Preview #1110 pass. That commit triggered Cloudflare Pages branch Preview in project sindarealest2 because its message lacked [CF-Pages-Skip]; follow-up is docs-only with that prefix, no Cloudflare/Production configuration changes.",
+  "currentHeadAtCheckpoint": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+  "currentHeadValidation": "VALIDATE_5769_AND_5770_PASS; PREVIEW_PLAYWRIGHT_1114_PASS; READ_ONLY_DIAGNOSTIC_538_PASS_ON_EXACT_SHA_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+  "currentHeadValidationReason": "Validate #5769/#5770 PASS, Preview Playwright #1114 PASS, and read-only diagnostic #538 PASS on exact code/test SHA 2f2c631c328d3658c0911a9066b39d0d513ff0b9.",
   "liveCheckpoint": {
     "capturedAtUtc": "2026-10-24T10:16:00Z",
     "branchHead": "d09ffa3eed66d99e42192085024524c8b6868aec",
@@ -496,8 +513,8 @@
   },
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "latestCodeCommitSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-  "testedCommitSha": "0469930f6836d5f8d87b155a538e1d68776e3913",
+  "latestCodeCommitSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+  "testedCommitSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
   "capturedAt": "2026-10-24T01:53:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
   "checks": {
@@ -544,9 +561,9 @@
     "uiFixtureConsoleErrors": "7 expected simulated HTTP 503 retry-path entries in fixture audit; pageErrors=0, fixtureApiErrors=0, attemptedWrites=0."
   },
   "latestLocalEvidence": {
-    "runId": 40046825046,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046",
-    "sourceCommit": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+    "runId": 40086638472,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472",
+    "sourceCommit": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "npmRunCheck": "PASS",
     "npmTest": "PASS",
     "projectIntegrity": "PASS",
@@ -576,20 +593,20 @@
       "imageDecode": "PASS",
       "mutationRequests": 0
     },
-    "businessDataBoundary": "Orders, customers, warranties and audit-log arrays were empty; this does not prove non-empty business workflows or writes."
+    "businessDataBoundary": "Orders, customers, warranties and audit-log arrays were empty; no business writes or persistence verification."
   },
   "latestScreenshotArtifact": {
-    "id": 12556296498,
-    "name": "admin-preview-evidence-535",
-    "runId": 40084037565,
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498",
-    "sourceCommit": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "id": 12556733771,
+    "name": "admin-preview-evidence-538",
+    "runId": 40086638472,
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771",
+    "sourceCommit": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "expired": false,
     "sourceScreenshotCount": 16,
     "fixtureScreenshotCount": 120,
     "fixtureMetricCount": 112,
-    "inspectedMetadata": "Downloaded and inspected metadata.json, preview-diagnostics.json, approved reference collage, and screenshot contact sheet. 16 source login screenshots cover 8 viewport sizes × light/dark; 120 synthetic-fixture screenshot entries (116 unique module captures) and 112 metrics; approved-reference parity remains unverified."
+    "inspectedMetadata": "Current exact-SHA source/fixture matrix passed; 16 source login images across 8 viewport sizes x light/dark, 120 synthetic fixture screenshot entries (116 unique module captures), 112 metrics; full approved-reference parity remains NOT_VERIFIED."
   },
   "remainingIssues": [
     "All 12 screens remain PARTIAL_NOT_ACCEPTED. Screen 7 Timeline is visible in artifact #493 using synthetic UI-only data; exact approved-reference parity and real order actions remain unverified.",
@@ -598,35 +615,38 @@
     "Remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED; migration 0009, PRE/PRO, product-image/R2 persistence and AI image grouping remain DEFERRED_BY_OWNER."
   ],
   "latestDiagnosticArtifact": {
-    "id": 12556296498,
-    "name": "admin-preview-evidence-535",
-    "runId": 40084037565,
-    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498",
-    "sourceCommit": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "id": 12556733771,
+    "name": "admin-preview-evidence-538",
+    "runId": 40086638472,
+    "runUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771",
+    "sourceCommit": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "expired": false,
     "readOnlyRoutes": 7,
     "catalogCount": 235,
     "decodedImageUrls": 527,
-    "nonReadOnlyRequests": 0
+    "nonReadOnlyRequests": 0,
+    "sourceScreenshotCount": 16,
+    "fixtureScreenshotCount": 120,
+    "fixtureMetricCount": 112
   },
   "latestValidateAttempt": {
-    "id": 40084641440,
-    "runNumber": 5760,
+    "id": 40086641043,
+    "runNumber": 5770,
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641440"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
   },
   "latestPreviewAttempt": {
-    "id": 40084641400,
-    "runNumber": 1109,
+    "id": 40086641087,
+    "runNumber": 1114,
     "workflow": "Admin Preview Playwright",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641400"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641087"
   },
   "latestAttempt": {
     "capturedAtUtc": "2026-10-24T10:00:37Z",
@@ -767,24 +787,34 @@
       "sourceSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
       "liveMutationRequests": 0,
       "acceptance": "Static-only; authenticated business workflows and writes NOT_TESTED"
+    },
+    {
+      "capturedAtUtc": "2026-10-24T10:41:30Z",
+      "workstream": "Screen 7 verified-refund ledger UI",
+      "status": "PASS_FIXTURE_ONLY",
+      "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+      "details": "Test-first regression, source UI action and fixture eligibility/over-limit checks pass; no live refund write."
     }
   ],
   "latestValidateRun": {
-    "id": 40084641440,
-    "runNumber": 5760,
+    "id": 40086641043,
+    "runNumber": 5770,
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641440"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
   },
   "livePrState": {
     "pr111": {
       "state": "OPEN",
       "merged": false,
-      "mergeable": false,
-      "headSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
-      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
+      "mergeable": true,
+      "mergeableState": "clean",
+      "headSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+      "baseHeadAtCheckpoint": "227622d3e3b7c75724ffa1775b193da71089269a",
+      "baseMetadataDiscrepancy": "PR base SHA 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 is one commit behind live main ref 227622d3e3b7c75724ffa1775b193da71089269a."
     },
     "pr108": {
       "state": "OPEN",
@@ -809,13 +839,15 @@
     "headSha": "0469930f6836d5f8d87b155a538e1d68776e3913"
   },
   "latestRun": {
-    "id": 40084641400,
-    "runNumber": 1109,
-    "workflow": "Admin Preview Playwright",
+    "id": 40086638472,
+    "runNumber": 538,
+    "workflow": "Admin Preview diagnostic smoke test",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641400"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472",
+    "artifactId": 12556733771,
+    "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771"
   },
   "acceptance": {
     "screens": "12 screens PARTIAL_NOT_ACCEPTED",
@@ -824,20 +856,20 @@
     "remoteD1SchemaLedger": "NOT_VERIFIED",
     "production": "NOT_PERFORMED"
   },
-  "nextStep": "Continue the independent read-only reviews after the current docs-only commit checks finish. No account-owner action is required by the evidence observed so far.",
+  "nextStep": "Continue independent read-only UI/backend evidence review after the docs handoff commit checks. Screen 7 refund UI exists and is fixture-tested, but no authenticated write/persistence QA has been performed.",
   "acceptanceBoundary": "Progress 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; approved-reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
   "latestSourceTestValidateRun": {
-    "id": 40084040238,
-    "runNumber": 5758,
+    "id": 40086641043,
+    "runNumber": 5770,
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
   },
   "latestAuthenticatedReadOnlyRoutes": {
-    "runId": 40084037565,
-    "sourceCommit": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "runId": 40086638472,
+    "sourceCommit": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "routeCount": 7,
     "passed": 7,
     "failed": 0,
@@ -857,27 +889,31 @@
       "/api/admin/warranties",
       "/api/admin/audit-logs"
     ],
-    "scope": "Authenticated feature Preview; GET-only routes and product/catalog UI checks. All 7 read-only admin endpoints returned HTTP 200; orders/customers/warranties/audit arrays were empty. 235 products and 527 image URLs were read; image decoding passed; productMutationRequests=[]; no business writes or persistence verification."
+    "catalogCount": 235,
+    "decodedImageUrls": 527,
+    "productMutationRequests": [],
+    "scope": "Authenticated configured isolated Preview; GET-only endpoints/catalog and product UI checks, no business writes."
   },
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "latestDocsHeadValidation": {
-    "id": 40084641440,
-    "runNumber": 5760,
+    "id": 40086641043,
+    "runNumber": 5770,
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "testedSha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641440"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
   },
   "latestDocsHead": "477bdda196ce8d5a24d7671703bcec3f5d6b5f63",
   "liveRefsAtCheckpoint": {
-    "branchHead": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "branchHead": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "mainHead": "227622d3e3b7c75724ffa1775b193da71089269a",
     "pr111": {
       "state": "open",
       "merged": false,
-      "head": "66bdd5e0ba5f41daa1de49c46f485e5042edb831"
+      "head": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+      "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+      "baseShaDiscrepancy": "PR base.sha 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 is one commit behind live main ref 227622d3e3b7c75724ffa1775b193da71089269a; leave open, do not merge/rebase."
     },
     "pr108": {
       "state": "open",
@@ -893,22 +929,22 @@
     }
   },
   "latestSourceTestValidation": {
-    "id": 40084040238,
-    "runNumber": 5758,
+    "id": 40086641043,
+    "runNumber": 5770,
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
   },
   "latestPreviewValidation": {
-    "id": 40084040292,
-    "runNumber": 1108,
+    "id": 40086641087,
+    "runNumber": 1114,
     "workflow": "Admin Preview Playwright",
     "status": "completed",
     "conclusion": "success",
-    "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641087"
   },
   "staticSecurityAudit": {
     "capturedAtUtc": "2026-10-24T02:42:00Z",
@@ -930,22 +966,27 @@
     "summary": "QR upload pending pointer/audit are atomic and failed persistence cleans only the staged R2 object. Isolated deployment workflow and E2E spec use unique paths separate from main."
   },
   "latestPreviewRun": {
-    "id": 40084040292,
-    "runNumber": 1108,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292",
+    "id": 40086641087,
+    "runNumber": 1114,
+    "workflow": "Admin Preview Playwright",
+    "status": "completed",
     "conclusion": "success",
-    "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641087"
   },
   "pr111": {
     "state": "OPEN",
     "merged": false,
     "mergeable": true,
     "mergeableState": "clean",
-    "headSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "headSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "aheadBy": 1715,
-    "behindBy": 7
+    "behindBy": 7,
+    "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+    "baseHeadAtCheckpoint": "227622d3e3b7c75724ffa1775b193da71089269a",
+    "baseMetadataDiscrepancy": "PR base SHA 28c768ba26b1d9f7d40e14efac5112526ed1c8b3 is one commit behind live main ref 227622d3e3b7c75724ffa1775b193da71089269a."
   },
-  "latestBranchHead": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
+  "latestBranchHead": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
   "latestAudit": {
     "capturedAtUtc": "2026-10-24T10:00:37Z",
     "sourceSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
@@ -953,8 +994,8 @@
     "referenceScreenshotEvidenceSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
     "referenceScreenshotEvidence": "Artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498; 16 source login captures across 8 viewport sizes×2 themes; 120 synthetic fixture screenshot entries/112 metrics; approved reference montage inspected; product-gallery visual differences remain; parity NOT_VERIFIED."
   },
-  "branchHead": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
-  "currentHead": "7f8d27895d61ded5e36f9358ad6f5ff830dd3e02",
+  "branchHead": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+  "currentHead": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
   "latestConcurrencyFix": {
     "sourceTestSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
     "summary": "Order cancellation guards order-item writes against a pending QR payment request to avoid partial writes when cancellation is blocked.",
@@ -973,22 +1014,22 @@
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082797140"
   },
   "latestCurrentHeadValidation": {
-    "id": 40084641440,
-    "runNumber": 5760,
+    "id": 40086641043,
+    "runNumber": 5770,
     "workflow": "Validate source and tests",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641440"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
   },
   "latestCurrentHeadPreview": {
-    "id": 40084641400,
-    "runNumber": 1109,
+    "id": 40086641087,
+    "runNumber": 1114,
     "workflow": "Admin Preview Playwright",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641400"
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641087"
   },
   "latestValidationRun": {
     "id": 40084040238,
@@ -1034,77 +1075,69 @@
     },
     "artifactId": 12556296498
   },
-  "latestCurrentHeadValidationReason": "Docs-only handoff SHA; exact-head Validate and Preview Playwright pass, while application source/test SHA remains 66bdd5e0ba5f41daa1de49c46f485e5042edb831.",
+  "latestCurrentHeadValidationReason": "Validate #5769/#5770 PASS, Preview Playwright #1114 PASS, and read-only diagnostic #538 PASS on exact code/test SHA 2f2c631c328d3658c0911a9066b39d0d513ff0b9.",
   "latestHeadChecks": {
-    "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-    "capturedAtUtc": "2026-10-24T10:16:00Z",
+    "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "capturedAtUtc": "2026-10-24T10:41:30Z",
     "validationRuns": [
       {
-        "id": 40084637704,
-        "runNumber": 5759,
+        "id": 40086638501,
+        "runNumber": 5769,
         "workflow": "Validate source and tests",
         "status": "completed",
         "conclusion": "success",
-        "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084637704"
+        "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638501"
       },
       {
-        "id": 40084641440,
-        "runNumber": 5760,
+        "id": 40086641043,
+        "runNumber": 5770,
         "workflow": "Validate source and tests",
         "status": "completed",
         "conclusion": "success",
-        "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641440"
+        "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
       }
     ],
     "previewRun": {
-      "id": 40084641400,
-      "runNumber": 1109,
+      "id": 40086641087,
+      "runNumber": 1114,
       "workflow": "Admin Preview Playwright",
       "status": "completed",
       "conclusion": "success",
-      "sha": "d09ffa3eed66d99e42192085024524c8b6868aec",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641400"
-    },
-    "comparisonBaseSourceTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-    "comparisonResult": "Only six handoff docs/JSON files changed; application source/tests unchanged.",
-    "sourceTestValidation": {
-      "id": 40084040238,
-      "runNumber": 5758,
-      "conclusion": "success",
-      "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238"
-    },
-    "sourceTestPreview": {
-      "id": 40084040292,
-      "runNumber": 1108,
-      "conclusion": "success",
-      "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292"
+      "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641087"
     },
     "readOnlyDiagnostic": {
-      "id": 40084037565,
-      "runNumber": 535,
+      "id": 40086638472,
+      "runNumber": 538,
+      "workflow": "Admin Preview diagnostic smoke test",
+      "status": "completed",
       "conclusion": "success",
-      "sha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
-      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498"
+      "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472",
+      "artifactId": 12556733771,
+      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771"
     },
-    "applicationParity": "NOT_VERIFIED"
+    "sourceTestSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "comparisonBaseSourceTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "comparisonResult": "Refund-recording UI and fixture contract/tests were added on the source/test commit; later docs-only commits are separate handoff checkpoints.",
+    "applicationParity": "NOT_VERIFIED",
+    "businessWriteQA": "NOT_TESTED",
+    "productionDeployment": "NOT_PERFORMED"
   },
   "latestReviewSummary": {
-    "capturedAtUtc": "2026-10-24T10:16:00Z",
-    "sourceTestSha": "66bdd5e0ba5f41daa1de49c46f485e5042edb831",
+    "capturedAtUtc": "2026-10-24T10:41:30Z",
+    "sourceTestSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
     "findings": [
-      "Atomic QR request guard rechecks order, item totals, transaction snapshot and all active QR/bank configuration values.",
-      "Case-insensitive UNIQUE transaction references and the unique one-pending-QR partial index are present in migration 0009.",
-      "Receipt/refund write guards suppress dependent status/audit writes when ledger insert does not succeed.",
-      "Order repricing/cancellation and warranty issuance/claim-token paths have atomic rechecks.",
-      "No new reproducible source defect was confirmed; no application source/test change was made."
+      "Test-first: missing Order Detail refund-recording UI failed contract test on 1708edf55395fc525e2ea37a386d49da5583f264; UI fix and fixture regression passed on the exact code/test SHA.",
+      "Refund form records only a previously transferred, bank-statement-verified refund; explicit confirmation warns that no money transfer is executed.",
+      "Unpaid UI fixture has refund action disabled; synthetic paid order enables action up to 7,800,000 VND; over-limit amount is rejected locally without a write request.",
+      "Existing refund API retains atomic net-receipt recheck at INSERT and unique transaction reference constraint.",
+      "No new independent concurrency defect found in payment/order/warranty source paths."
     ],
-    "screen5": "Source has the intended mobile cover-plus-horizontal-rail layout, but synthetic artifact fixture evidence conflicts visually; parity remains unverified.",
-    "workflowSafety": "Diagnostics exact-branch and exact-HEAD guards verified; isolated Preview deploy targets dedicated non-production Pages project; Production workflow was read only, never invoked."
+    "screen5": "Source has a featured cover plus horizontal mobile thumbnail rail, but synthetic screenshot discrepancy against approved reference remains unresolved; do not claim parity.",
+    "workflowSafety": "Validate, Preview Playwright and diagnostic #538 pass exact SHA; diagnostic only used authenticated GET routes, no mutations. [CF-Pages-Skip] prefix prevented Cloudflare Pages deployment check on current commit."
   },
   "latestUnexpectedPrimaryProjectPreview": {
     "capturedAtUtc": "2026-10-24T10:21:00Z",
@@ -1122,5 +1155,52 @@
     "cause": "The docs-only commit message did not contain the [CF-Pages-Skip] prefix.",
     "correctiveProcess": "For future commits on the ADMIN branch, prefix commit message with [CF-Pages-Skip] and verify current check-runs; do not change Cloudflare project settings, Access, DNS or secrets.",
     "note": "This was an unintended Preview deployment in the primary Pages project, not a declared Production deployment. No public/index.html or shared storefront file was changed by the docs commit."
+  },
+  "latestRefundUiFix": {
+    "status": "TEST_FIRST_RED_THEN_FIX; EXACT_SHA_CHECKS_PASS",
+    "missingUiFailingTestCommit": "1708edf55395fc525e2ea37a386d49da5583f264",
+    "missingUiFailingValidateRun": 40086054034,
+    "sourceTestSha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+    "summary": "Order Detail supports recording an already-completed, bank-statement-verified refund to the existing ledger. Explicit confirmation states it does not transfer money. Refund entry is disabled with no net receipts; client rejects invalid/nonpositive net balance and over-limit amounts. Fixture test verifies enabled state on synthetic paid order with 7,800,000 VND and no write request on over-limit input.",
+    "validateRuns": [
+      {
+        "id": 40086638501,
+        "runNumber": 5769,
+        "workflow": "Validate source and tests",
+        "status": "completed",
+        "conclusion": "success",
+        "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638501"
+      },
+      {
+        "id": 40086641043,
+        "runNumber": 5770,
+        "workflow": "Validate source and tests",
+        "status": "completed",
+        "conclusion": "success",
+        "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043"
+      }
+    ],
+    "previewRun": {
+      "id": 40086641087,
+      "runNumber": 1114,
+      "workflow": "Admin Preview Playwright",
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641087"
+    },
+    "diagnosticRun": {
+      "id": 40086638472,
+      "runNumber": 538,
+      "workflow": "Admin Preview diagnostic smoke test",
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "2f2c631c328d3658c0911a9066b39d0d513ff0b9",
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472",
+      "artifactId": 12556733771,
+      "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771"
+    }
   }
 }

@@ -1,10 +1,38 @@
-# POST-CI LIVE HANDOFF — 2026-10-24 10:21 UTC
+# POST-CI LIVE HANDOFF — 2026-10-24 10:41 UTC
 
-**Current pre-update branch HEAD:** `7f8d27895d61ded5e36f9358ad6f5ff830dd3e02` on `feature/admin-isolated-handoff-2026-10-20`; `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`. PR #111 is OPEN/unmerged and HEAD matched the feature branch at the last live refresh. This follow-up changes handoff docs/JSON only and uses the `[CF-Pages-Skip]` commit-message prefix; refresh live refs/CI before future writes.
+**Verified code/test checkpoint:** `2f2c631c328d3658c0911a9066b39d0d513ff0b9` on `feature/admin-isolated-handoff-2026-10-20`. Live `main` ref is `227622d3e3b7c75724ffa1775b193da71089269a`. PR #111 is OPEN/unmerged, and its HEAD matches the feature branch. PR API currently reports base ref `main` with base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3`, while the live `main` ref is `227622d3e3b7c75724ffa1775b193da71089269a`; comparing the commits shows `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` is one commit behind `main`. Treat this as stale/inconsistent PR base metadata, not a verified main-ref change. Do not merge/rebase; refresh API state before any future PR-level decision.
 
-- Validate #5761 and #5762 PASS on exact HEAD `7f8d27895d61ded5e36f9358ad6f5ff830dd3e02`; Admin Preview Playwright #1110 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40085407282, https://github.com/chichute5500/Sindarealest-admin/actions/runs/40085409610, https://github.com/chichute5500/Sindarealest-admin/actions/runs/40085409472.
-- Application/source-test SHA remains `66bdd5e0ba5f41daa1de49c46f485e5042edb831` and has separate Validate #5758, Preview Playwright #1108, and read-only diagnostic #535 PASS. Keep that evidence tied only to this SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238, https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292, https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565.
-- Read-only concurrency review found no new reproducible source defect. Screen 5 source structure implements a featured image plus horizontal thumbnail rail; the fixture/reference discrepancy remains unresolved.
+## Exact-SHA validation
+
+- Validate #5769 PASS on `2f2c631c328d3658c0911a9066b39d0d513ff0b9`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638501
+- Validate #5770 PASS on `2f2c631c328d3658c0911a9066b39d0d513ff0b9`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641043
+- Admin Preview Playwright #1114 PASS on `2f2c631c328d3658c0911a9066b39d0d513ff0b9`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086641087
+- Read-only diagnostic #538 PASS on `2f2c631c328d3658c0911a9066b39d0d513ff0b9`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472
+- Artifact `admin-preview-evidence-538`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086638472/artifacts/12556733771
+- The diagnostic authenticated to the configured isolated Preview and made only GET requests: 7/7 admin endpoints returned HTTP 200, catalog 235 products, 527 persisted image URLs decoded, no product mutations, no non-read-only requests, and the exact feature-branch HEAD guard passed. Local Playwright source/fixture matrix passed. These results do **not** prove business-write persistence or full approved-reference parity.
+- All current check-runs on this source/test SHA are PASS; the commit message starts with `[CF-Pages-Skip]` and the check set contains no Cloudflare Pages deployment check.
+
+## Screen 7 refund UI — test-first finding and fix
+
+- Regression-only commit `1708edf55395fc525e2ea37a386d49da5583f264` deliberately failed at the new contract assertion because Order Detail had no refund-recording action: Validate #5765 https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086054034. Diagnostic #536 stopped at the same failing test and did not execute Preview GET checks: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40086054024.
+- The Order Detail payment disclosure now includes a form to **record an already-transferred refund** in the verified ledger. The UI explicitly warns that it does not send money. It requires a bank statement transaction reference, limits amount to remaining net verified receipts, rejects malformed/non-positive balances, requires explicit confirmation, and posts `direction: "refunded"` to the existing API.
+- Fixture-only Playwright checks verify the refund form is disabled for an order with no receipts and enabled for `UI-ONLY-ORDER-3` (net receipts 7,800,000 VND). An over-limit fixture input is rejected locally with zero write requests. No actual refund, transaction, or business write was performed. Existing API atomic over-refund guard remains authoritative.
+- Screen 7 remains `PARTIAL_NOT_ACCEPTED`: its controls passed automated fixture checks, but authenticated ledger mutation/persistence and approved-reference parity remain untested.
+
+## Read-only workflow and visual review
+
+- Concurrency review still finds no additional reproducible defect in QR request creation, receipt/refund ledger guards, order repricing/cancellation, warranty issuance, and claim-token consumption.
+- Screen 5 source has a featured cover image and horizontally scrolling mobile thumbnail rail; artifact fixture appearance differs from the approved montage, but synthetic fixture data cannot prove live parity. Keep all 12 screens `PARTIAL_NOT_ACCEPTED`.
+- The recorded unwanted Preview in Pages project `sindarealest2` was caused by commit `7f8d27895d61ded5e36f9358ad6f5ff830dd3e02` missing `[CF-Pages-Skip]`; the incident is preserved below. Follow-up commits use that prefix. No Cloudflare settings, DNS, Access, secrets or Production workflow were changed.
+
+## Acceptance boundary — unchanged
+
+- Progress: **50% PROVISIONAL**.
+- All 12 screens: **PARTIAL_NOT_ACCEPTED**.
+- Approved-reference parity: **NOT_VERIFIED**.
+- Authenticated business-write/persistence QA: **NOT_TESTED**.
+- Remote Preview D1 schema/ledger: **NOT_VERIFIED**.
+- Production: **NOT_PERFORMED**.
 
 
 ## Operational finding — unintended primary-project Preview deploy
