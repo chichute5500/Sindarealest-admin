@@ -3699,6 +3699,15 @@ html.dark #home .hero-visual::after{border-color:rgba(144,181,207,.58);backgroun
 
 #home.hero:after{content:none!important;display:none!important;background:none!important}
 
+/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */
+#home .hero-visual img{position:relative!important;z-index:1!important;object-fit:contain!important;transform:none!important;opacity:1!important;mix-blend-mode:normal!important;mask-image:none!important;-webkit-mask:none!important;mask:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
+#home .hero-visual::before,
+#home .hero-visual::after{pointer-events:none!important}
+#home .hero-visual-caption{display:none!important}
+#home.hero:after{content:none!important;display:none!important;background:none!important}
+@media(max-width:760px){#home .hero-visual img{width:122%!important;max-height:330px!important}}
+@media(min-width:761px) and (max-width:1000px){#home .hero-visual img{width:113%!important;max-height:540px!important;margin-left:0!important;margin-right:0!important}}
+
 /* Mobile Hero rebuild: readable copy first, complete product presentation second.
    Desktop/tablet compositions and original transparent PNG remain unchanged. */
 @media(max-width:760px){
