@@ -1,3 +1,13 @@
+## DECISION UPDATE — PREVIEW ROOT NOINDEX VERIFIED VIA ACCESS SERVICE TOKEN — 2026-10-24
+
+- Do not modify `functions/_middleware.js`, shared response headers, Cloudflare Access policy, or infrastructure to solve the Preview root noindex question unless new evidence shows a regression. A read-only authenticated diagnostic verified the actual response already includes `X-Robots-Tag: noindex`.
+- Keep the non-blocking post-deploy diagnostic. It restricts targets to the approved non-production Pages Preview origin and `/`, `/robots.txt`, `/sitemap.xml`; it uses existing paired Access service-token secrets, logs only status/content-type/robots/cache headers, and never logs credentials or bodies.
+- Verified results on SHA `79cca22640d31189001410595245e1d1b809734a`: root 200/noindex; robots 200/Disallow all; sitemap 404/noindex/nofollow/no-store. Validate and Preview deployment both PASS.
+- External unauthenticated fetch is redirected to Access login; this is expected and does not indicate app failure. Use the authenticated workflow diagnostic to verify application response behavior.
+- PR #108 OPEN/unmerged, base main; no Production/main edits. Hero, SKU verification and gallery flicker remain paused; accepted sections stay locked.
+
+---
+
 ## DECISION UPDATE — TEST COMMENTS MUST MATCH EFFECTIVE NOINDEX SOURCE — 2026-10-24
 
 - Refer to `public/admin/index.html`'s document-level `<meta name="robots" content="noindex,nofollow">` as Admin's crawl-visible noindex signal. Do not claim `public/_headers` alone proves a Pages Function response carries `X-Robots-Tag`.

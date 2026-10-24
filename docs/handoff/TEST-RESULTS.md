@@ -1,3 +1,23 @@
+## EXACT-SHA RESULT — AUTHENTICATED PREVIEW SEO RESPONSE CHECK — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| npm audit, integrity, full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052741328 |
+| Preview deploy | PASS on `79cca22640d31189001410595245e1d1b809734a` | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052741331 |
+| Post-deploy authenticated HTTP diagnostic | PASS — all three endpoints | Same deploy workflow log |
+| Root `/` | HTTP 200, `X-Robots-Tag: noindex` | Access service-token request |
+| `/robots.txt` | HTTP 200, `Disallow: /`, no sitemap | Access service-token request |
+| `/sitemap.xml` | HTTP 404, `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store` | Access service-token request |
+| Liquid Glass visual workflow | SKIPPED | Hero guard |
+| Browser/device visual acceptance | NOT CLAIMED | HTTP headers do not replace visual acceptance |
+
+- Diagnostic implementation: `scripts/verify-preview-seo.mjs`; regression: `tests/preview-seo-smoke.test.mjs`. Requests are read-only and restricted to the project's non-production Preview origin and three exact paths; secrets and response bodies are never logged.
+- Preview-origin sitemap guard remains tested against ordinary and terminal-dot hostnames; primary and custom domains retain existing sitemap behavior.
+- Direct fetch without Access service token returns the Access login page; that response is not used as app endpoint evidence.
+- PR #108 OPEN/unmerged; Production/main untouched.
+
+---
+
 ## EXACT-SHA RESULT — NOINDEX COMMENT PRECISION — 2026-10-24
 
 | Gate | Result | Evidence |

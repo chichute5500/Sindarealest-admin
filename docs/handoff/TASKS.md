@@ -1,3 +1,15 @@
+## LATEST TASK RESULT — VERIFY LIVE PREVIEW SEO RESPONSES THROUGH ACCESS — 2026-10-24
+
+- Added a read-only post-deploy diagnostic using the existing Cloudflare Access service-token helper. It only requests the project Preview root, `/robots.txt`, and `/sitemap.xml`; no Access settings or middleware are modified.
+- The URL validator rejects Production, non-project hosts, credentials, query strings and non-root base paths. The helper sends paired Access headers only to same-origin Preview requests, never logs secrets or response bodies, and classifies Access redirects separately from application responses.
+- Unit regression `tests/preview-seo-smoke.test.mjs` covers target allowlisting, missing root noindex, Access redirects, expected Preview robots response, and expected sitemap suppression.
+- Exact SHA `79cca22640d31189001410595245e1d1b809734a`: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052741328; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052741331; Preview https://837f73ba.sindarealest2.pages.dev/.
+- Live HTTP diagnostic PASS through Access service token: root 200 + `X-Robots-Tag: noindex`; robots 200 + full disallow; sitemap 404 + noindex/nofollow + no-store.
+- Root Preview noindex is verified for this deployed response; no middleware/Access/infrastructure change was needed. Direct unauthenticated fetch redirects to Access login and is not endpoint evidence.
+- PR #108 OPEN/unmerged; no Production/main changes. Keep Hero, SKU verification, and fullscreen gallery flicker paused; accepted sections locked.
+
+---
+
 ## LATEST TASK RESULT — CORRECT NOINDEX TEST DESCRIPTIONS — 2026-10-24
 
 - Corrected stale comments in `tests/robots-txt.test.mjs` and `tests/storefront-operations.test.mjs`: Admin's effective noindex signal is the HTML meta robots directive, not an assumed response header from `public/_headers`.
