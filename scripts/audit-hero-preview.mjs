@@ -344,8 +344,8 @@ try {
           if (!st || st.face.clipPath !== 'none' || !String(st.face.borderRadius).includes('22%')
               || !String(st.face.maskImage).includes('linear-gradient') || !Number.isFinite(st.face.height) || st.face.height < 33 || st.face.height > 42
               || st.face.top < st.oval.top + st.oval.height - 11
-              || st.face.top > st.oval.top + st.oval.height - 2) {
-            fail('Mobile marble shelf must join the oval top and project down without a floating edge.');
+              || st.face.top > st.oval.top + st.oval.height + 4) {
+            fail('Mobile marble shelf must join the raised shoe support surface and extend down naturally.');
           }
         }
         if (m.viewport.width <= 390) {

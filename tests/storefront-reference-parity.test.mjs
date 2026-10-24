@@ -516,7 +516,7 @@ assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr
   && mobileHeroReferenceMatch.includes("opacity:1!important;mix-blend-mode:normal!important;"),
   "Mobile reference must use a short horizontal layout and undistorted transparent product asset.");
 assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
-  && mobileHeroReferenceMatch.includes("bottom:26px!important;")
+  && mobileHeroReferenceMatch.includes("bottom:35px!important;")
   && mobileHeroReferenceMatch.includes("height:25px!important;")
   && mobileHeroReferenceMatch.includes("bottom:-4px!important;")
   && mobileHeroReferenceMatch.includes("height:38px!important;"),
