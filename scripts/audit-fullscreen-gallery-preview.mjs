@@ -228,20 +228,13 @@ async function inspectFadeOpacity(page, label) {
 async function measureTransition(page, activate, delta, label) {
   const counterProgress = await activateAndVerifyCounter(page, activate, delta, label);
   await page.waitForFunction(() => {
-    const transitionClasses = [
-      ['sd-slide-out-left', 'sdFullscreenOutLeft'],
-      ['sd-slide-out-right', 'sdFullscreenOutRight'],
-      ['sd-slide-in-left', 'sdFullscreenInLeft'],
-      ['sd-slide-in-right', 'sdFullscreenInRight']
-    ];
     const images = [
       document.querySelector('#sdFullscreenImage'),
       document.querySelector('#sdFullscreenImageNext')
     ].filter(Boolean);
-    return images.some((image) => transitionClasses.some((item) =>
-      image.classList.contains(item[0]) &&
-      Array.from(image.getAnimations()).some((animation) =>
-        animation.animationName === item[1] && animation.playState === 'running')));
+    return images.some((image) => image.classList.contains('sd-fade-in')
+      && Array.from(image.getAnimations()).some((animation) =>
+        String(animation.transitionProperty || '') === 'opacity' && animation.playState === 'running'));
   }, null, { timeout: 8000 });
   const result = await inspectFadeOpacity(page, label);
   result.counterProgress = counterProgress;
@@ -250,10 +243,7 @@ async function measureTransition(page, activate, delta, label) {
     const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
     return viewer && viewer.classList.contains('open')
       && images.filter((image) => image.classList.contains('is-active')).length === 1
-      && images.every((image) => !image.classList.contains('sd-slide-out-left')
-        && !image.classList.contains('sd-slide-out-right')
-        && !image.classList.contains('sd-slide-in-left')
-        && !image.classList.contains('sd-slide-in-right'))
+      && images.every((image) => !image.classList.contains('sd-fade-in'))
       && images.some((image) => image.classList.contains('is-active') && image.complete && image.naturalWidth > 0);
   }, null, { timeout: 8000 });
   return result;
@@ -379,10 +369,7 @@ async function runViewport(viewport) {
       const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
       return viewer && viewer.classList.contains('open')
         && images.filter((image) => image.classList.contains('is-active')).length === 1
-        && images.every((image) => !image.classList.contains('sd-slide-out-left')
-          && !image.classList.contains('sd-slide-out-right')
-          && !image.classList.contains('sd-slide-in-left')
-          && !image.classList.contains('sd-slide-in-right'))
+        && images.every((image) => !image.classList.contains('sd-fade-in'))
         && images.some((image) => image.classList.contains('is-active') && image.complete && image.naturalWidth > 0);
     }, null, { timeout: 8000 });
     const rapid = await page.evaluate(() => {
@@ -417,10 +404,7 @@ async function runViewport(viewport) {
       const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
       return viewer && viewer.classList.contains('open')
         && images.filter((image) => image.classList.contains('is-active')).length === 1
-        && images.every((image) => !image.classList.contains('sd-slide-out-left')
-          && !image.classList.contains('sd-slide-out-right')
-          && !image.classList.contains('sd-slide-in-left')
-          && !image.classList.contains('sd-slide-in-right'))
+        && images.every((image) => !image.classList.contains('sd-fade-in'))
         && images.some((image) => image.classList.contains('is-active') && image.complete && image.naturalWidth > 0);
     }, null, { timeout: 8000 });
     const settled = await page.evaluate(() => ({
