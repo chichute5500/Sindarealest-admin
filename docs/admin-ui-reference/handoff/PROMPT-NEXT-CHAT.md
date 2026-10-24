@@ -1,6 +1,16 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 ## Read this and continue the project immediately
 
+## CURRENT VERIFIED STATE — 2026-10-24 18:43 UTC (newest; supersedes older history)
+
+- Writable Admin branch is a documentation child of one-shot workflow SHA `1a3cd63444f58506546b73c9434a14709fabe201`. **Deployed application code = `078dd7cbccd6915f4923c3a52b61d27c6d9d4f7a`** to isolated Admin Preview project only, Cloudflare reported SHA match, deployment ID `0848b2d4-3196-46c0-9904-d190518ba2c4`. [Live deploy/QA PASS #40121670202](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121670202).
+- Approved 12-screen source visual polish and 390/412/1280 light/dark QA with **four actual repository product images and synthetic browser-only price/stock**. [Diagnostics PASS #40121235347](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121235347), [same-data image artifact #12571356633](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121235347/artifacts/12571356633), no horizontal overflow, zero API writes. Source screenshots still **NOT approved-reference pixel parity**.
+- Authenticated isolated D1 QA: product save, order pricing/terms, claim update, **warranty issuance duplicate/date protections**, D1/audit readbacks, Backup GET all PASS; 48 distinct screen captures PASS. Synthetic journal `cleanupVerified=true`, `failures=[]`, **7/7 tables + generated warranty/item fully removed**, twice. Artifact [#12570909132](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121670202/artifacts/12570909132).
+- Historic 50% PROVISIONAL marker is not a mathematical progress calculation. 12/12 screens still PARTIAL_NOT_ACCEPTED for exact design parity; real payment/refund, full Restore POST, R2/QR and Production not accepted. Do not claim 100%. No merge/Production/secrets change. Temporary one-shot workflow removed with this handoff commit.
+- Next: use visual fixture evidence to reduce exact-reference layout differences, especially Gallery screen #5 and mobile editor; close missing business acceptance on **disposable** environments; run tests and compare screenshots before approving screens. Re-fetch GitHub HEAD, PRs and CI before writing; do not request earlier project context again.
+
+
+
 ## NEWEST VERIFIED CHECKPOINT — owner-approved isolated Preview deployed (2026-10-24 17:50 UTC)
 
 - Exact approved **deployed application SHA** `fc760be6fe8a67cc07aa1d32f17d1d5be7b305ac`. Isolated Cloudflare Pages Preview deployment and metadata match **PASS** [Actions #40117657594](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117657594), deployment `dce25587-1869-42cb-abfb-a18c9ec4c925`. Exact GitHub QA/test SHA `4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad` differed only by one temporary workflow; no application code changes. This documentation handoff is a newer descendant; first **fetch live** HEAD, PR and Actions.

@@ -1,20 +1,20 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T17:50:00Z",
+  "capturedAtUtc": "2026-10-24T18:43:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad",
   "checkpointSemantics": "Live QA source HEAD 538b20fa04b1d3b15e98d5bad59b5992e2f1dc47 before handoff docs commit; deployed app 564ea556e6dee745eaaa491ee033a2a8cfbb595c; 48/48 screenshots, product PUT/GET D1, warranty claim PATCH/GET D1, backup GET V2 PASS; 7 QA rows cleaned twice; same-data reference parity and end-to-end payment/refund/order/restore NOT_ACCEPTED. 50% PROVISIONAL.",
-  "codeTestSha": "4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad",
+  "codeTestSha": "078dd7cbccd6915f4923c3a52b61d27c6d9d4f7a",
   "latestProductSourceCommit": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
   "latestActionsRun": {
-    "id": 40117657594,
-    "workflow": "Owner-approved one-shot isolated Admin Preview deploy and QA",
+    "id": 40121670202,
+    "workflow": "Owner-approved reference-aligned isolated Admin Preview deploy and QA",
     "status": "completed",
     "conclusion": "success",
-    "sha": "4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117657594",
-    "artifactId": 12569586706
+    "sha": "1a3cd63444f58506546b73c9434a14709fabe201",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121670202",
+    "artifactId": 12570909132
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -219,7 +219,7 @@
     },
     "3_product_list": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Actual catalog density/pagination not proven; unknown data must remain unknown."
+      "gap": "Same-data visual QA PASS: four verified public catalog photos and explicit synthetic browser-only price/stock; six 390/412/1280 × light/dark screenshots no overflow, zero writes. Reference pixel parity remains NOT_VERIFIED."
     },
     "4_product_editor": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -227,7 +227,7 @@
     },
     "5_product_gallery": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Source has a featured cover slot plus a horizontally scrolling mobile thumbnail rail. Artifact #535's synthetic fixture shows placeholder/tile-like thumbnails unlike the approved reference montage; no authenticated same-data gallery capture exists to resolve the discrepancy. Keep PARTIAL_NOT_ACCEPTED and parity NOT_VERIFIED."
+      "gap": "New visual QA uses genuine repository photos and opens Gallery successfully, including screen capture. Exact mobile gallery featured-photo sizing and thumb-rail parity vs approved reference remains NOT_VERIFIED."
     },
     "6_orders": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -243,7 +243,7 @@
     },
     "9_warranty_support": {
       "status": "PARTIAL_NOT_ACCEPTED",
-      "gap": "Warranty issuance atomic insert rechecks that the order is still completed. QR upload metadata/audit atomicity also verified by CI #5636 and Preview #521. Real warranty/payment persistence not tested."
+      "gap": "Authenticated isolated D1 warranty claim status and new issuance POST→GET/D1/audit PASS, duplicate 409, invalid date 400; all QA rows removed. Full production issuance and exact reference parity NOT_ACCEPTED."
     },
     "10_website_settings": {
       "status": "PARTIAL_NOT_ACCEPTED",
@@ -519,8 +519,8 @@
   },
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "latestCodeCommitSha": "4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad",
-  "testedCommitSha": "4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad",
+  "latestCodeCommitSha": "078dd7cbccd6915f4923c3a52b61d27c6d9d4f7a",
+  "testedCommitSha": "1a3cd63444f58506546b73c9434a14709fabe201",
   "capturedAt": "2026-10-24T01:53:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
   "checks": {
@@ -826,19 +826,19 @@
     "headSha": "0469930f6836d5f8d87b155a538e1d68776e3913"
   },
   "latestRun": {
-    "id": 40117657594,
-    "workflow": "Owner-approved one-shot isolated Admin Preview deploy and QA",
+    "id": 40121670202,
+    "workflow": "Owner-approved reference-aligned isolated Admin Preview deploy and QA",
     "status": "completed",
     "conclusion": "success",
-    "sha": "4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117657594",
-    "artifactId": 12569586706
+    "sha": "1a3cd63444f58506546b73c9434a14709fabe201",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121670202",
+    "artifactId": 12570909132
   },
   "acceptance": {
-    "progress": "50% PROVISIONAL",
+    "progress": "50% PROVISIONAL — HISTORICAL NON-WEIGHTED MARKER",
     "screens": "12 screens PARTIAL_NOT_ACCEPTED",
     "referenceParity": "NOT_VERIFIED",
-    "authenticatedBusinessWriteQA": "PARTIAL_PRODUCT_WARRANTY_CLAIM_ORDER_PRICE_TERMS_QA_PASS",
+    "authenticatedBusinessWriteQA": "PARTIAL_PRODUCT_ORDER_PRICE_TERMS_WARRANTY_CLAIM_AND_ISSUANCE_PASS",
     "remoteD1SchemaLedger": "REQUIRED_SCHEMA_SHAPE_VERIFIED_READ_ONLY",
     "production": "NOT_PERFORMED"
   },
@@ -1356,5 +1356,54 @@
     "productionDeployment": "NOT_PERFORMED",
     "ownerApprovalScope": "isolated Admin Preview deployment and synthetic run-owned QA only",
     "temporaryDeployWorkflow": "REMOVED_IN_HANDOFF_CHILD_COMMIT"
-  }
+  },
+  "latestReferenceAlignedPreviewDeployment": {
+    "capturedAtUtc": "2026-10-24T18:43:00Z",
+    "deployedApplicationSha": "078dd7cbccd6915f4923c3a52b61d27c6d9d4f7a",
+    "workflowQaSha": "1a3cd63444f58506546b73c9434a14709fabe201",
+    "deployRunId": 40121670202,
+    "deployedCloudflareProject": "sindarealest-admin-preview",
+    "deployedEnvironment": "preview",
+    "cloudflareDeploymentId": "0848b2d4-3196-46c0-9904-d190518ba2c4",
+    "shaProvenance": "REPORTED_SHA_MATCH_METADATA_ONLY",
+    "productReferenceVisualRunId": 40121235347,
+    "productReferenceVisualArtifactId": 12571356633,
+    "productReferenceVisualFixtures": "4 repository product photos; synthetic browser-only price/SKU/stock; backendWrites=[]",
+    "productReferenceVisualSizes": [
+      "390x844 light",
+      "390x844 dark",
+      "412x915 light",
+      "412x915 dark",
+      "1280x800 light",
+      "1280x800 dark"
+    ],
+    "referenceVisualArtifactImageCount": 8,
+    "visualReferencePixelParity": "NOT_VERIFIED",
+    "sourceVisualDiagnostic": "PASS",
+    "visual12Screens": "48 CAPTURED_NOT_ACCEPTED; 12 DISTINCT PER MATRIX",
+    "syntheticLifecycleArtifactId": 12570909132,
+    "authenticatedProductWrite": true,
+    "authenticatedOrderPricingAndTermsWrite": true,
+    "authenticatedWarrantyClaimWrite": true,
+    "authenticatedWarrantyIssuanceWrite": true,
+    "warrantyIssuedD1AndAuditReadback": true,
+    "warrantyDuplicateRejected409": true,
+    "warrantyImpossibleDateRejected400": true,
+    "backupReadOnlyPass": true,
+    "financialReceiptsRefundsLiveQA": "NOT_PERFORMED",
+    "backupRestorePOSTIntegration": "NOT_PERFORMED",
+    "production": "UNTOUCHED",
+    "runOwnedQaCleanup": "VERIFIED_TWO_PASSES",
+    "runOwnedQaRemainingRows": 0,
+    "qaExtraRowsStatus": {
+      "warranty_issue_item": "REMOVED",
+      "warranty_issued_by_qa": "REMOVED"
+    },
+    "acceptanceStatus": "PARTIAL_NOT_SIGNED_OFF",
+    "overallPercentBasis": "PROVISIONAL_HISTORICAL_NON_WEIGHTED",
+    "temporaryDeployWorkflow": "REMOVED_IN_HANDOFF_CHILD"
+  },
+  "realWarrantyIssuanceQA": "PASS_ISOLATED_PREVIEW_RUN_OWNED",
+  "visualDesignParity": "NOT_VERIFIED",
+  "progressMethodology": "50% historic provisional, not a weighted metric; no acceptance percentage is inferred from CI PASS."
 }
