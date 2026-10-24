@@ -84,70 +84,102 @@ async function tap(locator, mobile) {
   if (mobile) await locator.tap({ timeout: 10000 });
   else await locator.click({ timeout: 10000 });
 }
-async function measureTransition(page, activate, label) {
-  await page.evaluate(() => {
-    const state = window.__sdGalleryGeometry = {
-      startedAt: performance.now(), frames: [], sawAnimation: false, quietFrames: 0,
-      finished: false, timedOut: false
-    };
-    function tick() {
-      if (state.finished) return;
-      const one = document.querySelector('#sdFullscreenImage');
-      const two = document.querySelector('#sdFullscreenImageNext');
+async function inspectAnimationGeometry(page, label) {
+  const measured = await page.evaluate(() => {
+    const imageNodes = [
+      document.querySelector('#sdFullscreenImage'),
+      document.querySelector('#sdFullscreenImageNext')
+    ].filter(Boolean);
+    const animations = imageNodes.flatMap((image) => image.getAnimations()
+      .filter((animation) => String(animation.animationName || '').indexOf('sdFullscreen') === 0));
+    const mediaReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!animations.length) return { found: false, reducedMotion: mediaReduce, names: [], durationsMs: [], frames: [] };
+    const names = animations.map((animation) => String(animation.animationName || ''));
+    const durationsMs = animations.map((animation) => Number(animation.effect && animation.effect.getTiming().duration));
+    animations.forEach((animation) => animation.pause());
+    const progress = [0, 0.25, 0.5, 0.75, 0.99];
+    const frames = [];
+    for (const amount of progress) {
+      animations.forEach((animation) => {
+        const duration = Number(animation.effect && animation.effect.getTiming().duration);
+        const endTime = Number.isFinite(duration) ? Math.max(0, duration - 0.01) : 0;
+        animation.currentTime = Math.min(duration * amount, endTime);
+      });
+      void document.body.offsetWidth;
+      const first = imageNodes[0].getBoundingClientRect();
+      const second = imageNodes[1].getBoundingClientRect();
       const frame = document.querySelector('#sdFullscreenFrame');
-      const viewer = document.querySelector('#sdFullscreenViewer');
-      if (viewer && viewer.classList.contains('open') && one && two && frame) {
-        const animOne = getComputedStyle(one).animationName || 'none';
-        const animTwo = getComputedStyle(two).animationName || 'none';
-        if (animOne.indexOf('sdFullscreen') === 0 || animTwo.indexOf('sdFullscreen') === 0) {
-          state.sawAnimation = true;
-          state.quietFrames = 0;
-          const a = one.getBoundingClientRect();
-          const b = two.getBoundingClientRect();
-          const f = frame.getBoundingClientRect();
-          const innerLeft = f.left + frame.clientLeft;
-          const innerRight = innerLeft + frame.clientWidth;
-          const left = a.left <= b.left ? a : b;
-          const right = a.left <= b.left ? b : a;
-          const overlap = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
-          const gap = Math.max(0, right.left - left.right);
-          const cover = Math.max(0,
-            Math.min(innerRight, Math.max(a.right, b.right)) -
-            Math.max(innerLeft, Math.min(a.left, b.left)));
-          state.frames.push({
-            t: Number((performance.now() - state.startedAt).toFixed(2)),
-            overlapPx: Number(overlap.toFixed(3)),
-            gapPx: Number(gap.toFixed(3)),
-            frameWidth: frame.clientWidth,
-            coveredWidth: Number(cover.toFixed(3)),
-            oneAnimation: animOne,
-            twoAnimation: animTwo
-          });
-        } else if (state.sawAnimation && ++state.quietFrames >= 4) {
-          state.finished = true;
-          return;
-        }
-      }
-      if (performance.now() - state.startedAt > 12000) {
-        state.finished = true;
-        state.timedOut = !state.sawAnimation;
-        return;
-      }
-      requestAnimationFrame(tick);
+      const rect = frame.getBoundingClientRect();
+      const innerLeft = rect.left + frame.clientLeft;
+      const innerRight = innerLeft + frame.clientWidth;
+      const left = first.left <= second.left ? first : second;
+      const right = first.left <= second.left ? second : first;
+      frames.push({
+        progress: amount,
+        overlapPx: Number(Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left)).toFixed(3)),
+        gapPx: Number(Math.max(0, right.left - left.right).toFixed(3)),
+        frameWidth: frame.clientWidth,
+        coveredWidth: Number(Math.max(0,
+          Math.min(innerRight, Math.max(first.right, second.right)) -
+          Math.max(innerLeft, Math.min(first.left, second.left))).toFixed(3))
+      });
     }
-    requestAnimationFrame(tick);
+    animations.forEach((animation) => {
+      const duration = Number(animation.effect && animation.effect.getTiming().duration);
+      animation.currentTime = Number.isFinite(duration) ? Math.max(0, duration - 0.01) : 0;
+      animation.play();
+    });
+    return {
+      found: true,
+      reducedMotion: mediaReduce,
+      names,
+      durationsMs,
+      frames
+    };
   });
+  if (!measured.found) throw new Error(label + ': CSS gallery animation objects were not found. Reduced motion=' + measured.reducedMotion + '.');
+  const maxOverlap = measured.frames.length ? Math.max.apply(null, measured.frames.map((frame) => frame.overlapPx)) : Infinity;
+  const maxGap = measured.frames.length ? Math.max.apply(null, measured.frames.map((frame) => frame.gapPx)) : Infinity;
+  const minCoverage = measured.frames.length
+    ? Math.min.apply(null, measured.frames.map((frame) => frame.coveredWidth / Math.max(1, frame.frameWidth)))
+    : 0;
+  const issues = [];
+  if (measured.reducedMotion) issues.push('Unexpected prefers-reduced-motion=reduce in a no-preference audit context.');
+  if (measured.durationsMs.some((duration) => !Number.isFinite(duration) || duration < 250 || duration > 350)) {
+    issues.push('CSS animation duration is not the expected 300ms: ' + measured.durationsMs.join(', ') + 'ms.');
+  }
+  if (maxOverlap > 1.5) issues.push('Image-layer overlap reached ' + maxOverlap + ' CSS px.');
+  if (maxGap > 1.5) issues.push('Image-layer gap reached ' + maxGap + ' CSS px.');
+  if (minCoverage < 0.985) issues.push('Combined image-layer frame coverage fell to ' + (minCoverage * 100).toFixed(2) + '%.');
+  const result = {
+    label,
+    samplingMode: 'CSSAnimation timeline sampled at 0/25/50/75/99 percent',
+    reducedMotion: measured.reducedMotion,
+    animationNames: measured.names,
+    animationDurationsMs: measured.durationsMs,
+    frameSamples: measured.frames.length,
+    maxOverlapPx: Number(maxOverlap.toFixed(3)),
+    maxGapPx: Number(maxGap.toFixed(3)),
+    minFrameCoveragePercent: Number((minCoverage * 100).toFixed(2)),
+    measuredFrames: measured.frames,
+    status: issues.length ? 'FAIL' : 'PASS',
+    issues
+  };
+  report.transitions.push(result);
+  assert.equal(issues.length, 0, label + ': ' + issues.join(' '));
+  return result;
+}
+async function measureTransition(page, activate, label) {
   await activate();
-  await page.waitForFunction(() => window.__sdGalleryGeometry && window.__sdGalleryGeometry.finished, null, { timeout: 15000 });
-  const sample = await page.evaluate(() => window.__sdGalleryGeometry);
-  assert.equal(sample.timedOut, false, label + ': no CSS slide animation was observed.');
-  assert.ok(sample.frames.length >= 6, label + ': insufficient frame-by-frame samples.');
-  const maxOverlap = Math.max.apply(null, sample.frames.map((x) => x.overlapPx));
-  const maxGap = Math.max.apply(null, sample.frames.map((x) => x.gapPx));
-  const minCoverage = Math.min.apply(null, sample.frames.map((x) => x.coveredWidth / Math.max(1, x.frameWidth)));
-  assert.ok(maxOverlap <= 1.5, label + ': two image boxes overlapped by ' + maxOverlap + ' CSS px.');
-  assert.ok(maxGap <= 1.5, label + ': image boxes left a gap of ' + maxGap + ' CSS px.');
-  assert.ok(minCoverage >= 0.985, label + ': image layers covered only ' + (minCoverage * 100).toFixed(2) + '% of the viewer frame.');
+  await page.waitForFunction(() => {
+    const images = [
+      document.querySelector('#sdFullscreenImage'),
+      document.querySelector('#sdFullscreenImageNext')
+    ].filter(Boolean);
+    return images.some((image) => Array.from(image.getAnimations()).some((animation) =>
+      String(animation.animationName || '').indexOf('sdFullscreen') === 0));
+  }, null, { timeout: 8000 });
+  const result = await inspectAnimationGeometry(page, label);
   await page.waitForFunction(() => {
     const viewer = document.querySelector('#sdFullscreenViewer');
     const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
@@ -159,15 +191,6 @@ async function measureTransition(page, activate, label) {
         && !image.classList.contains('sd-slide-in-right'))
       && images.some((image) => image.classList.contains('is-active') && image.complete && image.naturalWidth > 0);
   }, null, { timeout: 8000 });
-  const result = {
-    label,
-    frameSamples: sample.frames.length,
-    maxOverlapPx: Number(maxOverlap.toFixed(3)),
-    maxGapPx: Number(maxGap.toFixed(3)),
-    minFrameCoveragePercent: Number((minCoverage * 100).toFixed(2)),
-    status: 'PASS'
-  };
-  report.transitions.push(result);
   return result;
 }
 async function runViewport(viewport) {
@@ -282,57 +305,44 @@ async function runViewport(viewport) {
     await measureTransition(page, () => tap(next, viewport.mobile), viewport.name + ' slow next');
     await measureTransition(page, () => tap(prev, viewport.mobile), viewport.name + ' slow previous');
 
-    await page.evaluate(() => {
-      const state = window.__sdGalleryRapid = {
-        startedAt: performance.now(), frames: [], sawAnimation: false, quietFrames: 0, finished: false, timedOut: false
-      };
-      function tick() {
-        if (state.finished) return;
-        const one = document.querySelector('#sdFullscreenImage');
-        const two = document.querySelector('#sdFullscreenImageNext');
-        const frame = document.querySelector('#sdFullscreenFrame');
-        const viewer = document.querySelector('#sdFullscreenViewer');
-        if (viewer && viewer.classList.contains('open') && one && two && frame) {
-          const an = getComputedStyle(one).animationName || 'none';
-          const bn = getComputedStyle(two).animationName || 'none';
-          if (an.indexOf('sdFullscreen') === 0 || bn.indexOf('sdFullscreen') === 0) {
-            state.sawAnimation = true; state.quietFrames = 0;
-            const a = one.getBoundingClientRect(), b = two.getBoundingClientRect(), f = frame.getBoundingClientRect();
-            const left = a.left <= b.left ? a : b, right = a.left <= b.left ? b : a;
-            const innerLeft = f.left + frame.clientLeft, innerRight = innerLeft + frame.clientWidth;
-            state.frames.push({
-              overlapPx: Number(Math.max(0, Math.min(a.right,b.right)-Math.max(a.left,b.left)).toFixed(3)),
-              gapPx: Number(Math.max(0,right.left-left.right).toFixed(3)),
-              frameWidth: frame.clientWidth,
-              coveredWidth: Number(Math.max(0,Math.min(innerRight,Math.max(a.right,b.right))-Math.max(innerLeft,Math.min(a.left,b.left))).toFixed(3))
-            });
-          } else if (state.sawAnimation && ++state.quietFrames >= 4) { state.finished = true; return; }
-        }
-        if (performance.now() - state.startedAt > 12000) { state.finished = true; state.timedOut = !state.sawAnimation; return; }
-        requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    });
     await tap(next, viewport.mobile);
     await tap(next, viewport.mobile);
     await tap(prev, viewport.mobile);
-    await page.waitForFunction(() => window.__sdGalleryRapid && window.__sdGalleryRapid.finished, null, { timeout: 15000 });
-    const rapid = await page.evaluate(() => window.__sdGalleryRapid);
-    assert.equal(rapid.timedOut, false, viewport.name + ' rapid next-next-previous: no transition was measured.');
-    assert.ok(rapid.frames.length >= 6, viewport.name + ' rapid taps: insufficient frame samples.');
-    const rapidOverlap = Math.max.apply(null, rapid.frames.map((x) => x.overlapPx));
-    const rapidGap = Math.max.apply(null, rapid.frames.map((x) => x.gapPx));
-    const rapidCoverage = Math.min.apply(null, rapid.frames.map((x) => x.coveredWidth / Math.max(1, x.frameWidth)));
-    assert.ok(rapidOverlap <= 1.5, viewport.name + ' rapid taps: overlap ' + rapidOverlap + ' CSS px.');
-    assert.ok(rapidGap <= 1.5, viewport.name + ' rapid taps: gap ' + rapidGap + ' CSS px.');
-    assert.ok(rapidCoverage >= 0.985, viewport.name + ' rapid taps: coverage below 98.5%.');
+    await page.waitForFunction(() => {
+      const viewer = document.querySelector('#sdFullscreenViewer');
+      const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
+      return viewer && viewer.classList.contains('open')
+        && images.filter((image) => image.classList.contains('is-active')).length === 1
+        && images.every((image) => !image.classList.contains('sd-slide-out-left')
+          && !image.classList.contains('sd-slide-out-right')
+          && !image.classList.contains('sd-slide-in-left')
+          && !image.classList.contains('sd-slide-in-right'))
+        && images.some((image) => image.classList.contains('is-active') && image.complete && image.naturalWidth > 0);
+    }, null, { timeout: 8000 });
+    const rapid = await page.evaluate(() => {
+      const images = Array.from(document.querySelectorAll('#sdFullscreenImage, #sdFullscreenImageNext'));
+      return {
+        activeCount: images.filter((image) => image.classList.contains('is-active')).length,
+        brokenActiveCount: images.filter((image) => image.classList.contains('is-active') && (!image.complete || image.naturalWidth === 0)).length,
+        staleTransitionClasses: images.filter((image) => image.classList.contains('sd-slide-out-left')
+          || image.classList.contains('sd-slide-out-right')
+          || image.classList.contains('sd-slide-in-left')
+          || image.classList.contains('sd-slide-in-right')).length,
+        counter: document.querySelector('#sdFullscreenCount')?.textContent || '',
+        imageSources: images.map((image) => image.getAttribute('src') || '')
+      };
+    });
+    assert.equal(rapid.activeCount, 1, viewport.name + ': rapid next-next-previous taps must settle on exactly one active image.');
+    assert.equal(rapid.brokenActiveCount, 0, viewport.name + ': rapid taps must not expose an undecoded active image.');
+    assert.equal(rapid.staleTransitionClasses, 0, viewport.name + ': rapid taps must clear stale transition classes.');
     report.transitions.push({
       label: viewport.name + ' rapid next-next-previous',
-      frameSamples: rapid.frames.length,
-      maxOverlapPx: Number(rapidOverlap.toFixed(3)),
-      maxGapPx: Number(rapidGap.toFixed(3)),
-      minFrameCoveragePercent: Number((rapidCoverage * 100).toFixed(2)),
-      status: 'PASS'
+      status: 'PASS_STABLE_FINAL_STATE',
+      activeImageCount: rapid.activeCount,
+      brokenActiveImageCount: rapid.brokenActiveCount,
+      staleTransitionClassCount: rapid.staleTransitionClasses,
+      counter: rapid.counter,
+      finalImageSourceCount: rapid.imageSources.length
     });
     await page.waitForFunction(() => {
       const viewer = document.querySelector('#sdFullscreenViewer');
