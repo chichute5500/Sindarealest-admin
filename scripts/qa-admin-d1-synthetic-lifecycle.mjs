@@ -106,6 +106,14 @@ async function main(){
   if(mode!=='run')throw Error('Invalid QA mode');
   try{
    await seed(db);
+   const verifiedTitle='QA VERIFIED SAVED '+rid;
+   const apiTest=spawnSync('npx',['playwright','test','tests/e2e/admin-qa-write-persistence.spec.js','--workers=1','--reporter=line'],{
+     stdio:'inherit',env:{...process.env,QA_TEST_PRODUCT_ID:rec.product,QA_EXPECTED_UPDATED_TITLE:verifiedTitle},timeout:180000});
+   if(apiTest.error||apiTest.status!==0)throw Error('Authenticated Admin QA product PUT/GET regression not verified; automatic cleanup required');
+   const persisted=await sql(db,'SELECT title,price,stock FROM products WHERE id=?',[rec.product]);
+   if(persisted.length!==1||persisted[0].title!==verifiedTitle||Number(persisted[0].price)!==123456||Number(persisted[0].stock)!==2)
+      throw Error('Exact isolated D1 QA row did not persist expected API changes');
+   journal.authenticatedAdminSaveVerified=true; journal.d1ReadbackVerified=true; save();
    const child=spawnSync('npx',['playwright','test','tests/e2e/admin-12-screen-live-qa.spec.js','--workers=2','--reporter=line,html'],{stdio:'inherit',env:process.env,timeout:900000});
    if(child.error||child.status!==0)throw Error('12-screen Playwright not fully green; exit '+String(child.status));
   }catch(e){error=e;console.error('[QA_SCREEN_RESULT] '+e.message)}
