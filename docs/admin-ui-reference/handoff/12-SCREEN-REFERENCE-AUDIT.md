@@ -1,14 +1,31 @@
-## Latest verified checkpoint — 2026-10-24 07:52 ICT
+## Latest checkpoint — 2026-10-24 08:22 ICT
 
-- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Exact source/test SHA: `ae0102f5caa773c5b4b92c4fd86eb6508759e3c0`.
-- Validate [#5525](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825040) **SUCCESS** and Admin Preview [#486](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046) **SUCCESS** on the same exact SHA. The Preview exact-HEAD guard passed.
-- Evidence artifact [admin-preview-evidence-486](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046/artifacts/12541717769): 133 PNGs (16 source/login screenshots, 120 fixture capture entries, 112 fixture metrics); zero horizontal-overflow metrics; source page/console/request/HTTP errors = 0; fixture page/API errors = 0, attempted writes = 0, unexpected API paths = 0. Seven fixture console entries are expected simulated HTTP 503 retry paths. Artifact SHA-256: `54ac0fa7d7da0d9ce81a3dbf861b9af345817828f3eb82c096c5612c5a1ee634`. Inspected Screen 9 warranty screenshot: no stale success toast; Screen 12 320×640 activity log shows several records above the fixed navigation.
-- **Test-first payment fix:** test-only SHA `2db00bbd0c28c8c0bfc97aa104525972f095acc9` failed as expected because a settled QR request still returned HTTP 201 for a new linked receipt. Fixed in [`ae0102f`](https://github.com/chichute5500/Sindarealest-admin/commit/ae0102f5caa773c5b4b92c4fd86eb6508759e3c0): preflight and atomic INSERT both require linked QR request status `pending`; added coverage for settled-before-preflight and settled-between-preflight-and-batch. Validate and Preview pass on exact SHA `ae0102f5caa773c5b4b92c4fd86eb6508759e3c0`.
-- Authenticated Preview checks are **read-only only**: 7/7 Admin GET routes returned HTTP 200; product list read-only test passed for 235 products and 527 persisted image URLs with successful image decoding and zero product mutation requests. Orders/customers/warranties/audit-log arrays were empty. This is not business write, non-empty business workflow, or persistence acceptance.
-- Dependency audit remains green without `npm audit fix --force`: Wrangler `4.152.0`, patched transitive `undici 7.30.1`.
-- **Acceptance is unchanged:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact approved-reference parity `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Overall progress remains 50% provisional.
-- Safety verified: `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 is open/unmerged; PR #108 is open/read-only; PR #112 is open/draft. No deployment, merge, Access bypass, secrets change, or real-data write.
-- Continue the seven operating rules: parallelize independent work, report then continue, mark genuine blockers and keep safe streams moving, test-first fixes only, tie claims to exact SHA/CI/artifact, stop only for required user action, and preserve branch/production/data boundaries.
+- Repository: `chichute5500/Sindarealest-admin`; writable branch: `feature/admin-isolated-handoff-2026-10-20`.
+- **Live HEAD at handoff start:** `6a31cb31d996a8937923d552421674f29d5c14d9`. Commit: [6a31cb3 — align order timeline and compact detail panels](https://github.com/chichute5500/Sindarealest-admin/commit/6a31cb31d996a8937923d552421674f29d5c14d9).
+- **Validate #40049172277: SUCCESS** on exact HEAD `6a31cb31d996a8937923d552421674f29d5c14d9`: dependency audit, project integrity, and automated tests passed. [Run details](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172277).
+- **Admin Preview #40049172286: IN PROGRESS** on exact HEAD `6a31cb31d996a8937923d552421674f29d5c14d9`. Repository checks and automated tests passed; Chromium installation was still running at last inspection. Do not claim Preview success until the run finishes, exact-HEAD guard succeeds, and its artifact is inspected. [Run details](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286).
+- Latest source work includes order timeline/detail-panel UI alignment. Previous test-first payment hardening requires continued review: receipt INSERT rechecks order cancellation, price/terms confirmation, and linked QR request status at the atomic write boundary. A prior regression reproduced a stale/settled QR request accepting a new linked receipt; the fix checks that the request remains `pending` at insert time. Keep all payment checks test-only; no real ledger writes.
+- **No acceptance uplift:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact approved-reference parity `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Overall project estimate remains 50% provisional.
+- **Isolation:** `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged; PR #108 OPEN/read-only; PR #112 OPEN/draft. Do not merge, deploy Production, change Access/secrets/shared Cloudflare configuration, seed/import, invoke Restore, or write real business data. Work only on the permitted feature branch.
+- **Six-file handoff sync is documentation-only.** Its resulting SHA is not the tested source SHA; the latest Validate/Preview evidence above belongs to `6a31cb31d996a8937923d552421674f29d5c14d9`. A new Preview may not auto-run for docs-only changes. Do not invent a source change just to trigger CI.
+
+## Seven mandatory operating rules
+
+1. **Parallelize real independent work.** Run safe, independent tracks concurrently where possible (UI/reference audit, regression-test review, API safety review, CI/artifact verification, handoff integrity); do not serialize unrelated work behind one slow check.
+2. **Report and continue.** A progress report is not a stop condition. After reporting, continue useful safe work until the user must act or all safe work is exhausted.
+3. **Handle blockers explicitly.** Record the exact blocker and evidence, then continue other independent work. Never repeat the same failed action without new evidence.
+4. **Test-first for reproducible regressions.** Add/confirm a failing regression test before changing source; avoid speculative CSS or business logic edits.
+5. **Tie claims to exact evidence.** Name the SHA, workflow/run, conclusion, exact-HEAD guard, artifact and inspected evidence. Distinguish local/synthetic fixtures from authenticated remote/backend behavior. Never treat an older SHA's green run as latest HEAD passing.
+6. **Stop only for genuine user action.** Examples: a required account/UI operation, permission grant, or explicit business decision. If needed, state the exact action; do not ask the user to hunt for a nonexistent “Run workflow” button.
+7. **Protect project boundaries.** Only the permitted feature branch; never modify `main` or storefront/shared branches/settings; do not merge/cherry-pick/force-push/sync PRs #111/#108/#112; do not touch PR #112; no Production deployment, Access bypass, secret changes, remote D1/R2/schema/business-data writes, migrations/setup scripts, seed/import, or TinyFish.
+
+## Next actions — continue without waiting passively
+
+1. Refresh run #40049172286 and inspect all steps/logs; if successful, inspect artifact and exact-HEAD guard for `6a31cb31d996a8937923d552421674f29d5c14d9`.
+2. In parallel, inspect the latest payment route/test diff and route invariants (receipt request state, cancellation races, refund net cap, audit/summary updates); add a regression test before any further source fix.
+3. Continue a separate read-only audit of the next unaccepted UI screen/reference; do not repeat already-fixed Screen 9 toast or Screen 12 mobile activity layout without new evidence.
+4. Refresh PR #111/#108/#112 and `main` before any branch-sensitive action. Keep them unmerged.
+5. When a genuine source/test defect is fixed, let watched-path CI trigger naturally and verify Validate + Preview on the same exact SHA. Update the handoff files again after evidence is final.
 
 ---
 ---

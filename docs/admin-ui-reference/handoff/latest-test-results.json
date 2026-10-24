@@ -1,27 +1,24 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T00:52:00Z",
+  "capturedAtUtc": "2026-10-24T01:22:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-  "codeTestSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+  "branchHeadAtCheckpointStart": "6a31cb31d996a8937923d552421674f29d5c14d9",
+  "codeTestSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
   "status": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SOURCE_TEST_SHA_ae0102f5caa773c5b4b92c4fd86eb6508759e3c0; DOCS_ONLY_HANDOFF_SYNC_FOLLOWS",
   "latestRun": {
-    "id": 40046825046,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046",
-    "status": "completed",
-    "conclusion": "success",
-    "sha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "headSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "testedSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+    "id": 40049172286,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286",
+    "status": "in_progress",
+    "conclusion": null,
+    "sha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "headSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
     "workflow": "Admin Preview diagnostic smoke test",
-    "artifact": "admin-preview-evidence-486",
-    "artifactId": 12541717769,
-    "sizeBytes": 20856642,
-    "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_READ_ONLY_GETS_7_OF_7; BUSINESS_WRITE_QA_NOT_TESTED",
-    "summary": "Local responsive/theme screenshot matrix, read-only authenticated Preview diagnostics, 7/7 Admin GET routes, read-only 235-product catalog checks, exact-HEAD guard and artifact upload passed."
+    "diagnostic": "PENDING_FINAL_RESULT; AUTHENTICATED_BUSINESS_WRITE_QA_NOT_TESTED",
+    "summary": "Repository checks and automated tests passed; Chromium installation was in progress at last inspection. Artifact not yet available."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3",
@@ -230,21 +227,19 @@
     }
   },
   "acceptanceBoundary": {
-    "all12Screens": "PARTIAL_NOT_ACCEPTED",
+    "screens": "ALL_12_PARTIAL_NOT_ACCEPTED",
     "exactReferenceParity": "NOT_VERIFIED",
-    "authenticatedBusinessBackendQA": "READ_ONLY_GETS_PASS; BUSINESS_WORKFLOWS_AND_WRITES_NOT_TESTED",
-    "remoteD1SchemaAndLedger": "NOT_VERIFIED",
-    "productImageSaveAndR2": "DEFERRED_BY_OWNER",
-    "migration0009": "DEFERRED_BY_OWNER",
-    "preProMigrations": "DEFERRED_BY_OWNER",
-    "productionDeployment": "NOT_PERFORMED"
+    "authenticatedBusinessWriteQA": "NOT_TESTED",
+    "remoteD1SchemaLedger": "NOT_VERIFIED",
+    "production": "NOT_PERFORMED",
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL"
   },
   "nextActions": [
-    "Continue parallel independent work after every progress report; do not stop unless user action/access/decision is genuinely required.",
-    "Prioritize exact-reference comparison on Screens 4, 5 and 7; only fix a reproducible mismatch with test-first evidence.",
-    "Settled-QR receipt race is fixed on exact SHA; do not repeat the same investigation.",
-    "Read-only authenticated Preview GETs passed, but empty business lists and no write requests do not prove business workflow acceptance.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED until evidence supports acceptance; no Access bypass, remote D1/R2 writes, migration, setup, or Production deployment."
+    "Inspect Preview #40049172286 and artifact for exact SHA 6a31cb31d996a8937923d552421674f29d5c14d9.",
+    "Continue test-first payment route race review.",
+    "Continue read-only reference audit of next unaccepted screen.",
+    "Preserve seven operating rules and branch/production/data boundaries."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -256,8 +251,8 @@
     "evidenceArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/39898454274/artifacts/12478285219",
     "screenshot": "warranties-responsive__320x640__light.png"
   },
-  "latestCodeCommitSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-  "testedCommitSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+  "latestCodeCommitSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+  "testedCommitSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
   "capturedAt": "2026-10-24T07:52:00+07:00",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046",
   "checks": {
@@ -391,7 +386,7 @@
     "No Production deploy, remote D1/R2/schema/ledger operations, or setup/migration/deploy script execution."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SHA_ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+  "currentHeadValidation": "VALIDATE_PASS_EXACT_HEAD; PREVIEW_IN_PROGRESS_EXACT_HEAD",
   "scopeAuditStatus": "B1_CLEANUP_REVIEW_COMPLETE; PRODUCT_ACCEPTANCE_PARTIAL",
   "livePrState": {
     "pr111": {
@@ -416,18 +411,15 @@
     },
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a"
   },
-  "currentHeadValidationReason": "Validate #5525 and Preview #486 succeeded on exact source/test SHA ae0102f5caa773c5b4b92c4fd86eb6508759e3c0; exact-HEAD guard passed. Handoff files are being synced in a docs-only child commit.",
+  "currentHeadValidationReason": "Validate passed on exact HEAD. Preview has not completed; no artifact/evidence yet.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-23T20:04:14.947Z",
-    "branchHeadAtCheckpointStart": "43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3",
-    "codeTestSha": "43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3",
-    "validateRunId": 40014439171,
-    "previewRunId": 40014439083,
-    "previewArtifactId": 12528367116,
-    "previewConclusion": "success",
+    "capturedAtUtc": "2026-10-24T01:22:00Z",
+    "branchHead": "6a31cb31d996a8937923d552421674f29d5c14d9",
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-    "pr111": "OPEN",
-    "pr108": "OPEN"
+    "validateRunId": 40049172277,
+    "validateConclusion": "success",
+    "previewRunId": 40049172286,
+    "previewConclusion": "in_progress"
   },
   "currentChange": {
     "sha": "7a57dfa634151ece49d3eb7cb7b2f31cf8f19628",
@@ -445,14 +437,14 @@
     "acceptance": "SCREEN_12_REMAINS_PARTIAL; full parity/authenticated audit data not verified"
   },
   "latestValidateRun": {
-    "id": 40046825040,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825040",
+    "id": 40049172277,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172277",
     "status": "completed",
     "conclusion": "success",
-    "sha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "testedSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+    "sha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
     "workflow": "Validate source and tests",
-    "summary": "Dependency audit, project integrity, npm run check and npm test passed on the exact source/test SHA."
+    "summary": "Dependency audit, project integrity and automated tests passed on exact HEAD."
   },
   "latestAttempt": {
     "capturedAtUtc": "2026-10-24T00:52:00Z",
@@ -516,13 +508,13 @@
     "result": "SUCCESS_ON_EXACT_SOURCE_TEST_SHA"
   },
   "handoffSync": {
-    "status": "SIX_FILE_DOCS_ONLY_SYNC_AFTER_EXACT_SHA_VALIDATE_PREVIEW_PASS",
-    "capturedAtUtc": "2026-10-24T00:52:00Z",
-    "codeTestSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "note": "This synchronization changes only handoff/audit documents. The new documentation commit is not a new application-source/test SHA; next chat must refresh live refs.",
+    "status": "SIX_FILE_DOCS_ONLY_SYNC_AFTER_VALIDATE_PASS_PREVIEW_PENDING",
+    "capturedAtUtc": "2026-10-24T01:22:00Z",
+    "codeTestSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "note": "This sync changes only handoff/audit docs. Current application source/test SHA remains the parent source SHA. Validate passed; Preview is pending and must be rechecked after this docs commit.",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "nextRequiredAction": "Refresh live refs after this docs-only sync, inspect artifact #486 if available, and continue parallel independent audits; only fix reproduced defects test-first."
+    "nextRequiredAction": "Refresh live refs; inspect Preview #40049172286 and artifact on exact source/test SHA 6a31cb31d996a8937923d552421674f29d5c14d9; continue independent safe audits in parallel."
   },
   "latestProductSourceCommit": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
   "latestDiagnosticArtifact": {
@@ -556,46 +548,42 @@
     "liveImageDecode": "PASS",
     "inspection": "Downloaded and inspected. Fixture-only screenshots have no overflow/errors/writes; live Preview test exercised authenticated GET routes and read-only product list only."
   },
-  "checkpointSemantics": "Live checkpoint at 2026-10-24T00:52:00Z: source/test SHA ae0102f5caa773c5b4b92c4fd86eb6508759e3c0; Validate #5525 and Preview #486 SUCCESS on the same exact SHA. Artifact #486 inspected: 133 PNGs, 120 fixture captures, 112 metrics, zero horizontal overflow/errors/writes. Remote read-only diagnostic passed 7/7 authenticated Admin GET routes and read-only 235-product catalog check; this is not business write/persistence acceptance. Docs-only handoff sync follows.",
+  "checkpointSemantics": "Live checkpoint 2026-10-24T01:22:00Z: feature branch HEAD 6a31cb31d996a8937923d552421674f29d5c14d9. Validate #40049172277 SUCCESS on exact HEAD; Admin Preview #40049172286 still IN_PROGRESS on exact HEAD, Chromium setup active at last inspection. Do not claim Preview PASS until exact-HEAD guard and artifact are verified. Six-file handoff update is docs-only.",
   "latestActionsRun": {
-    "id": 40046825046,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046",
-    "status": "completed",
-    "conclusion": "success",
-    "sha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "headSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "testedSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+    "id": 40049172286,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286",
+    "status": "in_progress",
+    "conclusion": null,
+    "sha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "headSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
     "workflow": "Admin Preview diagnostic smoke test",
-    "artifact": "admin-preview-evidence-486",
-    "artifactId": 12541717769,
-    "sizeBytes": 20856642,
-    "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_READ_ONLY_GETS_7_OF_7; BUSINESS_WRITE_QA_NOT_TESTED",
-    "summary": "Local responsive/theme screenshot matrix, read-only authenticated Preview diagnostics, 7/7 Admin GET routes, read-only 235-product catalog checks, exact-HEAD guard and artifact upload passed."
+    "diagnostic": "PENDING_FINAL_RESULT; AUTHENTICATED_BUSINESS_WRITE_QA_NOT_TESTED",
+    "summary": "Repository checks and automated tests passed; Chromium installation was in progress at last inspection. Artifact not yet available."
   },
   "latestValidateAttempt": {
-    "id": 40046825040,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825040",
+    "id": 40049172277,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172277",
     "status": "completed",
     "conclusion": "success",
-    "sha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "testedSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+    "sha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
     "workflow": "Validate source and tests",
-    "summary": "Dependency audit, project integrity, npm run check and npm test passed on the exact source/test SHA."
+    "summary": "Dependency audit, project integrity and automated tests passed on exact HEAD."
   },
   "latestPreviewAttempt": {
-    "id": 40046825046,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046",
-    "status": "completed",
-    "conclusion": "success",
-    "sha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "headSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-    "testedSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+    "id": 40049172286,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286",
+    "status": "in_progress",
+    "conclusion": null,
+    "sha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "headSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+    "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
     "workflow": "Admin Preview diagnostic smoke test",
-    "artifact": "admin-preview-evidence-486",
-    "artifactId": 12541717769,
-    "sizeBytes": 20856642,
-    "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_READ_ONLY_GETS_7_OF_7; BUSINESS_WRITE_QA_NOT_TESTED",
-    "summary": "Local responsive/theme screenshot matrix, read-only authenticated Preview diagnostics, 7/7 Admin GET routes, read-only 235-product catalog checks, exact-HEAD guard and artifact upload passed."
+    "activeStep": "Install Chromium for Playwright",
+    "artifact": null,
+    "diagnostic": "PENDING_FINAL_RESULT; AUTHENTICATED_BUSINESS_WRITE_QA_NOT_TESTED",
+    "summary": "Run is active; exact-HEAD guard and artifact inspection remain pending."
   },
   "latestProductChange": {
     "status": "PRODUCT_EDITOR_NARROW_MOBILE_SKU_PLACEHOLDER_REFINED; VALIDATE_PASS; PREVIEW_PASS",
@@ -607,8 +595,8 @@
     "previewStatus": "SUCCESS",
     "summary": "Changed the long commercial-SKU placeholder to 'SKU chính thức' so it fits the 320px mobile field more cleanly; added Playwright assertion. Validate and Preview passed on exact SHA; artifact 421 confirms screenshot."
   },
-  "currentHeadAtCheckpoint": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
-  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046",
+  "currentHeadAtCheckpoint": "6a31cb31d996a8937923d552421674f29d5c14d9",
+  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286",
   "latestReviewFinding": {
     "status": "SETTLED_QR_RECEIPT_GUARD_VERIFIED_ON_EXACT_SHA",
     "sourceTestSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
@@ -628,7 +616,7 @@
     "meaning": "Workflow refused because target Preview DB already contained 235 product rows. User subsequently confirmed products are visible in UI. Do not re-import.",
     "unverified": "CRUD, image delivery, authenticated API end-to-end behavior, visual acceptance of all 12 screens, production"
   },
-  "nextStep": "Refresh live refs after this docs-only sync. Continue with the next reproducible reference mismatch among unaccepted screens, prioritizing Screens 4/5/7; inspect exact artifact https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046/artifacts/12541717769. Do not repeat the settled-QR fix.",
+  "nextStep": "Inspect Preview #40049172286 to completion; in parallel review payment route invariants and next UI reference gap without speculative changes.",
   "latestAuthenticatedReadOnlyRoutes": {
     "runId": 40001316195,
     "sourceCommit": "0be55ce7385fa1bc9408e0faca17c5be6a42373e",
@@ -772,5 +760,37 @@
     "progressEstimate": "50% PROVISIONAL"
   },
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "nextChatInstructions": "Continue directly on feature/admin-isolated-handoff-2026-10-20; refresh live branch HEAD, PRs and Actions. Source/test SHA ae0102f5caa773c5b4b92c4fd86eb6508759e3c0 passed Validate #5525 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825040) and Preview #486 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046); artifact #486 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046/artifacts/12541717769) was downloaded and inspected. The settled-QR regression was reproduced test-first and fixed; do not repeat it. Continue parallel independent work and reference-driven screen audit, prioritizing Screens 4/5/7; fix only reproducible defects test-first. Preserve all seven operating rules and safety boundaries. Authenticated Preview evidence is read-only only: 7/7 Admin GET routes passed, catalog 235 products/527 image URLs decoded; orders/customers/warranties/audit logs were empty. All 12 screens remain PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; business write QA NOT_TESTED; remote D1 NOT_VERIFIED; Production NOT_PERFORMED. Do not seek a missing Run workflow control, create dummy commits, merge, deploy Production, bypass Access, change secrets, or mutate real business data."
+  "nextChatInstructions": "## Latest checkpoint — 2026-10-24 08:22 ICT\n\n- Repository: `chichute5500/Sindarealest-admin`; writable branch: `feature/admin-isolated-handoff-2026-10-20`.\n- **Live HEAD at handoff start:** `6a31cb31d996a8937923d552421674f29d5c14d9`. Commit: [6a31cb3 — align order timeline and compact detail panels](https://github.com/chichute5500/Sindarealest-admin/commit/6a31cb31d996a8937923d552421674f29d5c14d9).\n- **Validate #40049172277: SUCCESS** on exact HEAD `6a31cb31d996a8937923d552421674f29d5c14d9`: dependency audit, project integrity, and automated tests passed. [Run details](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172277).\n- **Admin Preview #40049172286: IN PROGRESS** on exact HEAD `6a31cb31d996a8937923d552421674f29d5c14d9`. Repository checks and automated tests passed; Chromium installation was still running at last inspection. Do not claim Preview success until the run finishes, exact-HEAD guard succeeds, and its artifact is inspected. [Run details](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286).\n- Latest source work includes order timeline/detail-panel UI alignment. Previous test-first payment hardening requires continued review: receipt INSERT rechecks order cancellation, price/terms confirmation, and linked QR request status at the atomic write boundary. A prior regression reproduced a stale/settled QR request accepting a new linked receipt; the fix checks that the request remains `pending` at insert time. Keep all payment checks test-only; no real ledger writes.\n- **No acceptance uplift:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact approved-reference parity `NOT_VERIFIED`; authenticated business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Overall project estimate remains 50% provisional.\n- **Isolation:** `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged; PR #108 OPEN/read-only; PR #112 OPEN/draft. Do not merge, deploy Production, change Access/secrets/shared Cloudflare configuration, seed/import, invoke Restore, or write real business data. Work only on the permitted feature branch.\n- **Six-file handoff sync is documentation-only.** Its resulting SHA is not the tested source SHA; the latest Validate/Preview evidence above belongs to `6a31cb31d996a8937923d552421674f29d5c14d9`. A new Preview may not auto-run for docs-only changes. Do not invent a source change just to trigger CI.\n\n## Seven mandatory operating rules\n\n1. **Parallelize real independent work.** Run safe, independent tracks concurrently where possible (UI/reference audit, regression-test review, API safety review, CI/artifact verification, handoff integrity); do not serialize unrelated work behind one slow check.\n2. **Report and continue.** A progress report is not a stop condition. After reporting, continue useful safe work until the user must act or all safe work is exhausted.\n3. **Handle blockers explicitly.** Record the exact blocker and evidence, then continue other independent work. Never repeat the same failed action without new evidence.\n4. **Test-first for reproducible regressions.** Add/confirm a failing regression test before changing source; avoid speculative CSS or business logic edits.\n5. **Tie claims to exact evidence.** Name the SHA, workflow/run, conclusion, exact-HEAD guard, artifact and inspected evidence. Distinguish local/synthetic fixtures from authenticated remote/backend behavior. Never treat an older SHA's green run as latest HEAD passing.\n6. **Stop only for genuine user action.** Examples: a required account/UI operation, permission grant, or explicit business decision. If needed, state the exact action; do not ask the user to hunt for a nonexistent “Run workflow” button.\n7. **Protect project boundaries.** Only the permitted feature branch; never modify `main` or storefront/shared branches/settings; do not merge/cherry-pick/force-push/sync PRs #111/#108/#112; do not touch PR #112; no Production deployment, Access bypass, secret changes, remote D1/R2/schema/business-data writes, migrations/setup scripts, seed/import, or TinyFish.\n\n## Next actions — continue without waiting passively\n\n1. Refresh run #40049172286 and inspect all steps/logs; if successful, inspect artifact and exact-HEAD guard for `6a31cb31d996a8937923d552421674f29d5c14d9`.\n2. In parallel, inspect the latest payment route/test diff and route invariants (receipt request state, cancellation races, refund net cap, audit/summary updates); add a regression test before any further source fix.\n3. Continue a separate read-only audit of the next unaccepted UI screen/reference; do not repeat already-fixed Screen 9 toast or Screen 12 mobile activity layout without new evidence.\n4. Refresh PR #111/#108/#112 and `main` before any branch-sensitive action. Keep them unmerged.\n5. When a genuine source/test defect is fixed, let watched-path CI trigger naturally and verify Validate + Preview on the same exact SHA. Update the handoff files again after evidence is final.\n",
+  "actions": {
+    "latestSuccessful": {
+      "currentHeadApplicability": "Validate #40049172277 passed on 6a31cb31d996a8937923d552421674f29d5c14d9; Preview #40049172286 is still running on exact HEAD."
+    },
+    "latestAttempt": {
+      "capturedAtUtc": "2026-10-24T01:22:00Z",
+      "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+      "validateRun": {
+        "id": 40049172277,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172277",
+        "status": "completed",
+        "conclusion": "success",
+        "sha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+        "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+        "workflow": "Validate source and tests",
+        "summary": "Dependency audit, project integrity and automated tests passed on exact HEAD."
+      },
+      "previewRun": {
+        "id": 40049172286,
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049172286",
+        "status": "in_progress",
+        "conclusion": null,
+        "sha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+        "headSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+        "testedSha": "6a31cb31d996a8937923d552421674f29d5c14d9",
+        "workflow": "Admin Preview diagnostic smoke test",
+        "summary": "Checks and tests passed; Chromium setup was running at last inspection; exact-HEAD guard/artifact still pending."
+      },
+      "previewArtifact": null,
+      "reason": "Order timeline/detail-panel alignment commit; await final Preview result and continue parallel payment/UI audit."
+    }
+  }
 }
