@@ -2,15 +2,15 @@
 
 Continue directly on GitHub repository `chichute5500/Sindarealest-admin`. Do not ask the user to repeat context. Verify live state first and continue useful work after reporting.
 
-## Live checkpoint — 2026-10-24 09:36 UTC
+## Live checkpoint — 2026-10-24 09:41 UTC
 
-- Writable branch: `feature/admin-isolated-handoff-2026-10-20`.
-- PR #111 was OPEN/unmerged at checkpoint capture; refresh PR metadata and branch HEAD before further action.
-- Latest application/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
-- Validate #5688 PASS on that exact source/test SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`; fetch live PR metadata and HEAD before further action.
+- PR #111 is OPEN/unmerged; do not merge, rebase, cherry-pick, or force-push.
+- Application/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
+- Validate #5688 PASS on that exact SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
 - Admin Preview Playwright #1077 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
-- Latest docs checkpoint at capture: `e5736c5542863fc23e5e235f5eaacc8c1374f325`. Validate #5721 failed because `current-status.json` lacked required `entryPoint`; Preview Playwright #1091 passed. The canonical field has now been restored; re-run/inspect validation on the newest HEAD before claiming all-green.
-- Recent source fix: order-item updates are blocked if cancellation is requested while a pending QR payment request exists, closing a partial-write race. Source/test exact-SHA checks passed.
+- Handoff metadata was repaired after Validate #5721 found missing `handoffSync.entryPoint` / `handoffSync.nextChatPrompt`. Validate #5733 and Admin Preview Playwright #1097 both PASS on docs-only SHA `5f7a9d94858a02faaea003e2a9ea6386d507121f`.
+- Recent source fix: order-item updates are blocked if cancellation is requested while a pending QR payment request exists, closing a partial-write race.
 - Progress remains 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; approved-reference parity NOT_VERIFIED; authenticated business-write/persistence QA NOT_TESTED; remote Preview D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
 
 ## Mandatory seven operating rules
