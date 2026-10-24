@@ -68,11 +68,13 @@ for (const {width,height,theme} of matrix) {
       await page.locator('#loginForm button[type=submit]').click();
       await expect(page.locator('#appView')).toBeVisible({timeout:30000});
       for(const [screen,view] of screens){
-        await page.evaluate(async v=>{if(typeof window.setView!=='function')throw new Error('setView missing from real ADMIN');await window.setView(v)},view);
+        await page.evaluate(v=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view===v);if(!nav)throw new Error('Missing Admin navigation button '+v);nav.click()},view);
+        await page.waitForTimeout(500);
         await expect(page.locator('#main')).toBeVisible();
         await shot(screen);
       }
-      await page.evaluate(async()=>window.setView('products'));
+      await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='products');if(!nav)throw new Error('Products navigation missing');nav.click()});
+      await page.waitForTimeout(400);
       const button=page.locator('.tablewrap table tbody tr button[data-action="edit"]:visible').first();
       if(await button.count()){
         await button.click();
