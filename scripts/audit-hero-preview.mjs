@@ -345,7 +345,7 @@ try {
               || !c.rect || c.rect.width < 180 || c.rect.height < 20) {
             fail('Mobile shoe contact shadow is missing, hidden or not layered between marble and PNG.');
           }
-          if (!m.filter.includes('drop-shadow(0px 5px 5px') || !m.filter.includes('drop-shadow(0px 2px 2px')) {
+          if (!m.filter.includes('rgba(14, 30, 42, 0.1) 0px 5px 5px') || !m.filter.includes('rgba(8, 19, 29, 0.16) 0px 2px 2px') || m.filter.includes('0px 12px 16px')) {
             fail('Mobile shoes still use the old airy drop-shadow instead of restrained ground shadow.');
           }
         }
