@@ -1,0 +1,78 @@
+name: Hero-only Preview browser audit
+
+on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
+    paths:
+      - '.github/workflows/hero-preview-audit.yml'
+      - 'scripts/audit-hero-preview.mjs'
+      - 'tests/storefront-reference-parity.test.mjs'
+      - 'public/index.html'
+      - 'public/images/hero-upload/tb_image_share_1792519964514-blended.png'
+
+permissions:
+  contents: read
+
+jobs:
+  audit-hero:
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PREVIEW_URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+      EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+      EXPECTED_DEPLOYMENT_SHA: ${{ github.sha }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+      CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Check out exact audit source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install temporary Playwright
+        run: npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+
+      - name: Install isolated Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Validate Preview-only URL
+        run: node scripts/validate-cloudflare-preview-url.mjs "$PREVIEW_URL"
+
+      - name: Wait for exact source SHA Preview deployment
+        shell: bash
+        run: |
+          set -u -o pipefail
+          verified=false
+          for attempt in $(seq 1 18); do
+            echo "Exact Preview verification attempt ${attempt}/18 for ${EXPECTED_DEPLOYMENT_SHA}."
+            if node scripts/verify-cloudflare-preview-deployment.mjs; then
+              verified=true
+              break
+            fi
+            if [ "$attempt" -lt 18 ]; then sleep 10; fi
+          done
+          if [ "$verified" != true ]; then
+            echo '::error::Preview alias was not verified as a completed deployment of this exact branch and SHA; Hero browser audit refused to run.'
+            exit 1
+          fi
+
+      - name: Audit Hero PNG on mobile, tablet and desktop in light and dark themes
+        run: node scripts/audit-hero-preview.mjs
+
+      - name: Upload Hero-only screenshots and audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hero-preview-audit-${{ github.sha }}
+          path: artifacts/hero-preview-audit/
+          if-no-files-found: warn
+          retention-days: 14
