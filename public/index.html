@@ -3717,12 +3717,14 @@ html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html
 }
 
 
-/* Reference comparison refinement: enlarge desktop product area through layout sizing, without transforming or filtering source pixels. */
+/* Reference comparison refinement: size the untouched source PNG by its natural 3:4 ratio, using the available desktop height. */
 @media(min-width:1001px){
   #home .hero-visual img{
-    width:122%!important;
+    width:auto!important;
+    height:auto!important;
     max-width:none!important;
-    margin-left:-11%!important;
+    max-height:min(100vh,900px)!important;
+    margin-left:0!important;
   }
 }
 </style>
