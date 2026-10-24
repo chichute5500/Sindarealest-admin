@@ -1,10 +1,10 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T03:39:00Z",
+  "capturedAtUtc": "2026-10-24T03:41:36Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "8468be144921b52bf78fb61451984215904e8e0a",
-  "checkpointSemantics": "Checkpoint 2026-10-24T03:39:00Z: docs HEAD 8468be144921b52bf78fb61451984215904e8e0a passed Validate #5581; source/test SHA 83e5c865e756a9df87c877380d4c506ae85ed8e5 passed Validate #5579 and Admin Preview #503 on exact same source/test SHA. Preview exact-HEAD guard passed. Artifact 12546093261 inspected; Screen 7 timeline is above fixed action row at 390x844; pageErrors=0, consoleErrors=0, failedRequests=0, httpErrors=0. UI screenshots use synthetic fixture data and block writes; authenticated business/backend QA remains NOT_TESTED.",
+  "branchHeadAtCheckpointStart": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
+  "checkpointSemantics": "Checkpoint 2026-10-24T03:41:36Z: docs HEAD fcc623e2ce281b3e7e2be823d3aeda52fec47a9d passed Validate #5582; source/test SHA 83e5c865e756a9df87c877380d4c506ae85ed8e5 passed Validate #5579 and Admin Preview #503 on exact same source/test SHA. Preview exact-HEAD guard passed. Artifact 12546093261 inspected; Screen 7 timeline fits above fixed action row at 390x844. Login metadata has zero errors; fixture matrix has zero page errors, zero horizontal overflow across 112 metrics, zero unexpected API paths and zero attempted writes, with 7 expected simulated HTTP 503 retry-path console entries. Fixture-only; authenticated business/backend QA remains NOT_TESTED.",
   "codeTestSha": "83e5c865e756a9df87c877380d4c506ae85ed8e5",
   "latestProductSourceCommit": "83e5c865e756a9df87c877380d4c506ae85ed8e5",
   "latestActionsRun": {
@@ -19,7 +19,7 @@
     "exactHeadGuard": "PASS",
     "artifactId": 12546093261,
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268/artifacts/12546093261",
-    "diagnostic": "PASS_EXACT_HEAD_GUARD; LOCAL_RESPONSIVE_THEME_MATRIX_PASS; PAGE_ERRORS_ZERO; CONSOLE_ERRORS_ZERO; FAILED_REQUESTS_ZERO; HTTP_ERRORS_ZERO; FIXTURE_ONLY; AUTHENTICATED_BACKEND_NOT_TESTED"
+    "diagnostic": "PASS_EXACT_HEAD_GUARD; SOURCE_MATRIX_PASS; LOGIN_METADATA_ERRORS_ZERO; FIXTURE_PAGE_ERRORS_ZERO; FIXTURE_EXPECTED_SIMULATED_503_CONSOLE_ENTRIES_7; HORIZONTAL_OVERFLOW_ZERO_OF_112; UNEXPECTED_API_PATHS_ZERO; ATTEMPTED_WRITES_ZERO; FIXTURE_ONLY"
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -49,7 +49,7 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "8468be144921b52bf78fb61451984215904e8e0a",
+      "headSha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
       "changedFiles": 489,
       "additions": 40646,
       "deletions": 212,
@@ -458,10 +458,10 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "Refresh live HEAD, main, PR #111/#108/#112 and Actions after this docs-only sync.",
+    "Refresh live HEAD, main, PR #111/#108/#112 and Actions after this docs-only handoff sync.",
     "Continue remaining reference-driven UI audit and independent read-only order/payment/security checks.",
-    "Validate #5579 and Preview #503 pass on exact source/test SHA 83e5c865e756a9df87c877380d4c506ae85ed8e5; Validate #5581 passes on docs-only HEAD 8468be144921b52bf78fb61451984215904e8e0a.",
-    "Do not treat fixture screenshots as authenticated business QA; keep reference parity NOT_VERIFIED, business-write QA NOT_TESTED, remote D1 NOT_VERIFIED and Production NOT_PERFORMED."
+    "Validate #5579 and Preview #503 pass on exact source/test SHA 83e5c865e756a9df87c877380d4c506ae85ed8e5; Validate #5582 passes on docs-only HEAD fcc623e2ce281b3e7e2be823d3aeda52fec47a9d.",
+    "Fixture evidence is synthetic/read-only; keep reference parity NOT_VERIFIED, business-write QA NOT_TESTED, remote D1 NOT_VERIFIED and Production NOT_PERFORMED."
   ],
   "handoffSync": {
     "status": "SIX_FILE_DOCS_ONLY_SYNC_COMPLETED",
@@ -473,14 +473,14 @@
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
     "nextRequiredAction": "Refresh live HEAD and Actions; verify Validate on the latest docs-only HEAD. Latest source/test Preview-verified SHA remains ab0343f963f0f113dc6c88a601c5499ebe15d592 (Preview #498 SUCCESS). Continue workstreams A–E. Do not create dummy source commits or weaken exact-HEAD guard."
   },
-  "currentHeadAtCheckpoint": "8468be144921b52bf78fb61451984215904e8e0a",
-  "currentHeadValidation": "DOCS_HEAD_VALIDATE_5581_PASS_ON_8468be144921b52bf78fb61451984215904e8e0a; SOURCE_TEST_VALIDATE_5579_AND_PREVIEW_503_PASS_ON_83e5c865e756a9df87c877380d4c506ae85ed8e5",
-  "currentHeadValidationReason": "Validate #5581 passed on docs-only HEAD 8468be144921b52bf78fb61451984215904e8e0a. Source/test SHA 83e5c865e756a9df87c877380d4c506ae85ed8e5 passed Validate #5579 and Preview #503 on the same SHA with exact-HEAD guard; artifact 12546093261 inspected. Fixture-only evidence does not prove authenticated business writes, remote D1 schema/ledger, exact reference parity or Production.",
+  "currentHeadAtCheckpoint": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
+  "currentHeadValidation": "DOCS_HEAD_VALIDATE_5582_PASS_ON_fcc623e2ce281b3e7e2be823d3aeda52fec47a9d; SOURCE_TEST_VALIDATE_5579_AND_PREVIEW_503_PASS_ON_83e5c865e756a9df87c877380d4c506ae85ed8e5",
+  "currentHeadValidationReason": "Validate #5582 passed on docs-only HEAD fcc623e2ce281b3e7e2be823d3aeda52fec47a9d. Source/test SHA 83e5c865e756a9df87c877380d4c506ae85ed8e5 passed Validate #5579 and Preview #503 on the same SHA with exact-HEAD guard. Artifact 12546093261 inspected; Screen 7 timeline fits above action row at 390x844. Fixture-only evidence does not prove authenticated business writes, remote D1 schema/ledger, exact reference parity or Production.",
   "liveCheckpoint": {
-    "capturedAtUtc": "2026-10-24T03:39:00Z",
-    "branchHead": "8468be144921b52bf78fb61451984215904e8e0a",
+    "capturedAtUtc": "2026-10-24T03:41:36Z",
+    "branchHead": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-    "docsValidateRunId": 40059113552,
+    "docsValidateRunId": 40059284669,
     "docsValidateConclusion": "success",
     "sourceTestSha": "83e5c865e756a9df87c877380d4c506ae85ed8e5",
     "sourceValidateRunId": 40058682257,
@@ -490,14 +490,14 @@
     "exactHeadGuard": "PASS"
   },
   "latestReviewFinding": {
-    "status": "SCREEN7_TIMELINE_ACTION_ROW_OVERLAP_FIXED; VALIDATE_5579_PASS; PREVIEW_503_PASS_EXACT_HEAD; DOCS_VALIDATE_5581_PASS",
+    "status": "SCREEN7_TIMELINE_ACTION_ROW_OVERLAP_FIXED; VALIDATE_5579_PASS; PREVIEW_503_PASS_EXACT_HEAD; DOCS_VALIDATE_5582_PASS",
     "sourceTestSha": "83e5c865e756a9df87c877380d4c506ae85ed8e5",
-    "docsHead": "8468be144921b52bf78fb61451984215904e8e0a",
+    "docsHead": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
     "validateRunId": 40058682257,
-    "docsValidateRunId": 40059113552,
+    "docsValidateRunId": 40059284669,
     "previewRunId": 40058682268,
     "artifactId": 12546093261,
-    "summary": "Preview #502 reproduced overlap at 390x844. Compact timeline CSS fix passed Preview #503; screenshot shows timeline above fixed action row. Screen remains PARTIAL_NOT_ACCEPTED pending approved-reference parity review."
+    "summary": "Preview #502 reproduced overlap at 390x844; compact timeline CSS fix passed Preview #503. Screen remains PARTIAL_NOT_ACCEPTED pending approved-reference parity review."
   },
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
@@ -638,14 +638,14 @@
     "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries; no fixture API errors or writes."
   },
   "latestValidateAttempt": {
-    "id": 40059113552,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059113552",
+    "id": 40059284669,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059284669",
     "status": "completed",
     "conclusion": "success",
-    "sha": "8468be144921b52bf78fb61451984215904e8e0a",
-    "testedSha": "8468be144921b52bf78fb61451984215904e8e0a",
+    "sha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
+    "testedSha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
     "workflow": "Validate source and tests",
-    "runNumber": 5581
+    "runNumber": 5582
   },
   "latestPreviewAttempt": {
     "id": 40058682268,
@@ -659,10 +659,10 @@
     "exactHeadGuard": "PASS",
     "artifactId": 12546093261,
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268/artifacts/12546093261",
-    "diagnostic": "PASS_EXACT_HEAD_GUARD; LOCAL_RESPONSIVE_THEME_MATRIX_PASS; PAGE_ERRORS_ZERO; CONSOLE_ERRORS_ZERO; FAILED_REQUESTS_ZERO; HTTP_ERRORS_ZERO; FIXTURE_ONLY; AUTHENTICATED_BACKEND_NOT_TESTED"
+    "diagnostic": "PASS_EXACT_HEAD_GUARD; SOURCE_MATRIX_PASS; LOGIN_METADATA_ERRORS_ZERO; FIXTURE_PAGE_ERRORS_ZERO; FIXTURE_EXPECTED_SIMULATED_503_CONSOLE_ENTRIES_7; HORIZONTAL_OVERFLOW_ZERO_OF_112; UNEXPECTED_API_PATHS_ZERO; ATTEMPTED_WRITES_ZERO; FIXTURE_ONLY"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-24T03:39:00Z",
+    "capturedAtUtc": "2026-10-24T03:41:36Z",
     "sourceTestRun": {
       "id": 40058682257,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682257",
@@ -674,14 +674,14 @@
       "runNumber": 5579
     },
     "docsHeadRun": {
-      "id": 40059113552,
-      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059113552",
+      "id": 40059284669,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059284669",
       "status": "completed",
       "conclusion": "success",
-      "sha": "8468be144921b52bf78fb61451984215904e8e0a",
-      "testedSha": "8468be144921b52bf78fb61451984215904e8e0a",
+      "sha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
+      "testedSha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
       "workflow": "Validate source and tests",
-      "runNumber": 5581
+      "runNumber": 5582
     },
     "previewRun": {
       "id": 40058682268,
@@ -695,10 +695,10 @@
       "exactHeadGuard": "PASS",
       "artifactId": 12546093261,
       "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268/artifacts/12546093261",
-      "diagnostic": "PASS_EXACT_HEAD_GUARD; LOCAL_RESPONSIVE_THEME_MATRIX_PASS; PAGE_ERRORS_ZERO; CONSOLE_ERRORS_ZERO; FAILED_REQUESTS_ZERO; HTTP_ERRORS_ZERO; FIXTURE_ONLY; AUTHENTICATED_BACKEND_NOT_TESTED"
+      "diagnostic": "PASS_EXACT_HEAD_GUARD; SOURCE_MATRIX_PASS; LOGIN_METADATA_ERRORS_ZERO; FIXTURE_PAGE_ERRORS_ZERO; FIXTURE_EXPECTED_SIMULATED_503_CONSOLE_ENTRIES_7; HORIZONTAL_OVERFLOW_ZERO_OF_112; UNEXPECTED_API_PATHS_ZERO; ATTEMPTED_WRITES_ZERO; FIXTURE_ONLY"
     }
   },
-  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059113552",
+  "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059284669",
   "previewRuntimeCheckpoint": {
     "status": "USER_CONFIRMED_PRODUCTS_VISIBLE",
     "capturedAtUtc": "2026-10-23T17:04:27.950Z",
@@ -815,21 +815,21 @@
     }
   ],
   "latestValidateRun": {
-    "id": 40059113552,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059113552",
+    "id": 40059284669,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059284669",
     "status": "completed",
     "conclusion": "success",
-    "sha": "8468be144921b52bf78fb61451984215904e8e0a",
-    "testedSha": "8468be144921b52bf78fb61451984215904e8e0a",
+    "sha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
+    "testedSha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
     "workflow": "Validate source and tests",
-    "runNumber": 5581
+    "runNumber": 5582
   },
   "livePrState": {
     "pr111": {
       "state": "OPEN",
       "merged": false,
       "mergeable": false,
-      "headSha": "8468be144921b52bf78fb61451984215904e8e0a",
+      "headSha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3"
     },
     "pr108": {
@@ -861,7 +861,7 @@
     "exactHeadGuard": "PASS",
     "artifactId": 12546093261,
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268/artifacts/12546093261",
-    "diagnostic": "PASS_EXACT_HEAD_GUARD; LOCAL_RESPONSIVE_THEME_MATRIX_PASS; PAGE_ERRORS_ZERO; CONSOLE_ERRORS_ZERO; FAILED_REQUESTS_ZERO; HTTP_ERRORS_ZERO; FIXTURE_ONLY; AUTHENTICATED_BACKEND_NOT_TESTED"
+    "diagnostic": "PASS_EXACT_HEAD_GUARD; SOURCE_MATRIX_PASS; LOGIN_METADATA_ERRORS_ZERO; FIXTURE_PAGE_ERRORS_ZERO; FIXTURE_EXPECTED_SIMULATED_503_CONSOLE_ENTRIES_7; HORIZONTAL_OVERFLOW_ZERO_OF_112; UNEXPECTED_API_PATHS_ZERO; ATTEMPTED_WRITES_ZERO; FIXTURE_ONLY"
   },
   "acceptance": {
     "screens": "12 screens PARTIAL_NOT_ACCEPTED",
@@ -908,23 +908,23 @@
   },
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "latestDocsHeadValidation": {
-    "id": 40059113552,
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059113552",
+    "id": 40059284669,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40059284669",
     "status": "completed",
     "conclusion": "success",
-    "sha": "8468be144921b52bf78fb61451984215904e8e0a",
-    "testedSha": "8468be144921b52bf78fb61451984215904e8e0a",
+    "sha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
+    "testedSha": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
     "workflow": "Validate source and tests",
-    "runNumber": 5581
+    "runNumber": 5582
   },
   "latestDocsHead": "477bdda196ce8d5a24d7671703bcec3f5d6b5f63",
   "liveRefsAtCheckpoint": {
-    "branchHead": "8468be144921b52bf78fb61451984215904e8e0a",
+    "branchHead": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d",
     "mainHead": "227622d3e3b7c75724ffa1775b193da71089269a",
     "pr111": {
       "state": "open",
       "merged": false,
-      "head": "8468be144921b52bf78fb61451984215904e8e0a"
+      "head": "fcc623e2ce281b3e7e2be823d3aeda52fec47a9d"
     },
     "pr108": {
       "state": "open",
@@ -961,7 +961,7 @@
     "exactHeadGuard": "PASS",
     "artifactId": 12546093261,
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40058682268/artifacts/12546093261",
-    "diagnostic": "PASS_EXACT_HEAD_GUARD; LOCAL_RESPONSIVE_THEME_MATRIX_PASS; PAGE_ERRORS_ZERO; CONSOLE_ERRORS_ZERO; FAILED_REQUESTS_ZERO; HTTP_ERRORS_ZERO; FIXTURE_ONLY; AUTHENTICATED_BACKEND_NOT_TESTED"
+    "diagnostic": "PASS_EXACT_HEAD_GUARD; SOURCE_MATRIX_PASS; LOGIN_METADATA_ERRORS_ZERO; FIXTURE_PAGE_ERRORS_ZERO; FIXTURE_EXPECTED_SIMULATED_503_CONSOLE_ENTRIES_7; HORIZONTAL_OVERFLOW_ZERO_OF_112; UNEXPECTED_API_PATHS_ZERO; ATTEMPTED_WRITES_ZERO; FIXTURE_ONLY"
   },
   "staticSecurityAudit": {
     "capturedAtUtc": "2026-10-24T02:42:00Z",
