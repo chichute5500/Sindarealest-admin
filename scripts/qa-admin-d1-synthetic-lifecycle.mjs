@@ -128,6 +128,28 @@ async function main(){
    save();
    const child=spawnSync('npx',['playwright','test','tests/e2e/admin-12-screen-live-qa.spec.js','--workers=2','--reporter=line,html'],{stdio:'inherit',env:{...process.env,QA_EXPECT_ORDER_ID:rec.order},timeout:900000});
    if(child.error||child.status!==0)throw Error('12-screen Playwright not fully green; exit '+String(child.status));
+   // Order writes send Admin push notifications. Never exercise that route if any
+   // subscription is present in isolated Preview D1; real subscribers are not QA fixtures.
+   const pushRows=await sql(db,'SELECT COUNT(1) AS n FROM admin_push_subscriptions');
+   if(pushRows.length!==1||Number(pushRows[0].n)!==0)
+     throw Error('ISOLATED_QA_PUSH_SUBSCRIPTIONS_NOT_EMPTY; refusing order API write and cleaning fixtures');
+   const orderQa=spawnSync('npx',['playwright','test','tests/e2e/admin-qa-order-persistence.spec.js','--workers=1','--reporter=line'],{
+     stdio:'inherit',env:{...process.env,QA_TEST_ORDER_ID:rec.order,QA_TEST_ORDER_ITEM_ID:rec.item},timeout:180000});
+   if(orderQa.error||orderQa.status!==0)throw Error('Authenticated Admin order pricing/terms QA failed; cleaning fixtures');
+   const orderReadback=await sql(db,'SELECT status,subtotal,total,payment_terms_confirmed_at,payment_terms_confirmed_by,payment_terms_note FROM orders WHERE id=?',[rec.order]);
+   const itemReadback=await sql(db,'SELECT unit_price,line_total FROM order_items WHERE id=? AND order_id=?',[rec.item,rec.order]);
+   const auditReadback=await sql(db,"SELECT COUNT(1) AS n FROM audit_logs WHERE entity_id=? AND actor='admin' AND action='order_updated'",[rec.order]);
+   if(orderReadback.length!==1||orderReadback[0].status!=='completed'||
+     Number(orderReadback[0].subtotal)!==135000||Number(orderReadback[0].total)!==135000||
+     !orderReadback[0].payment_terms_confirmed_at||orderReadback[0].payment_terms_confirmed_by!=='admin'||
+     orderReadback[0].payment_terms_note!=='QA ONLY - PRICE TERMS '+rid||
+     itemReadback.length!==1||Number(itemReadback[0].unit_price)!==135000||
+     Number(itemReadback[0].line_total)!==135000||auditReadback.length!==1||Number(auditReadback[0].n)!==1)
+     throw Error('Isolated D1 order price/terms/audit readback mismatch; cleaning fixtures');
+   journal.orderApiPriceTermsVerified=true;
+   journal.orderD1ReadbackVerified=true;
+   journal.orderAuditVerified=true;
+   save();
   }catch(e){error=e;console.error('[QA_SCREEN_RESULT] '+e.message)}
   finally{try{await cleanup(db)}catch(cleanupErr){console.error('[QA_CLEANUP_ERROR] '+cleanupErr.message);error=error||cleanupErr}}
   if(error)throw error;

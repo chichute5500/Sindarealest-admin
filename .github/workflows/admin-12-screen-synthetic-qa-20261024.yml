@@ -13,6 +13,7 @@ on:
       - "tests/e2e/admin-12-screen-live-qa.spec.js"
       - "scripts/qa-admin-d1-synthetic-lifecycle.mjs"
       - "tests/e2e/admin-qa-write-persistence.spec.js"
+      - "tests/e2e/admin-qa-order-persistence.spec.js"
 
 permissions:
   contents: read
