@@ -1,29 +1,25 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T01:24:09Z",
+  "capturedAtUtc": "2026-10-24T01:31:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "94669674ab0d5e635ac47026ef3c98d362e63002",
+  "branchHeadAtCheckpointStart": "47b3dae8514540ac46b3a364bc552c8f003be4f1",
   "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SOURCE_TEST_SHA_ae0102f5caa773c5b4b92c4fd86eb6508759e3c0; DOCS_ONLY_HANDOFF_SYNC_FOLLOWS",
+  "status": "PASS_VALIDATE_ON_EXACT_DOCS_HEAD_47b3dae8514540ac46b3a364bc552c8f003be4f1; PREVIEW_FAILED_EXACT_HEAD_GUARD_ON_0c441375a212c73ce56f16d4f9673e44c1b8260f_AFTER_BRANCH_MOVED",
   "latestRun": {
     "id": 40049413302,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
     "status": "completed",
     "conclusion": "failure",
     "sha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "headSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
     "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
     "workflow": "Admin Preview diagnostic smoke test",
     "runNumber": 493,
-    "artifact": "admin-preview-evidence-493",
     "artifactId": 12543031534,
     "artifactUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534",
-    "sizeBytes": 20839936,
-    "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_READ_ONLY_GETS_7_OF_7; EXACT_HEAD_GUARD_FAILED_AFTER_BRANCH_MOVED",
-    "summary": "Screenshot capture and read-only Preview diagnostics completed; final exact-HEAD guard failed because the branch moved from the tested SHA to a docs-only child commit during the run."
+    "diagnostic": "PASS_LOGIN_CSS_SIGNATURE; AUTHENTICATED_READ_ONLY_GETS_7_OF_7; EXACT_HEAD_GUARD_FAILED_AFTER_BRANCH_MOVED"
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3",
@@ -231,20 +227,12 @@
       "gap": "Screen 12 320×640 visibility regression reproduced test-first (card bottom 778px vs nav top 564px); heading-only CSS reduced to 723px but still failed. Exact-SHA compaction in 7a57dfa634151ece49d3eb7cb7b2f31cf8f19628 passes; artifact 467 shows multiple fixture records above navigation. Authenticated audit feed, real notification delivery and full reference parity remain untested."
     }
   },
-  "acceptanceBoundary": {
-    "screens": "ALL_12_PARTIAL_NOT_ACCEPTED",
-    "exactReferenceParity": "NOT_VERIFIED",
-    "authenticatedBusinessWriteQA": "NOT_TESTED",
-    "remoteD1SchemaLedger": "NOT_VERIFIED",
-    "production": "NOT_PERFORMED",
-    "progressPercent": 50,
-    "progressStatus": "PROVISIONAL"
-  },
+  "acceptanceBoundary": "All 12 screens PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated business/backend QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
   "nextActions": [
-    "After the seven-file docs-only checkpoint sync, refresh live branch HEAD, PR metadata and Actions; do not treat Preview #493 as latest-HEAD acceptance.",
-    "When source/test work stabilizes, run Preview on the exact tested SHA and avoid docs-only commits during the run's exact-HEAD guard.",
-    "Continue the reference-driven audit of Screens 4/5/7; only fix reproducible mismatches test-first.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED and progress at 50% PROVISIONAL; no merge, Production deploy, Access/secrets change, D1/R2 write, or migration."
+    "After the six-file docs-only commit, refresh live HEAD, PR state and Actions.",
+    "Do not create dummy source/test changes to trigger Preview; handoff paths are excluded by the workflow filter.",
+    "Continue parallel safe reference audit and static API contract audit; reproduce defects and add regression tests before source changes.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED, progress 50% PROVISIONAL, exact reference parity NOT_VERIFIED, authenticated backend QA NOT_TESTED, remote D1 NOT_VERIFIED, Production NOT_PERFORMED."
   ],
   "mobileToastFix": {
     "status": "PASS_ON_EXACT_SOURCE_TEST_SHA",
@@ -529,14 +517,14 @@
     "result": "PREVIEW_GUARD_FAILED_AFTER_BRANCH_MOVED; CAPTURE_AND_READ_ONLY_DIAGNOSTIC_COMPLETED"
   },
   "handoffSync": {
-    "status": "SEVEN_FILE_DOCS_ONLY_SYNC_COMPLETED",
-    "capturedAtUtc": "2026-10-24T01:24:09Z",
-    "branchHeadAtCheckpointStart": "94669674ab0d5e635ac47026ef3c98d362e63002",
+    "status": "PREPARED_FOR_SIX_FILE_DOCS_ONLY_SYNC",
+    "capturedAtUtc": "2026-10-24T01:31:00Z",
+    "branchHeadAtCheckpointStart": "47b3dae8514540ac46b3a364bc552c8f003be4f1",
     "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
-    "note": "This checkpoint was captured before the seven-file docs-only sync. The handoff commits advance branch HEAD without changing application source; refresh live refs and Actions after the final handoff commit.",
+    "note": "This update changes handoff docs only; refresh HEAD and Actions after commit. Docs-only changes do not trigger Admin Preview.",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "nextRequiredAction": "Verify final docs HEAD, PR state, and exact-HEAD Actions after the final handoff commit; then continue safe reference-driven UI audit."
+    "nextRequiredAction": "Verify exact HEAD and Validate after commit; inspect Preview status and continue safe independent work."
   },
   "latestProductSourceCommit": "6a31cb31d996a8937923d552421674f29d5c14d9",
   "latestDiagnosticArtifact": {
@@ -791,7 +779,7 @@
     "progressEstimate": "50% PROVISIONAL"
   },
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "nextChatInstructions": "Continue directly on feature/admin-isolated-handoff-2026-10-20. At checkpoint start, branch HEAD was docs-only 94669674ab0d5e635ac47026ef3c98d362e63002; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f passed Validate #5540 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343), and Validate #5541 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049531482) passed on the docs-only HEAD. Preview #493 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302) captured and uploaded artifact #493 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534), but the exact-HEAD guard failed because the branch advanced during the run. Artifact #493 was inspected: 133 PNGs, 120 synthetic UI-fixture captures, 112 metrics, zero overflow/errors/writes; Screen 7 Timeline visible at 390x844 using synthetic data. Read-only deployed diagnostic passed 7/7 Admin GET routes and 235 products/527 decoded image URLs. This is not exact-reference or business workflow acceptance. Refresh live HEAD/Actions after the seven-file sync; keep all 12 screens PARTIAL_NOT_ACCEPTED, progress 50% PROVISIONAL, and do not merge, deploy Production, change Access/secrets, mutate D1/R2, or run migrations.",
+  "nextChatInstructions": "# PROMPT NEXT CHAT — SINDAREALEST ADMIN\n\nContinue directly on GitHub. Do not ask the user to repeat history. Read this prompt and `docs/admin-ui-reference/handoff/START-HERE.md`, then verify live state before relying on the checkpoint.\n\n## Checkpoint — 2026-10-24 08:31 ICT\n\n- Repository: `chichute5500/Sindarealest-admin`; only writable branch: `feature/admin-isolated-handoff-2026-10-20`.\n- Branch HEAD at checkpoint: `47b3dae8514540ac46b3a364bc552c8f003be4f1` (docs-only). `main`: `227622d3e3b7c75724ffa1775b193da71089269a`.\n- Validate #5549 SUCCESS on exact docs HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40050001852\n- Preview #493 tested source/test SHA `0c441375a212c73ce56f16d4f9673e44c1b8260f`, captured artifact #493 and ran read-only diagnostics, but FAILED at the exact-HEAD guard because the branch moved during the run: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302\n- Artifact #493 inspected: 133 PNGs, 120 synthetic fixture capture entries, 112 metrics, no horizontal overflow; zero source page/console/request/HTTP errors; zero fixture page/API errors, writes or unexpected API paths; seven expected simulated fixture HTTP 503 console entries. Screen 7 Timeline visible at 390×844 using synthetic data. Read-only diagnostic passed 7/7 Admin GET routes and catalog checks of 235 products / 527 decoded image URLs. This is not exact-reference parity or business-write/persistence acceptance.\n- PR #111 OPEN/unmerged; #108 OPEN/unmerged/read-only; #112 OPEN/unmerged/draft. Keep them open. Main unchanged.\n- Acceptance: all 12 screens PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated backend/business QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED. Progress 50% PROVISIONAL.\n\n## Mandatory seven operating rules\n\n1. Work in parallel: run independent safe workstreams concurrently; one blocked stream must not stall the others.\n2. Report and continue: a progress report is not a stopping point; resume safe independent work after reporting.\n3. Blocked means switch streams: state blocker and evidence; do not repeat an action without new evidence.\n4. Test first: fix only a concrete reproducible regression. Add/adjust a regression test and show it fails for the relevant reason before source fix.\n5. Exact evidence only: tie claims to exact SHA, Actions, Preview and inspected artifact. Never apply an older SHA PASS to current HEAD. Distinguish fixtures from authenticated backend evidence.\n6. Stop only for genuine owner action: stop only when account/device access, an owner decision or authorized action is required. Do not ask the user to hunt for a nonexistent “Run workflow” button.\n7. Preserve isolation: no merge/rebase/cherry-pick/force-push/sync; no Production deploy; no Access/secrets/DNS changes or bypass; no remote D1/R2/schema/ledger/business writes; no migration/seed/import/setup scripts; do not modify main, storefront branches, PR #108 or #112. Keep PR #111 open.\n\n## Parallel workstreams\n\n- A — UI/reference: audit unaccepted screens; only fix a specific reproducible mismatch. Do not repeat verified Screen 12 or Screen 9 fixture work without new evidence.\n- B — Regression/source: inspect an independent source/test area. Reproduce test-first; avoid speculative CSS/business logic.\n- C — API safety: static/read-only route contract audit; never invoke destructive endpoints or write data.\n- D — CI/Preview: inspect exact run status/logs while other streams continue. Preview watches `public/admin/**`, `functions/**`, `migrations/**`, `scripts/**`, `tests/**`, `package.json`, and its workflow. Docs-only commits do not trigger Preview. Do not weaken the exact-HEAD guard or create dummy source commits.\n- E — handoff/integrity: keep all six canonical files current, preserve the seven rules, verify entry-point/prompt links.\n\n## Required next steps\n\n1. Refresh branch HEAD, main, PR #111/#108/#112 and Actions before making claims.\n2. Inspect Validate #5549 jobs and latest Preview evidence. If no Preview exists for current source/test SHA, state that and continue independent work.\n3. Keep source/test and docs checkpoints separate. Do not commit docs while Preview exact-HEAD guard is running.\n4. For a source fix, show test failure first, then fix; push only to allowed branch and inspect exact-SHA Validate/Preview evidence.\n5. Update handoff after a meaningful verified checkpoint, then refresh live refs again.\n\n## Canonical handoff files\n\n- `docs/admin-ui-reference/handoff/START-HERE.md`\n- `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`\n- `docs/admin-ui-reference/handoff/LATEST-STATUS.md`\n- `docs/admin-ui-reference/handoff/current-status.json`\n- `docs/admin-ui-reference/handoff/latest-test-results.json`\n- `docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md`\n\nFixture screenshots/source validation alone do not upgrade acceptance. Exact reference parity NOT_VERIFIED; authenticated backend QA NOT_TESTED; remote D1 NOT_VERIFIED; Production NOT_PERFORMED. Keep progress at 50% PROVISIONAL until evidence supports revision.\n",
   "actions": {
     "latestSuccessful": {
       "id": 40049531482,
@@ -878,6 +866,26 @@
   },
   "progressBasis": "Provisional overall estimate only; all 12 screens remain unaccepted.",
   "latestSourceTestValidateRun": {
+    "id": 40049413343,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343",
+    "status": "completed",
+    "conclusion": "success",
+    "sha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
+    "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
+    "workflow": "Validate source and tests",
+    "runNumber": 5540
+  },
+  "latestDocsHeadValidation": {
+    "id": 40050001852,
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40050001852",
+    "status": "completed",
+    "conclusion": "success",
+    "sha": "47b3dae8514540ac46b3a364bc552c8f003be4f1",
+    "testedSha": "47b3dae8514540ac46b3a364bc552c8f003be4f1",
+    "workflow": "Validate source and tests",
+    "runNumber": 5549
+  },
+  "latestSourceTestValidation": {
     "id": 40049413343,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343",
     "status": "completed",

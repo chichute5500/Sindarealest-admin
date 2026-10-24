@@ -1,3 +1,14 @@
+## Latest checkpoint — 2026-10-24 08:31 ICT
+
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`; branch HEAD at checkpoint `47b3dae8514540ac46b3a364bc552c8f003be4f1` (docs-only); `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`.
+- Validate #5549 **SUCCESS** on exact docs HEAD: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40050001852. This is not a fresh Preview deployment.
+- Preview #493 tested source/test SHA `0c441375a212c73ce56f16d4f9673e44c1b8260f` and **FAILED at exact-HEAD guard** after the branch moved during capture: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302. [Artifact #493](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534) was inspected: 133 PNGs, 120 synthetic fixture captures, 112 metrics, no horizontal overflow; zero source page/console/request/HTTP errors; zero fixture page/API errors, writes or unexpected API paths; seven expected simulated HTTP 503 fixture-console entries. Screen 7 Timeline visible at 390×844 using synthetic data. Read-only diagnostics passed 7/7 Admin GET routes and catalog check of 235 products / 527 decoded image URLs. No exact-reference or business-write/persistence acceptance.
+- PR #111 OPEN/unmerged; #108 OPEN/unmerged/read-only; #112 OPEN/unmerged/draft. Keep them open. All 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend/business QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`; progress 50% PROVISIONAL.
+- Next: refresh refs/Actions after the final handoff commit and continue independent safe work. Docs-only commits do not trigger Preview because handoff paths are excluded. Do not create dummy source commits or weaken exact-HEAD guard.
+- Safety boundaries remain: no merge/rebase/cherry-pick/force-push; no Production deploy, Access/secrets/DNS change or bypass; no remote D1/R2/schema/ledger/business writes; no migrations/seed/import/setup scripts; no changes to `main`, storefront branches, PR #108 or #112.
+
+---
+
 ## Latest checkpoint — 2026-10-24 08:24 ICT
 
 - Repository: `chichute5500/Sindarealest-admin`; writable branch: `feature/admin-isolated-handoff-2026-10-20`. Live branch HEAD at checkpoint start: `94669674ab0d5e635ac47026ef3c98d362e63002` (docs-only handoff commit); source/test SHA: `0c441375a212c73ce56f16d4f9673e44c1b8260f`. Latest source UI commit before the test-only correction: `6a31cb31d996a8937923d552421674f29d5c14d9`.
