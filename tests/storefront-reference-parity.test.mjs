@@ -512,7 +512,7 @@ assert.ok(
   mobileHeroReferenceMatch.includes("grid-template-rows:auto auto!important;") &&
   mobileHeroReferenceMatch.includes("grid-row:1!important;") &&
   mobileHeroReferenceMatch.includes("grid-row:2!important;") &&
-  mobileHeroReferenceMatch.includes("height:auto!important;max-width:none!important;max-height:none!important;margin:0 0 0 -10%!important;") &&
+  mobileHeroReferenceMatch.includes("width:100%!important;height:100%!important;max-width:100%!important;max-height:390px!important;margin:0!important;") &&
   mobileHeroReferenceMatch.includes("height:clamp(360px,100vw,390px)!important;") &&
-  mobileHeroReferenceMatch.includes("object-fit:contain!important;object-position:center top!important"),
+  mobileHeroReferenceMatch.includes("object-fit:contain!important;object-position:center center!important"),
   "Mobile Hero must show copy and CTA above a naturally scaled original product image with transparent padding cropped by the visual frame.");
