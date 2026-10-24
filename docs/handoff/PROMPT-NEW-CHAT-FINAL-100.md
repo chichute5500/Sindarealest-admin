@@ -1,13 +1,13 @@
-# LIVE HANDOFF REFRESH — 2026-10-24 — SUPERSEDES HISTORICAL TODO/COUNT NOTES
+# LIVE HANDOFF REFRESH — 2026-10-24 — VERIFIED CURRENT STATE
 
 - Repository: `chichute5500/Sindarealest-admin`; branch: `fix/liquid-glass-audit-2026-10-19`.
-- Immediately before this documentation-only refresh, verified PR #108 and branch HEAD both equaled `0259dc38d5fd4ba4497b60fcf6236debb1f27f45`; PR remained OPEN/unmerged, base `main`. This commit advances docs only; re-fetch live PR/branch HEAD before any next write.
-- Live changed-file inventory is complete: **298 paths** in [PR-SCOPE-REVIEW.md](PR-SCOPE-REVIEW.md); do not repeat it unless the live PR diff changes.
-- Source/test/deployed baseline is `8a4cc6066436f040e7900709e8dd2047ab7ab579`: [Validate PASS](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/40052984815), [Preview deploy + authenticated HTTP diagnostic PASS](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/40052984918), Preview https://837f73ba.sindarealest2.pages.dev/.
-- Visual workflow [run 40052984980](https://api.github.com/repos/chichute5500/Sindarealest-admin/actions/runs/40052984980) is SKIPPED by the Hero guard. Hero remains paused; the currently available non-Hero workflows target owner-locked `#order` or catalog filters and are not valid substitutes. Gallery remains PAUSED / NOT ACCEPTED pending authorized real-phone acceptance.
+- **Current live PR/branch HEAD at refresh:** `62e21246a745835ea35bb148335e2877facad8d0` (re-fetched immediately before this documentation-only write); PR #108 OPEN/unmerged, base `main`, 298 changed paths.
+- Inventory: [PR-SCOPE-REVIEW.md](PR-SCOPE-REVIEW.md). The 298-path inventory is complete; do not repeat unless the live diff changes.
+- Source/test/deployed SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`; [Validate PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815); [Preview deploy + authenticated HTTP diagnostic PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918); Preview https://837f73ba.sindarealest2.pages.dev/.
+- Visual workflow [run 40052984980](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984980) is SKIPPED by the Hero guard. Hero remains paused. Existing alternative visual workflows target owner-locked `#order` or catalog filters and are not valid substitutes. Gallery remains PAUSED / NOT ACCEPTED pending authorized real-phone acceptance.
 - SKU URL builder passes its source-level strict contract (`skuVerified === true` and non-empty trimmed SKU; otherwise ID/key). Product-by-product authoritative SKU verification and live Preview D1 migration state remain NOT RUN/BLOCKED.
-- Important D1 correction: Preview deploy workflow runs `npm run check`, `npm test`, `wrangler pages deploy public`, and an HTTP SEO diagnostic; it does not apply remote D1 migrations. `scripts/check-migrations.mjs` verifies migrations on a temporary local D1 only. Do not assume `0008_product_sku_verification.sql` is applied to Preview; do not apply/query remote D1 or edit restricted API/shared-helper/catalog paths without separate authorization.
-- **Not 100% complete.** Remaining owner-dependent gates: approved scope disposition for this mixed-scope PR; a safe authorized visual path that excludes Hero and locked sections; real-phone gallery acceptance when reopened; approved read-only proof of Preview D1 migration 0008 and authoritative SKU API flags. No Production/main changes, no merge, no restricted data/API/Admin/infra/payment changes.
+- Preview deploy workflow does not apply remote D1 migrations; `scripts/check-migrations.mjs` checks a temporary local D1. Do not assume migration `0008_product_sku_verification.sql` is applied to Preview. Do not apply/query remote D1 or edit restricted API/shared-helper/catalog paths without separate authorization.
+- **Not 100% complete.** Remaining gates: owner decision on mixed PR scope; authorized safe visual path excluding Hero/locked sections; real-phone gallery acceptance if reopened; owner-approved read-only proof of Preview D1 migration 0008 and authoritative SKU flags. No merge, no `main`/Production changes, no restricted data/API/Admin/infra/payment changes.
 
 ---
 
@@ -21,7 +21,7 @@
 - Repository: `chichute5500/Sindarealest-admin`
 - Branch: `fix/liquid-glass-audit-2026-10-19`
 - PR #108: https://github.com/chichute5500/Sindarealest-admin/pull/108 — OPEN, chưa merge, base `main`.
-- HEAD trước các cập nhật tài liệu bàn giao: `6f7c8b5d336d83550d0d5328b3b68773114084db`. Các cập nhật tài liệu này tạo commit mới trên cùng branch; **bắt buộc fetch lại PR head trước khi làm việc hoặc ghi file**.
+- **Live PR HEAD = branch HEAD tại lần xác minh 2026-10-24T02:40:31.389Z: `62e21246a745835ea35bb148335e2877facad8d0`**; PR #108 OPEN, chưa merge, base `main`, 298 changed files. Re-fetch live PR/branch HEAD before each subsequent write because documentation updates advance HEAD.
 - Latest verified source/test SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`.
 - Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815
 - Preview deploy + authenticated post-deploy HTTP diagnostic PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918
