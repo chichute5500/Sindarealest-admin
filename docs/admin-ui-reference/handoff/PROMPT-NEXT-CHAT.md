@@ -1,3 +1,13 @@
+## Latest verified checkpoint — 2026-10-24 07:39 ICT
+
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`. Source/test SHA: `b45d7f8d46d43d89f5e2330676009f5db778c379`.
+- Validate [#5521]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045795261 ) **SUCCESS** and Admin Preview [#484]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045795310 ) **SUCCESS** on the same exact SHA. Exact-HEAD guard passed.
+- Evidence artifact [admin-preview-evidence-484]( https://github.com/chichute5500/Sindarealest-admin/actions/runs/40045795310/artifacts/12541480929 ): 133 PNGs (16 login shell, 120 fixture capture entries, 112 fixture metrics); 0 horizontal-overflow metrics; no source page/console/request/HTTP errors; fixture page errors 0, API errors 0, attempted writes 0, unexpected API paths 0. Seven fixture console entries are expected simulated HTTP 503 retry-path cases. Preview's remote diagnostic remains `PASS_LOGIN_CSS_SIGNATURE` only; this is **not** authenticated backend/business QA.
+- Test-first payment fixes: a receipt insert now rechecks order cancellation, confirmed price/terms, and—when linked—the payment request's order ownership and non-cancelled status at the atomic write boundary. The over-refund guard remains intact. QR request creation also rejects stale order/terms/ledger snapshots. Regression tests cover concurrent state changes.
+- Dependency audit blocker resolved without `npm audit fix --force`: Wrangler `4.152.0` and patched transitive `undici 7.30.1`; the audit step passed.
+- **Acceptance is unchanged:** all 12 screens `PARTIAL_NOT_ACCEPTED`; exact reference parity `NOT_VERIFIED`; authenticated backend/business QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`. Overall estimate remains 50% provisional.
+- Safety: `main` remains `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 remains open/unmerged; PR #108 remains read-only/open; PR #112 remains draft/open. No deployment, merge, Access bypass, secrets change, or real-data write.
+
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
 ## VERIFIED LIVE CHECKPOINT — 2026-10-24 06:31 ICT (live GitHub recheck)
