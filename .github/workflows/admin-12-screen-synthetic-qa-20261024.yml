@@ -6,6 +6,9 @@ on:
       - feature/admin-isolated-handoff-2026-10-20
     paths:
       - ".github/workflows/admin-12-screen-synthetic-qa-20261024.yml"
+      - "scripts/qa-admin-d1-synthetic-lifecycle.mjs"
+      - "scripts/qa-journal-state.mjs"
+      - "tests/qa-journal-resume.test.mjs"
       - "tests/e2e/admin-12-screen-live-qa.spec.js"
       - "scripts/qa-admin-d1-synthetic-lifecycle.mjs"
       - "tests/e2e/admin-qa-write-persistence.spec.js"
@@ -52,6 +55,8 @@ jobs:
         run: |
           remote="$(git ls-remote origin refs/heads/feature/admin-isolated-handoff-2026-10-20 | awk '{print $1}')"
           test "$remote" = "$GITHUB_SHA"
+      - name: Verify QA lifecycle artifact preserves previous run-owned evidence
+        run: node tests/qa-journal-resume.test.mjs
       - name: Seed, capture, then clean all synthetic Preview D1 rows even on test failure
         run: node scripts/qa-admin-d1-synthetic-lifecycle.mjs run
       - name: Final best-effort cleanup on failure or cancellation

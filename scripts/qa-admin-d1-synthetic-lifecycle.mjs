@@ -4,7 +4,8 @@
  * Every SQL statement is parameterized and scoped to run-owned QA IDs.
  */
 import {spawnSync} from 'node:child_process';
-import {mkdirSync,writeFileSync} from 'node:fs';
+import {mkdirSync,writeFileSync,readFileSync,existsSync} from 'node:fs';
+import {recoverQaJournal} from './qa-journal-state.mjs';
 import {join} from 'node:path';
 const project='sindarealest-admin-preview';
 const storefront='sindarealest2';
@@ -18,7 +19,9 @@ const rec=Object.fromEntries(['product','customer','order','item','warranty','cl
 const sku='QA-'+rid,code='QA-WARRANTY-'+rid,orderNo='QA-ORDER-'+rid;
 const folder=join(process.cwd(),'artifacts','admin-12-screen-live',(process.env.GITHUB_SHA||'unknown').slice(0,12));
 mkdirSync(folder,{recursive:true});
-const journal={tag,checkedAt:new Date().toISOString(),environment:'ISOLATED_PREVIEW_ONLY',isolated:false,seeded:false,cleanupVerified:false,records:{},dbIdsExposed:false};
+const journalPath=join(folder,'synthetic-qa-lifecycle.json');
+const emptyJournal={tag,checkedAt:new Date().toISOString(),environment:'ISOLATED_PREVIEW_ONLY',isolated:false,seeded:false,cleanupVerified:false,records:{},dbIdsExposed:false};
+const journal=recoverQaJournal(existsSync(journalPath)?readFileSync(journalPath,'utf8'):null,tag,emptyJournal);
 const save=()=>writeFileSync(join(folder,'synthetic-qa-lifecycle.json'),JSON.stringify(journal,null,2)+'\n');
 const request=async(url,opts={})=>{
  const res=await fetch(url,{...opts,headers:{Authorization:'Bearer '+token,...opts.headers},signal:AbortSignal.timeout(20000)});
