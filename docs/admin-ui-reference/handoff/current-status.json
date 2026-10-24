@@ -486,7 +486,10 @@
       "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
       "docs/admin-ui-reference/handoff/current-status.json",
       "docs/admin-ui-reference/handoff/latest-test-results.json"
-    ]
+    ],
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+    "latestRepairNote": "Restored required handoff integrity metadata and explicit prompt/live-state instructions after checkpoint refresh."
   },
   "currentHeadAtCheckpoint": "17024987fa3cf0e5760ab2c38bc71237a6899baa",
   "currentHeadValidation": "VALIDATE_5769_AND_5770_PASS; PREVIEW_PLAYWRIGHT_1114_PASS; READ_ONLY_DIAGNOSTIC_538_PASS_ON_EXACT_SHA_2f2c631c328d3658c0911a9066b39d0d513ff0b9",

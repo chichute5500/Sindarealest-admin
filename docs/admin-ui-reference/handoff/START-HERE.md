@@ -6,6 +6,12 @@
 **PR #111:** [OPEN/unmerged](https://github.com/chichute5500/Sindarealest-admin/pull/111), head matches the feature branch. Current PR API diff is **494 files, +46,350 / -223**. API base SHA `28c768ba26b1d9f7d40e14efac5112526ed1c8b3` is one commit behind the live `main` ref. Do not merge/rebase; this is a live metadata/diff risk requiring fresh review before any PR-level decision.
 PR #108 remains open/read-only; PR #112 remains open/draft and must not be edited.
 
+
+Canonical next-chat prompt: [PROMPT-NEXT-CHAT.md](PROMPT-NEXT-CHAT.md).
+
+Before acting, **fetch live GitHub state first**; do not trust historical checkpoint data without refreshing refs and Actions.
+
+---
 ## Exact-SHA CI and read-only Preview evidence
 
 - Validate #5775 PASS on docs HEAD `17024987fa3cf0e5760ab2c38bc71237a6899baa`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40087512136
