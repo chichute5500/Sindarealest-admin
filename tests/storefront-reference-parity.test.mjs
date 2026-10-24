@@ -296,9 +296,13 @@ const heroBlendOverride = html.slice(html.lastIndexOf('<style id="hero-image-ble
 assert.ok(heroBlendOverride.includes('mix-blend-mode:normal!important')
   && heroBlendOverride.includes("mask-image:none!important")
   && !heroBlendOverride.includes("mask-image:radial-gradient(")
-  && heroBlendOverride.includes("width:130%!important")
+  && heroBlendOverride.includes("width:122%!important")
   && heroBlendOverride.includes("max-height:330px!important"),
-  "The alpha-feathered Hero derivative must be enlarged with no CSS brightness, color blending, or whole-image mask.");
+  "The mobile alpha-feathered Hero derivative must remain enlarged with no CSS brightness, color blending, or whole-image mask.");
+assert.ok(heroBlendOverride.includes("@media(min-width:761px) and (max-width:1000px)")
+  && heroBlendOverride.includes("width:113%!important")
+  && heroBlendOverride.includes("max-height:540px!important;margin-left:0!important"),
+  "The tablet Hero derivative must be sized in the right column without negative image offsets.");
 assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
   "The Hero image must be fully visible with no CSS crop or transform; edge feathering is baked into alpha only.");
 assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
