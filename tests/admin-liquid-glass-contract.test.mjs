@@ -187,8 +187,10 @@ assert.match(adminHtml, /\.editorhead\{[^}]*background:var\(--paper\);color:var\
   'Editor header must follow the active theme surface/text tokens');
 assert.match(adminHtml, /\.editorfooter\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
   'Editor footer must follow the active theme surface/text tokens');
-assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Đóng cửa sổ chỉnh sửa"[^>]*><svg[^>]*aria-hidden="true"/,
-  'Editor close control should use an accessible SVG icon');
+assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Quay lại danh sách sản phẩm"[^>]*><svg[^>]*aria-hidden="true"/,
+  'Editor back control should use an accessible SVG icon');
+assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Quay lại danh sách sản phẩm"[^>]*><svg[^>]*aria-hidden="true"[\s\S]*?<path d="M15 18 9 12 15 6">/,
+  'Editor back control should use the reference back-chevron');
 assert.match(adminHtml, /:root\[data-admin-theme="dark"\] \.btn\.danger\{[^}]*background:rgba\(165,67,67,\.18\)/,
   'Destructive controls should maintain readable dark-theme contrast');
 assert.match(baselineSpec, /chromeColors\.headerBg, 'Dark editor header should use the navy glass surface'\)\.toContain\('17, 34, 49'\)/,
