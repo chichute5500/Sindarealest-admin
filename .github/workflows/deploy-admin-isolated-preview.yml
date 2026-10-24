@@ -1,4 +1,4 @@
-name: Deploy ADMIN feature branch to isolated Cloudflare Pages Preview
+name: Deploy ADMIN to isolated Cloudflare Pages Preview
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: admin-feature-pages-preview
+  group: admin-isolated-pages-preview
   cancel-in-progress: false
 
 jobs:

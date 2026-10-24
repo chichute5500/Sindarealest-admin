@@ -39,6 +39,9 @@ assert.ok(isolatedAdminDeployWorkflow.includes('CLOUDFLARE_PAGES_PROJECT: sindar
   'The isolated workflow must pin the dedicated Admin Preview project.');
 assert.ok(isolatedAdminDeployWorkflow.includes('refs/heads/feature/admin-isolated-handoff-2026-10-20'),
   'The isolated workflow must guard the exact approved branch.');
+const adminDiagnosticsWorkflow = readFileSync('.github/workflows/admin-preview-diagnostics.yml', 'utf8');
+assert.ok(adminDiagnosticsWorkflow.includes('deploy-admin-isolated-preview.yml'),
+  'Changes to the isolated deployment workflow must trigger the exact-SHA Preview diagnostics.');
 assert.ok(isolatedAdminDeployWorkflow.includes('npx wrangler pages deploy public'),
   'The isolated workflow must deploy only the approved public ADMIN build to the isolated Pages project.');
 assert.ok(!isolatedAdminDeployWorkflow.includes('CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}'),
