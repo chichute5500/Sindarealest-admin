@@ -994,3 +994,17 @@ Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (do
 - Gallery remains OWNER ACCEPTED/LOCKED and passed its isolated read-only audit. PR #108 stays OPEN/unmerged, main and Production unchanged.
 - Only outstanding design acceptance gate: actual owner visual PASS on current Preview, especially desktop/tablet. Other project blockers are tracked separately.
 
+---
+
+## 2026-10-25 LIVE OWNER DESKTOP SCREENSHOT CORRECTION — SHA 5c560184
+
+- Directly fixed reported Windows PC Hero exaggerated/cropped shoes at 1365px, and compacted layout for coarse-pointer desktop request on phone (980px); mobile CSS unaffected.
+- Added 1365 PC and simulated touch desktop 980 audit, including two-column product grid and menu visibility, plus full-page touch snapshot. 14/14 actual Preview browser contexts passed.
+Actual tested/source/Preview runtime SHA: `5c5601841a8ae39fa052c15d488e9a2a88f404ff`; branch-only Preview https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Validate source/tests: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730473 PASS.
+- Exact-SHA Cloudflare Pages Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730495 PASS.
+- Read-only Hero Playwright screenshot audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520 PASS, 14/14 contexts (360/390 mobile, 768 tablet, touchscreen 980 desktop request, desktop 1280/1365/1440 × light/dark). Exact screenshots + JSON: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520/artifacts/12569574286.
+- Automatic protected Gallery-only read-only audit PASS for same runtime CSS-changing commit's immediate predecessor `579779bcb0eadb8536299c88944d14e654341b9b`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119520254. The succeeding commit `5c5601841a8ae39fa052c15d488e9a2a88f404ff` changes only Hero audit tests (not Gallery/HTML/runtime CSS).
+
+- **OWNER VISUAL PASS still needed** on actual PC/phone; technical PASS is not subjective acceptance. Gallery owner-locked and regression PASS. PR #108 unmerged, no main/Production changes.
+

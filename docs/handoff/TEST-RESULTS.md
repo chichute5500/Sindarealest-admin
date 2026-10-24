@@ -1207,3 +1207,17 @@ Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (do
 - The expanded Playwright audit checks nonmobile Hero height, shared curved/fading stone geometry, visible contact-shadow node and shoe alpha bounds. These were not earlier aesthetics assertions; now enforced at the browser level.
 - OWNER AESTHETIC APPROVAL PENDING — green CI does not replace owner's inspection.
 
+---
+
+## 2026-10-25 LIVE OWNER DESKTOP SCREENSHOT CORRECTION — SHA 5c560184
+
+Actual tested/source/Preview runtime SHA: `5c5601841a8ae39fa052c15d488e9a2a88f404ff`; branch-only Preview https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Validate source/tests: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730473 PASS.
+- Exact-SHA Cloudflare Pages Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730495 PASS.
+- Read-only Hero Playwright screenshot audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520 PASS, 14/14 contexts (360/390 mobile, 768 tablet, touchscreen 980 desktop request, desktop 1280/1365/1440 × light/dark). Exact screenshots + JSON: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520/artifacts/12569574286.
+- Automatic protected Gallery-only read-only audit PASS for same runtime CSS-changing commit's immediate predecessor `579779bcb0eadb8536299c88944d14e654341b9b`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119520254. The succeeding commit `5c5601841a8ae39fa052c15d488e9a2a88f404ff` changes only Hero audit tests (not Gallery/HTML/runtime CSS).
+
+- Newly inserted browser audit cases `desktop-1365` and `phone-desktop-mode-980`; former tests real user's screenshot resolution, latter uses `hasTouch:true` at a 980 CSS viewport. Computed compact touch layout on 980: `(pointer:coarse)=true`, navigation CSS hides `.navlinks`, displays `#menuToggle`, Featured grid columns `464px 464px`. Full-page touch screenshot archived in 14-context artifact. Desktop 1440 visible shoe width after correction ≈412px, bounded by new 380–460px audit contract; desktop 1280 ≈382px, 1365 ≈397px. Desktop Hero no longer clips visible shoe pixels near header.
+- Strict alpha integrity, zero copy overlap, no unintended requests / network writes, marble geometry/light-dark rendering and viewport overflow all retained in browser audit. 360/390 mobile unchanged.
+- User still needs to visually judge on the actual Windows PC and physical Android/Chrome desktop mode; do not claim pixel-level or owner aesthetic approval.
+

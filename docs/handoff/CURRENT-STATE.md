@@ -1208,3 +1208,21 @@ Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (do
 
 **Current acceptance:** implementation, technical audit, exact-SHA Preview and image self-review PASS. Final owner physical-device/visual acceptance of desktop/tablet/mobile remains distinct and pending. PR #108 remains OPEN, unmerged against main. Do not mark whole project 100% or claim owner-accepted Hero without owner confirmation. Other PR/D1/SKU owner-only blockers remain independent.
 
+---
+
+## 2026-10-25 LIVE OWNER DESKTOP SCREENSHOT CORRECTION — SHA 5c560184
+
+Owner supplied an ACTUAL Windows Chrome 1365×768 page screenshot and an ACTUAL mobile browser in "Desktop site" mode, and instructed ChatGPT to **perform the edits directly** instead of sending code patches. Corrections now implemented directly in GitHub Preview; user does not need to copy/paste code or perform work. The prior green CI had not tested the actual 1365 PC resolution or browser touch desktop-mode. New audit explicitly exercises both.
+
+PC source CSS corrects the visually oversized/cropped elevated shoe pair by resizing the unchanged protected RGBA PNG from `clamp(620px,46vw,700px)` to `clamp(565px,43vw,610px)`, lowering its image canvas top from -90px to -25px, and bringing marble shelf top/contact/face down in proportion. Tablet also uses a more contained product with aligned marble surface. Screenshot examined at 1440 (shoe tops now safely inside card), and the 1365 width is now separately tested.
+
+For simulated Android Chrome desktop request at 980px with coarse pointer/hasTouch, header has CSS for a compact hamburger and enlarged brand/controls; Featured and Catalog grids are two columns (confirmed via computed grid geometry 464px 464px instead of four tiny columns), more legible product card typography, and contained Hero/CTA. Playwright also saves an actual full-page 980px screenshot for inspection. Note: browsers may force desktop-layout viewport and page zoom, which CSS alone cannot fully override; no promise that this reproduces native mobile UI in manual Chrome "Desktop site" mode. Need owner physical-device visual check.
+
+Actual tested/source/Preview runtime SHA: `5c5601841a8ae39fa052c15d488e9a2a88f404ff`; branch-only Preview https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Validate source/tests: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730473 PASS.
+- Exact-SHA Cloudflare Pages Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730495 PASS.
+- Read-only Hero Playwright screenshot audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520 PASS, 14/14 contexts (360/390 mobile, 768 tablet, touchscreen 980 desktop request, desktop 1280/1365/1440 × light/dark). Exact screenshots + JSON: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520/artifacts/12569574286.
+- Automatic protected Gallery-only read-only audit PASS for same runtime CSS-changing commit's immediate predecessor `579779bcb0eadb8536299c88944d14e654341b9b`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119520254. The succeeding commit `5c5601841a8ae39fa052c15d488e9a2a88f404ff` changes only Hero audit tests (not Gallery/HTML/runtime CSS).
+
+**Status:** implementation/technical Preview PASS; manual physical-device owner aesthetic acceptance OPEN. Main and Production untouched, PR #108 OPEN/unmerged. No changes to protected Gallery, Admin, Catalog semantics, APIs, migrations or source shoe image. Outstanding authorization issues from prior handoffs remain separate. Future work should never ask the owner to manually apply a code patch when writable GitHub access already exists.
+

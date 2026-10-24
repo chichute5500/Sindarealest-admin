@@ -444,3 +444,16 @@ Exact tested/deployed runtime SHA `0479d5ba313057ddb1f096a1fafe618a81ee5166` (do
 
 No Gallery, Catalog, Admin, backend, database or Production changes. Owner visual acceptance stays open, PR #108 unmerged.
 
+---
+
+## 2026-10-25 LIVE OWNER DESKTOP SCREENSHOT CORRECTION — SHA 5c560184
+
+User experience decision: when a user requests a site edit and GitHub write access exists, edit directly, test and show real Preview rather than repeatedly giving CSS snippets for manual application. Maintain one source hero PNG, same stone/contact treatment, and responsive scaling by device class. Real PC hero should not obscure shoe tips under the fixed header. A mobile browser requesting Desktop site is not identical to native mobile viewport: use a coarse-pointer branch to improve legibility, but do not claim to control browser-chosen viewport zoom. Test both 1365 PC and 980 touch desktop simulation. Do not alter owner-protected Gallery or unrelated store flows.
+
+Actual tested/source/Preview runtime SHA: `5c5601841a8ae39fa052c15d488e9a2a88f404ff`; branch-only Preview https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Validate source/tests: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730473 PASS.
+- Exact-SHA Cloudflare Pages Preview deployment: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730495 PASS.
+- Read-only Hero Playwright screenshot audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520 PASS, 14/14 contexts (360/390 mobile, 768 tablet, touchscreen 980 desktop request, desktop 1280/1365/1440 × light/dark). Exact screenshots + JSON: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520/artifacts/12569574286.
+- Automatic protected Gallery-only read-only audit PASS for same runtime CSS-changing commit's immediate predecessor `579779bcb0eadb8536299c88944d14e654341b9b`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119520254. The succeeding commit `5c5601841a8ae39fa052c15d488e9a2a88f404ff` changes only Hero audit tests (not Gallery/HTML/runtime CSS).
+
+
