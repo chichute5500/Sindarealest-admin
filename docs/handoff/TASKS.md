@@ -1,3 +1,13 @@
+## QR + FULFILLMENT CONTRACT — STATIC STOREFRONT RECHECK — 2026-10-24
+
+- **Static presentation contract: PASS at source/test level** on storefront source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579`. Test `tests/storefront-payment-product-type-contract.test.mjs` asserts conservative `fulfillmentType` fallback to `unclassified`, per-product badges (not an unauthorized catalog filter), and a fail-closed QR renderer.
+- QR is rendered only when the server explicitly returns `paymentReady === true`, `status === 'confirmed'`, `priceConfirmationRequired === false`, `paymentInstructions.status === 'ready'`, `qrIncludesAmount === false`, a trusted QR URL, positive safe-integer VND amount, and non-empty bank/account/reference fields. Pending state explicitly says not to transfer. Broken QR fails closed. The browser never writes `payment_status`.
+- **Live API integration: BLOCKED / NOT VERIFIED.** The owner-approved contract states current `POST /api/orders` creates `pending_confirmation`; public order-payment lookup/QR receiver config may not exist. The static client references `GET /api/order-payment` only for an order with a server-issued access token, but this audit did not authorize changes to or prove availability of that restricted backend route. No endpoint was invented and no payment-success state was simulated.
+- **Fulfillment data persistence: BLOCKED / dependency on Admin/backend.** UI safely maps missing/unknown values to `unclassified`; existing products must not be inferred from stock/category/SKU. The static branch does not add Admin UI, database fields, migrations, or backfill.
+- Close these gates only after owner-approved review of the actual API contract on the relevant branch(es), an authorized Preview endpoint contract check, and exact-SHA tests. Do not inspect or change Admin branch, APIs, database/migrations, QR configuration, or payment flow from this static branch without separate approval.
+
+---
+
 ## CORRECTION — PREVIEW D1 MIGRATION EVIDENCE — 2026-10-24
 
 - Read-only review of `.github/workflows/deploy-storefront-preview.yml` (blob `15c1c189e4228334acc06e5de290a887a281f49d`) confirms the workflow runs project checks and tests, then `wrangler pages deploy public`, then the authenticated SEO HTTP diagnostic. It does **not** run `wrangler d1 migrations apply`.
