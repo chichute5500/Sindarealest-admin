@@ -1,3 +1,35 @@
+# POST-CI LIVE HANDOFF — 2026-10-24 10:16 UTC
+
+**Verified branch state:** `feature/admin-isolated-handoff-2026-10-20` HEAD `d09ffa3eed66d99e42192085024524c8b6868aec`; `main` `227622d3e3b7c75724ffa1775b193da71089269a`. PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) is OPEN/unmerged and its HEAD matches the feature branch. PR #108 and #112 remain untouched.
+
+## Exact-SHA checks
+
+- Validate #5759 PASS on docs-only HEAD `d09ffa3eed66d99e42192085024524c8b6868aec`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084637704
+- Validate #5760 PASS on docs-only HEAD `d09ffa3eed66d99e42192085024524c8b6868aec`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641440
+- Admin Preview Playwright #1109 PASS on docs-only HEAD `d09ffa3eed66d99e42192085024524c8b6868aec`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084641400
+- Comparing source/test SHA `66bdd5e0ba5f41daa1de49c46f485e5042edb831` to this HEAD shows only the six handoff documentation/JSON files changed. Source and tests remain at `66bdd5e0ba5f41daa1de49c46f485e5042edb831`; that SHA independently passed Validate #5758 and Preview Playwright #1108, plus read-only diagnostic #535: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238, https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292, https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565.
+
+## Parallel read-only review findings
+
+- Payment schema enforces case-insensitive UNIQUE transaction references and one pending QR request per order. Payment request creation rechecks price/terms, order items/totals, transaction snapshot and all active QR/bank settings at the INSERT boundary.
+- Verified receipts recheck current order state and, when linked, the QR request's pending state. Refund writes recheck remaining net receipts at the write boundary; follow-on status and audit changes depend on successful ledger insertion.
+- Order repricing/cancellation has atomic guards against pending QR requests and verified payment history. Warranty issuance rechecks completed order status and duplicate-per-item issuance; claim lookup tokens are consumed only if claim creation succeeds.
+- No new reproducible source defect was confirmed; no application source/test changes were made.
+- Screen 5: source `public/admin/index.html` has a featured cover slot and horizontally scrolling thumbnail rail at mobile widths. The existing #535 synthetic fixture evidence shows a visual discrepancy (placeholders/tile-like thumbnails) against the approved montage, but that fixture is not an authenticated same-data capture. Record as unresolved evidence; do not claim parity or make a speculative source patch.
+- Workflow isolation reviewed: the read-only diagnostic guards the exact feature branch and final HEAD; the isolated-preview deploy workflow is distinct and targets only `sindarealest-admin-preview`; Production deployment remains separate and must not be invoked.
+
+## Acceptance boundary — unchanged
+
+- Progress **50% PROVISIONAL**; all 12 screens `PARTIAL_NOT_ACCEPTED`.
+- Approved-reference parity **NOT_VERIFIED**.
+- Authenticated business-write/persistence QA **NOT_TESTED**.
+- Remote Preview D1 schema/ledger **NOT_VERIFIED**.
+- Production **NOT_PERFORMED**.
+
+Refresh live state before any later write. Continue independent safe streams; if a source issue is suspected, reproduce it and add the failing regression first. Do not merge/rebase/cherry-pick/force-push; keep PR #111 open and do not touch #108/#112, main/storefront, remote D1/R2, secrets, Access/DNS or Production.
+
+---
+
 # LIVE HANDOFF UPDATE — 2026-10-24 10:00 UTC
 
 **Exact source/test SHA:** `66bdd5e0ba5f41daa1de49c46f485e5042edb831`. Source evidence artifact: [admin-preview-evidence-535](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565/artifacts/12556296498); run [#535](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565), Validate [#5758](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040238), Preview Playwright [#1108](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084040292).
