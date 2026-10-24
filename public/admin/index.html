@@ -930,6 +930,191 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .order-detail-extra>summary::after{content:"+";font-weight:800;color:var(--muted)}
 .order-detail-extra[open]>summary::after{content:"−"}
 .order-detail-extra[open]>summary{border-bottom:1px solid var(--line)}
+
+/* SD_ADMIN_REFERENCE_PARITY_MOBILE_V1 - 2026-10-25 */
+/* Based on the supplied 12-screen 1024×1536 mobile reference. Structural changes
+   are confined to Admin skin; APIs, auth, D1, image metadata and unknown values remain intact. */
+:root {
+  --reference-blue:#477eae;
+  --reference-navy:#123d69;
+  --reference-border:rgba(107,158,194,.25);
+  --reference-sheet:rgba(251,254,255,.87);
+}
+:root[data-admin-theme="dark"] {
+  --reference-blue:#92c9ec;
+  --reference-navy:#cfe8fb;
+  --reference-border:rgba(142,188,224,.27);
+  --reference-sheet:rgba(18,38,55,.89);
+}
+/* Recolor the original SD emblem; do not replace it with a generated logo. */
+.brand-logo {
+  filter:grayscale(1) sepia(.95) saturate(2.6) hue-rotate(164deg) contrast(1.2);
+}
+:root[data-admin-theme="dark"] .brand-logo {
+  filter:grayscale(1) brightness(1.35) sepia(.85) saturate(2) hue-rotate(162deg);
+}
+.topbar .brand h1{color:var(--reference-navy);font-weight:760;letter-spacing:.17em}
+.topbar .brand p{color:#467ca6;letter-spacing:.14em}
+.panel,.stat,.setting,.shortcut,.logincard,.editor,
+#main .mobilecards tbody tr,.activity-log-card {
+  border-color:var(--reference-border);
+  background:linear-gradient(148deg,var(--reference-sheet),rgba(219,237,250,.46));
+  box-shadow:0 6px 20px rgba(30,86,131,.07),inset 0 1px 0 rgba(255,255,255,.6);
+}
+:root[data-admin-theme="dark"] .panel,
+:root[data-admin-theme="dark"] .stat,
+:root[data-admin-theme="dark"] .setting,
+:root[data-admin-theme="dark"] .shortcut,
+:root[data-admin-theme="dark"] .logincard,
+:root[data-admin-theme="dark"] .editor,
+:root[data-admin-theme="dark"] #main .mobilecards tbody tr,
+:root[data-admin-theme="dark"] .activity-log-card {
+  background:linear-gradient(155deg,rgba(25,50,69,.93),rgba(14,34,51,.83));
+  box-shadow:0 8px 23px rgba(0,0,0,.18);
+}
+.control,.editor-tab-panel,.imagedrop,
+#main .toolbar,#main .order-toolbar,.activity-view-tabs {
+  border-color:var(--reference-border);
+}
+.control:focus-visible,.btn:focus-visible,.nav:focus-visible,
+.editor-tab:focus-visible,.activity-category-chip:focus-visible {
+  outline:2px solid #3179bb;outline-offset:2px;
+}
+.btn.primary{background:linear-gradient(180deg,#78b7e2,#4d87b7);border-color:#5c91b9;box-shadow:0 4px 9px rgba(66,126,173,.14)}
+:root[data-admin-theme="dark"] .btn.primary{color:#0b263d;background:linear-gradient(180deg,#add9f6,#82bce3)}
+#main .pagehead h2{color:var(--reference-navy);font-family:Inter,"Noto Sans",system-ui,sans-serif;font-weight:760;letter-spacing:-.035em}
+#main .pagehead p{line-height:1.45}
+#main .eyebrow{color:#497fa7;letter-spacing:.12em}
+#main .stat .value{color:var(--reference-navy)}
+#main .order-detail-page,#main .settingsgrid,#main .activity-log-cards{min-width:0}
+#main .order-detail-page .panel,#main .settingsgrid .panel{border-radius:15px}
+body:has(#loginView:not(.hidden)) .logincard {
+  max-width:370px;
+  padding:25px 22px;
+  background:linear-gradient(145deg,rgba(255,255,255,.91),rgba(239,249,255,.77));
+  border:1px solid rgba(255,255,255,.82);
+  box-shadow:0 17px 45px rgba(46,101,143,.11);
+}
+:root[data-admin-theme="dark"] body:has(#loginView:not(.hidden)) .logincard {
+  background:linear-gradient(145deg,rgba(25,48,67,.94),rgba(17,35,52,.86));
+  border-color:var(--reference-border);
+}
+body:has(#loginView:not(.hidden)) .logincard h2 {
+  font-family:Inter,"Noto Sans",system-ui,sans-serif;
+  font-weight:760;font-size:24px;text-align:left;color:var(--reference-navy);
+}
+body:has(#loginView:not(.hidden)) .logincard .btn.primary{min-height:46px;width:100%}
+body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
+/* The approved design is airy but must not hide full business controls. */
+@media(max-width:820px) {
+  .topbar {
+    min-height:65px;padding:8px 14px;
+    border-bottom:1px solid rgba(124,178,212,.26);
+    background:linear-gradient(110deg,rgba(242,250,255,.91),rgba(222,240,250,.85));
+    box-shadow:0 3px 12px rgba(37,88,127,.05);
+  }
+  :root[data-admin-theme="dark"] .topbar{background:rgba(16,38,55,.94)}
+  .layout{padding:15px 12px calc(93px + env(safe-area-inset-bottom))}
+  #main .pagehead{margin-bottom:12px}
+  #main .pagehead h2{font-size:24px;line-height:1.14}
+  #main .pagehead .eyebrow{font-size:10px;margin-bottom:4px}
+  #main .pagehead p{font-size:11px;max-width:42ch}
+  #main .statgrid{gap:9px}
+  #main .stat{min-height:99px;padding:13px 12px;border-radius:12px}
+  #main .stat .label{font-size:11px}
+  #main .stat .value{font-size:22px;line-height:1.2}
+  #main .dashboard-shortcuts{gap:7px}
+  #main .dashboard-shortcut{min-height:57px;border-radius:12px}
+  #main .dashboard-revenue{margin-bottom:12px}
+  #main .panel{border-radius:14px}
+  #main .panelhead{padding:13px 13px 10px}
+  #main .panelbody{padding:0 13px 13px}
+  #main .toolbar,#main .order-toolbar{border-radius:14px;background:rgba(248,253,255,.72)}
+  :root[data-admin-theme="dark"] #main .toolbar,
+  :root[data-admin-theme="dark"] #main .order-toolbar{background:rgba(23,47,66,.84)}
+  .mobiletabs{
+    gap:1px;
+    min-height:66px;
+    padding:6px 9px calc(6px + env(safe-area-inset-bottom));
+    background:rgba(245,251,255,.94);
+    border-top:1px solid rgba(124,178,212,.31);
+    box-shadow:0 -5px 18px rgba(36,87,126,.06);
+  }
+  :root[data-admin-theme="dark"] .mobiletabs{background:rgba(13,32,48,.96)}
+  .mobiletabs .nav{border:0!important;min-height:51px;padding:4px 2px;border-radius:11px;font-size:10px;line-height:1.3}
+  .mobiletabs .nav span:first-child svg{width:19px;height:19px}
+  .mobiletabs .nav.active{
+    background:rgba(91,154,200,.11)!important;color:var(--reference-navy)!important;
+    box-shadow:none;
+  }
+  .mobile-more-panel{bottom:calc(70px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(76px + env(safe-area-inset-bottom))}
+  /* Product cards mirror the reference's image-left / information-right rhythm. */
+  #main .product-table tbody{gap:7px;padding:8px 0 10px}
+  #main .product-table tbody tr{border-radius:13px;padding:7px 10px}
+  #main .product-table tbody tr td:first-child{padding:3px 0}
+  #main .product-table .rowprod{gap:10px;align-items:center}
+  #main .product-table .thumb{width:62px;height:62px;flex:0 0 62px;border-radius:9px}
+  #main .product-table .prodname{font-size:12px;line-height:1.3;font-weight:750}
+  #main .product-table .product-row-info .sku{font-size:10px}
+  #main .product-table .product-mobile-inline-metric b{font-size:10px}
+  #main .product-table .product-mobile-actions{gap:6px}
+  #main .product-table .product-mobile-edit{width:31px;height:31px}
+  #main .product-table .product-mobile-status{font-size:9px}
+  #main .order-table .order-mobile-summary{padding:8px 9px 10px;gap:8px}
+  #main .order-table .order-mobile-order-id{font-size:11px;color:var(--reference-navy)}
+  #main .order-table .order-mobile-product{font-size:11px}
+  #main .order-table .order-mobile-total{font-size:11px}
+  #main .order-table .order-mobile-payment{font-size:9px}
+  #main .order-table tbody tr{border-radius:13px}
+  #main .order-detail-page .panel,#main .order-detail-page section{min-width:0}
+  #main .order-detail-customer-card{align-items:center}
+  #main .activity-log-card{border-radius:12px}
+  #main .activity-log-card-head{gap:9px}
+  #main .activity-log-card-avatar{background:rgba(160,202,227,.20)}
+  #backdrop .editorhead h2{font-size:20px;font-weight:750}
+  #backdrop .product-editor-tabs{border-color:var(--reference-border);background:rgba(237,248,255,.81)}
+  :root[data-admin-theme="dark"] #backdrop .product-editor-tabs{background:rgba(17,40,60,.92)}
+  #backdrop .editor-tab[aria-selected="true"]{background:linear-gradient(180deg,#fff,rgba(235,246,254,.94));color:var(--reference-navy)}
+  :root[data-admin-theme="dark"] #backdrop .editor-tab[aria-selected="true"]{background:rgba(63,112,150,.42)}
+  #backdrop .control{border-radius:10px;min-height:39px;font-size:12px}
+  #backdrop .editor-tab-panel{border-radius:12px}
+  #backdrop .editorfooter{box-shadow:0 -7px 18px rgba(25,77,114,.065)}
+  #imageGrid .image-cover-slot .imageitem{border-radius:14px}
+  #imageGrid .image-rail .imageitem{border-radius:8px}
+}
+/* Preserve usable controls at 320/360px; do not overflow the five-tab footer. */
+@media(max-width:390px) {
+  .topbar .brand-logo{width:35px;height:35px;flex-basis:35px}
+  .topbar .brand h1{font-size:10px;letter-spacing:.12em}
+  .topbar .brand p{font-size:8px;letter-spacing:.06em}
+  .topright #adminThemeToggle,.topright #notificationToggle,.topright #logout{
+    width:34px;min-width:34px;min-height:34px;flex-basis:34px;border-radius:9px;
+  }
+  .topright #notificationToggle .bell-icon{width:17px;height:17px}
+  .layout{padding-inline:10px}
+  #main .pagehead h2{font-size:21px}
+  #main .pagehead .btn{min-height:34px}
+  #main .stat .value{font-size:21px}
+  #main .product-table .thumb{width:58px;height:58px;flex-basis:58px}
+  #main .product-table .rowprod{gap:8px}
+  #main .product-table .product-mobile-actions{flex-basis:54px;width:54px}
+  #main .product-table .product-mobile-status{max-width:54px}
+  #main .product-table .product-mobile-inline-meta{gap:4px}
+}
+@media(max-width:359px){
+  .mobiletabs{padding-inline:4px}
+  .mobiletabs .nav{font-size:9px;min-width:0}
+  #main .pagehead h2{font-size:20px}
+  #main .product-table .thumb{width:52px;height:52px;flex-basis:52px}
+  #main .product-table .prodname{font-size:11px}
+  #main .product-table .product-mobile-inline-metric>span{font-size:8px}
+  #main .activity-log-reference-filters{gap:5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .brand-logo,.panel,.stat,.control,.mobiletabs .nav{transition:none!important;animation:none!important}
+}
+
 </style></head>
 <body>
 <header class="topbar"><div class="brand"><img class="brand-logo" src="/images/brand-emblem.png" alt="SinDarealest"><div><h1>SINDAREAL EST</h1><p>Luxury in Every Detail</p></div></div><div class="topright"><span class="badge" id="conn">Đang kiểm tra…</span><button class="btn small" id="adminThemeToggle" type="button" aria-label="Đổi giao diện sáng tối">◐ Giao diện</button><button class="btn small" id="notificationToggle" type="button" aria-expanded="false" aria-controls="notificationPanel"><svg class="bell-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span>Thông báo</span><span id="notificationCount" class="notif-count hidden" aria-label="Số thông báo chưa đọc">0</span></button><button class="btn small" id="logout" type="button" aria-label="Đăng xuất" title="Đăng xuất" hidden>Đăng xuất ↗</button></div></header><section id="notificationPanel" class="notification-panel hidden" aria-label="Trung tâm thông báo"><div class="panelhead" style="padding:0 0 10px"><h3>Hoạt động gần đây</h3><button class="btn small" id="markNotificationsRead" type="button">Đánh dấu đã đọc</button></div><div id="notificationList" class="tiny muted">Đang tải thông báo…</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn small" id="enablePush" type="button">Bật thông báo đẩy</button><span id="pushStatus" class="tiny muted" style="align-self:center"></span></div></section>
@@ -939,7 +1124,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>
-(()=>{'use strict';const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));const CAT={sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví da',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};const SKU_RULES={sneakers:'SD-SN',loafers:'SD-GL','dress-shoes':'SD-GT',belts:'SD-TL',wallets:'SD-VD',sandals:'SD-DD','watch-straps':'SD-DH','phone-cases':'SD-ODT'};const SKU_CATEGORY_ALIASES={sneaker:'sneakers',sneakers:'sneakers','giay-luoi':'loafers',loafers:'loafers','giay-tay':'dress-shoes','dress-shoes':'dress-shoes','that-lung':'belts',belts:'belts','vi-da':'wallets',wallets:'wallets',dep:'sandals',sandals:'sandals','day-dong-ho':'watch-straps','watch-straps':'watch-straps','op-dien-thoai':'phone-cases','phone-cases':'phone-cases'};function skuCategory(value){const key=String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return SKU_CATEGORY_ALIASES[key]||null}function nextSkuForCategory(value){const key=skuCategory(value),prefix=key&&SKU_RULES[key];if(!prefix)return '';let max=0;for(const p of products){const sku=String(p.sku||'').toUpperCase();if(!sku.startsWith(prefix))continue;const suffix=sku.slice(prefix.length);if(/^\d+$/.test(suffix))max=Math.max(max,Number(suffix)||0)}return prefix+String(max+1).padStart(3,'0')}let products=[],paymentQrSettings={active:false,pending:false,activeImageUrl:'',pendingImageUrl:''},settings={showPrices:false,watermarkEnabled:true,watermarkLogoUrl:'/watermark.webp',watermarkPosition:'bottom-right',watermarkSize:16,watermarkOpacity:68},orders=[],customers=[],claims=[],issuedWarranties=[],auditLogs=[],auditLogLoadError=false,customersLoadError=false,warrantyLoadError=false,selectedOrderId=new URLSearchParams(location.search).get('orderId')||'',view=(()=>{const params=new URLSearchParams(location.search),v=params.get('view');return ['dashboard','products','orders','customers','warranties','settings','backup','activity'].includes(v)||(v==='order-detail'&&params.get('orderId'))?v:'dashboard'})(),search='',category='all',fulfillmentFilter='all',publishedFilter='all',page=1,customerSearch='',orderSearch='',orderStatusFilter='all',orderPaymentFilter='all',warrantySearch='',warrantyClaimFilter='all',activitySearch='',activityActionFilter='all',activityEntityFilter='all',activityActorFilter='all',activityDateFrom='',activityDateTo='',activityFiltersExpanded=true,activityTab='log',editing=null,gallery=[],busy=false,resetBusy=false,autoSkuValue='',timer=0;
+(()=>{'use strict';const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));const CAT={sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví da',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};const SKU_RULES={sneakers:'SD-SN',loafers:'SD-GL','dress-shoes':'SD-GT',belts:'SD-TL',wallets:'SD-VD',sandals:'SD-DD','watch-straps':'SD-DH','phone-cases':'SD-ODT'};const SKU_CATEGORY_ALIASES={sneaker:'sneakers',sneakers:'sneakers','giay-luoi':'loafers',loafers:'loafers','giay-tay':'dress-shoes','dress-shoes':'dress-shoes','that-lung':'belts',belts:'belts','vi-da':'wallets',wallets:'wallets',dep:'sandals',sandals:'sandals','day-dong-ho':'watch-straps','watch-straps':'watch-straps','op-dien-thoai':'phone-cases','phone-cases':'phone-cases'};function skuCategory(value){const key=String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return SKU_CATEGORY_ALIASES[key]||null}function nextSkuForCategory(value){const key=skuCategory(value),prefix=key&&SKU_RULES[key];if(!prefix)return '';let max=0;for(const p of products){const sku=String(p.sku||'').toUpperCase();if(!sku.startsWith(prefix))continue;const suffix=sku.slice(prefix.length);if(/^\d+$/.test(suffix))max=Math.max(max,Number(suffix)||0)}return prefix+String(max+1).padStart(3,'0')}let products=[],paymentQrSettings={active:false,pending:false,activeImageUrl:'',pendingImageUrl:''},settings={showPrices:false,watermarkEnabled:true,watermarkLogoUrl:'/watermark.webp',watermarkPosition:'bottom-right',watermarkSize:16,watermarkOpacity:68},orders=[],customers=[],claims=[],issuedWarranties=[],auditLogs=[],auditLogLoadError=false,customersLoadError=false,warrantyLoadError=false,selectedOrderId=new URLSearchParams(location.search).get('orderId')||'',view=(()=>{const params=new URLSearchParams(location.search),v=params.get('view');return ['dashboard','products','orders','customers','warranties','settings','backup','activity'].includes(v)||(v==='order-detail'&&params.get('orderId'))?v:'dashboard'})(),search='',category='all',fulfillmentFilter='all',publishedFilter='all',page=1,customerSearch='',orderSearch='',orderStatusFilter='all',orderPaymentFilter='all',warrantySearch='',warrantyClaimFilter='all',activitySearch='',activityActionFilter='all',activityEntityFilter='all',activityActorFilter='all',activityDateFrom='',activityDateTo='',activityFiltersExpanded=false,activityTab='log',editing=null,gallery=[],busy=false,resetBusy=false,autoSkuValue='',timer=0;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function applyAdminTheme(mode){const dark=mode==='dark'||(mode==='auto'&&!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches));document.documentElement.dataset.adminTheme=dark?'dark':'light';const themeColor=$('#adminThemeColor');if(themeColor)themeColor.setAttribute('content',dark?'#09131d':'#eaf3fb');const b=$('#adminThemeToggle');if(b){b.textContent=dark?'☀ Giao diện sáng':'☾ Giao diện tối';b.setAttribute('aria-pressed',String(dark))}}function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');clearTimeout(timer);timer=setTimeout(()=>$('#toast').classList.remove('show'),3500)}function err(el,s){el.textContent=s||'';el.classList.toggle('hidden',!s)}
 async function api(url,opt={}){let r;try{r=await fetch(url,{credentials:'same-origin',cache:'no-store',...opt,headers:{...(opt.body instanceof FormData?{}:{'Content-Type':'application/json'}),...(opt.headers||{})}})}catch{throw Error('Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.')}let d;try{d=(r.headers.get('content-type')||'').includes('application/json')?await r.json():{error:'Máy chủ trả dữ liệu không hợp lệ.'}}catch{d={error:'Không đọc được phản hồi máy chủ.'}}if(!r.ok){if(r.status===401)showLogin();throw Error(d.error||`Lỗi máy chủ ${r.status}`)}return d}
 function showLogin(){$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');$('#logout').hidden=true;clearTimeout(inactivityTimer)}function showApp(){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');$('#logout').hidden=false;$('#conn').textContent='Đã kết nối máy chủ';if(!history.state?.sdAdminRoot&&!history.state?.sdAdminGuard){history.replaceState({sdAdminRoot:true,view},'',location.href);history.pushState({sdAdminGuard:true,view},'',location.href)}resetInactivity();renderNotifications();render()}let inactivityTimer=0,lastUserActivity=Date.now();function resetInactivity(){lastUserActivity=Date.now();clearTimeout(inactivityTimer);if($('#appView').classList.contains('hidden'))return;inactivityTimer=setTimeout(()=>logout(true),600000)}async function loadData(){const d=await api('/api/admin/products');products=d.products||[];refreshCategoryOptions();const loaded=await Promise.allSettled([api('/api/admin/settings'),api('/api/admin/payment-qr')]);if(loaded[0].status==='fulfilled')settings=loaded[0].value;if(loaded[1].status==='fulfilled')paymentQrSettings=loaded[1].value;const optional=await Promise.allSettled([api('/api/admin/orders'),api('/api/admin/customers'),api('/api/admin/warranties'),api('/api/admin/audit-logs')]);orders=optional[0].status==='fulfilled'?(optional[0].value.orders||[]):[];customersLoadError=optional[1].status!=='fulfilled'||!Array.isArray(optional[1].value.customers);customers=customersLoadError?[]:optional[1].value.customers;warrantyLoadError=optional[2].status!=='fulfilled'||!Array.isArray(optional[2].value.claims)||!Array.isArray(optional[2].value.warranties);claims=warrantyLoadError?[]:optional[2].value.claims;issuedWarranties=warrantyLoadError?[]:optional[2].value.warranties;auditLogLoadError=optional[3].status!=='fulfilled';auditLogs=optional[3].status==='fulfilled'?(optional[3].value.logs||[]):[];renderNotifications()}
