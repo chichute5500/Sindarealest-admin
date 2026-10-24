@@ -340,6 +340,10 @@ try {
             fail('Marble top/front are detached or incorrectly scaled.');
         }
         if (m.viewport.width <= 390) {
+          const imageTopOffset=m.imageRect.top-m.frameRect.top;
+          if (imageTopOffset < -45 || imageTopOffset > -38) fail('Mobile shoes float too far above the calibrated marble contact position.');
+        }
+        if (m.viewport.width <= 390) {
           const c=m.contactShadow;
           if (!c || c.display==='none' || c.zIndex!=='1' || !c.background.includes('radial-gradient')
               || !c.rect || c.rect.width < 180 || c.rect.height < 20) {

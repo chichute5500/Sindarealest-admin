@@ -96,7 +96,7 @@ assert.ok(canonicalMobile.includes("grid-template-columns:minmax(0,58fr) minmax(
   && canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
   && canonicalMobile.includes("position:absolute!important;top:0!important;right:0!important;")
   && canonicalMobile.includes("object-fit:contain!important;object-position:center center!important;")
-  && canonicalMobile.includes("top:-48px!important;left:-30px!important;"),
+  && canonicalMobile.includes("top:-42px!important;left:-30px!important;"),
   "Mobile Hero shoes must float beside, not beneath, the editorial copy.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
