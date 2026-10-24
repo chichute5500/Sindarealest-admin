@@ -190,7 +190,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   const statements = db.batches[0];
   assert.ok(statements[0].sql.includes("EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled'"),
     "the receipt INSERT must recheck that the order is not cancelled");
-  assert.ok(statements.slice(1).every(s => s.sql.includes("EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)"),
+  assert.ok(statements.slice(1).every(s => s.sql.includes("EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)")),
     "order status and audit writes must be skipped when the receipt insert is rejected");
 }
 
