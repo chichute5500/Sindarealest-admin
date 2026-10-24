@@ -141,7 +141,6 @@ assert.ok(html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!importa
   && protectedHeroDisplayLock.includes('grid-column:1!important;')
   && protectedHeroDisplayLock.includes('grid-column:2!important;')
   && protectedHeroDisplayLock.includes('max-height:210px!important;')
-  && !protectedHeroDisplayLock.includes('drop-shadow')
   && protectedHeroDisplayLock.includes('#home .hero-visual-caption{display:none!important}'),
   "The mobile Hero must place copy and the enlarged alpha-feathered image side-by-side, preserving image colors and avoiding crop/transform while allowing the approved subtle drop shadow.");
 
