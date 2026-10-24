@@ -8,6 +8,8 @@ on:
       - 'public/index.html'
       - 'data/legacy-products.json'
       - 'scripts/audit-fullscreen-gallery-preview.mjs'
+      - 'tests/detail-gallery-integrity.test.mjs'
+      - 'tests/gallery-transition-mobile-cart-badge.test.mjs'
       - '.github/workflows/gallery-preview-audit.yml'
   workflow_dispatch:
 
