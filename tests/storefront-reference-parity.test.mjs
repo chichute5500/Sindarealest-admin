@@ -281,7 +281,7 @@ for (const [, selector, declarations] of heroImageDeclarations) {
     if (!effect) continue;
     const property = effect[2].toLowerCase();
     const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
-    const neutral = (((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
+    const neutral = ((property === "filter" && value === "drop-shadow(0 12px 16px rgba(0,0,0,.18))") || ((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
       || (property === "mix-blend-mode" && value === "normal")
       || (property === "opacity" && value === "1"));
     assert.ok(neutral, "Hero image must preserve the source pixels apart from the explicitly approved drop shadow (" + selector.trim() + ": " + declaration + ").");
