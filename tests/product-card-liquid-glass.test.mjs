@@ -127,22 +127,27 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-const protectedHeroDisplayLock = html.slice(html.lastIndexOf('/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */'));
+const protectedHeroDisplayLock = html.slice(
+  html.lastIndexOf('/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */'),
+  html.lastIndexOf('/* Mobile Hero rebuild: readable copy first, complete product presentation second.')
+);
+const mobileHeroRebuild = html.slice(html.lastIndexOf('/* Mobile Hero rebuild: readable copy first, complete product presentation second.'));
 assert.ok(html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
   && protectedHeroDisplayLock.includes('#home .hero-visual img{')
   && protectedHeroDisplayLock.includes('object-fit:contain!important;object-position:center!important;padding:0!important;')
   && protectedHeroDisplayLock.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
   && protectedHeroDisplayLock.includes('mix-blend-mode:normal!important;opacity:1!important;')
   && protectedHeroDisplayLock.includes('transform:none!important;')
-  && protectedHeroDisplayLock.includes('border-radius:0!important;box-shadow:none!important;')
-  && protectedHeroDisplayLock.includes('display:flex!important;')
-  && protectedHeroDisplayLock.includes('justify-content:center!important;align-items:center!important;')
   && protectedHeroDisplayLock.includes('grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;')
   && protectedHeroDisplayLock.includes('grid-column:1!important;')
   && protectedHeroDisplayLock.includes('grid-column:2!important;')
   && protectedHeroDisplayLock.includes('max-height:330px!important;')
-  && protectedHeroDisplayLock.includes('#home .hero-visual-caption{display:none!important}'),
-  "The mobile Hero must place copy and the original RGBA PNG side-by-side, preserve source colors, avoid crop/transform, and keep the approved subtle drop shadow.");
+  && mobileHeroRebuild.includes('grid-template-columns:minmax(0,1fr)!important;')
+  && mobileHeroRebuild.includes('grid-template-rows:auto auto!important;')
+  && mobileHeroRebuild.includes('grid-row:1!important;')
+  && mobileHeroRebuild.includes('grid-row:2!important;')
+  && mobileHeroRebuild.includes('object-fit:contain!important;object-position:center center!important'),
+  "The desktop/tablet Hero display lock must remain intact while mobile uses readable copy above the fully contained original RGBA product image.");
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
