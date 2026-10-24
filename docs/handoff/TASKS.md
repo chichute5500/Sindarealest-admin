@@ -912,3 +912,22 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - Original source file, its SHA, PNG dimensions and alpha were verified; no modified/generated product derivative is used by the storefront.
 - Remaining: (1) exact source image named `a_clean_high_end_e_commerce_mobile_app_ui_screens.png` not found; ask owner to supply/identify it before claiming exact reference comparison. (2) owner physical-phone check on Preview still required before Hero can be OWNER-ACCEPTED PASS / LOCKED.
 - Do not touch gallery or other locked scopes. PR remains OPEN/unmerged; no main/Production changes.
+
+---
+
+## LATEST VERIFIED HERO MOBILE/PEDESTAL WORK — 2026-10-24 — OWNER ACCEPTANCE PENDING
+
+- Hero source/root-cause/rendering: **PASS for automated/runtime evidence** at SHA `681fbd203f495a1eb94fb01699f04b87c5516154`; marble oval and front face restored; mobile frame compact; tablet right edge no longer clipped.
+- Hero owner physical-device/reference comparison: **OWNER ACCEPTANCE REQUIRED**; do not label it LOCKED or 100% complete. Owner rejected an earlier screenshot, not yet this current SHA.
+- Exact technical evidence:
+Source/test/deployed commit: `681fbd203f495a1eb94fb01699f04b87c5516154` (documentation-only commits after it do not change deployed runtime).
+- Validate/full suite: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491470 — PASS.
+- Branch-only Cloudflare Pages Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491486 — PASS, exact source SHA.
+- Isolated Hero-only actual-Preview browser audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422 — PASS, 10/10 contexts (360x800, 390x844, 768x1024, 1280x800, 1440x900 × light/dark).
+- Actual screenshot/report artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422/artifacts/12566580049. Manual inspection included mobile light/dark, tablet and desktop; tablet right-edge plinth clipping from the prior version was corrected.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Runtime audit reports zero page/console errors, same-origin HTTP/failed-request errors, unauthorized writes, and hard failures. The intentionally blocked Cloudflare Insights beacon is not an app failure.
+
+- Fullscreen gallery: **OWNER-ACCEPTED PASS / LOCKED**, automatic read-only audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491472 PASS; no modifications to gallery semantics or design.
+- Existing independent blockers remain: mixed PR #108 scope-disposition owner decision; authorized read-only Preview D1 migration 0008 proof; authoritative product `skuVerified` flags. Restricted Admin/API/data/infrastructure/payments/main/Production stay untouched.
+

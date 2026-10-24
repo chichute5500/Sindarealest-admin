@@ -1123,3 +1123,22 @@ The exact source/test/Preview SHA for the successful runs is `81abc218535b53f151
 - Decoded alpha evidence: transparentRatio 0.831484375; semitransparentPixels 9781; opaqueRatio 0.163421354; four corner alpha values all 0; visible shoe bounds (162,267)–(972,1060), not touching image edges.
 - Each browser result: correct original asset/status, decoded natural dimensions, `object-fit:contain`, approved drop shadow, copyOverlap area 0, no horizontal overflow. Console/page/relevant same-origin HTTP/failed request/write errors all 0. The ten Cloudflare Insights beacon requests were intentionally blocked by audit allowlist.
 - Fixed root causes without weakening tests: runtime/capture/audit target now uses the uploaded source asset rather than deleted derivative; source-file Git blob pin updated; PNG alpha is decoded/tested; stale style and height assertions updated; audit expected result count follows declared matrix length.
+
+---
+
+## LATEST VERIFIED HERO MOBILE/PEDESTAL WORK — 2026-10-24 — OWNER ACCEPTANCE PENDING
+
+Source/test/deployed commit: `681fbd203f495a1eb94fb01699f04b87c5516154` (documentation-only commits after it do not change deployed runtime).
+- Validate/full suite: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491470 — PASS.
+- Branch-only Cloudflare Pages Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491486 — PASS, exact source SHA.
+- Isolated Hero-only actual-Preview browser audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422 — PASS, 10/10 contexts (360x800, 390x844, 768x1024, 1280x800, 1440x900 × light/dark).
+- Actual screenshot/report artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422/artifacts/12566580049. Manual inspection included mobile light/dark, tablet and desktop; tablet right-edge plinth clipping from the prior version was corrected.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Runtime audit reports zero page/console errors, same-origin HTTP/failed-request errors, unauthorized writes, and hard failures. The intentionally blocked Cloudflare Insights beacon is not an app failure.
+
+- Source tests assert mobile geometry, CSS pseudo-element override, PNG integrity and undistorted contain sizing, and tablet clipping regression.
+- Hero-only Playwright screenshot/report artifact inspected in mobile 360/390 and tablet 768, alongside desktop/dark contexts. All 10 audit result records were PASS. Direct visual self-review confirms mobile oval/front are visible and shoes no longer overpower copy; tablet platform fits within the viewport. No owner acceptance claimed.
+- The broader Liquid Glass visual workflow was **SKIPPED by its safety guard**, not counted as PASS, and the `#order` audit remained SKIPPED; protected scope not reopened.
+- Isolated gallery audit triggered automatically by shared HTML path: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491472 PASS. Existing gallery owner acceptance stays LOCKED.
+- Hero status: **OWNER ACCEPTANCE REQUIRED**, original exact reference unavailable for direct comparison in this session; no 100% project declaration. PR scope, authoritative SKU and Preview D1 0008 remain separate authorization blockers.
+

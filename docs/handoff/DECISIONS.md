@@ -366,3 +366,20 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Ten viewport/theme cases passed. Original PNG is 1200×1600 RGBA, transparent ratio 83.15%, semitransparent edges present, transparent corners, no clipping at source edges; copy overlap 0; console/page/relevant same-origin HTTP/failed request/write counters 0.
 - Exact named design reference file was not available to the assistant, so exact image-reference parity remains NOT VERIFIED. Owner must provide `a_clean_high_end_e_commerce_mobile_app_ui_screens.png` (or confirm an identical file), and physically inspect/accept Preview before Hero is owner-accepted/LOCKED.
 - Keep gallery and other PASS/LOCKED scopes untouched. No merge, no main/Production changes, no overall 100% claim.
+
+---
+
+## LATEST VERIFIED HERO MOBILE/PEDESTAL WORK — 2026-10-24 — OWNER ACCEPTANCE PENDING
+
+Decision: the original owner-provided 1200×1600 RGBA Hero shoe PNG stays byte-for-byte untouched, with `object-fit:contain` and restrained drop shadow. Fix reference presentation with CSS only. The authoritative final mobile media rule uses a compact 310–330px frame and specifically places the white/ice-blue oval top and plinth front beneath the shoes. The old `!important` blur/inset/background is explicitly neutralized. Tablet oval/front are centered at 40% of the visual frame with 100%/95% width so neither extends off the right side. Browser regression coverage asserts the computed marble oval is real rather than the earlier glow and checks tablet horizontal bounds; never discard these assertions to greenlight CI.
+
+Source/test/deployed commit: `681fbd203f495a1eb94fb01699f04b87c5516154` (documentation-only commits after it do not change deployed runtime).
+- Validate/full suite: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491470 — PASS.
+- Branch-only Cloudflare Pages Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491486 — PASS, exact source SHA.
+- Isolated Hero-only actual-Preview browser audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422 — PASS, 10/10 contexts (360x800, 390x844, 768x1024, 1280x800, 1440x900 × light/dark).
+- Actual screenshot/report artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422/artifacts/12566580049. Manual inspection included mobile light/dark, tablet and desktop; tablet right-edge plinth clipping from the prior version was corrected.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Runtime audit reports zero page/console errors, same-origin HTTP/failed-request errors, unauthorized writes, and hard failures. The intentionally blocked Cloudflare Insights beacon is not an app failure.
+
+Decision status is implementation verified, **not** owner-accepted. Keep PR #108 unmerged, main/Production untouched, and owner-PASS/LOCKED fullscreen gallery unchanged. An exact reference image and owner physical-phone approval are still distinct outstanding gates; CI and Chromium cannot replace them.
+

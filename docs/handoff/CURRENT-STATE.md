@@ -1116,3 +1116,22 @@ This is the latest Hero automated outcome and supersedes older failed CI/audit n
 - Preserve the original owner-supplied RGBA PNG and product pixels; do not use blind height-only tweaks, negative vertical offsets, or remove tests to force green. Compare with the exact owner reference if available; otherwise clearly state exact reference parity remains unverified.
 - Previous automated run IDs 40103752991, 40103752988, and 40103753008 are not owner visual acceptance and must not be used to dismiss this rejection.
 - Follow the detailed mandatory continuation checklist at the end of docs/handoff/PROMPT-NEW-CHAT-FINAL-100.md. Do not ask the owner to retest until the agent has fixed the layout, deployed the exact tested SHA, and personally reviewed mobile screenshots. PR #108 stays open/unmerged; do not touch main, Production, or other PASS/LOCKED scope.
+
+---
+
+## LATEST VERIFIED HERO MOBILE/PEDESTAL WORK — 2026-10-24 — OWNER ACCEPTANCE PENDING
+
+The previously **owner-rejected** mobile Hero is no longer the latest implementation; it remains **NOT OWNER-ACCEPTED** until the owner actually approves this new exact Preview. The source defect was proven by inspecting the CSS cascade: an earlier `#home .hero-visual::before` rule still used `!important` inset/blur/background and suppressed the later pearl-marble oval. A scoped override now resets these properties, retains the ice-blue/marble top in light/dark, and leaves the original RGBA shoe PNG unchanged. Mobile Hero portrait frame is now clamp(310px,85vw,330px), with the oval/top and front-face positioned to contact the shoes. Tablet pedestal width and horizontal center were narrowed to prevent viewport-edge clipping. No image pixels, product/catalog/SKU/API, backend, gallery, or locked content were changed.
+
+Source/test/deployed commit: `681fbd203f495a1eb94fb01699f04b87c5516154` (documentation-only commits after it do not change deployed runtime).
+- Validate/full suite: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491470 — PASS.
+- Branch-only Cloudflare Pages Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491486 — PASS, exact source SHA.
+- Isolated Hero-only actual-Preview browser audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422 — PASS, 10/10 contexts (360x800, 390x844, 768x1024, 1280x800, 1440x900 × light/dark).
+- Actual screenshot/report artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491422/artifacts/12566580049. Manual inspection included mobile light/dark, tablet and desktop; tablet right-edge plinth clipping from the prior version was corrected.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Runtime audit reports zero page/console errors, same-origin HTTP/failed-request errors, unauthorized writes, and hard failures. The intentionally blocked Cloudflare Insights beacon is not an app failure.
+
+The already owner-accepted fullscreen gallery remains PASS/LOCKED. Its isolated read-only audit ran automatically because `public/index.html` changed and also PASSed: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109491472; do not intentionally reopen it.
+
+**Status:** source tests PASS, exact-SHA Preview PASS, browser geometry/error audit PASS, manual screenshot self-review PASS; **OWNER VISUAL ACCEPTANCE REQUIRED**. The owner's exact reference file is still not available for direct pixel-level parity comparison in this session; do not infer it from generated imagery. Ask the owner to inspect the current Preview on their physical phone (light/dark) and explicitly say PASS before locking Hero. The project is **not confirmed 100%** due to owner Hero acceptance and separate PR #108 scope decision, authoritative SKU flags, and authorized read-only Preview D1 migration 0008 proof. PR #108 stays OPEN/unmerged, base main; no Production/main changes.
+
