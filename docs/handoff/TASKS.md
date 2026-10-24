@@ -1,3 +1,32 @@
+## LIVE FINAL-AUDIT TASK STATUS — 2026-10-24
+
+> Supersedes outdated task counts/status below. Full per-path evidence: [PR-SCOPE-REVIEW.md](PR-SCOPE-REVIEW.md).
+
+| Work item | Status | Evidence / next condition |
+|---|---|---|
+| Four-file handoff and latest prompt read | PASS | CURRENT-STATE, TASKS, DECISIONS, TEST-RESULTS and PROMPT-NEW-CHAT-FINAL-100 reviewed |
+| Live PR/branch state | PASS at audit checkpoint | PR #108 OPEN/unmerged, base `main`; HEAD matched after scope inventory. Re-fetch live HEAD after current docs-only writes |
+| PR changed-path inventory | PASS — path classification | 298 live paths enumerated and categorized in PR-SCOPE-REVIEW.md; classification does not imply hunk-level approval |
+| Automated validation | PASS on source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579` | [Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815); docs-only commits are not new source validation |
+| Preview deployment + authenticated HTTP | PASS on source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579` | [Deploy/diagnostic](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918) |
+| Preview root/canonical/OG/Twitter, robots, sitemap HTTP contracts | PASS on `8a4cc6066436f040e7900709e8dd2047ab7ab579` | Authenticated diagnostic in deploy run above |
+| Isolate PR scope / merge readiness | BLOCKED — owner decision required | PR includes Admin/backend/API, catalog data, migration, shared functions, deployment/access tooling and visual archives. No split/revert/merge without explicit disposition |
+| Fullscreen gallery flicker | PAUSED / OWNER ACCEPTANCE REQUIRED | No code/tests changed. Real phone must verify slow/rapid previous-next and thumbnail changes without flicker/ghosting; keep paused until owner reopens/accepts |
+| Hero visual evidence | BLOCKED — safe path unavailable in current workflows | Hero workflow guarded; do not bypass. Existing alternative visual workflows target owner-locked #order or catalog filters and require explicit unlock |
+| SKU URL-builder contract | PASS at source/test level | Strict `skuVerified === true` + trimmed nonempty rule and ID/key fallback are asserted in tests |
+| Authoritative product-by-product SKU verification | BLOCKED / NOT RUN | No verified live API/catalog evidence in this audit. Migration application not independently established. Do not infer or change restricted data/API/helper paths |
+| Final exact-SHA gates | PASS for deployed source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579`; NOT RUN on docs-only HEAD | No storefront source/test changed in this audit; do not call docs-only branch HEAD a newly deployed build |
+| Final acceptance | NOT COMPLETE | Browser/device checks, gallery owner acceptance and scope disposition remain open; 100% is not supported |
+
+### Next safe actions
+1. Keep PR #108 OPEN/unmerged. Owner must decide how to disposition/isolate the non-storefront paths before any merge decision; do not clean these automatically.
+2. Leave gallery implementation untouched until explicitly reopened; request actual phone verification only when that gate is being accepted.
+3. Resolve the visual evidence path only with an explicitly safe Hero-excluded, unlocked workflow or owner-approved alternative; do not dispatch existing guarded workflows.
+4. Obtain authoritative API evidence and confirm the SKU verification migration state through an approved read-only path. Do not inspect/modify catalog data or restricted APIs from this scope.
+5. If any source/test changes are later authorized, rerun Validate, Preview deploy and authenticated HTTP diagnostic on the exact final code SHA; keep browser/device/owner acceptance separate.
+
+---
+
 ## FINAL COMPLETION TRACKER — OWNER REQUEST TO RESOLVE ALL REMAINING ITEMS — 2026-10-24
 
 **This section supersedes older “next task / unresolved” notes below when they conflict.** Re-check the live branch and exact-SHA workflow results before acting.
