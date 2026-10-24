@@ -1,5 +1,35 @@
 # LIVE HANDOFF — 2026-10-24 11:16 UTC
 
+## LIVE 12-SCREEN QA CHECKPOINT — 2026-10-24T15:56:46Z
+
+- **Exact QA/test SHA:** `996d1208b9529a714e9f46de4dedd5905e7eea6e`; deployed `public/` + `functions/` app remains owner-approved `564ea556e6dee745eaaa491ee033a2a8cfbb595c`. GitHub comparison confirms no app/function changes; only QA workflows/scripts/tests plus historical docs differ.
+- **Isolated database preflight:** [read-only #40108515818](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40108515818) established `ISOLATED_DB_BINDING_VERIFIED`; Preview D1 differs from both storefront Production D1 and Preview project Production D1. No database IDs disclosed or Cloudflare configuration modified.
+- **Owner-approved synthetic live QA:** [run #40109162506 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109162506), [artifact 12565629211](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109162506/artifacts/12565629211). **48/48 full-page browser screenshots captured**: all 12 actual authenticated Preview screens at 390×844 and 1280×800, both light and dark. Each of 4 screen tests PASSED. 0 document-level horizontal overflow observations, 0 visibly unlabeled interactive elements in scanned main areas, 0 Admin business mutation requests from browser capture.
+- **Synthetic D1 fixture lifecycle:** seven run-owned QA records (hidden product, test customer, test order, order item, warranty, claim and audit row) inserted only into the independently isolated Preview DB, read via the actual Admin UI, then deleted by exact QA IDs in reverse dependency order. **Verified 0 run-owned rows remaining in all seven tables**, twice; QA cleanup artifact says `cleanupVerified=true`, `failures=[]`. There were no test payment-ledger records or R2 uploads. The QA records were NOT real customer orders/payments; no user business records were overwritten. Authenticated Admin API **business-write/persistence acceptance is still NOT_TESTED**: this cycle seeds directly into isolated D1 and verifies browser reads/cleanup, not Admin save/payment operations.
+- **Visual review:** Approved reference `docs/admin-ui-reference/admin-mobile-reference.png` vs 390×844 live screenshots shows design differences: the reference login has email/phone, remember/forgot UI whereas deployed login uses an intentional password-only auth contract; reference emphasizes navy monogram/card imagery while deployed build uses a gold monogram and denser catalog controls; reference revenue chart has sample values but deployed dashboard shows a truthful no-verified-revenue empty state. Synthetic text/image contents and reference mock phone frames are NOT same-data pixel parity evidence. Do not silently change auth/business truth to match mockup. Screens 1–12 remain `PARTIAL_NOT_ACCEPTED`, parity `NOT_VERIFIED`.
+- **Non-blocking visual-capture limitation:** a transient `Đăng nhập thành công` toast overlays part of early screenshots; cleaner screenshot timing should be tested without changing business UI.
+- **PR/production:** #111 OPEN/unmerged; #108 read-only; #112 draft untouched; no merge/rebase/Production deploy. No further isolated Preview deploy performed here. **Progress remains 50% PROVISIONAL**. Next safe work: deterministic screenshot clean-up and targeted same-data reference checks; then guarded authenticated business-write/persistence QA on isolated D1 using run-owned IDs and compulsory cleanup, without treating test data as real transactions.
+
+### Per-screen visual-acceptance assessment (2026-10-24T15:56:46Z; latest remote + QA fixture screenshots)
+
+| # | Screen | Browser captured | Review finding | Acceptance |
+|---|---|---|---|---|
+| 1 | Login | 4/4 | Password-only live auth differs from reference's email/phone and recovery UI; do not change security contract for visual mimicry | PARTIAL_NOT_ACCEPTED |
+| 2 | Dashboard | 4/4 | Counts render; sample revenue graph is truthfully empty without verified ledger; reference parity unverified | PARTIAL_NOT_ACCEPTED |
+| 3 | Product list | 4/4 | 235 real catalog items plus temporary hidden QA product shown in Admin; denser mobile product layout than reference | PARTIAL_NOT_ACCEPTED |
+| 4 | Product editor | 4/4 | Existing editable product modal and tab controls render; no save submitted | PARTIAL_NOT_ACCEPTED |
+| 5 | Gallery | 4/4 | Cover area and image panel render; number of images differs from reference; no R2 uploads | PARTIAL_NOT_ACCEPTED |
+| 6 | Orders | 4/4 | Isolated QA order card renders; no actual fulfillment/payment updates | PARTIAL_NOT_ACCEPTED |
+| 7 | Order detail | 4/4 | Isolated QA order detail renders in all four environments; no real payment/ledger status changed | PARTIAL_NOT_ACCEPTED |
+| 8 | Customers | 4/4 | QA customer record renders; account/profile write persistence not tested | PARTIAL_NOT_ACCEPTED |
+| 9 | Warranty/support | 4/4 | QA warranty and claim render; issuing a genuine warranty not tested | PARTIAL_NOT_ACCEPTED |
+| 10 | Website settings | 4/4 | Settings controls render; no settings mutations | PARTIAL_NOT_ACCEPTED |
+| 11 | Backup/Restore | 4/4 | Controls render; destructive restore not invoked | PARTIAL_NOT_ACCEPTED |
+| 12 | Activity log | 4/4 | Scoped QA audit entry renders; no real business-audit operation authored | PARTIAL_NOT_ACCEPTED |
+
+**Scope:** Screenshot/renderability PASS does **not** mean reference-parity or end-to-end business acceptance PASS. 48/48 screenshots captured; 0 measured horizontal overflow or observed unlabeled main-area interactives across viewport/theme matrix. Source `996d1208b9529a714e9f46de4dedd5905e7eea6e`, screenshot artifact 12565629211, read-only Page screenshot code (save screenshots is not a business mutation), D1 cleanup twice verified.
+
+
 ## POST-DEPLOY VERIFIED CHECKPOINT — 2026-10-24T15:31:44.461Z
 
 - **Owner-approved isolated Admin Preview deployment succeeded.** Approved source SHA: `564ea556e6dee745eaaa491ee033a2a8cfbb595c`. [Deployment workflow run #40106880423](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40106880423) PASS; exact project `sindarealest-admin-preview`, branch `feature-admin-isolated-handoff-2026-10-20`, alias `https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/`. This was **Preview only**, not production.
