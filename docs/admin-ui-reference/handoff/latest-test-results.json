@@ -461,7 +461,9 @@
     "previewRunId": 40074512187,
     "diagnosticRunId": 40074508692,
     "artifactId": 12551859359,
-    "commitIsDocsOnly": true
+    "commitIsDocsOnly": true,
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
   },
   "latestProductSourceCommit": "e55088d89632ff84ec68715cdee3ef64c1a9e964",
   "latestDiagnosticArtifact": {
