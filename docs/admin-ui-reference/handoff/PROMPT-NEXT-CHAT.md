@@ -1,3 +1,33 @@
+# PROMPT NEXT CHAT — SINDAREALEST ADMIN
+
+Continue directly in GitHub repo `chichute5500/Sindarealest-admin`. Do not ask the user to repeat history. Read this file and the current status JSON, then verify live branch/PR/CI state before changes.
+
+## Current verified checkpoint
+- Branch: `feature/admin-isolated-handoff-2026-10-20`
+- Latest application/test SHA: `b6d68ef9cd5ba8e72fcf4c2175e6b7674d039018`
+- Validate #5646 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074512151
+- Admin Preview Playwright #1062 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074512187
+- Admin Preview diagnostics #527 PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074508692
+- Artifact #12551859359: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074508692/artifacts/12551859359
+- PR #111 OPEN/unmerged; GitHub reports `mergeable=true`, `mergeable_state=clean`.
+- Feature deployment workflow is `.github/workflows/deploy-admin-isolated-preview.yml`, pinned to `sindarealest-admin-preview` and guarded to the approved branch.
+- Feature E2E spec is `tests/e2e/admin-isolated-preview.spec.js`; diagnostics invokes it. Do not restore old shared paths or alter `main` workflow/spec.
+- Live Preview evidence is read-only: 7/7 Admin GET routes 200, catalog 235 products, 527 relative image URLs decoded, no mutation requests.
+- Business-write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; approved-reference parity `NOT_VERIFIED`; all 12 screens `PARTIAL_NOT_ACCEPTED`; progress 50% `PROVISIONAL`; Production `NOT_PERFORMED`.
+
+## Operating rules
+1. Parallelize independent safe work and continue after each report.
+2. Stop only when actual user action is required.
+3. Test-first: add a regression test, verify it fails for the target bug, then fix and rerun exact-SHA CI/Preview.
+4. Tie every result to exact SHA; distinguish local fixtures/read-only GET from authenticated business writes.
+5. Blockers must include evidence; switch to independent work instead of repeating a failed path.
+6. Only write branch `feature/admin-isolated-handoff-2026-10-20`. PR #111 stays open/unmerged. PR #108/#112 read-only.
+7. Never merge/rebase/cherry-pick, force-push, touch `main`/storefront, deploy Production, change Access/secrets/DNS, or write remote D1/R2/schema/ledger.
+
+## Next work
+Continue read-only audit of order/payment/warranty concurrency and compare Admin UI to approved references using the current evidence artifact. Make no speculative visual edits. Keep progress provisional until acceptance evidence changes.
+
+---
 # CURRENT VERIFIED CHECKPOINT — 2026-10-24 07:11 UTC
 
 **Repository:** `chichute5500/Sindarealest-admin`  
