@@ -10,10 +10,10 @@ async function patchOrder({ existingStatus, simulateCancelRace = false }) {
   const statements = [];
   const DB = {
     prepare(sql) {
-      const entry = { sql, values: [] };
-      statements.push(entry);
-      return {
-        bind(...values) { entry.values = values; return this; },
+      const statement = {
+        sql,
+        values: [],
+        bind(...values) { this.values = values; return this; },
         async first() {
           if (sql === "SELECT id,status FROM orders WHERE id=?") return { id: "test-order", status: existingStatus };
           if (sql.includes("SELECT id FROM order_payment_requests")) return null;
@@ -26,6 +26,8 @@ async function patchOrder({ existingStatus, simulateCancelRace = false }) {
           return { results: [] };
         },
       };
+      statements.push(statement);
+      return statement;
     },
     async batch(items) {
       return items.map((item, index) => {
