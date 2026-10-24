@@ -3678,6 +3678,25 @@ html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html
   transition:none !important;animation:none !important;
  }
 }
+
+/* Desktop Hero visual correction: preserve the PNG's intrinsic aspect ratio and match the reference's product emphasis. */
+@media(min-width:1001px){
+  #home .hero-copy{padding-left:clamp(24px,5vw,72px)!important}
+  #home .hero-visual{
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:auto!important;
+    overflow:visible!important;
+  }
+  #home .hero-visual img{
+    width:auto!important;
+    height:auto!important;
+    max-width:100%!important;
+    max-height:min(84vh,740px)!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+}
 </style>
 
 </body>
