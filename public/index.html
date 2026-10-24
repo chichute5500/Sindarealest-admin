@@ -4072,3 +4072,169 @@ html.dark #home .hero-visual::before{
   .nav-wrap .nav .brand-name{font-size:20px}
   .nav-wrap .navlinks .navlink{font-size:11px}
 }
+
+
+/* HERO V2 — compact physical marble plinth, shared contact geometry 2026-10-25 */
+/* The original 1200x1600 transparent owner PNG is NOT modified. Only the framing
+   and independent pedestal layers change; small/mobile, tablet and coarse pointer
+   share the same ellipsoid/rim/body/contact-shadow geometry. */
+@media (min-width:761px) {
+  #home.hero.wrap {
+    height:clamp(340px,38vw,392px)!important;
+    min-height:0!important;
+    padding:clamp(18px,2vw,25px) clamp(21px,3vw,45px)!important;
+    margin:10px auto 14px!important;
+    gap:clamp(9px,1.3vw,19px)!important;
+    grid-template-columns:minmax(0,.89fr) minmax(0,1.11fr)!important;
+  }
+  #home .hero-copy {align-self:center!important;max-width:510px!important}
+  #home .hero-copy h1 {
+    font-size:clamp(36px,3.6vw,52px)!important;
+    line-height:1.06!important;
+    margin-bottom:14px!important;
+  }
+  #home .hero-description {font-size:clamp(12px,1.06vw,14px)!important;line-height:1.56!important}
+  #home .hero-actions {margin-top:17px!important}
+  #home .hero-actions .pill-btn {
+    min-height:42px!important;padding:10px 18px!important;font-size:13px!important;
+  }
+  #home .hero-visual {
+    position:relative!important;left:-22px!important;transform:none!important;
+    min-height:0!important;overflow:visible!important;
+  }
+  #home .hero-visual img {
+    left:0!important;top:-110px!important;
+    width:clamp(430px,35.6vw,465px)!important;
+    height:auto!important;max-height:none!important;
+    margin:0!important;padding:0!important;
+    filter:drop-shadow(0 3px 3px rgba(7,20,30,.14))!important;
+  }
+  /* The upper ellipse has a thin beveled edge; the front face tapers as a
+     three-dimensional block and disappears softly into the website backdrop. */
+  #home .hero-visual::before {
+    left:43%!important;bottom:26px!important;
+    width:74%!important;max-width:440px!important;
+    height:clamp(48px,4vw,57px)!important;
+    border:1px solid rgba(151,181,203,.43)!important;border-radius:50%!important;
+    background:
+      radial-gradient(ellipse 43% 46% at 31% 22%,rgba(255,255,255,.96),transparent 100%),
+      linear-gradient(161deg,transparent 0 41%,rgba(106,146,173,.065) 42%,transparent 43% 74%,rgba(100,142,169,.05) 75%,transparent 76%),
+      linear-gradient(110deg,#fafdff 0%,#edf6fb 28%,#d5e6f1 62%,#e2eef5 84%,#c7deea 100%)!important;
+    box-shadow:
+      0 4px 7px rgba(22,62,91,.08),
+      inset 0 2px 1px rgba(255,255,255,.98),
+      inset 0 -5px 6px rgba(94,143,175,.20),
+      0 1px 0 rgba(154,182,200,.28)!important;
+    filter:none!important;
+  }
+  #home .hero-visual::after {
+    left:43%!important;bottom:-4px!important;
+    width:72%!important;max-width:429px!important;
+    height:57px!important;
+    clip-path:polygon(0 0,100% 0,96% 100%,4% 100%)!important;
+    border:0!important;border-radius:0 0 24% 24% / 0 0 11% 11%!important;
+    background:
+      linear-gradient(104deg,rgba(80,121,148,.16),transparent 18% 82%,rgba(90,132,158,.18)),
+      linear-gradient(157deg,transparent 0 46%,rgba(122,162,187,.075) 47%,transparent 49% 80%,rgba(136,174,196,.065) 81%,transparent 83%),
+      linear-gradient(180deg,rgba(236,247,252,.98) 0%,rgba(207,226,239,.89) 43%,rgba(177,208,225,.52) 76%,rgba(177,208,225,0) 100%)!important;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 36%,rgba(0,0,0,.84) 58%,rgba(0,0,0,.32) 81%,transparent 100%)!important;
+    mask-image:linear-gradient(to bottom,#000 0%,#000 36%,rgba(0,0,0,.84) 58%,rgba(0,0,0,.32) 81%,transparent 100%)!important;
+    box-shadow:0 15px 18px rgba(16,47,72,.06)!important;
+  }
+  #home .hero-visual-glow {
+    left:43%!important;bottom:45px!important;
+    width:71%!important;max-width:423px!important;height:45px!important;
+    filter:blur(1.8px)!important;
+    background:
+      radial-gradient(ellipse 30% 25% at 42% 82%,rgba(12,27,39,.48) 0%,rgba(18,37,53,.19) 40%,transparent 88%),
+      radial-gradient(ellipse 16% 23% at 79% 30%,rgba(12,28,41,.41) 0%,rgba(19,43,59,.14) 48%,transparent 88%),
+      radial-gradient(ellipse 55% 43% at 56% 68%,rgba(28,58,78,.08),transparent 100%)!important;
+  }
+  html.dark #home .hero-visual::before {
+    border-color:rgba(166,201,225,.49)!important;
+    background:
+      radial-gradient(ellipse 42% 45% at 30% 23%,rgba(229,243,252,.65),transparent 100%),
+      linear-gradient(158deg,transparent 0 41%,rgba(28,63,86,.13) 42%,transparent 43% 75%,rgba(28,64,88,.09) 76%,transparent 77%),
+      linear-gradient(110deg,#b8d4e7 0%,#93b8d1 28%,#668eae 63%,#81abc6 85%,#547e9c 100%)!important;
+    box-shadow:0 5px 12px rgba(0,9,21,.22),inset 0 2px 1px rgba(242,250,255,.6),inset 0 -5px 7px rgba(23,54,80,.31)!important;
+  }
+  html.dark #home .hero-visual::after {
+    background:
+      linear-gradient(104deg,rgba(16,48,70,.32),transparent 18% 82%,rgba(12,43,65,.35)),
+      linear-gradient(155deg,transparent 0 45%,rgba(32,71,96,.16) 46%,transparent 49% 80%,rgba(29,67,91,.14) 81%,transparent 83%),
+      linear-gradient(180deg,rgba(130,170,196,.92),rgba(92,135,165,.77) 43%,rgba(57,100,131,.4) 77%,rgba(57,100,131,0))!important;
+  }
+  html.dark #home .hero-visual-glow {
+    background:
+      radial-gradient(ellipse 30% 25% at 42% 82%,rgba(0,8,18,.65),rgba(0,15,30,.30) 43%,transparent 88%),
+      radial-gradient(ellipse 16% 23% at 79% 30%,rgba(0,6,16,.62),rgba(0,13,27,.25) 48%,transparent 88%),
+      radial-gradient(ellipse 55% 43% at 56% 68%,rgba(0,10,24,.12),transparent 100%)!important;
+  }
+}
+@media (min-width:761px) and (max-width:1100px) {
+  #home.hero.wrap {
+    grid-template-columns:minmax(0,.90fr) minmax(0,1.10fr)!important;
+    padding:18px 22px!important;
+  }
+  #home .hero-visual {left:-12px!important}
+  #home .hero-visual img {
+    width:clamp(348px,44vw,430px)!important;
+    top:clamp(-100px,calc(60px - 15vw),-55px)!important;
+    left:-8px!important;
+  }
+  #home .hero-visual::before {
+    width:90%!important;max-width:385px!important;
+    height:48px!important;left:46%!important;bottom:26px!important;
+  }
+  #home .hero-visual::after {width:88%!important;max-width:375px!important;left:46%!important;height:51px!important}
+  #home .hero-visual-glow {width:85%!important;max-width:368px!important;left:46%!important;height:40px!important;bottom:44px!important}
+  #home .hero-copy h1 {font-size:clamp(34px,4vw,43px)!important}
+  #home .hero-description {font-size:12px!important}
+  #home .hero-actions .pill-btn {font-size:12px!important;min-height:40px!important}
+}
+@media (max-width:760px) {
+  /* Both plinth parts and both contact patches use the identical anchor,
+     ensuring a narrow display never chops the front lip at its right edge. */
+  #home .hero-visual::before,#home .hero-visual::after,#home .hero-visual-glow {
+    left:calc(50% - 9px)!important;
+    width:clamp(175px,51vw,206px)!important;
+    max-width:none!important;
+  }
+  #home .hero-visual::before {
+    bottom:35px!important;height:35px!important;
+    border:1px solid rgba(155,190,212,.4)!important;
+    background:
+      radial-gradient(ellipse 41% 42% at 32% 25%,rgba(255,255,255,.97),transparent 100%),
+      linear-gradient(158deg,transparent 0 41%,rgba(105,145,171,.07) 42%,transparent 43% 75%,rgba(112,152,177,.05) 76%,transparent 78%),
+      linear-gradient(105deg,#fafdff,#e9f4fa 33%,#d4e6f0 67%,#dcebf3)!important;
+    box-shadow:0 3px 7px rgba(27,67,95,.10),inset 0 2px 2px rgba(255,255,255,.96),inset 0 -4px 5px rgba(88,140,174,.17)!important;
+  }
+  #home .hero-visual::after {
+    bottom:-2px!important;height:38px!important;
+    border-radius:0 0 23% 23% / 0 0 12% 12%!important;
+    clip-path:polygon(0 0,100% 0,96% 100%,4% 100%)!important;
+    background:linear-gradient(101deg,rgba(84,129,155,.14),transparent 17% 83%,rgba(91,138,164,.12)),
+      linear-gradient(180deg,rgba(229,243,251,.97),rgba(196,221,236,.7) 53%,rgba(176,207,224,0))!important;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0 32%,rgba(0,0,0,.79) 54%,rgba(0,0,0,.3) 80%,transparent 100%)!important;
+    mask-image:linear-gradient(to bottom,#000 0 32%,rgba(0,0,0,.79) 54%,rgba(0,0,0,.3) 80%,transparent 100%)!important;
+  }
+  #home .hero-visual-glow {
+    bottom:34px!important;height:34px!important;filter:blur(1.25px)!important;
+    background:radial-gradient(ellipse 29% 25% at 45% 78%,rgba(12,27,40,.42),transparent 90%),
+      radial-gradient(ellipse 17% 27% at 85% 32%,rgba(12,29,43,.38),transparent 85%)!important;
+  }
+  html.dark #home .hero-visual::before {
+    border-color:rgba(141,183,211,.5)!important;
+    background:radial-gradient(ellipse 41% 42% at 32% 25%,rgba(230,246,255,.54),transparent 100%),
+      linear-gradient(105deg,#b4d2e5,#89b2cc 33%,#638eae 67%,#729fbf)!important;
+  }
+  html.dark #home .hero-visual::after {
+    background:linear-gradient(101deg,rgba(16,47,69,.33),transparent 17% 83%,rgba(18,49,71,.29)),
+      linear-gradient(180deg,rgba(116,160,190,.90),rgba(76,121,154,.66) 53%,rgba(47,88,119,0))!important;
+  }
+  html.dark #home .hero-visual-glow {
+    background:radial-gradient(ellipse 29% 25% at 45% 78%,rgba(0,7,17,.59),transparent 90%),
+      radial-gradient(ellipse 17% 27% at 85% 32%,rgba(0,8,20,.56),transparent 85%)!important;
+  }
+}
+
