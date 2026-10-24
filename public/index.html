@@ -3708,6 +3708,12 @@ html.dark #home .hero-visual::before{
   background:linear-gradient(167deg,transparent 0 28%,rgba(116,157,187,.20) 29%,transparent 30% 55%,rgba(116,157,187,.14) 56%,transparent 57%),radial-gradient(ellipse at 30% 28%,rgba(213,234,248,.96),rgba(137,171,196,.98) 48%,rgba(74,111,139,.98) 100%)!important;
 }
 
+/* Tablet Hero pedestal stays under the shoes without extending beyond the right edge. */
+@media(min-width:761px) and (max-width:1000px){
+  #home .hero-visual::before{left:40%!important;width:100%!important}
+  #home .hero-visual::after{left:40%!important;width:95%!important}
+}
+
 /* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */
 #home .hero-visual img{position:relative!important;z-index:1!important;object-fit:contain!important;transform:none!important;opacity:1!important;mix-blend-mode:normal!important;mask-image:none!important;-webkit-mask:none!important;mask:none!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important}
 #home .hero-visual::before,

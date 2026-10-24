@@ -521,3 +521,8 @@ assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;b
   && mobileHeroReferenceMatch.includes("width:84%!important;height:11%!important;bottom:43%!important;")
   && mobileHeroReferenceMatch.includes("width:81%!important;height:9%!important;bottom:34%!important;"),
   "The mobile marble oval must override the obsolete blur and meet the visible pedestal front.");
+
+assert.ok(heroPedestalStyles.includes("Tablet Hero pedestal stays under the shoes")
+  && heroPedestalStyles.includes("#home .hero-visual::before{left:40%!important;width:100%!important}")
+  && heroPedestalStyles.includes("#home .hero-visual::after{left:40%!important;width:95%!important}"),
+  "Tablet pedestal must remain entirely within the Hero presentation without clipping its right edge.");

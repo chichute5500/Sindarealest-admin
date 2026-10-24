@@ -190,7 +190,7 @@ try {
           const topStyle = getComputedStyle(frame,'::before');
           const frontStyle = getComputedStyle(frame,'::after');
           const pedestal={oval:{content:topStyle.content,filter:topStyle.filter,background:topStyle.backgroundImage,
-            top:Number.parseFloat(topStyle.top),width:Number.parseFloat(topStyle.width),height:Number.parseFloat(topStyle.height)},
+            left:Number.parseFloat(topStyle.left),top:Number.parseFloat(topStyle.top),width:Number.parseFloat(topStyle.width),height:Number.parseFloat(topStyle.height)},
             face:{content:frontStyle.content,top:Number.parseFloat(frontStyle.top),width:Number.parseFloat(frontStyle.width)}};
           const imageVisible = !image.hidden && imageStyle.display !== 'none'
             && imageStyle.visibility !== 'hidden' && Number.parseFloat(imageStyle.opacity || '1') > 0
@@ -334,6 +334,14 @@ try {
             fail('Marble top/front are detached or incorrectly scaled.');
         }
         if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < 320)) fail('Tablet Hero product is too small compared with the reference-led layout.');
+        if (m.viewport.width >= 761 && m.viewport.width <= 1000) {
+          const p=m.pedestal?.oval;
+          if (!p||!Number.isFinite(p.left)||!Number.isFinite(p.width)) fail('Tablet marble pedestal geometry unavailable.');
+          else {
+            const left=m.frameRect.left+p.left-p.width/2;
+            if (left < -1 || left + p.width > m.viewport.width + 1) fail('Tablet marble pedestal extends outside the viewport.');
+          }
+        }
         if (m.viewport.width >= 1001) {
           const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;
           if (ratio < 0.70 || ratio > 0.80) fail('Desktop Hero PNG is being squeezed by a mismatched CSS box ratio.');
