@@ -96,7 +96,7 @@ assert.ok(canonicalMobile.includes("grid-template-columns:minmax(0,58fr) minmax(
   && canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
   && canonicalMobile.includes("position:absolute!important;top:0!important;right:0!important;")
   && canonicalMobile.includes("object-fit:contain!important;object-position:center center!important;")
-  && canonicalMobile.includes("top:-55px!important;left:-30px!important;"),
+  && canonicalMobile.includes("top:-48px!important;left:-30px!important;"),
   "Mobile Hero shoes must float beside, not beneath, the editorial copy.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");
@@ -110,4 +110,10 @@ assert.ok(canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
   && canonicalMobile.includes("bottom:10px!important;")
   && heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;"),
   "The mobile Hero uses a single compact, visible platform beneath the unchanged shoe PNG.");
+assert.ok(canonicalMobile.includes("#home .hero-visual-glow{")
+  && canonicalMobile.includes("at 40% 81%")
+  && canonicalMobile.includes("at 79% 30%")
+  && canonicalMobile.includes("drop-shadow(0 5px 5px rgba(14,30,42,.10))")
+  && canonicalMobile.includes("drop-shadow(0 2px 2px rgba(8,19,29,.16))"),
+  "A mobile contact-shadow layer must ground both shoes without changing the original PNG pixels.");
 console.log("PASS: owner-authorized Hero presentation PNG and restrained drop-shadow experiment are enforced.");

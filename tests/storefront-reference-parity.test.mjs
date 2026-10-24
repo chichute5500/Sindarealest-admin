@@ -401,7 +401,7 @@ const mobileReferenceCss = html.slice(html.lastIndexOf("/* Mobile Hero — owner
 assert.ok(mobileReferenceCss.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
   && mobileReferenceCss.includes("height:clamp(216px,57vw,230px)!important;")
   && mobileReferenceCss.includes("position:absolute!important;top:0!important;right:0!important;")
-  && mobileReferenceCss.includes("top:-55px!important;left:-30px!important;")
+  && mobileReferenceCss.includes("top:-48px!important;left:-30px!important;")
   && mobileReferenceCss.includes("width:clamp(244px,67vw,270px)!important;")
   && mobileReferenceCss.includes("object-fit:contain!important")
   && !mobileReferenceCss.includes("grid-template-rows:auto auto!important;"),
@@ -511,7 +511,7 @@ const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero —
 assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
   && mobileHeroReferenceMatch.includes("grid-template-rows:1fr!important;")
   && mobileHeroReferenceMatch.includes("height:clamp(216px,57vw,230px)!important;")
-  && mobileHeroReferenceMatch.includes("top:-55px!important;left:-30px!important;")
+  && mobileHeroReferenceMatch.includes("top:-48px!important;left:-30px!important;")
   && mobileHeroReferenceMatch.includes("max-height:none!important")
   && mobileHeroReferenceMatch.includes("opacity:1!important;mix-blend-mode:normal!important;"),
   "Mobile reference must use a short horizontal layout and undistorted transparent product asset.");
@@ -521,6 +521,13 @@ assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;b
   && mobileHeroReferenceMatch.includes("bottom:10px!important;")
   && mobileHeroReferenceMatch.includes("height:24px!important;"),
   "Mobile pedestal top/front must form a compact marble display below the shoe soles.");
+assert.ok(mobileHeroReferenceMatch.includes("filter:drop-shadow(0 5px 5px rgba(14,30,42,.10)) drop-shadow(0 2px 2px rgba(8,19,29,.16))!important;")
+  && mobileHeroReferenceMatch.includes("#home .hero-visual-glow{")
+  && mobileHeroReferenceMatch.includes("bottom:36px!important;")
+  && mobileHeroReferenceMatch.includes("at 40% 81%")
+  && mobileHeroReferenceMatch.includes("at 79% 30%")
+  && mobileHeroReferenceMatch.includes("z-index:1!important;pointer-events:none!important;"),
+  "Realistic mobile ground contact needs two separate shadows above the marble surface and below the shoes.");
 
 assert.ok(heroPedestalStyles.includes("Tablet Hero pedestal stays under the shoes")
   && heroPedestalStyles.includes("#home .hero-visual::before{left:40%!important;width:100%!important}")

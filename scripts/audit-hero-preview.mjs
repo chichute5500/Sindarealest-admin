@@ -187,6 +187,12 @@ try {
           const copyRect = rect(copy);
           const frameRect = rect(frame);
           const imageStyle = getComputedStyle(image);
+          const contactNode=frame.querySelector('.hero-visual-glow');
+          const contactStyle=contactNode?getComputedStyle(contactNode):null;
+          const contactShadow=contactNode?{
+            display:contactStyle.display,background:contactStyle.backgroundImage,
+            zIndex:contactStyle.zIndex,rect:rect(contactNode)
+          }:null;
           const topStyle = getComputedStyle(frame,'::before');
           const frontStyle = getComputedStyle(frame,'::after');
           const pedestal={oval:{content:topStyle.content,filter:topStyle.filter,background:topStyle.backgroundImage,
@@ -298,7 +304,7 @@ try {
             objectFit: imageStyle.objectFit,
             objectPosition: imageStyle.objectPosition,
             filter: imageStyle.filter,
-            imageRect, frameRect, copyRect, heroRect:rect(hero), visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal,
+            imageRect, frameRect, copyRect, heroRect:rect(hero), visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal, contactShadow,
             productWithinHorizontalViewport: !visibleProductRect || (visibleProductRect.left >= -1 && visibleProductRect.right <= window.innerWidth + 1),
             expectedThemeApplied: rootDark === (args.theme === 'dark'),
             viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth },
@@ -332,6 +338,16 @@ try {
             ||pl.face.top<=pl.oval.top||pl.face.top-pl.oval.top-pl.oval.height>10
             ||pl.oval.width<m.heroRect.width*.52||pl.oval.width>m.heroRect.width*.68)
             fail('Marble top/front are detached or incorrectly scaled.');
+        }
+        if (m.viewport.width <= 390) {
+          const c=m.contactShadow;
+          if (!c || c.display==='none' || c.zIndex!=='1' || !c.background.includes('radial-gradient')
+              || !c.rect || c.rect.width < 180 || c.rect.height < 20) {
+            fail('Mobile shoe contact shadow is missing, hidden or not layered between marble and PNG.');
+          }
+          if (!m.filter.includes('drop-shadow(0px 5px 5px') || !m.filter.includes('drop-shadow(0px 2px 2px')) {
+            fail('Mobile shoes still use the old airy drop-shadow instead of restrained ground shadow.');
+          }
         }
         if (m.viewport.width <= 390) {
           if (!m.heroRect || m.heroRect.height > 245 || m.heroRect.height < 195) fail('Mobile Hero no longer matches the short reference-height composition.');
