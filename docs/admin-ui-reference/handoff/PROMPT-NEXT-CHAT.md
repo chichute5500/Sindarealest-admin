@@ -1,6 +1,16 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 ## Read this and continue the project immediately
 
+## EXACT CURRENT CHECKPOINT — 2026-10-25
+
+Repo: `chichute5500/Sindarealest-admin`. Writable branch: `feature/admin-isolated-handoff-2026-10-20`. At start of handoff current SHA `b5c3e1d7bf72efafb488821674586691908f3d8d`, **deployed application source SHA `6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef`**. A new documentation-only handoff child commit is expected, so **fetch live GitHub HEAD before writes**. Admin Preview URL: https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/ . Last successful owner-approved Preview deploy, QA and D1 cleanup: [#40122810186](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186), Cloudflare deployment `35534df8-86f7-4c2c-9a18-f6387ee1aee0`, artifact [#12572171035](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122810186/artifacts/12572171035). SHA provenance is **Cloudflare API metadata match**, not independent served-byte verification.
+
+Latest Gallery UI patch: `6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef`, six real repo product photos, horizontal thumbnails and featured image in mobile; 390/1280 populated Gallery tests and six 390/412/1280 light/dark product-matrix captures PASS [diagnostics #40122361977](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122361977), [artifact #12571935719](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40122361977/artifacts/12571935719). Real Preview D1 QA PASS: product edit, order price/terms/audit, warranty claim and new warranty issuance duplicate/date checks, Backup GET; 48 screenshots PASS; two run-owned cleanup checks PASS. One-shot deployment workflow is removed in handoff child, Production untouched, PRs unmerged.
+
+**Acceptance remains 50% PROVISIONAL (historic arbitrary marker)**, 12 screens PARTIAL_NOT_ACCEPTED for exact approved-reference parity, actual finances/refunds, QR/R2, Restore POST, Production not signed off. Do not falsely claim 100%, do not fabricate prices/ledger. Scope: Admin isolated Preview only; no merging, Production, secrets/DNS, real customer/payment mutations. Owner authorized safe isolated QA fixtures, Preview changes and parallel work. Next: inspect Gallery/editor and other screen parity with same data, fix remaining differences test-first; perform missing high-risk API workflows on fully disposable environments; create weighted acceptance criteria. Continue autonomously; ask only if owner-only action is truly necessary.
+
+
+
 ## CURRENT VERIFIED STATE — 2026-10-24 18:43 UTC (newest; supersedes older history)
 
 - Writable Admin branch is a documentation child of one-shot workflow SHA `1a3cd63444f58506546b73c9434a14709fabe201`. **Deployed application code = `078dd7cbccd6915f4923c3a52b61d27c6d9d4f7a`** to isolated Admin Preview project only, Cloudflare reported SHA match, deployment ID `0848b2d4-3196-46c0-9904-d190518ba2c4`. [Live deploy/QA PASS #40121670202](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40121670202).
