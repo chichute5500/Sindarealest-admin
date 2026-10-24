@@ -1,16 +1,18 @@
-# LIVE HANDOFF UPDATE — 2026-10-24 09:30 UTC
+# LIVE HANDOFF UPDATE — 2026-10-24 09:36 UTC
 
-**Handoff SHA semantics:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` was the live branch HEAD at the start of this documentation sync. The handoff-only commits made afterward change documentation/status snapshots only; they do not change source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`. Always fetch the live PR head before starting the next action; never treat the checkpoint-start SHA as the current live HEAD.
+**Checkpoint semantics:** live PR #111 HEAD when this update began was `e5736c5542863fc23e5e235f5eaacc8c1374f325`, a documentation-only commit. The latest application/source-test SHA remains `cf340b686e0974ac5602b6ef4594c00e477c8932`. Handoff-only commits after the checkpoint do not alter application source; always refresh live PR HEAD before acting.
 
-**Live branch HEAD:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` (documentation-only commit updating `current-status.json`).  
-**Latest source/test SHA:** `cf340b686e0974ac5602b6ef4594c00e477c8932` (order cancellation race guard).  
-**PR #111:** OPEN, unmerged; do not merge/rebase.  
-**Validate #5688:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892  
-**Admin Preview Playwright #1077:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888  
-**Scope boundary:** progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+**Latest source/test SHA:** `cf340b686e0974ac5602b6ef4594c00e477c8932`.
+- Validate #5688: PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Admin Preview Playwright #1077: PASS on the same source/test SHA — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
+- Docs checkpoint Validate #5721: FAIL — handoff integrity test found `current-status.json.entryPoint` missing; this was metadata-only, not an application regression. The canonical fields have been restored; re-run/inspect validation on the newest HEAD — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444182
+- Admin Preview Playwright #1091: PASS on docs checkpoint `e5736c5542863fc23e5e235f5eaacc8c1374f325` — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40082444230
+- PR #111: OPEN, unmerged. Keep it open; no merge/rebase/cherry-pick/force-push.
+- Acceptance remains: 50% PROVISIONAL; all 12 screens PARTIAL_NOT_ACCEPTED; reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
 
-Recent source change at `cf340b686e0974ac5602b6ef4594c00e477c8932`: cancellation now also guards order-item writes against a pending QR payment request, closing the partial-write race in which order cancellation was blocked but associated item writes could still proceed. Exact-SHA Validate and Admin Preview Playwright both passed on this source/test SHA. These are automated source/Playwright results, not proof of authenticated business writes or visual parity. Keep all seven operating rules and safety restrictions below intact.
+The order-cancellation race guard is included in source/test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: order-item updates are guarded against pending QR payment requests. Exact-SHA Validate and Preview runs passed; this is not evidence of authenticated business-write persistence or approved-reference visual parity.
 
+---
 ---
 
 # VERIFIED HANDOFF CHECKPOINT — 2026-10-24 09:00 UTC
