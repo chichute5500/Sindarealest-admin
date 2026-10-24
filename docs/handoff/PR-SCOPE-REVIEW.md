@@ -429,3 +429,8 @@ Evidence for gallery audit SHA 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0: Validat
 
 This delta adds two test/evidence-only paths; it does not reduce the original out-of-scope/restricted-scope risks already recorded in the 298-path inventory. PR #108 remains OPEN/unmerged; do not merge or deploy Production based on this gallery pass.
 
+
+
+## OWNER ACCEPTANCE UPDATE — FULLSCREEN GALLERY — 2026-10-24
+- Owner phone acceptance is now **PASS** for fullscreen gallery flicker/ghosting, following the Preview implementation at SHA `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87` and PASS results for validation https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016, Preview deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047, and isolated Playwright audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963.
+- This closes the gallery visual-acceptance gate only; it does not alter the 300-path inventory or resolve the separate PR scope-disposition concerns. PR #108 remains OPEN/unmerged. No main/Production changes or reopening of other locked areas.

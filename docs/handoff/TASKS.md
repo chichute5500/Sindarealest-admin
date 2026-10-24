@@ -870,3 +870,9 @@ Owner explicitly accepted the current warranty claim form state for now and will
 - Remaining acceptance gate: owner must check this exact Preview on a physical phone, both slow taps and repeated rapid taps, and confirm no flicker/ghosting/blank gap and correct counter. Do not claim physical-device PASS until then.
 - Preserve previous gallery code, no rollback. PR #108 stays OPEN/unmerged; no main/Production/restricted-scope changes.
 
+
+
+## OWNER ACCEPTANCE — FULLSCREEN GALLERY FLICKER PASS — 2026-10-24
+- Owner tested the latest Preview on a physical phone and replied **“Pass”**. The remaining device-acceptance gate is closed for the fullscreen gallery flicker/ghosting issue.
+- Evidence at accepted implementation SHA `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87`: validation https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016; Preview deployment https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047; isolated Playwright audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963. All PASS.
+- Status: **PASS / LOCKED**. Do not reopen or retune this gallery issue absent explicit owner authorization. PR #108 remains OPEN/unmerged; no Production/main changes. Other locked scopes remain locked.

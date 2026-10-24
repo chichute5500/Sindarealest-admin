@@ -1057,3 +1057,12 @@ Browser target was actual Preview catalog product sneakers-new-sneaker-contrast 
 - Screenshots capture only #sdFullscreenViewer; Hero and other locked sections are excluded.
 - Physical-device verification has NOT RUN. Browser evidence supports the geometry/code fix but cannot prove that the owner’s phone GPU/compositor no longer shows flicker. Required final acceptance: open the exact Preview on a physical phone; slowly tap next/previous and repeatedly tap next-next-previous; confirm no flash, ghost, blank gap or counter mismatch.
 
+
+
+## OWNER PHONE ACCEPTANCE — FULLSCREEN GALLERY FLICKER PASS — 2026-10-24
+- **Owner acceptance: PASS.** Owner tested the latest Preview on a physical phone and replied “Pass”; the previously outstanding phone flicker/ghosting acceptance requirement is now satisfied.
+- Accepted implementation SHA: `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87`.
+- Source validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016
+- Cloudflare Pages Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047
+- Isolated Playwright gallery audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963
+- Final gallery status: **PASS / LOCKED**. Earlier “physical-device verification NOT RUN / owner acceptance required” entries are historical and superseded by this dated acceptance. No implication that the full PR is approved to merge or Production.

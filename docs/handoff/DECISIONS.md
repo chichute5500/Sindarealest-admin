@@ -335,3 +335,9 @@ Lưu các quyết định đã chốt để AI sau không hỏi lại hoặc đ�
 - Acceptance evidence: real multi-photo Preview product, mobile 360×800 / 390×844 and desktop 1440×900; frame samples at 0/25/50/75/99%; exactly two animations tied to currently active slide classes, both 300 ms; overlap 0 px, gap 0 px, coverage 100%; checked next/previous counter after each tap including rapid next-next-previous; settled exactly one active decoded photo and no stale classes. No page or console errors, no same-origin HTTP errors, no write attempts. Hero and locked areas were not captured.
 - Automated gates do not emulate the owner’s actual phone GPU/compositor. Final status remains OWNER PHONE ACCEPTANCE REQUIRED until this Preview is checked physically. No merge/Production permission is implied.
 
+
+
+## DECISION UPDATE — OWNER ACCEPTED FULLSCREEN GALLERY ON PHONE — 2026-10-24
+- Owner explicitly confirmed **“Pass”** after the Preview phone check. Record fullscreen gallery flicker/ghosting as **OWNER-ACCEPTED PASS / LOCKED**; this supersedes earlier notes saying physical-device acceptance was still pending.
+- Accepted implementation SHA: `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87`. Validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016; Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047; isolated browser audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963.
+- No further gallery changes without an explicit reopen. This is not permission to merge PR #108, change main/Production, or unlock Hero/other PASS-LOCKED scopes.

@@ -1026,3 +1026,10 @@ The owner explicitly authorized reopening fullscreen image/gallery flicker and f
 - Status matrix: source/regression tests PASS; Validate PASS; Preview deploy PASS; deterministic Chromium gallery audit PASS; physical-device flicker/ghosting acceptance REQUIRED. Do not claim 100% or a fully verified physical-device GPU/compositor fix until the owner checks the phone.
 - Branch/PR state before this documentation update: branch and PR #108 HEAD 9cdcdfc5096e6b5efd2e5f4c74520f8c8d6049a0; PR #108 OPEN/unmerged; 300 changed paths; main and Production untouched. The next commit is documentation-only and must not trigger a storefront deploy.
 
+
+
+## OWNER ACCEPTANCE — FULLSCREEN GALLERY FLICKER PASS — 2026-10-24
+- Owner explicitly replied **“Pass”** after testing the latest Preview on their physical phone. This satisfies the outstanding physical-device visual acceptance gate for the fullscreen product gallery flicker/ghosting fix.
+- Current accepted implementation HEAD at the time of acceptance: `e273cf46bb66b7b0a8a647dbe7582cddd3c19e87`. Validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150016. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065150047. Isolated real-Preview Playwright audit PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40065149963.
+- **Gallery flicker/ghosting: OWNER-ACCEPTED PASS / LOCKED.** Do not continue tuning or alter the gallery implementation unless the owner explicitly reopens it. Keep the existing guardrails: PR #108 stays OPEN/unmerged; no Production/main changes; Hero and all other accepted sections remain locked.
+- This acceptance closes the physical-device gate for this gallery issue only. It does not imply the entire PR/project is 100% complete or authorize merge/Production deployment.
