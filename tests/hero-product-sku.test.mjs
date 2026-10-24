@@ -68,9 +68,13 @@ assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("#home .hero-visual{")
   && heroEdgeTreatment.includes("mask-image:none!important")
   && !heroEdgeTreatment.includes("mask-image:radial-gradient(")
-  && heroEdgeTreatment.includes("width:130%!important")
+  && heroEdgeTreatment.includes("width:122%!important")
   && heroEdgeTreatment.includes("max-height:330px!important"),
-  "The derived Hero shoes must be enlarged while alpha edges blend into the page and the original RGB stays unchanged.");
+  "The derived Hero shoes must remain enlarged while alpha edges blend into the page and original RGB stays unchanged.");
+assert.ok(heroEdgeTreatment.includes("@media(min-width:761px) and (max-width:1000px)")
+  && heroEdgeTreatment.includes("width:113%!important")
+  && heroEdgeTreatment.includes("max-height:540px!important;margin-left:0!important"),
+  "Tablet Hero sizing must preserve the entire transparent PNG in the right column with clear separation from copy.");
 assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important")
   && html.includes("-webkit-mask:none!important;mask:none!important"));
 assert.ok(html.includes("object-fit:contain!important;object-position:center!important"));
