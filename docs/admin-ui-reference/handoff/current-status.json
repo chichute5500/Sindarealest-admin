@@ -1,24 +1,24 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T16:26:00Z",
+  "capturedAtUtc": "2026-10-24T16:40:36Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
-  "checkpointSemantics": "Exact feature QA source d13dd92b75a392acf7cae3eddf1df971a86b9b62 passes 6 CI workflows. App deployed at 564ea556...; 48/48 authentic Preview capture+isolated QA product authenticated PUT/GET and D1 readback pass. Remote D1 schema/ledger shape read-only pass; actual payment/warranty/order writes and reference parity incomplete. 50% PROVISIONAL.",
-  "codeTestSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+  "branchHeadAtCheckpointStart": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+  "checkpointSemantics": "Live QA source HEAD 538b20fa04b1d3b15e98d5bad59b5992e2f1dc47 before handoff docs commit; deployed app 564ea556e6dee745eaaa491ee033a2a8cfbb595c; 48/48 screenshots, product PUT/GET D1, warranty claim PATCH/GET D1, backup GET V2 PASS; 7 QA rows cleaned twice; same-data reference parity and end-to-end payment/refund/order/restore NOT_ACCEPTED. 50% PROVISIONAL.",
+  "codeTestSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
   "latestProductSourceCommit": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
   "latestActionsRun": {
-    "id": 40111472681,
+    "id": 40112502171,
     "workflow": "Owner-approved synthetic D1 QA and complete 12-screen captures",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111472681",
-    "artifactId": 12566487432
+    "sha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171",
+    "artifactId": 12567645472
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "progressBasis": "50% PROVISIONAL: all CI checks pass but isolated Cloudflare deployment metadata reports an older commit. All 12 screens partial; no same-data visual parity or business-write QA.",
+  "progressBasis": "50% PROVISIONAL official: functional QA product and claim readback pass, backup read and D1 shape pass, all 12 UI captures exist; real payment/order/restore and same-data visual reference parity not accepted",
   "pullRequests": {
     "108": {
       "state": "OPEN",
@@ -44,7 +44,7 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+      "headSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
       "changedFiles": 496,
       "additions": 46507,
       "deletions": 224,
@@ -474,13 +474,13 @@
     "No Production deploy, remote D1/R2 writes, business writes, migrations, secrets/Access/DNS changes, or edits to main/storefront/PR #108/#112."
   ],
   "handoffSync": {
-    "capturedAtUtc": "2026-10-24T16:26:00Z",
+    "capturedAtUtc": "2026-10-24T16:40:36Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
-    "docsHeadAtCheckpoint": "c277c5a2f99114856ec78594823f71b0c9010cf0",
-    "codeTestSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+    "docsHeadAtCheckpoint": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+    "codeTestSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-    "pr111Head": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+    "pr111Head": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
     "pr111State": "OPEN_UNMERGED",
     "pr111BaseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
     "pr111ChangedFiles": 495,
@@ -490,11 +490,12 @@
       40104728038,
       40104730979
     ],
-    "previewRunId": 40104728057,
-    "diagnosticRunId": 40111472624,
-    "diagnosticArtifactId": 12566487432,
+    "previewRunId": 40112507164,
+    "diagnosticRunId": 40112502162,
+    "diagnosticArtifactId": 12567645472,
     "commitMessagePrefix": "[CF-Pages-Skip]",
-    "latestRepairNote": "Test-first cancelled-order status guard reproduced red then fixed; current exact-SHA tests and read-only diagnostic pass."
+    "latestRepairNote": "Test-first cancelled-order status guard reproduced red then fixed; current exact-SHA tests and read-only diagnostic pass.",
+    "nextRequiredAction": "Fetch live GitHub head and CI; continue evidence-based 12-screen same-data visual acceptance and synthetic order/warranty QA in isolated Preview"
   },
   "currentHeadAtCheckpoint": "c277c5a2f99114856ec78594823f71b0c9010cf0",
   "currentHeadValidation": "VALIDATE_5769_AND_5770_PASS; PREVIEW_PLAYWRIGHT_1114_PASS; READ_ONLY_DIAGNOSTIC_538_PASS_ON_EXACT_SHA_2f2c631c328d3658c0911a9066b39d0d513ff0b9",
@@ -518,8 +519,8 @@
   },
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "latestCodeCommitSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
-  "testedCommitSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+  "latestCodeCommitSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+  "testedCommitSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
   "capturedAt": "2026-10-24T01:53:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
   "checks": {
@@ -825,20 +826,20 @@
     "headSha": "0469930f6836d5f8d87b155a538e1d68776e3913"
   },
   "latestRun": {
-    "id": 40111472681,
+    "id": 40112502171,
     "workflow": "Owner-approved synthetic D1 QA and complete 12-screen captures",
     "status": "completed",
     "conclusion": "success",
-    "sha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111472681",
-    "artifactId": 12566487432
+    "sha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171",
+    "artifactId": 12567645472
   },
   "acceptance": {
     "progress": "50% PROVISIONAL",
     "screens": "12 screens PARTIAL_NOT_ACCEPTED",
     "referenceParity": "NOT_VERIFIED",
-    "authenticatedBusinessWriteQA": "NOT_TESTED",
-    "remoteD1SchemaLedger": "NOT_VERIFIED",
+    "authenticatedBusinessWriteQA": "PARTIAL_PRODUCT_AND_WARRANTY_CLAIM_QA_ONLY",
+    "remoteD1SchemaLedger": "REQUIRED_SCHEMA_SHAPE_VERIFIED_READ_ONLY",
     "production": "NOT_PERFORMED"
   },
   "nextStep": "Continue order/payment state contract review and same-data reference evidence work; don't stop after this report.",
@@ -1167,7 +1168,7 @@
   },
   "deploymentProvenance": "REPORTED_SHA_MATCH_CLOUDFLARE_METADATA_ONLY",
   "approvedReferenceParity": "NOT_VERIFIED",
-  "authenticatedBusinessWritePersistence": "PARTIAL_PRODUCT_QA_ONLY",
+  "authenticatedBusinessWritePersistence": "PARTIAL_PRODUCT_AND_WARRANTY_CLAIM_QA_ONLY",
   "remotePreviewD1SchemaLedger": "SCHEMA_LEDGER_TABLES_VERIFIED_READONLY",
   "productionDeployment": "NOT_PERFORMED",
   "latestVerifiedAudit": {
@@ -1255,5 +1256,41 @@
     "qaCleanupVerified": true,
     "qaCleanupFailures": 0,
     "progressPercent": 50
+  },
+  "latestOwnerAuthorizedHandoffMilestone": {
+    "observedAtUtc": "2026-10-24T16:40:36Z",
+    "branchHeadBeforeDocsCommit": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+    "deployedAppSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
+    "ownerApprovedDeployRunId": 40106880423,
+    "cloudflareProvenanceRunId": 40107164294,
+    "sourceTestSha": "538b20fa04b1d3b15e98d5bad59b5992e2f1dc47",
+    "latestSyntheticQA": {
+      "runId": 40112502171,
+      "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40112502171",
+      "artifactId": 12567645472,
+      "workflowConclusion": "success",
+      "productApiPutGetD1Readback": "PASS_RUN_OWNED_QA_ONLY",
+      "warrantyClaimPatchGetD1Readback": "PASS_RUN_OWNED_QA_ONLY",
+      "backupGetSnapshot": "PASS_READ_ONLY_V2",
+      "screenshots": "48_OF_48_CAPTURED",
+      "syntheticD1RecordsRemoved": 7,
+      "verifiedCleanups": 2,
+      "cleanupVerified": true,
+      "cleanupFailures": 0
+    },
+    "schemaLedgerShape": {
+      "runId": 40110704947,
+      "status": "SCHEMA_SHAPE_VERIFIED_READ_ONLY_NOT_FINANCIAL_WRITE_QA"
+    },
+    "outstanding": [
+      "APPROVED_REFERENCE_SAME_DATA_PARITY_NOT_VERIFIED",
+      "ORDER_LIFECYCLE_WRITE_QA_NOT_TESTED",
+      "WARRANTY_ISSUANCE_QA_NOT_TESTED",
+      "REAL_BANK_PAYMENT_REFUND_NOT_VERIFIED",
+      "BACKUP_RESTORE_NOT_TESTED_DESTRUCTIVE",
+      "PRODUCTION_NOT_PERFORMED"
+    ],
+    "progressPercent": 50,
+    "progressStatus": "PROVISIONAL"
   }
 }
