@@ -191,6 +191,14 @@ assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Quay lại danh sách 
   'Editor back control should use an accessible SVG icon');
 assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Quay lại danh sách sản phẩm"[^>]*><svg[^>]*aria-hidden="true"[\s\S]*?<path d="M15 18 9 12 15 6">/,
   'Editor back control should use the reference back-chevron');
+assert.ok(adminHtml.includes('<button id="deleteProduct" class="btn danger hidden" type="button" aria-label="Xóa sản phẩm">Xóa</button>'),
+  'Product editor should use a compact visible delete label with a descriptive accessible name');
+assert.ok(adminHtml.includes('<button id="saveProduct" class="btn primary" type="submit" aria-label="Lưu sản phẩm">Lưu</button>'),
+  'Product editor should use a compact visible save label with a descriptive accessible name');
+assert.ok(adminHtml.includes("b.disabled=true;b.textContent='Đang lưu…';b.setAttribute('aria-label','Đang lưu sản phẩm')"),
+  'The save button accessible name should communicate the in-progress state');
+assert.ok(adminHtml.includes("b.textContent='Lưu';b.setAttribute('aria-label','Lưu sản phẩm')"),
+  'The save button should restore its compact visible label and full accessible name after completion');
 assert.match(adminHtml, /:root\[data-admin-theme="dark"\] \.btn\.danger\{[^}]*background:rgba\(165,67,67,\.18\)/,
   'Destructive controls should maintain readable dark-theme contrast');
 assert.match(baselineSpec, /chromeColors\.headerBg, 'Dark editor header should use the navy glass surface'\)\.toContain\('17, 34, 49'\)/,
