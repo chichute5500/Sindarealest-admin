@@ -1,3 +1,38 @@
+## Live handoff checkpoint — 2026-10-24 02:35 UTC
+
+- **Verified writable branch HEAD:** `badbdf091b0fdf716a5f64a74e626694147ba95e` on `feature/admin-isolated-handoff-2026-10-20`. Live branch and PR #111 head matched at checkpoint.
+- **Latest Validate #5567: SUCCESS on exact HEAD** `badbdf091b0fdf716a5f64a74e626694147ba95e`; workflow [run #5567](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40054728143). All steps passed, including dependency audit, project integrity and automated tests. This is a docs-only commit; it does not replace source/test Preview evidence.
+- **Latest source/test SHA:** `ab0343f963f0f113dc6c88a601c5499ebe15d592`. Validate [#5565](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201672) and Admin Preview [#498](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632) both SUCCESS on that exact SHA; Preview exact-HEAD guard passed. Artifact [#498](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40053201632/artifacts/12544236677) was inspected: Product Editor and Product Gallery mobile footer labels show compact `Xóa`, `Hủy`, `Lưu`; no obvious horizontal overflow at 390×844.
+- **Latest documentation sync:** this checkpoint updates all six canonical handoff files. Preserve the distinction between current docs HEAD `badbdf091b0fdf716a5f64a74e626694147ba95e` and Preview-verified source/test SHA `ab0343f...`.
+- **Live refs:** `main` = `227622d3e3b7c75724ffa1775b193da71089269a`; PR #111 OPEN/unmerged at current branch HEAD; PR #108 OPEN/unmerged/read-only; PR #112 OPEN/unmerged/draft. No merges, deployments, or writes to protected branches.
+- **Progress:** 50% PROVISIONAL. All 12 screens remain `PARTIAL_NOT_ACCEPTED`; exact approved-reference parity `NOT_VERIFIED`; authenticated backend/business write QA `NOT_TESTED`; remote D1 schema/ledger `NOT_VERIFIED`; Production `NOT_PERFORMED`.
+
+### Next chat — start here, then continue without waiting
+1. Recheck live branch HEAD, `main`, PR #111/#108/#112, and latest Actions before using this snapshot.
+2. Keep work on independent safe workstreams in parallel. Continue reference-driven comparison of remaining screen elements, using artifact #498 and approved reference assets; only change source after reproducing a concrete mismatch and adding a failing regression test first.
+3. Inspect the newest exact-SHA evidence before making any claim. Docs-only SHA `badbdf091b0fdf716a5f64a74e626694147ba95e` has Validate #5567 PASS; Preview evidence applies to source/test SHA `ab0343f...`, not the docs SHA.
+4. Continue read-only security/route/test audits where independent; do not repeat already-completed B1 cleanup/provenance or the footer-label fix without new evidence.
+5. If authenticated Preview access is unavailable, record the exact limitation and keep moving on safe fixture/source/reference work. Never ask the owner to bypass Access or change secrets. Stop for owner action only when the next necessary step genuinely requires their account interaction.
+
+### Seven mandatory operating rules
+1. Parallelize independent safe workstreams; one blocked stream must not stop others.
+2. Report verified progress and then continue working; do not stop after reporting.
+3. When blocked, state cause/evidence and switch streams; do not repeat the same action without new evidence.
+4. Test first: reproduce a concrete bug, add a regression test, observe failure, then patch source.
+5. Tie evidence to exact SHA; never transfer PASS from an old SHA to a new HEAD, and distinguish synthetic fixtures from authenticated backend evidence.
+6. Stop only when a real owner action is required; do not ask about nonexistent UI controls or “Run workflow”.
+7. Preserve all isolation and safety boundaries below.
+
+### Non-negotiable safety boundaries
+- Write only to `feature/admin-isolated-handoff-2026-10-20`; use expected-SHA/fast-forward updates only.
+- Never merge/rebase/cherry-pick/force-push/sync PRs; never deploy Production.
+- Do not alter Cloudflare Access, secrets, DNS, or bypass Access.
+- Do not write remote D1/R2/schema/payment ledger/business data; do not run migration, seed, import, or setup scripts.
+- Do not modify `main`, storefront branches, PR #108 or PR #112; keep PR #111 OPEN/unmerged.
+- Never weaken the exact-HEAD guard or create dummy source commits to trigger Preview.
+
+---
+
 ## Latest checkpoint — 2026-10-24 09:20 ICT
 
 - **Writable branch / exact current source HEAD:** `feature/admin-isolated-handoff-2026-10-20`, `ab0343f963f0f113dc6c88a601c5499ebe15d592`.
