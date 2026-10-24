@@ -41,8 +41,14 @@ assert.match(html, /incoming\.onload=finishLoad;incoming\.onerror=failLoad;incom
 assert.match(html, /let decoded;[\s\S]*?try\{decoded=typeof incoming\.decode==='function'\?incoming\.decode\(\):Promise\.resolve\(\)\}[\s\S]*?catch\{decoded=Promise\.reject\(\)\}/, 'Decode failures must be handled without revealing an unconfirmed image.');
 assert.match(html, /Promise\.resolve\(decoded\)\.then\(revealDecodedImage,rejectDecodedImage\)/);
 assert.match(html, /const rejectDecodedImage=\(\)=>\{[\s\S]*?incoming\.classList\.remove\('is-active'\)[\s\S]*?active\.classList\.add\('is-active'\)/);
-assert.match(html, /@keyframes sdFullscreenOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-18%\)/);
-assert.match(html, /@keyframes sdFullscreenInRight\{from\{opacity:1;transform:translateX\(18%\)/);
+const fullscreenTravelCss = html.slice(html.indexOf('@keyframes sdFullscreenOutLeft'), html.indexOf('.sd-fullscreen-close', html.indexOf('@keyframes sdFullscreenOutLeft')));
+assert.match(fullscreenTravelCss, /@keyframes sdFullscreenOutLeft\{from\{opacity:1;transform:translateX\(0\)[\s\S]*?to\{opacity:1;transform:translateX\(-100%\)/,
+  'The outgoing photo must travel a full frame so transparent pixels cannot overlap the incoming photo.');
+assert.match(fullscreenTravelCss, /@keyframes sdFullscreenOutRight\{from\{opacity:1;transform:translateX\(0\)[\s\S]*?to\{opacity:1;transform:translateX\(100%\)/);
+assert.match(fullscreenTravelCss, /@keyframes sdFullscreenInRight\{from\{opacity:1;transform:translateX\(100%\)/);
+assert.match(fullscreenTravelCss, /@keyframes sdFullscreenInLeft\{from\{opacity:1;transform:translateX\(-100%\)/);
+assert.doesNotMatch(fullscreenTravelCss, /translateX\(-?18%\)/,
+  'Fullscreen photo layers must not use a short overlapping slide; transparent PNGs would reveal the previous image.');
 assert.match(html, /@keyframes sdGalleryOutLeft\{[\s\S]*?to\{opacity:1;transform:translateX\(-22%\) scale\(\.985\);filter:blur\(0\)\}\}/);
 assert.match(html, /@keyframes sdGalleryInRight\{from\{opacity:1;transform:translateX\(22%\) scale\(\.985\);filter:blur\(0\)\}/);
 assert.match(html, /\.sd-fullscreen-frame\{[^}]*background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none/);
