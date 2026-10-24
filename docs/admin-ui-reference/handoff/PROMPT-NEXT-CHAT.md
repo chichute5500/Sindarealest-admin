@@ -1,6 +1,15 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 ## Read this and continue the project immediately
 
+## NEWEST VERIFIED CHECKPOINT — owner-approved isolated Preview deployed (2026-10-24 17:50 UTC)
+
+- Exact approved **deployed application SHA** `fc760be6fe8a67cc07aa1d32f17d1d5be7b305ac`. Isolated Cloudflare Pages Preview deployment and metadata match **PASS** [Actions #40117657594](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117657594), deployment `dce25587-1869-42cb-abfb-a18c9ec4c925`. Exact GitHub QA/test SHA `4f6e0b22ac71f7d43ab703b557e0dc64a5b645ad` differed only by one temporary workflow; no application code changes. This documentation handoff is a newer descendant; first **fetch live** HEAD, PR and Actions.
+- Genuine previously failing order PATCH HTTP 503 now **PASS** on deployed Preview with run-owned QA, confirmed price 135000 and payment terms, authenticated GET + D1 and audit readback. Fraudulent paid status 409; foreign item price 400. Existing product, warranty claim, Backup GET QA PASS. Artifact [#12569586706](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40117657594/artifacts/12569586706) contains 48 unique captures (12 each × mobile/desktop light/dark) and journal confirming **7/7 QA rows deleted**, two cleanup PASS, `failures=[]`.
+- Still **50% PROVISIONAL**, twelve screens `PARTIAL_NOT_ACCEPTED`, approved-reference parity `NOT_VERIFIED`. No real bank ledger, full warranty issuance, destructive restore or Production acceptance. No merge, production deployment or new Preview deploy authorized. Temporary one-shot deploy workflow removed with this checkpoint.
+- Next: evidence-based same-data design parity against reference PNG and actual captured screenshots; warranty issuance QA, payment/refund mock negatives, disposable DB restore validation; preserve fixed order regression tests. Do not repeat past questions/permissions; only ask for genuinely new owner-only action.
+
+
+
 ## Latest verified live findings — 2026-10-24 17:35 UTC
 
 - Current source and regression test SHA `904962ed1b4f94f14ba133ebf23227a40f098696`. **Live Preview remains on app SHA `564ea556e6dee745eaaa491ee033a2a8cfbb595c`**; source fix not deployed.
