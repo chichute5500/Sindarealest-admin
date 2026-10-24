@@ -376,7 +376,7 @@
     "liveCatalogCount": 235,
     "liveImageUrls": 527,
     "liveImageDecode": "PASS",
-    "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries remain fixture-only; no fixture API errors or writes."
+    "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries; no fixture API errors or writes."
   },
   "remainingIssues": [
     "All 12 screens remain PARTIAL_NOT_ACCEPTED. Screen 7 Timeline is visible in artifact #493 using synthetic UI-only data; exact approved-reference parity and real order actions remain unverified.",
@@ -419,7 +419,7 @@
     },
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a"
   },
-  "currentHeadValidationReason": "Validate #5541 passed on docs-only HEAD 94669674ab0d5e635ac47026ef3c98d362e63002; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f passed Validate #5540. Preview #493 captured screenshots and read-only diagnostics on 0c441375a212c73ce56f16d4f9673e44c1b8260f, but its final exact-HEAD guard failed because the branch advanced to 94669674ab0d5e635ac47026ef3c98d362e63002 during the run. No Preview success is attached to the current docs-only HEAD.",
+  "currentHeadValidationReason": "Validate #5541 passed on docs-only HEAD 94669674ab0d5e635ac47026ef3c98d362e63002; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f passed Validate #5540. Preview #493 capture and read-only diagnostics completed on 0c441375a212c73ce56f16d4f9673e44c1b8260f, but its exact-HEAD guard failed because the branch advanced to 94669674ab0d5e635ac47026ef3c98d362e63002 during the run. No Preview success is attached to the current docs-only HEAD.",
   "liveCheckpoint": {
     "capturedAtUtc": "2026-10-24T01:24:00Z",
     "branchHead": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
@@ -452,8 +452,7 @@
     "sha": "94669674ab0d5e635ac47026ef3c98d362e63002",
     "testedSha": "94669674ab0d5e635ac47026ef3c98d362e63002",
     "workflow": "Validate source and tests",
-    "runNumber": 5541,
-    "summary": "Validate source and tests passed on the docs-only handoff checkpoint HEAD."
+    "runNumber": 5541
   },
   "latestAttempt": {
     "capturedAtUtc": "2026-10-24T01:24:09Z",
@@ -467,8 +466,7 @@
       "sha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
       "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
       "workflow": "Validate source and tests",
-      "runNumber": 5540,
-      "summary": "Dependency audit, project integrity, npm run check and npm test passed on exact source/test SHA."
+      "runNumber": 5540
     },
     "validateDocsHeadRun": {
       "id": 40049531482,
@@ -478,8 +476,7 @@
       "sha": "94669674ab0d5e635ac47026ef3c98d362e63002",
       "testedSha": "94669674ab0d5e635ac47026ef3c98d362e63002",
       "workflow": "Validate source and tests",
-      "runNumber": 5541,
-      "summary": "Validate source and tests passed on the docs-only handoff checkpoint HEAD."
+      "runNumber": 5541
     },
     "previewRun": {
       "id": 40049413302,
@@ -527,12 +524,12 @@
       "liveCatalogCount": 235,
       "liveImageUrls": 527,
       "liveImageDecode": "PASS",
-      "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries remain fixture-only; no fixture API errors or writes."
+      "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries; no fixture API errors or writes."
     },
     "result": "PREVIEW_GUARD_FAILED_AFTER_BRANCH_MOVED; CAPTURE_AND_READ_ONLY_DIAGNOSTIC_COMPLETED"
   },
   "handoffSync": {
-    "status": "SEVEN_FILE_DOCS_ONLY_SYNC_IN_PROGRESS",
+    "status": "SEVEN_FILE_DOCS_ONLY_SYNC_COMPLETED",
     "capturedAtUtc": "2026-10-24T01:24:09Z",
     "branchHeadAtCheckpointStart": "94669674ab0d5e635ac47026ef3c98d362e63002",
     "codeTestSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
@@ -571,9 +568,9 @@
     "liveCatalogCount": 235,
     "liveImageUrls": 527,
     "liveImageDecode": "PASS",
-    "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries remain fixture-only; no fixture API errors or writes."
+    "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries; no fixture API errors or writes."
   },
-  "checkpointSemantics": "Live checkpoint at 2026-10-24T01:24:09Z: branch HEAD 94669674ab0d5e635ac47026ef3c98d362e63002 is a docs-only handoff commit; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f. Validate #5540 passed on source/test SHA and Validate #5541 passed on docs-only HEAD. Preview #493 capture and read-only diagnostic steps completed on 0c441375a212c73ce56f16d4f9673e44c1b8260f, but the exact-HEAD guard failed because the branch moved to 94669674ab0d5e635ac47026ef3c98d362e63002 during the run. Artifact #493 inspected: 133 PNGs, 120 fixture captures, 112 fixture metrics, zero overflow, zero source errors, zero fixture page/API errors or writes; seven fixture console HTTP 503 entries. Screen 7 Timeline is visible in the 390x844 synthetic fixture. Read-only deployed diagnostics passed 7/7 Admin GET routes and the 235-product/527-image check. This is not exact-reference, business-write, or persistence acceptance.",
+  "checkpointSemantics": "Live checkpoint at 2026-10-24T01:24:09Z: branch HEAD 94669674ab0d5e635ac47026ef3c98d362e63002 is docs-only; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f. Validate #5540 and #5541 passed on their exact SHAs. Preview #493 capture/read-only diagnostic completed but exact-HEAD guard failed because branch moved to 94669674ab0d5e635ac47026ef3c98d362e63002. Artifact #493 inspected: 133 PNGs, 120 fixture captures, 112 metrics, zero overflow/errors/writes; seven fixture console HTTP 503 entries. Screen 7 Timeline visible in 390x844 synthetic fixture. Read-only deployed diagnostic passed 7/7 Admin GET routes and 235-product/527-image check. This is not exact-reference, business-write, or persistence acceptance.",
   "latestActionsRun": {
     "id": 40049413302,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302",
@@ -599,8 +596,7 @@
     "sha": "94669674ab0d5e635ac47026ef3c98d362e63002",
     "testedSha": "94669674ab0d5e635ac47026ef3c98d362e63002",
     "workflow": "Validate source and tests",
-    "runNumber": 5541,
-    "summary": "Validate source and tests passed on the docs-only handoff checkpoint HEAD."
+    "runNumber": 5541
   },
   "latestPreviewAttempt": {
     "id": 40049413302,
@@ -795,7 +791,7 @@
     "progressEstimate": "50% PROVISIONAL"
   },
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "nextChatInstructions": "Continue directly on feature/admin-isolated-handoff-2026-10-20. At checkpoint start, branch HEAD was docs-only 94669674ab0d5e635ac47026ef3c98d362e63002; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f passed Validate #5540 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343), and Validate #5541 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049531482) passed on the docs-only HEAD. Preview #493 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302) captured and uploaded artifact #493 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534), but the final exact-HEAD guard failed because the branch advanced during the run. Artifact #493 was inspected: 133 PNGs, 120 synthetic UI-fixture captures, 112 metrics, zero overflow/errors/writes; Screen 7 Timeline visible at 390x844 using synthetic data. Read-only deployed diagnostic passed 7/7 Admin GET routes and 235 products/527 decoded image URLs. This is not exact-reference or business workflow acceptance. Refresh live HEAD/Actions after the seven-file sync; keep all 12 screens PARTIAL_NOT_ACCEPTED, progress 50% PROVISIONAL, and do not merge, deploy Production, change Access/secrets, mutate D1/R2, or run migrations.",
+  "nextChatInstructions": "Continue directly on feature/admin-isolated-handoff-2026-10-20. At checkpoint start, branch HEAD was docs-only 94669674ab0d5e635ac47026ef3c98d362e63002; source/test SHA 0c441375a212c73ce56f16d4f9673e44c1b8260f passed Validate #5540 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413343), and Validate #5541 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049531482) passed on the docs-only HEAD. Preview #493 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302) captured and uploaded artifact #493 (https://github.com/chichute5500/Sindarealest-admin/actions/runs/40049413302/artifacts/12543031534), but the exact-HEAD guard failed because the branch advanced during the run. Artifact #493 was inspected: 133 PNGs, 120 synthetic UI-fixture captures, 112 metrics, zero overflow/errors/writes; Screen 7 Timeline visible at 390x844 using synthetic data. Read-only deployed diagnostic passed 7/7 Admin GET routes and 235 products/527 decoded image URLs. This is not exact-reference or business workflow acceptance. Refresh live HEAD/Actions after the seven-file sync; keep all 12 screens PARTIAL_NOT_ACCEPTED, progress 50% PROVISIONAL, and do not merge, deploy Production, change Access/secrets, mutate D1/R2, or run migrations.",
   "actions": {
     "latestSuccessful": {
       "id": 40049531482,
@@ -805,8 +801,7 @@
       "sha": "94669674ab0d5e635ac47026ef3c98d362e63002",
       "testedSha": "94669674ab0d5e635ac47026ef3c98d362e63002",
       "workflow": "Validate source and tests",
-      "runNumber": 5541,
-      "summary": "Validate source and tests passed on the docs-only handoff checkpoint HEAD."
+      "runNumber": 5541
     },
     "latestAttempt": {
       "capturedAtUtc": "2026-10-24T01:24:09Z",
@@ -818,8 +813,7 @@
         "sha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
         "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
         "workflow": "Validate source and tests",
-        "runNumber": 5540,
-        "summary": "Dependency audit, project integrity, npm run check and npm test passed on exact source/test SHA."
+        "runNumber": 5540
       },
       "docsHeadRun": {
         "id": 40049531482,
@@ -829,8 +823,7 @@
         "sha": "94669674ab0d5e635ac47026ef3c98d362e63002",
         "testedSha": "94669674ab0d5e635ac47026ef3c98d362e63002",
         "workflow": "Validate source and tests",
-        "runNumber": 5541,
-        "summary": "Validate source and tests passed on the docs-only handoff checkpoint HEAD."
+        "runNumber": 5541
       },
       "previewRun": {
         "id": 40049413302,
@@ -878,7 +871,7 @@
         "liveCatalogCount": 235,
         "liveImageUrls": 527,
         "liveImageDecode": "PASS",
-        "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries remain fixture-only; no fixture API errors or writes."
+        "inspection": "Downloaded and inspected. Screen 7 Timeline is visible after the product list at 390x844 using synthetic UI-only data. Screenshot capture and read-only diagnostics completed; workflow failed only at the exact-HEAD guard after the branch advanced to a docs-only child commit. Seven fixture console HTTP 503 entries; no fixture API errors or writes."
       },
       "reason": "Preview capture/diagnostics completed but exact-HEAD guard failed because branch advanced to a docs-only child commit."
     }
@@ -892,7 +885,6 @@
     "sha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
     "testedSha": "0c441375a212c73ce56f16d4f9673e44c1b8260f",
     "workflow": "Validate source and tests",
-    "runNumber": 5540,
-    "summary": "Dependency audit, project integrity, npm run check and npm test passed on exact source/test SHA."
+    "runNumber": 5540
   }
 }
