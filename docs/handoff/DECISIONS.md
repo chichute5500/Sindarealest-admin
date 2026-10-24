@@ -456,4 +456,26 @@ Actual tested/source/Preview runtime SHA: `5c5601841a8ae39fa052c15d488e9a2a88f40
 - Read-only Hero Playwright screenshot audit: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520 PASS, 14/14 contexts (360/390 mobile, 768 tablet, touchscreen 980 desktop request, desktop 1280/1365/1440 × light/dark). Exact screenshots + JSON: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119730520/artifacts/12569574286.
 - Automatic protected Gallery-only read-only audit PASS for same runtime CSS-changing commit's immediate predecessor `579779bcb0eadb8536299c88944d14e654341b9b`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40119520254. The succeeding commit `5c5601841a8ae39fa052c15d488e9a2a88f404ff` changes only Hero audit tests (not Gallery/HTML/runtime CSS).
 
+---
 
+## 2026-10-25 01:55+07 HERO VISUAL HANDOFF — 7ffdf82 (OWNER APPROVAL OPEN)
+
+Keep one coherent responsive Hero language—identical original transparent shoe PNG, consistent marble geometry/material/contact shadows and light/dark visual semantics, with device-specific scale and spacing. Do NOT solve one viewport by reintroducing a vertically stacked mobile layout, an oversized 900px portrait image box, or CSS pseudo-elements overriding one another. The original mobile reference has readable copy on left and two loafers on right; owner's Windows desktop screenshot requested a shorter Hero boundary (~437px around width 1365), with the shoe entirely visible. The two shoe soles must visually contact the TOP surface, not just cast vague drop shadows.
+
+Use the GitHub writable tools directly and verify the live branch SHA before committing. The PR is mixed (302 changed files); keep all changes narrowly scoped, maintain rollback via separate commits and inspect Playwright screenshots rather than equating CI PASS with aesthetics. Screenshot under browser "Desktop site" on Android may be affected by viewport zoom outside CSS control.
+
+Latest source SHA: `7ffdf82aa835361dd3d96c8f19f0bbfb081e0ca5` on `fix/liquid-glass-audit-2026-10-19` (this note is followed by a docs-only commit). PR #108 OPEN/unmerged, base `main`, 302 changed files overall in the mixed PR; do not merge, alter `main`, deploy Production, or reopen locked Gallery without owner approval.
+
+Exact source-SHA technical results:
+- Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40123569558
+- Cloudflare Pages branch Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40123569570
+- Hero-only Preview browser audit PASS, 14/14 contexts, 0 hardFailures, no same-origin network, console or page errors, no read-only violations: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40123569529
+- Exact screenshot and JSON artifact: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40123569529/artifacts/12571609020
+- Isolated read-only Gallery regression PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40123569611
+- Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+
+The most recent source commit `7ffdf82aa835361dd3d96c8f19f0bbfb081e0ca5` (parent `6641f0b0a27aaf57d5377b615d8d415ba789f6f0`) specifically raises the rear edge of the shared marble oval under the upright shoe for mobile/tablet/desktop. Earlier parent widened/deepened the marble oval and localized contact shadows. The original 1200x1600 transparent PNG asset `/images/hero-upload/tb_image_share_1792519964514%20(1).png` must not be edited; Gallery already OWNER PASS / LOCKED.
+
+Audit viewport matrix: 360x800 mobile, 390x844 mobile, 768x1024 tablet, 980x800 hasTouch desktop-mode simulation, 1280x800 desktop, 1365x768 PC reference, 1440x900 desktop; each light/dark = 14. Real phone browser "Desktop site" can change viewport/page zoom beyond CSS control; a 980px hasTouch simulation is not full physical-device equivalence.
+
+Critical distinction: automated tests PASS but the owner has repeatedly rejected the "floating shoes" / fake podium look and wants a genuinely grounded 3D stone pedestal and consistent premium visual style on both PC and phones. Final owner visual acceptance is NOT granted, do not mark Hero LOCKED or project 100%.
