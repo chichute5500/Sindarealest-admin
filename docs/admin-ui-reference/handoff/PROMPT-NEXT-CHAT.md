@@ -1,5 +1,7 @@
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN
 
+Canonical entry point: [START-HERE.md](START-HERE.md). Latest docs-only HEAD `c63def3bffa9c2ab0593aaa2afe3b8e174351fcc` failed Validate #5814 (tests/handoff-integrity.test.mjs:68) because this link was absent; last tested app SHA is `c0c649022e0459c7d23f20ed46f9d750c52892d8` (Validate #5808, read-only Preview #1127 both PASS). Deployed Preview provenance remains NOT_VERIFIED; all 12 screens PARTIAL_NOT_ACCEPTED, progress 50% PROVISIONAL.
+
 Continue the project directly in GitHub repository `chichute5500/Sindarealest-admin`. Read this prompt, then verify the live GitHub branch, PR, and Actions state before acting. Do not ask the user to paste history or repeat the prompt. Do not stop after reporting; continue with the next useful safe workstream unless an actual owner-only action is required.
 
 ## Live checkpoint — 2026-10-24 12:35 UTC
