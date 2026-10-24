@@ -1879,6 +1879,22 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#main .pagehead h2')).toHaveText('Chi tiết đơn hàng');
       await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id', 'UI-ONLY-ORDER');
       await expect(page.locator('#orderDetailBackdrop')).toHaveCount(0);
+      const orderTimeline = page.locator('#orderDetailContent .order-detail-timeline');
+      await expect(orderTimeline, 'reference Screen 7 includes a timeline in the order detail view').toBeVisible();
+      await expect(orderTimeline).toContainText('Timeline');
+      await expect(orderTimeline).toContainText('Đặt hàng');
+      await expect(orderTimeline).toContainText('Cập nhật gần nhất');
+      if (page.viewportSize()?.width === 390) {
+        const timelineGeometry = await orderTimeline.evaluate(element => {
+          const rect = element.getBoundingClientRect();
+          const actions = document.querySelector('.order-detail-page-actions')?.getBoundingClientRect();
+          return { top: rect.top, bottom: rect.bottom, actionTop: actions?.top ?? window.innerHeight,
+            visibleAboveActions: rect.top >= 0 && rect.bottom <= (actions?.top ?? window.innerHeight) - 8 };
+        });
+        expect(timelineGeometry.visibleAboveActions,
+          'Screen 7 timeline should be visible above the fixed action row at 390×844 without scrolling: ' +
+          JSON.stringify(timelineGeometry)).toBe(true);
+      }
       await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
       await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
       const orderDetailViewportWidth = page.viewportSize()?.width ?? 0;
