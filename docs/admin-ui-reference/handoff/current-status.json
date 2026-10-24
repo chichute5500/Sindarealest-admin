@@ -462,19 +462,23 @@
   ],
   "handoffSync": {
     "status": "UPDATED",
-    "capturedAtUtc": "2026-10-24T09:32:00Z",
+    "capturedAtUtc": "2026-10-24T09:37:00Z",
+    "branchHeadAtCheckpointStart": "e5736c5542863fc23e5e235f5eaacc8c1374f325",
     "sourceTestSha": "cf340b686e0974ac5602b6ef4594c00e477c8932",
     "validateRunId": 40081623892,
     "previewRunId": 40081623888,
     "filesUpdated": [
-      "START-HERE.md",
-      "PROMPT-NEXT-CHAT.md",
-      "LATEST-STATUS.md",
-      "current-status.json",
-      "latest-test-results.json",
-      "12-SCREEN-REFERENCE-AUDIT.md"
+      "docs/admin-ui-reference/handoff/START-HERE.md",
+      "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+      "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+      "docs/admin-ui-reference/handoff/current-status.json",
+      "docs/admin-ui-reference/handoff/latest-test-results.json",
+      "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md"
     ],
-    "note": "Docs-only handoff commits may advance PR HEAD after this snapshot; always refresh live PR HEAD before acting."
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+    "commitIsDocsOnly": true,
+    "note": "The checkpoint head was documentation-only. New handoff commits may advance branch HEAD; always fetch live PR metadata before continuing."
   },
   "currentHeadAtCheckpoint": "d5f4b06a28d0a682891580b5e646a3bc064fd68a",
   "currentHeadValidation": "VALIDATE_5666_PASS_AND_PREVIEW_PLAYWRIGHT_1070_PASS",
