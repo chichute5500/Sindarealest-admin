@@ -1,3 +1,31 @@
+## FINAL COMPLETION TRACKER — OWNER REQUEST TO RESOLVE ALL REMAINING ITEMS — 2026-10-24
+
+**This section supersedes older “next task / unresolved” notes below when they conflict.** Re-check the live branch and exact-SHA workflow results before acting.
+
+### Current baseline
+- PR #108 is OPEN and unmerged, base `main`; current verified PR head before this handoff update: `6f7c8b5d336d83550d0d5328b3b68773114084db`.
+- Latest verified source/test SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`; Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815 ; Preview deploy + authenticated post-deploy HTTP diagnostic PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918 ; immutable Preview https://837f73ba.sindarealest2.pages.dev/ ; branch alias https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Latest HTTP evidence: `/` returns 200 + `X-Robots-Tag: noindex` and canonical/OG/Twitter URLs use the Preview origin; `/robots.txt` returns 200 + `Disallow: /`; `/sitemap.xml` returns 404 + `X-Robots-Tag: noindex, nofollow` + `Cache-Control: no-store`.
+- Keep gates separate: source/test PASS, Preview deploy PASS, authenticated HTTP PASS do **not** equal browser/device visual PASS or owner acceptance.
+
+### Remaining completion work — do not silently omit
+1. **Full final inventory/reconciliation:** read the four handoff files and PR changed-file list; compare all tracked modifications with the authorized public storefront scope. PR #108 has a large historical diff (297 files), including areas outside a narrow storefront visual task. Produce a path-by-path scope classification: allowed storefront, tests/docs/workflows, restricted/out-of-scope. Do not merge or “clean up” restricted changes automatically. Preserve PR #108 OPEN/unmerged and ask owner before any merge/split or changes to Admin/backend/API/data/config.
+2. **Visual acceptance still outstanding:** Hero remains previously paused; fullscreen gallery flicker remains PAUSED / NOT ACCEPTED; the Liquid Glass visual workflow was skipped by its Hero guard. Owner's current request is to finish all outstanding work, so assess these as reopened for planning and safe investigation, but do not bypass existing workflow safety guards or capture/change Hero through a guarded workflow. Establish a safe Hero-excluded visual route first; if no supported route exists, document the exact blocker and required owner action. For gallery, do not claim it is fixed until real mobile-device slow/rapid tap verification proves no flicker/ghosting; do not alter unrelated locked controls.
+3. **SKU route/data boundary:** URL generation must use a SKU only when authoritative API data explicitly confirms `skuVerified === true` and the SKU is non-empty after trimming; otherwise fall back to the product ID/key. Never infer, fabricate, or bulk-“verify” SKUs. If completion requires authoritative catalog verification unavailable to this branch, list the exact missing source/evidence and request it while continuing independent tasks.
+4. **Icon visual baseline:** icon owner acceptance was recorded for source `58f67a424e74b86e798cb5faa043a5d18e10b228`, Preview https://3587ce1f.sindarealest2.pages.dev/, CI #39999873524, deploy #39999874042. Treat as PASS/LOCKED unless the final inventory finds evidence that the current code regressed; do not gratuitously restyle.
+5. **SEO/Preview safety:** root canonical/social metadata, root noindex, robots and sitemap have authenticated HTTP evidence at the latest exact source SHA. Reconcile stale historical notes below so they are clearly marked superseded, not still-open. Do not make Access/infrastructure/shared-middleware changes without a concrete failure and explicit scoped approval.
+6. **Final regression gates:** run the current full validation and Preview deploy on the final source/test SHA after any code changes; verify exact deployed SHA; check workflow logs and authenticated Preview diagnostic; ensure no failing, skipped-by-guard, or unverified gate is mislabeled PASS. Do not run Production.
+7. **Final 100% decision:** provide a checklist with PASS / FAIL / BLOCKED / OWNER ACCEPTANCE REQUIRED for every identified scope. “100% complete” is allowed only if every required in-scope item is verified and accepted. If an owner action, real device, authoritative SKU evidence, or scope-isolation decision remains, report the overall project as not yet 100% and identify the one precise next action; do not inflate a percentage.
+
+### Execution protocol
+- Work autonomously in parallel only across non-conflicting tasks; after each report continue automatically.
+- Before every write, re-fetch live PR head and target file SHA. Use normal commits only; never force-push.
+- No Production/main deployment or edits, no merge of PR #108, no Admin/backend/API/auth, catalog data, D1/R2, secrets/bindings, DNS, Cloudflare Access/infrastructure, or payment changes without separate explicit approval.
+- Preserve owner-accepted/locked sections unless the owner explicitly reopens the specific area; the current broad request authorizes completion planning/investigation of outstanding items, not fabricated evidence or bypassing safety guards.
+- Update CURRENT-STATE, TASKS, DECISIONS, and TEST-RESULTS together at the end, then re-read all four files and verify their top sections agree. Keep a copyable next-chat prompt at `docs/handoff/PROMPT-NEW-CHAT-FINAL-100.md`.
+
+---
+
 ## LATEST TASK RESULT — VERIFY PREVIEW CANONICAL/SOCIAL METADATA LIVE — 2026-10-24
 
 - Extended the read-only post-deploy diagnostic to verify that root response metadata uses the actual deployed Preview origin: canonical link, Open Graph URL, Open Graph image, and Twitter image. This catches accidental cross-origin/production canonical metadata without logging the HTML body.
