@@ -468,17 +468,19 @@
     "No fabricated business data or unapproved API contracts."
   ],
   "nextActions": [
-    "After this six-file docs-only sync, fetch live branch HEAD and run workflow_dispatch for Admin Preview diagnostic smoke test on the resulting feature branch HEAD. Keep the branch unchanged until completion, then verify tested SHA, exact-HEAD guard and artifact.",
-    "Do not rerun completed Preview #40020809121 as a substitute: it reuses source SHA 448e7d2 and repeats the exact-HEAD guard failure.",
-    "Continue read-only reference/API/test audit while Actions runs; do not edit source without a reproduced defect and regression test first.",
-    "Keep all 12 screens PARTIAL_NOT_ACCEPTED; exact parity NOT_VERIFIED; authenticated backend/business QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
-    "Do not merge PR #111/#108/#112, alter main/storefront/shared Cloudflare settings, write business data, run seed/import/migrations, expose secrets or bypass Access."
+    "Fetch live branch HEAD, PR state and latest Actions first; do not use historical checkpoint SHAs as live state.",
+    "Source/test SHA b45d7f8d46d43d89f5e2330676009f5db778c379 passed Validate #5521 and Preview #484 on the exact same SHA; artifact #484 was inspected.",
+    "Continue parallel independent work; test-first only for reproducible defects. After each progress report, continue safe work rather than stopping.",
+    "Keep all 12 screens PARTIAL_NOT_ACCEPTED; exact reference parity NOT_VERIFIED; authenticated backend/business QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.",
+    "Do not request the unavailable Run workflow control, create dummy commits, weaken exact-HEAD protection, merge, deploy Production, bypass Access, alter secrets, or mutate real business data."
   ],
   "handoffSync": {
     "status": "SIX_FILE_DOCS_ONLY_SYNC_AFTER_EXACT_SHA_VALIDATE_PREVIEW_PASS",
     "capturedAtUtc": "2026-10-24T00:39:16Z",
     "codeTestSha": "b45d7f8d46d43d89f5e2330676009f5db778c379",
-    "note": "This synchronization changes only handoff/audit documents. The next chat must refresh live branch HEAD and distinguish the source/test SHA from the documentation-only child."
+    "note": "This synchronization changes only handoff/audit documents. Next chat must refresh live branch HEAD and distinguish source/test SHA from the docs-only child.",
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
   },
   "currentHeadAtCheckpoint": "b45d7f8d46d43d89f5e2330676009f5db778c379",
   "currentHeadValidation": "PASS_VALIDATE_AND_PREVIEW_ON_EXACT_SHA_b45d7f8d46d43d89f5e2330676009f5db778c379",

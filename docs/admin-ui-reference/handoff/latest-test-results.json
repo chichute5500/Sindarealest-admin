@@ -14,12 +14,9 @@
     "status": "completed",
     "conclusion": "success",
     "sha": "b45d7f8d46d43d89f5e2330676009f5db778c379",
-    "headSha": "b45d7f8d46d43d89f5e2330676009f5db778c379",
     "testedSha": "b45d7f8d46d43d89f5e2330676009f5db778c379",
     "workflow": "Admin Preview diagnostic smoke test",
-    "artifact": "admin-preview-evidence-484",
-    "artifactId": 12541480929,
-    "summary": "Source screenshot matrix, read-only Preview login CSS diagnostic, exact-HEAD guard, and artifact upload passed on the exact source/test SHA."
+    "summary": "Preview #484 and Validate #5521 both passed on the exact same source/test SHA; artifact #484 inspected. Remote diagnostic is login CSS signature only."
   },
   "validatedChecks": {
     "npmRunCheck": "PASS_ON_43465c70e7bd3ba4cda94c7f5a1abc281a4ee3d3",
@@ -498,7 +495,9 @@
     "status": "SIX_FILE_DOCS_ONLY_SYNC_AFTER_EXACT_SHA_VALIDATE_PREVIEW_PASS",
     "capturedAtUtc": "2026-10-24T00:39:16Z",
     "codeTestSha": "b45d7f8d46d43d89f5e2330676009f5db778c379",
-    "note": "Documentation-only sync follows exact-SHA evidence; next chat must refresh live branch HEAD."
+    "note": "This synchronization changes only handoff/audit documents. Next chat must refresh live branch HEAD and distinguish source/test SHA from the docs-only child.",
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
   },
   "latestProductSourceCommit": "efb49359a4e8b4ad65ea0120f41ad4c6cfa90631",
   "latestDiagnosticArtifact": {
