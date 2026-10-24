@@ -1891,6 +1891,17 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       );
       expect(customerCardColumns, `Customer identity card should keep avatar, contact details, and action in separate columns at ${orderDetailViewportWidth}px`).toBe(3);
       expect(itemMetaGridColumns, `Order item details should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
+      if (orderDetailViewportWidth === 390) {
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const actionGeometry = await page.locator('.order-detail-page-actions .btn.primary').evaluate(element => {
+          const rect = element.getBoundingClientRect();
+          return { top: rect.top, bottom: rect.bottom, viewportHeight: window.innerHeight,
+            visibleWithoutScrolling: rect.top >= 0 && rect.bottom <= window.innerHeight };
+        });
+        expect(actionGeometry.visibleWithoutScrolling,
+          'Screen 7 primary order action should remain visible in the 390×844 reference viewport without scrolling: ' +
+          JSON.stringify(actionGeometry)).toBe(true);
+      }
       if (orderDetailViewportWidth <= 820) {
         await expect(page.locator('.mobiletabs')).toBeVisible();
       } else {
