@@ -227,11 +227,39 @@ try {
             };
             visibleProductRect.width = visibleProductRect.right - visibleProductRect.left;
             visibleProductRect.height = visibleProductRect.bottom - visibleProductRect.top;
-            copyOverlap = (() => {
-              const width = Math.max(0, Math.min(visibleProductRect.right, copyRect.right) - Math.max(visibleProductRect.left, copyRect.left));
-              const height = Math.max(0, Math.min(visibleProductRect.bottom, copyRect.bottom) - Math.max(visibleProductRect.top, copyRect.top));
-              return { width, height, area: width * height };
-            })();
+            // The .hero-copy container includes wide empty layout space. Measure painted text line fragments
+            // and the CTA hit target separately, so harmless container whitespace is not misreported as overlap.
+            const paintedCopyRects = [];
+            const walker = document.createTreeWalker(copy, NodeFilter.SHOW_TEXT);
+            let textNode;
+            while ((textNode = walker.nextNode())) {
+              if (!String(textNode.nodeValue || '').trim()) continue;
+              const range = document.createRange();
+              range.selectNodeContents(textNode);
+              for (const r of range.getClientRects()) {
+                if (r.width > 0.5 && r.height > 0.5) {
+                  paintedCopyRects.push({ left:r.left, right:r.right, top:r.top, bottom:r.bottom, kind:'text-line' });
+                }
+              }
+            }
+            for (const control of copy.querySelectorAll('.hero-actions a,.hero-actions button,.hero-actions [role="button"]')) {
+              const r = control.getBoundingClientRect();
+              const style = getComputedStyle(control);
+              if (style.display !== 'none' && style.visibility !== 'hidden' && r.width > 0.5 && r.height > 0.5) {
+                paintedCopyRects.push({ left:r.left, right:r.right, top:r.top, bottom:r.bottom, kind:'action-control' });
+              }
+            }
+            const intersections = paintedCopyRects.map((r) => {
+              const width = Math.max(0, Math.min(visibleProductRect.right, r.right) - Math.max(visibleProductRect.left, r.left));
+              const height = Math.max(0, Math.min(visibleProductRect.bottom, r.bottom) - Math.max(visibleProductRect.top, r.top));
+              return { kind:r.kind, width, height, area:width*height };
+            }).filter((item) => item.area > 0.01);
+            copyOverlap = {
+              area: intersections.reduce((sum, item) => sum + item.area, 0),
+              intersectingFragments: intersections.length,
+              maxFragmentArea: intersections.reduce((max, item) => Math.max(max, item.area), 0),
+              copyFragmentCount: paintedCopyRects.length,
+            };
           }
           const rootDark = document.documentElement.classList.contains('dark');
           return {
