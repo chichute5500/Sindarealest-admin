@@ -1,3 +1,49 @@
+# VERIFIED CHECKPOINT — 2026-10-24 07:35 UTC
+
+**Repo:** `chichute5500/Sindarealest-admin`  
+**Writable branch:** `feature/admin-isolated-handoff-2026-10-20`  
+**Latest application/test SHA:** `b6d68ef9cd5ba8e72fcf4c2175e6b7674d039018`
+
+## Exact-SHA validation
+- Validate #5646: PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074512151
+- Admin Preview Playwright #1062: PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074512187
+- Admin Preview diagnostics #527: PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074508692
+- All three runs completed on the exact same SHA `b6d68ef9cd5ba8e72fcf4c2175e6b7674d039018`.
+- Evidence artifact: [admin-preview-evidence-527](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40074508692/artifacts/12551859359)
+
+## PR conflict resolution
+- PR #111 is OPEN, unmerged; GitHub reports `mergeable=true`, `mergeable_state=clean`.
+- No overlap remains between the PR's changed paths and the four files currently changed on `main`.
+- To avoid overwriting `main`'s unrelated Pages workflow and E2E spec, feature-only paths are now:
+  - `.github/workflows/deploy-admin-isolated-preview.yml` (pins `sindarealest-admin-preview`, guards the approved feature branch)
+  - `tests/e2e/admin-isolated-preview.spec.js` (pins the isolated Preview host)
+- `.github/workflows/admin-preview-diagnostics.yml` invokes the isolated spec and is triggered when the isolated deployment workflow changes. The test checks this contract.
+- Previous failures on SHA `e54af7f...` were test assertion errors caused by checking absence of main's base-tree files; the stale absence assertions were removed. Current exact-SHA runs pass.
+
+## Verified Preview scope
+- Diagnostic signature: `PASS_LOGIN_CSS_SIGNATURE`.
+- Authenticated read-only GET checks: 7/7 routes HTTP 200 (session, orders, customers, warranties, audit logs, settings, payment QR).
+- Catalog: 235 products; 527 relative product image URLs decoded; pagination/search/category/publication filters and detail editor passed.
+- Product mutation requests: none; Admin API mutation requests: none.
+- Playwright smoke checks: 3 passed. Evidence is from an authenticated read-only Preview session.
+
+## Boundaries / remaining work
+- Authenticated business-write/persistence QA: `NOT_TESTED`.
+- Remote Preview D1 schema/ledger verification: `NOT_VERIFIED`.
+- Approved reference parity: `NOT_VERIFIED`.
+- All 12 screens remain `PARTIAL_NOT_ACCEPTED`.
+- Progress remains **50% PROVISIONAL**; Production remains `NOT_PERFORMED`.
+- Do not merge/rebase/cherry-pick, force push, write to `main`/storefront, deploy Production, alter Cloudflare Access/secrets/DNS, or write remote D1/R2. No fake commits.
+
+## Continue immediately
+1. Continue read-only source/concurrency audit and reference-driven UI comparison; change application code only for a reproduced issue with a regression test.
+2. Preserve the isolated deployment and E2E paths. Do not run the manual isolated deploy without a supported dispatch action and clear need.
+3. Keep PR #111 open/unmerged until project acceptance criteria are met.
+
+**Entry point:** `docs/admin-ui-reference/handoff/START-HERE.md`  
+**Next-chat prompt:** `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`
+
+---
 # CURRENT VERIFIED CHECKPOINT — 2026-10-24 07:11 UTC
 
 **Repository:** `chichute5500/Sindarealest-admin`  
