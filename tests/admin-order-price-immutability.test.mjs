@@ -147,7 +147,7 @@ for (const {label,price,status} of [
   assert.equal(response.status,200,label+" should be accepted in the simulated no-ledger case");
   assert.equal(db.calls.batches.length,1,label+" should use one atomic batch");
   for (const {sql,values} of db.calls.batches[0]) {
-    assert.equal(values.length,(sql.match(/\\?/g)||[]).length,
+    assert.equal(values.length,sql.split('?').length-1,
       label+": SQL must bind exactly one value per placeholder for D1 execution");
   }
 }

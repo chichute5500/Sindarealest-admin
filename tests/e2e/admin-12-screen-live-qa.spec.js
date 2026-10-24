@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -58,8 +59,9 @@ for (const {width,height,theme} of matrix) {
             }).length,heading:target?.querySelector('h1,h2')?.textContent?.trim().slice(0,90)||null};
         });
         const nameFile=name+'.png';
-        await page.screenshot({path:join(folder,nameFile),fullPage:true,animations:'disabled'});
-        report.screens.push({screen:name,status:'CAPTURED_NOT_ACCEPTED',file:nameFile,metrics:m});
+        const screenshot=await page.screenshot({path:join(folder,nameFile),fullPage:true,animations:'disabled'});
+        report.screens.push({screen:name,status:'CAPTURED_NOT_ACCEPTED',file:nameFile,
+          sha256:createHash('sha256').update(screenshot).digest('hex'),metrics:m});
       }
       if((await page.evaluate(()=>document.documentElement.dataset.adminTheme))!==theme)
         await page.locator('#adminThemeToggle').click();
@@ -69,10 +71,17 @@ for (const {width,height,theme} of matrix) {
       await expect(page.locator('#appView')).toBeVisible({timeout:30000});
       // Hide the transient login toast before recording reference-comparison screenshots.
       await expect(page.locator('#toast')).not.toHaveClass(/show/,{timeout:7000});
+      const expectedHeadings={
+        dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',
+        warranties:'Bảo hành / Yêu cầu hỗ trợ',settings:'Cài đặt website',
+        backup:'Sao lưu / Khôi phục',activity:'Nhật ký hoạt động'
+      };
       for(const [screen,view] of screens){
         await page.evaluate(v=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view===v);if(!nav)throw new Error('Missing Admin navigation button '+v);nav.click()},view);
-        await page.waitForTimeout(500);
-        await expect(page.locator('#main')).toBeVisible();
+        // Navigation awaits a backend read for operational views. A fixed 500ms delay
+        // previously captured Orders again under the Customers filename.
+        await expect(page.locator('#main .pagehead h2').first(),
+          'Capture must show the intended module, not the previous page').toHaveText(expectedHeadings[view],{timeout:20000});
         await shot(screen);
       }
       await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='products');if(!nav)throw new Error('Products navigation missing');nav.click()});
@@ -105,6 +114,13 @@ for (const {width,height,theme} of matrix) {
       }
       expect(report.nonAuthMutationRequests,'Read-only QA must not make business writes').toEqual([]);
       const captures=report.screens.filter(s=>s.status==='CAPTURED_NOT_ACCEPTED');
+      const byHash=new Map();
+      for(const capture of captures){
+        const previous=byHash.get(capture.sha256);
+        expect(previous,'Duplicate screenshot: '+capture.screen+' repeats '+previous+
+          '; a mislabeled route must not count as a captured distinct screen').toBeUndefined();
+        byHash.set(capture.sha256,capture.screen);
+      }
       if(process.env.QA_EXPECT_ORDER_ID)expect(captures.length,'All 12 real Admin screens must be captured whenever isolated QA order fixtures are present').toBe(12);
       else expect(captures.length,'At least 10 real screens should be available without synthetic data').toBeGreaterThanOrEqual(10);
     } finally {
