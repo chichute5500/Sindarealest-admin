@@ -394,7 +394,7 @@ PR #111 provenance/cleanup review remains complete. No further deletions or API 
 
 **Allowed branch:** `feature/admin-isolated-handoff-2026-10-20`  
 **Exact source/test SHA:** `cac4999611feacecf80e9e980a8ace0dd45e6f3d`  
-**Validate #5590:** PASS — [run 40070858136](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136)  
+**Validate #5625:** PASS — [run 40070858136](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136)  
 **Admin Preview #517:** SUCCESS on the same SHA — [run 40070858169](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169)  
 **Screenshot artifact:** [admin-preview-evidence-517](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169/artifacts/12551172629)
 

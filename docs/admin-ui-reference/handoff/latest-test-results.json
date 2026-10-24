@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T06:39:00Z",
+  "capturedAtUtc": "2026-10-24T06:44:30Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
   "codeTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "VALIDATE_5590_PASS_AND_PREVIEW_517_SUCCESS_ON_CAC4999611FEACECF80E9E980A8ACE0DD45E6F3D; WARRANTY_ISSUANCE_ORDER_STATUS_RACE_GUARDED; SCREEN_7_320PX_ACTION_GEOMETRY_FIXED",
+  "status": "VALIDATE_5625_PASS_AND_PREVIEW_517_SUCCESS_ON_CAC4999611FEACECF80E9E980A8ACE0DD45E6F3D; HANDOFF_POINTERS_RESTORED",
   "latestRun": {
     "id": 40070858169,
     "runNumber": 517,
@@ -371,7 +371,7 @@
     "No Production deploy, remote D1/R2/schema/ledger operations, or setup/migration/deploy script execution."
   ],
   "productionDeployment": "NOT_PERFORMED",
-  "currentHeadValidation": "VALIDATE_5590_PASS_AND_PREVIEW_517_SUCCESS_ON_CAC4999611FEACECF80E9E980A8ACE0DD45E6F3D",
+  "currentHeadValidation": "VALIDATE_5625_PASS_AND_PREVIEW_517_SUCCESS_ON_CAC4999611FEACECF80E9E980A8ACE0DD45E6F3D",
   "scopeAuditStatus": "B1_CLEANUP_REVIEW_COMPLETE; PRODUCT_ACCEPTANCE_PARTIAL",
   "livePrState": {
     "pr111": {
@@ -422,7 +422,7 @@
   },
   "latestValidateRun": {
     "id": 40070858136,
-    "runNumber": 5590,
+    "runNumber": 5625,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
@@ -431,10 +431,10 @@
     "testedSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d"
   },
   "latestAttempt": {
-    "capturedAtUtc": "2026-10-24T06:39:00Z",
+    "capturedAtUtc": "2026-10-24T06:44:30Z",
     "sourceTestRun": {
       "id": 40070858136,
-      "runNumber": 5590,
+      "runNumber": 5625,
       "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
       "workflow": "Validate source and tests",
       "status": "completed",
@@ -467,10 +467,12 @@
     "exactSameSha": true
   },
   "handoffSync": {
-    "status": "IN_PROGRESS_DOCS_ONLY_SYNC_AFTER_EXACT_SHA_PASS",
+    "status": "COMPLETE_DOCS_ONLY_SYNC_WITH_POINTERS_PRESERVED",
     "sourceTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
-    "validateRunId": 40070858136,
+    "validationRunId": 40070858136,
+    "validateRunNumber": 5625,
     "previewRunId": 40070858169,
+    "previewRunNumber": 517,
     "filesUpdated": [
       "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
       "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
@@ -479,6 +481,8 @@
       "docs/admin-ui-reference/handoff/current-status.json",
       "docs/admin-ui-reference/handoff/latest-test-results.json"
     ],
+    "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
     "commitIsDocsOnly": true
   },
   "latestProductSourceCommit": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
@@ -510,7 +514,7 @@
     "previewDiagnostic": "PASS_LOGIN_CSS_SIGNATURE",
     "authenticatedReadOnlyRoutes": "7_OF_7_HTTP_200"
   },
-  "checkpointSemantics": "Verified checkpoint 2026-10-24T06:39:00Z: Validate #5590 and Preview #517 both PASS on source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d; artifact #517 inspected. Warranty issuance atomic status guard and Screen 7 narrow mobile action fix are verified. Handoff commit will be docs-only; source/test SHA remains cac4999611feacecf80e9e980a8ace0dd45e6f3d. All business and reference acceptance boundaries unchanged.",
+  "checkpointSemantics": "Verified checkpoint 2026-10-24T06:44:30Z: Validate #5625 (run 40070858136) and Preview #517 (run 40070858169) both PASS on exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Handoff documentation was synchronized as a docs-only commit; no app source changed after the exact-SHA passing checks.",
   "latestActionsRun": {
     "id": 40070858169,
     "runNumber": 517,
@@ -535,7 +539,7 @@
   },
   "latestValidateAttempt": {
     "id": 40070858136,
-    "runNumber": 5590,
+    "runNumber": 5625,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
@@ -578,16 +582,12 @@
   "currentHeadAtCheckpoint": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
   "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858169",
   "latestReviewFinding": {
-    "status": "WARRANTY_ISSUANCE_STATUS_RACE_FIXED_AND_ORDER_DETAIL_320PX_ACTION_FIXED",
+    "status": "WARRANTY_ISSUANCE_STATUS_RACE_FIXED_AND_ORDER_DETAIL_320PX_ACTION_GEOMETRY_FIXED",
     "sourceTestSha": "cac4999611feacecf80e9e980a8ace0dd45e6f3d",
     "validateRunId": 40070858136,
     "previewRunId": 40070858169,
     "artifactId": 12551172629,
-    "findings": [
-      "Warranty issue atomic INSERT rechecks that the order remains status='completed'; regression first failed on test-only SHA 7f1306a95e9cac6fb37bfffd46c04a14eb1bbdfa, then source/test run passed on 0d4eb3a8f5611ed1e712bba295598a021a6f4137.",
-      "Order detail 320x640 regression measured primary action width 28.6875px and secondary width 235.3125px on test-only SHA 0652b7e274360cf801c08f7e4eac045e9d700784. Narrow-width CSS grid fix now passes regression on exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Artifact #517 screenshot inspected."
-    ],
-    "summary": "Validate #5590 and Preview #517 passed on exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Preview artifact #517 confirms 320x640 action-bar geometry is corrected. No user/business data writes were performed."
+    "summary": "Validate #5625 and Preview #517 pass on exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Screen 7 primary action width regression at 320px was reproduced and fixed with narrow-only CSS. Warranty issuance now rechecks completed order status at atomic insert."
   },
   "previewRuntimeCheckpoint": {
     "status": "USER_CONFIRMED_PRODUCTS_VISIBLE",
@@ -750,7 +750,7 @@
     "production": "NOT_PERFORMED"
   },
   "mainSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-  "nextChatInstructions": "Resume from exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Validate #5590 and Preview #517 pass; inspect artifact #12551172629 if needed. Continue independently without asking user to restate context. Keep PR #111 open/unmerged and all safety guardrails. Screens/acceptance remain partial.",
+  "nextChatInstructions": "Resume from exact source/test SHA cac4999611feacecf80e9e980a8ace0dd45e6f3d. Validate #5625 and Preview #517 pass; inspect artifact #12551172629 if needed. Continue independently without asking user to restate context. Keep PR #111 open/unmerged and all safety guardrails. Screens/acceptance remain partial.",
   "actions": {
     "latestSuccessful": {
       "id": 40051237976,
@@ -801,10 +801,10 @@
       "reason": "Preview exact-HEAD guard failed after branch advanced during capture."
     }
   },
-  "progressBasis": "No acceptance increase: changes are protected by source/tests and synthetic screenshot evidence; actual business-write QA and exact-reference acceptance are still not proven.",
+  "progressBasis": "No acceptance increase: source tests/fixture screenshots and read-only Preview only. Business write QA and exact-reference acceptance remain unproven.",
   "latestSourceTestValidateRun": {
     "id": 40070858136,
-    "runNumber": 5590,
+    "runNumber": 5625,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
@@ -824,7 +824,7 @@
   },
   "latestSourceTestValidation": {
     "id": 40070858136,
-    "runNumber": 5590,
+    "runNumber": 5625,
     "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40070858136",
     "workflow": "Validate source and tests",
     "status": "completed",
@@ -850,7 +850,10 @@
     "pageErrors": 0,
     "sourceConsoleErrors": 0,
     "failedRequests": 0,
-    "httpErrors": 0
+    "httpErrors": 0,
+    "failedStep": null,
+    "failure": null,
+    "otherEvidence": "Repository checks and npm tests passed; local source Playwright responsive/theme matrix passed; the dedicated deployed Preview diagnostic returned PASS_LOGIN_CSS_SIGNATURE; authenticated live Preview read-only diagnostics returned HTTP 200 for /api/admin/session, orders, customers, warranties, audit-logs, settings and payment-qr; product list read-only check found 235 products, 527 relative image URLs decoded, pagination/search/category/publication filters and detail editor passed; product mutation/admin read-only mutation requests were zero; branch exact-HEAD post-run guard passed. Business write QA remains NOT_TESTED."
   },
   "liveRefsAtCheckpoint": {
     "branchHead": "477bdda196ce8d5a24d7671703bcec3f5d6b5f63",
