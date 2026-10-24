@@ -1,20 +1,20 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T15:56:46Z",
+  "capturedAtUtc": "2026-10-24T16:26:00Z",
   "repository": "chichute5500/Sindarealest-admin",
   "activeBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
-  "checkpointSemantics": "12 live screens captured in 4 viewport/theme conditions with isolated QA D1 fixture; all 7 fixture rows cleaned twice; screenshot/parity != final acceptance; source 996d1208b9529a714e9f46de4dedd5905e7eea6e vs deployed UI 564ea556e6dee745eaaa491ee033a2a8cfbb595c.",
-  "codeTestSha": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
+  "branchHeadAtCheckpointStart": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+  "checkpointSemantics": "Exact feature QA source d13dd92b75a392acf7cae3eddf1df971a86b9b62 passes 6 CI workflows. App deployed at 564ea556...; 48/48 authentic Preview capture+isolated QA product authenticated PUT/GET and D1 readback pass. Remote D1 schema/ledger shape read-only pass; actual payment/warranty/order writes and reference parity incomplete. 50% PROVISIONAL.",
+  "codeTestSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
   "latestProductSourceCommit": "c0c649022e0459c7d23f20ed46f9d750c52892d8",
   "latestActionsRun": {
-    "id": 40109162506,
+    "id": 40111472681,
     "workflow": "Owner-approved synthetic D1 QA and complete 12-screen captures",
     "status": "completed",
     "conclusion": "success",
-    "sha": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109162506",
-    "artifactId": 12565629211
+    "sha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111472681",
+    "artifactId": 12566487432
   },
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
@@ -44,7 +44,7 @@
       "branch": "feature/admin-isolated-handoff-2026-10-20",
       "base": "main",
       "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-      "headSha": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
+      "headSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
       "changedFiles": 496,
       "additions": 46507,
       "deletions": 224,
@@ -474,13 +474,13 @@
     "No Production deploy, remote D1/R2 writes, business writes, migrations, secrets/Access/DNS changes, or edits to main/storefront/PR #108/#112."
   ],
   "handoffSync": {
-    "capturedAtUtc": "2026-10-24T15:56:46Z",
+    "capturedAtUtc": "2026-10-24T16:26:00Z",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
     "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
     "docsHeadAtCheckpoint": "c277c5a2f99114856ec78594823f71b0c9010cf0",
-    "codeTestSha": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
+    "codeTestSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
     "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-    "pr111Head": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
+    "pr111Head": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
     "pr111State": "OPEN_UNMERGED",
     "pr111BaseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
     "pr111ChangedFiles": 495,
@@ -491,8 +491,8 @@
       40104730979
     ],
     "previewRunId": 40104728057,
-    "diagnosticRunId": 40109162421,
-    "diagnosticArtifactId": 12565629211,
+    "diagnosticRunId": 40111472624,
+    "diagnosticArtifactId": 12566487432,
     "commitMessagePrefix": "[CF-Pages-Skip]",
     "latestRepairNote": "Test-first cancelled-order status guard reproduced red then fixed; current exact-SHA tests and read-only diagnostic pass."
   },
@@ -518,8 +518,8 @@
   },
   "snapshotCapturedBeforeHandoffSync": true,
   "mainSha": "227622d3e3b7c75724ffa1775b193da71089269a",
-  "latestCodeCommitSha": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
-  "testedCommitSha": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
+  "latestCodeCommitSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+  "testedCommitSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
   "capturedAt": "2026-10-24T01:53:00Z",
   "lastActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40084037565",
   "checks": {
@@ -825,13 +825,13 @@
     "headSha": "0469930f6836d5f8d87b155a538e1d68776e3913"
   },
   "latestRun": {
-    "id": 40109162506,
+    "id": 40111472681,
     "workflow": "Owner-approved synthetic D1 QA and complete 12-screen captures",
     "status": "completed",
     "conclusion": "success",
-    "sha": "996d1208b9529a714e9f46de4dedd5905e7eea6e",
-    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40109162506",
-    "artifactId": 12565629211
+    "sha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+    "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40111472681",
+    "artifactId": 12566487432
   },
   "acceptance": {
     "progress": "50% PROVISIONAL",
@@ -1167,8 +1167,8 @@
   },
   "deploymentProvenance": "REPORTED_SHA_MATCH_CLOUDFLARE_METADATA_ONLY",
   "approvedReferenceParity": "NOT_VERIFIED",
-  "authenticatedBusinessWritePersistence": "NOT_TESTED",
-  "remotePreviewD1SchemaLedger": "NOT_VERIFIED",
+  "authenticatedBusinessWritePersistence": "PARTIAL_PRODUCT_QA_ONLY",
+  "remotePreviewD1SchemaLedger": "SCHEMA_LEDGER_TABLES_VERIFIED_READONLY",
   "productionDeployment": "NOT_PERFORMED",
   "latestVerifiedAudit": {
     "capturedAtUtc": "2026-10-24T15:09:54.221Z",
@@ -1230,5 +1230,30 @@
     "authenticatedBusinessWritePersistence": "NOT_TESTED",
     "referenceParity": "NOT_VERIFIED",
     "productionDeployment": "NOT_PERFORMED"
+  },
+  "lastVerified12ScreenProductQa": {
+    "recordedAtUtc": "2026-10-24T16:26:00Z",
+    "sourceTestSha": "d13dd92b75a392acf7cae3eddf1df971a86b9b62",
+    "deployedApplicationSha": "564ea556e6dee745eaaa491ee033a2a8cfbb595c",
+    "fullScreenAuditRunId": 40111072318,
+    "fullScreenAuditArtifactId": 12566034958,
+    "finalQaRunId": 40111472681,
+    "finalQaArtifactId": 12566487432,
+    "remoteSchemaRunId": 40110704947,
+    "remoteSchemaArtifactId": 12566007654,
+    "latestCiSixPass": true,
+    "screenCaptures": 48,
+    "viewportThemeCombinations": 4,
+    "horizontalOverflowObservations": 0,
+    "referenceParity": "NOT_VERIFIED",
+    "productApiAuthenticatedPersistence": "TESTED_PASS_QA_ONLY",
+    "productD1Readback": "TESTED_PASS_QA_ONLY",
+    "warrantyPaymentsOrderWriteQa": "NOT_TESTED",
+    "remotePreviewD1Schema": "VERIFIED_REQUIRED_TABLE_SHAPE_READONLY",
+    "realPaymentsLedgerAcceptance": "NOT_TESTED",
+    "qaRecordsRemaining": 0,
+    "qaCleanupVerified": true,
+    "qaCleanupFailures": 0,
+    "progressPercent": 50
   }
 }
