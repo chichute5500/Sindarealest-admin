@@ -112,7 +112,7 @@ assert.ok(canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
   "The mobile Hero uses a single compact, visible platform beneath the unchanged shoe PNG.");
 assert.ok(canonicalMobile.includes("#home .hero-visual-glow{")
   && canonicalMobile.includes("at 41% 82%")
-  && canonicalMobile.includes("at 78% 40%")
+  && canonicalMobile.includes("at 78% 26%")
   && canonicalMobile.includes("drop-shadow(0 5px 5px rgba(14,30,42,.10))")
   && canonicalMobile.includes("drop-shadow(0 2px 2px rgba(8,19,29,.16))"),
   "A mobile contact-shadow layer must ground both shoes without changing the original PNG pixels.");

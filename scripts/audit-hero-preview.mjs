@@ -400,6 +400,12 @@ try {
           }
         }
         if (m.viewport.width >= 761) {
+          const minOvalHeight=m.viewport.width>=1001?50:47;
+          if (!m.pedestal || m.pedestal.oval.height<minOvalHeight
+            || !m.contactShadow || m.contactShadow.rect.height < (m.viewport.width>=1001?42:37))
+            fail('Rear shoe must be supported by a deeper perspective oval and localized contact shadow at every nonmobile breakpoint.');
+        }
+        if (m.viewport.width >= 761) {
           const maxHeight=m.viewport.width>=1001?485:575;
           if(!m.heroRect || m.heroRect.height>maxHeight || m.heroRect.height<(m.viewport.width>=1001?400:430)) fail('Desktop/tablet Hero is oversized or collapsed.');
           if(!m.pedestal || m.pedestal.face.clipPath!=='none' || !String(m.pedestal.face.maskImage).includes('linear-gradient'))
