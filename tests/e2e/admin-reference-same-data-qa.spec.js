@@ -9,7 +9,7 @@ test('reference-comparable Admin products use labelled synthetic prices and genu
   const root=process.cwd();
   const catalog=JSON.parse(readFileSync(join(root,'data/legacy-products.json'),'utf8'));
   const chosen=[
-    {slug:'loafers-giay-luoi-bach-tang-2000k',price:5500000,stock:12,sku:'QA-SN001'},
+    {slug:'sneakers-new-sneaker-contrast',price:5500000,stock:12,sku:'QA-SN001'},
     {slug:'wallets-bach-tang-2-mat-may-vien-1250k',price:5800000,stock:8,sku:'QA-W001'},
     {slug:'belts-bach-tang-khoa-thuong-1300k',price:3200000,stock:15,sku:'QA-B001'},
     {slug:'sneakers-26-41-a',price:12500000,stock:5,sku:'QA-SN002'}
@@ -90,8 +90,21 @@ test('reference-comparable Admin products use labelled synthetic prices and genu
   await page.screenshot({path:join(folder,'04_product_editor_populated_390x844_light.png'),animations:'disabled'});
   await page.locator('#productTabGallery').click();
   await expect(page.locator('#productPanelGallery')).toBeVisible();
-  await expect(page.locator('#imageGrid img').first()).toBeVisible();
+  await expect(page.locator('#imageGrid .imageitem')).toHaveCount(6);
+  await expect(page.locator('#imageGrid .image-rail .imageitem')).toHaveCount(5);
+  await expect.poll(()=>page.locator('#imageGrid img').evaluateAll(imgs=>
+    imgs.length===6&&imgs.every(img=>img.complete&&img.naturalWidth>0)),{timeout:15000}).toBe(true);
+  const featured=await page.locator('#imageGrid .image-cover-slot img').evaluate(el=>{
+    const b=el.getBoundingClientRect();
+    return {width:b.width,height:b.height,fit:getComputedStyle(el).objectFit};
+  });
+  expect(featured.fit,'Featured preview should fill the approved reference frame').toBe('cover');
+  expect(featured.width).toBeGreaterThan(250);
+  expect(featured.height).toBeGreaterThan(180);
   await page.screenshot({path:join(folder,'05_gallery_populated_390x844_light.png'),animations:'disabled'});
+  await page.setViewportSize({width:1280,height:800});
+  await expect(page.locator('#backdrop .editor')).toBeVisible();
+  await page.screenshot({path:join(folder,'05_gallery_populated_1280x800_light.png'),animations:'disabled'});
   writeFileSync(join(folder,'manifest.json'),JSON.stringify({
     status:'LOCAL_SYNTHETIC_VISUAL_COMPARISON_NOT_APPROVED_REFERENCE_PARITY',
     sourceSha:process.env.GITHUB_SHA||'local',

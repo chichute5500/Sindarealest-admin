@@ -15,6 +15,7 @@ const expected=[
   '@media(max-width:390px)',
   '@media(max-width:359px)',
   '@media(prefers-reduced-motion:reduce)',
+  'SD_ADMIN_REFERENCE_GALLERY_FEATURED_V2',
   "activityFiltersExpanded=false"
 ];
 for(const selector of expected) assert.ok(src.includes(selector),'Missing reference-design safeguard: '+selector);

@@ -932,6 +932,42 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .order-detail-extra[open]>summary{border-bottom:1px solid var(--line)}
 
 
+
+/* SD_ADMIN_REFERENCE_GALLERY_FEATURED_V2 */
+/* The editor's featured preview fills the reference photo frame, while the
+   original files are untouched and all image reordering/delete controls remain. */
+@media(max-width:680px){
+  #imageGrid .image-cover-slot .imageitem{
+    overflow:hidden;
+    border-radius:13px;
+    background:linear-gradient(145deg,rgba(230,244,253,.92),rgba(190,217,238,.42));
+    border:1px solid var(--reference-border);
+  }
+  #imageGrid .image-cover-slot .imageitem img{
+    display:block;width:100%;height:auto;max-height:250px;
+    aspect-ratio:1.5/1;object-fit:cover;object-position:center;
+    background:rgba(207,228,242,.38);
+  }
+  #imageGrid .image-rail{
+    display:flex;gap:7px;min-width:0;max-width:100%;
+    padding:5px 1px 6px;scroll-padding-inline:3px;
+    scroll-snap-type:x proximity;
+  }
+  #imageGrid .image-rail .imageitem{
+    flex:0 0 63px;width:63px;min-width:63px;border-radius:9px;
+    background:var(--reference-sheet);
+  }
+  #imageGrid .image-rail .imageitem img{aspect-ratio:1/1;object-fit:cover}
+  #imageGrid .image-cover-slot .imagebuttons{padding:7px 4px}
+  :root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem {
+    background:rgba(19,46,65,.86);
+  }
+}
+@media(max-width:359px){
+  #imageGrid .image-rail .imageitem{flex-basis:54px;width:54px;min-width:54px}
+  #imageGrid .image-cover-slot .imageitem img{max-height:210px}
+}
+
 /* SD_ADMIN_REFERENCE_PRODUCT_TOOLBAR_V2: closer mobile search/filter hierarchy
    to approved reference, without losing accessible labels or business controls. */
 @media (max-width:680px){
