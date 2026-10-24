@@ -1,3 +1,16 @@
+# LIVE HANDOFF UPDATE — 2026-10-24 09:30 UTC
+
+**Live branch HEAD:** `fb12af89a15f3bb901a2ae34c9c96dedb2dd3b94` (documentation-only commit updating `current-status.json`).  
+**Latest source/test SHA:** `cf340b686e0974ac5602b6ef4594c00e477c8932` (order cancellation race guard).  
+**PR #111:** OPEN, unmerged; do not merge/rebase.  
+**Validate #5688:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892  
+**Admin Preview Playwright #1077:** PASS — https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888  
+**Scope boundary:** progress 50% PROVISIONAL; 12 screens PARTIAL_NOT_ACCEPTED; reference parity NOT_VERIFIED; authenticated business-write QA NOT_TESTED; remote D1 schema/ledger NOT_VERIFIED; Production NOT_PERFORMED.
+
+Recent source change at `cf340b686e0974ac5602b6ef4594c00e477c8932`: cancellation now also guards order-item writes against a pending QR payment request, closing the partial-write race in which order cancellation was blocked but associated item writes could still proceed. Exact-SHA Validate and Admin Preview Playwright both passed on this source/test SHA. These are automated source/Playwright results, not proof of authenticated business writes or visual parity. Keep all seven operating rules and safety restrictions below intact.
+
+---
+
 # VERIFIED HANDOFF CHECKPOINT — 2026-10-24 09:00 UTC
 
 **Repository:** `chichute5500/Sindarealest-admin`  
