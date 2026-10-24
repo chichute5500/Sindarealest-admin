@@ -368,7 +368,7 @@ const heroBlendOverride = html.slice(html.lastIndexOf("/* Hero uses the original
 assert.ok(heroBlendOverride.includes('mix-blend-mode:normal!important')
   && heroBlendOverride.includes("mask-image:none!important")
   && !heroBlendOverride.includes("mask-image:radial-gradient(")
-  && heroBlendOverride.includes("width:clamp(258px,70vw,286px)!important")
+  && heroBlendOverride.includes("width:clamp(244px,67vw,270px)!important")
   && heroBlendOverride.includes("max-height:none!important"),
   "The original mobile Hero PNG must stay enlarged, uncropped, unmasked, and color-preserving.");
 assert.ok(heroBlendOverride.includes("@media(min-width:761px) and (max-width:1000px)")
@@ -401,8 +401,8 @@ const mobileReferenceCss = html.slice(html.lastIndexOf("/* Mobile Hero — owner
 assert.ok(mobileReferenceCss.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
   && mobileReferenceCss.includes("height:clamp(216px,57vw,230px)!important;")
   && mobileReferenceCss.includes("position:absolute!important;top:0!important;right:0!important;")
-  && mobileReferenceCss.includes("top:-55px!important;left:-43px!important;")
-  && mobileReferenceCss.includes("width:clamp(258px,70vw,286px)!important;")
+  && mobileReferenceCss.includes("top:-55px!important;left:-30px!important;")
+  && mobileReferenceCss.includes("width:clamp(244px,67vw,270px)!important;")
   && mobileReferenceCss.includes("object-fit:contain!important")
   && !mobileReferenceCss.includes("grid-template-rows:auto auto!important;"),
   "Mobile Hero must follow the supplied side-by-side reference, not stack the shoe below its copy.");
@@ -511,7 +511,7 @@ const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero —
 assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
   && mobileHeroReferenceMatch.includes("grid-template-rows:1fr!important;")
   && mobileHeroReferenceMatch.includes("height:clamp(216px,57vw,230px)!important;")
-  && mobileHeroReferenceMatch.includes("top:-55px!important;left:-43px!important;")
+  && mobileHeroReferenceMatch.includes("top:-55px!important;left:-30px!important;")
   && mobileHeroReferenceMatch.includes("max-height:none!important")
   && mobileHeroReferenceMatch.includes("opacity:1!important;mix-blend-mode:normal!important;"),
   "Mobile reference must use a short horizontal layout and undistorted transparent product asset.");

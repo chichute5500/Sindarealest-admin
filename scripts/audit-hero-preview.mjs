@@ -330,7 +330,7 @@ try {
             fail('Marble pedestal is suppressed by stale glow rules.');
           else if(pl.oval.top/m.frameRect.height<.65||pl.oval.top/m.frameRect.height>.90
             ||pl.face.top<=pl.oval.top||pl.face.top-pl.oval.top-pl.oval.height>10
-            ||pl.oval.width<m.frameRect.width*.7||pl.oval.width>m.frameRect.width*.95)
+            ||pl.oval.width<m.heroRect.width*.52||pl.oval.width>m.heroRect.width*.68)
             fail('Marble top/front are detached or incorrectly scaled.');
         }
         if (m.viewport.width <= 390) {

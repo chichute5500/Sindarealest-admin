@@ -68,7 +68,7 @@ assert.ok(heroEdgeTreatment.includes("mix-blend-mode:normal!important")
   && heroEdgeTreatment.includes("#home .hero-visual{")
   && heroEdgeTreatment.includes("mask-image:none!important")
   && !heroEdgeTreatment.includes("mask-image:radial-gradient(")
-  && heroEdgeTreatment.includes("width:clamp(258px,70vw,286px)!important")
+  && heroEdgeTreatment.includes("width:clamp(244px,67vw,270px)!important")
   && heroEdgeTreatment.includes("max-height:none!important"),
   "The derived Hero shoes must remain enlarged while alpha edges blend into the page and original RGB stays unchanged.");
 assert.ok(heroEdgeTreatment.includes("@media(min-width:761px) and (max-width:1000px)")
@@ -96,7 +96,7 @@ assert.ok(canonicalMobile.includes("grid-template-columns:minmax(0,58fr) minmax(
   && canonicalMobile.includes("height:clamp(216px,57vw,230px)!important;")
   && canonicalMobile.includes("position:absolute!important;top:0!important;right:0!important;")
   && canonicalMobile.includes("object-fit:contain!important;object-position:center center!important;")
-  && canonicalMobile.includes("top:-55px!important;left:-43px!important;"),
+  && canonicalMobile.includes("top:-55px!important;left:-30px!important;"),
   "Mobile Hero shoes must float beside, not beneath, the editorial copy.");
 
 const liveCapture = readFileSync(new URL("../scripts/capture-cloudflare-preview.mjs", import.meta.url), "utf8");

@@ -133,7 +133,7 @@ assert.ok(html.includes('/* Hero uses the original owner-supplied RGBA PNG; pres
   && mobileHeroReferenceMatch.includes('grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;')
   && mobileHeroReferenceMatch.includes('height:clamp(216px,57vw,230px)!important;')
   && mobileHeroReferenceMatch.includes('grid-template-rows:1fr!important;')
-  && mobileHeroReferenceMatch.includes('top:-55px!important;left:-43px!important;')
+  && mobileHeroReferenceMatch.includes('top:-55px!important;left:-30px!important;')
   && mobileHeroReferenceMatch.includes('object-fit:contain!important;object-position:center center!important;')
   && mobileHeroReferenceMatch.includes('opacity:1!important;mix-blend-mode:normal!important;'),
   "Hero reference layout must not expand transparent PNG padding or stack the shoes below the copy.");
