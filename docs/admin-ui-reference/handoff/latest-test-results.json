@@ -521,7 +521,8 @@
     "codeTestSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
     "note": "This synchronization changes only handoff/audit documents. The new documentation commit is not a new application-source/test SHA; next chat must refresh live refs.",
     "entryPoint": "docs/admin-ui-reference/handoff/START-HERE.md",
-    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
+    "nextChatPrompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+    "nextRequiredAction": "Refresh live refs after this docs-only sync, inspect artifact #486 if available, and continue parallel independent audits; only fix reproduced defects test-first."
   },
   "latestProductSourceCommit": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
   "latestDiagnosticArtifact": {
@@ -608,7 +609,14 @@
   },
   "currentHeadAtCheckpoint": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
   "latestActionsRunUrl": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046825046",
-  "latestReviewFinding": "Live source audit at HEAD ea3942fe0ab106640b1d041e50bf5b3bb153d2fb reviewed Backup/Restore, warranty paths, and payment request/ledger handlers without calling endpoints or changing real data. No new reproducible product-code defect was found in these areas. Current handoff correction removes stale instructions to manually dispatch Preview when the UI has no control and the connected tools have no dispatch action.",
+  "latestReviewFinding": {
+    "status": "SETTLED_QR_RECEIPT_GUARD_VERIFIED_ON_EXACT_SHA",
+    "sourceTestSha": "ae0102f5caa773c5b4b92c4fd86eb6508759e3c0",
+    "validateRunId": 40046825040,
+    "previewRunId": 40046825046,
+    "artifactId": 12541717769,
+    "summary": "Test-first regression reproduced HTTP 201 for a receipt linked to an already-settled QR request. Source rejects non-pending linked requests before writes and rechecks pending status atomically. Validate #5525 and Preview #486 pass on the same SHA."
+  },
   "previewRuntimeCheckpoint": {
     "status": "USER_CONFIRMED_PRODUCTS_VISIBLE",
     "previewUrl": "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/",
