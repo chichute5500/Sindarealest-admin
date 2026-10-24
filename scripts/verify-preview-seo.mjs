@@ -24,10 +24,10 @@ export function assessPreviewSeoResponse(path, response, body = "", expectedOrig
   }
 
   if (path === "/") {
-    if (response.status !== 200 || !/text\\/html/i.test(contentType)) {
+    if (response.status !== 200 || !/text\/html/i.test(contentType)) {
       return { ...common, result: "UNEXPECTED_ROOT_RESPONSE", note: "Preview root did not return HTML 200." };
     }
-    if (!/\\bnoindex\\b/i.test(robotsTag)) {
+    if (!/\bnoindex\b/i.test(robotsTag)) {
       return { ...common, result: "MISSING_NOINDEX", note: "Preview root response lacks an observable X-Robots-Tag noindex directive." };
     }
     if (expectedOrigin) {
