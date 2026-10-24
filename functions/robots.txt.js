@@ -1,4 +1,14 @@
 export async function onRequestGet({ request }) {
-  const origin = new URL(request.url).origin;
-  return new Response(`User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nSitemap: ${origin}/sitemap.xml\n`, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=3600", "X-Content-Type-Options": "nosniff" } });
+  const url = new URL(request.url);
+  const previewHost = url.hostname.endsWith(".sindarealest2.pages.dev")
+    && url.hostname !== "sindarealest2.pages.dev";
+  const headers = {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Cache-Control": "public, max-age=3600",
+    "X-Content-Type-Options": "nosniff",
+  };
+  if (previewHost) {
+    return new Response("User-agent: *\nDisallow: /\n", { headers });
+  }
+  return new Response("User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nSitemap: " + url.origin + "/sitemap.xml\n", { headers });
 }
