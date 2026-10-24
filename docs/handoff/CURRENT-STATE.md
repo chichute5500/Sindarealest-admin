@@ -1,3 +1,19 @@
+## LATEST VERIFIED UPDATE — PREVIEW SEO + CANONICAL METADATA HTTP CHECK — 2026-10-24
+
+- Exact source/test SHA: `8a4cc6066436f040e7900709e8dd2047ab7ab579`. Validate PASS (npm audit, integrity, full automated tests): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815. Preview deploy PASS with authenticated post-deploy HTTP diagnostic: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918. Immutable Preview: https://837f73ba.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Diagnostic `scripts/verify-preview-seo.mjs` now verifies the root response has `X-Robots-Tag: noindex` and that canonical, `og:url`, `og:image`, and `twitter:image` all use the actual Preview origin. `tests/preview-seo-smoke.test.mjs` covers correct metadata and mismatched origin.
+- Authenticated live HTTP diagnostic PASS on the deployed branch alias:
+  - `/`: HTTP 200, HTML, `X-Robots-Tag: noindex`; canonical and social image URLs match Preview origin.
+  - `/robots.txt`: HTTP 200, `User-agent: *\nDisallow: /\n`, no sitemap advertised.
+  - `/sitemap.xml`: HTTP 404, `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store`.
+- Diagnostic uses paired Cloudflare Access service-token secrets, restricts requests to the approved non-production Preview hostname and exact paths, and does not log credentials or response bodies. Direct unauthenticated requests are redirected to Access login; authenticated workflow evidence verifies the app responses.
+- One intermediate commit `3ae0d98b` failed validation due to incorrectly escaped regexes; deployment was stopped before deploy. Fixed in `8a4cc606`; exact-SHA Validate and Preview deployment plus post-deploy diagnostic all PASS.
+- Preview sitemap guard remains covered for regular/dotted Preview hostnames; exact primary Pages hostname and custom domains remain allowed.
+- Visual workflow remains SKIPPED by Hero guard; no browser/device visual acceptance is claimed.
+- PR #108 OPEN/unmerged, base `main`; Production/main untouched. Hero, SKU verification and fullscreen gallery flicker remain paused; accepted sections remain locked.
+
+---
+
 ## LATEST VERIFIED UPDATE — ACCESS-AUTHENTICATED PREVIEW SEO DIAGNOSTIC — 2026-10-24
 
 - Exact source/test SHA: `79cca22640d31189001410595245e1d1b809734a`. Validate PASS (npm audit, integrity, full automated tests): https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052741328. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052741331. Immutable Preview: https://837f73ba.sindarealest2.pages.dev/ ; branch alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.

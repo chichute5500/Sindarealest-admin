@@ -1,3 +1,14 @@
+## LATEST TASK RESULT — VERIFY PREVIEW CANONICAL/SOCIAL METADATA LIVE — 2026-10-24
+
+- Extended the read-only post-deploy diagnostic to verify that root response metadata uses the actual deployed Preview origin: canonical link, Open Graph URL, Open Graph image, and Twitter image. This catches accidental cross-origin/production canonical metadata without logging the HTML body.
+- Regression test covers correct Preview metadata and a mismatched origin. The diagnostic also checks root noindex header, Preview robots crawl-block response, and Preview sitemap suppression.
+- Exact SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579`: Validate PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815; Preview deploy PASS https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918; Preview https://837f73ba.sindarealest2.pages.dev/.
+- Authenticated live HTTP diagnostic PASS: root 200 + noindex + origin-correct canonical/social URLs; robots 200 + Disallow all; sitemap 404 + noindex/nofollow/no-store.
+- Intermediate commit `3ae0d98b` had malformed regex escaping and was stopped before deployment; corrected in `8a4cc606`, all exact-SHA gates now green.
+- PR #108 OPEN/unmerged, no Production/main changes. Hero, SKU verification, gallery flicker remain paused; accepted areas locked.
+
+---
+
 ## LATEST TASK RESULT — VERIFY LIVE PREVIEW SEO RESPONSES THROUGH ACCESS — 2026-10-24
 
 - Added a read-only post-deploy diagnostic using the existing Cloudflare Access service-token helper. It only requests the project Preview root, `/robots.txt`, and `/sitemap.xml`; no Access settings or middleware are modified.

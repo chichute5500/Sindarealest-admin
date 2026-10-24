@@ -1,3 +1,22 @@
+## EXACT-SHA RESULT — PREVIEW SEO + CANONICAL METADATA DIAGNOSTIC — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| npm audit, integrity, full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984815 |
+| Preview deploy | PASS on `8a4cc6066436f040e7900709e8dd2047ab7ab579` | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40052984918 |
+| Authenticated live HTTP diagnostic | PASS, all three endpoints | Same deploy workflow log |
+| Root `/` | HTTP 200; `X-Robots-Tag: noindex`; canonical, OG URL/image and Twitter image use Preview origin | Access service-token request |
+| `/robots.txt` | HTTP 200; `Disallow: /`; no sitemap | Access service-token request |
+| `/sitemap.xml` | HTTP 404; `X-Robots-Tag: noindex, nofollow`; `Cache-Control: no-store` | Access service-token request |
+| Visual workflow | SKIPPED | Hero guard |
+| Browser/device visual acceptance | NOT CLAIMED | HTTP diagnostic does not replace visual acceptance |
+
+- Diagnostic source: `scripts/verify-preview-seo.mjs`; unit regression: `tests/preview-seo-smoke.test.mjs`; workflow integration: `.github/workflows/deploy-storefront-preview.yml`.
+- Intermediate commit `3ae0d98b` failed syntax validation due to regex escaping; deploy was blocked. Corrected commit `8a4cc606` has green exact-SHA validation, deploy, and diagnostic.
+- PR #108 OPEN/unmerged; Production/main untouched.
+
+---
+
 ## EXACT-SHA RESULT — AUTHENTICATED PREVIEW SEO RESPONSE CHECK — 2026-10-24
 
 | Gate | Result | Evidence |

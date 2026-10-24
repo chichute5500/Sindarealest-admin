@@ -1,3 +1,13 @@
+## DECISION UPDATE — PREVIEW SEO RESPONSE + CANONICAL METADATA VERIFIED — 2026-10-24
+
+- Keep the non-blocking post-deploy authenticated HTTP diagnostic. It must verify root `X-Robots-Tag: noindex`, canonical link, `og:url`, `og:image`, `twitter:image` origin; Preview `robots.txt` crawl-block response; and Preview sitemap 404/noindex/no-store response.
+- Diagnostic target is restricted to the project's non-production `*.sindarealest2.pages.dev` hostname and exact paths `/`, `/robots.txt`, `/sitemap.xml`. It uses paired Access service-token secrets only for same-origin requests and never logs credentials or response bodies.
+- Exact source/test SHA `8a4cc6066436f040e7900709e8dd2047ab7ab579` passed Validate, Preview deploy, and authenticated response diagnostic. Root noindex/canonical issue is verified; no middleware, Access, infrastructure, or Production change was needed.
+- A previous diagnostic commit failed on regex escaping and was not deployed; the corrected exact SHA above is green.
+- PR #108 OPEN/unmerged, base main; no Production/main edits. Hero, SKU verification, fullscreen gallery flicker remain paused; accepted scopes locked.
+
+---
+
 ## DECISION UPDATE — PREVIEW ROOT NOINDEX VERIFIED VIA ACCESS SERVICE TOKEN — 2026-10-24
 
 - Do not modify `functions/_middleware.js`, shared response headers, Cloudflare Access policy, or infrastructure to solve the Preview root noindex question unless new evidence shows a regression. A read-only authenticated diagnostic verified the actual response already includes `X-Robots-Tag: noindex`.
