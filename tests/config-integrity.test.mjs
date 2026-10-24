@@ -46,6 +46,14 @@ assert.ok(isolatedAdminDeployWorkflow.includes('npx wrangler pages deploy public
   'The isolated workflow must deploy only the approved public ADMIN build to the isolated Pages project.');
 assert.ok(!isolatedAdminDeployWorkflow.includes('CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}'),
   'The isolated workflow must not inherit the shared Pages project variable.');
+const isolatedPreviewSpecPath = 'tests/e2e/admin-isolated-preview.spec.js';
+assert.ok(existsSync(isolatedPreviewSpecPath),
+  'The isolated Admin E2E spec must use a distinct path from main\'s shared Admin Preview spec.');
+assert.ok(!existsSync('tests/e2e/admin-preview.spec.js'),
+  'The feature branch must not shadow main\'s tests/e2e/admin-preview.spec.js.');
+const isolatedPreviewSpec = readFileSync(isolatedPreviewSpecPath, 'utf8');
+assert.ok(isolatedPreviewSpec.includes('sindarealest-admin-preview.pages.dev'),
+  'The isolated Admin E2E spec must remain pinned to the isolated Preview host.');
 const deployReadme = readFileSync('README-DEPLOY.txt', 'utf8');
 assert.ok(deployReadme.includes('migrations/0004_admin_notifications.sql') && deployReadme.includes('migrations/0005_address_warranty_verification.sql') && deployReadme.includes('migrations/0006_remove_warranty_otp.sql') && deployReadme.includes('migrations/0007_order_contact_details.sql') && deployReadme.includes('migrations/0008_product_sku_verification.sql'), 'Deployment guide must match current migration sequence');
 assert.ok(!/TWILIO_ACCOUNT_SID|TWILIO_AUTH_TOKEN|TWILIO_FROM_NUMBER/.test(deployReadme), 'Deployment guide must not require obsolete SMS credentials');

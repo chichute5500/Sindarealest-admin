@@ -56,7 +56,7 @@ assert.ok(previewWorkflow.includes("uses: actions/upload-artifact@v7"),
   "Full ADMIN Playwright screenshots must remain available as a run artifact using a Node.js 24-compatible action");
 assert.ok(previewWorkflow.includes('group: admin-preview-diagnostics-${{ github.ref }}-${{ github.sha }}'),
   "A hung Preview run for an older SHA must not block evidence for the current Admin branch head");
-const adminFeatureDeployWorkflow = read("../.github/workflows/deploy-admin-feature-preview.yml");
+const adminFeatureDeployWorkflow = read("../.github/workflows/deploy-admin-isolated-preview.yml");
 assert.ok(adminFeatureDeployWorkflow.includes("CLOUDFLARE_PAGES_PROJECT: sindarealest-admin-preview"),
   "Manual ADMIN feature deployments must be pinned to the dedicated Admin Pages project");
 assert.ok(!adminFeatureDeployWorkflow.includes("vars.CLOUDFLARE_PAGES_PROJECT"),
