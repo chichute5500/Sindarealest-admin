@@ -1155,3 +1155,19 @@ Exact runtime/test/Preview SHA: `5134981e0c670212c030486e6b14bffa1e790adc`.
 
 The screenshot self-review found no overlapping copy/shoe pixels, and the 390px shoe alpha bounds were x=200.3–376.9 while the mobile Hero height was 222.3px. The Hero browser audit reports no hard failures in ten contexts. This is **AUTOMATED PASS + SELF-REVIEW**, not owner visual acceptance. The user explicitly does not accept generic CI-green summaries as visual signoff; only the user may mark Hero OWNER PASS/LOCKED after viewing this source SHA. PR #108 stays OPEN/unmerged, base main, Production untouched. Separate owner-only PR-scope/D1-proof/SKU flag blockers remain.
 
+---
+
+## HERO PHYSICAL CONTACT PASS — 2026-10-24 — STILL OWNER-UNACCEPTED
+
+The owner subsequently rejected the remaining suspended-loafer look after the mobile side-by-side design was repaired. We examined the actual 390px light screenshot and zoomed the shoe soles instead of relying on green CI alone. Contact gap root cause: the shoe silhouette, especially the upright loafer, remained several rendered pixels above the bright marble upper face; a 12px/16px wide drop-shadow made the pair appear airborne. The 1200×1600 RGBA owner-source pixels stay intact. **Changes are only inside the final mobile Hero CSS** (plus adjacent Hero-only regression tests): move shoes down 13px total (`top:-55px` → `-42px`), replace the airy filter with two restrained near-ground shadows, and repurpose the existing `.hero-visual-glow` element into two independent soft contact regions at 40% and 79%, correctly layered z=1 over the oval z=0 and under the original PNG z=2. No image masking, recoloring or pixels changed. The broad oval marble top and front face retain their dimensions and finish; layout/copy/CTA/tablet/desktop are not redesigned.
+
+The actual final mobile 360/390 screenshot was downloaded from exact-SHA Hero audit and manually inspected, including an enlarged sole/platform crop: the horizontal shoe now visually rests on the oval; the upright shoe has its own contact shadow and is closer to the stone. The original reference remains authoritative: this is a materially improved CSS approximation, not a claim of pixel-identical marble/physical-device approval.
+
+Runtime/Preview source SHA: `6b446660772b1899c44c523d21535c65cc3b7eb5`. Technical preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Preview branch deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326543 — PASS.
+- Hero-only browser audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326481 — PASS at 360×800, 390×844, 768×1024, 1280×800 and 1440×900 in both light/dark; 10 screenshots: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326481/artifacts/12567970257.
+- Fullscreen Gallery read-only regression https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326500 — PASS; gallery remains OWNER-ACCEPTED/LOCKED.
+- Validate https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326498 — *check live conclusion before claiming PASS*; in progress at handoff preparation, while the deploy job's own predeployment integrity/tests and exact-SHA Preview deploy have completed successfully.
+
+**Status: automated technical PASS; owner visual acceptance PENDING.** Never re-open or edit the OWNER PASS/LOCKED Gallery, catalog, navigation, #order or backend; PR #108 remains OPEN/unmerged, base main; no Production. Project 100% still blocked on owner signoff and separately recorded PR/D1/SKU authorization.
+

@@ -1159,3 +1159,18 @@ Exact runtime/test/Preview SHA: `5134981e0c670212c030486e6b14bffa1e790adc`.
 - Fullscreen Gallery was only re-audited because the same shared HTML path triggered that existing workflow; it passed and remains owner accepted/locked.
 - Owner visual acceptance is outstanding; do not assert pixel-identical parity or project 100% completion based only on tests.
 
+---
+
+## HERO PHYSICAL CONTACT PASS — 2026-10-24 — STILL OWNER-UNACCEPTED
+
+Runtime/Preview source SHA: `6b446660772b1899c44c523d21535c65cc3b7eb5`. Technical preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Preview branch deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326543 — PASS.
+- Hero-only browser audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326481 — PASS at 360×800, 390×844, 768×1024, 1280×800 and 1440×900 in both light/dark; 10 screenshots: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326481/artifacts/12567970257.
+- Fullscreen Gallery read-only regression https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326500 — PASS; gallery remains OWNER-ACCEPTED/LOCKED.
+- Validate https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326498 — *check live conclusion before claiming PASS*; in progress at handoff preparation, while the deploy job's own predeployment integrity/tests and exact-SHA Preview deploy have completed successfully.
+
+- Exact 10-context audit JSON: `passed:true`, `hardFailures:[]`. At 390px light the computed CSS PNG filter was `drop-shadow(rgba(14, 30, 42, 0.1) 0px 5px 5px) drop-shadow(rgba(8, 19, 29, 0.16) 0px 2px 2px)`; contact-shadow DOM `display:block`, `z-index:1`, width 226px. The product mask visible lower edge was y=260.0 CSS px, upper oval starts y=236.3 CSS px, with a 28px deep oval. Browser assertions verify no overlapping text, original PNG alpha, no viewport horizontal clipping, platform visibility and exact computed contact shadows.
+- Opened mobile screenshots (light/dark) and a magnified sole/platform crop to check appearance. This improves contact materially; it does **not** substitute for the owner viewing on the actual physical handset.
+- Validate source + tests run may still be in progress at write; verify actual completed conclusion before any PASS statement.
+- Gallery-only audit was triggered automatically by shared HTML source and succeeded without modifying the previously owner-locked Gallery.
+

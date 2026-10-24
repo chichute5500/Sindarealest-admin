@@ -948,3 +948,17 @@ Exact runtime/test/Preview SHA: `5134981e0c670212c030486e6b14bffa1e790adc`.
 - **Hero owner approval STILL OPEN.** Older mobile screenshot rejected; latest mobile screenshot is visually much closer to owner's target but not a pixel-identical guarantee. Do not reintroduce a vertically stacked Hero, large alpha-padding frame, or duplicate CSS blocks.
 - Preserve all previously owner-accepted storefront sections, Gallery especially. PR #108 remains OPEN/unmerged; no main/Production deployment. Existing unrelated signoff blockers remain separate.
 
+---
+
+## HERO PHYSICAL CONTACT PASS — 2026-10-24 — STILL OWNER-UNACCEPTED
+
+- Hero screenshot previously visually rejected due to floating shoes. Latest source `6b446660772b1899c44c523d21535c65cc3b7eb5` moves the original image lower, reduces airy image shadow and adds two independent contact shadows inside the existing Hero visual node.
+- Manually inspected audit screenshots at 360px and 390px plus a 4× sole/marble crop; horizontal shoe rests on oval and upright shoe is better grounded. **Owner acceptance still required**, never label the mobile Hero LOCKED/PASS by owner solely from CI.
+Runtime/Preview source SHA: `6b446660772b1899c44c523d21535c65cc3b7eb5`. Technical preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/.
+- Preview branch deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326543 — PASS.
+- Hero-only browser audit https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326481 — PASS at 360×800, 390×844, 768×1024, 1280×800 and 1440×900 in both light/dark; 10 screenshots: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326481/artifacts/12567970257.
+- Fullscreen Gallery read-only regression https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326500 — PASS; gallery remains OWNER-ACCEPTED/LOCKED.
+- Validate https://github.com/chichute5500/Sindarealest-admin/actions/runs/40113326498 — *check live conclusion before claiming PASS*; in progress at handoff preparation, while the deploy job's own predeployment integrity/tests and exact-SHA Preview deploy have completed successfully.
+
+- No changes to gallery, data, Admin/backend/API, D1/R2/migrations, main or Production. PR #108 OPEN/unmerged. Other project blockers remain outstanding.
+
