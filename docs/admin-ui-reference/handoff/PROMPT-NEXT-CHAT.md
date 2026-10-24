@@ -2,11 +2,11 @@
 
 Continue directly on GitHub repository `chichute5500/Sindarealest-admin`. Do not ask the user to repeat context. Verify live state first and continue useful work after reporting.
 
-## Live checkpoint — 2026-10-24 09:41 UTC
+## Live checkpoint — 2026-10-24 10:00 UTC
 
-- Writable branch: `feature/admin-isolated-handoff-2026-10-20`; fetch live PR metadata and HEAD before further action.
+- Writable branch: `feature/admin-isolated-handoff-2026-10-20`; refresh live PR metadata/HEAD after this handoff-only commit.
 - PR #111 is OPEN/unmerged; do not merge, rebase, cherry-pick, or force-push.
-- Application/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
+- Branch HEAD at refresh start: `e7d974c87af1889ccceae459beeb08d45d7da6ec` (docs/source history may advance with this handoff sync). Application/source-test SHA: `cf340b686e0974ac5602b6ef4594c00e477c8932`.
 - Validate #5688 PASS on that exact SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
 - Admin Preview Playwright #1077 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
 - Handoff metadata was repaired after Validate #5721 found missing `handoffSync.entryPoint` / `handoffSync.nextChatPrompt`. Validate #5733 and Admin Preview Playwright #1097 both PASS on docs-only SHA `5f7a9d94858a02faaea003e2a9ea6386d507121f`.
@@ -32,6 +32,12 @@ Continue directly on GitHub repository `chichute5500/Sindarealest-admin`. Do not
 - Remote Preview D1 schema/ledger: **NOT_VERIFIED**.
 - Production: **NOT_PERFORMED**.
 - Historical read-only diagnostics and synthetic fixture screenshots must not be attributed to current HEAD unless exact-SHA evidence supports it.
+
+## Latest verified CI — 2026-10-24 10:00 UTC
+
+- Validate #5688 PASS on exact application/source-test SHA `cf340b686e0974ac5602b6ef4594c00e477c8932`: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623892
+- Admin Preview Playwright #1077 PASS on the same SHA: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40081623888
+- Validate #5733 and Admin Preview Playwright #1097 PASS on docs-only SHA `5f7a9d94858a02faaea003e2a9ea6386d507121f`; this validates handoff integrity fields, not business acceptance.
 
 ## Next actions — continue without asking the user
 
