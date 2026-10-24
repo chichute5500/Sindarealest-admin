@@ -116,6 +116,12 @@ has('data-order-status="${esc(o.id)}" aria-label="Trạng thái đơn hàng ${es
 has('Đã thanh toán (đã xác minh)', 'payment status must be presented as a ledger-derived, read-only label');
 has('data-action="record-payment"', 'admin must have an explicit manual verification action for real bank receipts');
 assert.doesNotMatch(adminHtml, /data-payment-status=/, 'payment status must not be directly editable in the order UI');
+
+assert.match(adminHtml, /data-order-detail-status=\"\$\{id\}\"/, 'Order detail must expose the order-status control shown in the approved Screen 7 reference');
+assert.match(adminHtml, /data-action=\"save-order-detail-status\"/, 'Order detail must provide a direct update action instead of requiring navigation back to the orders list');
+assert.match(adminHtml, /main\.querySelectorAll\('\[data-action=save-order-detail-status\]'\)/, 'The dedicated order-detail update action must be wired to the existing Admin orders PATCH API');
+assert.match(adminHtml, /order-detail-status-grid/, 'Order detail status and read-only payment state must be grouped in a compact responsive section');
+
 has('data-action="save-order" data-id="${esc(o.id)}" aria-label="Lưu đơn hàng ${esc(o.order_number)}"', 'accessible per-order save action');
 has('data-claim-status="${esc(c.id)}" aria-label="Trạng thái yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim status');
 has('data-claim-note="${esc(c.id)}" aria-label="Ghi chú quản trị cho yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty admin note');
