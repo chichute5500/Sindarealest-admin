@@ -1,3 +1,23 @@
+## EXACT-SHA VALIDATION — ROBOTS TRAILING-DOT GUARD + DEPENDENCY AUDIT — 2026-10-24
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Focused robots regression | PASS in full test chain | Added terminal-dot Preview host case; run log prints `PASS: robots.txt blocks Preview hostnames, including terminal-dot variants, while retaining production crawl rules.` |
+| npm audit | PASS | Included in Validate run `40047154504` on SHA `75556d97f1a2e92882ec2a6ee3c9df55f5e3bedd` |
+| Project integrity | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154504 |
+| Full automated tests | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154504 |
+| Cloudflare Pages Preview deploy | PASS | https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154500 |
+| Immutable Preview URL | Deployed | https://91080d1e.sindarealest2.pages.dev/ |
+| Visual workflow | SKIPPED | Existing Hero guard; do not bypass |
+| External live HTTP check | NOT VERIFIED | Runtime requests could not resolve Preview hostnames from this environment |
+| Browser/device and owner acceptance | NOT CLAIMED | CI/deploy are not visual acceptance |
+
+- Source/test SHA: `75556d97f1a2e92882ec2a6ee3c9df55f5e3bedd`.
+- Dependency audit fix: commit `ce7631c8acf97edefbffae073dadb30d3528f992` adds `overrides.undici = 7.30.1`; the Validate audit/integrity/tests and Preview deploy succeeded at that exact SHA too.
+- PR #108 remains OPEN/unmerged, base `main`; no Production deployment. All paused/locked scopes remain unchanged.
+
+---
+
 ## EXACT-SHA TEST + DEPLOY RESULT — PREVIEW ROBOTS CRAWL GUARD — 2026-10-24
 
 | Gate | Result | Evidence |

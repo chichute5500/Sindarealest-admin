@@ -1,3 +1,15 @@
+## LATEST TASK RESULT — PREVIEW ROBOTS TERMINAL-DOT BYPASS — 2026-10-24
+
+- Found and fixed an edge case in the unlocked `robots.txt` crawl guard: `new URL(...).hostname` preserves one terminal DNS dot, so a Preview hostname with that spelling bypassed the suffix match.
+- `functions/robots.txt.js` now strips one final dot for the host classification only. The response rules for the primary Pages host and custom domains remain unchanged.
+- Regression added in `tests/robots-txt.test.mjs`: regular Preview and terminal-dot Preview both return `User-agent: *\nDisallow: /\n`; primary hostname and custom-domain prior rules remain covered.
+- Exact source/test SHA: `75556d97f1a2e92882ec2a6ee3c9df55f5e3bedd`. Validate PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154504. Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154500. Immutable Preview: https://91080d1e.sindarealest2.pages.dev/.
+- Dependency audit blocker also fixed in prior commit `ce7631c8acf97edefbffae073dadb30d3528f992` via `overrides.undici = 7.30.1`, without a Wrangler downgrade or audit bypass; Validate and Preview deploy passed on that SHA. The terminal-dot SHA passes those gates again.
+- A network attempt from the tool environment could not resolve the Preview hostname, so live HTTP behavior remains unverified. Visual workflow skipped by Hero guard; no owner visual acceptance claim.
+- PR #108 remains OPEN/unmerged, base `main`; Production untouched. Keep SKU, gallery flicker and Hero paused; keep all owner-accepted areas PASS/LOCKED.
+
+---
+
 ## LATEST TASK RESULT — PREVIEW ROBOTS CRAWL GUARD — 2026-10-24
 
 - Fixed the confirmed unlocked SEO defect in `functions/robots.txt.js`: all non-primary `*.sindarealest2.pages.dev` Preview hostnames are now disallowed from crawling; the primary Pages hostname and custom domains keep prior crawl rules.

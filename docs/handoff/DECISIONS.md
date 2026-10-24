@@ -1,3 +1,13 @@
+## DECISION — ROBOTS PREVIEW HOST NORMALIZATION + AUDIT REMEDIATION — 2026-10-24
+
+- Preview crawl guard compares a hostname after removing one terminal DNS dot, preventing a FQDN spelling from bypassing the `.sindarealest2.pages.dev` suffix check. The production Pages hostname and custom-domain rules remain unchanged.
+- Keep `undici` override pinned at `7.30.1` under the current Wrangler `4.149.0` dependency rather than accepting npm's suggested breaking Wrangler downgrade to `4.35.0`. Exact-SHA Validate workflow now passes the high-severity audit, integrity checks and full tests.
+- `robots.txt` is a crawl directive, not guaranteed de-indexing or an `X-Robots-Tag: noindex` response. Do not claim guaranteed search-result removal; a stronger noindex/access-control change requires separate scoped authorization.
+- No direct external HTTP check succeeded from the current environment; do not infer live endpoint behavior from CI alone.
+- PR #108 remains OPEN/unmerged; no Production or `main` changes. Hero, SKU verification and fullscreen gallery flicker remain paused; owner-accepted areas remain locked.
+
+---
+
 ## DECISION UPDATE — PREVIEW CRAWL POLICY — 2026-10-24
 
 - Non-production branch/hash deployments under `*.sindarealest2.pages.dev` must not expose `Allow: /` or advertise a sitemap. Return `User-agent: *\nDisallow: /\n` for these preview hosts.

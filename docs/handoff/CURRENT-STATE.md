@@ -1,3 +1,15 @@
+## LATEST VERIFIED UPDATE — PREVIEW ROBOTS TRAILING-DOT GUARD + DEPENDENCY AUDIT — 2026-10-24
+
+- Exact storefront source/test commit: `75556d97f1a2e92882ec2a6ee3c9df55f5e3bedd`; CI validation PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154504; Preview deploy PASS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40047154500; immutable Preview: https://91080d1e.sindarealest2.pages.dev/.
+- A source-level edge case was fixed in `functions/robots.txt.js`: WHATWG `URL.hostname` preserves a terminal DNS dot, so the old `.endsWith(".sindarealest2.pages.dev")` check did not classify `fix-liquid-glass-audit-2026.sindarealest2.pages.dev.` as Preview. The host check now strips one terminal dot before classification. `tests/robots-txt.test.mjs` covers normal and terminal-dot Preview hostnames, plus existing primary-host/custom-domain behavior.
+- The dependency-audit failure was also resolved without downgrading Wrangler: commit `ce7631c8acf97edefbffae073dadb30d3528f992` pins the transitive `undici` override to `7.30.1`; exact-SHA audit, integrity, tests and Preview deployment passed on that commit (Validate: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046976588; Preview deploy: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40046976627). Commit `75556d97` retains that override and passes again.
+- Runtime limitations: direct requests from this environment to both dotted and normal Preview hostnames failed at DNS resolution, so there is no independent live HTTP verification. CI confirms source/tests and deploy, not endpoint response from an external browser/device.
+- Liquid Glass visual workflow remains SKIPPED by the Hero guard. No visual/device acceptance is claimed.
+- PR #108 remains OPEN/unmerged, base `main`; no Production deployment or `main` edit.
+- Locks unchanged: SKU verification PAUSED; fullscreen gallery flicker PAUSED / NOT ACCEPTED; Hero PAUSED BY OWNER; owner-accepted sections PASS/LOCKED. Do not reopen them. Continue source-first review only in authorized unlocked scope; report, then continue automatically.
+
+---
+
 ## LATEST VERIFIED UPDATE — PREVIEW ROBOTS CRAWL GUARD — 2026-10-24
 
 - Live source/test commit: `e70246eb05f7e864b21a4ff94c7c321bc9917b9f`; branch `fix/liquid-glass-audit-2026-10-19`; PR #108 remains OPEN/unmerged, base `main`. No Production deployment or `main` change.
