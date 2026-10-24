@@ -517,7 +517,7 @@ assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr
   "Mobile reference must use a short horizontal layout and undistorted transparent product asset.");
 assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
   && mobileHeroReferenceMatch.includes("bottom:35px!important;")
-  && mobileHeroReferenceMatch.includes("height:31px!important;")
+  && mobileHeroReferenceMatch.includes("height:36px!important;")
   && mobileHeroReferenceMatch.includes("bottom:-4px!important;")
   && mobileHeroReferenceMatch.includes("height:38px!important;"),
   "Mobile pedestal top/front must form a compact marble display below the shoe soles.");
@@ -562,7 +562,7 @@ assert.ok(sharedHeroStyles.includes("position:absolute!important;top:-107px!impo
   && sharedHeroStyles.includes(".featured-grid,.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;"),
   "Desktop product must fit below the header; touch-requested desktop view must expose menu and larger two-column product cards.");
 
-assert.ok(sharedHeroStyles.includes("width:78%!important;max-width:505px!important;height:52px!important;")
+assert.ok(sharedHeroStyles.includes("width:78%!important;max-width:505px!important;height:60px!important;")
   && sharedHeroStyles.includes("width:76%!important;max-width:493px!important;height:52px!important;")
   && sharedHeroStyles.includes("left:43%!important;bottom:35px!important;")
   && sharedHeroStyles.includes("#home .hero-visual::before{left:50%!important;")
@@ -579,6 +579,6 @@ assert.ok(sharedHeroStyles.includes("linear-gradient(to bottom,#000 0%,#000 32%,
 
 assert.ok(mobileHeroReferenceMatch.includes("max-width:218px!important;height:31px!important;min-height:0!important;")
   && sharedHeroStyles.includes("max-width:480px!important;height:44px!important;")
-  && sharedHeroStyles.includes("max-width:475px!important;height:49px!important;bottom:24px!important")
+  && sharedHeroStyles.includes("max-width:475px!important;height:56px!important;bottom:24px!important")
   && sharedHeroStyles.includes("max-width:448px!important;height:39px!important;bottom:38px!important"),
   "Across phone/tablet/PC the rear shoe must rest above the rear edge of a deeper oval, with a real contact field rather than a detached hover shadow.");
