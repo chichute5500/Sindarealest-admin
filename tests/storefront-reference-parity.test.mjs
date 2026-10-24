@@ -187,7 +187,7 @@ assert.ok(heroSync.includes("target.dataset.productImageStatus='owner-presentati
   && heroSync.includes("target.hidden=false")
   && heroSync.includes("target.src='/images/hero-upload/tb_image_share_1792519964514-blended.png'"),
   'The owner-authorized Hero experiment must load the standalone presentation PNG without depending on catalog SKU data.');
-assert.doesNotMatch(heroSync, /products\\.find\\(p=>String\\(p\\?\\.sku/,
+assert.doesNotMatch(heroSync, /products\.find\(p=>String\(p\?\.sku/,
   'The homepage Hero presentation image must not be gated by or misrepresented as a catalog SKU record.');
 assert.ok(heroSync.includes("target.onerror=()=>{target.hidden=true;target.dataset.productImageStatus='presentation-image-load-failed'}"),
   'A missing presentation asset must fail closed without leaving an empty Hero image frame.');
