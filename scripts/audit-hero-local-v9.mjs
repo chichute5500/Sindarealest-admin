@@ -102,7 +102,7 @@ try{
   // QA-ONLY PARAMETER SWEEP: real screenshots of temporary CSS offsets in a browser test.
   // No production CSS mutation, no image compositing and no reference image in deployed assets.
   // Used to choose measured marble geometry before modifying the actual single authority CSS.
-  if(name==='pc-1440'&&theme==='light'){
+  if(name==='pc-1440'&&theme==='light'&&process.env.HERO_GEOMETRY_SWEEP==='1'){
    const stage=page.locator('#home .hero-pedestal-art');
    const variants=[
     ...[-38,-34,-30,-26,-22,-18,-14,-10,-6].map(x=>({bottom:x,left:53,height:null})),
