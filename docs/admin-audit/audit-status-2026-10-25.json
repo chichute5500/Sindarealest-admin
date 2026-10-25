@@ -20,7 +20,7 @@
   "visualParityTotal": 12,
   "ownerAcceptance": "NOT_GRANTED",
   "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge.",
-  "latestVerifiedCodeAndTestSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+  "latestVerifiedCodeAndTestSha": "27a145253c71bc887b536611e9fece3ddd51779d",
   "latestChanges": [
     {
       "sha": "d6da905c4ce53cbf0a84e426943927c978767923",
@@ -51,6 +51,18 @@
       "finding": "Backup Restore accepted payment ledger where refunded aggregate exceeds received aggregate for the same order",
       "resolution": "Validate net ledger per order before constructing destructive batch",
       "test": "tests/restore-safety.test.mjs"
+    },
+    {
+      "sha": "30b193a640dd6bad826265bf3b982b05558616cc",
+      "finding": "Payment POST coerced non-numeric JSON input into financial amounts",
+      "resolution": "Only JSON numbers accepted; tests reject boolean/array/string before D1",
+      "test": "tests/payment-ledger-route.test.mjs"
+    },
+    {
+      "sha": "27a145253c71bc887b536611e9fece3ddd51779d",
+      "finding": "Warranty issuance coerced array/object/boolean values into durations",
+      "resolution": "Strict number or decimal-only string validation for real FormData compatibility",
+      "test": "tests/warranty-issuance-race.test.mjs"
     }
   ],
   "qaEvidence": {
@@ -108,19 +120,18 @@
   ],
   "overallStatus": "NOT_100_PERCENT_ACCEPTED",
   "latestHandoffDate": "2026-10-25",
-  "lastVerifiedCodeAndTestHeadBeforeHandoff": "181e1ff3e843c9984ce5889095e3913290a038a7",
+  "lastVerifiedCodeAndTestHeadBeforeHandoff": "27a145253c71bc887b536611e9fece3ddd51779d",
   "lastVerifiedExactShaCi": {
-    "sourceSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
-    "result": "6_SUCCESS_AND_0_OTHER",
+    "sourceSha": "27a145253c71bc887b536611e9fece3ddd51779d",
+    "result": "6/6_SUCCESS",
     "runs": [
-      40173679010,
-      40173679054,
-      40173679011,
-      40173676017,
-      40173676036,
-      40173676045
-    ],
-    "additionalRuns": []
+      40175655753,
+      40175655821,
+      40175655848,
+      40175651274,
+      40175651270,
+      40175651273
+    ]
   },
   "lastVerifiedDeployedAppSourceSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
   "lastVerifiedDeployedRun": 40165551327,
@@ -137,5 +148,25 @@
   "lastRoundTwoDiagnostic": {
     "id": 40173676045,
     "status": "success"
+  },
+  "latestHandoffCodeSha": "27a145253c71bc887b536611e9fece3ddd51779d",
+  "latestIndependentAuditDocument": "docs/admin-audit/INDEPENDENT-QA-2026-10-25.md",
+  "visualArtifactIndependentReview": {
+    "sourceSha": "30b193a640dd6bad826265bf3b982b05558616cc",
+    "artifactId": 12591429398,
+    "pngCount": 132,
+    "allPngDecoded": true,
+    "viewportMismatches": 0,
+    "overallUniqueHashes": 112,
+    "canonical12DistinctAt390Light": true,
+    "canonical12DistinctAt390Dark": true,
+    "canonical12DistinctAt1280Light": true,
+    "ownerAccepted": 0
+  },
+  "deploymentProvenanceMostRecentViewed": {
+    "artifactId": 12592052512,
+    "expectedSha": "30b193a640dd6bad826265bf3b982b05558616cc",
+    "observedSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
+    "status": "REPORTED_SHA_MISMATCH"
   }
 }

@@ -1,3 +1,7 @@
+> **Nghiệm thu độc lập bổ sung 25/10/2026:** code HEAD `27a145253c71bc887b536611e9fece3ddd51779d`. Sửa API thanh toán `30b193a640dd6bad826265bf3b982b05558616cc` và cấp bảo hành `27a145253c71bc887b536611e9fece3ddd51779d`; các nguồn kiểm thử mới đã **6/6 SUCCESS**. Đã kiểm tra ZIP evidence, 12 màn hình đủ ảnh ở 390×844 light/dark và 1280×800 light, đúng kích thước và duy nhất trong mỗi bộ; vẫn **0/12 owner accepted**. Cloudflare Preview deploy metadata vẫn là `c64e07fca248dc527361c4d018dc26c11f5b3570`, KHÔNG chứa backend mới. Đọc [INDEPENDENT-QA-2026-10-25.md](../../admin-audit/INDEPENDENT-QA-2026-10-25.md). Chỉ sửa nhánh Admin, không merge/tích hợp.
+
+---
+
 > **CẬP NHẬT BỔ SUNG 25/10/2026 — RESTORE AUDIT ROUND 2:** nguồn mã Admin đã tiến lên `181e1ff3e843c9984ce5889095e3913290a038a7` qua hai commit sửa dữ liệu Restore: `e047395ee5f4823deec22d4a1f721a0ef6a0ebc2` (chặn kiểu số sai) và `181e1ff3e843c9984ce5889095e3913290a038a7` (chặn số tiền hoàn vượt tiền đã nhận). Các workflow kết quả chính xác và giới hạn nghiệm thu xem [RESTORE-HARDENING-2026-10-25.md](../../admin-audit/RESTORE-HARDENING-2026-10-25.md). 0/12 visual OWNER_ACCEPTED; các blocker Cloudflare vẫn còn. Chưa deploy backend mới, chưa tích hợp/merge. Luôn xác minh HEAD mới sau commit tài liệu.
 
 ---
