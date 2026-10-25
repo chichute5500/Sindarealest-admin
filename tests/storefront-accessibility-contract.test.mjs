@@ -582,3 +582,85 @@ assert.equal(nativeShareSuccess.copyCalls.length, 0,
   'a successful native share must not also trigger clipboard fallback');
 assert.equal(nativeShareSuccess.messages.length, 0,
   'a successful native share needs no extra toast');
+
+
+// Bidirectional viewport reveal regression: repeated scroll DOWN and UP must
+// re-trigger blur-reveal, but never hide a still-intersecting element.
+{
+  const start = html.indexOf('function unbindReveal(root){');
+  const end = html.indexOf('\nfunction preferredGallery(', start);
+  assert.ok(start > 0 && end > start,
+    'bidirectional reveal controller must be present in the actual storefront script');
+  const controller = html.slice(start, end);
+  function createTarget() {
+    const classes = new Set();
+    return {
+      isConnected: true,
+      bound: false,
+      setAttribute(name) { if (name === 'data-reveal-bound') this.bound = true; },
+      classList: {
+        add(c) { classes.add(c); },
+        remove(c) { classes.delete(c); },
+        toggle(c, force) { if (force) classes.add(c); else classes.delete(c); },
+        contains(c) { return classes.has(c); }
+      }
+    };
+  }
+  function rootFor(items) {
+    return { querySelectorAll(selector) {
+      if (selector === '[data-reveal]:not([data-reveal-bound])')
+        return items.filter(item => !item.bound);
+      if (selector === '[data-reveal-bound]')
+        return items.filter(item => item.bound);
+      throw Error('Unexpected reveal selector: ' + selector);
+    } };
+  }
+  const observed = new Set();
+  let notify;
+  let observerSettings;
+  class FakeIntersectionObserver {
+    constructor(callback, settings) { notify = callback; observerSettings = settings; }
+    observe(item) { observed.add(item); }
+    unobserve(item) { observed.delete(item); }
+  }
+  const ctx = { window: { IntersectionObserver: FakeIntersectionObserver },
+    IntersectionObserver: FakeIntersectionObserver };
+  vm.runInNewContext(controller +
+    '\n;globalThis.revealHarness = {bindReveal, unbindReveal};', ctx, { timeout: 1000 });
+  const { bindReveal, unbindReveal } = ctx.revealHarness;
+  const first = createTarget();
+  bindReveal(rootFor([first]));
+  assert.equal(observed.has(first), true, 'scrolling reveal must keep observing after activation');
+  assert.equal(observerSettings.threshold, 0, 'partially visible cards must not flicker at scroll boundaries');
+  notify([{ target: first, isIntersecting: true }]);
+  assert.equal(first.classList.contains('is-visible'), true, 'first scroll-down entry reveals the card');
+  notify([{ target: first, isIntersecting: true }]);
+  assert.equal(first.classList.contains('is-visible'), true, 'partially visible card stays visible');
+  notify([{ target: first, isIntersecting: false }]);
+  assert.equal(first.classList.contains('is-visible'), false, 'fully exited card resets for next entry');
+  notify([{ target: first, isIntersecting: true }]);
+  assert.equal(first.classList.contains('is-visible'), true, 'scrolling UP into the card replays reveal');
+  notify([{ target: first, isIntersecting: false }]);
+  notify([{ target: first, isIntersecting: true }]);
+  assert.equal(first.classList.contains('is-visible'), true, 'repeated down/up cycles keep working');
+  const second = createTarget();
+  bindReveal(rootFor([second]));
+  assert.equal(observed.has(second), true, 'new catalog cards must be observed');
+  unbindReveal(rootFor([first, second]));
+  assert.equal(observed.size, 0, 'catalog rerender must unobserve detached product cards');
+  const disconnected = createTarget();
+  bindReveal(rootFor([disconnected]));
+  disconnected.isConnected = false;
+  notify([{ target: disconnected, isIntersecting: false }]);
+  assert.equal(observed.has(disconnected), false, 'detached DOM nodes cannot leak observers');
+  const noObserver = { window: {} };
+  vm.runInNewContext(controller +
+    '\n;globalThis.revealHarness = {bindReveal};', noObserver, { timeout: 1000 });
+  const fallback = createTarget();
+  noObserver.revealHarness.bindReveal(rootFor([fallback]));
+  assert.equal(fallback.classList.contains('is-visible'), true,
+    'unsupported IntersectionObserver must display content without motion');
+  assert.ok(html.includes('@media(prefers-reduced-motion:reduce)') &&
+    html.includes('html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}'),
+    'reduced-motion users must always see content without the blur effect');
+}
