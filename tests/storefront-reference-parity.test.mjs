@@ -336,7 +336,7 @@ assert.doesNotMatch(performantThemeTransition, /transition:[^}]*backdrop-filter/
 // V12 native visual-contract checks replace obsolete V2–V11 pseudo-element rules.
 assert.match(nativeHeroCss, /#home \.hero-visual #heroProductImage\{/,
   'Native HERO shoe PNG must be an independent original asset.');
-assert.ok(nativeHeroCss.includes("url('/images/hero-upload/ai-marble-pedestal.webp')") &&
+assert.ok(nativeHeroCss.includes("url('/images/hero-rebuild/marble-shelf-v14.svg')") &&
   nativeHeroCss.includes("url('/images/hero-rebuild/silk-waves.svg')"),
   'Marble and satin remain independent noncomposite decorative layers.');
 assert.ok(nativeHeroCss.includes('mask:none;-webkit-mask:none') &&
