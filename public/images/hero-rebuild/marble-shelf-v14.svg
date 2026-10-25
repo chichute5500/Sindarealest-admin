@@ -38,8 +38,8 @@
     <stop offset="0" stop-color="#3a6785" stop-opacity=".15"/><stop offset=".65" stop-color="#5a88a4" stop-opacity=".055"/><stop offset="1" stop-color="#9fc3db" stop-opacity="0"/>
   </radialGradient>
   <mask id="sdShelfFade"><rect x="0" y="0" width="1600" height="650" fill="url(#sdFadeLower)"/></mask>
-  <clipPath id="sdMarbleFace"><path d="M95 244 C395 341 1207 350 1511 250 L1509 384 C1316 461 385 481 100 356Z"/></clipPath>
-  <clipPath id="sdMarbleDeck"><path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250 C1207 350 395 341 95 244Z"/></clipPath>
+  <clipPath id="sdMarbleFace"><path d="M80 251 C430 333 1220 335 1510 263 L1492 408 C1254 491 451 493 104 376Z"/></clipPath>
+  <clipPath id="sdMarbleDeck"><path d="M80 251 C52 234 55 217 77 200 L200 114 C231 90 267 83 300 81 L1351 80 C1391 84 1416 106 1445 135 L1545 218 C1556 235 1543 249 1510 263 C1220 335 430 333 80 251Z"/></clipPath>
 
 <!-- V16: translucent mineral grain and sharp irregular micro-faults. All artwork exclusively independent marble. -->
 <filter id="sdStoneMineralV16" x="-8%" y="-10%" width="116%" height="120%">
@@ -54,7 +54,7 @@
 </defs>
 <ellipse cx="809" cy="420" rx="754" ry="137" fill="url(#sdUnderShadow)"/>
 <g mask="url(#sdShelfFade)">
- <path d="M95 244 C395 341 1207 350 1511 250 L1509 384 C1316 461 385 481 100 356Z" fill="url(#sdMarbleRim)"/>
+ <path d="M80 251 C430 333 1220 335 1510 263 L1492 408 C1254 491 451 493 104 376Z" fill="url(#sdMarbleRim)"/>
 <!-- Crisp branching mineral seams, faceted blue-gray crystal, and stochastic natural grain. -->
 <g clip-path="url(#sdMarbleFace)" pointer-events="none">
  <rect x="65" y="246" width="1475" height="244" filter="url(#sdStoneMineralV16)" opacity=".31"/>
@@ -64,6 +64,15 @@
  <g fill="none" stroke="url(#sdMicroGoldV16)" stroke-linecap="round" stroke-width="1.65" opacity=".81"><path d="M165.0 283.0 L188.4 293.2 L211.1 304.9 L227.8 325.5 L252.8 334.4 L276.8 344.7 L302.8 346.7 L323.6 362.0 L347.0 373.0"/><path d="M201.5 301.0 L205.0 289.0 L198.3 278.3 L192.7 267.2 L196.7 255.5"/><path d="M286.8 343.2 L275.8 359.9 L259.2 370.9 L249.0 387.6 L241.2 405.6"/><path d="M312.9 356.1 L307.1 352.3 L306.0 345.5 L302.2 338.3 L308.5 333.2"/><path d="M300.0 295.0 L322.7 301.6 L342.5 314.6 L363.9 324.1 L384.5 335.3 L403.5 349.3 L421.9 364.0 L439.9 381.5 L465.0 383.0"/><path d="M376.1 335.6 L397.7 343.1 L416.8 355.6 L435.1 369.8 L457.5 375.7"/><path d="M335.7 314.1 L320.5 297.3 L298.5 292.1 L277.6 300.2 L255.5 296.3"/><path d="M378.4 336.8 L366.1 343.3 L352.2 341.7 L338.2 341.1 L326.6 349.1"/><path d="M558.0 320.0 L580.5 329.0 L598.9 344.8 L615.8 361.8 L634.9 376.2 L653.1 393.1 L676.9 399.7 L700.5 404.7 L724.0 410.0"/><path d="M588.7 336.7 L596.3 343.4 L598.5 353.4 L594.9 362.5 L588.2 369.8"/><path d="M617.0 352.0 L623.3 365.0 L636.1 371.9 L636.4 385.7 L637.6 399.4"/><path d="M625.5 356.6 L619.2 370.3 L606.2 377.9 L592.5 384.0 L584.5 396.8"/><path d="M754.0 328.0 L778.8 331.3 L801.5 342.0 L825.1 349.1 L848.8 356.5 L868.2 372.6 L892.0 381.1 L910.5 397.6 L930.0 413.0"/><path d="M881.3 389.5 L909.5 397.8 L930.9 417.8 L948.9 440.2 L971.8 457.6"/><path d="M890.8 394.1 L871.6 408.2 L853.3 423.5 L840.9 444.1 L823.8 461.0"/><path d="M830.8 365.1 L842.3 373.6 L854.8 380.5 L867.7 388.0 L874.5 401.3"/><path d="M1110.0 322.0 L1132.0 330.8 L1151.7 344.0 L1175.0 351.0 L1192.2 368.2 L1214.2 378.5 L1238.5 378.8 L1256.6 395.8 L1281.0 400.0"/><path d="M1187.1 357.2 L1191.6 362.7 L1192.8 369.9 L1199.7 372.3 L1206.8 370.9"/><path d="M1193.5 360.1 L1178.1 362.3 L1169.2 375.0 L1155.6 379.6 L1142.6 385.6"/><path d="M1158.7 344.2 L1156.3 355.6 L1146.1 361.2 L1139.5 369.5 L1131.4 376.3"/><path d="M1323.0 309.0 L1346.3 320.1 L1364.3 338.6 L1387.6 350.1 L1413.6 350.8 L1438.5 343.5 L1464.0 348.1 L1487.3 359.0 L1513.0 360.0"/><path d="M1460.3 345.9 L1446.9 343.5 L1434.2 348.2 L1421.8 352.7 L1408.7 354.3"/><path d="M1462.2 346.4 L1475.3 361.8 L1494.6 367.6 L1511.5 378.6 L1531.6 379.4"/><path d="M1471.2 348.8 L1468.2 345.3 L1467.4 340.8 L1465.8 335.1 L1471.3 332.9"/></g>
  <path d="M-5 303 L213 343 L252 379 L305 361 L408 405 L532 412" fill="none" stroke="#fffefa" stroke-width="1.5" opacity=".47"/>
 </g>
+
+<!-- V20 sculpted faceted slab; all artwork belongs to standalone mineral podium. -->
+<g clip-path="url(#sdMarbleFace)" pointer-events="none">
+ <path d="M92 284 L191 310 L290 341 L362 361 L410 366 L319 374 L205 355 Z" fill="#fff" opacity=".30"/>
+ <path d="M104 374 L364 420 L608 452 L946 460 L1280 446 L1489 394 C1270 467 805 503 415 470 Z" fill="#688cab" opacity=".075"/>
+ <path d="M98 306 C307 359 577 422 937 424 S1370 394 1513 335" fill="none" stroke="#ffffff" stroke-width="23" opacity=".14"/>
+ <path d="M108 332 C318 387 663 448 1034 433 S1328 409 1497 368" fill="none" stroke="#f9fbff" stroke-width="2.4" opacity=".45"/>
+ <path d="M99 277 L112 364 M1490 279 L1484 391" stroke="#c4e1f4" stroke-width="9" opacity=".42" fill="none"/>
+</g>
  <g clip-path="url(#sdMarbleFace)" fill="none">
   <path d="M27 306 C345 354 516 342 705 376 S1232 420 1577 313" stroke="#e3f6ff" stroke-width="38" opacity=".43"/>
   <path d="M1 333 C375 367 483 386 708 395 C1059 427 1358 384 1588 356" stroke="#84a8c5" stroke-width="6" opacity=".19"/>
@@ -72,8 +81,8 @@
   <path d="M238 314 C271 331 286 351 312 338 S367 346 405 385 M826 354 C856 363 865 400 893 391 S951 374 1008 408 M1143 367 C1174 381 1189 410 1216 397 S1243 373 1267 364" stroke="#e5bc82" stroke-width="2" opacity=".65"/>
   <path d="M52 355 C449 460 1184 469 1548 382" stroke="#fff" stroke-width="5" opacity=".32"/>
  </g>
- <path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250 C1207 350 395 341 95 244Z" fill="url(#sdStoneTop)"/>
- <path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250 C1207 350 395 341 95 244Z" fill="url(#sdStoneLight)" opacity=".72"/>
+ <path d="M80 251 C52 234 55 217 77 200 L200 114 C231 90 267 83 300 81 L1351 80 C1391 84 1416 106 1445 135 L1545 218 C1556 235 1543 249 1510 263 C1220 335 430 333 80 251Z" fill="url(#sdStoneTop)"/>
+ <path d="M80 251 C52 234 55 217 77 200 L200 114 C231 90 267 83 300 81 L1351 80 C1391 84 1416 106 1445 135 L1545 218 C1556 235 1543 249 1510 263 C1220 335 430 333 80 251Z" fill="url(#sdStoneLight)" opacity=".72"/>
 
 <g clip-path="url(#sdMarbleDeck)" pointer-events="none">
  <rect x="70" y="25" width="1470" height="315" filter="url(#sdStoneMineralV16)" opacity=".13"/>
@@ -88,8 +97,8 @@
    <path d="M873 196 C900 169 932 143 966 159 S1007 195 1037 176 S1125 124 1152 145 S1214 178 1256 165 S1304 148 1336 160" stroke="#c7a46d" stroke-width="1.7" opacity=".27"/>
    <path d="M570 290 C601 264 627 224 654 231 S697 262 724 245 S786 205 814 225 S878 248 910 219" stroke="#fef6df" stroke-width="1.5" opacity=".5"/>
  </g>
- <path d="M95 244 C395 341 1207 350 1511 250" fill="none" stroke="url(#sdGildedEdge)" stroke-width="5" opacity=".85"/>
- <path d="M105 254 C400 344 1208 352 1499 263" fill="none" stroke="#fff" stroke-width="3" opacity=".38"/>
- <path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250" fill="none" stroke="#f9fdff" stroke-width="5" opacity=".65"/>
+ <path d="M80 251 C430 333 1220 335 1510 263" fill="none" stroke="url(#sdGildedEdge)" stroke-width="5" opacity=".85"/>
+ <path d="M88 257 C434 343 1216 347 1503 271" fill="none" stroke="#fff" stroke-width="3" opacity=".38"/>
+ <path d="M80 251 C52 234 55 217 77 200 L200 114 C231 90 267 83 300 81 L1351 80 C1391 84 1416 106 1445 135 L1545 218 C1556 235 1543 249 1510 263" fill="none" stroke="#f9fdff" stroke-width="5" opacity=".65"/>
 </g>
 </svg>
