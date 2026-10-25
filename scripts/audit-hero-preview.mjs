@@ -325,7 +325,7 @@ try {
             },
             productWithinHorizontalViewport: !visibleProductRect || (visibleProductRect.left >= -1 && visibleProductRect.right <= window.innerWidth + 1),
             expectedThemeApplied: rootDark === (args.theme === 'dark'),
-            viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth },
+            viewport: { width: window.innerWidth, height: window.innerHeight, scrollWidth: document.documentElement.scrollWidth, hasTouch: matchMedia('(pointer:coarse)').matches },
             noHorizontalPageOverflow: document.documentElement.scrollWidth <= window.innerWidth + 1,
           };
         }, { theme });

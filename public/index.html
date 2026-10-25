@@ -4286,14 +4286,14 @@ html.dark #home .hero-visual::before{
 #home .hero-visual .hero-pedestal-art {
   position:absolute!important;display:block!important;
   z-index:0!important;pointer-events:none!important;
-  left:calc(43% - 14px)!important;bottom:-65px!important;
+  left:calc(43% - 14px)!important;bottom:-101px!important;
   width:620px!important;height:auto!important;aspect-ratio:1200/610!important;
   transform:translateX(-50%)!important;
   background:transparent url('/images/hero-upload/ai-marble-pedestal.svg?v=20261025-1') center / 100% 100% no-repeat!important;
   opacity:.98!important;filter:drop-shadow(0 5px 14px rgba(1,15,29,.08))!important;
 }
 html.dark #home .hero-visual .hero-pedestal-art {
-  filter:drop-shadow(0 7px 15px rgba(0,4,14,.14))!important;
+  filter:brightness(1.16) saturate(1.1) drop-shadow(0 7px 15px rgba(0,4,14,.14))!important;
 }
 html:not(.dark) #home .hero-visual .hero-pedestal-art {
   filter:brightness(1.22) saturate(.82) drop-shadow(0 8px 15px rgba(12,39,60,.09))!important;
@@ -4309,11 +4309,14 @@ html:not(.dark) #home .hero-visual .hero-pedestal-art {
   }
   #home .hero-visual .hero-visual-glow {opacity:.48!important}
 }
+@media(min-width:900px) and (max-width:1100px) {
+  #home .hero-visual .hero-pedestal-art {bottom:-75px!important}
+}
 @media(max-width:760px) {
   #home .hero-visual .hero-pedestal-art {
     left:calc(50% - 9px)!important;bottom:-33px!important;
     width:clamp(252px,75vw,295px)!important;
-    filter:drop-shadow(0 4px 9px rgba(0,12,22,.07))!important;
+    filter:brightness(1.15) saturate(1.05) drop-shadow(0 4px 9px rgba(0,12,22,.07))!important;
   }
   #home .hero-visual .hero-visual-glow {opacity:.36!important;filter:blur(1.5px)!important}
 }
