@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "auditedDate": "2026-10-25",
+  "integrationApproved": false,
+  "readyForMerge": false,
+  "overall": "BLOCKED",
+  "independentCIStatus": "PASS_NOT_INTEGRATION",
+  "adminShaAtAuditStart": "c64e07fca248dc527361c4d018dc26c11f5b3570",
+  "websiteShaAtAudit": "7558ab4cdc329b7b3786a37e20a3c3eca5e9eaa4",
+  "cloudflareReadOnlyWorkflow": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166237135",
+  "immutableKnownFacts": {
+    "adminPreviewD1IsolatedFromProduction": true,
+    "websitePreviewD1SharesProduction": true,
+    "adminPreviewImagesSeparatedFromProduction": true,
+    "bothPreviewPublicImagesShareIsolatedBucket": true,
+    "adminPreviewOriginalsBindingPresent": false,
+    "websitePreviewOriginalsSharesProduction": true
+  },
+  "criticalBlockers": [
+    "STORE_PREVIEW_D1_PRODUCTION_SHARED",
+    "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED",
+    "ADMIN_PREVIEW_ORIGINALS_MISSING",
+    "MIGRATION_0009_NOT_ON_STORE_BRANCH",
+    "ORDER_PAYMENT_ENDPOINT_NOT_ON_STORE_BRANCH",
+    "STORE_ORDER_CREATE_RETURNS_NO_ACCESS_TOKEN",
+    "12_ADMIN_DESIGN_SCREENS_UNACCEPTED",
+    "CROSS_PROJECT_WRITE_QA_NOT_SAFE"
+  ],
+  "readinessScoreLabel": "NO_MEANINGFUL_PERCENT_WITH_OPEN_BLOCKERS",
+  "gateTotal": 15,
+  "gateFullyApproved": 0,
+  "ownerApproval": "NOT_GRANTED",
+  "notes": "This status intentionally does not mark 100%; audit workflow SUCCESS means read-only metadata check finished, not that integration is safe."
+}
