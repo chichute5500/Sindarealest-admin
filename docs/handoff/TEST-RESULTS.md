@@ -1,3 +1,19 @@
+## 2026-10-25 — BIDIRECTIONAL SCROLL REVEAL — LATEST CHECKPOINT
+| Gate | Result |
+|---|---|
+| Tested runtime and Node simulation SHA | `64561dc7f9c3c7706787f29d3cd725fc52c6b8b3` |
+| Scroll down enters → visible; exit → reset; scroll up reentry → visible; repeated cycles | **PASS (Node VM simulated IntersectionObserver)** |
+| Partly visible stays visible; newly created cards observe; removed cards cleanup | **PASS (Node VM test)** |
+| Reduced-motion CSS and no IntersectionObserver fallback | **PASS (contract + simulation)** |
+| Validate source and full test suite | **PASS** [40168921460](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168921460) |
+| Cloudflare Preview deployment | **PASS** [40168921430](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168921430) |
+| Hero browser audit | **PASS** [40168921431](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168921431) |
+| Fullscreen Gallery browser audit | **PASS** [40168921478](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168921478) |
+| Dedicated scroll-up/down screenshots or physical-device owner visual approval | **NOT RUN / PENDING** |
+| PR #108 and Production | OPEN/unmerged, Production untouched |
+
+---
+
 ## LATEST — CATALOG FILTER BUTTON COMPACT HEIGHT — 2026-10-25
 | Gate | Status |
 |---|---|

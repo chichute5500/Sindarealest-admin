@@ -1,3 +1,15 @@
+## 2026-10-25 — BIDIRECTIONAL SCROLL REVEAL — LATEST CHECKPOINT
+- [x] Re-enable repeat reveal on viewport reentry, down and up, via a continuously observing IntersectionObserver; do not dim cards until fully outside its root.
+- [x] Preserve current blur/slide/timing, both themes, and reduced-motion/no-IntersectionObserver visibility.
+- [x] Unobserve old featured/catalog elements before dynamic DOM replacement; unobserve disconnected elements as cleanup.
+- [x] Add behavioral regression testing simulated down/up multiple times, partly visible stability, DOM replacement, observer fallback and reduced motion.
+- [x] Exact code SHA `64561dc7f9c3c7706787f29d3cd725fc52c6b8b3`: Validate PASS 40168921460, Preview deploy PASS 40168921430, Hero browser PASS 40168921431, Gallery browser PASS 40168921478.
+- [ ] Separate real-device or dedicated real-browser scroll-direction screenshots remain available for owner visual check; not captured in this source-only behavior verification.
+- [ ] Owner visual acceptance of repeat-on-scroll effect pending, unless explicitly given afterward.
+- [ ] Keep Hero/Gallery and already accepted catalog UI unchanged, PR #108 unmerged and Production untouched.
+
+---
+
 ## LATEST — CATALOG FILTER BUTTON COMPACT HEIGHT — 2026-10-25
 - [x] Scope the owner's height request only to category chips; preserve search field, catalog selection state and widths, other locked sections.
 - [x] Compact button visual rim to 38px across PC, tablet, 390/360 phones and dark/light themes; align specular `::after` at 1px inset and preserve 44px transparent pointer-receiving touch area.

@@ -1,3 +1,12 @@
+## 2026-10-25 — BIDIRECTIONAL SCROLL REVEAL — LATEST CHECKPOINT
+1. Owner replaced prior one-time reveal behavior with viewport reentry replay on **both scroll directions** for all existing `[data-reveal]` sections and dynamically rendered product cards. Sticky navigation and modal surfaces not tagged `data-reveal` are deliberately excluded so persistent controls do not blur.
+2. Use a single `IntersectionObserver` with threshold 0 and existing 30px bottom margin: keep an element visible while still in the viewport; reset after it exits, then show again on re-entry. Prevent retained detached-product observations across filter and page changes.
+3. Preserve motion accessibility (reduced motion, unsupported IntersectionObserver fallbacks), existing CSS animations and all unrelated locked Hero/Gallery/catalog designs.
+4. Source `64561dc7f9c3c7706787f29d3cd725fc52c6b8b3` passed full CI, Preview and Hero/Gallery regressions. No dedicated visual scrolling screenshot audit was performed. Owner aesthetic signoff remains distinct.
+5. No main/Production write, PR merge, Admin/API/backend/data/Gallery/hero-geometry modifications.
+
+---
+
 ## LATEST — CATALOG FILTER BUTTON COMPACT HEIGHT — 2026-10-25
 1. Owner authorized a new, narrow category-filter visual-height change. Target visible chip frame = 38px and specular reflection inset = 1px; preserve label size/width/layout and 460ms active animation on both themes.
 2. Preserve mobile usability: 3px transparent `::before` hit extension above/below the 38px button provides at least 44px effective touch region, without returning the visible rim to 44px or overlapping adjacent rows (8px row gap).
