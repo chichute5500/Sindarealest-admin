@@ -459,6 +459,6 @@ assert.ok(nativeHeroCss.includes("width:clamp(250px,79vw,470px)") &&
   nativeHeroCss.includes('height:clamp(185px,61vw,326px)'),
   'Mobile independently layered plinth must be sized to support the shoe soles.');
 assert.ok(nativeHeroCss.includes('linear-gradient(to bottom,transparent 1%,#000 13%,#000 56%') &&
-  nativeHeroCss.includes('filter:saturate(.82) brightness(1.16) contrast(.88);mix-blend-mode:screen'),
+  nativeHeroCss.includes('filter:saturate(.70) contrast(.22) brightness(1.64);mix-blend-mode:normal'),
   'Marble face blends into icy floor rather than forming an opaque floating disk.');
 
