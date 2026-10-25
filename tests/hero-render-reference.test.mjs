@@ -32,6 +32,7 @@ assert.doesNotMatch(css,/hero-reference-(?:desktop|mobile)|hero-reference-art|he
 assert.match(css,/#home \.hero-copy h1\{/);
 assert.match(css,/#home \.hero-copy h1 span:nth-child\(2\)\{/);
 assert.match(css,/--hero-red:#b71520/,'Highlight red is native CSS, not embedded pixels');
+assert.match(css,/-webkit-background-clip:text;background-clip:text/, 'Luxury ruby treatment must remain live selectable text, not a flattened bitmap');
 assert.match(css,/#home \.hero-actions \.pill-btn\{/);
 assert.match(css,/font:600 clamp\(/,'CTA uses a visible responsive font size');
 assert.match(css,/#home \.hero-visual #heroProductImage\{/);
