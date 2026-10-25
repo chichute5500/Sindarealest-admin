@@ -1,0 +1,95 @@
+name: HERO V10 isolated Cloudflare Preview (NEVER Production)
+on:
+  push:
+    branches:
+      - feature/hero-v9-integrated-2026-10-25
+    paths:
+      - .github/workflows/hero-v10-isolated-preview.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hero-v10-isolated-preview
+  cancel-in-progress: false
+jobs:
+  guard-and-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      PREVIEW_BRANCH: hero-v10-native-20261025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Refuse unexpected repo, branch, target or missing credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/hero-v9-integrated-2026-10-25"
+          test "$CF_TARGET" = "sindarealest-admin-preview"
+          test "$PREVIEW_BRANCH" = "hero-v10-native-20261025"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Prove isolated Preview D1/R2 and reject Production identities (read-only)
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import {assessAdminPreviewBindings} from './scripts/admin-preview-binding-safety.mjs';
+          const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCOUNT_ID;
+          const root='https://api.cloudflare.com/client/v4/accounts/'+account+'/pages/projects/';
+          async function get(name){
+            const r=await fetch(root+name,{headers:{Authorization:'Bearer '+token}});
+            if(!r.ok)throw Error('Cloudflare project metadata unavailable');
+            const result=await r.json();
+            if(result.success!==true)throw Error('Cloudflare API rejected metadata request');
+            return result;
+          }
+          const [admin,shop]=await Promise.all([get('sindarealest-admin-preview'),get('sindarealest2')]);
+          const report=assessAdminPreviewBindings(admin,shop);
+          for(const warning of report.warnings)console.log('::warning::'+warning);
+          for(const error of report.blockers)console.error('::error::'+error);
+          if(!report.deployAllowed)throw Error('Unsafe Preview bindings: no deploy');
+          const db=o=>o?.d1_databases?.DB?.id||o?.d1_databases?.DB?.database_id;
+          const d=db(admin.result?.deployment_configs?.preview);
+          if(!d||d===db(admin.result?.deployment_configs?.production)||d===db(shop.result?.deployment_configs?.production))
+            throw Error('Preview D1 isolation unknown: no deploy');
+          console.log('PASS: isolated D1/R2 identities; redacted');
+          NODE
+      - name: Validate native HTML/CSS HERO before deployment
+        run: |
+          npm install --no-audit --no-fund
+          npm run check
+          node tests/hero-render-reference.test.mjs
+          node tests/storefront-reference-parity.test.mjs
+      - name: Deploy ONLY to isolated Admin Pages Preview non-main branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public \
+            --project-name "$CF_TARGET" \
+            --branch "$PREVIEW_BRANCH" \
+            --commit-hash "$GITHUB_SHA" \
+            --commit-message "native hero V10 Preview $GITHUB_SHA"
+      - name: Verify exact deployed source commit via Cloudflare API (read-only)
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCOUNT_ID;
+          const url='https://api.cloudflare.com/client/v4/accounts/'+account+'/pages/projects/sindarealest-admin-preview/deployments?env=preview&per_page=50';
+          const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
+          if(!r.ok)throw Error('Preview deployment verification unavailable');
+          const data=await r.json();
+          if(data.success!==true)throw Error('Cannot verify Preview deploy');
+          const match=(data.result||[]).find(x=>x.deployment_trigger?.metadata?.branch===process.env.PREVIEW_BRANCH&&x.deployment_trigger?.metadata?.commit_hash===process.env.GITHUB_SHA);
+          if(!match||match.latest_stage?.status!=='success')throw Error('Expected Preview deployment SHA/branch not confirmed');
+          console.log('PASS exact Preview SHA; no production deployment');
+          console.log('Preview URL: https://hero-v10-native-20261025.sindarealest-admin-preview.pages.dev');
+          NODE
