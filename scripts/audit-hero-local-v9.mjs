@@ -119,6 +119,20 @@ try{
    }
    await stage.evaluate(el=>{el.style.removeProperty('bottom');el.style.removeProperty('left');el.style.removeProperty('height');});
    console.log('PASS QA-only marble parameter sweep '+variants.length+' genuine DOM browser captures; no website CSS edits.');
+   // QA-only right-side soft lighting sweep. Photos are from live DOM, not saved artwork.
+   const baseBefore=await page.locator('#home').evaluate(el=>getComputedStyle(el,'::before').backgroundImage);
+   const lighting=await page.addStyleTag({content:''});
+   const strengths=[.035,.07,.105,.14,.175,.21,.245,.28];
+   for(const strength of strengths){
+    const extra='radial-gradient(ellipse 47% 82% at 97% 17%,rgba(36,89,141,'+strength+'),transparent 87%)';
+    await lighting.evaluate((el,code)=>{el.textContent=code;},
+      '#home.hero.wrap::before{background-image:'+extra+','+baseBefore+'}');
+    const file='silk-light-right-'+Math.round(strength*1000)+'.png';
+    await page.locator('#home').screenshot({path:out+'/'+file,animations:'disabled'});
+   }
+   await lighting.evaluate(el=>el.remove());
+   console.log('PASS QA-only right-side silk lighting parameter sweep '+strengths.length+' actual Chromium captures.');
+
   }
   await page.locator('#home .hero-actions .pill-btn').focus();
   assert.ok(await page.evaluate(()=>document.activeElement?.matches('#home .hero-actions .pill-btn')),name+' CTA takes keyboard focus');
