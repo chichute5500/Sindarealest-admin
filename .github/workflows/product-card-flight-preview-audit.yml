@@ -1,0 +1,67 @@
+name: Full-card fly-to-cart Preview browser audit
+on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
+    paths:
+      - '.github/workflows/product-card-flight-preview-audit.yml'
+      - 'scripts/audit-product-card-flight-preview.mjs'
+      - 'public/index.html'
+      - 'tests/gallery-transition-mobile-cart-badge.test.mjs'
+      - 'tests/storefront-operations.test.mjs'
+permissions:
+  contents: read
+jobs:
+  audit-flight:
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PREVIEW_URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+      EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+      EXPECTED_DEPLOYMENT_SHA: ${{ github.sha }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+      CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Check out exact branch source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install temporary Playwright
+        run: npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Validate named non-production Preview URL
+        run: node scripts/validate-cloudflare-preview-url.mjs "$PREVIEW_URL"
+      - name: Wait for exact branch/SHA Preview deployment
+        shell: bash
+        run: |
+          set -u -o pipefail
+          verified=false
+          for attempt in $(seq 1 18); do
+            if node scripts/verify-cloudflare-preview-deployment.mjs; then
+              verified=true
+              break
+            fi
+            if [ "$attempt" -lt 18 ]; then sleep 10; fi
+          done
+          if [ "$verified" != true ]; then
+            echo '::error::Exact Preview SHA not deployed; do not run audit.'
+            exit 1
+          fi
+      - name: Test complete-card flight and mobile/desktop landing in both themes
+        run: node scripts/audit-product-card-flight-preview.mjs
+      - name: Upload screenshots and exact-source flight report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: product-card-flight-preview-${{ github.sha }}
+          path: artifacts/product-card-flight-audit/
+          if-no-files-found: warn
+          retention-days: 14
