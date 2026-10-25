@@ -5,6 +5,8 @@ on:
       - feature/hero-v9-integrated-2026-10-25
     paths:
       - public/index.html
+      - public/images/hero-rebuild/silk-waves.svg
+      - public/images/hero-rebuild/marble-shelf-v14.svg
       - tests/hero-render-reference.test.mjs
       - scripts/audit-hero-local-v9.mjs
       - .github/workflows/hero-v9-local-visual-qa.yml
