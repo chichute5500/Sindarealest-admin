@@ -414,6 +414,11 @@ try {
             fail('Desktop/tablet Hero uses a detached polygon platform instead of the shared curved stone shelf.');
           if(!m.contactShadow || m.contactShadow.display==='none'||!m.contactShadow.background.includes('radial-gradient'))
             fail('Desktop/tablet Hero lacks the shared dual shoe-contact shadow.');
+          // V3's shadow missed the rear heel. Cover all shoe support regions.
+          if(m.visibleProductRect&&m.contactShadow?.rect
+              &&(m.contactShadow.rect.left>m.visibleProductRect.left+8
+              ||m.contactShadow.rect.right<m.visibleProductRect.right-12))
+            fail('Heel contact shadow does not extend beneath both shoes.');
           if(m.visibleProductRect && m.heroRect && (m.visibleProductRect.top<m.heroRect.top-5 || m.visibleProductRect.bottom>m.heroRect.bottom+5))
             fail('Desktop/tablet shoe pixels extend outside the bounded Hero.');
         }
