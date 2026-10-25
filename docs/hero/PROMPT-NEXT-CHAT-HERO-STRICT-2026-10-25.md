@@ -1,3 +1,18 @@
+# ACTIVE V14 CHECKPOINT — 2026-10-26
+
+Use this checkpoint BEFORE the historical V11 instructions below. The project is NOT a new project.
+- GitHub repo chichute5500/Sindarealest-admin; only work on feature/hero-v9-integrated-2026-10-25; PR #115 must remain Draft, do not merge or deploy Production.
+- The latest verified isolated V14 Preview app code SHA is e8497d4f764110007e41fb4797728581d0ce569b; doc-only updates follow, so reverify live HEAD/CI.
+- Isolated Preview: https://hero-v11-native-20261025.sindarealest-admin-preview.pages.dev/ (historic alias), immutable V14: https://82f400e8.sindarealest-admin-preview.pages.dev/; D1/R2 safety and live deployment run #40217731968 PASS.
+- FULL VISUAL STATUS = FAIL, owner has not passed 95%. Do not mark complete from technical QA successes.
+- Main technical check at SHA 723d47e0: source tests #40217448593 PASS, 14-viewport Chromium #40217452710 PASS, full integration #40217452804 PASS; source integrity protects Admin/order/payment/QR/D1/R2.
+- Single clean authoritative HERO CSS style#sd-hero-component-authority; 392 legacy HERO selectors were removed. No !important patch piles. HTML text/CTA are real; original separate transparent PNG shoes; separate silk-waves.svg and V14 independent marble-shelf-v14.svg (no flattened composite).
+- Pixel-alpha browser QA proves zero opaque shoe pixels over real description and CTA at widths 320/360/390/768/980/1280/1440 in both themes.
+- Visual fail blockers: marble natural light/gold veins/stone-floor blending, silk realism, fine serif/font spacing and shoe-contact reflection; use Library main desktop reference, not the old no-red layout.
+- Detailed source and precise unresolved items: docs/hero/HERO-STRICT-ACCEPTANCE-AND-HANDOFF-2026-10-25.md, section 7.
+- Continue edits/capture/visual comparison until EACH essential region >95% AND owner approves. No fake score or image cheating.
+
+---
 # PROMPT NEXT CHAT — SINDAREALEST HERO (STRICT 95%+; CURRENTLY VISUAL FAIL)
 
 Tiếp tục trực tiếp dự án SinDarealest tại GitHub `chichute5500/Sindarealest-admin`. **Không khởi tạo dự án mới, không hỏi lại lịch sử, không lấy CI PASS làm nghiệm thu giao diện.** Đọc đầy đủ tài liệu **`docs/hero/HERO-STRICT-ACCEPTANCE-AND-HANDOFF-2026-10-25.md`** trên nhánh `feature/hero-v9-integrated-2026-10-25`. Xác minh HEAD PR #115 và trạng thái Preview/Actions trước khi thay đổi code.
