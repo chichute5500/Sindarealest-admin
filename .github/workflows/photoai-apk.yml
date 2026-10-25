@@ -34,6 +34,12 @@ jobs:
           mkdir -p mobile/photoai/project
           base64 -d mobile/photoai/source.tar.xz.b64 | tar -xJ -C mobile/photoai/project
           test -f mobile/photoai/project/settings.gradle
+      - name: Bundle official MobileNetV3 image embedding model
+        run: |
+          MODEL=mobile/photoai/project/app/src/main/assets/mobilenet_v3_small.tflite
+          curl -fL --retry 3 --connect-timeout 30 --max-time 300 -o "$MODEL" 'https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/1/mobilenet_v3_small.tflite'
+          test "$(stat -c%s "$MODEL")" -gt 1000000
+          sha256sum "$MODEL"
       - name: Build Android debug APK
         working-directory: mobile/photoai/project
         run: gradle --no-daemon --stacktrace assembleDebug
