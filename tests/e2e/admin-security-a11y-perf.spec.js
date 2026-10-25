@@ -75,7 +75,7 @@ for (const {width,height,theme} of [
       await expect(bell).toBeVisible();
       await expect(bell).toHaveAttribute('aria-controls','notificationPanel');
       await expect(bell).toHaveAttribute('aria-expanded','false');
-      await expect(bellBadge).toHaveText(/^\\d+$/);
+      await expect(bellBadge).toHaveText(/^\d+$/);
       await bell.focus();
       await page.keyboard.press('Enter');
       await expect(bell).toHaveAttribute('aria-expanded','true');
