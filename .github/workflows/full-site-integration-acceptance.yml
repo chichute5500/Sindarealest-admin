@@ -28,6 +28,7 @@ jobs:
           test "$(git hash-object public/index.html)" = "4b5776766cdea9976fdeef55c7c79f00c82662bc"
           test "$(git hash-object 'public/images/hero-upload/tb_image_share_1792519964514 (1).png')" = "c17cc9058ae3008dc662806d21d2cf8f7d83b8a9"
           test "$(git hash-object public/images/hero-upload/ai-marble-pedestal.webp)" = "25230efbf4d3c9457dc36ce91b75fbf60f56d157"
+          test "$(git hash-object public/images/hero-rebuild/silk-waves.svg)" = "d23a5d48bd5eb128e53f003b2297efcaa8a6a0d4"
           for path in public/admin/index.html functions/_lib.js functions/api/orders.js functions/api/admin/products.js migrations/0008_product_sku_verification.sql; do
             test "$(git hash-object "$path")" = "$(git rev-parse "$BASE:$path")" || {
               echo "::error::Protected Admin backend or schema changed: $path"; exit 1;

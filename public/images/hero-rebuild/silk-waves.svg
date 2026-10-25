@@ -17,4 +17,22 @@
 <path d="M-80 666 C384 570 636 690 954 578 C1258 481 1456 555 1690 481" fill="none" stroke="#ffffff" stroke-width="9" opacity=".52"/>
 <ellipse cx="687" cy="693" rx="1050" ry="180" fill="url(#floor)"/>
 <path d="M120 684 C400 599 620 625 881 594" fill="none" stroke="#f8fcff" stroke-width="8" opacity=".65"/>
+<defs>
+<linearGradient id="sdSilkCrest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".08"/><stop offset=".32" stop-color="#ffffff" stop-opacity=".98"/><stop offset=".62" stop-color="#edf7ff" stop-opacity=".48"/><stop offset="1" stop-color="#a9c9e1" stop-opacity=".08"/></linearGradient>
+<linearGradient id="sdSilkShadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#739cc1" stop-opacity=".02"/><stop offset=".5" stop-color="#648fac" stop-opacity=".23"/><stop offset="1" stop-color="#ffffff" stop-opacity=".01"/></linearGradient>
+<linearGradient id="sdPearlLight" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset=".42" stop-color="#ffffff" stop-opacity=".68"/><stop offset=".8" stop-color="#ffffff" stop-opacity=".3"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>
+</defs>
+<!-- Pure decorative vector gradients / paths, never a baked text, shoes or CTA image. -->
+<g fill="none">
+<path d="M-160 8 C 130 174 340 237 627 177 C 944 109 1301 119 1720 -162" stroke="url(#sdSilkShadow)" stroke-width="65" opacity=".30"/>
+<path d="M-150 2 C 151 167 345 216 629 164 C 977 99 1300 107 1710 -169" stroke="url(#sdSilkCrest)" stroke-width="39" opacity=".42"/>
+<path d="M-157 41 C 148 203 343 260 638 206 C 978 145 1320 166 1710 -115" stroke="#ffffff" stroke-width="3.5" opacity=".36"/>
+<path d="M-140 93 C 157 251 356 316 654 254 C 1021 181 1328 198 1700 -58" stroke="#8db7d4" stroke-width="12" opacity=".09"/>
+<path d="M-178 517 C 95 473 383 531 636 496 C 1003 446 1389 429 1710 271" stroke="url(#sdSilkShadow)" stroke-width="76" opacity=".34"/>
+<path d="M-175 534 C 110 502 372 566 665 515 C 1033 458 1395 457 1710 293" stroke="url(#sdSilkCrest)" stroke-width="44" opacity=".53"/>
+<path d="M-170 548 C 120 517 402 583 665 530 C 1014 481 1413 488 1710 316" stroke="#ffffff" stroke-width="3" opacity=".59"/>
+<path d="M-150 597 C 165 563 398 648 688 580 C 1056 518 1400 532 1705 369" stroke="#ffffff" stroke-width="7" opacity=".21"/>
+<path d="M-154 634 C 180 594 444 683 712 622 C 1024 558 1410 561 1710 421" stroke="#789fbb" stroke-width="12" opacity=".085"/>
+<path d="M270 711 C 508 633 741 672 975 612 C 1172 551 1386 553 1674 469" stroke="url(#sdPearlLight)" stroke-width="5" opacity=".55"/>
+</g>
 </svg>
