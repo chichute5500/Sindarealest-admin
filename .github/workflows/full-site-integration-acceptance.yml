@@ -25,10 +25,11 @@ jobs:
         run: |
           set -euo pipefail
           BASE=777988063adabc3fac3796468f2ab0f77c5606ed
-          test "$(git hash-object public/index.html)" = "61ae93a0ba20b6ac895f039e2ce30f2711829f70"
+          test "$(git hash-object public/index.html)" = "8f8d2e67502dd4d0b464f005c1ffc79d0be7b980"
           test "$(git hash-object 'public/images/hero-upload/tb_image_share_1792519964514 (1).png')" = "c17cc9058ae3008dc662806d21d2cf8f7d83b8a9"
           test "$(git hash-object public/images/hero-upload/ai-marble-pedestal.webp)" = "25230efbf4d3c9457dc36ce91b75fbf60f56d157"
           test "$(git hash-object public/images/hero-rebuild/silk-waves.svg)" = "80ce734b7cd8f300a6e9124179ef56942b0c341d"
+          test "$(git hash-object public/images/hero-rebuild/marble-shelf-v14.svg)" = "91ca65bc83dc1bdba065f0c1ded9c0820534eecf"
           for path in public/admin/index.html functions/_lib.js functions/api/orders.js functions/api/admin/products.js migrations/0008_product_sku_verification.sql; do
             test "$(git hash-object "$path")" = "$(git rev-parse "$BASE:$path")" || {
               echo "::error::Protected Admin backend or schema changed: $path"; exit 1;
