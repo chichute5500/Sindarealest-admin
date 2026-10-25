@@ -1,0 +1,53 @@
+name: ADMIN isolated Preview remote R2 canary (self-cleaning)
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - '.github/workflows/admin-preview-r2-canary.yml'
+      - 'scripts/qa-admin-preview-r2-canary.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-admin-preview-r2-self-cleaning
+  cancel-in-progress: false
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Guard exact isolated Admin feature branch
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install pinned Wrangler CLI for remote R2 object operations
+        run: npm install --no-fund
+      - name: Confirm isolated Admin Preview alias has exact SHA before remote R2 canary
+        run: node scripts/qa-admin-preview-deployed-sha.mjs
+      - name: Test unique synthetic R2 objects, public route, and two cleanup reads
+        run: node scripts/qa-admin-preview-r2-canary.mjs
+      - name: Upload sanitized run-owned R2 evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-r2-self-cleaning-${{ github.run_number }}
+          path: artifacts/admin-r2-canary/
+          if-no-files-found: warn
+          retention-days: 14
