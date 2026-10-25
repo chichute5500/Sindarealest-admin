@@ -22,6 +22,11 @@ Repository: chichute5500/Sindarealest-admin. Chỉ sửa branch feature/admin-is
 ## D1/R2: HOÃN, KHÔNG ĐƯỢC CÔNG BỐ ĐÃ HẾT RỦI RO
 Read-only preintegration workflow #40207822357 FAIL vì Storefront Preview DB và ORIGINALS còn cùng tài nguyên Production. Admin Preview ORIGINALS đã có và cách ly PASS. Hai blocker Storefront tồn tại nhưng **DEFERRED/NOT PASSED** theo quyết định không ưu tiên D1/R2; không động Cloudflare bindings, DB, R2 hoặc thử nghiệm ghi Storefront. Tích hợp vẫn BLOCKED, chỉ chủ dự án có quyền đổi ưu tiên.
 
+## ĐIỂM VÀO DUY NHẤT VÀ ĐIỀU KIỆN KIỂM THỬ HỒ SƠ
+- **Điểm vào chính thức:** [START-HERE.md](./START-HERE.md) — đọc để định tuyến sang prompt mới, luôn fetch live HEAD và phân biệt SHA tài liệu với SHA app đã deploy.
+- **Bảng trọng số bằng chứng:** [weighted-acceptance.json](./weighted-acceptance.json) là **rubric lịch sử**, không phải tỷ lệ hoàn thành và có thể còn trạng thái thiết kế cũ. Chữ ký duyệt 12/12 mới nhất nằm trong `docs/admin-audit/OWNER-VISUAL-APPROVALS-2026-10-25.md`, không tự sửa hồi tố bảng rubric này khi chưa có tiêu chí so-sánh-cùng-dữ-liệu.
+- **Lỗi handoff riêng biệt đã phát hiện ở HEAD trước bản sửa:** [Validate #40211740971](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211740971) và [Isolated Preview #40211741034](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211741034) FAIL tại `tests/handoff-integrity.test.mjs` vì prompt cũ thiếu liên kết `START-HERE.md`. Đã bổ sung liên kết ở đây, chỉ ghi PASS nếu CI commit sửa tương ứng xác nhận. Các PASS khác không cần chạy lại thủ công.
+
 ## QUY TRÌNH CHAT SAU
 - Đọc trước docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md và docs/admin-audit/audit-status-2026-10-25.json.
 - Rà soát các công việc chưa PASS theo nhiều nhóm song song; không hỏi lại lịch sử.
