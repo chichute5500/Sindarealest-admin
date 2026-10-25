@@ -48,7 +48,7 @@ for(const profile of [{width:390,height:844,theme:'light'},
        // Sanitize sensitive attribute values; retain structural CSS targets for fixes.
        targets:v.nodes.slice(0,12).map(n=>n.target.join(' ')
          .replace(/\[[^\]]+\]/g,'[attr]')
-         .replace(/#[A-Za-z0-9_-]{18,}/g,'#redacted')
+         .replace(/#([A-Za-z0-9_-]{18,})/g,(_,id)=>/^[A-Za-z]+$/.test(id)?'#'+id:'#redacted')
          .slice(0,140))
      }));
      results.push({view:name,violations,violationCount:violations.length,
