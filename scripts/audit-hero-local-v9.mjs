@@ -43,6 +43,8 @@ try{
     pedestalBg:css(p).backgroundImage,pedestal:r(p),pedestalOpacity:css(p).opacity,
     background:css(h).backgroundImage,overflowWidth:document.documentElement.scrollWidth-innerWidth};
   });
+  await page.locator('#home').screenshot({path:out+'/'+name+'-'+theme+'.png',animations:'disabled'});
+  console.log('[HERO_LAYOUT_EVIDENCE] '+name+' / '+theme+' '+JSON.stringify({title:data.title,spans:data.spans,description:data.desc,button:data.btn,shoe:data.shoe,pedestal:data.pedestal}));
   assert.ok(data.title.width>90&&data.title.height>50&&data.spans.length===3,name+' actual visible heading');
   assert.ok(data.spans.every(x=>x.rect.width>35&&x.rect.height>12&&x.display!=='none'),name+' visible headline lines');
   assert.ok(data.spans.every(x=>x.rect.left>=data.hero.left-3&&x.rect.right<=data.hero.right+3),name+' headline must fit');
