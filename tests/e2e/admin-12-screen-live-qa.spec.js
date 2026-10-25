@@ -56,7 +56,12 @@ for (const {width,height,theme} of matrix) {
           const de=document.documentElement;
           const target=document.querySelector(captureContainer==='#backdrop' ? '#backdrop' : captureContainer==='#loginView' ? '#loginView' : '#main');
           const interactive=target?[...target.querySelectorAll('button,input,select,textarea,a[href]')]:[];
+          const modalNavGapPx=captureContainer==='#backdrop' && innerWidth<=680
+            ? Math.abs(document.querySelector('#backdrop').getBoundingClientRect().bottom-
+                document.querySelector('.mobiletabs').getBoundingClientRect().top)
+            : null;
           return {documentWidth:de.scrollWidth,viewportWidth:innerWidth,horizontalOverflow:de.scrollWidth>innerWidth+2,
+            modalNavGapPx,
             unlabeledInteractive:interactive.filter(el=>{
               if(el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return false;
               if(el.labels?.length||el.getAttribute('title')||el.textContent?.trim())return false;
@@ -65,6 +70,9 @@ for (const {width,height,theme} of matrix) {
         },container);
         expect(m.horizontalOverflow,'No screenshot may pass with document horizontal overflow: '+name+' at '+width+'px').toBe(false);
         expect(m.unlabeledInteractive,'Visible controls must have accessible names: '+name+' at '+width+'px '+theme).toBe(0);
+        if(m.modalNavGapPx!==null)expect(m.modalNavGapPx,
+          'Deployed mobile editor/gallery must meet navigation without exposing product rows: '+name+' '+theme)
+          .toBeLessThanOrEqual(2);
         const nameFile=name+'.png';
         // Capture exactly the nominated viewport, not the entire scrollable page.
         // Only equal-sized PNGs can be directly aligned with a reference viewport.
