@@ -181,6 +181,39 @@ class PhotoAIWebUITest(unittest.TestCase):
         self.assertEqual(after['category'],'Thắt lưng')
         self.assertEqual(self.page.locator('.touch-drag-ghost').count(),0)
 
+    def test_search_change_clears_hidden_selection(self):
+        before=self.page.evaluate('JSON.parse(JSON.stringify(window.__PhotoTest.state()))')
+        first=before['photos'][0]
+        target=before['models'][0]
+        self.page.locator('#gallery .photo').first.click()
+        self.assertGreater(self.page.locator('#gallery .photo.selected').count(),0)
+        self.page.locator('#searchInput').fill('thắt lưng')
+        self.assertEqual(self.page.locator('#gallery .photo.selected').count(),0)
+        self.page.locator('#gallery .photo').first.click()
+        self.page.locator('#moveBtn').click()
+        selected=self.page.evaluate('''(id)=>{
+          let radio=[...document.querySelectorAll('input[name="destination"]')].find(x=>{const d=JSON.parse(decodeURIComponent(x.value));return d.type==='model'&&d.id===id});
+          if(!radio)return false;radio.checked=true;return true;
+        }''',target['id'])
+        self.assertTrue(selected)
+        self.page.locator('#modalConfirm').click()
+        after=self.page.evaluate('(id)=>window.__PhotoTest.state().photos.find(p=>p.id===id)',first['id'])
+        self.assertEqual(first['modelId'],after['modelId'])
+
+    def test_large_792_image_catalog_search_and_render(self):
+        self.page.evaluate('''()=>{
+          const s=window.__PhotoTest.state(),initial=s.photos.map(p=>({...p}));
+          s.photos=Array.from({length:792},(_,i)=>({...initial[i%initial.length],id:'mass'+i,name:'KHO_'+i.toString().padStart(4,'0')+'.jpg'}));
+          window.PhotoApp.render();
+        }''')
+        self.assertEqual(self.page.locator('#photoCount').inner_text(),'792')
+        self.page.locator('#searchInput').fill('KHO_0791')
+        self.assertEqual(self.page.locator('#gallery .photo').count(),1)
+        self.page.locator('#searchInput').fill('KHO_')
+        self.assertEqual(self.page.locator('#gallery .photo').count(),60)
+        self.page.locator('#loadMoreBtn').click()
+        self.assertEqual(self.page.locator('#gallery .photo').count(),120)
+
     def test_mobile_screenshot(self):
         self.page.screenshot(path='/mnt/data/PhotoAI_v0_5_Mobile_Preview.png',full_page=True)
 
