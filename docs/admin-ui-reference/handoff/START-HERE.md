@@ -1,3 +1,17 @@
+## LIVE CHECKPOINT — 2026-10-25 01:24 UTC (before handoff-only sync)
+
+- Repository: `chichute5500/Sindarealest-admin`; branch: `feature/admin-isolated-handoff-2026-10-20`.
+- Live branch HEAD at verification start: `76ee79b341b3e3389fc727fc73e440409796ba63`.
+- Exact-SHA workflows on that HEAD all **SUCCESS**: [Validate #40125566809](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566809), [Admin Preview Playwright #40125566760](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566760), [Admin isolated Preview Playwright #40125566758](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566758), [Validate push #40125563037](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125563037). Each run reports `head_sha=76ee79b341b3e3389fc727fc73e440409796ba63`.
+- PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111): OPEN, unmerged, `mergeable=true`, head `76ee79b341b3e3389fc727fc73e440409796ba63`. PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108): OPEN, unmerged, read-only, `mergeable=false`, head `5b175cc7a5867376084a90908ed7cf39dd19d90a`.
+- Viewport evidence is from code/test SHA `40137cbdb7ac2c473cde981cd8214c28b00a6ef5`, parent of the current docs-only commit: [synthetic QA run #40125202714](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714), [artifact #12573100551](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551), [read-only capture #40125202712](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202712), [diagnostics #40125202720](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202720). Evidence: 48 distinct PNGs (24 at 390×844, 24 at 1280×800), no duplicate hashes, two cleanup passes and zero run-owned QA rows across seven tables. These are not a new 12-screen acceptance run on this docs HEAD.
+- Acceptance boundary: **50% PROVISIONAL remains a historic marker**, weighted evidence rubric 32/100 (not project completion), approved-reference visual parity **0/12 accepted**. Do not increase progress.
+- Path mismatch: requested `docs/admin-ui-reference/handoff/MASTER-PROMPT-AUTO-HANDOFF.md` does **not** exist. The similarly named canonical file is `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md` (verified present, blob `dd69c12196d284142fb155d747988267143d9ede`). It is intentionally not modified because it is outside the explicitly listed paths; do not create a duplicate silently.
+- This checkpoint records the state before documentation-only updates; each handoff commit advances branch HEAD. Re-fetch the live branch and verify workflows on the final resulting SHA before treating the sync as checked.
+- Safety: no source changes, merges, deployments, Production changes, Cloudflare Access/secrets changes, D1/R2 writes, or migrations.
+
+---
+
 # SINDAREALEST ADMIN — LIVE HANDOFF
 
 ## EXACT-HEAD VERIFIED — 2026-10-25: 7/7 PASS, 48 EXACT-VIEWPORT SCREENSHOTS
