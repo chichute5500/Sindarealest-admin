@@ -105,6 +105,9 @@ jobs:
             --commit-hash "$GITHUB_SHA" \
             --commit-message "ADMIN feature Preview $GITHUB_SHA"
 
+      - name: Confirm latest source SHA is mapped to isolated Preview alias
+        run: node scripts/qa-admin-preview-deployed-sha.mjs
+
       - name: Print expected Preview alias
         run: |
           echo "Preview branch: $PREVIEW_BRANCH"
