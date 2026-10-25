@@ -2274,7 +2274,8 @@ html.dark{
   --sd-reference-shadow:0 14px 36px rgba(0,5,15,.30),inset 0 1px 0 rgba(219,241,255,.10);
 }
 /* Brand fidelity: keep the repository's actual emblem asset intact. Do not grayscale or recolor it. */
-.brand-symbol,html.dark .brand-symbol{
+.brand-symbol,
+html.dark .brand-symbol{
   filter:drop-shadow(0 1px 3px rgba(74,111,139,.16))!important;
 }
 .sd-fullscreen-brand-mark img{display:block;width:100%;height:100%;object-fit:contain;filter:none!important}
@@ -3521,22 +3522,22 @@ html.dark .icon-btn:active,html.dark .nav-wrap .icon-btn:active,html.dark .mini-
 }
 #home .hero-visual::before,#home .hero-visual::after{content:none;display:none}
 #home .hero-visual .hero-pedestal-art{
- position:absolute;z-index:1;display:block;left:53%;bottom:-19%;transform:translateX(-50%);
+ position:absolute;z-index:1;display:block;left:53%;bottom:-40%;transform:translateX(-50%);
  width:clamp(560px,59vw,805px);height:clamp(310px,36vw,470px);opacity:.92;border:0;
  background:transparent url('/images/hero-upload/ai-marble-pedestal.webp') center/100% 100% no-repeat;
- filter:saturate(.74) brightness(1.30) contrast(.77);
+ filter:saturate(.63) brightness(1.45) contrast(.49);
  -webkit-mask-image:linear-gradient(to bottom,transparent 1%,#000 13%,#000 56%,rgba(0,0,0,.62) 75%,transparent 97%);
  mask-image:linear-gradient(to bottom,transparent 1%,#000 13%,#000 56%,rgba(0,0,0,.62) 75%,transparent 97%);
 }
 #home .hero-visual .hero-visual-glow{
- position:absolute;z-index:3;display:block;left:52%;bottom:14%;transform:translateX(-50%);
+ position:absolute;z-index:3;display:block;left:52%;bottom:-4%;transform:translateX(-50%);
  width:95%;height:clamp(45px,5.6vw,73px);border-radius:50%;filter:blur(3px);opacity:.79;
  background:radial-gradient(ellipse 24% 17% at 24% 43%,rgba(8,22,32,.57),rgba(8,24,35,.20) 57%,transparent 94%),
  radial-gradient(ellipse 28% 19% at 70% 76%,rgba(10,22,33,.51),rgba(15,31,43,.22) 58%,transparent 95%),
  radial-gradient(ellipse 59% 45% at 52% 54%,rgba(26,42,54,.18),transparent 94%);
 }
 #home .hero-visual #heroProductImage{
- position:absolute;z-index:5;display:block;top:-13%;left:52%;right:auto;bottom:auto;
+ position:absolute;z-index:5;display:block;top:-23%;left:52%;right:auto;bottom:auto;
  transform:translateX(-50%);width:clamp(510px,52vw,710px);height:auto;max-width:none;max-height:none;
  margin:0;padding:0;opacity:1;mix-blend-mode:normal;object-fit:contain;object-position:center;
  border:0;clip-path:none;mask:none;-webkit-mask:none;filter:drop-shadow(0 7px 8px rgba(11,25,38,.17));
@@ -3554,8 +3555,8 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:saturate(.65) brightness(
  #home .hero-copy h1{font-size:clamp(40px,5.3vw,60px)}
  #home .hero-description{font-size:clamp(12px,1.55vw,16px);max-width:360px}
  #home .hero-actions .pill-btn{width:clamp(204px,24vw,261px);min-height:50px;font-size:clamp(14px,1.8vw,19px)}
- #home .hero-visual #heroProductImage{width:clamp(395px,55vw,570px);top:-12%;left:52%}
- #home .hero-visual .hero-pedestal-art{width:clamp(470px,66vw,650px);height:clamp(265px,39vw,360px);bottom:-20%;left:53%}
+ #home .hero-visual #heroProductImage{width:clamp(395px,55vw,570px);top:-21%;left:52%}
+ #home .hero-visual .hero-pedestal-art{width:clamp(470px,66vw,650px);height:clamp(265px,39vw,360px);bottom:-39%;left:53%}
 }
 @media(max-width:760px){
  #home.hero.wrap{grid-template-columns:minmax(0,55%) minmax(0,45%);width:calc(100% - 18px);max-width:none;height:clamp(207px,58vw,280px);min-height:0;padding:clamp(10px,2.7vw,17px);margin:9px auto 13px;border-radius:17px}
@@ -3569,9 +3570,9 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:saturate(.65) brightness(
  #home .hero-actions .pill-btn{width:auto;min-height:clamp(34px,9vw,43px);padding:7px clamp(10px,2.8vw,16px);gap:clamp(8px,2.3vw,14px);font-size:clamp(10.5px,2.65vw,13.5px)}
  #home .hero-actions .pill-btn .arrow{font-size:1.3em}
  #home .hero-visual{position:absolute;grid-column:auto;grid-row:auto;top:0;right:0;left:auto;bottom:auto;width:47%;height:100%}
- #home .hero-visual #heroProductImage{width:clamp(218px,66vw,400px);left:43%;top:-15%;filter:drop-shadow(0 4px 5px rgba(9,24,35,.19))}
- #home .hero-visual .hero-pedestal-art{width:clamp(250px,79vw,470px);height:clamp(185px,61vw,326px);left:44%;bottom:-29%;opacity:.84}
- #home .hero-visual .hero-visual-glow{width:108%;height:clamp(25px,7vw,40px);left:43%;bottom:15%;filter:blur(2px);opacity:.66}
+ #home .hero-visual #heroProductImage{width:clamp(218px,66vw,400px);left:43%;top:-20%;filter:drop-shadow(0 4px 5px rgba(9,24,35,.19))}
+ #home .hero-visual .hero-pedestal-art{width:clamp(250px,79vw,470px);height:clamp(185px,61vw,326px);left:44%;bottom:-48%;opacity:.87}
+ #home .hero-visual .hero-visual-glow{width:108%;height:clamp(25px,7vw,40px);left:43%;bottom:2%;filter:blur(2px);opacity:.71}
 }
 @media(max-width:350px){
  #home.hero.wrap{height:207px;padding:10px}
