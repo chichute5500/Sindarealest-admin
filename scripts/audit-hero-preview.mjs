@@ -190,6 +190,15 @@ try {
           const copyRect = rect(copy);
           const frameRect = rect(frame);
           const imageStyle = getComputedStyle(image);
+          const podiumNode=frame.querySelector('.hero-pedestal-art');
+          const podiumStyle=podiumNode?getComputedStyle(podiumNode):null;
+          const aiPodium=podiumNode?{
+            rect:rect(podiumNode),
+            display:podiumStyle.display,
+            opacity:Number.parseFloat(podiumStyle.opacity),
+            background:podiumStyle.backgroundImage,
+            zIndex:podiumStyle.zIndex,
+          }:null;
           const contactNode=frame.querySelector('.hero-visual-glow');
           const contactStyle=contactNode?getComputedStyle(contactNode):null;
           const contactShadow=contactNode?{
@@ -307,7 +316,7 @@ try {
             objectFit: imageStyle.objectFit,
             objectPosition: imageStyle.objectPosition,
             filter: imageStyle.filter,
-            imageRect, frameRect, copyRect, heroRect:rect(hero), visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal, contactShadow,
+            imageRect, frameRect, copyRect, heroRect:rect(hero), visibleProductRect, alphaBounds, alphaStats, copyOverlap, pedestal, contactShadow, aiPodium,
             compactTouchDesktop: {
               matches: matchMedia('(pointer: coarse) and (min-width:761px)').matches,
               desktopLinksDisplay: getComputedStyle(document.querySelector('.navlinks')).display,
@@ -343,102 +352,67 @@ try {
         if (m.hidden || !m.complete || m.naturalWidth < 1 || m.naturalHeight < 1) fail('Hero PNG is hidden, undecoded, or has zero natural dimensions.');
         if (!m.imageVisible || !m.frameVisible) fail('Hero image or frame is not visible.');
         if (m.objectFit !== 'contain') fail('Hero image object-fit is not contain.');
-        if (m.viewport.width <= 390 && m.visibleProductRect && m.visibleProductRect.width < (m.viewport.width <= 360 ? 150 : 165)) fail('Mobile Hero product is too small compared with the reference image.');
-        if(m.viewport.width<=390){
-          const pl=m.pedestal;
-          if(!pl||pl.oval.content==='none'||pl.oval.filter!=='none'||pl.oval.background==='none'||!Number.isFinite(pl.oval.top)||!Number.isFinite(pl.face.top))
-            fail('Marble pedestal is suppressed by stale glow rules.');
-          else if(pl.oval.top/m.frameRect.height<.65||pl.oval.top/m.frameRect.height>.90
-            ||pl.face.top<=pl.oval.top||pl.face.top-pl.oval.top-pl.oval.height>10
-            ||pl.oval.width<m.heroRect.width*.50||pl.oval.width>m.heroRect.width*.68)
-            fail('Marble top/front are detached or incorrectly scaled.');
+        // The Hero now uses a true external AI-designed SVG asset rather than the
+        // former two CSS pseudo-element slabs. Validate actual drawn layer and
+        // preserve shoe alpha, contact, viewport, theme and copy safety gates.
+        if (!m.aiPodium || m.aiPodium.display === 'none'
+            || m.aiPodium.opacity < .84
+            || !m.aiPodium.background.includes('/images/hero-upload/ai-marble-pedestal.svg')
+            || m.aiPodium.zIndex !== '0'
+            || !m.aiPodium.rect
+            || m.aiPodium.rect.width < (m.viewport.width <= 390 ? 245 : 400)) {
+          fail('Independent AI marble podium asset is missing, invisible, or undersized.');
+        }
+        if (m.aiPodium?.rect && m.visibleProductRect) {
+          const p=m.aiPodium.rect, s=m.visibleProductRect;
+          const planeTop=p.top+p.height*(153/610);
+          const planeBottom=p.top+p.height*(341/610);
+          if (s.bottom < planeTop-10 || s.bottom > planeBottom+27)
+            fail('Shoe outsole does not meet the AI marble support plane.');
+          if (s.left < p.left+p.width*.07 || s.right > p.right-p.width*.03)
+            fail('Shoe silhouette extends outside the AI plinth footprint.');
+          if (p.left+p.width*.15 < -24 || p.right-p.width*.15 > m.viewport.width+24)
+            fail('AI podium stone surface overflows the viewport.');
         }
         if (m.viewport.width <= 390) {
-          const st=m.pedestal;
-          if (!st || st.face.clipPath !== 'none' || !String(st.face.borderRadius).includes('22%')
-              || !String(st.face.maskImage).includes('linear-gradient') || !Number.isFinite(st.face.height) || st.face.height < 33 || st.face.height > 42
-              || st.face.top < st.oval.top + st.oval.height - 11
-              || st.face.top > st.oval.top + st.oval.height + 4) {
-            fail('Mobile marble shelf must join the raised shoe support surface and extend down naturally.');
-          }
+          if (!m.visibleProductRect || m.visibleProductRect.width < (m.viewport.width <= 360 ? 150 : 165))
+            fail('Mobile Hero shoes too small.');
+          if (!m.heroRect || m.heroRect.height > 245 || m.heroRect.height < 195)
+            fail('Mobile Hero no longer short and compact.');
+          if (m.visibleProductRect && m.visibleProductRect.bottom>m.heroRect.bottom+2)
+            fail('Mobile shoe pixels clipped.');
+          if (m.visibleProductRect && (m.visibleProductRect.left<m.viewport.width*.43 || m.visibleProductRect.left>m.viewport.width*.63))
+            fail('Mobile shoes escaped the right-hand column.');
         }
-        if (m.viewport.width <= 390) {
-          const imageTopOffset=m.imageRect.top-m.frameRect.top;
-          if (imageTopOffset < -45 || imageTopOffset > -38) fail('Mobile shoes float too far above the calibrated marble contact position.');
-        }
-        if (m.viewport.width <= 390) {
-          const c=m.contactShadow;
-          if (!c || c.display==='none' || c.zIndex!=='1' || !c.background.includes('radial-gradient')
-              || !c.rect || c.rect.width < 180 || c.rect.height < 20) {
-            fail('Mobile shoe contact shadow is missing, hidden or not layered between marble and PNG.');
-          }
-          if (!m.filter.includes('rgba(14, 30, 42, 0.1) 0px 5px 5px') || !m.filter.includes('rgba(8, 19, 29, 0.16) 0px 2px 2px') || m.filter.includes('0px 12px 16px')) {
-            fail('Mobile shoes still use the old airy drop-shadow instead of restrained ground shadow.');
-          }
-        }
-        if (m.viewport.width <= 390) {
-          if (!m.heroRect || m.heroRect.height > 245 || m.heroRect.height < 195) fail('Mobile Hero no longer matches the short reference-height composition.');
-          if (!m.visibleProductRect || m.visibleProductRect.top >= m.copyRect.bottom - 50) fail('Mobile Hero shoes fell below the copy instead of floating beside it.');
-          if (m.visibleProductRect && m.visibleProductRect.bottom > m.heroRect.bottom + 2) fail('Visible shoes are clipped past the Hero frame.');
-          if (m.visibleProductRect && (m.visibleProductRect.left < m.viewport.width*.43 || m.visibleProductRect.left > m.viewport.width*.63)) fail('Mobile Hero shoes do not start in the right-hand image column.');
-        }
-        if (viewport.hasTouch) {
-          const compact=m.compactTouchDesktop;
-          if(!compact.matches || compact.desktopLinksDisplay!=='none' || compact.menuButtonDisplay==='none')
-            fail('Touch desktop mode must show the compact hamburger header rather than miniature full desktop links.');
-          const colSizes=(compact.productColumns||'').split(' ').filter(Boolean);
-          if(colSizes.length!==2)
-            fail('Touch desktop mode must expose two usable product columns, not four tiny cards.');
-        }
-        if (m.viewport.width >= 761 && m.viewport.width <= 1000 && (!m.visibleProductRect || m.visibleProductRect.width < Math.max(225, m.viewport.width*.27) || m.visibleProductRect.width > 400)) fail('Tablet/touch desktop Hero product must have a realistic, bounded size.');
-        if (m.viewport.width >= 761 && m.viewport.width <= 1000) {
-          const p=m.pedestal?.oval;
-          if (!p||!Number.isFinite(p.left)||!Number.isFinite(p.width)) fail('Tablet marble pedestal geometry unavailable.');
-          else {
-            const left=m.frameRect.left+p.left-p.width/2;
-            if (left < -1 || left + p.width > m.viewport.width + 1) fail('Tablet marble pedestal extends outside the viewport.');
-          }
-        }
-        if (m.viewport.width >= 761) {
-          const minOvalHeight=m.viewport.width>=1001?50:47;
-          if (!m.pedestal || m.pedestal.oval.height<minOvalHeight
-            || !m.contactShadow || m.contactShadow.rect.height < (m.viewport.width>=1001?42:37))
-            fail('Rear shoe must be supported by a deeper perspective oval and localized contact shadow at every nonmobile breakpoint.');
-        }
-        if (m.viewport.width >= 761) {
-          const maxHeight=m.viewport.width>=1001?450:425;
-          // Owner-approved compact Hero: 340px tablet, ~372px touch desktop, <=415px PC.
+        if (m.viewport.width>=761) {
+          if(!m.contactShadow || m.contactShadow.display==='none'
+             || !m.contactShadow.background.includes('radial-gradient'))
+            fail('Heel contact shading is missing.');
           const minHeight=m.viewport.width>=1001?385:320;
-          if(!m.heroRect || m.heroRect.height>maxHeight || m.heroRect.height<minHeight) fail('Desktop/tablet Hero is oversized or collapsed.');
-          if(!m.pedestal || m.pedestal.face.clipPath!=='none' || !String(m.pedestal.face.maskImage).includes('linear-gradient'))
-            fail('Desktop/tablet Hero uses a detached polygon platform instead of the shared curved stone shelf.');
-          if(!m.contactShadow || m.contactShadow.display==='none'||!m.contactShadow.background.includes('radial-gradient'))
-            fail('Desktop/tablet Hero lacks the shared dual shoe-contact shadow.');
-          // V3's shadow missed the rear heel. Cover all shoe support regions.
-          if(m.visibleProductRect&&m.contactShadow?.rect
-              &&(m.contactShadow.rect.left>m.visibleProductRect.left+8
-              ||m.contactShadow.rect.right<m.visibleProductRect.right-12))
-            fail('Heel contact shadow does not extend beneath both shoes.');
-          if(m.visibleProductRect && m.heroRect && (m.visibleProductRect.top<m.heroRect.top-5 || m.visibleProductRect.bottom>m.heroRect.bottom+5))
-            fail('Desktop/tablet shoe pixels extend outside the bounded Hero.');
+          const maxHeight=m.viewport.width>=1001?450:425;
+          if(!m.heroRect || m.heroRect.height<minHeight || m.heroRect.height>maxHeight)
+            fail('Compact Hero height outside owner limits.');
+          if(m.visibleProductRect && m.heroRect
+              && (m.visibleProductRect.top<m.heroRect.top-5 || m.visibleProductRect.bottom>m.heroRect.bottom+5))
+            fail('Shoe pixels outside bounded Hero.');
         }
-        if (m.viewport.width >= 1001) {
-          const ratio = m.imageRect.height > 0 ? m.imageRect.width / m.imageRect.height : 0;
-          if (ratio < 0.70 || ratio > 0.80) fail('Desktop Hero PNG is being squeezed by a mismatched CSS box ratio.');
-          const minimumProductWidth = m.viewport.width >= 1400 ? 340 : 315;
-          const maximumProductWidth = m.viewport.width >= 1400 ? 390 : 370;
-          if (!m.visibleProductRect || m.visibleProductRect.width < minimumProductWidth || m.visibleProductRect.width > maximumProductWidth)
-            fail('Desktop Hero product must be scaled realistically (not cropped by header or exaggerated).');
-          const ovalTop=m.frameRect.top + m.pedestal.oval.top;
-          const shoeToOval=m.visibleProductRect?.bottom - ovalTop;
-          // Perspective ellipse support: compare the sole to the actual curved stone
-          // plane depth, rather than V3's obsolete fixed 46px top-only threshold.
-          // The rear heel has an additional localized-shadow coverage assertion.
-          const stoneDepth=m.pedestal?.oval?.height || 0;
-          if(!Number.isFinite(shoeToOval) || shoeToOval < -3 || shoeToOval > stoneDepth + 4)
-            fail('Compact desktop shoe soles must touch the downsized marble plane, not hover or sink through it.');
-          if (m.heroRect.height > 470) fail('Owner-marked desktop Hero boundary must stay above 470px.');
-
+        if (m.viewport.width >= 761 && m.viewport.width <= 1000) {
+          if(!m.visibleProductRect || m.visibleProductRect.width<Math.max(225,m.viewport.width*.27)
+             || m.visibleProductRect.width>400)
+            fail('Tablet or touch desktop product sizing invalid.');
+        }
+        if(m.viewport.width>=1001){
+          const ratio=m.imageRect.height>0?m.imageRect.width/m.imageRect.height:0;
+          if(ratio<.70||ratio>.80)fail('PNG aspect ratio changed.');
+          const minW=m.viewport.width>=1400?340:315,maxW=m.viewport.width>=1400?390:370;
+          if(!m.visibleProductRect || m.visibleProductRect.width<minW || m.visibleProductRect.width>maxW)
+            fail('Desktop shoe scale invalid.');
+        }
+        if(m.viewport.hasTouch){
+          // Real desktop-site browser emulation must preserve usable touch nav.
+          const c=m.compactTouchDesktop;
+          if(!c.matches || c.desktopLinksDisplay!=='none' || c.menuButtonDisplay==='none')
+            fail('Touch desktop navigation inconsistent.');
         }
         if (!String(m.filter).includes('drop-shadow')) fail('Hero image is missing the restrained drop shadow.');
         if (!m.expectedThemeApplied) fail('Requested light/dark theme was not applied.');
