@@ -1,0 +1,45 @@
+name: PhotoAI Android APK
+on:
+  push:
+    branches:
+      - feature/photoai-android-apk-2026-10-25
+    paths:
+      - 'mobile/photoai/**'
+      - '.github/workflows/photoai-apk.yml'
+  workflow_dispatch:
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK 35
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Extract isolated PhotoAI source
+        run: |
+          mkdir -p mobile/photoai/project
+          base64 -d mobile/photoai/source.tar.xz.b64 | tar -xJ -C mobile/photoai/project
+          test -f mobile/photoai/project/settings.gradle
+      - name: Build Android debug APK
+        working-directory: mobile/photoai/project
+        run: gradle --no-daemon --stacktrace assembleDebug
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SinDarealest-PhotoAI-Android-Debug
+          path: mobile/photoai/project/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
