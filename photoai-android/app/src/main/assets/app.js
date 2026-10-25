@@ -110,6 +110,7 @@ const finishTouch=e=>{
  e.preventDefault();suppressTap=true;
  const dest=hover?.__node,ids=dragging?.ids||[p.id];
  if(ghost)ghost.remove();ghost=null;clearHover();holding=false;dragging=null;
+ if(e.type==='touchcancel'){renderGallery();notify('Đã hủy thao tác kéo ảnh.');return}
  if(dest)movePhotos(ids,dest);
  else{renderGallery();notify('Thả ảnh lên thư mục hiển thị hoặc dùng “Chuyển đến” để tìm thư mục khác.')}
 };
