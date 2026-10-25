@@ -106,7 +106,24 @@ jobs:
           else
             echo "PASS: Storefront Preview ORIGINALS distinct from Production and Preview public images."
           fi
-          echo "Audit mode: no deployments, no database reads or writes, no R2 object requests, no bucket/database names logged."
+          echo "Audit mode: read-only Cloudflare Pages metadata; no deployments, D1 reads/writes, R2 object requests, or binding identifiers in logs."
+          # Keep a dated, sanitized audit summary even when a mandatory safety
+          # gate intentionally FAILS. This is evidence of a recheck, not release approval.
+          if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+            {
+              echo '### Storefront/Admin Preview storage separation'
+              echo
+              echo "Source SHA: \`$GITHUB_SHA\`"
+              echo "Run: \`$GITHUB_RUN_ID\`"
+              echo "Read-only: yes; Production writes: none"
+              if (( ${#blockers[@]} > 0 )); then
+                echo "**INTEGRATION BLOCKED** — unresolved binding gates:"
+                printf -- '- \`%s\`\n' "${blockers[@]}"
+              else
+                echo "**RESOURCE ISOLATION PASS** — independent contract/release authorization still required."
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
           # Discovery is not acceptance. Keep this job RED until every mandatory
           # Preview resource is genuinely independent of Production.
           if (( ${#blockers[@]} > 0 )); then
