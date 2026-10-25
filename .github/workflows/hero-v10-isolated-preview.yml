@@ -79,7 +79,7 @@ jobs:
             --branch "$PREVIEW_BRANCH" \
             --commit-hash "$GITHUB_SHA" \
             --commit-message "native hero V10 Preview $GITHUB_SHA" 2>&1 | tee /tmp/hero-preview-deploy.log
-          DEPLOYMENT_URL="$(grep -oE 'https://[[:xdigit:]]+\\.sindarealest-admin-preview\\.pages\\.dev' /tmp/hero-preview-deploy.log | head -n 1 || true)"
+          DEPLOYMENT_URL="$(grep -oE 'https://[[:xdigit:]]+\.sindarealest-admin-preview\.pages\.dev' /tmp/hero-preview-deploy.log | head -n 1 || true)"
           test -n "$DEPLOYMENT_URL" || { echo '::error::No immutable isolated deployment URL'; exit 1; }
           echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           echo "Immutable isolated Preview URL: $DEPLOYMENT_URL"
@@ -105,7 +105,7 @@ jobs:
           grep -Fq '<h1 class="serif"><span>Phong cách</span><span>đẳng cấp</span><span>từ da cá sấu</span></h1>' /tmp/hero-v10-live.html
           grep -Fq 'ai-marble-pedestal.webp' /tmp/hero-v10-live.html
           grep -Fq 'heroProductImage' /tmp/hero-v10-live.html
-          if grep -Eq 'heroReferenceArt|hero-reference-(desktop|mobile)\\.webp|hero-reference-art' /tmp/hero-v10-live.html; then
+          if grep -Eq 'heroReferenceArt|hero-reference-(desktop|mobile)\.webp|hero-reference-art' /tmp/hero-v10-live.html; then
             echo '::error::Old flattened HERO remains in live HTML'; exit 1
           fi
           echo 'PASS: immutable isolated Preview serves native text, shoe and marble layer; flattened V9 absent'
