@@ -1,3 +1,39 @@
+# PROMPT BÀN GIAO — SINDAREALEST ADMIN (25/10/2026)
+
+Tiếp tục trực tiếp dự án **SinDarealest Admin** trên GitHub. KHÔNG hỏi lại lịch sử. Ưu tiên **duyệt thiết kế 12 màn hình lần lượt**.
+
+Repository: `chichute5500/Sindarealest-admin`
+Chỉ sửa branch `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN, chưa merge.
+Latest deployed/tested app SHA: `ab46d35311ab1ef7fb2f95428401076c70325ce7` (**10/10 GitHub workflows PASS**). Branch HEAD tại thời điểm viết: `0f0dcba2ecb0bce0ecd46f6104ef371a5c0ff301` (tài liệu có thể có commit sau). PHẢI reverify GitHub HEAD trước khi làm.
+Admin Preview: https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/
+
+## Đã làm
+- **Màn 01 Đăng nhập: CHỦ DỰ ÁN ĐÃ DUYỆT (1/12)**. Giữ nguyên giao diện và logo vàng SD.
+- **Màn 02 Tổng quan: CHƯA DUYỆT**. Chủ dự án chê 2 nhãn "Tổng quan" trùng nhau và nút đăng xuất mũi tên không rõ nghĩa. Đã sửa: eyebrow thành "BẢNG ĐIỀU KHIỂN", chỉ một tiêu đề "Tổng quan"; nút logout SVG icon nguồn tắt **màu đỏ** trên mobile/PC, `aria-label="Đăng xuất"`, không còn mũi tên. Không sửa chức năng logout.
+- Sửa lỗi WCAG ở danh sách Nhật ký trống: chỉ có role=list khi có item.
+- Exact deployed source `ab46d35`: **10/10 workflow PASS**: deploy #40194565202, WCAG axe #40194565239, live 12-screen screenshots #40194565226, synthetic D1 QA #40194565196, cùng các nguồn/Playwright/diagnostics.
+- **Artifact live ảnh MỚI** từ run #40194565226: `12599625737`, tên `admin-12-screen-live-evidence-20` (43 MB). Chụp nhiều kích thước mobile/desktop sáng/tối. CẦN download artifact để lấy **02_dashboard mới nhất**, so với mẫu gốc `docs/admin-ui-reference/admin-mobile-reference.png`; đừng sử dụng ảnh màn 02 cũ còn hai tiêu đề và nút mũi tên.
+- R2 S3 end-to-end 2 bucket Preview PUT/GET/media/DELETE + 2 HEAD absent PASS run #40187426696; Restore POST thật trên D1 hoàn toàn mới, rollback, xóa DB dùng một lần PASS #40188752986.
+- Hồ sơ owner approval: `docs/admin-audit/OWNER-VISUAL-APPROVALS-2026-10-25.md`. Màn 01 YES; màn 02 NO, chưa duyệt.
+
+## CẦN LÀM NGAY TRONG CHAT MỚI
+1. Kiểm tra HEAD, PR #111, latest Actions.
+2. Download và giải nén GitHub artifact `12599625737` (run #40194565226). Tách ảnh 02 Dashboard mobile sáng 390×844 và PC, đối chiếu với crop 02 của poster `docs/admin-ui-reference/admin-mobile-reference.png`.
+3. Tạo **ảnh so sánh mới**, trình bày cho user duyệt màn 02. Nếu user không đạt, sửa tiếp code ở branch Admin, deploy và test lại. KHÔNG tự tick APPROVED.
+4. Khi user duyệt màn 02, ghi rõ 2/12 vào GitHub và chuyển sang ảnh 03 Danh sách sản phẩm. Duyệt lần lượt 12 màn hình.
+
+## Tuyệt đối không
+- Không merge PR #111, không ghi Production/main, không sửa Storefront PR #108 và nhánh `fix/liquid-glass-audit-2026-10-19`.
+- Storefront Preview D1 và ORIGINALS vẫn dùng chung Production; cấm thử ghi hay tích hợp với Storefront.
+- Không đổi logo SD vàng sang xanh; không giả giá/doanh thu thực.
+- Đừng coi CI xanh là chủ dự án đã duyệt thiết kế.
+
+Hồ sơ khác: `docs/admin-audit/PARALLEL-ACCEPTANCE-2026-10-25.md`, `docs/admin-ui-reference/reference-instructions.md`.
+
+---
+
+# LỊCH SỬ BÀN GIAO CŨ
+
 > **R2 S3 CANARY PASS — 25/10/2026 (supersedes the older Wrangler-token blocker below):** Tested/deployed source `04f115405699434431b51216f31c311ef8bea333`, Cloudflare isolated Admin Preview alias exact SHA verified. [GitHub Actions #40187426696](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40187426696) **SUCCESS**, artifact #12597070312. Using owner-configured bucket-scoped `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, S3 SigV4 `PutObject` / `GetObject` on **both** `sindarealest-images-preview` and `sindarealest-preview-original` succeeded; SHA256 content readback matched; the Preview public media function served exactly the uploaded WebP; `DeleteObject` succeeded, followed by **two independent HeadObject absence checks** for each run-owned UUID object (`cleanupVerified:true`). Cloudflare Pages metadata also confirmed Preview resources separate from Production and no Production resources touched. No keys/credentials stored in source or artifacts; Secrets hidden. 12 screens still **0/12 owner-approved**. Remote destructive Restore on separately disposable D1 and independent financial/WCAG/load signoff remain pending. Do not merge/integrate or write Storefront Preview sharing Production.
 
 ---
