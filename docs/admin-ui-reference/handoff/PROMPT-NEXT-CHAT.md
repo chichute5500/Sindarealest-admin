@@ -1,3 +1,7 @@
+> **BÀN GIAO MỚI NHẤT — CHỈ XỬ LÝ CHƯA PASS, KHÔNG LẶP BÀI ĐÃ PASS.** Xem [bảng còn mở](../../preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md). OWNER PASS 12/12; R2 #40187426696 PASS; D1 disposable Restore #40188752986 PASS; security/keyboard smoke #40208397077 PASS. Preintegration read-only #40207822357 FAIL đúng hai binding Storefront Preview DB và ORIGINALS trỏ Production; Admin ORIGINALS đã PASS. API/migration payment giữa Storefront/Admin lệch. Còn signoff tài chính thực và pentest/screenreader/load toàn diện. PR #111 OPEN, không merge, không sửa PR #108/main/Production.
+
+---
+
 # PROMPT BÀN GIAO — SINDAREALEST ADMIN (25/10/2026)
 
 Repository: `chichute5500/Sindarealest-admin`; writable branch: `feature/admin-isolated-handoff-2026-10-20`; PR #111 OPEN, **KHÔNG MERGE, không sửa main, PR #108, Storefront hay Production**, không tích hợp với website nếu chủ dự án chưa cấp phép. Giữ logo SD vàng.

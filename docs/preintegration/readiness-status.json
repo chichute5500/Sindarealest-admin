@@ -13,22 +13,37 @@
     "websitePreviewD1SharesProduction": true,
     "adminPreviewImagesSeparatedFromProduction": true,
     "bothPreviewPublicImagesShareIsolatedBucket": true,
-    "adminPreviewOriginalsBindingPresent": false,
+    "adminPreviewOriginalsBindingPresent": true,
     "websitePreviewOriginalsSharesProduction": true
   },
   "criticalBlockers": [
     "STORE_PREVIEW_D1_PRODUCTION_SHARED",
     "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED",
-    "ADMIN_PREVIEW_ORIGINALS_MISSING",
     "MIGRATION_0009_NOT_ON_STORE_BRANCH",
     "ORDER_PAYMENT_ENDPOINT_NOT_ON_STORE_BRANCH",
     "STORE_ORDER_CREATE_RETURNS_NO_ACCESS_TOKEN",
-    "12_ADMIN_DESIGN_SCREENS_UNACCEPTED",
+    "INDEPENDENT_FULL_SECURITY_A11Y_LOAD_SIGNOFF_MISSING",
+    "EXTERNAL_SETTLEMENT_RECONCILIATION_PENDING",
     "CROSS_PROJECT_WRITE_QA_NOT_SAFE"
   ],
   "readinessScoreLabel": "NO_MEANINGFUL_PERCENT_WITH_OPEN_BLOCKERS",
   "gateTotal": 15,
   "gateFullyApproved": 0,
-  "ownerApproval": "NOT_GRANTED",
-  "notes": "This status intentionally does not mark 100%; audit workflow SUCCESS means read-only metadata check finished, not that integration is safe."
+  "ownerApproval": "OWNER_VISUAL_DESIGN_12_OF_12_APPROVED_INTEGRATION_NOT_AUTHORIZED",
+  "notes": "This status intentionally does not mark 100%; audit workflow SUCCESS means read-only metadata check finished, not that integration is safe.",
+  "currentGateEvidence": {
+    "latestReadOnlyRun": 40207822357,
+    "unresolvedExact": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "adminPreviewOriginals": "PASS_PRESENT_ISOLATED",
+    "designOwnerApprovedScreens": 12,
+    "r2PassRun": 40187426696,
+    "remoteRestorePassRun": 40188752986,
+    "securitySmokePassRun": 40208397077,
+    "retestPassedWorkflows": false,
+    "checkedOn": "2026-10-25"
+  },
+  "currentHandoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md"
 }

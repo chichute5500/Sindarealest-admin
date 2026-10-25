@@ -13,7 +13,10 @@
   "uploadRollback": "LOCAL_TEST_PASS",
   "blockers": [
     "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
-    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+    "STOREFRONT_ADMIN_PAYMENT_API_MIGRATION_CONTRACT_DRIFT",
+    "REAL_BANK_SETTLEMENT_REFUND_RECONCILIATION_NOT_APPROVED",
+    "FULL_INDEPENDENT_PENTEST_SCREENREADER_LOAD_SIGNOFF_NOT_VERIFIED"
   ],
   "visualParityAccepted": 0,
   "visualParityTotal": 12,
@@ -128,12 +131,11 @@
   "appDeploymentNote": "Latest code/test branch includes backend fixes NOT yet redeployed to isolated Admin Preview. Browser visual captures are static/local source and existing Admin Preview checks, not backend live integration proof.",
   "designParityAccepted": 12,
   "remainingBlockers": [
-    "ADMIN_PREVIEW_ORIGINALS_MISSING",
     "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
     "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
-    "12_SCREEN_OWNER_VISUAL_ACCEPTANCE_PENDING",
-    "REMOTE_R2_PRIVATE_WRITE_READ_CLEANUP_NOT_VERIFIED",
-    "REMOTE_RESTORE_POST_TO_DISPOSABLE_D1_NOT_VERIFIED"
+    "STOREFRONT_ADMIN_PAYMENT_API_MIGRATION_CONTRACT_DRIFT",
+    "REAL_BANK_SETTLEMENT_REFUND_RECONCILIATION_NOT_APPROVED",
+    "FULL_INDEPENDENT_PENTEST_SCREENREADER_LOAD_SIGNOFF_NOT_VERIFIED"
   ],
   "overallStatus": "NOT_100_PERCENT_ACCEPTED",
   "latestHandoffDate": "2026-10-25",
@@ -527,5 +529,50 @@
   },
   "ownerVisualDesignApproved": true,
   "remainingTechnicalReleaseGatesStatus": "NOT_FULLY_ACCEPTED_DO_NOT_MERGE_OR_DEPLOY_PRODUCTION",
-  "ownerBellApprovalScope": "Owner affirmed bell behavior/design as described; no claim of independent pixel-by-pixel owner inspection of latest bell screenshots"
+  "ownerBellApprovalScope": "Owner affirmed bell behavior/design as described; no claim of independent pixel-by-pixel owner inspection of latest bell screenshots",
+  "previousRemainingBlockersHistorical": [
+    "ADMIN_PREVIEW_ORIGINALS_MISSING",
+    "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+    "12_SCREEN_OWNER_VISUAL_ACCEPTANCE_PENDING",
+    "REMOTE_R2_PRIVATE_WRITE_READ_CLEANUP_NOT_VERIFIED",
+    "REMOTE_RESTORE_POST_TO_DISPOSABLE_D1_NOT_VERIFIED"
+  ],
+  "currentOpenGates": {
+    "recordedOn": "2026-10-25",
+    "scope": "UNFINISHED_ONLY_NO_RETEST",
+    "passEvidenceLocked": true,
+    "ownerDesignScreensApproved": 12,
+    "adminBellSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+    "r2CanaryPassRun": 40187426696,
+    "disposableRestorePassRun": 40188752986,
+    "securitySmokePassRun": 40208397077,
+    "latestBindingRun": 40207822357,
+    "actualProductionSharedBindings": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "adminPreviewOriginals": "PRESENT_AND_ISOLATED",
+    "contractDrift": [
+      "Storefront missing order-payment.js, payment-settings.js, payment-qr/[key].js, migration 0009",
+      "Storefront create order does not return orderAccessToken"
+    ],
+    "remaining": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+      "STOREFRONT_ADMIN_PAYMENT_API_MIGRATION_CONTRACT_DRIFT",
+      "REAL_BANK_SETTLEMENT_REFUND_RECONCILIATION_NOT_APPROVED",
+      "FULL_INDEPENDENT_PENTEST_SCREENREADER_LOAD_SIGNOFF_NOT_VERIFIED"
+    ],
+    "productionTouched": false,
+    "mergeAuthorized": false,
+    "handoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md"
+  },
+  "lastVerifiedRemoteDisposableRestore": {
+    "run": 40188752986,
+    "sourceSha": "7dc38dbef59ebce049ab40af35734dae6467f478",
+    "artifactId": 12597562027,
+    "result": "PASS_REMOTE_DISPOSABLE_RESTORE_ROUTE_AND_ROLLBACK",
+    "productionTouched": false
+  }
 }
