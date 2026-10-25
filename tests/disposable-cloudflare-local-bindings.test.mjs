@@ -38,17 +38,8 @@ try{
       await DB.prepare(statement).run();
     }
   }
-  const password='NO_REAL_ADMIN_PASSWORD_QA',secret='NO_REAL_SESSION_SECRET_QA';
-  // Expose only SQL error codes/messages from disposable D1 for test diagnosis.
-  // The real handler intentionally hides database details from HTTP clients.
-  const tracedDB={
-    prepare:(...args)=>{try{return DB.prepare(...args)}catch(e){console.error('[LOCAL_D1_PREPARE_ERROR]',String(args[0]).slice(0,110),String(e?.message||e));throw e}},
-    async batch(statements){
-      try{return await DB.batch(statements)}
-      catch(error){console.error('[LOCAL_DISPOSABLE_D1_SQL_ERROR]',String(error?.message||error));throw error}
-    }
-  };
-  const env={...platform.env,DB:tracedDB,ADMIN_PASSWORD:password,SESSION_SECRET:secret};
+  const password='NO_REAL_ADMIN_PASSWORD_QA',secret='NO_REAL_SESSION_SECRET_QA_FIXED_AT_LEAST_32_CHARS';
+  const env={...platform.env,ADMIN_PASSWORD:password,SESSION_SECRET:secret};
   const headers={Cookie:'sd_admin_session='+await createSession(secret),
     Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin'};
   const req=(path,method,body)=>new Request('https://qa.invalid'+path,{
