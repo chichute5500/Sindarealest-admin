@@ -6,6 +6,7 @@ on:
       - feature/admin-isolated-handoff-2026-10-20
     paths:
       - ".github/workflows/admin-d1-schema-readonly-20261024.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read

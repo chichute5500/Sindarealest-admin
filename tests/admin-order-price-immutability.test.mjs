@@ -117,7 +117,15 @@ async function patchOrder(DB, prices, status = "confirmed") {
   assert.equal(response.status, 200, "an order without financial activity may still be repriced");
   assert.equal(db.calls.batches.length, 1);
   const statements = db.calls.batches[0];
-  assert.equal(statements.length, 3, "one item, the order summary, and the audit row are written together");
+  assert.equal(statements.length, 3, "the order claim, one item, and the audit row are written together");
+  assert.match(statements[0].sql, /^UPDATE orders SET status=/,
+    "the conditional parent order UPDATE must execute before any item repricing");
+  assert.match(statements[0].sql, /AND status=\?/,
+    "the parent UPDATE must compare against the original order status");
+  assert.match(statements[0].sql, /SELECT COUNT\(\*\) FROM order_items/,
+    "the parent UPDATE must compare the original complete item snapshot");
+  assert.match(statements[1].sql, /^UPDATE order_items.*changes\(\)=1/,
+    "child price writes must be gated on the successful parent claim");
   assert.ok(statements.every(statement =>
     statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions")
     && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests")
@@ -133,6 +141,16 @@ async function patchOrder(DB, prices, status = "confirmed") {
     statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_transactions")
     && statement.sql.includes("NOT EXISTS (SELECT 1 FROM order_payment_requests")
   ), "item, order, and audit writes must all be guarded against a concurrent payment");
+}
+
+{
+  const db=makeDB();
+  const result=await patchOrder(db,[
+    {itemId:"item-1",unitPrice:200000},
+    {itemId:"item-1",unitPrice:210000}
+  ]);
+  assert.equal(result.status,400,"repeated updates to one order item must be rejected");
+  assert.equal(db.calls.batches.length,0,"duplicate prices must not write to D1");
 }
 
 // D1 rejects statements whose bound-parameter count differs from SQL placeholders.

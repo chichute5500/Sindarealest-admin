@@ -161,6 +161,68 @@ try {
   sql.prepare("UPDATE order_items SET unit_price=120000,line_total=120000 WHERE id=?").run(qaItem.id);
   sql.prepare("UPDATE orders SET subtotal=120000,total=120000 WHERE id=?").run(qaOrder.id);
 
+  // Competing Admin repricing must be rejected BEFORE any line write.
+  // The earlier code wrote a stale item first and re-summarized the order later.
+  beforeNextBatch=() => {
+    sql.prepare("UPDATE order_items SET unit_price=130000,line_total=130000 WHERE id=?").run(qaItem.id);
+    sql.prepare("UPDATE orders SET subtotal=130000,total=130000 WHERE id=?").run(qaOrder.id);
+  };
+  const conflictingReprice=await patchAdminOrder({
+    request:new Request('https://qa.invalid/api/admin/orders',{
+      method:'PATCH',
+      headers:{Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin',
+        Cookie:'sd_admin_session='+session,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        id:qaOrder.id,status:'confirmed',
+        prices:[{itemId:qaItem.id,unitPrice:140000}]
+      })
+    }),env
+  });
+  assert.equal(conflictingReprice.status,409,'concurrently repriced order must reject stale price change');
+  assert.equal(scalar('SELECT unit_price FROM order_items').unit_price,130000);
+  assert.equal(scalar('SELECT total FROM orders').total,130000);
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM audit_logs').n,0);
+  sql.prepare("UPDATE order_items SET unit_price=120000,line_total=120000 WHERE id=?").run(qaItem.id);
+  sql.prepare("UPDATE orders SET subtotal=120000,total=120000 WHERE id=?").run(qaOrder.id);
+
+  // A concurrent status-only transition should also be protected by the
+  // original order status compare-and-swap, not just a terminal-cancel check.
+  beforeNextBatch=() => sql.prepare("UPDATE orders SET status='shipped' WHERE id=?").run(qaOrder.id);
+  const conflictingStatus=await patchAdminOrder({
+    request:new Request('https://qa.invalid/api/admin/orders',{
+      method:'PATCH',
+      headers:{Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin',
+        Cookie:'sd_admin_session='+session,'Content-Type':'application/json'},
+      body:JSON.stringify({id:qaOrder.id,status:'processing'})
+    }),env
+  });
+  assert.equal(conflictingStatus.status,409,'stale status transition must not overwrite another admin');
+  assert.equal(scalar('SELECT status FROM orders').status,'shipped');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM audit_logs').n,0);
+  sql.prepare("UPDATE orders SET status='confirmed' WHERE id=?").run(qaOrder.id);
+
+  // The guarded order-first transaction must still support an actual
+  // legitimate reprice in the disposable real SQLite database.
+  const repriced=await patchAdminOrder({
+    request:new Request('https://qa.invalid/api/admin/orders',{
+      method:'PATCH',
+      headers:{Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin',
+        Cookie:'sd_admin_session='+session,'Content-Type':'application/json'},
+      body:JSON.stringify({id:qaOrder.id,status:'confirmed',
+        prices:[{itemId:qaItem.id,unitPrice:125000}]})
+    }),env
+  });
+  assert.equal(repriced.status,200,'valid reprice is accepted');
+  assert.equal(scalar('SELECT unit_price FROM order_items').unit_price,125000);
+  assert.equal(scalar('SELECT total FROM orders').total,125000);
+  sql.prepare("DELETE FROM audit_logs WHERE entity_type='order' AND entity_id=?").run(qaOrder.id);
+  sql.prepare("UPDATE order_items SET unit_price=120000,line_total=120000 WHERE id=?").run(qaItem.id);
+  // The disposable fixture must restore its original signed payment terms
+  // after the preceding QA reprice invalidated them; otherwise the later real
+  // ledger handler correctly rejects the synthetic receipt with HTTP 409.
+  sql.prepare("UPDATE orders SET subtotal=120000,total=120000,payment_terms_confirmed_at=? WHERE id=?")
+    .run(stamp,qaOrder.id);
+
   // Validation failure must happen before D1 batch and preserve all existing rows.
   const preBatch=batches;
   const invalid=structuredClone(v2);
