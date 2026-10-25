@@ -4601,3 +4601,18 @@ html.dark #home .hero-visual .hero-pedestal-art{opacity:.76!important;filter:sat
 @media(prefers-reduced-motion:reduce){
   #home .hero-actions .pill-btn{transition:none!important}
 }
+
+
+/* HERO RENDER PARITY V7.1 — audited geometry: preserve a visible natural support
+   plane while keeping its perimeter feathered; prevent text/shoe collision at 360px. */
+#home .hero-visual .hero-pedestal-art{opacity:.89!important}
+html:not(.dark) #home .hero-visual .hero-pedestal-art{opacity:.88!important}
+html.dark #home .hero-visual .hero-pedestal-art{opacity:.88!important}
+@media(min-width:900px) and (max-width:1100px){
+  #home .hero-visual .hero-pedestal-art{bottom:-188px!important}
+}
+@media(max-width:375px){
+  #home .hero-visual img{left:-10px!important}
+  #home .hero-visual .hero-pedestal-art{opacity:.88!important}
+  html:not(.dark) #home .hero-visual .hero-pedestal-art{opacity:.88!important}
+}
