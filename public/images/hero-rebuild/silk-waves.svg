@@ -35,4 +35,47 @@
 <path d="M-154 634 C 180 594 444 683 712 622 C 1024 558 1410 561 1710 421" stroke="#789fbb" stroke-width="12" opacity=".085"/>
 <path d="M270 711 C 508 633 741 672 975 612 C 1172 551 1386 553 1674 469" stroke="url(#sdPearlLight)" stroke-width="5" opacity=".55"/>
 </g>
+
+<!-- Independent translucent silk fold geometry, no text, product, CTA, raster or external images. -->
+<defs>
+<linearGradient id="silkGlossV12" x1="0" y1="0" x2=".2" y2="1">
+ <stop offset="0" stop-color="#ffffff" stop-opacity=".04"/>
+ <stop offset=".26" stop-color="#d4e9f7" stop-opacity=".17"/>
+ <stop offset=".45" stop-color="#ffffff" stop-opacity=".76"/>
+ <stop offset=".53" stop-color="#f4fbff" stop-opacity=".64"/>
+ <stop offset=".77" stop-color="#99bed9" stop-opacity=".21"/>
+ <stop offset="1" stop-color="#ffffff" stop-opacity=".02"/>
+</linearGradient>
+<linearGradient id="silkUnderfoldV12" x1="0" y1="0" x2=".05" y2="1">
+ <stop offset="0" stop-color="#577fa1" stop-opacity=".02"/>
+ <stop offset=".33" stop-color="#6e9cbe" stop-opacity=".18"/>
+ <stop offset=".55" stop-color="#7aa5c5" stop-opacity=".34"/>
+ <stop offset=".76" stop-color="#d8eefb" stop-opacity=".09"/>
+ <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="silkCrestV12" x1="0" y1="0" x2="1" y2=".2">
+ <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+ <stop offset=".23" stop-color="#ffffff" stop-opacity=".36"/>
+ <stop offset=".52" stop-color="#ffffff" stop-opacity=".84"/>
+ <stop offset=".83" stop-color="#f6fcff" stop-opacity=".44"/>
+ <stop offset="1" stop-color="#ffffff" stop-opacity=".05"/>
+</linearGradient>
+<radialGradient id="silkReflectedLightV12" cx=".66" cy=".39" rx=".75" ry=".53">
+ <stop stop-color="#ffffff" stop-opacity=".60"/>
+ <stop offset=".40" stop-color="#eff8ff" stop-opacity=".26"/>
+ <stop offset="1" stop-color="#d7edfb" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<g fill="none" stroke-linecap="round">
+ <path d="M-230 -123 C144 128 383 345 702 275 C1022 201 1271 76 1746 -178" stroke="url(#silkUnderfoldV12)" stroke-width="127" opacity=".61"/>
+ <path d="M-208 -138 C166 88 392 307 692 252 C1020 189 1295 48 1746 -208" stroke="url(#silkGlossV12)" stroke-width="74" opacity=".83"/>
+ <path d="M-194 -155 C192 88 408 291 701 239 C1011 182 1317 30 1760 -222" stroke="url(#silkCrestV12)" stroke-width="11" opacity=".72"/>
+ <path d="M-110 318 C169 445 361 441 675 355 C1098 235 1366 251 1720 96" stroke="url(#silkUnderfoldV12)" stroke-width="124" opacity=".55"/>
+ <path d="M-96 287 C163 414 398 418 689 329 C1091 210 1377 228 1714 74" stroke="url(#silkGlossV12)" stroke-width="75" opacity=".61"/>
+ <path d="M-90 279 C164 401 391 406 679 320 C1060 205 1377 214 1715 66" stroke="url(#silkCrestV12)" stroke-width="8" opacity=".53"/>
+ <path d="M-185 635 C199 527 422 681 791 564 C1146 447 1411 472 1760 340" stroke="url(#silkUnderfoldV12)" stroke-width="148" opacity=".53"/>
+ <path d="M-190 613 C199 500 442 650 789 540 C1154 422 1451 439 1775 304" stroke="url(#silkGlossV12)" stroke-width="86" opacity=".64"/>
+ <path d="M-202 602 C207 497 432 642 788 527 C1129 420 1460 429 1780 287" stroke="url(#silkCrestV12)" stroke-width="9" opacity=".55"/>
+</g>
+<rect width="1600" height="730" fill="url(#silkReflectedLightV12)" opacity=".24"/>
 </svg>
