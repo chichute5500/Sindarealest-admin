@@ -1232,6 +1232,17 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   .brand-logo,.panel,.stat,.control,.mobiletabs .nav{transition:none!important;animation:none!important}
 }
 
+/* Narrow phone regression: at 320px the fifth navigation label wraps and the
+   measured navigation becomes ~71px tall. Match the editor overlay boundary to
+   the actual fixed bar; preserve the 66px layout from 376px upward. */
+@media(max-width:375px){
+  .mobiletabs{
+    height:calc(71px + env(safe-area-inset-bottom));
+    min-height:calc(71px + env(safe-area-inset-bottom));
+  }
+  #backdrop{bottom:calc(71px + env(safe-area-inset-bottom))}
+}
+
 </style></head>
 <body>
 <header class="topbar"><div class="brand"><img class="brand-logo" src="/images/brand-emblem.png" alt="SinDarealest"><div><h1>SINDAREAL EST</h1><p>Luxury in Every Detail</p></div></div><div class="topright"><span class="badge" id="conn">Đang kiểm tra…</span><button class="btn small" id="adminThemeToggle" type="button" aria-label="Đổi giao diện sáng tối">◐ Giao diện</button><button class="btn small" id="notificationToggle" type="button" aria-expanded="false" aria-controls="notificationPanel"><svg class="bell-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span>Thông báo</span><span id="notificationCount" class="notif-count hidden" aria-label="Số thông báo chưa đọc">0</span></button><button class="btn small" id="logout" type="button" aria-label="Đăng xuất" title="Đăng xuất" hidden>Đăng xuất ↗</button></div></header><section id="notificationPanel" class="notification-panel hidden" aria-label="Trung tâm thông báo"><div class="panelhead" style="padding:0 0 10px"><h3>Hoạt động gần đây</h3><button class="btn small" id="markNotificationsRead" type="button">Đánh dấu đã đọc</button></div><div id="notificationList" class="tiny muted">Đang tải thông báo…</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn small" id="enablePush" type="button">Bật thông báo đẩy</button><span id="pushStatus" class="tiny muted" style="align-self:center"></span></div></section>
