@@ -1,3 +1,14 @@
+## LATEST — CATALOG FILTER BUTTON COMPACT HEIGHT — 2026-10-25
+- [x] Scope the owner's height request only to category chips; preserve search field, catalog selection state and widths, other locked sections.
+- [x] Compact button visual rim to 38px across PC, tablet, 390/360 phones and dark/light themes; align specular `::after` at 1px inset and preserve 44px transparent pointer-receiving touch area.
+- [x] Update static unit/contract tests and the existing manual catalog-only audit assertions, without removing the audit authorization gates.
+- [x] Exact SHA `a83d09dcab091f62a2fb650f2639c48046385883` Validate PASS 40168185013 and Preview deploy PASS 40168185019.
+- [ ] Catalog-specific 8 viewport/theme screenshot/interaction workflow still REQUIRES manual authorized dispatch and repository `CATALOG_FILTER_AUDIT_UNLOCKED` gate; dynamic screenshot-level visual PASS not yet verified.
+- [ ] Owner visually accepts final compact chip height on phone/PC (if not yet explicitly signed off).
+- [ ] Keep Hero/Gallery PASS-LOCKED, PR #108 OPEN/unmerged, main/Production untouched.
+
+---
+
 ## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
 - [x] **OWNER VISUAL ACCEPTANCE: PASS / LOCKED** for final blended Hero design at exact code SHA `5deacf37a9affe602affd064cdbb0f5ce2466c30`; owner explicitly confirmed "Pass". Supersedes earlier Hero owner-acceptance checkboxes below.
 - [x] Exact-source Hero browser audit 14/14 PASS [40166267532](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267532); Validate PASS 40166267533; branch Preview deploy PASS 40166267558; Gallery isolated regression PASS 40166267531. Original uploaded PNG unchanged.

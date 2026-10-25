@@ -1,3 +1,14 @@
+## LATEST — CATALOG FILTER BUTTON COMPACT HEIGHT — 2026-10-25
+- Owner explicitly authorized reopening **only catalog category button height / specular-flash alignment**. Prior owner-PASS filter height references are historical for this specific dimension; do not reopen unrelated accepted filter UX, search, product routing, Hero, locked Gallery or Admin/backend.
+- Exact verified code/test SHA: `a83d09dcab091f62a2fb650f2639c48046385883`. The selected/unselected `#products .filter-pill` visible rim uses **38px min-height** instead of 44px. The specular `::after` is inset 1px rather than 3px; the transparent `::before` extends 3px above/below the rim, preserving a >=44px effective touch target with the existing 8px row gap.
+- Horizontal padding, typography, active state, physical press, focus, hover, animation timing (460ms), category selection JS, light/dark colors and breakpoints remain unchanged except for vertical padding needed to match the 38px rim. 390px and 360px mobile overrides are aligned.
+- Both the existing `tests/product-card-liquid-glass.test.mjs` and `tests/storefront-operations.test.mjs` were updated to assert the compact frame AND 44px touch extension. The catalog-only **manually authorized** browser workflow's new assertions check real visible height and touch extension; its owner_authorized + repository variable guard remains intact.
+- **Exact SHA `a83d09dcab091f62a2fb650f2639c48046385883`: Validate PASS [40168185013](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168185013); Cloudflare Preview deploy PASS [40168185019](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168185019).** The first code commit `646fcf1` FAILed CI due to a stale 44px assertion in operations tests; the follow-up `a83d09d` corrected the test to enforce the new visible size and extended hit area; no runtime code changed between those two commits.
+- **Actual catalog-specific visual screenshot audit / owner visual acceptance remains NOT RUN**: the isolated workflow is `workflow_dispatch` only, with `owner_authorized=true` and `vars.CATALOG_FILTER_AUDIT_UNLOCKED=='true'` gates; neither gate was bypassed. Do not claim image-level visual PASS from CI alone.
+- PR #108 remains OPEN/unmerged, Preview only; no change to main/Production, Hero, original PNG, Gallery or unrelated features.
+
+---
+
 ## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
 > This checkpoint supersedes the historical Hero "owner acceptance pending" entries below for the **current final Hero only**. Earlier CSS/SVG/WebP iterations are historical and are not independently accepted.
 

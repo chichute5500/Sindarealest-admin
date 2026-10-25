@@ -1,3 +1,11 @@
+## LATEST — CATALOG FILTER BUTTON COMPACT HEIGHT — 2026-10-25
+1. Owner authorized a new, narrow category-filter visual-height change. Target visible chip frame = 38px and specular reflection inset = 1px; preserve label size/width/layout and 460ms active animation on both themes.
+2. Preserve mobile usability: 3px transparent `::before` hit extension above/below the 38px button provides at least 44px effective touch region, without returning the visible rim to 44px or overlapping adjacent rows (8px row gap).
+3. Preserve catalog-only visual workflow's manual authorization and repository variable gates; do not bypass them to manufacture browser evidence. Static CI / Preview are PASS at `a83d09dcab091f62a2fb650f2639c48046385883`; owner/device visual approval is independent.
+4. No Hero, Gallery, Admin, API, catalog data, payment, D1/R2, main/Production or PR #108 merge changes.
+
+---
+
 ## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
 1. Owner explicitly confirmed "**Pass**" for the final blended Hero in conversation. Record **HERO DESIGN = OWNER PASS / LOCKED** for source SHA `5deacf37a9affe602affd064cdbb0f5ce2466c30`; previous handoffs saying the *latest* Hero still needs acceptance are superseded. Historical iterations' acceptance statements remain historical.
 2. Do not equate Hero acceptance with full storefront completion. Exact-SHA Validate, Cloudflare Preview, Hero 14/14 and Gallery regression are PASS; PR #108 is OPEN/unmerged and **currently unmergeable due to conflicts**. Its 303-file mixed-scope diff and historical 298-path inventory require reconciliation.

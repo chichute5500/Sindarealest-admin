@@ -1,3 +1,20 @@
+## LATEST — CATALOG FILTER BUTTON COMPACT HEIGHT — 2026-10-25
+| Gate | Status |
+|---|---|
+| Final code/test SHA | `a83d09dcab091f62a2fb650f2639c48046385883` |
+| Product-card Liquid Glass and storefront operations contracts | **PASS**, in full CI |
+| Source integrity / automated test suite | **PASS** [40168185013](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168185013) |
+| Cloudflare Pages branch Preview | **PASS** [40168185019](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40168185019) |
+| Static chip target | 38px visible / 44px effective pointer target, horizontal dimensions preserved |
+| Light and dark selection animation source | unchanged, static contract **PASS** |
+| Catalog-only real browser screenshots / tap interactions | **NOT RUN / REQUIRES GUARDED MANUAL DISPATCH**, no visual acceptance claimed |
+| Original PNG / locked Hero & Gallery | unchanged |
+| PR #108 | OPEN/unmerged; Production untouched |
+
+Initial source commit `646fcf1` CI/Preview failed on a stale `tests/storefront-operations.test.mjs` assertion expecting a 44px visible button; fixed without runtime changes in `a83d09d`, then full CI and deploy passed.
+
+---
+
 ## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
 | Gate | Current verified result |
 |---|---|
