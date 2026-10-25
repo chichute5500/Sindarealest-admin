@@ -47,7 +47,7 @@ for(const profile of [{width:390,height:844,theme:'light'},
      const violations=r.violations.map(v=>({id:v.id,impact:v.impact,nodeCount:v.nodes.length,
        // Sanitize sensitive attribute values; retain structural CSS targets for fixes.
        targets:v.nodes.slice(0,12).map(n=>n.target.join(' ')
-         .replace(/\\[[^\\]]+\\]/g,'[attr]')
+         .replace(/\[[^\]]+\]/g,'[attr]')
          .replace(/#[A-Za-z0-9_-]{18,}/g,'#redacted')
          .slice(0,140))
      }));
