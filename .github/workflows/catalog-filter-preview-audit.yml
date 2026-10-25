@@ -1,6 +1,6 @@
 name: Non-Hero catalog-filter live Preview audit
-# Catalog filter height is OWNER PASS / LOCKED. Keep visual capture manual-only and require explicit owner authorization.
-# Pushes to public/index.html or storefront tests must not retest this locked item automatically.
+# Owner explicitly reopened category chip height on 2026-10-25. Visual capture remains
+# manual-only, with BOTH explicit owner_authorized and repo variable unlock gates.
 
 on:
   workflow_dispatch:
@@ -816,8 +816,23 @@ jobs:
                 const touchCategory = touchGroup.locator('button[data-category]:not([data-category="all"])').first();
                 await touchCategory.waitFor({ state: 'visible', timeout: 25000 });
                 const touchBox = await touchCategory.boundingBox();
-                assert.ok(touchBox && touchBox.height >= 44 && touchBox.height < 100,
-                  'Touch category chip must be a valid, single mobile tap target.');
+                assert.ok(touchBox && touchBox.height >= 37.5 && touchBox.height <= 39.5,
+                  'The visible category frame must match the compact 38px glass design.');
+                const hitArea = await touchCategory.evaluate(el => {
+                  const pseudo = getComputedStyle(el, '::before');
+                  const reflection = getComputedStyle(el, '::after');
+                  return {
+                    effectiveHeight: el.getBoundingClientRect().height +
+                      Math.abs(parseFloat(pseudo.top)) + Math.abs(parseFloat(pseudo.bottom)),
+                    pointerEvents: pseudo.pointerEvents,
+                    reflectionTop: parseFloat(reflection.top),
+                    reflectionBottom: parseFloat(reflection.bottom)
+                  };
+                });
+                assert.ok(hitArea.effectiveHeight >= 44 && hitArea.pointerEvents === 'auto',
+                  'Mobile chip must preserve a 44px effective hit area.');
+                assert.ok(hitArea.reflectionTop <= 1.5 && hitArea.reflectionBottom <= 1.5,
+                  'The specular flash must closely follow the smaller visible frame.');
                 await touchPage.touchscreen.tap(touchBox.x + touchBox.width / 2, touchBox.y + touchBox.height / 2);
                 assert.equal(await touchCategory.getAttribute('aria-pressed'), 'true',
                   'A real touchscreen tap must change selected category state.');

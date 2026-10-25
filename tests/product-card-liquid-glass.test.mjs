@@ -228,17 +228,17 @@ assert.ok(html.includes('#products .filter-pill:active:not(:disabled):not(.activ
   && html.includes('transform:translateY(1px) scale(.965)'),
   "Slimming catalog filter pills must preserve the existing press feedback.");
 
-assert.match(html, /#products \.filter-pill\{[^}]*min-height:44px;\s*padding:9px 19px;/,
-  "The authoritative product filter must keep a 44px hit target while clipping its visible glass surface 2px inward at top and bottom.");
+assert.match(html, /#products \.filter-pill\{[^}]*min-height:38px;\s*padding:6px 19px;/,
+  "The visible filter frame must be 38px high while keeping full text and width.");
 
-assert.match(html, /#products \.filter-pill\{min-height:44px;padding:7px 11px;font-size:13\.5px\}/,
-  "Narrow-phone product filters must preserve the 44px touch target while keeping the visible glass surface slim.");
+assert.match(html, /#products \.filter-pill\{min-height:38px;padding:5px 11px;font-size:13\.5px\}/,
+  "Narrow-phone filter frame must be 38px while preserving the original text and horizontal padding.");
 assert.ok(html.includes('.filter-pill.active,.filter-pill:hover{background:var(--panel-strong);border-color:var(--gold);box-shadow:inset 0 1px rgba(255,255,255,.26)}'),
   "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
 
-assert.ok(html.includes('border-top:2px solid transparent;')
-  && html.includes('border-bottom:2px solid transparent;')
-  && html.includes('background-clip:padding-box!important;'),
-  "The visible Liquid Glass surface should be inset vertically while the real button keeps its 44px touch target.");
-assert.ok(html.includes('inset:3px 1px;') && html.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;'),
-  "The specular sweep must remain inside the slimmer glass surface and retain its existing activation animation.");
+assert.ok(html.includes('#products .filter-pill::before{')
+  && html.includes('inset:-3px 0;')
+  && html.includes('pointer-events:auto;'),
+  "The 38px visible chip must preserve a >=44px effective touch area via transparent extensions.");
+assert.ok(html.includes('inset:1px 1px;') && html.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;'),
+  "The specular sweep must sit adjacent to the reduced frame while preserving light/dark selection animation.");
