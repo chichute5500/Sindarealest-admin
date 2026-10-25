@@ -4616,3 +4616,11 @@ html.dark #home .hero-visual .hero-pedestal-art{opacity:.88!important}
   #home .hero-visual .hero-pedestal-art{opacity:.88!important}
   html:not(.dark) #home .hero-visual .hero-pedestal-art{opacity:.88!important}
 }
+
+
+/* HERO RENDER PARITY V7.2 — 320–375px: keep both silhouette and legible copy
+   fully inside the inset rounded card, without distorting the source image. */
+@media(max-width:375px){
+  #home .hero-visual img{width:224px!important;left:-13px!important}
+  #home .hero-description{max-width:145px!important;font-size:10px!important;line-height:1.38!important}
+}
