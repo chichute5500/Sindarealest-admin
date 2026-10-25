@@ -35,6 +35,11 @@ for(const v of matrix){
     const response=await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:45000});
     expect(response?.status()).toBe(200);
     await expect(page.locator('#welcomeSplash')).toBeVisible({timeout:10000});
+    // Source-level first paint test: never rely on a late !important override.
+    const html=await page.content();
+    const source=html.match(/\.welcome-content\{display:flex;[^\n]*\}/);
+    expect(source?.[0]).toContain('background:transparent');
+    expect(source?.[0]).not.toContain('background:var(--welcome-panel)');
     const metrics=await page.evaluate(()=>{
       const overlay=document.getElementById('welcomeSplash');
       const panel=overlay.querySelector('.welcome-content');
@@ -49,7 +54,11 @@ for(const v of matrix){
         rootOverflow:getComputedStyle(root).overflowY,
         bodyOverflow:getComputedStyle(document.body).overflowY,
         textureFilter:getComputedStyle(overlay.querySelector('.welcome-texture--light')).filter,
-        logoFilter:getComputedStyle(logo).filter
+        logoFilter:getComputedStyle(logo).filter,
+        panelBackground:getComputedStyle(panel).backgroundColor,
+        panelBorder:getComputedStyle(panel).borderTopWidth,
+        panelShadow:getComputedStyle(panel).boxShadow,
+        panelBackdrop:getComputedStyle(panel).backdropFilter
       };
     });
     expect(Math.abs(metrics.overlay.left)).toBeLessThanOrEqual(2);
@@ -62,6 +71,10 @@ for(const v of matrix){
     expect(metrics.rootOverflow,'No second desktop/document scrollbar under intro').toBe('hidden');
     expect(metrics.bodyOverflow).toBe('hidden');
     expect(metrics.textureFilter,'No full-screen pixel filter during opening').toBe('none');
+    expect(metrics.panelBackground,'Welcome panel must be transparent from first CSS paint').toBe('rgba(0, 0, 0, 0)');
+    expect(metrics.panelBorder,'Welcome must not briefly render a white card border').toBe('0px');
+    expect(metrics.panelShadow,'Welcome must never have a white-card shadow').toBe('none');
+    expect(metrics.panelBackdrop,'Welcome must not composite a large glass blur').toBe('none');
     if(v.width>=761){
       expect(metrics.content.scrollHeight-metrics.content.clientHeight,
         'PC welcome must fit vertically without any internal scroll').toBeLessThanOrEqual(3);
