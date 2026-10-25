@@ -11,7 +11,7 @@ const heroSectionEnd = html.indexOf("</section>", heroSectionStart);
 assert.ok(heroSectionStart >= 0 && heroSectionEnd > heroSectionStart,
   "the public homepage must retain the crocodile-leather Hero section");
 const heroSection = html.slice(heroSectionStart, heroSectionEnd);
-assert.match(heroSection, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
+assert.match(heroSection, /<h1 class="serif"><span>Phong cách<\/span><span>Đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
   "the Hero must keep the confirmed three-line brand headline hierarchy");
 assert.match(heroSection, /<img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">/,
   "the Hero image source remains runtime-assigned to the owner-supplied presentation PNG");

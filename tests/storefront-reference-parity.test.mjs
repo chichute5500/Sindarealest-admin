@@ -177,7 +177,7 @@ assert.match(finalCss, /\.hero-copy\{display:flex!important;min-height:0!importa
   'The hero copy must determine its own height without a hidden image keeping a tall blank frame.');
 assert.match(finalCss, /\.hero-visual:has\(#heroProductImage\[hidden\]\)\{display:none!important;visibility:hidden!important;min-height:0!important;height:0!important;/,
   'The unavailable product image frame must collapse completely.');
-assert.match(html, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
+assert.match(html, /<h1 class="serif"><span>Phong cách<\/span><span>Đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
   'The hero headline must keep the exact three-line hierarchy from the supplied mobile reference.');
 assert.match(finalCss, /#home \.hero h1 span:first-child\{max-width:6em\}/);
 assert.match(finalCss, /#home \.hero h1 span:last-child\{max-width:7em\}/);
