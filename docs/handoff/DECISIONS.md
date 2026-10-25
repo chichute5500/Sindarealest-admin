@@ -1,3 +1,12 @@
+## DECISION — HERO HEEL CONTACT V5 — 2026-10-25
+1. Treat visible rear heel flotation as OPEN when owner reports it, even if the older Hero audit passes. V3 was owner-rejected; V4 was also visually rejected after direct screenshot inspection for excessive slope.
+2. Use V5 (`c29f830` CSS) as current compact visual candidate. Keep the original RGBA shoe PNG, owner-PASS Gallery and all unrelated features untouched.
+3. Maintain separate, properly located contact shadows at left heel, front loafer and upright loafer and modest 4° PC/tablet + 3° mobile stone inclination. Check actual light/dark screenshots, not just automation status.
+4. Source/test `4c27db5f6f046acd61cf7bb715540fccb0fc0b4c` has validated Preview PASS, Hero 14/14 PASS. Gallery PASS on same HTML/CSS visual source (`c29f830`); only Hero audit script changed after that. **Owner aesthetic acceptance still REQUIRED**.
+5. Keep PR #108 OPEN/unmerged; no Production/main, Admin, backend/API/auth, Gallery, catalog data, payment, DB/migrations, Cloudflare/infra edits.
+
+---
+
 ## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
 1. The owner's latest request **unlocks Hero visual refinement only**; preserve locked Gallery and unrelated storefront/Admin/backend scope.
 2. Adopt compact Hero V3 at source SHA `a8731583a87ef2dc8b776b6f33897329f5ff0f37`: desktop 415px high; tablet 340px; touch-desktop 372px; mobile 216–222px. The old Hero automated minimum-height bounds were incompatible with the owner's explicit "shorter Hero" request and were updated while retaining strict size/contact/no-overflow checks.

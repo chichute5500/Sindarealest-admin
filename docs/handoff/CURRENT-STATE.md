@@ -1,3 +1,16 @@
+## LATEST HERO OWNER FEEDBACK — HEEL CONTACT V5 — 2026-10-25
+> Supersedes previous claims that 14/14 Hero PASS means shoes no longer appear to float. The owner specifically rejected V3's visibly floating heel and authorized continued PC + mobile work.
+
+- Writable fix branch: `fix/liquid-glass-audit-2026-10-19`; PR #108 OPEN/unmerged, base main. Exact verified code/test SHA: `4c27db5f6f046acd61cf7bb715540fccb0fc0b4c`.
+- Changes since previous docs: V4 `8884a5e` created separate left-heel/front-shoe contact shadows and inclined plinth for desktop, tablet, mobile. Although V4's technical gates passed, real screenshots revealed an overly sloped/boat-like pedestal: **VISUAL REJECTED**, so it was not treated as final.
+- V5 CSS commit `c29f830` softened the perspective (4° desktop/tablet, 3° mobile), raised the rear stone lip modestly, retained heel-localized shadows, and kept Hero compact. The original 1200×1600 PNG pixels were not altered.
+- First V5 audit `40160126438`: FAIL only on an old scalar test assuming the bottom of a shoe may not exceed 46px from ellipse top, independent of ellipse physical depth. Verified screenshots were inspected rather than bypassed. Audit-only commit `4c27db5f6f046acd61cf7bb715540fccb0fc0b4c` measures shoe contact against actual oval depth + 4px, **retaining** localized heel-shadow coverage, clipping, no-overlap, theme, image alpha and network guards.
+- **EXACT-SHA `4c27db5f6f046acd61cf7bb715540fccb0fc0b4c` VERIFIED:** Validate PASS [40160292433](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292433), Cloudflare Preview deploy PASS [40160292397](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292397), Hero browser audit **14/14 PASS** [40160292599](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292599), screenshot/report [artifact 12586491454](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292599/artifacts/12586491454). Isolated Gallery audit PASS on identical CSS/source `c29f830` [40160126396](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160126396); subsequent commit was ONLY the Hero audit script.
+- Captures: 360, 390, 768, 980 touch, 1280, 1365, 1440, light/dark. Compared V3, V4, V5 PC/tablet/mobile images: V5's rear heel is much closer to supporting surface with localized contact shadow; plinth remains compact and fades into site background. **Owner aesthetic approval NOT YET GIVEN**; actual-phone and exact reference comparison remain owner required. Do NOT call complete on technical PASS alone.
+- Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/ . Keep PR #108 OPEN/unmerged. main/Production, locked Gallery, Admin/backend/API/auth, catalog/payment/DB/infrastructure untouched.
+
+---
+
 ## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
 > The latest Hero-specific checkpoint supersedes older "Hero paused" and tall reference sizing notes below; these remain historical, not current instructions.
 

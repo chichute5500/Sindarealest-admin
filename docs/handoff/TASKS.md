@@ -1,3 +1,15 @@
+## HERO HEEL CONTACT V5 — LATEST CHECKPOINT — 2026-10-25
+- [x] Reopen specifically unresolved heel-floating problem for desktop, tablet, mobile and touch desktop.
+- [x] Inspect V3/V4/V5 actual screenshots for ground contact; reject V4's over-tilted slab despite CI green.
+- [x] CSS V5 `c29f830`: moderated oval inclination, subtle front face, independent heel/front contact shadows, preserved owner PNG and locked Gallery.
+- [x] Change Hero-only audit to guard rear heel shadow coverage + physical oval depth; no blanket weakening of horizontal overflow, copy overlap, alpha, visual sizing, or sole/plane tests.
+- [x] Exact source/test SHA `4c27db5f6f046acd61cf7bb715540fccb0fc0b4c`: Validate PASS 40160292433; deploy PASS 40160292397; Hero Playwright 14/14 PASS 40160292599. [Artifact 12586491454](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292599/artifacts/12586491454).
+- [x] Gallery browser regression PASS on unchanged V5 HTML/CSS source `c29f830` (40160126396), no Gallery code changes.
+- [ ] **OWNER ACCEPTANCE REQUIRED**: inspect latest Preview on real PC/mobile; decide whether rear heel contact and stone material reach exact luxury reference. Automated green checks do not establish visual acceptance.
+- [ ] Keep PR OPEN, never merge or deploy Production from this task.
+
+---
+
 ## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
 - [x] Verify live branch/PR #108 HEAD and four handoff files; keep PR OPEN, main/Production untouched.
 - [x] Revise compact Hero CSS only (shoes + mineral ellipse + masked front face + independent localized contact shadows) while preserving original transparent product PNG and Gallery.

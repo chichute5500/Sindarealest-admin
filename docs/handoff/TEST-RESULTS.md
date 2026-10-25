@@ -1,3 +1,19 @@
+## HERO V5 HEEL CONTACT — EXACT-SHA CHECKS — 2026-10-25
+| Gate | Result | Source and evidence |
+|---|---|---|
+| Latest verified source/test SHA | `4c27db5f6f046acd61cf7bb715540fccb0fc0b4c` | V5 style `c29f830` + calibrated Hero-only audit |
+| Source Validate | **PASS** | [40160292433](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292433) |
+| Cloudflare branch Preview | **PASS** | [40160292397](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292397) |
+| Hero browser audit 7 sizes × 2 themes | **14/14 PASS** | [40160292599](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292599), [screenshot artifact 12586491454](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160292599/artifacts/12586491454) |
+| Gallery browser regression on final V5 Hero CSS | **PASS** | [40160126396](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160126396), source `c29f830`; newer audit-only commit does not change Gallery or HTML |
+| V4 aesthetics | **VISUAL FAIL / SUPERSEDED** | Excessive sloping platform in actual 1440 and 768 captures; do not call V4 accepted |
+| V5 preliminary Hero audit | **FAIL / SUPERSEDED** | [40160126438](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40160126438): old hardcoded 46px scalar; final measured-depth regression gate PASS |
+| Owner aesthetic acceptance / real device | **NOT YET ACCEPTED** | Real PC/mobile viewing and exact owner reference parity required |
+| Original PNG / Gallery source | **UNCHANGED** | No edits to PNG or Gallery files |
+| PR #108 / Production | **OPEN, UNMERGED / NO PRODUCTION DEPLOY** | Intentionally maintained |
+
+---
+
 ## HERO COMPACT V3 — EXACT-SHA BROWSER EVIDENCE — 2026-10-25
 | Check | Result | Evidence |
 |---|---|---|
