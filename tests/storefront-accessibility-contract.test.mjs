@@ -584,83 +584,82 @@ assert.equal(nativeShareSuccess.messages.length, 0,
   'a successful native share needs no extra toast');
 
 
-// Bidirectional viewport reveal regression: repeated scroll DOWN and UP must
-// re-trigger blur-reveal, but never hide a still-intersecting element.
+// Repeat-on-entry regression with threshold hysteresis and no full-card GPU blur.
 {
   const start = html.indexOf('function unbindReveal(root){');
   const end = html.indexOf('\nfunction preferredGallery(', start);
-  assert.ok(start > 0 && end > start,
-    'bidirectional reveal controller must be present in the actual storefront script');
+  assert.ok(start > 0 && end > start, 'reveal controller is present');
   const controller = html.slice(start, end);
-  function createTarget() {
-    const classes = new Set();
+  const classes = () => {
+    const items = new Set();
     return {
-      isConnected: true,
-      bound: false,
-      setAttribute(name) { if (name === 'data-reveal-bound') this.bound = true; },
-      classList: {
-        add(c) { classes.add(c); },
-        remove(c) { classes.delete(c); },
-        toggle(c, force) { if (force) classes.add(c); else classes.delete(c); },
-        contains(c) { return classes.has(c); }
-      }
+      add(k) { items.add(k); },
+      remove(k) { items.delete(k); },
+      contains(k) { return items.has(k); }
     };
+  };
+  function target() {
+    return { isConnected: true, bound: false, classList: classes(),
+      setAttribute(name) { if(name === 'data-reveal-bound') this.bound = true; } };
   }
-  function rootFor(items) {
-    return { querySelectorAll(selector) {
-      if (selector === '[data-reveal]:not([data-reveal-bound])')
-        return items.filter(item => !item.bound);
-      if (selector === '[data-reveal-bound]')
-        return items.filter(item => item.bound);
-      throw Error('Unexpected reveal selector: ' + selector);
-    } };
+  function root(items) { return { querySelectorAll(q) {
+    if (q === '[data-reveal]:not([data-reveal-bound])') return items.filter(x => !x.bound);
+    if (q === '[data-reveal-bound]') return items.filter(x => x.bound);
+    throw Error(q);
+  } }; }
+  let callback, settings; const observed = new Set();
+  class FakeObserver {
+    constructor(fn, options) { callback = fn; settings = options; }
+    observe(el) { observed.add(el); }
+    unobserve(el) { observed.delete(el); }
   }
-  const observed = new Set();
-  let notify;
-  let observerSettings;
-  class FakeIntersectionObserver {
-    constructor(callback, settings) { notify = callback; observerSettings = settings; }
-    observe(item) { observed.add(item); }
-    unobserve(item) { observed.delete(item); }
-  }
-  const ctx = { window: { IntersectionObserver: FakeIntersectionObserver },
-    IntersectionObserver: FakeIntersectionObserver };
-  vm.runInNewContext(controller +
-    '\n;globalThis.revealHarness = {bindReveal, unbindReveal};', ctx, { timeout: 1000 });
-  const { bindReveal, unbindReveal } = ctx.revealHarness;
-  const first = createTarget();
-  bindReveal(rootFor([first]));
-  assert.equal(observed.has(first), true, 'scrolling reveal must keep observing after activation');
-  assert.equal(observerSettings.threshold, 0, 'partially visible cards must not flicker at scroll boundaries');
-  notify([{ target: first, isIntersecting: true }]);
-  assert.equal(first.classList.contains('is-visible'), true, 'first scroll-down entry reveals the card');
-  notify([{ target: first, isIntersecting: true }]);
-  assert.equal(first.classList.contains('is-visible'), true, 'partially visible card stays visible');
-  notify([{ target: first, isIntersecting: false }]);
-  assert.equal(first.classList.contains('is-visible'), false, 'fully exited card resets for next entry');
-  notify([{ target: first, isIntersecting: true }]);
-  assert.equal(first.classList.contains('is-visible'), true, 'scrolling UP into the card replays reveal');
-  notify([{ target: first, isIntersecting: false }]);
-  notify([{ target: first, isIntersecting: true }]);
-  assert.equal(first.classList.contains('is-visible'), true, 'repeated down/up cycles keep working');
-  const second = createTarget();
-  bindReveal(rootFor([second]));
-  assert.equal(observed.has(second), true, 'new catalog cards must be observed');
-  unbindReveal(rootFor([first, second]));
-  assert.equal(observed.size, 0, 'catalog rerender must unobserve detached product cards');
-  const disconnected = createTarget();
-  bindReveal(rootFor([disconnected]));
-  disconnected.isConnected = false;
-  notify([{ target: disconnected, isIntersecting: false }]);
-  assert.equal(observed.has(disconnected), false, 'detached DOM nodes cannot leak observers');
-  const noObserver = { window: {} };
-  vm.runInNewContext(controller +
-    '\n;globalThis.revealHarness = {bindReveal};', noObserver, { timeout: 1000 });
-  const fallback = createTarget();
-  noObserver.revealHarness.bindReveal(rootFor([fallback]));
-  assert.equal(fallback.classList.contains('is-visible'), true,
-    'unsupported IntersectionObserver must display content without motion');
-  assert.ok(html.includes('@media(prefers-reduced-motion:reduce)') &&
-    html.includes('html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}'),
-    'reduced-motion users must always see content without the blur effect');
+  const ctx = { window: { IntersectionObserver: FakeObserver }, IntersectionObserver: FakeObserver };
+  vm.runInNewContext(controller + '\n;globalThis.harness = {bindReveal,unbindReveal};', ctx, {timeout:1000});
+  const {bindReveal,unbindReveal} = ctx.harness;
+  assert.equal(JSON.stringify(Array.from(settings.threshold)), JSON.stringify([0,.08]),
+    'entry threshold must avoid edge flicker while preserving scroll replays');
+  const el=target();bindReveal(root([el]));
+  assert.equal(observed.has(el),true,'element observed initially');
+  const ping=(intersect,ratio)=>callback([{target:el,isIntersecting:intersect,intersectionRatio:ratio}]);
+  ping(true,.03);
+  assert.equal(el.classList.contains('is-visible'),false,'do not trigger on tiny edge overlap');
+  ping(true,.20);
+  assert.equal(el.classList.contains('is-visible'),true,'scroll down reveals');
+  ping(true,.01);
+  assert.equal(el.classList.contains('is-visible'),true,'still partially visible stays shown');
+  ping(false,0);
+  assert.equal(el.classList.contains('is-visible'),false,'fully exited resets immediately');
+  ping(true,.12);
+  assert.equal(el.classList.contains('is-visible'),true,'scroll up replays');
+  ping(false,0);ping(true,.3);
+  assert.equal(el.classList.contains('is-visible'),true,'repeated scroll replays');
+  assert.equal(observed.has(el),true,'enter/exit does not drop observer');
+  const fresh=target();bindReveal(root([fresh]));
+  assert.equal(observed.has(fresh),true,'dynamic cards observed');
+  unbindReveal(root([fresh,el]));
+  assert.equal(observed.size,0,'detached catalog cards release observer');
+  const stale=target();bindReveal(root([stale]));stale.isConnected=false;
+  callback([{target:stale,isIntersecting:false,intersectionRatio:0}]);
+  assert.equal(observed.has(stale),false,'disconnected card gets unobserved');
+  const noIO={window:{}};
+  vm.runInNewContext(controller + '\n;globalThis.harness = {bindReveal};',noIO,{timeout:1000});
+  const fallback=target();noIO.harness.bindReveal(root([fallback]));
+  assert.equal(fallback.classList.contains('is-visible'),true,'no IO fallback shows content');
+  const cssStart=html.indexOf('/* Lightweight bidirectional reveal.');
+  const cssEnd=html.indexOf('html.theme-transitioning',cssStart);
+  assert.ok(cssStart>0 && cssEnd>cssStart,'lightweight reveal CSS exists');
+  const css=html.slice(cssStart,cssEnd);
+  assert.ok(css.includes('filter:none;') && !/filter:blur\(/.test(css),
+    'reveal must not blur entire glass/photographic card layers');
+  assert.ok(css.includes('transition:none;') && css.includes('opacity .38s'),
+    'exit must reset without animation; entering uses a short transition');
+  assert.ok(css.includes('will-change:auto;') && !css.includes('translate3d'),
+    'do not pin compositor layers or 3D transform each product card');
+  assert.ok(css.includes(':is(.hero-copy,.section-head,.order-cta)[data-reveal]'),
+    'only small editorial copy slides; photo cards remain stationary');
+  assert.ok(html.includes('html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}'),
+    'prefers-reduced-motion CSS must reveal content without motion');
+  assert.ok(html.includes("function renderCatalog(){unbindReveal($('#catalogGrid'))") &&
+    html.includes("function renderFeatured(){unbindReveal($('#featuredGrid'))"),
+    'render loops must clean up old observers to avoid retained layers');
 }
