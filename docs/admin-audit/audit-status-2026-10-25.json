@@ -2,7 +2,7 @@
   "auditDate": "2026-10-25",
   "adminHeadBeforeDocumentation": "f0bd664fa359aa197c274e8648e71c79e67567a9",
   "pr": 111,
-  "preintegration": "BLOCKED",
+  "preintegration": "BLOCKED_DEFERRED_BY_OWNER",
   "integrationAuthorized": false,
   "merged": false,
   "productionModified": false,
@@ -158,7 +158,7 @@
   "lastVerifiedDeployedAppSourceSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
   "lastVerifiedDeployedRun": 40165551327,
   "storefrontHeadAsOfHandoff": "632a64c09a47d71bb1461c2937c44b9c2d3dc028",
-  "latestOwnerInstruction": "Continue to fix all Admin issues, but DO NOT integrate or merge the Storefront",
+  "latestOwnerInstruction": "Do not repeat already PASS tests. D1/R2 are not a current priority; only continue other unfinished work. Update GitHub handoff and prompt for next chat.",
   "cloudflareBindingLastVerifiedByRun": 40167641001,
   "cloudflareImageBindingHistoricalGapResolved": true,
   "ownerAcceptedScreenCount": 12,
@@ -528,7 +528,7 @@
     "releaseAuthorized": false
   },
   "ownerVisualDesignApproved": true,
-  "remainingTechnicalReleaseGatesStatus": "NOT_FULLY_ACCEPTED_DO_NOT_MERGE_OR_DEPLOY_PRODUCTION",
+  "remainingTechnicalReleaseGatesStatus": "NON_D1_R2_SIGNOFFS_OUTSTANDING_INTEGRATION_BLOCKED_NO_MERGE",
   "ownerBellApprovalScope": "Owner affirmed bell behavior/design as described; no claim of independent pixel-by-pixel owner inspection of latest bell screenshots",
   "previousRemainingBlockersHistorical": [
     "ADMIN_PREVIEW_ORIGINALS_MISSING",
@@ -540,7 +540,7 @@
   ],
   "currentOpenGates": {
     "recordedOn": "2026-10-25",
-    "scope": "UNFINISHED_ONLY_NO_RETEST",
+    "scope": "NON_D1_R2_UNFINISHED_ONLY_NO_PASS_RETEST",
     "passEvidenceLocked": true,
     "ownerDesignScreensApproved": 12,
     "adminBellSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
@@ -566,7 +566,32 @@
     ],
     "productionTouched": false,
     "mergeAuthorized": false,
-    "handoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md"
+    "handoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md",
+    "d1R2Priority": "DEFERRED_BY_OWNER_NOT_BLOCKER_RESOLVED",
+    "activelyPrioritized": [
+      "INDEPENDENT_DEEP_SECURITY_REVIEW",
+      "ASSISTIVE_TECH_ACCESSIBILITY_SIGNOFF",
+      "PERFORMANCE_LOAD_INDEPENDENT_ACCEPTANCE",
+      "REAL_FINANCIAL_RECONCILIATION_SIGNOFF",
+      "ADMIN_STOREFRONT_API_SCHEMA_READONLY_CONTRACT_PLAN"
+    ],
+    "deferredWork": [
+      "REPEAT_R2_CANARY",
+      "REPEAT_DISPOSABLE_RESTORE",
+      "NEW_REMOTE_D1_R2_QA",
+      "STOREFRONT_PREVIEW_CLOUDFLARE_DB_ORIGINALS_REBINDING",
+      "CROSS_PROJECT_WRITE_INTEGRATION"
+    ],
+    "deferredIntegrationRisksNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "lastVerifiedDocsCheckpoint": "a29a46abe88516456ee23078ad29015649b31e53",
+    "docsCheckpointWorkflowResults": "4/4 SUCCESS",
+    "lastVerifiedCodeDeployedSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "lastVerifiedCodeDeployWorkflow": 40208396978,
+    "handoffPromptPath": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+    "handoffScopeInstructionDate": "2026-10-25"
   },
   "lastVerifiedRemoteDisposableRestore": {
     "run": 40188752986,
