@@ -269,5 +269,16 @@
     "approvedAppSha": "0b9395721cfd58ec0d1dace922ffc3372b7bba60",
     "nextScreen": "02_dashboard",
     "status": "IN_PROGRESS"
+  },
+  "screen02VisualReview": {
+    "screen": 2,
+    "name": "Tổng quan",
+    "state": "AWAITING_REAPPROVAL",
+    "ownerFeedback": "Duplicate dashboard heading; replace ambiguous logout arrow with red power-off icon",
+    "fixedDeployedSourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+    "visualWorkflowRun": 40194565226,
+    "visualArtifactId": 12599625737,
+    "ciPasses": 10,
+    "ciTotal": 10
   }
 }
