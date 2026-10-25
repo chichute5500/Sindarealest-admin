@@ -39,4 +39,10 @@ assert.match(css,/ai-marble-pedestal\.webp/,'Marble stage must be a distinct ima
 assert.match(css,/@media\(max-width:760px\)/,'Mobile must have responsive native layout');
 assert.doesNotMatch(css,/font-size:0!important|clip-path:inset\(50%\)/,
  'Live text must not be visually hidden behind screenshot');
+const wave=readFileSync(new URL('images/hero-rebuild/silk-waves.svg',base),'utf8');
+assert.match(wave,/<svg[^>]*>/);
+assert.match(wave,/<path /);
+assert.doesNotMatch(wave,/(Phong cách|đẳng cấp|Khám phá ngay|<image|<text|<foreignObject)/i,
+ 'Silk background must be decorative paths only: never hide a screenshot of the full HERO in an SVG');
+assert.match(css,/silk-waves\.svg/,'The background must use standalone decorative silk only');
 console.log('PASS: HERO native semantic text, native CTA, standalone product and stage, responsive CSS; no composite wallpaper');
