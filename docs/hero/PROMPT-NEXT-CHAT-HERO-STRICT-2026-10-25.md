@@ -1,3 +1,15 @@
+# V17 exact strict visual continuation — 2026-10-26, VISUAL FAIL
+
+Before doing any more implementation, read `docs/hero/HERO-STRICT-ACCEPTANCE-AND-HANDOFF-2026-10-25.md`, especially **section 8**. Do NOT repeat historical V14/V15/V16 fixes already tested or falsely pass the design.
+
+**Facts:** Repo `chichute5500/Sindarealest-admin`; ONLY branch `feature/hero-v9-integrated-2026-10-25`; PR #115 DRAFT, NO MERGE, NO Production, NO unrelated Admin or accepted Storefront changes. V17 last full code/QA SHA `ff901d333983ea6c35f392e2b6948e212aa83e3e`. Subsequent docs SHA changes do not change app. Native Chromium [run #40220877828](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40220877828) PASS, 14 actual photos [artifact 12608909260](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40220877828/artifacts/12608909260). Protected integration [run #40220877862](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40220877862) PASS. Exact source original shoe image immutable. **V17 HAS NOT BEEN DEPLOYED TO PREVIEW**; existing stable Preview remains V14. **Visual acceptance FAIL**.
+
+**Real SSIM after geometry normalization** (owner master 1779×884 resized to Chromium 1380×677, same crop): heading .599, upper silk .787, lower silk/floor .794, shoes+stage .328, lower marble .418, CTA .651, overall .615. This is NOT 95%, and every core region fails. Honest comparison, not fabricated percentage or functional CI PASS interpreted as visual pass. Existing isolated SVG stage remains too pale/simple/vector-based; golden veins and satin fold highlights not photorealistic; owner's original paired-shoe left shoe relative top is substantially lower than in the rendered target, cannot fix both shoes with a global transform. Original preserved standalone WebP marble is a dark navy platter, tested in actual browser and **rejected**; do not reuse as an alleged pale stone. V15 squiggly veins and uniform vector ribbons were rejected. Desktop slab height compression V17 improves floor but not required overall.
+
+**Next actions:** Truly redesign independently layered silk and gold-veined light marble and relative shoe presentation WITHOUT full banner image, embedded markup as image, fake image CTA, altered owner PNG bytes or CSS `!important` patch stacks. Keep live 3-line h1, descriptive paragraph and clickable native #products CTA. Run actual Chromium at 320, 360, 390, 768, 980, 1280, 1440 × light/dark; download its 14 real screenshots, compare to untouched original master at matched viewport/crop and save named per-region SSIM, then visual self-audit and iterate. Maintain separate technical PASS vs visual FAIL and only propose owner approval when **EVERY** key region >.95 and explicitly visually verified. Keep PR Draft, no Production or isolated Preview deploy except after separate D1/R2 guard. Do not ask user to re-explain their rules. Read more history below.
+
+---
+
 # ACTIVE V14 CHECKPOINT — 2026-10-26
 
 Use this checkpoint BEFORE the historical V11 instructions below. The project is NOT a new project.
