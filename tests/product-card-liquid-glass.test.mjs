@@ -132,16 +132,14 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
-assert.ok(html.includes('/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */')
-  && html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
-  && mobileHeroReferenceMatch.includes('grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;')
-  && mobileHeroReferenceMatch.includes('height:clamp(216px,57vw,230px)!important;')
-  && mobileHeroReferenceMatch.includes('grid-template-rows:1fr!important;')
-  && mobileHeroReferenceMatch.includes('top:-42px!important;left:-30px!important;')
-  && mobileHeroReferenceMatch.includes('object-fit:contain!important;object-position:center center!important;')
-  && mobileHeroReferenceMatch.includes('opacity:1!important;mix-blend-mode:normal!important;'),
-  "Hero reference layout must not expand transparent PNG padding or stack the shoes below the copy.");
+assert.ok(nativeHeroCss.includes("url('/images/hero-upload/ai-marble-pedestal.webp')") &&
+  nativeHeroCss.includes("url('/images/hero-rebuild/silk-waves.svg')"),
+  "HERO V12 must use separate true marble pedestal and purely decorative silk assets.");
+assert.ok(nativeHeroCss.includes("width:clamp(218px,66vw,400px)") &&
+  nativeHeroCss.includes("grid-template-columns:minmax(0,55%) minmax(0,45%)"),
+  "Compact mobile HERO must retain native left-copy/right-shoes layout.");
+assert.ok(!nativeHeroCss.includes('!important'),
+  "HERO V12 single authority must not restore override piles.");
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
