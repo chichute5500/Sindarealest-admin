@@ -1,21 +1,16 @@
-name: HERO V9.4 integrated Chromium visual QA (NO DEPLOY)
+name: HERO V10 actual HTML/CSS Chromium UI — NO DEPLOY
 on:
   push:
     branches:
       - feature/hero-v9-integrated-2026-10-25
     paths:
       - public/index.html
-      - public/images/hero-rebuild/**
+      - tests/hero-render-reference.test.mjs
       - scripts/audit-hero-local-v9.mjs
       - .github/workflows/hero-v9-local-visual-qa.yml
   pull_request:
     branches:
       - integration/full-site-admin-storefront-2026-10-25
-    paths:
-      - public/index.html
-      - public/images/hero-rebuild/**
-      - scripts/audit-hero-local-v9.mjs
-      - .github/workflows/hero-v9-local-visual-qa.yml
 permissions:
   contents: read
 jobs:
@@ -33,13 +28,15 @@ jobs:
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
           npx playwright install --with-deps chromium
-      - name: Audit 7 viewports × 2 themes and CTA keyboard navigation
+      - name: Native DOM contract
+        run: node tests/hero-render-reference.test.mjs
+      - name: Audit 7 viewports, 2 themes, visible typography, shoe and podium layers, CTA focus
         run: node scripts/audit-hero-local-v9.mjs
-      - name: Upload screenshots and pixel parity results
+      - name: Upload actual HERO screenshots and DOM metrics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hero-v9-integrated-chromium
-          path: artifacts/hero-v9-isolated-browser-qa/
+          name: hero-v10-native-browser
+          path: artifacts/hero-v10-native-browser-qa/
           if-no-files-found: warn
           retention-days: 14
