@@ -12,3 +12,4 @@
 .mode-options input{width:18px;height:18px;flex-shrink:0}
 
   
+.touch-drag-ghost{position:fixed;z-index:999;background:#e4bd70;border-radius:16px;color:#17130c;font-weight:800;padding:9px 12px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px #0009;transform:translateZ(0)}
