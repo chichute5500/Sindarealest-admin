@@ -15,6 +15,7 @@ on:
       - "scripts/qa-admin-d1-synthetic-lifecycle.mjs"
       - "tests/e2e/admin-qa-write-persistence.spec.js"
       - "tests/e2e/admin-qa-order-persistence.spec.js"
+      - "functions/api/admin/orders.js"
 
 permissions:
   contents: read

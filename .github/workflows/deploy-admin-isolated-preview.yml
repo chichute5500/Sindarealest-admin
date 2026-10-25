@@ -19,6 +19,10 @@ on:
       # Reissue the pinned Preview deployment after QA-only changes to retain
       # exact-source-SHA provenance for cross-workflow browser acceptance.
       - 'tests/e2e/admin-security-a11y-perf.spec.js'
+      - '.github/workflows/admin-12-screen-synthetic-qa-20261024.yml'
+      - '.github/workflows/admin-12-screen-qa-20261024.yml'
+      - '.github/workflows/admin-security-a11y-perf-readonly.yml'
+      - 'tests/disposable-sqlite-integration.test.mjs'
 
 permissions:
   contents: read

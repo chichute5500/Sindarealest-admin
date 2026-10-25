@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/admin-security-a11y-perf-readonly.yml'
       - 'tests/e2e/admin-security-a11y-perf.spec.js'
+      - 'functions/api/admin/orders.js'
   workflow_dispatch:
 
 permissions:

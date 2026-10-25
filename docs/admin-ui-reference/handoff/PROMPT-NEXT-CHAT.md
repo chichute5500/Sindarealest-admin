@@ -1,3 +1,7 @@
+> **LIVE QA ĐA LUỒNG 2026-10-25** — source commit `3cbfc808fe0a7c9fde25c36ca6aab350ff3a42ac` đã đạt **5/5 CI PASS**: Validate #40184069669/#40184065903, Admin Preview Playwright #40184069661, isolated Playwright #40184069682, diagnostic #40184065876. Mã sửa tranh chấp cập nhật giá/trạng thái bằng parent-order snapshot trước mọi item write, SQLite thực tế chặn stale reprice; fixture thanh toán đã được sửa mà không nới lỏng điều kiện nghiệp vụ. Remote Admin D1 QA synthetic #40182629881 PASS 14 × 12 màn hình, cleanup hai lần; security keyboard #40183492321 PASS; Preview R2/D1 isolation #40183717239 và remote D1 schema #40183717244 PASS. Đang triển khai/kiểm tra lại đúng code mới trên Admin Preview; không ghi Production/Storefront, không merge. **0/12 OWNER_ACCEPTED**, 32/100 là điểm trọng số bằng chứng, KHÔNG phải tỷ lệ hoàn thành. Báo cáo: [PARALLEL-ACCEPTANCE-2026-10-25.md](../../admin-audit/PARALLEL-ACCEPTANCE-2026-10-25.md).
+
+---
+
 > **BỔ SUNG NGHIỆM THU ĐỘC LẬP (Admin order race, 25/10/2026):** code/test SHA `030a39928204a5b091b27880adf645f57e343593`, commit sửa thêm điều kiện kiểm tra snapshot dòng hàng khi thao tác lưu giá không thay đổi. Test D1-contract bằng SQLite in-memory mô phỏng người khác đổi giá trước `DB.batch`; bản lưu cũ phải HTTP 409, giữ giá/tổng tiền mới, không tạo audit thành công giả. CI tại mốc cập nhật: 6/6 SUCCESS (xem báo cáo cập nhật), không coi job chưa kết thúc là PASS. Các blocker Cloudflare vẫn giữ nguyên; không deploy/merge/tích hợp. [Báo cáo](../../admin-audit/INDEPENDENT-QA-2026-10-25.md).
 
 ---
