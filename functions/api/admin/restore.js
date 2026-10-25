@@ -2,7 +2,11 @@ import { fail, getSetting, json, productInsertStatement, readJsonBodyLimited, re
 import { validateWatermarkSettingUpdates } from "../../_lib/watermark-settings.js";
 
 const str = (v, max, required = false) => typeof v === "string" && v.length <= max && (!required || v.trim().length > 0);
-const integer = (v, min = 0, max = Number.MAX_SAFE_INTEGER) => Number.isSafeInteger(Number(v)) && Number(v) >= min && Number(v) <= max;
+// Reject JavaScript coercion of empty strings, booleans and arrays before destructive Restore.
+// Preserve decimal-string integers for compatibility with older backup files.
+const integer = (v, min = 0, max = Number.MAX_SAFE_INTEGER) =>
+  (typeof v === "number" || (typeof v === "string" && /^\d+$/.test(v))) &&
+  Number.isSafeInteger(Number(v)) && Number(v) >= min && Number(v) <= max;
 const nullableInteger = (v, max = Number.MAX_SAFE_INTEGER) => v === null || integer(v, 0, max);
 const timestamp = (v) => str(v, 50, true);
 const MAX_BACKUP_BYTES = 20 * 1024 * 1024;

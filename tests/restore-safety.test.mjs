@@ -161,6 +161,20 @@ const validRelationshipsBackup = () => ({
     },
 });
 
+// Reject coercible-but-invalid numbers before any destructive D1 batch.
+for (const [label, mutate] of [
+  ["whitespace order total", backup => { backup.operations.orders[0].total = " "; }],
+  ["array item quantity", backup => { backup.operations.orderItems[0].quantity = [1]; }],
+  ["boolean item line total", backup => { backup.operations.orderItems[0].line_total = false; }],
+]) {
+  const backup = validRelationshipsBackup();
+  mutate(backup);
+  const db = makeDB();
+  const response = await restoreBackup({ request: request(backup), env: { ...env, DB: db } });
+  assert.equal(response.status, 400, label + " must be rejected before restore");
+  assert.equal(db.batchCalls, 0, label + " must cause no destructive D1 writes");
+}
+
 {
   const mismatchedWarranty = validRelationshipsBackup();
   mismatchedWarranty.operations.warranties.push({
