@@ -30,11 +30,15 @@ for (const {width,height,theme} of [
     page.on('request',r=>{if(new URL(r.url()).origin===base&&r.url().includes('/api/admin/')&&
       !['GET','HEAD','OPTIONS'].includes(r.method())&&!r.url().endsWith('/api/admin/login'))wrote=true;});
     try {
-      for(const path of ['/api/admin/products','/api/admin/orders','/api/admin/settings','/api/admin/backup','/api/admin/warranties','/api/admin/customers','/api/admin/audit-logs','/api/admin/payment-transactions']) {
+      for(const path of ['/api/admin/products','/api/admin/orders','/api/admin/settings','/api/admin/backup','/api/admin/warranties','/api/admin/customers','/api/admin/audit-logs']) {
         const r=await ctx.request.get(base+path,{failOnStatusCode:false});
         out.authProbes.push({path,status:r.status()});
         expect([401,403],path+' unauthenticated access must be rejected').toContain(r.status());
       }
+      // This ledger endpoint intentionally does not expose GET. HTTP 405 is
+      // method rejection, NOT evidence of successful auth enforcement.
+      const ledgerUnsupportedGet=await ctx.request.get(base+'/api/admin/payment-transactions',{failOnStatusCode:false});
+      expect(ledgerUnsupportedGet.status(),'GET on write-only ledger endpoint must remain unsupported').toBe(405);
       const start=Date.now();
       const response=await page.goto(base+'/admin/',{waitUntil:'domcontentloaded',timeout:30000});
       expect(response?.status()).toBe(200);
