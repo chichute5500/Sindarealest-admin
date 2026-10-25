@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "capturedDate": "2026-10-25",
+  "status": "HANDOFF_READY_NOT_100_PERCENT",
+  "sourceShaBeforeDocsCommit": "6b10cd53ad591521ee719aefd015898bfeb5d36f",
+  "branch": "feature/admin-isolated-handoff-2026-10-20",
+  "repo": "chichute5500/Sindarealest-admin",
+  "adminPr": 111,
+  "adminPrState": "OPEN",
+  "merged": false,
+  "websitePr": 108,
+  "websiteHeadAtLastCheck": "a72e6d4344b963a50057480ddb1d9f7d57d653ce",
+  "websiteWriteAllowed": false,
+  "mainRefAtLastCheck": "227622d3e3b7c75724ffa1775b193da71089269a",
+  "latestAdminPreviewApplicationSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
+  "latestPreviewDeployRunId": 40165551327,
+  "codeAfterDeploymentHasUnredeployedChanges": true,
+  "exactShaRuns": [
+    {
+      "id": 40170302058,
+      "conclusion": "success",
+      "name": "Validate"
+    },
+    {
+      "id": 40170299770,
+      "conclusion": "success",
+      "name": "Validate"
+    },
+    {
+      "id": 40170302063,
+      "conclusion": "success",
+      "name": "Admin Preview Playwright"
+    },
+    {
+      "id": 40170302057,
+      "conclusion": "success",
+      "name": "Isolated Admin Preview Playwright"
+    }
+  ],
+  "previousSourceWithSixWorkflows": "9b6bb3145145b1399391dd235f1a2efb9ee66b99",
+  "diagnosticRun": 40169833613,
+  "diagnosticArtifactId": 12589933479,
+  "runtimeProtectedHandlerCount": 31,
+  "moduleCount": 22,
+  "approvedReferenceScreens": 0,
+  "referenceScreenCount": 12,
+  "weightedEvidencedScore": 32,
+  "weightedScoreIsProjectCompletionPercent": false,
+  "resolvedPreviewImagesBinding": true,
+  "cloudflareReadOnlyBlockerRunId": 40167641001,
+  "cloudflareBlockers": [
+    "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+    "ADMIN_PREVIEW_ORIGINALS_MISSING",
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+  ],
+  "missingAcceptance": [
+    "privateR2RemoteWriteReadCleanup",
+    "remoteDisposableD1Restore",
+    "manualSettlementSignoff",
+    "referenceMatched12Screens",
+    "independentAccessibilitySecurityPerformance",
+    "ownerApproval"
+  ],
+  "integrationApproved": false,
+  "productionChangeAllowed": false,
+  "websiteMergeAllowed": false,
+  "prompt": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+  "note": "Doc-only commit changes HEAD; re-query GitHub live before asserting CI on that resulting SHA."
+}

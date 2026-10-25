@@ -94,5 +94,27 @@
     "REMOTE_R2_PRIVATE_WRITE_READ_CLEANUP_NOT_VERIFIED",
     "REMOTE_RESTORE_POST_TO_DISPOSABLE_D1_NOT_VERIFIED"
   ],
-  "overallStatus": "NOT_100_PERCENT_ACCEPTED"
+  "overallStatus": "NOT_100_PERCENT_ACCEPTED",
+  "latestHandoffDate": "2026-10-25",
+  "lastVerifiedCodeAndTestHeadBeforeHandoff": "6b10cd53ad591521ee719aefd015898bfeb5d36f",
+  "lastVerifiedExactShaCi": {
+    "sourceSha": "6b10cd53ad591521ee719aefd015898bfeb5d36f",
+    "result": "4/4_SUCCESS",
+    "runs": [
+      40170302058,
+      40170299770,
+      40170302063,
+      40170302057
+    ]
+  },
+  "lastVerifiedDeployedAppSourceSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
+  "lastVerifiedDeployedRun": 40165551327,
+  "storefrontHeadAsOfHandoff": "a72e6d4344b963a50057480ddb1d9f7d57d653ce",
+  "latestOwnerInstruction": "Continue to fix all Admin issues, but DO NOT integrate or merge the Storefront",
+  "cloudflareBindingLastVerifiedByRun": 40167641001,
+  "cloudflareImageBindingHistoricalGapResolved": true,
+  "ownerAcceptedScreenCount": 0,
+  "acceptanceEvidenceWeight": 32,
+  "completionPercentNotEstablished": true,
+  "handoffDocument": "docs/admin-ui-reference/handoff/CURRENT-CHECKPOINT-2026-10-25.md"
 }

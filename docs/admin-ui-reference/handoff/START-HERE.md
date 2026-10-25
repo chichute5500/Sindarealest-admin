@@ -1,3 +1,7 @@
+> **CHỐT MỚI NHẤT 2026-10-25 — PHẢI ĐỌC TRƯỚC PHẦN LỊCH SỬ BÊN DƯỚI.** Chi tiết tại [CURRENT-CHECKPOINT-2026-10-25.md](./CURRENT-CHECKPOINT-2026-10-25.md) và [PROMPT-NEXT-CHAT.md](./PROMPT-NEXT-CHAT.md). Nguồn Admin trước commit tài liệu: 6b10cd53ad591521ee719aefd015898bfeb5d36f, 4/4 CI PASS. Deploy ứng dụng đã xác minh: c64e07fca248dc527361c4d018dc26c11f5b3570. PR #111 OPEN; main không đổi. Cloudflare R2 IMAGES Preview **đã cấu hình thành công**, nhưng Admin ORIGINALS còn thiếu; Storefront Preview DB/ORIGINALS vẫn trỏ tài nguyên Production. 12 màn hình 0/12 chấp thuận; 32/100 là **điểm chứng cứ**, không phải % dự án. KHÔNG TÍCH HỢP / MERGE / DEPLOY PRODUCTION. Các checkpoint phía dưới là lịch sử, không còn là trạng thái mới nhất.
+
+---
+
 ## VERIFIED CHECKPOINT — 2026-10-25, source QA `9fde886e4be1`
 
 See [2026-10-25-EXECUTION-REPORT.md](./2026-10-25-EXECUTION-REPORT.md) for **7/7 exact-SHA CI SUCCESS; 72 read-only + 72 run-owned synthetic screenshots; 320/390/1280 light/dark; zero modal-nav gap; twice-verified zero QA rows; isolated Admin Preview deployed SHA `1f9795e`; and the owner-only Preview R2 `IMAGES` binding blocker.** Visual reference parity remains **0/12 accepted** and weighted evidence **32/100 (not project completion)**. PR #111 OPEN. No Production or main changes.
