@@ -1,0 +1,77 @@
+name: PRE-INTEGRATION read-only Admin vs Storefront Preview bindings
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - '.github/workflows/preintegration-preview-bindings-readonly.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-bindings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Read Pages project metadata only, never query D1 or R2 objects
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$CF_TOKEN"
+          test -n "$CF_ACCOUNT"
+          root="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/pages/projects"
+          curl -fsSS --max-time 20 -H "Authorization: Bearer ${CF_TOKEN}" "$root/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-project.json"
+          curl -fsSS --max-time 20 -H "Authorization: Bearer ${CF_TOKEN}" "$root/sindarealest2" > "$RUNNER_TEMP/storefront-project.json"
+          jq -e '.success == true and .result.name == "sindarealest-admin-preview" and .result.production_branch == "main"' "$RUNNER_TEMP/admin-project.json" >/dev/null
+          jq -e '.success == true and .result.name == "sindarealest2" and .result.production_branch == "main"' "$RUNNER_TEMP/storefront-project.json" >/dev/null
+          get_db(){
+            jq -r --arg env "$2" '.result.deployment_configs[$env].d1_databases.DB.id // .result.deployment_configs[$env].d1_databases.DB.database_id // empty' "$1"
+          }
+          get_img(){
+            jq -r --arg env "$2" --arg key "$3" '.result.deployment_configs[$env].r2_buckets[$key].name // .result.deployment_configs[$env].r2_buckets[$key].bucket_name // empty' "$1"
+          }
+          a="$RUNNER_TEMP/admin-project.json"
+          w="$RUNNER_TEMP/storefront-project.json"
+          a_db="$(get_db "$a" preview)"
+          w_db="$(get_db "$w" preview)"
+          w_prod_db="$(get_db "$w" production)"
+          a_img="$(get_img "$a" preview IMAGES)"
+          w_img="$(get_img "$w" preview IMAGES)"
+          prod_img="$(get_img "$w" production IMAGES)"
+          prod_priv="$(get_img "$w" production ORIGINALS)"
+          if [[ -z "$a_db" || -z "$w_prod_db" || -z "$a_img" || -z "$prod_img" || -z "$prod_priv" ]]; then
+            echo "::error::PREINTEGRATION_METADATA_MISSING: require Admin Preview D1/IMAGES and Storefront Production D1/IMAGES/ORIGINALS before safety decision."
+            exit 1
+          fi
+          if [[ "$a_db" == "$w_prod_db" || "$a_img" == "$prod_img" || "$a_img" == "$prod_priv" ]]; then
+            echo "::error::ADMIN_PREVIEW_PRODUCTION_SHARED_BINDING: integration or write QA is prohibited."
+            exit 1
+          fi
+          echo "PASS: Admin Preview D1/IMAGES separated from storefront Production D1/IMAGES/ORIGINALS (metadata only)."
+          if [[ -z "$w_db" ]]; then
+            echo "::warning::STOREFRONT_PREVIEW_DB_MISSING: storefront Preview DB metadata unavailable, cannot approve cross-project writes."
+          elif [[ "$w_db" == "$w_prod_db" ]]; then
+            echo "::warning::STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION: unsafe for preview write tests and integration."
+          elif [[ "$w_db" == "$a_db" ]]; then
+            echo "::notice::CROSS_PREVIEW_DB_SHARED_ISOLATED: both Preview projects use the same non-Production D1 (still requires API/schema contract audit)."
+          else
+            echo "::warning::CROSS_PREVIEW_DB_DISTINCT: writes in Admin Preview cannot reach storefront Preview automatically; do not assume synchronization."
+          fi
+          if [[ -z "$w_img" ]]; then
+            echo "::warning::STOREFRONT_PREVIEW_IMAGES_MISSING: cannot prove cross-project gallery compatibility."
+          elif [[ "$w_img" == "$prod_img" || "$w_img" == "$prod_priv" ]]; then
+            echo "::warning::STOREFRONT_PREVIEW_IMAGES_PRODUCTION_BACKED: never write test files from Preview into Production image buckets."
+          elif [[ "$w_img" == "$a_img" ]]; then
+            echo "::notice::CROSS_PREVIEW_IMAGES_SHARED_ISOLATED: same non-Production images bucket."
+          else
+            echo "::warning::CROSS_PREVIEW_IMAGES_DISTINCT: Admin uploads are not automatically visible to storefront Preview."
+          fi
+          echo "Audit mode: no deployments, no database reads or writes, no R2 object requests, no bucket/database names logged."
