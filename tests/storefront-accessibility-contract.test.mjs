@@ -88,8 +88,8 @@ assert.equal(welcome.attributes.inert, '', 'a dismissing dialog must become iner
 assert.equal(doc.activeElement, welcomeBrand, 'dismissal must move focus to the storefront brand/navigation');
 assert.equal(welcomeListeners.keydown.length, 0, 'the keyboard trap must be removed after dismissal starts');
 assert.equal(welcomeListeners.focusin.length, 0, 'the focus guard must be removed after dismissal starts');
-const removalTimer = welcomeTimers.find(timer => timer.delay === 900);
-assert.ok(removalTimer, 'dialog removal must follow the existing exit transition');
+const removalTimer = welcomeTimers.find(timer => timer.delay === 360);
+assert.ok(removalTimer, 'welcome removal must follow the reduced-cost 360ms exit transition');
 removalTimer.fn();
 assert.equal(welcome.isConnected, false, 'the dialog must be removed after its exit transition');
 assert.deepEqual(doc.body.classList.removed, ['welcome-active'], 'the welcome active state must be cleaned up');
