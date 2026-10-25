@@ -47,9 +47,9 @@
  <g clip-path="url(#sdMarbleFace)" fill="none">
   <path d="M27 306 C345 354 516 342 705 376 S1232 420 1577 313" stroke="#e3f6ff" stroke-width="38" opacity=".43"/>
   <path d="M1 333 C375 367 483 386 708 395 C1059 427 1358 384 1588 356" stroke="#84a8c5" stroke-width="6" opacity=".19"/>
-  <path d="M161 293 L212 322 L267 305 L315 358 L359 330 L420 385 L486 344 L531 406 L597 374 L655 430" stroke="url(#sdSideVein)" stroke-width="3" opacity=".47"/>
-  <path d="M722 335 L779 371 L818 357 L874 420 L938 378 L1004 405 L1089 364 L1153 419 L1224 355 L1284 383 L1369 340" stroke="url(#sdSideVein)" stroke-width="4" opacity=".53"/>
-  <path d="M238 314 L294 350 L338 327 L405 385 M826 354 L882 402 L946 365 L1008 408 M1143 367 L1214 408 L1267 364" stroke="#e5bc82" stroke-width="2" opacity=".65"/>
+  <path d="M161 293 C188 298 190 332 223 321 S266 308 283 334 S333 355 360 342 S405 369 430 373 S477 351 499 376 S531 407 571 390 S616 398 655 430" stroke="url(#sdSideVein)" stroke-width="3" opacity=".47"/>
+  <path d="M722 335 C749 344 764 376 788 369 S829 359 848 393 S908 391 931 379 S977 413 1008 396 S1064 367 1089 380 S1147 420 1175 389 S1221 364 1249 372 S1336 359 1369 340" stroke="url(#sdSideVein)" stroke-width="4" opacity=".53"/>
+  <path d="M238 314 C271 331 286 351 312 338 S367 346 405 385 M826 354 C856 363 865 400 893 391 S951 374 1008 408 M1143 367 C1174 381 1189 410 1216 397 S1243 373 1267 364" stroke="#e5bc82" stroke-width="2" opacity=".65"/>
   <path d="M52 355 C449 460 1184 469 1548 382" stroke="#fff" stroke-width="5" opacity=".32"/>
  </g>
  <path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250 C1207 350 395 341 95 244Z" fill="url(#sdStoneTop)"/>
@@ -58,9 +58,9 @@
    <path d="M-38 226 C278 158 505 81 794 142 S1311 228 1612 109" stroke="#fff" stroke-width="69" opacity=".19"/>
    <path d="M-22 218 C302 173 558 91 754 167 S1301 263 1605 172" stroke="#74a4c6" stroke-width="4" opacity=".13"/>
    <path d="M-15 280 C334 196 558 226 800 263 C1066 302 1366 226 1634 236" stroke="#fff" stroke-width="49" opacity=".30"/>
-   <path d="M200 222 L295 158 L382 196 L475 134 L534 189 L628 121 L710 155" stroke="url(#sdSideVein)" stroke-width="2" opacity=".37"/>
-   <path d="M873 196 L952 146 L1022 194 L1146 131 L1225 177 L1336 160" stroke="#c7a46d" stroke-width="1.7" opacity=".27"/>
-   <path d="M570 290 L641 224 L719 250 L793 206 L864 250 L910 219" stroke="#fef6df" stroke-width="1.5" opacity=".5"/>
+   <path d="M200 222 C237 207 266 158 302 172 S360 199 397 176 S460 135 477 151 S517 192 557 170 S664 126 710 155" stroke="url(#sdSideVein)" stroke-width="2" opacity=".37"/>
+   <path d="M873 196 C900 169 932 143 966 159 S1007 195 1037 176 S1125 124 1152 145 S1214 178 1256 165 S1304 148 1336 160" stroke="#c7a46d" stroke-width="1.7" opacity=".27"/>
+   <path d="M570 290 C601 264 627 224 654 231 S697 262 724 245 S786 205 814 225 S878 248 910 219" stroke="#fef6df" stroke-width="1.5" opacity=".5"/>
  </g>
  <path d="M95 244 C395 341 1207 350 1511 250" fill="none" stroke="url(#sdGildedEdge)" stroke-width="5" opacity=".85"/>
  <path d="M105 254 C400 344 1208 352 1499 263" fill="none" stroke="#fff" stroke-width="3" opacity=".38"/>
