@@ -45,5 +45,20 @@
     "retestPassedWorkflows": false,
     "checkedOn": "2026-10-25"
   },
-  "currentHandoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md"
+  "currentHandoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md",
+  "latestOwnerPriority": "NON_D1_R2_UNFINISHED_ONLY_NO_PASS_RETEST",
+  "lastOwnerScopeUpdate": "2026-10-25",
+  "priorityGates": [
+    "INDEPENDENT_DEEP_SECURITY_REVIEW",
+    "ASSISTIVE_TECH_ACCESSIBILITY_SIGNOFF",
+    "NONDESTRUCTIVE_PERFORMANCE_AND_LOAD_ANALYSIS",
+    "REAL_FINANCIAL_RECONCILIATION_SIGNOFF",
+    "ADMIN_STOREFRONT_API_SCHEMA_READONLY_PLAN"
+  ],
+  "d1R2Decision": "DEFERRED_BY_OWNER; previously passed D1/R2 evidence locked; Storefront Production-shared binding risks remain real but not current priority",
+  "deferredRisksNotApproved": [
+    "STORE_PREVIEW_D1_PRODUCTION_SHARED",
+    "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED",
+    "CROSS_PROJECT_WRITE_QA_NOT_SAFE"
+  ]
 }
