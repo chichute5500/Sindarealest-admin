@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="730" viewBox="0 0 1600 730">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fdfefe"/><stop offset=".42" stop-color="#edf7ff"/><stop offset=".78" stop-color="#d6eafa"/><stop offset="1" stop-color="#c8e1f4"/></linearGradient>
+<linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset=".25" stop-color="#f8fbff" stop-opacity=".62"/><stop offset=".58" stop-color="#bfdaed" stop-opacity=".2"/><stop offset="1" stop-color="#ffffff" stop-opacity=".03"/></linearGradient>
+<linearGradient id="ribbon2" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffffff" stop-opacity=".82"/><stop offset=".6" stop-color="#d7ecf9" stop-opacity=".28"/><stop offset="1" stop-color="#a9cce6" stop-opacity=".02"/></linearGradient>
+<radialGradient id="sun"><stop stop-color="#ffffff" stop-opacity=".99"/><stop offset=".65" stop-color="#fafdff" stop-opacity=".61"/><stop offset="1" stop-color="#fafdff" stop-opacity="0"/></radialGradient>
+<radialGradient id="floor"><stop stop-color="#fff" stop-opacity=".93"/><stop offset=".5" stop-color="#f9fcff" stop-opacity=".28"/><stop offset="1" stop-color="#e0effb" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1600" height="730" fill="url(#sky)"/>
+<ellipse cx="235" cy="286" rx="750" ry="425" fill="url(#sun)"/>
+<path d="M-100 -70 C205 155 394 102 688 133 C998 168 1275 54 1660 -166 L1660 10 C1218 261 1054 186 763 206 C449 232 196 185 -90 15Z" fill="url(#ribbon)"/>
+<path d="M-70 60 C190 222 381 258 622 227 C987 190 1270 230 1680 34 L1680 109 C1299 338 1046 269 726 292 C352 322 151 268 -70 130Z" fill="url(#ribbon2)" opacity=".9"/>
+<path d="M-70 123 C270 313 504 300 868 246 C1208 194 1400 199 1680 66" fill="none" stroke="#ffffff" stroke-width="7" opacity=".42"/>
+<path d="M-60 184 C281 375 515 341 825 305 C1091 270 1393 246 1680 107" fill="none" stroke="#ffffff" stroke-width="16" opacity=".16"/>
+<path d="M-130 530 C328 447 596 569 910 486 C1278 392 1407 446 1690 362 L1690 730 L-130 730Z" fill="url(#ribbon2)" opacity=".94"/>
+<path d="M-80 593 C315 502 496 657 850 538 C1144 449 1431 508 1680 411" fill="none" stroke="#ffffff" stroke-width="7" opacity=".6"/>
+<path d="M-80 666 C384 570 636 690 954 578 C1258 481 1456 555 1690 481" fill="none" stroke="#ffffff" stroke-width="9" opacity=".52"/>
+<ellipse cx="687" cy="693" rx="1050" ry="180" fill="url(#floor)"/>
+<path d="M120 684 C400 599 620 625 881 594" fill="none" stroke="#f8fcff" stroke-width="8" opacity=".65"/>
+</svg>
