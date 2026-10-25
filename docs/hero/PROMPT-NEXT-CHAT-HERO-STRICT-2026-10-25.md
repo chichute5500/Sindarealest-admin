@@ -1,3 +1,17 @@
+# V24 VERIFIED — HERO STRICT >95% VISUAL FAIL, CONTINUE WITHOUT REPEATING (2026-10-26 VN)
+
+Read `docs/hero/HERO-STRICT-ACCEPTANCE-AND-HANDOFF-2026-10-25.md` **§10**. Repository `chichute5500/Sindarealest-admin`; writable branch ONLY `feature/hero-v9-integrated-2026-10-25`. PR #115 must remain DRAFT. NO main, merge, Production, shared D1/R2, accepted Admin/Storefront changes. Exact latest verified V24 SOURCE SHA `8fae2807f2bfbb3f4bd53758db4ab80397025779`; documentation checkpoint `c445108a4e7407e21c306784a729a215f329fee0`. Recheck HEAD before editing.
+
+**Current evidence:** Chrome [40225956576 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225956576), [14 light/dark screenshot evidence artifact 12611486771](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225956576/artifacts/12611486771), full integration [40225960520 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225960520), source validation [40225956561 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225956561). Original owner shoe PNG bytes unchanged, separate silk SVG, separate light marble SVG, real semantic Vietnamese h1/description and clickable #products CTA, split transparent shoe layers only at approved viewports. No alpha overlap/overflow. Isolated live Preview still **V14**, V24 NOT DEPLOYED. Do not mislabel Preview.
+
+**Actual reference-sized screenshot metric, all FAIL:** overall SSIM `0.62453`, upper satin `0.79394`, lower floor `0.79550`, marble `0.45811`, shoes+stage `0.35713`, heading `0.59504`. Measured against original unchanged `/SinDarealest/HERO-REFERENCE/REFERENCE-DESKTOP-luxury-red-text.png`, RGB skimage SSIM with equal 1380×677 crops. These values are metric coefficients, not percentages of visual pass. **EVERY major region far below 0.95. No 95–99% claim, no owner approval.**
+
+**Already rejected using actual screenshots:** V20 angular slab worsened (.6196 overall), V21 globally darkened silk worsened (.6116), V22 Libre Bodoni font worsened heading (.502), V19 blue thick vein trial worsened, previous dark standalone WebP platter and squiggly-vein attempts failed; DO NOT repeat. V23 podium uplift improved baseline, kept. V24 localized right satin shadow at opacity .28 measurably improved overall .62269→.62453, kept. Browser QA has optional `HERO_GEOMETRY_SWEEP=1` to capture 21 stage and 8 light candidates; default mandatory workflow keeps 14 captures. Stage candidates with superficially higher SSIM that made shoes float were REJECTED. Historical script filenames still contain v9/v10.
+
+**Next:** Major true independent material/photographic realism redesign for satin, mineral stage/reflections (NOT full banner screenshot; no embedded shoes, text, CTA, base64/foreignObject, CSS hacks). Keep exact owner PNG and correct nonfloating heels at all widths. Each candidate: edit isolated authoritative HERO CSS/art -> execute technical guards -> capture REAL 320/360/390/768/980/1280/1440 light/dark -> visually compare to immutable owner master, measure all named regions, revert if worse. Update GitHub checkpoint and report **VISUAL FAIL** until >95% EVERY critical region + explicit owner approval. Do not do background-work promises or stop after only reporting.
+
+---
+
 # V18 VERIFIED — STRICT CONTINUATION, VISUAL FAIL — 2026-10-26
 
 **Mandatory:** Read `docs/hero/HERO-STRICT-ACCEPTANCE-AND-HANDOFF-2026-10-25.md` **section 9**, then resume DIRECTLY without repeating already verified work. This message supersedes older V17 status sections below.
