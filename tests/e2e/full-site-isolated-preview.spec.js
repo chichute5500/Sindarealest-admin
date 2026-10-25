@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 const root = process.env.FULL_SITE_PREVIEW_URL;
-const expected = 'https://integration-fullsite-20261025.sindarealest-admin-preview.pages.dev';
+const expected = 'https://integration-fullsite-2026102.sindarealest-admin-preview.pages.dev';
 if (root !== expected) throw Error('Unexpected remote target — isolated Preview only');
 const evidence = 'artifacts/full-site-preview-evidence';
 mkdirSync(evidence, { recursive: true });

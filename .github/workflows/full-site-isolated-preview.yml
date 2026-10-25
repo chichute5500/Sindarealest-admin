@@ -101,7 +101,7 @@ jobs:
         id: target
         shell: bash
         run: |
-          url="https://integration-fullsite-20261025.sindarealest-admin-preview.pages.dev"
+          url="https://integration-fullsite-2026102.sindarealest-admin-preview.pages.dev"
           echo "preview_url=$url" >> "$GITHUB_OUTPUT"
           echo "Isolated Preview URL: $url"
           echo "Exact source SHA: $GITHUB_SHA"
