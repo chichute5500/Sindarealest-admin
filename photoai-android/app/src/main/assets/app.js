@@ -73,15 +73,48 @@ const check=document.createElement('span');check.className='check';check.textCon
 const filename=document.createElement('span');filename.className='filename';filename.textContent=p.name;
 const color=document.createElement('span');color.className='meta'+(p.color==='Chưa rõ'?' uncertain':'');color.textContent=p.color+' · '+(modelById(p.modelId)?.name||'Chưa phân nhóm');
 div.append(img,check,filename,color);
-div.addEventListener('click',ev=>{if(chosen.has(p.id))chosen.delete(p.id);else chosen.add(p.id);renderGallery()});
+div.addEventListener('click',ev=>{if(suppressTap){suppressTap=false;ev.preventDefault();return}if(chosen.has(p.id))chosen.delete(p.id);else chosen.add(p.id);renderGallery()});
 div.addEventListener('dblclick',()=>openPreview(p));
 div.addEventListener('dragstart',ev=>{if(!chosen.has(p.id))chosen.add(p.id);dragging={kind:'photos',ids:[...chosen]};ev.dataTransfer.setData('text/plain',JSON.stringify(dragging));ev.dataTransfer.effectAllowed='move'});
-let timer,pressX=0,pressY=0;
-div.addEventListener('touchstart',e=>{pressX=e.touches[0].clientX;pressY=e.touches[0].clientY;
- timer=setTimeout(()=>{chosen.add(p.id);renderGallery();notify('Đã chọn ảnh. Dùng “Chuyển đến” hoặc nhấn giữ ảnh để kéo thả.')},550)
+// Real touch drag-and-drop: keep the touched node mounted during long press.
+// The safe 'Chuyển đến' dialog remains available for offscreen/collapsed folders.
+let timer,pressX=0,pressY=0,ghost=null,hover=null,suppressTap=false,holding=false;
+const clearHover=()=>{if(hover)hover.classList.remove('dragover');hover=null};
+const updateTouch=(x,y)=>{
+ if(!ghost)return;
+ ghost.style.left=Math.min(window.innerWidth-90,Math.max(8,x+12))+'px';
+ ghost.style.top=Math.max(8,y-42)+'px';
+ const row=document.elementFromPoint(x,y)?.closest('.tree-row')||null;
+ if(row!==hover){clearHover();hover=row;if(hover)hover.classList.add('dragover')}
+};
+div.addEventListener('touchstart',e=>{
+ if(e.touches.length!==1)return;
+ pressX=e.touches[0].clientX;pressY=e.touches[0].clientY;
+ timer=setTimeout(()=>{
+  holding=true;chosen.add(p.id);div.classList.add('selected');
+  dragging={kind:'photos',ids:[...chosen]};
+  ghost=document.createElement('div');ghost.className='touch-drag-ghost';
+  ghost.textContent='⇧ '+dragging.ids.length+' ảnh';document.body.appendChild(ghost);
+  updateTouch(pressX,pressY);
+ },520);
 },{passive:true});
-div.addEventListener('touchend',()=>clearTimeout(timer));
-div.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-pressX)+Math.abs(e.touches[0].clientY-pressY)>15)clearTimeout(timer)},{passive:true});
+div.addEventListener('touchmove',e=>{
+ if(!e.touches.length)return;
+ const t=e.touches[0],x=t.clientX,y=t.clientY;
+ if(!holding){if(Math.abs(x-pressX)+Math.abs(y-pressY)>14)clearTimeout(timer);return}
+ e.preventDefault();updateTouch(x,y);
+},{passive:false});
+const finishTouch=e=>{
+ clearTimeout(timer);
+ if(!holding)return;
+ e.preventDefault();suppressTap=true;
+ const dest=hover?.__node,ids=dragging?.ids||[p.id];
+ if(ghost)ghost.remove();ghost=null;clearHover();holding=false;dragging=null;
+ if(dest)movePhotos(ids,dest);
+ else{renderGallery();notify('Thả ảnh lên thư mục hiển thị hoặc dùng “Chuyển đến” để tìm thư mục khác.')}
+};
+div.addEventListener('touchend',finishTouch,{passive:false});
+div.addEventListener('touchcancel',finishTouch,{passive:false});
 grid.appendChild(div)
 }
 }
