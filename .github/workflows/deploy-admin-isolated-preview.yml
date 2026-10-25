@@ -68,6 +68,8 @@ jobs:
         run: |
           npm run check
           npm test
+      - name: Check deploy dependencies for known high severity advisories
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Verify project production branch remains main
         shell: bash
