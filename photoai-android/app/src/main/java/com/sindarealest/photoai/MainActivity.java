@@ -226,9 +226,11 @@ public class MainActivity extends Activity {
         }catch(Exception ignored){}
         String rootId=DocumentsContract.getTreeDocumentId(tree);
         Uri root=DocumentsContract.buildDocumentUriUsingTree(tree,rootId);
-        synchronized(photoUris){photoUris.clear();}
+        // Transactional import: never replace the current photo ID/URI table until scanning succeeds.
+        Map<String,Uri> importedUris=new HashMap<>();
+        walk(tree,root,new ArrayList<String>(),rootName,photos,importedUris,new int[]{0},0);
+        synchronized(photoUris){photoUris.clear();photoUris.putAll(importedUris);}
         synchronized(thumbCache){thumbCache.evictAll();}
-        walk(tree,root,new ArrayList<String>(),rootName,photos,new int[]{0},0);
         state.put("rootName",rootName);state.put("rootUri",tree.toString());state.put("photos",photos);
         js("onImported",state.toString());
     }catch(Exception ex){message("Không đọc được thư mục: "+ex.getMessage());}}
@@ -236,13 +238,13 @@ public class MainActivity extends Activity {
         String n=value.toLowerCase(java.util.Locale.ROOT);
         return n.contains("giày")||n.contains("dép")||n.contains("thắt lưng")||n.contains("ví")||n.contains("túi")||n.contains("clutch")||n.contains("golf")||n.contains("mũ")||n.contains("ốp")||n.contains("đồng hồ")||n.contains("quần")||n.contains("áo");
     }
-    private void walk(Uri tree,Uri dir,List<String> parents,String rootName,JSONArray photos,int[] count,int depth)throws Exception{
+    private void walk(Uri tree,Uri dir,List<String> parents,String rootName,JSONArray photos,Map<String,Uri> importedUris,int[] count,int depth)throws Exception{
         if(depth>16)return;
         for(Doc d:children(tree,dir)){
-            if(d.dir){List<String> next=new ArrayList<>(parents);next.add(d.name);walk(tree,d.uri,next,rootName,photos,count,depth+1);continue;}
+            if(d.dir){List<String> next=new ArrayList<>(parents);next.add(d.name);walk(tree,d.uri,next,rootName,photos,importedUris,count,depth+1);continue;}
             if(!isImage(d)||!decodes(d.uri))continue;
             String id="p"+ (++count[0]);
-            synchronized(photoUris){photoUris.put(id,d.uri);}
+            importedUris.put(id,d.uri);
             boolean singleCategory=isCategoryName(rootName)&& !rootName.toLowerCase(java.util.Locale.ROOT).contains("sp order");
             String category=singleCategory?rootName:(parents.isEmpty()?"Chưa phân loại":parents.get(0));
             int index=singleCategory?0:1;
