@@ -1,3 +1,7 @@
+> **CẬP NHẬT BỔ SUNG 25/10/2026 — RESTORE AUDIT ROUND 2:** nguồn mã Admin đã tiến lên `181e1ff3e843c9984ce5889095e3913290a038a7` qua hai commit sửa dữ liệu Restore: `e047395ee5f4823deec22d4a1f721a0ef6a0ebc2` (chặn kiểu số sai) và `181e1ff3e843c9984ce5889095e3913290a038a7` (chặn số tiền hoàn vượt tiền đã nhận). Các workflow kết quả chính xác và giới hạn nghiệm thu xem [RESTORE-HARDENING-2026-10-25.md](../../admin-audit/RESTORE-HARDENING-2026-10-25.md). 0/12 visual OWNER_ACCEPTED; các blocker Cloudflare vẫn còn. Chưa deploy backend mới, chưa tích hợp/merge. Luôn xác minh HEAD mới sau commit tài liệu.
+
+---
+
 # PROMPT NEXT CHAT — SINDAREALEST ADMIN (CẬP NHẬT 2026-10-25)
 
 Đây là công việc đang tiếp tục trên GitHub, KHÔNG phải dự án mới. Không bắt người dùng kể lại lịch sử. Hãy trực tiếp mở repository, đối chiếu trạng thái hiện tại, sửa/kiểm tra các phần còn thiếu trên đúng nhánh Admin và chạy kiểm thử có bằng chứng. Được phép thực hiện nhiều hướng rà soát độc lập song song; không tuyên bố đang chạy ngầm nếu chưa thực hiện tool.

@@ -1,3 +1,7 @@
+> **CẬP NHẬT BỔ SUNG 25/10/2026 — RESTORE AUDIT ROUND 2:** nguồn mã Admin đã tiến lên `181e1ff3e843c9984ce5889095e3913290a038a7` qua hai commit sửa dữ liệu Restore: `e047395ee5f4823deec22d4a1f721a0ef6a0ebc2` (chặn kiểu số sai) và `181e1ff3e843c9984ce5889095e3913290a038a7` (chặn số tiền hoàn vượt tiền đã nhận). Các workflow kết quả chính xác và giới hạn nghiệm thu xem [RESTORE-HARDENING-2026-10-25.md](../../admin-audit/RESTORE-HARDENING-2026-10-25.md). 0/12 visual OWNER_ACCEPTED; các blocker Cloudflare vẫn còn. Chưa deploy backend mới, chưa tích hợp/merge. Luôn xác minh HEAD mới sau commit tài liệu.
+
+---
+
 # SINDAREALEST ADMIN — CHECKPOINT CHÍNH THỨC 2026-10-25
 
 **Nguồn kiểm chứng:** GitHub repo chichute5500/Sindarealest-admin, PR #111 OPEN, nhánh feature/admin-isolated-handoff-2026-10-20.

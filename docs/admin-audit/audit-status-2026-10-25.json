@@ -20,7 +20,7 @@
   "visualParityTotal": 12,
   "ownerAcceptance": "NOT_GRANTED",
   "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge.",
-  "latestVerifiedCodeAndTestSha": "9b6bb3145145b1399391dd235f1a2efb9ee66b99",
+  "latestVerifiedCodeAndTestSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
   "latestChanges": [
     {
       "sha": "d6da905c4ce53cbf0a84e426943927c978767923",
@@ -39,6 +39,18 @@
       "finding": "Only static Admin handler authorization sweep existed",
       "resolution": "Dynamic 401/403 test of 31 protected handlers before DB access",
       "test": "tests/admin-route-runtime-auth.test.mjs"
+    },
+    {
+      "sha": "e047395ee5f4823deec22d4a1f721a0ef6a0ebc2",
+      "finding": "Backup Restore accepted whitespace, arrays or booleans as financial/integer fields through JavaScript coercion",
+      "resolution": "Reject non-numeric JSON types and non-decimal integer strings before D1 write",
+      "test": "tests/restore-safety.test.mjs"
+    },
+    {
+      "sha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+      "finding": "Backup Restore accepted payment ledger where refunded aggregate exceeds received aggregate for the same order",
+      "resolution": "Validate net ledger per order before constructing destructive batch",
+      "test": "tests/restore-safety.test.mjs"
     }
   ],
   "qaEvidence": {
@@ -96,25 +108,34 @@
   ],
   "overallStatus": "NOT_100_PERCENT_ACCEPTED",
   "latestHandoffDate": "2026-10-25",
-  "lastVerifiedCodeAndTestHeadBeforeHandoff": "6b10cd53ad591521ee719aefd015898bfeb5d36f",
+  "lastVerifiedCodeAndTestHeadBeforeHandoff": "181e1ff3e843c9984ce5889095e3913290a038a7",
   "lastVerifiedExactShaCi": {
-    "sourceSha": "6b10cd53ad591521ee719aefd015898bfeb5d36f",
-    "result": "4/4_SUCCESS",
+    "sourceSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+    "result": "6_SUCCESS_AND_0_OTHER",
     "runs": [
-      40170302058,
-      40170299770,
-      40170302063,
-      40170302057
-    ]
+      40173679010,
+      40173679054,
+      40173679011,
+      40173676017,
+      40173676036,
+      40173676045
+    ],
+    "additionalRuns": []
   },
   "lastVerifiedDeployedAppSourceSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
   "lastVerifiedDeployedRun": 40165551327,
-  "storefrontHeadAsOfHandoff": "a72e6d4344b963a50057480ddb1d9f7d57d653ce",
+  "storefrontHeadAsOfHandoff": "632a64c09a47d71bb1461c2937c44b9c2d3dc028",
   "latestOwnerInstruction": "Continue to fix all Admin issues, but DO NOT integrate or merge the Storefront",
   "cloudflareBindingLastVerifiedByRun": 40167641001,
   "cloudflareImageBindingHistoricalGapResolved": true,
   "ownerAcceptedScreenCount": 0,
   "acceptanceEvidenceWeight": 32,
   "completionPercentNotEstablished": true,
-  "handoffDocument": "docs/admin-ui-reference/handoff/CURRENT-CHECKPOINT-2026-10-25.md"
+  "handoffDocument": "docs/admin-ui-reference/handoff/CURRENT-CHECKPOINT-2026-10-25.md",
+  "latestFixesAtSourceSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+  "latestHandoffSourceSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+  "lastRoundTwoDiagnostic": {
+    "id": 40173676045,
+    "status": "success"
+  }
 }

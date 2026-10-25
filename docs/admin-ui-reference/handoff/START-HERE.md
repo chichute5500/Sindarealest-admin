@@ -1,3 +1,7 @@
+> **CẬP NHẬT BỔ SUNG 25/10/2026 — RESTORE AUDIT ROUND 2:** nguồn mã Admin đã tiến lên `181e1ff3e843c9984ce5889095e3913290a038a7` qua hai commit sửa dữ liệu Restore: `e047395ee5f4823deec22d4a1f721a0ef6a0ebc2` (chặn kiểu số sai) và `181e1ff3e843c9984ce5889095e3913290a038a7` (chặn số tiền hoàn vượt tiền đã nhận). Các workflow kết quả chính xác và giới hạn nghiệm thu xem [RESTORE-HARDENING-2026-10-25.md](../../admin-audit/RESTORE-HARDENING-2026-10-25.md). 0/12 visual OWNER_ACCEPTED; các blocker Cloudflare vẫn còn. Chưa deploy backend mới, chưa tích hợp/merge. Luôn xác minh HEAD mới sau commit tài liệu.
+
+---
+
 > **CHỐT MỚI NHẤT 2026-10-25 — PHẢI ĐỌC TRƯỚC PHẦN LỊCH SỬ BÊN DƯỚI.** Chi tiết tại [CURRENT-CHECKPOINT-2026-10-25.md](./CURRENT-CHECKPOINT-2026-10-25.md) và [PROMPT-NEXT-CHAT.md](./PROMPT-NEXT-CHAT.md). Nguồn Admin trước commit tài liệu: 6b10cd53ad591521ee719aefd015898bfeb5d36f, 4/4 CI PASS. Deploy ứng dụng đã xác minh: c64e07fca248dc527361c4d018dc26c11f5b3570. PR #111 OPEN; main không đổi. Cloudflare R2 IMAGES Preview **đã cấu hình thành công**, nhưng Admin ORIGINALS còn thiếu; Storefront Preview DB/ORIGINALS vẫn trỏ tài nguyên Production. 12 màn hình 0/12 chấp thuận; 32/100 là **điểm chứng cứ**, không phải % dự án. KHÔNG TÍCH HỢP / MERGE / DEPLOY PRODUCTION. Các checkpoint phía dưới là lịch sử, không còn là trạng thái mới nhất.
 
 ---
