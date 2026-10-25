@@ -26,14 +26,19 @@ const mobileReferenceEnd = html.indexOf("@media(max-width:360px){", mobileRefere
 assert.ok(mobileReferenceStart >= 0 && mobileReferenceEnd > mobileReferenceStart,
   "The mobile reference-fit block must remain a single identifiable design section.");
 const mobileReferenceCss = html.slice(mobileReferenceStart, mobileReferenceEnd);
-assert.match(mobileReferenceCss, /\.hero-visual\{height:clamp\(170px,48vw,205px\);min-height:0;aspect-ratio:\.9\/1;border-radius:22px\}/,
-  "The mobile Hero must avoid the too-tall crop that cuts off real product imagery.");
-assert.match(mobileReferenceCss, /\.hero-visual img\{object-fit:contain;padding:4%;box-sizing:border-box\}/,
-  "Mobile Hero must show the full real catalog image instead of cropping the product.");
+const nativeHeroCss = html.split('<style id="sd-hero-component-authority">')[1]?.split('</style>')[0] || '';
+assert.ok(nativeHeroCss, 'The independent native V12 HERO stylesheet must exist.');
+assert.match(nativeHeroCss, /@media\(max-width:760px\)\{/,
+  'The mobile HERO must keep its distinct compact horizontal layout.');
+assert.match(nativeHeroCss, /#home \.hero-visual\{position:absolute;grid-column:auto;grid-row:auto;top:0;right:0;left:auto;bottom:auto;width:47%;height:100%\}/,
+  'Mobile real shoes must remain on the right, without a stacked image card.');
+assert.match(nativeHeroCss, /#home \.hero-visual #heroProductImage\{width:clamp\(218px,66vw,400px\)/,
+  'The independently sourced product image must retain a restrained mobile scale.');
+
 assert.match(mobileReferenceCss, /\.service-strip \.service-copy\{min-height:52px;padding:4px 2px\}/,
   "The six reference benefit tiles must stay compact on mobile.");
-assert.match(html, /\.hero-visual\{height:clamp\(155px,46vw,175px\);min-height:0;aspect-ratio:\.9\/1\}/,
-  "Narrow phones must keep the Hero image frame compact without restoring the oversized crop.");
+assert.match(nativeHeroCss, /@media\(max-width:350px\)\{/,
+  "Narrow 320px phones must have explicit HERO sizing, not a large portrait image crop.");
 const finalBackgroundStart = html.lastIndexOf(".theme-bg--light::after{");
 const finalBackgroundCss = html.slice(finalBackgroundStart, finalBackgroundStart + 6000);
 const finalThemeCss = html.slice(html.lastIndexOf("/* Organic liquid-glass wave assets"));
