@@ -130,3 +130,46 @@ SSIM is a strict screenshot metric, NOT an arbitrary visual-approval percentage;
 7. Next strict loop: start from actual V17 14-view artifact and primary master. Fix visual FAIL (especially stage, silk, relative left-shoe geometry); run local browser QA/compare same-sized screenshots and record per-region SSIM & owner-facing screenshot. Any essential region below 0.95 => FAIL. Reconfirm isolated Preview D1/R2 safety before any future *Preview-only* deploy, maintain Draft and no Production.
 
 **Latest owner instruction:** no lowering the original assistant-promised 95–99% quality bar; assistant must inspect its OWN browser renders before presenting. This checkpoint is intentionally FAIL and preserves the truth.
+
+
+## 9. V18 native shoe-relative-placement checkpoint — 2026-10-26 VN
+
+> **ABSOLUTE VISUAL FAIL.** All technical tests below pass, but neither overall SSIM nor ANY critical region reaches 0.95; no owner approval, no Production merge/deploy. Continue the >95% requirement.
+
+### Exact code and screenshots
+
+- Code/CI guard exact SHA before this documentation-only update: `e5a3fdc4ec163a8459dd3bbef00c5f222e95db70`. **Check newer HEAD before acting.** PR #115 stays Draft on `feature/hero-v9-integrated-2026-10-25`.
+- **Native Chromium screenshot run [40223012421 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223012421), [screenshot+JSON artifact 12610202195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223012421/artifacts/12610202195)**: light/dark at 320/360/390/768/980/1280/1440px = 14 real browser captures with actual DOM, image alpha and computed styles. All **14/14 PASS** technical; CSS real semantic h1, descriptive paragraph, native keyboard CTA, isolated original source PNG and individual decorative SVGs.
+- Original transparent shoe file (1200×1600) unchanged byte-for-byte. **V18 contains exactly one separate additional `<img id="heroLeftShoe">` referencing the SAME owner PNG** to reposition the horizontally lying loafer relative to the upright loafer. Complementary CSS clip polygons keep the artwork separate; not a reference screenshot or baked composite. The copy, CTA, marble and background remain native layers. At 768, 1280, 1440px the duplicate left display is enabled and each alpha-layer is explicitly tested; at 320/360/390/980 it is hidden and the original safe pair remains.
+- For both themes at ALL seven widths: **zero opaque PNG sample overlaps** over copy and CTA; CSS scroll overflow check PASS. Shoe dual-layer original URL/source dimensions verified across layouts, CTA Enter→#products PASS.
+- [Full-site integration run 40223012433 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223012433), [source validation run 40223008842 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223008842). Exact protected Admin/Storefront/QR/D1/R2 source blobs unchanged; no Production write, no merge. **Live isolated Preview remains older V14, NOT V18**; no new Preview deploy while visual fails.
+
+### Same-canvas real-browser vs reference SSIM
+
+Original approved desktop reference (file in Library, NOT a website asset) resized to actual 1380x677 Chromium `pc-1440-light.png`. Python skimage windowed RGB SSIM on unaltered browser captures; this strictly supplements visual evaluation, not a human likeness promise:
+
+| Named region | Previous V17 | V18 accepted technical branch | Required |
+|---|---:|---:|---:|
+| Whole HERO | 0.6155 | **0.6233** | ≥0.950 |
+| Shoes + podium | 0.3280 | **0.3537** | ≥0.950 |
+| Shoes dominant subregion | 0.3716 | **0.3990** | ≥0.950 |
+| Lower marble | 0.4181 | **0.4524** | ≥0.950 |
+| Upper satin | 0.787 | **0.7858** | ≥0.950 |
+| Lower satin/floor | 0.794 | **0.7941** | ≥0.950 |
+
+Thus V18 fixes SOME geometry but **fails all strict visual approval gates**. Do not describe 0.6233 SSIM as "62.33% visual similarity" or interpret PASS 14/14 as design 95%.
+
+### Rejected tests based on real screenshots (do not repeat)
+
+- **V19 stronger blue stone `f981d5db`**: increased top/face crystalline contrast & gold-fault visibility; native Chromium artifact [12609851600](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40222272874/artifacts/12609851600). Objective SSIM **worsened** overall 0.6233→0.6199; marble 0.4524→0.4369; shoes+stage 0.3537→0.3448. Reverted stone file exactly to V16/V18 blob `02b96a62417825b36dc2af3c54bb8c0537117726` in `cb6e163ca...`, guard hash restored `2a2c08b7...`. **Do not reactivate V19**.
+- **Split shoe at 980px `b77b36fe...`**: Chromium screenshot showed a visibly FLOATING front loafer, even though Chromium contracts PASS. Rejected by eye; retained lift only for 761–850px tablet and ≥1101px Desktop; 980px uses safe original paired artwork. Correction `1b087571...`, QA enforcement `e080554a...`, final guarded test SHA `e5a3fdc4...`. Full 14/14 screenshot and alpha QA PASS after correction.
+- Main unresolved critical failures: natural photoreal **marble gemstone/mineral topology and dense gold veins**, realistic textile light scattering/creases, serif font/high-contrast Didone glyph differences, full screenshot region matching. Existing authentic owner PNG shape remains a fundamental constraint. Do NOT use master reference as website background, baked text/CTA, CSS `!important` accumulation or modify protected functionality.
+
+### Continue from here
+
+1. Inspect actual V18 14-view screenshot artifact `12610202195` and original Library master at identical canvas geometry; re-establish baseline whole-frame SSIM **0.6233**.
+2. Redesign or source **independent** photoreal decorative silk and **independent** transparent natural marble with plausible reflection and shoe contact. Preserve native h1/CTA and original shoe source; visual reference itself must NEVER be deployed or composited into artwork.
+3. Each edit requires Chromium 14 screenshots (320–1440 both themes), pixel-alpha collision checks for BOTH shoe layers and strict quantitative+visual comparison. Revert trials with no measurable improvement or visible shoe/platform floating.
+4. Keep PR #115 Draft until explicit owner approval, isolated Preview only after fail-closed D1/R2 checks, no Production, no merge. **No 95% acceptance claim.**
+
+**Owner instruction kept verbatim in spirit: multi-stream safe work, no lowering >95%, self-capture and self-evaluation; never ask owner to PASS a visibly unfinished build.**
