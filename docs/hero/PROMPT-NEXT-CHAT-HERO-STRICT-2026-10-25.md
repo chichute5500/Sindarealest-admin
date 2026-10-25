@@ -1,3 +1,17 @@
+# V18 VERIFIED — STRICT CONTINUATION, VISUAL FAIL — 2026-10-26
+
+**Mandatory:** Read `docs/hero/HERO-STRICT-ACCEPTANCE-AND-HANDOFF-2026-10-25.md` **section 9**, then resume DIRECTLY without repeating already verified work. This message supersedes older V17 status sections below.
+
+- Repo `chichute5500/Sindarealest-admin`; only writable branch `feature/hero-v9-integrated-2026-10-25`; PR #115 DRAFT; NO merge / Production / shared D1/R2; nothing changed in accepted Admin/Storefront.
+- Exact tested V18 **source/CI SHA** `e5a3fdc4ec163a8459dd3bbef00c5f222e95db70`. Documentation-only checkpoint then commit `395f35d54aa0479913ade897af22af89cc39f486`. Reconfirm GitHub PR head. Chromium [#40223012421 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223012421), 14 actual screenshots + JSON [artifact 12610202195](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223012421/artifacts/12610202195), Full-site integration [#40223012433 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223012433), source validation [#40223008842 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40223008842).
+- **Latest strict image comparison:** reference original in ChatGPT Library `/SinDarealest/HERO-REFERENCE/REFERENCE-DESKTOP-luxury-red-text.png`. Real desktop hero Chromium capture V18 overall **SSIM .6233**, shoes+stage .3537, marble .4524, upper satin .7858, floor .7941; every essential region below .950. **VISUAL FAIL, NOT APPROVED.**
+- V18 actually improved owner PNG relative shoe geometry by using two **complementary clipped displays of the SAME unchanged 1200x1600 transparent source**. Correct split enabled 761–850px tablet and ≥1101px PC, **NOT at 980px because browser captured shoe floating**. Mobile 320–390 keeps original paired shoes. Real Chromium 14/14 QA covers both alpha layers, 0 shoe pixel overlap on text/CTA, keyboard CTA, no overflow. Do not break this passing technical behavior or flatten artwork.
+- Failed V19 extra-dark blue marble after true screenshot: SSIM worsened overall .6233→.6199 and marble .4524→.4369; **REVERTED**. Earlier dark navy photographic standalone WebP and spaghetti-gold vector trial also rejected. Existing silk and marble still far too vector-like for natural photoreal target.
+- No V18 Preview deploy; stable isolated Preview still earlier V14. Visual FAIL prevents merge and no Production ever.
+- Next safe useful task: genuinely improve independent photoreal marble+gold vein material and flowing satin (not full baked HERO, no reference screenshot used as site background), inspect shoes grounding across all breakpoints, adjust native Didone type if measured, run ALL 14 Chromium screenshots each edit, compute SSIM per critical region against approved Library original and visually inspect, revert failures, update same authoritative CSS not new `!important` stacks. No 95% or approval assertion without evidence and owner PASS.
+
+---
+
 # V17 exact strict visual continuation — 2026-10-26, VISUAL FAIL
 
 Before doing any more implementation, read `docs/hero/HERO-STRICT-ACCEPTANCE-AND-HANDOFF-2026-10-25.md`, especially **section 8**. Do NOT repeat historical V14/V15/V16 fixes already tested or falsely pass the design.
