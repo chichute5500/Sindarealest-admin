@@ -1,0 +1,27 @@
+<!doctype html><html lang="vi"><head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https://photoai.local data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#08090c"><title>SinDarealest • AI Kho Ảnh</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<div class="app-shell">
+<header class="top"><div class="brand"><div class="mark">SD</div><div><strong>SinDarealest</strong><small>AI KHO ẢNH SẢN PHẨM</small></div></div><button class="iconbtn" id="menuBtn" aria-label="Tùy chọn">⚙</button></header>
+<div class="hero"><span class="eyebrow">QUẢN LÝ HÌNH ẢNH</span><h1>Đúng mẫu. Đúng màu.</h1><p>Phân nhóm thông minh, chỉnh sửa bằng cảm ứng. Ảnh gốc luôn an toàn.</p></div>
+<div class="mode-strip"><span class="mode-pip"></span><span id="aiModeLabel">AI trên máy</span><button id="modeOpenBtn">Đổi chế độ ⚙</button></div>
+<div class="toolbar"><button class="primary" id="pickBtn">📁 Chọn thư mục</button><button id="analyzeBtn">✦ Gợi ý nhóm</button><button id="exportBtn">⇧ Xuất ảnh</button></div>
+<div class="disclaimer">AI chỉ đề xuất. Màu và mẫu chưa chắc chắn cần bạn xác nhận; giá tiền không được AI tự tạo.</div>
+<div class="stats"><div><strong id="photoCount">0</strong><small>Ảnh</small></div><div><strong id="modelCount">0</strong><small>Mẫu</small></div><div><strong id="reviewCount">0</strong><small>Cần xem lại</small></div></div>
+<div class="searchbar"><span>⌕</span><input id="searchInput" type="search" placeholder="Tìm tên file ảnh, mã hoặc mẫu..." autocomplete="off"><button id="clearSearch" aria-label="Xóa tìm kiếm">×</button></div>
+<div class="tabs"><button id="treeTab" class="active">▦ Danh mục</button><button id="photosTab">▥ Ảnh trong nhóm</button><button id="reviewTab">⚑ Cần xem lại</button></div>
+<div class="workspace">
+<section class="tree-section" id="treeSection"><div class="pane-heading"><span id="treeTitle">DANH MỤC / MẪU / MÀU</span><button id="newModelBtn">＋ Mẫu mới</button></div><div class="tree-scroll" id="treeList"></div></section>
+<section class="photo-section" id="photoSection"><div class="pane-heading"><span id="galleryTitle">CHỌN NHÓM ĐỂ XEM ẢNH</span><button id="selectAllBtn">Chọn tất cả</button></div><div id="gallery" class="gallery"></div><button class="loadmore" id="loadMoreBtn" hidden>Xem thêm ảnh</button></section>
+</div>
+<nav class="bottom"><button id="moveBtn">↪<span>Chuyển đến</span></button><button id="renameBtn">✎<span>Đổi tên</span></button><button id="mergeBtn">⧉<span>Gộp mẫu</span></button><button id="undoBtn">↶<span>Hoàn tác</span></button><button id="saveBtn">▣<span>Lưu dự án</span></button></nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<div class="modal-backdrop hidden" id="modal"><div class="sheet"><div class="sheet-grab"></div><div class="sheet-head"><h2 id="modalTitle"></h2><button id="modalClose" aria-label="Đóng">×</button></div><div id="modalBody"></div><div class="sheet-buttons"><button id="modalCancel">Hủy</button><button class="primary" id="modalConfirm">Xác nhận</button></div></div></div>
+<input id="browserFolder" type="file" webkitdirectory multiple hidden>
+<script src="app.js"></script>
+</body></html>
+
+  
