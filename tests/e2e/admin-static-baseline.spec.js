@@ -2093,6 +2093,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(firstCustomerCellDisplay, 'Customer rows should retain table layout above 680px').toBe('table-cell');
       }
       await expect(page.locator('#customerSearchStatus')).toHaveAttribute('aria-live', 'polite');
+      await expect(page.locator('#customerSearchStatus')).toContainText('hồ sơ đã tải');
       await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
       await expect(page.locator('.customer-avatar')).toHaveCount(2);
       await expect(page.locator('.customer-avatar').nth(0)).toHaveText('KD');
