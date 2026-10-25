@@ -96,7 +96,8 @@ html.js-enabled [data-reveal]{
 }
 html.js-enabled [data-reveal].is-visible{
   opacity:1;
-  transition:opacity .38s cubic-bezier(.22,.7,.25,1);
+  /* Keep existing card hover/press transform motion without moving cards during reveal. */
+  transition:opacity .38s cubic-bezier(.22,.7,.25,1),transform .22s ease;
   transition-delay:min(var(--reveal-delay,0ms),90ms);
 }
 /* Move small editorial headings only, never full product/image/glass cards.

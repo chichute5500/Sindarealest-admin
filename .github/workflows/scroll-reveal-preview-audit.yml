@@ -1,0 +1,66 @@
+name: Scroll reveal and glass layer Preview browser audit
+on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
+    paths:
+      - '.github/workflows/scroll-reveal-preview-audit.yml'
+      - 'scripts/audit-scroll-reveal-preview.mjs'
+      - 'tests/storefront-accessibility-contract.test.mjs'
+      - 'public/index.html'
+permissions:
+  contents: read
+jobs:
+  audit-scroll-reveal:
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PREVIEW_URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+      EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+      EXPECTED_DEPLOYMENT_SHA: ${{ github.sha }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+      CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Playwright
+        run: npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Validate approved Preview URL
+        run: node scripts/validate-cloudflare-preview-url.mjs "$PREVIEW_URL"
+      - name: Wait for exact source SHA Preview deployment
+        shell: bash
+        run: |
+          set -u -o pipefail
+          verified=false
+          for attempt in $(seq 1 18); do
+            if node scripts/verify-cloudflare-preview-deployment.mjs; then
+              verified=true
+              break
+            fi
+            if [ "$attempt" -lt 18 ]; then sleep 10; fi
+          done
+          if [ "$verified" != true ]; then
+            echo '::error::Exact Preview branch/source SHA not verified; browser audit refused.'
+            exit 1
+          fi
+      - name: Audit scrolling two ways and overlapping glass UI on PC/mobile
+        run: node scripts/audit-scroll-reveal-preview.mjs
+      - name: Upload read-only browser screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scroll-reveal-preview-${{ github.sha }}
+          path: artifacts/scroll-reveal-preview-audit/
+          if-no-files-found: warn
+          retention-days: 14
