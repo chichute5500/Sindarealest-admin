@@ -3543,6 +3543,9 @@ html.dark .icon-btn:active,html.dark .nav-wrap .icon-btn:active,html.dark .mini-
  border:0;clip-path:none;mask:none;-webkit-mask:none;filter:drop-shadow(0 7px 8px rgba(11,25,38,.17));
 }
 #home .hero-visual #heroProductImage[hidden]{display:none}
+#home.hero:has(#heroProductImage[hidden]){grid-template-columns:minmax(0,1fr)}
+#home.hero:has(#heroProductImage[hidden]) .hero-copy{grid-column:1;max-width:100%}
+#home.hero:has(#heroProductImage[hidden]) .hero-visual{display:none}
 #home .hero-visual-caption{display:none}
 html.dark #home.hero.wrap{border-color:rgba(128,165,194,.46);background:linear-gradient(110deg,rgba(4,22,39,.76),rgba(11,38,59,.78)),url('/images/hero-rebuild/silk-waves.svg') center/cover no-repeat}
 html.dark #home.hero.wrap::before{opacity:.19}
