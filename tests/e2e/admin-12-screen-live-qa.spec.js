@@ -18,6 +18,8 @@ const screens = [
   ['10_website_settings','settings'], ['11_backup_restore','backup'], ['12_activity_log','activity']
 ];
 const matrix = [
+  // Include narrow-phone viewport; navigation height differs from 390px.
+  {width:320,height:640,theme:'light'}, {width:320,height:640,theme:'dark'},
   {width:390,height:844,theme:'light'}, {width:390,height:844,theme:'dark'},
   {width:1280,height:800,theme:'light'}, {width:1280,height:800,theme:'dark'}
 ];
