@@ -1,3 +1,7 @@
+> **BỔ SUNG NGHIỆM THU ĐỘC LẬP (Admin order race, 25/10/2026):** code/test SHA `030a39928204a5b091b27880adf645f57e343593`, commit sửa thêm điều kiện kiểm tra snapshot dòng hàng khi thao tác lưu giá không thay đổi. Test D1-contract bằng SQLite in-memory mô phỏng người khác đổi giá trước `DB.batch`; bản lưu cũ phải HTTP 409, giữ giá/tổng tiền mới, không tạo audit thành công giả. CI tại mốc cập nhật: 6/6 SUCCESS (xem báo cáo cập nhật), không coi job chưa kết thúc là PASS. Các blocker Cloudflare vẫn giữ nguyên; không deploy/merge/tích hợp. [Báo cáo](../../admin-audit/INDEPENDENT-QA-2026-10-25.md).
+
+---
+
 > **Nghiệm thu độc lập bổ sung 25/10/2026:** code HEAD `27a145253c71bc887b536611e9fece3ddd51779d`. Sửa API thanh toán `30b193a640dd6bad826265bf3b982b05558616cc` và cấp bảo hành `27a145253c71bc887b536611e9fece3ddd51779d`; các nguồn kiểm thử mới đã **6/6 SUCCESS**. Đã kiểm tra ZIP evidence, 12 màn hình đủ ảnh ở 390×844 light/dark và 1280×800 light, đúng kích thước và duy nhất trong mỗi bộ; vẫn **0/12 owner accepted**. Cloudflare Preview deploy metadata vẫn là `c64e07fca248dc527361c4d018dc26c11f5b3570`, KHÔNG chứa backend mới. Đọc [INDEPENDENT-QA-2026-10-25.md](../../admin-audit/INDEPENDENT-QA-2026-10-25.md). Chỉ sửa nhánh Admin, không merge/tích hợp.
 
 ---

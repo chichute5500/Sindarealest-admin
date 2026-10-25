@@ -37,3 +37,18 @@ Still **NOT ACCEPTED**: real Preview QR/private-original R2 write-read-cleanup, 
 ## Continue independently when safe
 
 Continue Admin-only contract and regression audits, exact-SHA CI, screenshot comparisons. Preserve official gold SD logo without color filters. No Production, storefront source or shared resource writes; only safely isolated, clearly tagged run-owned synthetic data with two cleanup verifications when remote writes become permissible.
+
+
+## Additional Admin order stale-snapshot guard — 030a39928204a5b091b27880adf645f57e343593
+
+Modified `functions/api/admin/orders.js` and `tests/disposable-sqlite-integration.test.mjs`. Ordinary status saves that *do not* reprice now skip rewriting unchanged order item prices, and final summary UPDATE requires the live D1 `order_items` snapshot (row count, IDs, quantity, existing unit price) to still match the preflight read. A real in-memory SQLite test injects a concurrent, already-committed `130000` VND reprice after this request read original `120000`: stale PATCH must return 409, leave `order_items.unit_price=130000`, `orders.total=130000`, zero false audit rows. Production/remote D1 are untouched.
+
+Exact SHA CI at report update:
+- [#40176386344](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40176386344) `Admin Preview Playwright`: `success`
+- [#40176386338](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40176386338) `Admin isolated Preview Playwright`: `success`
+- [#40176386348](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40176386348) `Validate source and tests`: `success`
+- [#40176382610](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40176382610) `Validate source and tests`: `success`
+- [#40176382603](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40176382603) `Admin isolated Preview Playwright`: `success`
+- [#40176382625](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40176382625) `Admin Preview diagnostic smoke test`: `success`
+
+**Residual work:** Concurrent *actual price changes* (as opposed to unchanged-price status saves) still require deeper optimistic concurrency and multi-row atomicity review before 100% acceptance. This fix is narrowly scoped; do not claim all order-write races are solved. No Admin backend redeployment has been verified. Owner action for Preview ORIGINALS and separate Storefront test-only DB/ORIGINALS remains necessary for safe remote QA, without authorization to integrate.

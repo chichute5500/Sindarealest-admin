@@ -20,7 +20,7 @@
   "visualParityTotal": 12,
   "ownerAcceptance": "NOT_GRANTED",
   "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge.",
-  "latestVerifiedCodeAndTestSha": "27a145253c71bc887b536611e9fece3ddd51779d",
+  "latestVerifiedCodeAndTestSha": "030a39928204a5b091b27880adf645f57e343593",
   "latestChanges": [
     {
       "sha": "d6da905c4ce53cbf0a84e426943927c978767923",
@@ -63,6 +63,12 @@
       "finding": "Warranty issuance coerced array/object/boolean values into durations",
       "resolution": "Strict number or decimal-only string validation for real FormData compatibility",
       "test": "tests/warranty-issuance-race.test.mjs"
+    },
+    {
+      "sha": "030a39928204a5b091b27880adf645f57e343593",
+      "finding": "Admin order status saves with unchanged user-supplied prices could replay stale item prices after a concurrent reprice",
+      "resolution": "Skip unchanged item updates and gate order summary update against exact preflight item/quantity/unit-price snapshot in the D1 batch",
+      "test": "tests/disposable-sqlite-integration.test.mjs"
     }
   ],
   "qaEvidence": {
@@ -120,18 +126,19 @@
   ],
   "overallStatus": "NOT_100_PERCENT_ACCEPTED",
   "latestHandoffDate": "2026-10-25",
-  "lastVerifiedCodeAndTestHeadBeforeHandoff": "27a145253c71bc887b536611e9fece3ddd51779d",
+  "lastVerifiedCodeAndTestHeadBeforeHandoff": "030a39928204a5b091b27880adf645f57e343593",
   "lastVerifiedExactShaCi": {
-    "sourceSha": "27a145253c71bc887b536611e9fece3ddd51779d",
-    "result": "6/6_SUCCESS",
+    "sourceSha": "030a39928204a5b091b27880adf645f57e343593",
+    "result": "6/6_SUCCESS_AT_CHECKPOINT",
     "runs": [
-      40175655753,
-      40175655821,
-      40175655848,
-      40175651274,
-      40175651270,
-      40175651273
-    ]
+      40176386344,
+      40176386338,
+      40176386348,
+      40176382610,
+      40176382603,
+      40176382625
+    ],
+    "pendingRuns": []
   },
   "lastVerifiedDeployedAppSourceSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
   "lastVerifiedDeployedRun": 40165551327,
