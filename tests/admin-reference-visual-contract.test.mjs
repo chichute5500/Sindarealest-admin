@@ -41,7 +41,8 @@ assert.ok(src.includes("head('BẢNG ĐIỀU KHIỂN','Tổng quan','Chào mừn
   'Dashboard must have one main Tổng quan title, not a duplicate eyebrow');
 assert.ok(!src.includes("head('Tổng quan','Tổng quan'"),
   'Dashboard must not show two identical Tổng quan headings');
-const logoutMarkup=src.match(/<button[^>]*id="logout"[^>]*>[\\s\\S]*?<\\/button>/)?.[0]||'';
+const logoutStart=src.indexOf('id="logout"');
+const logoutMarkup=logoutStart<0?'':src.slice(logoutStart,src.indexOf('</button>',logoutStart)+9);
 assert.match(logoutMarkup,/aria-label="Đăng xuất"/,
   'Red power-off logout must keep its accessible action name');
 assert.match(logoutMarkup,/class="logout-power-icon"/,
