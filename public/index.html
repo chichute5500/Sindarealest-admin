@@ -4943,3 +4943,16 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:brightness(.78) saturate(
 @media(prefers-reduced-motion:reduce){
  #home .hero-reference-art,#home .hero-reference-art img,#home .hero-copy{animation:none!important;transition:none!important}
 }
+
+/* CTA FOCUS V9.1 — no translucent glass overlay may fade the text baked in artwork. */
+#home .hero-actions .pill-btn{
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+  filter:none!important;mix-blend-mode:normal!important;
+  -webkit-mask:none!important;mask:none!important;
+  text-decoration:none!important;
+}
+#home .hero-actions .pill-btn::before,
+#home .hero-actions .pill-btn::after{
+ content:none!important;display:none!important;opacity:0!important;
+ background:none!important;box-shadow:none!important;
+}

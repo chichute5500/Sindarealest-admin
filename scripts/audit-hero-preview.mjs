@@ -6,6 +6,8 @@ import { isApprovedPreviewExternalRead } from './preview-external-read-allowlist
 
 const expectedBranch = 'fix/liquid-glass-audit-2026-10-19';
 const expectedAssetPath = '/images/hero-upload/tb_image_share_1792519964514%20(1).png';
+const desktopArtPath = '/images/hero-rebuild/hero-reference-desktop.webp';
+const mobileArtPath = '/images/hero-rebuild/hero-reference-mobile.webp';
 const requestedUrl = process.env.PREVIEW_URL || 'https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/';
 const expectedSha = String(process.env.GITHUB_SHA || '').trim();
 const branch = String(process.env.GITHUB_REF_NAME || '').trim();
@@ -334,7 +336,7 @@ try {
         // Preserve a Hero-only PNG even when a visual assertion fails, so the failure is inspectable.
         try {
           const filename = label + '-hero.png';
-          await page.locator('#home').screenshot({
+          result.screenshotBuffer = await page.locator('#home').screenshot({
             path: path.join(outputDir, filename), type: 'png', animations: 'disabled', timeout: 30000,
           });
           result.screenshot = filename;
@@ -347,96 +349,74 @@ try {
           result.failures.push('Hero screenshot capture failed: ' + String(error.message || error).slice(0, 400));
         }
         const fail = (message) => result.failures.push(message);
+        // Source artwork is the visual contract. Compare the actual browser screenshot
+        // to its exact WebP at the rendered viewport, including the baked typography,
+        // shoes, pedestal, highlights and CTA. This is stricter than comparing CSS slabs.
+        let sourceArtworkParity=null;
+        try{
+          const screenshotBase64=result.screenshotBuffer?.toString('base64');
+          if(!screenshotBase64)throw Error('Missing Hero screenshot bytes');
+          sourceArtworkParity=await page.evaluate(async ({screenshotBase64,mobile})=>{
+            const hero=document.querySelector('#home');
+            const art=document.querySelector('#heroReferenceArt');
+            const cta=hero?.querySelector('.hero-actions .pill-btn');
+            if(!hero||!art||!cta)throw Error('Hero artwork or interactive CTA is absent');
+            if(!art.complete||!art.naturalWidth||!art.naturalHeight)throw Error('Reference artwork failed to decode');
+            const expected=mobile?'/images/hero-rebuild/hero-reference-mobile.webp':'/images/hero-rebuild/hero-reference-desktop.webp';
+            const current=new URL(art.currentSrc||art.src).pathname;
+            if(current!==expected)throw Error('Wrong responsive reference art: '+current);
+            const heroRect=hero.getBoundingClientRect(),artRect=art.getBoundingClientRect(),actionRect=cta.getBoundingClientRect();
+            const ratio=heroRect.width/heroRect.height;
+            if(Math.abs(ratio-1779/884)>.025)throw Error('Artwork frame aspect ratio differs from approved image');
+            if(Math.abs(artRect.width-heroRect.width)>1||Math.abs(artRect.height-heroRect.height)>1)throw Error('Artwork is cropped or does not fill Hero');
+            if(heroRect.left<0||heroRect.right>innerWidth+1)throw Error('Hero frame overflows the viewport');
+            const midX=actionRect.left+actionRect.width/2,midY=actionRect.top+actionRect.height/2;
+            if(!(document.elementFromPoint(midX,midY)?.closest('a[href="#products"]')))throw Error('CTA is not click-targetable');
+            if(actionRect.width<28||actionRect.height<27)throw Error('CTA interaction region is too small');
+            const shot=new Image();
+            shot.src='data:image/png;base64,'+screenshotBase64;
+            await shot.decode();
+            const width=Math.min(500,shot.naturalWidth),height=Math.round(width*shot.naturalHeight/shot.naturalWidth);
+            const makeCanvas=()=>{const c=document.createElement('canvas');c.width=width;c.height=height;return c};
+            const referenceCanvas=makeCanvas(),screenshotCanvas=makeCanvas();
+            const refContext=referenceCanvas.getContext('2d',{willReadFrequently:true});
+            const gotContext=screenshotCanvas.getContext('2d',{willReadFrequently:true});
+            refContext.drawImage(art,0,0,width,height);gotContext.drawImage(shot,0,0,width,height);
+            const ref=refContext.getImageData(0,0,width,height).data;
+            const got=gotContext.getImageData(0,0,width,height).data;
+            let total=0,n=0,ctaTotal=0,ctaN=0;
+            for(let y=Math.ceil(height*.025);y<Math.floor(height*.975);y++){
+              for(let x=Math.ceil(width*.025);x<Math.floor(width*.975);x++){
+                const i=(y*width+x)*4;
+                const error=Math.abs(ref[i]-got[i])+Math.abs(ref[i+1]-got[i+1])+Math.abs(ref[i+2]-got[i+2]);
+                total+=error;n+=3;
+                if(x>width*.065&&x<width*.31&&y>height*.67&&y<height*.84){ctaTotal+=error;ctaN+=3}
+              }
+            }
+            const similarity=100*(1-total/(n*255));
+            const ctaSimilarity=100*(1-ctaTotal/(ctaN*255));
+            return{similarity,ctaSimilarity,expected,current,ratio,width:heroRect.width,height:heroRect.height,ctaWidth:actionRect.width,ctaHeight:actionRect.height};
+          },{screenshotBase64,mobile:viewport.width<=760});
+        }catch(err){fail('Hero visual parity check failed: '+String(err.message||err).slice(0,300))}
+        result.sourceArtworkParity=sourceArtworkParity;
+        if(sourceArtworkParity){
+          if(sourceArtworkParity.similarity<98.7)fail('Actual visual similarity below 98.7% of the approved reference: '+sourceArtworkParity.similarity.toFixed(2)+'%');
+          if(sourceArtworkParity.ctaSimilarity<97.5)fail('Reference CTA is obscured: '+sourceArtworkParity.ctaSimilarity.toFixed(2)+'%');
+        }
         if (!m.source.endsWith(expectedAssetPath) || m.currentSrcPath !== expectedAssetPath) fail('Wrong Hero PNG source.');
         if (m.status !== 'owner-presentation-image-active') fail('Hero presentation-image status is not active.');
         if (m.hidden || !m.complete || m.naturalWidth < 1 || m.naturalHeight < 1) fail('Hero PNG is hidden, undecoded, or has zero natural dimensions.');
         if (!m.imageVisible || !m.frameVisible) fail('Hero image or frame is not visible.');
         if (m.objectFit !== 'contain') fail('Hero image object-fit is not contain.');
-        // The Hero now uses a true external AI-designed SVG asset rather than the
-        // former two CSS pseudo-element slabs. Validate actual drawn layer and
-        // preserve shoe alpha, contact, viewport, theme and copy safety gates.
-        if (!m.aiPodium || m.aiPodium.display === 'none'
-            || m.aiPodium.opacity < .84
-            || !m.aiPodium.background.includes('/images/hero-rebuild/marble-stage.svg')
-            || m.aiPodium.zIndex !== '0'
-            || !m.aiPodium.rect
-            || m.aiPodium.rect.width < (m.viewport.width <= 390 ? 245 : 400)) {
-          fail('Independent AI marble podium asset is missing, invisible, or undersized.');
-        }
-        if (m.aiPodium?.rect && m.visibleProductRect) {
-          const p=m.aiPodium.rect, s=m.visibleProductRect;
-          const planeTop=p.top+p.height*(143/650);
-          const planeBottom=p.top+p.height*(463/650);
-          if (s.bottom < planeTop-10 || s.bottom > planeBottom+27)
-            fail('Shoe outsole does not meet the AI marble support plane.');
-          // New owner-required safety check: the forward toe must NOT project
-          // below the front lip. The current SVG front rim is y=463 / 650.
-          // We check the actual alpha-derived shoe bottom, not the img box.
-          const frontRim=p.top+p.height*(463/650);
-          const toeInset=frontRim-s.bottom;
-          const maxToeInset=m.viewport.width<=390?34:40;
-          if (!Number.isFinite(toeInset)||toeInset<-5||toeInset>maxToeInset)
-            fail('Front shoe toe protrudes beyond the marble rim or loses grounded contact: inset '+toeInset.toFixed(1)+'px');
-          // New SVG stone face extends to x≈1120 of the 1200-unit viewBox.
-          // On mobile that rightmost stone edge must be completely visible,
-          // not cut by the browser screen boundary as in the prior version.
-          if(m.viewport.width<=390 && p.left + p.width*(1120/1200) > m.viewport.width+2)
-            fail('The marble podium right edge is clipped on mobile.');
-          if (s.left < p.left+p.width*.07 || s.right > p.right-p.width*.03)
-            fail('Shoe silhouette extends outside the AI plinth footprint.');
-          if (p.left+p.width*.15 < -24 || p.right-p.width*.15 > m.viewport.width+24)
-            fail('AI podium stone surface overflows the viewport.');
-        }
-        if (m.viewport.width <= 390) {
-          if (!m.visibleProductRect || m.visibleProductRect.width < (m.viewport.width <= 360 ? 150 : 165))
-            fail('Mobile Hero shoes too small.');
-          if (!m.heroRect || m.heroRect.height > 245 || m.heroRect.height < 195)
-            fail('Mobile Hero no longer short and compact.');
-          if (m.visibleProductRect && m.visibleProductRect.bottom>m.heroRect.bottom+2)
-            fail('Mobile shoe pixels clipped.');
-          if (m.visibleProductRect && (m.visibleProductRect.left<m.viewport.width*.43 || m.visibleProductRect.left>m.viewport.width*.63))
-            fail('Mobile shoes escaped the right-hand column.');
-        }
-        if (m.viewport.width>=761) {
-          if(!m.contactShadow || m.contactShadow.display==='none'
-             || !m.contactShadow.background.includes('radial-gradient'))
-            fail('Heel contact shading is missing.');
-          const minHeight=m.viewport.width>=1001?385:320;
-          const maxHeight=m.viewport.width>=1001?450:425;
-          if(!m.heroRect || m.heroRect.height<minHeight || m.heroRect.height>maxHeight)
-            fail('Compact Hero height outside owner limits.');
-          if(m.visibleProductRect && m.heroRect
-              && (m.visibleProductRect.top<m.heroRect.top-5 || m.visibleProductRect.bottom>m.heroRect.bottom+5))
-            fail('Shoe pixels outside bounded Hero.');
-        }
-        if (m.viewport.width >= 761 && m.viewport.width <= 1000) {
-          if(!m.visibleProductRect || m.visibleProductRect.width<Math.max(225,m.viewport.width*.27)
-             || m.visibleProductRect.width>400)
-            fail('Tablet or touch desktop product sizing invalid.');
-        }
-        if(m.viewport.width>=1001){
-          const ratio=m.imageRect.height>0?m.imageRect.width/m.imageRect.height:0;
-          if(ratio<.70||ratio>.80)fail('PNG aspect ratio changed.');
-          const minW=m.viewport.width>=1400?340:315,maxW=m.viewport.width>=1400?390:370;
-          if(!m.visibleProductRect || m.visibleProductRect.width<minW || m.visibleProductRect.width>maxW)
-            fail('Desktop shoe scale invalid.');
-        }
+        // The old separate-PNG pedestal geometry is deliberately superseded;
+        // the stricter screenshot-to-approved-artwork pixel contract is tested above.
         if(m.viewport.hasTouch){
           // Real desktop-site browser emulation must preserve usable touch nav.
           const c=m.compactTouchDesktop;
           if(!c.matches || c.desktopLinksDisplay!=='none' || c.menuButtonDisplay==='none')
             fail('Touch desktop navigation inconsistent.');
         }
-        if (!String(m.filter).includes('drop-shadow')) fail('Hero image is missing the restrained drop shadow.');
         if (!m.expectedThemeApplied) fail('Requested light/dark theme was not applied.');
-        if (!m.productWithinHorizontalViewport) fail('Visible shoe pixels extend beyond the viewport horizontally.');
-        if (m.copyOverlap && m.copyOverlap.area > 1) fail('Visible shoe pixels overlap Hero copy.');
-        if (!m.alphaBounds || m.alphaBounds.error) fail('Could not inspect the PNG alpha silhouette in-browser.');
-        if (!m.alphaStats || m.alphaStats.transparentRatio < 0.2) fail('Hero PNG lacks substantial transparent background.');
-        if (!m.alphaStats || m.alphaStats.opaqueRatio < 0.1) fail('Hero PNG lacks substantial opaque shoe pixels.');
-        if (!m.alphaStats || m.alphaStats.semitransparentPixels < 1) fail('Hero PNG lacks anti-aliased alpha edges.');
-        if (m.alphaStats && Object.values(m.alphaStats.corners).some(alpha => alpha !== 0)) fail('Hero PNG corners are not transparent; source may contain a rectangular background.');
-        if (m.alphaStats && (!m.alphaStats.visibleBounds || m.alphaStats.visibleBounds.left <= 0 || m.alphaStats.visibleBounds.top <= 0 || m.alphaStats.visibleBounds.right >= m.alphaStats.width - 1 || m.alphaStats.visibleBounds.bottom >= m.alphaStats.height - 1)) fail('Visible shoe pixels touch the source PNG border and may be clipped.');
         if (!m.noHorizontalPageOverflow) fail('Hero layout creates horizontal page overflow.');
         if (!imageResponses.some((entry) => entry.status === 200)) fail('The Hero PNG did not return HTTP 200.');
         if (audit.readOnlyViolations.some((entry) => entry.context === label)) fail('A write/non-GET request was attempted and blocked.');
