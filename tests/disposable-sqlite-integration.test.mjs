@@ -217,7 +217,11 @@ try {
   assert.equal(scalar('SELECT total FROM orders').total,125000);
   sql.prepare("DELETE FROM audit_logs WHERE entity_type='order' AND entity_id=?").run(qaOrder.id);
   sql.prepare("UPDATE order_items SET unit_price=120000,line_total=120000 WHERE id=?").run(qaItem.id);
-  sql.prepare("UPDATE orders SET subtotal=120000,total=120000 WHERE id=?").run(qaOrder.id);
+  // The disposable fixture must restore its original signed payment terms
+  // after the preceding QA reprice invalidated them; otherwise the later real
+  // ledger handler correctly rejects the synthetic receipt with HTTP 409.
+  sql.prepare("UPDATE orders SET subtotal=120000,total=120000,payment_terms_confirmed_at=? WHERE id=?")
+    .run(stamp,qaOrder.id);
 
   // Validation failure must happen before D1 batch and preserve all existing rows.
   const preBatch=batches;
