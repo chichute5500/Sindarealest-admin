@@ -1,3 +1,22 @@
+> **CẬP NHẬT ƯU TIÊN CUỐI — 25/10/2026:** Chủ dự án đã quyết định **D1/R2 không còn quá quan trọng; chỉ xử lý phần khác chưa hoàn thành; không làm lại mục đã PASS**. Giữ tất cả bằng chứng PASS bên dưới. Hai lỗi Storefront Preview dùng chung tài nguyên Production là **hoãn xử lý chứ KHÔNG ĐƯỢC ĐÁNH DẤU PASS**; không tự sửa Cloudflare hoặc kiểm thử D1/R2. Không tích hợp, không merge.
+
+## Thứ tự việc cần thực hiện ở chat mới (chỉ NON-D1/R2)
+
+1. **Kiểm toán security sâu** những vấn đề chưa có bằng chứng: authorization, IDOR, CSRF, session, rate limiting, XSS, secrets và negative tests; không chạy lại smoke PASS #40208397077.
+2. **Accessibility với assistive tech**: audit chuyên sâu screen reader, focus, live status, labels, error states; tiêu chí nghiệm thu thực tế còn cần ký xác nhận.
+3. **Performance/load**: kiểm tra tĩnh, performance budgets và benchmark độc lập, không stress-test Production/Preview có tài nguyên chung.
+4. **Tài chính**: lập checklist thanh toán, hoàn tiền, đối soát ngân hàng; chỉ rà soát code và dữ liệu đã ẩn nhạy cảm, phải có signoff của người phụ trách thực tế.
+5. **Contract Admin–Storefront**: chỉ đọc PR #108, so sánh API create order/token, payment status, QR và schema migration 0009; chuẩn bị kế hoạch thay đổi chọn lọc, tuyệt đối không sửa Storefront hoặc merge khi chưa được yêu cầu.
+
+## Mốc xác minh mới nhất
+
+- Admin code deployed source `f9c992a614193722d2510755a24fb46dac20c4eb`, deploy [#40208396978](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40208396978) PASS, security/keyboard/performance smoke [#40208397077](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40208397077) PASS.
+- Commit tài liệu trước bản cập nhật: `a29a46abe88516456ee23078ad29015649b31e53`, **4/4 workflows SUCCESS**; prompt mới có commit `e8e731a702806a75cc2e062d7e88bb382747618f`. Luôn fetch HEAD mới, đừng dùng SHA tài liệu làm SHA app deploy.
+- PR #111 OPEN, PR #108 OPEN; không merge, không sửa Production. OWNER approved thiết kế **12/12**.
+- Tệp khởi động mới: [PROMPT-NEXT-CHAT.md](../admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md). Tất cả bảng kiểm cũ phía dưới là chứng cứ lịch sử; không tự tái thực hiện các PASS.
+
+---
+
 # SINDAREALEST ADMIN — BÀN GIAO CHỈ CÁC VIỆC CÒN MỞ (25/10/2026)
 
 **Giới hạn:** chỉ sửa nhánh Admin `feature/admin-isolated-handoff-2026-10-20`, [PR #111](https://github.com/chichute5500/Sindarealest-admin/pull/111). [Storefront PR #108](https://github.com/chichute5500/Sindarealest-admin/pull/108) và `main` READ-ONLY. Không merge, không sửa Production, không viết vào Storefront Preview còn chia sẻ tài nguyên Production.
