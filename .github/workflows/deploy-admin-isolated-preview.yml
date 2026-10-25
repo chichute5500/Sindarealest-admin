@@ -2,6 +2,13 @@ name: Deploy ADMIN to isolated Cloudflare Pages Preview
 
 on:
   workflow_dispatch:
+  # Deploy the isolated Admin Preview only when the actual Admin UI changes.
+  # No production deployment, main writes, D1 or R2 mutations in this workflow.
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - 'public/admin/index.html'
 
 permissions:
   contents: read

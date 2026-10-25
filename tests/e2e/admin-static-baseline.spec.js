@@ -682,6 +682,19 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#backdrop')).toBeVisible();
     expect(pageErrors, 'Opening Product Editor must not throw a browser JavaScript error').toEqual([]);
     await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'false');
+    // The editor must meet the fixed mobile nav without exposing the product list
+    // through a gap (and must not cover the nav). Test both light/dark and all
+    // narrow viewports used by the existing baseline, not just a screenshot.
+    if (variant.viewport.width <= 680) {
+      const seam = await page.evaluate(() => {
+        const overlay = document.querySelector('#backdrop').getBoundingClientRect();
+        const nav = document.querySelector('.mobiletabs').getBoundingClientRect();
+        return { overlayBottom:overlay.bottom, navTop:nav.top, viewportHeight:innerHeight };
+      });
+      expect(Math.abs(seam.overlayBottom-seam.navTop),
+        'Modal and mobile navigation must share a seamless boundary: '+JSON.stringify(seam))
+        .toBeLessThanOrEqual(2);
+    }
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
     // Reference screen 4 uses a back affordance, not an X close icon, before returning to the product list.
     await expect(page.locator('#editorClose')).toHaveAttribute('aria-label', 'Quay lại danh sách sản phẩm');
