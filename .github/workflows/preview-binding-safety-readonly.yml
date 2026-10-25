@@ -1,4 +1,4 @@
-name: Cloudflare Preview binding isolation — READ ONLY (no deploy)
+name: Isolated Admin project Preview binding safety — READ ONLY
 on:
   push:
     branches:
@@ -10,40 +10,35 @@ permissions:
 
 jobs:
   audit:
-    name: Confirm Preview D1 and private R2 are distinct from Production
+    name: Verify isolated Admin Preview target against Storefront Production
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
     steps:
-      - name: Read project configuration and compare resource identities only
+      - uses: actions/checkout@v4
+      - name: Inspect only binding identities — never log IDs, names or secret values
         run: |
           node --input-type=module <<'NODE'
-          const { CLOUDFLARE_API_TOKEN: token, CLOUDFLARE_ACCOUNT_ID: account, CLOUDFLARE_PAGES_PROJECT: project } = process.env;
-          if (!token || !account || !project) throw new Error("Cloudflare read credentials/project variable missing; cannot certify Preview safety.");
-          if (project !== "sindarealest2") throw new Error("Unexpected project name; refusing unrelated environment check.");
-          const url = `https://api.cloudflare.com/client/v4/accounts/${account}/pages/projects/${project}`;
-          const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-          const payload = await response.json().catch(() => null);
-          if (!response.ok || payload?.success !== true || !payload?.result) throw new Error("Unable to read Cloudflare Pages Preview binding metadata safely.");
-          const config = payload.result;
-          if (config.production_branch !== "main") throw new Error("Pages Production branch is not confirmed as main. Stop all Preview deployment.");
-          const production = config.deployment_configs?.production;
-          const preview = config.deployment_configs?.preview;
-          if (!production || !preview) throw new Error("Missing production or preview configuration; stop.");
-          const prodDB = production.d1_databases?.DB?.id;
-          const testDB = preview.d1_databases?.DB?.id;
-          // Report only booleans, never database identifiers, bucket names, secrets or API responses.
-          console.log("D1 binding: production configured=" + Boolean(prodDB) + "; Preview configured=" + Boolean(testDB) + "; isolated=" + Boolean(prodDB && testDB && prodDB !== testDB));
-          if (!prodDB) throw new Error("Production D1 identity unavailable; cannot establish safe Preview separation.");
-          if (!testDB) throw new Error("Preview D1 binding DB is NOT configured; Preview functions cannot be tested safely.");
-          if (prodDB === testDB) throw new Error("Preview D1 binding DB points to the SAME database as Production; Preview writes unsafe.");
-          for (const name of ["IMAGES", "ORIGINALS"]) {
-            const live = production.r2_buckets?.[name]?.name;
-            const test = preview.r2_buckets?.[name]?.name;
-            if (!test || (live && test === live)) throw new Error("Preview R2 " + name + " missing or shared with Production; do not deploy/write test data.");
+          import { assessAdminPreviewBindings } from './scripts/admin-preview-binding-safety.mjs';
+          const { CLOUDFLARE_API_TOKEN: token, CLOUDFLARE_ACCOUNT_ID: account } = process.env;
+          if (!token || !account) throw new Error("Cloudflare read credentials unavailable; no Preview deployment allowed.");
+          const endpoint = `https://api.cloudflare.com/client/v4/accounts/${account}/pages/projects/`;
+          async function get(name) {
+            const result = await fetch(endpoint + name, { headers: { Authorization: `Bearer ${token}` } });
+            if (!result.ok) throw new Error("Cloudflare Pages project metadata unavailable.");
+            return await result.json();
           }
-          console.log("PASS: Pages production branch main; Preview D1 and both Preview R2 buckets isolated. No resource IDs/names/secrets logged.");
+          const admin = await get("sindarealest-admin-preview");
+          const storefront = await get("sindarealest2");
+          const safety = assessAdminPreviewBindings(admin, storefront);
+          for (const code of safety.blockers) console.error("::error::" + code);
+          for (const code of safety.warnings) console.log("::warning::" + code);
+          if (!safety.deployAllowed) throw new Error("ISOLATED_ADMIN_PREVIEW_UNSAFE; no deploy, no D1/R2 write tests.");
+          const liveDB = storefront.result?.deployment_configs?.production?.d1_databases?.DB?.id;
+          const storePreviewDB = storefront.result?.deployment_configs?.preview?.d1_databases?.DB?.id;
+          if (liveDB && storePreviewDB && liveDB === storePreviewDB)
+            console.log("::warning::STOREFRONT_PAGES_PREVIEW_SHARES_PRODUCTION_D1 — do not use sindarealest2 Preview for write testing.");
+          console.log("PASS: selected target is isolated Admin Preview project; separate from Storefront Production D1/IMAGES and private originals. No API writes or deploy.");
           NODE
