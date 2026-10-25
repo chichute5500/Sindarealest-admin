@@ -1,0 +1,60 @@
+name: PhotoAI Android emulator acceptance smoke
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'photoai-android/**'
+      - '.github/workflows/photoai-android-emulator.yml'
+permissions:
+  contents: read
+jobs:
+  android-emulator:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable KVM for Android emulator
+        run: |
+          if [ -e /dev/kvm ]; then sudo chmod 666 /dev/kvm; else echo "KVM not available; software emulation may be slow"; fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Obtain real offline MediaPipe model
+        run: |
+          set -euo pipefail
+          mkdir -p photoai-android/app/src/main/assets
+          curl -fL --retry 3 --connect-timeout 25             'https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/1/mobilenet_v3_small.tflite'             -o photoai-android/app/src/main/assets/mobilenet_v3_small.tflite
+          python3 - <<'PY'
+          from pathlib import Path
+          model=Path('photoai-android/app/src/main/assets/mobilenet_v3_small.tflite').read_bytes()
+          assert len(model)>1_000_000 and model[4:8]==b'TFL3'
+          print('Verified AI model size',len(model))
+          PY
+      - name: Run UI launch and real MobileNet inference in emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 3
+          ram-size: 4096M
+          disk-size: 6144M
+          disable-animations: true
+          emulator-boot-timeout: 900
+          script: cd photoai-android && gradle --no-daemon --stacktrace :app:connectedDebugAndroidTest
+      - name: Upload instrumentation reports even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: photoai-android-emulator-reports
+          path: |
+            photoai-android/app/build/outputs/androidTest-results/**
+            photoai-android/app/build/reports/androidTests/**
+          if-no-files-found: ignore
+          retention-days: 14
