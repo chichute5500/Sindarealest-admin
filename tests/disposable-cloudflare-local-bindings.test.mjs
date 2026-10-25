@@ -27,7 +27,17 @@ try{
   const files=['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql',
   '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
   '0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql'];
-  for(const name of files)await DB.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
+  // D1.exec() is line-delimited and cannot safely apply full multi-line
+  // migration files. Prepare and execute each complete SQL statement instead.
+  for(const name of files){
+    const source=readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8');
+    const withoutComments=source.replace(/^\s*--.*$/gm,'');
+    for(const fragment of withoutComments.split(';')){
+      const statement=fragment.trim();
+      if(!statement || /^PRAGMA foreign_keys\s*=/i.test(statement))continue;
+      await DB.prepare(statement).run();
+    }
+  }
   const password='NO_REAL_ADMIN_PASSWORD_QA',secret='NO_REAL_SESSION_SECRET_QA';
   const env={...platform.env,ADMIN_PASSWORD:password,SESSION_SECRET:secret};
   const headers={Cookie:'sd_admin_session='+await createSession(secret),
