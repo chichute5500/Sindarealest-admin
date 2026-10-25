@@ -826,6 +826,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
       <span class="hero-pedestal-art" aria-hidden="true"></span>
       <div class="hero-visual-glow"></div>
       <img id="heroProductImage" hidden alt="" decoding="async" fetchpriority="high">
+      <img id="heroLeftShoe" src="/images/hero-upload/tb_image_share_1792519964514%20(1).png" alt="" aria-hidden="true" decoding="async" loading="eager">
       <span class="hero-visual-caption">SINDAREALEST · SIGNATURE</span>
     </div>
   </section>
@@ -3552,6 +3553,7 @@ html.dark .icon-btn:active,html.dark .nav-wrap .icon-btn:active,html.dark .mini-
  border:0;clip-path:none;mask:none;-webkit-mask:none;filter:drop-shadow(0 7px 8px rgba(11,25,38,.17));
 }
 #home .hero-visual #heroProductImage[hidden]{display:none}
+#home .hero-visual #heroLeftShoe{display:none}
 #home.hero:has(#heroProductImage[hidden]){grid-template-columns:minmax(0,1fr)}
 #home.hero:has(#heroProductImage[hidden]) .hero-copy{grid-column:1;max-width:100%}
 #home.hero:has(#heroProductImage[hidden]) .hero-visual{display:none}
@@ -3566,6 +3568,19 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:saturate(.90) brightness(
    Line boxes are intentionally individually positioned; the red center word is larger, as in the reference.
    Compact phone/tablet rules below retain natural text flow. */
 @media(min-width:1101px){
+ /* V18: two strictly complementary crop layers of the *same* unchanged owner shoe PNG.
+    The upright shoe remains in native #heroProductImage, the lying shoe is lifted;
+    neither layer contains text, CTA, pedestal or a baked screenshot. */
+ #home .hero-visual #heroProductImage{
+  clip-path:polygon(51% 0,100% 0,100% 100%,72% 100%,66% 60%,57% 40%,49% 27%);
+ }
+ #home .hero-visual #heroLeftShoe{
+  display:block;position:absolute;z-index:6;top:calc(-23% - 52px);left:46%;
+  transform:translateX(-50%);width:clamp(510px,52vw,710px);height:auto;max-width:none;
+  object-fit:contain;object-position:center;pointer-events:none;
+  clip-path:polygon(0 0,51% 0,49% 27%,57% 40%,66% 60%,72% 100%,0 100%);
+  filter:drop-shadow(0 9px 8px rgba(11,25,38,.17));
+ }
  #home .hero-copy h1{height:clamp(217px,17.4vw,250px);flex:0 0 auto;margin-bottom:clamp(16px,1.7vw,26px)}
  #home .hero-copy h1 span{
   position:absolute;left:0;width:max-content;max-width:none;
