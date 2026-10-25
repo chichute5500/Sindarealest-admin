@@ -1,3 +1,8 @@
+## VERIFIED CHECKPOINT — 2026-10-25, source QA `9fde886e4be1`
+
+See [2026-10-25-EXECUTION-REPORT.md](./2026-10-25-EXECUTION-REPORT.md) for **7/7 exact-SHA CI SUCCESS; 72 read-only + 72 run-owned synthetic screenshots; 320/390/1280 light/dark; zero modal-nav gap; twice-verified zero QA rows; isolated Admin Preview deployed SHA `1f9795e`; and the owner-only Preview R2 `IMAGES` binding blocker.** Visual reference parity remains **0/12 accepted** and weighted evidence **32/100 (not project completion)**. PR #111 OPEN. No Production or main changes.
+
+---
 ## LIVE CHECKPOINT — 2026-10-25 01:24 UTC (before handoff-only sync)
 
 - Repository: `chichute5500/Sindarealest-admin`; branch: `feature/admin-isolated-handoff-2026-10-20`.
