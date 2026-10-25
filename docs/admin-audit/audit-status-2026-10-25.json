@@ -126,7 +126,7 @@
     "previewBrandFilter": "none"
   },
   "appDeploymentNote": "Latest code/test branch includes backend fixes NOT yet redeployed to isolated Admin Preview. Browser visual captures are static/local source and existing Admin Preview checks, not backend live integration proof.",
-  "designParityAccepted": 0,
+  "designParityAccepted": 1,
   "remainingBlockers": [
     "ADMIN_PREVIEW_ORIGINALS_MISSING",
     "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
@@ -159,7 +159,7 @@
   "latestOwnerInstruction": "Continue to fix all Admin issues, but DO NOT integrate or merge the Storefront",
   "cloudflareBindingLastVerifiedByRun": 40167641001,
   "cloudflareImageBindingHistoricalGapResolved": true,
-  "ownerAcceptedScreenCount": 0,
+  "ownerAcceptedScreenCount": 1,
   "acceptanceEvidenceWeight": 32,
   "completionPercentNotEstablished": true,
   "handoffDocument": "docs/admin-ui-reference/handoff/CURRENT-CHECKPOINT-2026-10-25.md",
@@ -244,5 +244,30 @@
     "bucketScope": "ADMIN_PREVIEW_IMAGES_AND_ORIGINALS_ONLY"
   },
   "lastVerifiedR2SourceSha": "04f115405699434431b51216f31c311ef8bea333",
-  "lastObservedStorefrontStorage": "PREVIEW_DB_AND_ORIGINALS_STILL_PRODUCTION_BACKED_NO_WRITES"
+  "lastObservedStorefrontStorage": "PREVIEW_DB_AND_ORIGINALS_STILL_PRODUCTION_BACKED_NO_WRITES",
+  "ownerApprovedScreens": [
+    {
+      "screenNumber": 1,
+      "screenId": "01_login",
+      "name": "Đăng nhập",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "0b9395721cfd58ec0d1dace922ffc3372b7bba60",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40191206728,
+      "artifactId": 12598276457,
+      "screenshotPath": "artifacts/admin-12-screen-live/0b9395721cfd/390x844_light/01_login.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Tôi duyệt màn hình 01 Đăng nhập với giao diện Preview hiện tại.",
+      "scopeNote": "Approval applies to the shown mobile-light current Preview comparison, not unseen breakpoints or future UI versions."
+    }
+  ],
+  "lastOwnerVisualAcceptance": {
+    "accepted": 1,
+    "total": 12,
+    "approvedAppSha": "0b9395721cfd58ec0d1dace922ffc3372b7bba60",
+    "nextScreen": "02_dashboard",
+    "status": "IN_PROGRESS"
+  }
 }
