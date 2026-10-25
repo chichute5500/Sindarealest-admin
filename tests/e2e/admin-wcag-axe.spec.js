@@ -19,7 +19,7 @@ const views=[
  {id:'warranties',heading:'Bảo hành / Yêu cầu hỗ trợ'},
  {id:'settings',heading:'Cài đặt website'},
  {id:'backup',heading:'Sao lưu / Khôi phục'},
- {id:'audit',heading:'Nhật ký hoạt động'},
+ {id:'activity',heading:'Nhật ký hoạt động'},
 ];
 for(const profile of [{width:390,height:844,theme:'light'},
                       {width:1440,height:900,theme:'dark'}]){
@@ -53,8 +53,15 @@ for(const profile of [{width:390,height:844,theme:'light'},
    await page.locator('#loginForm button[type="submit"]').click();
    await expect(page.locator('#appView')).toBeVisible({timeout:20000});
    for(const {id,heading} of views){
-     const nav=page.locator('button[data-view="'+id+'"]:visible').first();
-     await nav.click();
+     // Some views are selected from the "Khác" mobile tab; the underlying
+     // nav control may be hidden by responsive CSS. Use the same supported
+     // application navigation event as the 12-screen authenticated QA.
+     await page.evaluate(viewId=>{
+       const target=[...document.querySelectorAll('[data-view]')]
+         .find(el=>el.dataset.view===viewId);
+       if(!target)throw Error('Missing Admin view '+viewId);
+       target.click();
+     },id);
      await expect(page.locator('#main .pagehead h2').first()).toHaveText(heading,{timeout:20000});
      await scan(id);
    }
