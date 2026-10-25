@@ -147,6 +147,40 @@ class PhotoAIWebUITest(unittest.TestCase):
         self.assertEqual(updated['priceVnd'],2450000)
         self.assertTrue(updated['editedByUser'])
 
+    def test_long_press_touch_drag_to_visible_folder(self):
+        before=self.page.evaluate('JSON.parse(JSON.stringify(window.__PhotoTest.state()))')
+        photo=before['photos'][0]
+        target=next(m['id'] for m in before['models'] if m['category']=='Thắt lưng')
+        self.page.locator('#searchInput').fill(photo['name'])
+        self.page.locator('#gallery .photo').first.scroll_into_view_if_needed()
+        points=self.page.evaluate('''id=>{
+           const source=document.querySelector('#gallery .photo');
+           const target=[...document.querySelectorAll('.tree-row')].find(n=>n.__node.type==='model'&&n.__node.id===id);
+           const point=e=>{const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}};
+           return {start:point(source),end:point(target)};
+        }''',target)
+        self.page.evaluate('''({x,y})=>{
+           const element=document.querySelector('#gallery .photo');
+           const touch=new Touch({identifier:1,target:element,clientX:x,clientY:y});
+           element.dispatchEvent(new TouchEvent('touchstart',{bubbles:true,cancelable:true,touches:[touch],targetTouches:[touch],changedTouches:[touch]}));
+        }''',points['start'])
+        self.page.wait_for_timeout(570)
+        self.assertEqual(self.page.locator('.touch-drag-ghost').count(),1)
+        self.page.evaluate('''({x,y})=>{
+           const element=document.querySelector('#gallery .photo');
+           const touch=new Touch({identifier:1,target:element,clientX:x,clientY:y});
+           element.dispatchEvent(new TouchEvent('touchmove',{bubbles:true,cancelable:true,touches:[touch],targetTouches:[touch],changedTouches:[touch]}));
+        }''',points['end'])
+        self.page.evaluate('''({x,y})=>{
+           const element=document.querySelector('#gallery .photo');
+           const touch=new Touch({identifier:1,target:element,clientX:x,clientY:y});
+           element.dispatchEvent(new TouchEvent('touchend',{bubbles:true,cancelable:true,touches:[],targetTouches:[],changedTouches:[touch]}));
+        }''',points['end'])
+        after=self.page.evaluate('(id)=>window.__PhotoTest.state().photos.find(p=>p.id===id)',photo['id'])
+        self.assertEqual(after['modelId'],target)
+        self.assertEqual(after['category'],'Thắt lưng')
+        self.assertEqual(self.page.locator('.touch-drag-ghost').count(),0)
+
     def test_mobile_screenshot(self):
         self.page.screenshot(path='/mnt/data/PhotoAI_v0_5_Mobile_Preview.png',full_page=True)
 
