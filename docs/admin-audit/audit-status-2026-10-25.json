@@ -1,0 +1,23 @@
+{
+  "auditDate": "2026-10-25",
+  "adminHeadBeforeDocumentation": "f0bd664fa359aa197c274e8648e71c79e67567a9",
+  "pr": 111,
+  "preintegration": "BLOCKED",
+  "integrationAuthorized": false,
+  "merged": false,
+  "productionModified": false,
+  "websiteModified": false,
+  "routesAudited": 22,
+  "deployGate": "STATIC_TEST_PASS_D1_R2_PREVIEW_GUARD_ADDED",
+  "uploadMissingOriginals": "LOCAL_TEST_PASS",
+  "uploadRollback": "LOCAL_TEST_PASS",
+  "blockers": [
+    "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+    "ADMIN_PREVIEW_ORIGINALS_MISSING",
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+  ],
+  "visualParityAccepted": 0,
+  "visualParityTotal": 12,
+  "ownerAcceptance": "NOT_GRANTED",
+  "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge."
+}
