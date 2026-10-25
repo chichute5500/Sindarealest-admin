@@ -27,6 +27,7 @@ function countReview(){return s.photos.filter(p=>{const m=modelById(p.modelId);r
 function selection(){return s.photos.filter(p=>chosen.has(p.id))}
 function groupPhotos(node=active){if(search){const q=norm(search);return s.photos.filter(p=>[p.name,p.category,p.color,p.relativePath,modelById(p.modelId)?.name].some(v=>norm(v).includes(q)))}if(!node)return s.photos.slice();if(node.type==='category')return s.photos.filter(p=>p.category===node.id);if(node.type==='model')return s.photos.filter(p=>p.modelId===node.id);if(node.type==='color')return s.photos.filter(p=>p.modelId===node.modelId&&p.color===node.color);return s.photos}
 function modelById(i){return s.models.find(m=>m.id===i)}
+function lockedModel(m){return !!m && (m.verified===true || m.editedByUser===true)}
 function validModels(){return s.models.filter(m=>s.photos.some(p=>p.modelId===m.id))}
 function colorsForModel(i){const result={};for(const p of s.photos)if(p.modelId===i)result[p.color]=(result[p.color]||0)+1;return Object.entries(result)}
 function setActive(node){active=node;chosen.clear();take=60;if(tab==='review')tab='tree';render()}
@@ -92,12 +93,12 @@ if(src.type==='color'&&target.type==='color'){if(src.modelId!==target.modelId){a
 if(src.type==='color'&&target.type==='model'){ask('Chuyển nhóm màu?',`Chuyển toàn bộ ảnh màu ${src.color} sang mẫu mới, giữ nguyên màu?`,()=>{moveGroupColor(src,target);hideModal()});return}
 notify('Chỉ hỗ trợ kéo Mẫu → Mẫu và Màu → Mẫu/Màu')
 }
-function mergeModels(from,to){if(from===to)return;remember();for(const p of s.photos)if(p.modelId===from)p.modelId=to;s.models=s.models.filter(m=>m.id!==from);if(active?.id===from)active={type:'model',id:to};autosave();render();notify('Đã gộp mẫu')}
-function moveGroupColor(src,target){remember();const mid=target.type==='model'?target.id:target.modelId;const targetModel=modelById(mid);if(!targetModel){notify('Mẫu đích không tồn tại');return}for(const p of s.photos)if(p.modelId===src.modelId&&p.color===src.color){p.modelId=mid;p.category=targetModel.category;if(target.type==='color')p.color=target.color}cleanupModels();autosave();render();notify('Đã chuyển nhóm màu')}
+function mergeModels(from,to){if(from===to)return;remember();const targetModel=modelById(to);if(targetModel)targetModel.editedByUser=true;for(const p of s.photos)if(p.modelId===from)p.modelId=to;s.models=s.models.filter(m=>m.id!==from);if(active?.id===from)active={type:'model',id:to};autosave();render();notify('Đã gộp mẫu')}
+function moveGroupColor(src,target){remember();const mid=target.type==='model'?target.id:target.modelId;const targetModel=modelById(mid);if(!targetModel){notify('Mẫu đích không tồn tại');return}targetModel.editedByUser=true;for(const p of s.photos)if(p.modelId===src.modelId&&p.color===src.color){p.modelId=mid;p.category=targetModel.category;if(target.type==='color')p.color=target.color}cleanupModels();autosave();render();notify('Đã chuyển nhóm màu')}
 function movePhotos(ids,target){if(!ids||!ids.length){notify('Chọn ảnh trước');return}remember();let count=0;const idsSet=new Set(ids);const newModelForCategory=target.type==='category'?createModel(target.id,'Mẫu mới'):null;for(const p of s.photos){if(!idsSet.has(p.id))continue;if(target.type==='category'){
 p.category=target.id;p.modelId=newModelForCategory.id;
-}else if(target.type==='model'){const m=modelById(target.id);if(!m)continue;p.modelId=m.id;p.category=m.category}
-else if(target.type==='color'){const m=modelById(target.modelId);if(!m)continue;p.category=m.category;p.modelId=m.id;p.color=target.color}count++}
+}else if(target.type==='model'){const m=modelById(target.id);if(!m)continue;m.editedByUser=true;p.modelId=m.id;p.category=m.category}
+else if(target.type==='color'){const m=modelById(target.modelId);if(!m)continue;m.editedByUser=true;p.category=m.category;p.modelId=m.id;p.color=target.color}count++}
 cleanupModels();chosen.clear();autosave();render();notify('Đã chuyển '+count+' ảnh')}
 function cleanupModels(){s.models=s.models.filter(m=>s.photos.some(p=>p.modelId===m.id))}
 function createModel(category,name){const m={id:id(),category,name:name||'Mẫu mới',verified:false};s.models.push(m);return m}
@@ -116,12 +117,12 @@ const m=active.type==='model'?modelById(active.id):null;
 const val=m?m.name:active.color;
 let html=`<label>Tên mới</label><input id="editName" value="${escapeHtml(val)}" maxlength="120">`;
 if(m)html+=`<label>Giá bán (VNĐ) — do bạn nhập, AI không tự đoán</label><input id="editPrice" type="number" min="0" step="1000" placeholder="Chưa nhập giá" value="${m.priceVnd??''}"><label class="checkline"><input type="checkbox" id="modelVerified" ${m.verified?'checked':''}> Đã xác nhận mẫu, màu và giá</label>`;
-modal('Đổi thông tin '+(m?'sản phẩm':'màu'),html,()=>{const name=$('editName').value.trim();if(!name){notify('Tên không được để trống');return}if(m){const raw=$('editPrice').value.trim();if(raw!==''&&(!/^\d+$/.test(raw)||Number(raw)>100000000000)){notify('Giá không hợp lệ');return}if($('modelVerified').checked&&raw===''){notify('Cần nhập giá trước khi xác nhận sản phẩm');return}if($('modelVerified').checked&&s.photos.some(p=>p.modelId===m.id&&(!p.color||p.color==='Chưa rõ'))){notify('Hãy xác nhận màu của từng ảnh trước khi duyệt mẫu');return}remember();m.name=name;m.priceVnd=raw===''?null:Number(raw);m.verified=$('modelVerified').checked}else{remember();for(const p of s.photos)if(p.modelId===active.modelId&&p.color===active.color)p.color=name;active={type:'color',modelId:active.modelId,id:active.modelId+'|'+name,color:name}}autosave();render();hideModal();notify('Đã lưu thông tin sản phẩm')})
+modal('Đổi thông tin '+(m?'sản phẩm':'màu'),html,()=>{const name=$('editName').value.trim();if(!name){notify('Tên không được để trống');return}if(m){const raw=$('editPrice').value.trim();if(raw!==''&&(!/^\d+$/.test(raw)||Number(raw)>100000000000)){notify('Giá không hợp lệ');return}if($('modelVerified').checked&&raw===''){notify('Cần nhập giá trước khi xác nhận sản phẩm');return}if($('modelVerified').checked&&s.photos.some(p=>p.modelId===m.id&&(!p.color||p.color==='Chưa rõ'))){notify('Hãy xác nhận màu của từng ảnh trước khi duyệt mẫu');return}remember();m.name=name;m.priceVnd=raw===''?null:Number(raw);m.verified=$('modelVerified').checked;m.editedByUser=true}else{remember();for(const p of s.photos)if(p.modelId===active.modelId&&p.color===active.color)p.color=name;const changedModel=modelById(active.modelId);if(changedModel)changedModel.editedByUser=true;active={type:'color',modelId:active.modelId,id:active.modelId+'|'+name,color:name}}autosave();render();hideModal();notify('Đã lưu thông tin sản phẩm')})
 }
 function mergeCurrent(){if(!active||active.type!=='model'){notify('Chọn một mẫu cần gộp trước');return}const src=modelById(active.id);const matches=s.models.filter(m=>m.category===src.category&&m.id!==src.id);if(!matches.length){notify('Không có mẫu khác trong danh mục');return}
 const html='<p>Chọn mẫu đích để gộp:</p><select id="mergeDest">'+matches.map(m=>`<option value="${escapeHtml(m.id)}">${escapeHtml(m.name)}</option>`).join('')+'</select>';
 modal('Gộp '+src.name,html,()=>{const to=$('mergeDest').value;mergeModels(src.id,to);hideModal()})}
-function newModel(){const cat=active?.type==='category'?active.id:active?.type==='model'?modelById(active.id)?.category:active?.type==='color'?modelById(active.modelId)?.category:categoryNames()[0];if(!cat){notify('Hãy nhập thư mục trước');return}modal('Tạo mẫu mới',`<p>Danh mục: ${escapeHtml(cat)}</p><label>Tên mẫu</label><input id="newName" value="Mẫu mới">`,()=>{const name=$('newName').value.trim();if(!name)return;remember();const m=createModel(cat,name);if(chosen.size)for(const p of selection()){p.category=cat;p.modelId=m.id}autosave();active={type:'model',id:m.id};chosen.clear();render();hideModal();notify('Đã tạo mẫu')})}
+function newModel(){const cat=active?.type==='category'?active.id:active?.type==='model'?modelById(active.id)?.category:active?.type==='color'?modelById(active.modelId)?.category:categoryNames()[0];if(!cat){notify('Hãy nhập thư mục trước');return}modal('Tạo mẫu mới',`<p>Danh mục: ${escapeHtml(cat)}</p><label>Tên mẫu</label><input id="newName" value="Mẫu mới">`,()=>{const name=$('newName').value.trim();if(!name)return;remember();const m=createModel(cat,name);m.editedByUser=true;if(chosen.size)for(const p of selection()){p.category=cat;p.modelId=m.id}autosave();active={type:'model',id:m.id};chosen.clear();render();hideModal();notify('Đã tạo mẫu')})}
 function openNodeOptions(node){if(node.type==='model')ask('Thao tác với mẫu','Chọn Đổi tên ở thanh phía dưới để chỉnh sửa. Kéo thả mẫu để gộp, hoặc chọn Gộp mẫu.',()=>{hideModal();renameNode()});else renameNode()}
 function setBusy(v){busy=v;$('analyzeBtn').disabled=v||!settings.aiEnabled;$('pickBtn').disabled=v;$('exportBtn').disabled=v}
 function onImported(data){setBusy(false);try{
@@ -146,10 +147,10 @@ if(settings.mode==='cloud'&&!safeUrl(settings.cloudEndpoint)){
     notify('Chưa có địa chỉ dịch vụ AI Cloud HTTPS. Vào ⚙ để cấu hình, hoặc chọn AI trên máy.');return;
 }
 if(settings.mode==='cloud'&&!settings.cloudConsent){notify('Cần bật đồng ý gửi ảnh lên Cloud trong ⚙ trước khi phân tích.');return;}
-const verified=s.models.filter(m=>m.verified).length;const eligible=s.photos.filter(p=>!modelById(p.modelId)?.verified);if(!eligible.length){notify('Tất cả mẫu đã xác nhận. AI không thay đổi dữ liệu đã duyệt.');return}
+const verified=s.models.filter(m=>lockedModel(m)).length;const eligible=s.photos.filter(p=>!lockedModel(modelById(p.modelId)));if(!eligible.length){notify('Tất cả mẫu đã xác nhận. AI không thay đổi dữ liệu đã duyệt.');return}
 const body=`<p>Chế độ: <b>${escapeHtml(modeText())}</b>. Quét toàn bộ ảnh trong từng danh mục lớn.</p>`+
 '<p><strong>Quan trọng:</strong> AI trên máy dùng MobileNetV3 để so ảnh. Đây chỉ là gợi ý cần kiểm tra, không bảo đảm gom đúng mọi mẫu. Màu chưa đủ tin cậy sẽ ghi “Chưa rõ”. Dịch vụ Cloud phải do bạn cấu hình và có thể tính phí.</p>'+
-(verified?`<p>✓ Giữ nguyên ${verified} mẫu đã xác nhận (tên, giá, màu, ảnh). AI chỉ phân tích ${eligible.length} ảnh chưa duyệt.</p>`:'')+
+(verified?`<p>✓ Giữ nguyên ${verified} mẫu đã xác nhận/chỉnh tay (tên, giá, màu, ảnh). AI chỉ phân tích ${eligible.length} ảnh chưa duyệt.</p>`:'')+
 (settings.mode==='cloud'||(settings.mode==='hybrid'&&settings.cloudConsent&&settings.cloudEndpoint)?'<p>Ảnh thu nhỏ sẽ được gửi đến dịch vụ HTTPS bạn cấu hình sau khi bạn xác nhận.</p>':'')+
 '<div class="progress"><div id="analysisBar"></div></div><p id="analysisInfo">Đang chuẩn bị...</p>';
 modal('Xác nhận phân nhóm',body,()=>{
@@ -166,16 +167,16 @@ if(data.error)throw Error(data.error);
 if(!settings.aiEnabled)throw Error('AI đã bị tắt. Kết quả cũ không được áp dụng.');
 if(analysisRevision!==null && analysisRevision!==projectRevision)throw Error('Dự án đã thay đổi trong lúc AI phân tích. Không ghi đè dữ liệu mới.');
 if(!Array.isArray(data.photos)||!Array.isArray(data.models))throw Error('Dữ liệu kết quả không hợp lệ');
-const mutable=s.photos.filter(p=>!modelById(p.modelId)?.verified),mutableIds=new Set(mutable.map(p=>p.id));
+const mutable=s.photos.filter(p=>!lockedModel(modelById(p.modelId))),mutableIds=new Set(mutable.map(p=>p.id));
 const suggestions=new Map();
 for(const a of data.photos){if(!mutableIds.has(a.id)||suggestions.has(a.id))throw Error('Kết quả AI có ảnh lạ hoặc lặp');suggestions.set(a.id,a)}
 if(suggestions.size!==mutable.length)throw Error('AI chưa trả đủ ảnh; dữ liệu cũ được giữ nguyên');
 const proposalModels=new Map();
-for(const m of data.models){if(!m.id||proposalModels.has(m.id)||s.models.some(existing=>existing.verified&&existing.id===m.id))throw Error('Mã mẫu từ AI không hợp lệ');proposalModels.set(m.id,m)}
+for(const m of data.models){if(!m.id||proposalModels.has(m.id)||s.models.some(existing=>lockedModel(existing)&&existing.id===m.id))throw Error('Mã mẫu từ AI không hợp lệ');proposalModels.set(m.id,m)}
 for(const p of mutable){const a=suggestions.get(p.id),m=proposalModels.get(a.modelId);if(!m||m.category!==p.category)throw Error('AI trả mẫu khác danh mục');}
 remember();
 // Never overwrite confirmed price, model name, colors or assignments.
-s.models=s.models.filter(m=>m.verified);
+s.models=s.models.filter(m=>lockedModel(m));
 for(const m of proposalModels.values())s.models.push({id:m.id,category:m.category,name:m.name||'Mẫu đề xuất',verified:false,priceVnd:null});
 for(const p of mutable){const a=suggestions.get(p.id);p.modelId=a.modelId;p.color=a.color||'Chưa rõ';p.confidence=Math.min(1,Math.max(0,Number(a.confidence)||0));p.review=p.confidence<.6||p.color==='Chưa rõ'}
 s.expanded=categoryNames().map(cat=>'category:'+cat);active=null;chosen.clear();autosave();render();
