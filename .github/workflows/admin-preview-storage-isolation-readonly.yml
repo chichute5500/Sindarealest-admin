@@ -1,0 +1,51 @@
+name: Read-only Admin Preview R2 and D1 isolation preflight
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - '.github/workflows/admin-preview-storage-isolation-readonly.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  separation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ISOLATED_PROJECT: sindarealest-admin-preview
+      PRODUCTION_PROJECT: sindarealest2
+    steps:
+      - name: Check only read-only Cloudflare metadata and never touch storage objects
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feature/admin-isolated-handoff-2026-10-20'
+          test -n "$CF_TOKEN"
+          test -n "$ACCOUNT_ID"
+          endpoint="https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/pages/projects"
+          isolated="$(curl --fail --silent --show-error -H "Authorization: Bearer ${CF_TOKEN}" "${endpoint}/${ISOLATED_PROJECT}")"
+          prod="$(curl --fail --silent --show-error -H "Authorization: Bearer ${CF_TOKEN}" "${endpoint}/${PRODUCTION_PROJECT}")"
+          printf '%s' "$isolated" | jq -e '.success == true and .result.name == "sindarealest-admin-preview"' > /dev/null
+          printf '%s' "$prod" | jq -e '.success == true and .result.name == "sindarealest2"' > /dev/null
+          isolated_r2="$(printf '%s' "$isolated" | jq -r '.result.deployment_configs.preview.r2_buckets.IMAGES.name // empty')"
+          isolated_db="$(printf '%s' "$isolated" | jq -r '.result.deployment_configs.preview.d1_databases.DB.id // empty')"
+          prod_r2="$(printf '%s' "$prod" | jq -r '.result.deployment_configs.production.r2_buckets.IMAGES.name // empty')"
+          prod_private="$(printf '%s' "$prod" | jq -r '.result.deployment_configs.production.r2_buckets.ORIGINALS.name // empty')"
+          prod_db="$(printf '%s' "$prod" | jq -r '.result.deployment_configs.production.d1_databases.DB.id // empty')"
+          if [[ -z "$isolated_r2" || -z "$isolated_db" || -z "$prod_r2" || -z "$prod_private" || -z "$prod_db" ]]; then
+            echo '::error::CANNOT_PROVE_ISOLATION: missing binding metadata; refuse all live R2 writes.'
+            exit 1
+          fi
+          if [[ "$isolated_r2" == "$prod_r2" || "$isolated_r2" == "$prod_private" || "$isolated_db" == "$prod_db" ]]; then
+            echo '::error::SHARED_BINDING_DETECTED: Admin Preview shares Production storage; live QA writes prohibited.'
+            exit 1
+          fi
+          echo 'PASS: separate Preview D1 and R2 IMAGES bindings from both Production image buckets and Production D1.'
+          echo 'Read-only metadata checks only; zero Cloudflare Pages deploy, D1 records, R2 objects, or secrets altered.'
