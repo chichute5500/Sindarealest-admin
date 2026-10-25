@@ -1,3 +1,13 @@
+## CURRENT HERO: REAL AI PHOTOGRAPHIC PODIUM — 2026-10-25
+- [x] Transform generated marble showcase into its own transparent 1200×610 WebP podium asset; exclude the generated shoe pixels and preserve the original PNG as the sole shoe artwork.
+- [x] Deploy asset on existing Hero Preview as background to independent decorative `.hero-pedestal-art`, not flatten the native webpage into an image.
+- [x] Verify responsive PC, tablet, mobile and 980px touch desktop across dark and light modes; 14/14 screenshot/browser cases PASS [run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360478) / [artifact](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360478/artifacts/12587117437).
+- [x] Validate exact source `bff758bd452253ee1b2487d92e16649fff7d6944` PASS [40163360553](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360553), Preview deploy PASS [40163360524](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360524), Gallery PASS [40163360489](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360489).
+- [ ] **OWNER VISUAL ACCEPTANCE REQUIRED**: compare exact photograph-inspired podium with the generated reference on real desktop/phone. Do not call 100% based on CI alone.
+- [ ] No merge/main/Production; no unrelated code changes.
+
+---
+
 ## HERO AI IMAGE IMPLEMENTATION — 2026-10-25
 - [x] Replace CSS-built pedestal with a separate, original SVG artwork asset in `public/images/hero-upload/ai-marble-pedestal.svg` and integrate it into the existing native webpage.
 - [x] Preserve original shoe PNG pixels and layering; preserve live copy/CTA and all Gallery functionality.

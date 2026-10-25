@@ -1,3 +1,12 @@
+## CURRENT HERO DECISION — AI-PHOTO PODIUM IMAGE — 2026-10-25
+1. The owner asked whether visual designs could be actually installed. Answer with an actual source edit: `public/images/hero-upload/ai-marble-pedestal.webp` is the standalone transparent AI-derived photo layer now served in Preview.
+2. Keep owner source PNG unchanged, native text/buttons and Gallery untouched. Decorative podium behind shoes; breakpoints separately calibrated for mobile/tablet/touch desktop/PC.
+3. This photorealistic WebP replaces the earlier experimental SVG illustrated podium in Hero CSS. No full-page screenshot mockup is used.
+4. Exact SHA `bff758bd452253ee1b2487d92e16649fff7d6944`: Validate PASS 40163360553; Preview PASS 40163360524; Hero Chromium 14/14 PASS 40163360478; Gallery regression PASS 40163360489. **Owner visual sign-off still required**.
+5. Preserve scope: PR #108 open/unmerged; no Production/main, Admin/backend/API, product data, payments, DB, Cloudflare/secrets/infra.
+
+---
+
 ## DESIGN DECISION — HERO MARBLE IMAGE LAYER — 2026-10-25
 1. Implement a separate transparent illustration file at `/images/hero-upload/ai-marble-pedestal.svg` instead of trying to replicate luxury mineral materials with dozens of CSS gradients.
 2. Position art independently for desktop/tablet/mobile, keep original shoe PNG unmodified above it, and remove the legacy CSS ellipse/face from visible rendering.

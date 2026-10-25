@@ -1,3 +1,18 @@
+## EXACT SHA — PHOTOGRAPHIC AI MARBLE ASSET ON ACTUAL WEBSITE — 2026-10-25
+| Gate | Status | Evidence |
+|---|---|---|
+| Source SHA | `bff758bd452253ee1b2487d92e16649fff7d6944` | WebP 1200×610 transparent marble; HTML/CSS background reference + Hero-only audit |
+| Validate | **PASS** | [40163360553](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360553) |
+| Cloudflare Pages Preview | **PASS** | [40163360524](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360524) |
+| Hero Chromium 7 viewport × 2 themes | **14/14 PASS** | [40163360478](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360478), [artifact 12587117437](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360478/artifacts/12587117437) |
+| Gallery isolated Preview regression | **PASS** | [40163360489](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360489) |
+| Original shoe PNG blob | **UNCHANGED** | Recheck repo tree SHA `c17cc9058ae3008dc662806d21d2cf8f7d83b8a9` |
+| Owner real-device aesthetics | **OWNER ACCEPTANCE REQUIRED** | No 100% claim |
+| PR #108 | **OPEN, NOT MERGED** | No main/Production changes |
+Earlier SVG attempt was a separate working illustration but not as photographically close to the AI sample; the WebP `bff758bd452253ee1b2487d92e16649fff7d6944` supersedes it. CI PASS and actual phone sign-off remain separate.
+
+---
+
 ## HERO AI PODIUM — EXACT SOURCE SHA — 2026-10-25
 | Gate | Result | Evidence |
 |---|---|---|

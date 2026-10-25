@@ -1,3 +1,15 @@
+## LATEST — PHOTOGRAPHIC AI PODIUM LIVE ON PREVIEW — 2026-10-25
+> This is the newest authorized Hero status, superseding the earlier experimental **SVG podium** handoff. Read the current live HEAD before any further edits.
+
+- Repo `chichute5500/Sindarealest-admin`, branch `fix/liquid-glass-audit-2026-10-19`, PR #108 **OPEN / unmerged**, base `main`. Source/test SHA: `bff758bd452253ee1b2487d92e16649fff7d6944`; Preview: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- **The Hero now uses a real standalone transparent WebP image asset** `public/images/hero-upload/ai-marble-pedestal.webp` (1200×610, generated from the owner's AI marble showcase artwork, cleaned of shoe pixels, independently placed behind the exact untouched owner shoe PNG). This is *not* a full screenshot used as page background and is *not* the experimental SVG vector from earlier in the conversation. Hero native HTML copy/CTA, product PNG, locked Gallery and site functionality remain intact.
+- Responsive placement source `public/index.html` uses real background image on `.hero-pedestal-art` at 360,390,768,980 touch,1280,1365,1440 with light/dark adaptation. Legacy CSS pedestal pseudo layers stay suppressed. The WebP marble has realistic mineral veins, stone face and diffuse floor haze; layering avoids a floating heel. **Owner aesthetics not yet accepted**; compare real phone and PC before final visual closure.
+- **Exact SHA `bff758bd452253ee1b2487d92e16649fff7d6944` evidence:** Validate PASS [40163360553](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360553), Preview deploy PASS [40163360524](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360524), Hero-only Chromium audit **14/14 PASS** [40163360478](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360478), [screenshots 12587117437](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360478/artifacts/12587117437); isolated Gallery PASS [40163360489](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40163360489).
+- The earlier SVG-based source `ab71253` passed CI but remained visually illustrative. The photograph-derived artwork `bff758bd452253ee1b2487d92e16649fff7d6944` supersedes it. Neither should be labeled owner-accepted until approved.
+- No main or Production writes, no merge, no Admin/backend/API/auth, DB, payment, catalog/data, Cloudflare infrastructure, secrets or accepted Gallery edits.
+
+---
+
 ## LIVE HERO DESIGN UPDATE — INDEPENDENT AI MARBLE ART — 2026-10-25
 > Supersedes all older CSS-plinth status. The owner's request is to actually integrate the visual concept on the website, NOT to show a mockup only.
 
