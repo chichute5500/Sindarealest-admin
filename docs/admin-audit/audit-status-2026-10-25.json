@@ -19,5 +19,80 @@
   "visualParityAccepted": 0,
   "visualParityTotal": 12,
   "ownerAcceptance": "NOT_GRANTED",
-  "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge."
+  "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge.",
+  "latestVerifiedCodeAndTestSha": "9b6bb3145145b1399391dd235f1a2efb9ee66b99",
+  "latestChanges": [
+    {
+      "sha": "d6da905c4ce53cbf0a84e426943927c978767923",
+      "finding": "Private R2 read outage incorrectly triggered public bucket fallback",
+      "resolution": "Fail closed with HTTP 503, without public read",
+      "test": "tests/private-warranty-attachments.test.mjs"
+    },
+    {
+      "sha": "192a4374f13bb9d918e85eabf167b6573efcf1b7",
+      "finding": "Stale product UPDATE/DELETE returned success plus phantom audit",
+      "resolution": "Guard D1 changes count; conditional audit; HTTP 409 on stale writes",
+      "test": "tests/admin-product-write-race-sqlite.test.mjs"
+    },
+    {
+      "sha": "9b6bb3145145b1399391dd235f1a2efb9ee66b99",
+      "finding": "Only static Admin handler authorization sweep existed",
+      "resolution": "Dynamic 401/403 test of 31 protected handlers before DB access",
+      "test": "tests/admin-route-runtime-auth.test.mjs"
+    }
+  ],
+  "qaEvidence": {
+    "sourceSha": "9b6bb3145145b1399391dd235f1a2efb9ee66b99",
+    "workflows": [
+      {
+        "run": 40169836229,
+        "result": "SUCCESS",
+        "type": "Validate & runtime tests"
+      },
+      {
+        "run": 40169836222,
+        "result": "SUCCESS",
+        "type": "Admin Preview Playwright"
+      },
+      {
+        "run": 40169836334,
+        "result": "SUCCESS",
+        "type": "Isolated Preview Playwright"
+      },
+      {
+        "run": 40169833547,
+        "result": "SUCCESS",
+        "type": "Isolated Preview Playwright"
+      },
+      {
+        "run": 40169833551,
+        "result": "SUCCESS",
+        "type": "Validate & runtime tests"
+      },
+      {
+        "run": 40169833613,
+        "result": "SUCCESS",
+        "type": "Admin Preview visual diagnostics"
+      }
+    ],
+    "runtimeAuthProtectedHandlers": 31,
+    "unauthorizedD1Operations": 0,
+    "sqliteProductRace": "PASS",
+    "privateR2FallbackGuard": "PASS",
+    "artifactId": 12589933479,
+    "artifactName": "admin-preview-evidence-587",
+    "visibleScreenshotsCount": 142,
+    "previewBrandFilter": "none"
+  },
+  "appDeploymentNote": "Latest code/test branch includes backend fixes NOT yet redeployed to isolated Admin Preview. Browser visual captures are static/local source and existing Admin Preview checks, not backend live integration proof.",
+  "designParityAccepted": 0,
+  "remainingBlockers": [
+    "ADMIN_PREVIEW_ORIGINALS_MISSING",
+    "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+    "12_SCREEN_OWNER_VISUAL_ACCEPTANCE_PENDING",
+    "REMOTE_R2_PRIVATE_WRITE_READ_CLEANUP_NOT_VERIFIED",
+    "REMOTE_RESTORE_POST_TO_DISPOSABLE_D1_NOT_VERIFIED"
+  ],
+  "overallStatus": "NOT_100_PERCENT_ACCEPTED"
 }
