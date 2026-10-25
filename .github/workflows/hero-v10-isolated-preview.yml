@@ -1,4 +1,4 @@
-name: HERO V10 isolated Cloudflare Preview (NEVER Production)
+name: HERO V11 isolated layered web Preview (NEVER Production)
 on:
   push:
     branches:
@@ -19,7 +19,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CF_TARGET: sindarealest-admin-preview
-      PREVIEW_BRANCH: hero-v10-native-20261025
+      PREVIEW_BRANCH: hero-v11-native-20261025
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,7 +35,7 @@ jobs:
           test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
           test "$GITHUB_REF" = "refs/heads/feature/hero-v9-integrated-2026-10-25"
           test "$CF_TARGET" = "sindarealest-admin-preview"
-          test "$PREVIEW_BRANCH" = "hero-v10-native-20261025"
+          test "$PREVIEW_BRANCH" = "hero-v11-native-20261025"
           test -n "$CLOUDFLARE_API_TOKEN"
           test -n "$CLOUDFLARE_ACCOUNT_ID"
       - name: Prove isolated Preview D1/R2 and reject Production identities (read-only)
@@ -102,14 +102,22 @@ jobs:
           fi
           curl "${args[@]}" "$DEPLOYMENT_URL/" -o /tmp/hero-v10-live.html
           grep -Fq 'HERO V10 — REAL WEB COMPOSITION' /tmp/hero-v10-live.html
+          grep -Fq 'HERO V11 — ACTUAL WEB LAYERS' /tmp/hero-v10-live.html
+          grep -Fq 'silk-waves.svg' /tmp/hero-v10-live.html
           grep -Fq '<h1 class="serif"><span>Phong cách</span><span>đẳng cấp</span><span>từ da cá sấu</span></h1>' /tmp/hero-v10-live.html
           grep -Fq 'ai-marble-pedestal.webp' /tmp/hero-v10-live.html
           grep -Fq 'heroProductImage' /tmp/hero-v10-live.html
           if grep -Eq 'heroReferenceArt|hero-reference-(desktop|mobile)\.webp|hero-reference-art' /tmp/hero-v10-live.html; then
             echo '::error::Old flattened HERO remains in live HTML'; exit 1
           fi
-          echo 'PASS: immutable isolated Preview serves native text, shoe and marble layer; flattened V9 absent'
+          curl "${args[@]}" "$DEPLOYMENT_URL/images/hero-rebuild/silk-waves.svg" -o /tmp/hero-v11-silk.svg
+          grep -q '<svg' /tmp/hero-v11-silk.svg
+          grep -q '<path ' /tmp/hero-v11-silk.svg
+          if grep -Eiq '<image|<text|<foreignObject|Phong cách|Khám phá ngay' /tmp/hero-v11-silk.svg; then
+            echo '::error::Decorative background contains baked text/image'; exit 1
+          fi
+          echo 'PASS: immutable isolated Preview serves true HTML/CSS, distinct shoes, podium, decorative-only silk SVG; V9 flattened artwork absent'
           echo "Verified test URL: $DEPLOYMENT_URL"
-          echo 'Preview branch alias: https://hero-v10-native-20261025.sindarealest-admin-preview.pages.dev'
+          echo 'Preview branch alias: https://hero-v11-native-20261025.sindarealest-admin-preview.pages.dev'
 
 # QA trigger: verify HTML/CSS native HERO against isolated Preview; NEVER Production.
