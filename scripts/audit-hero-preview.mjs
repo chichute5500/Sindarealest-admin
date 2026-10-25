@@ -369,6 +369,14 @@ try {
           const planeBottom=p.top+p.height*(341/610);
           if (s.bottom < planeTop-10 || s.bottom > planeBottom+27)
             fail('Shoe outsole does not meet the AI marble support plane.');
+          // New owner-required safety check: the forward toe must NOT project
+          // below the front lip. The source WebP front rim is y≈295 / 610.
+          // We check the actual alpha-derived shoe bottom, not the img box.
+          const frontRim=p.top+p.height*(295/610);
+          const toeInset=frontRim-s.bottom;
+          const maxToeInset=m.viewport.width<=390?34:40;
+          if (!Number.isFinite(toeInset)||toeInset<-5||toeInset>maxToeInset)
+            fail('Front shoe toe protrudes beyond the marble rim or loses grounded contact: inset '+toeInset.toFixed(1)+'px');
           if (s.left < p.left+p.width*.07 || s.right > p.right-p.width*.03)
             fail('Shoe silhouette extends outside the AI plinth footprint.');
           if (p.left+p.width*.15 < -24 || p.right-p.width*.15 > m.viewport.width+24)
