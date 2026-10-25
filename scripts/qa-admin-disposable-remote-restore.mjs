@@ -132,7 +132,7 @@ try{
    'binding = "DB"',
    'database_name = "'+dbName+'"',
    'database_id = "'+id+'"',
- ].join('\\n')+'\\n');
+ ].join('\n')+'\n');
  for(const filename of migrations){
   proof.currentMigration=filename;save();
   const wrangler=resolve('node_modules/wrangler/bin/wrangler.js');
