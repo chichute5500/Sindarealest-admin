@@ -70,6 +70,7 @@ jobs:
           node tests/hero-render-reference.test.mjs
           node tests/storefront-reference-parity.test.mjs
       - name: Deploy ONLY to isolated Admin Pages Preview non-main branch
+        id: publish
         shell: bash
         run: |
           set -euo pipefail
@@ -77,21 +78,38 @@ jobs:
             --project-name "$CF_TARGET" \
             --branch "$PREVIEW_BRANCH" \
             --commit-hash "$GITHUB_SHA" \
-            --commit-message "native hero V10 Preview $GITHUB_SHA"
-      - name: Verify exact deployed source commit via Cloudflare API (read-only)
+            --commit-message "native hero V10 Preview $GITHUB_SHA" 2>&1 | tee /tmp/hero-preview-deploy.log
+          DEPLOYMENT_URL="$(grep -oE 'https://[[:xdigit:]]+\\.sindarealest-admin-preview\\.pages\\.dev' /tmp/hero-preview-deploy.log | head -n 1 || true)"
+          test -n "$DEPLOYMENT_URL" || { echo '::error::No immutable isolated deployment URL'; exit 1; }
+          echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+          echo "Immutable isolated Preview URL: $DEPLOYMENT_URL"
+      - name: Verify real live HTML/CSS on exact isolated Preview URL (read-only)
+        env:
+          DEPLOYMENT_URL: ${{ steps.publish.outputs.deployment_url }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         shell: bash
         run: |
-          node --input-type=module <<'NODE'
-          const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCOUNT_ID;
-          const url='https://api.cloudflare.com/client/v4/accounts/'+account+'/pages/projects/sindarealest-admin-preview/deployments?env=preview&per_page=50';
-          const r=await fetch(url,{headers:{Authorization:'Bearer '+token}});
-          if(!r.ok)throw Error('Preview deployment verification unavailable');
-          const data=await r.json();
-          if(data.success!==true)throw Error('Cannot verify Preview deploy');
-          const match=(data.result||[]).find(x=>x.deployment_trigger?.metadata?.branch===process.env.PREVIEW_BRANCH&&x.deployment_trigger?.metadata?.commit_hash===process.env.GITHUB_SHA);
-          if(!match||match.latest_stage?.status!=='success')throw Error('Expected Preview deployment SHA/branch not confirmed');
-          console.log('PASS exact Preview SHA; no production deployment');
-          console.log('Preview URL: https://hero-v10-native-20261025.sindarealest-admin-preview.pages.dev');
-          NODE
+          set -euo pipefail
+          test -n "$DEPLOYMENT_URL"
+          case "$DEPLOYMENT_URL" in
+            https://*.sindarealest-admin-preview.pages.dev) ;;
+            *) echo '::error::Wrong host: refusing probe'; exit 1 ;;
+          esac
+          args=(--fail --silent --show-error --location --max-time 35 --retry 4 --retry-all-errors --retry-delay 3)
+          if [ -n "$CF_ACCESS_CLIENT_ID" ] && [ -n "$CF_ACCESS_CLIENT_SECRET" ]; then
+            args+=(-H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET")
+          fi
+          curl "${args[@]}" "$DEPLOYMENT_URL/" -o /tmp/hero-v10-live.html
+          grep -Fq 'HERO V10 — REAL WEB COMPOSITION' /tmp/hero-v10-live.html
+          grep -Fq '<h1 class="serif"><span>Phong cách</span><span>đẳng cấp</span><span>từ da cá sấu</span></h1>' /tmp/hero-v10-live.html
+          grep -Fq 'ai-marble-pedestal.webp' /tmp/hero-v10-live.html
+          grep -Fq 'heroProductImage' /tmp/hero-v10-live.html
+          if grep -Eq 'heroReferenceArt|hero-reference-(desktop|mobile)\\.webp|hero-reference-art' /tmp/hero-v10-live.html; then
+            echo '::error::Old flattened HERO remains in live HTML'; exit 1
+          fi
+          echo 'PASS: immutable isolated Preview serves native text, shoe and marble layer; flattened V9 absent'
+          echo "Verified test URL: $DEPLOYMENT_URL"
+          echo 'Preview branch alias: https://hero-v10-native-20261025.sindarealest-admin-preview.pages.dev'
 
 # QA trigger: verify HTML/CSS native HERO against isolated Preview; NEVER Production.
