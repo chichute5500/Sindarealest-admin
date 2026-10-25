@@ -78,4 +78,49 @@
  <path d="M-202 602 C207 497 432 642 788 527 C1129 420 1460 429 1780 287" stroke="url(#silkCrestV12)" stroke-width="9" opacity=".55"/>
 </g>
 <rect width="1600" height="730" fill="url(#silkReflectedLightV12)" opacity=".24"/>
+
+<!-- hero-satin-ridges-v13: standalone spectral textile highlights and cross-fade, no bitmap/source artwork -->
+<defs>
+ <linearGradient id="sdFoldBlueV13" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#a7c9e1" stop-opacity=".10"/>
+  <stop offset=".21" stop-color="#accde3" stop-opacity=".46"/>
+  <stop offset=".36" stop-color="#ffffff" stop-opacity=".73"/>
+  <stop offset=".49" stop-color="#fbfdff" stop-opacity=".86"/>
+  <stop offset=".62" stop-color="#b4d7ed" stop-opacity=".30"/>
+  <stop offset=".91" stop-color="#7ca9ca" stop-opacity=".04"/>
+  <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+ </linearGradient>
+ <linearGradient id="sdFoldShadeV13" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+  <stop offset=".37" stop-color="#4f8db9" stop-opacity=".09"/>
+  <stop offset=".53" stop-color="#6b9cbe" stop-opacity=".34"/>
+  <stop offset=".79" stop-color="#b5d5ed" stop-opacity=".05"/>
+  <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+ </linearGradient>
+ <linearGradient id="sdSatinHorizontalMaskV13" x1="0" y1="0" x2="1" y2="0">
+  <stop offset="0" stop-color="#fff" stop-opacity=".06"/>
+  <stop offset=".29" stop-color="#fff" stop-opacity=".12"/>
+  <stop offset=".55" stop-color="#fff" stop-opacity=".59"/>
+  <stop offset="1" stop-color="#fff" stop-opacity=".92"/>
+ </linearGradient>
+ <mask id="sdSatinFadeLeftV13">
+  <rect width="1600" height="730" fill="url(#sdSatinHorizontalMaskV13)"/>
+ </mask>
+</defs>
+<g mask="url(#sdSatinFadeLeftV13)">
+ <path d="M-180 341 C 236 492 518 426 864 314 C 1216 199 1450 90 1730 -73
+  L1730 70 C1440 228 1204 313 882 409 C 531 513 223 541 -180 405Z"
+  fill="url(#sdFoldShadeV13)" opacity=".45"/>
+ <path d="M-180 308 C 236 455 515 389 866 281 C 1203 178 1420 72 1730 -107
+  L1730 -18 C1439 181 1210 274 878 371 C 522 470 238 490 -180 371Z"
+  fill="url(#sdFoldBlueV13)" opacity=".46"/>
+ <path d="M-192 297 C 235 431 513 373 864 266 C 1226 151 1484 43 1750 -114"
+  fill="none" stroke="#faffff" stroke-width="7" opacity=".38"/>
+ <path d="M-156 366 C 241 493 565 471 902 382 C 1189 310 1502 212 1730 85"
+  fill="none" stroke="#7da8c8" stroke-width="29" opacity=".085"/>
+ <path d="M-70 586 C 275 541 545 628 810 559 C 1220 449 1442 507 1751 396"
+  fill="none" stroke="url(#sdFoldBlueV13)" stroke-width="83" opacity=".48"/>
+ <path d="M-80 619 C 293 558 526 650 841 570 C 1187 466 1468 507 1746 418"
+  fill="none" stroke="url(#sdFoldShadeV13)" stroke-width="48" opacity=".41"/>
+</g>
 </svg>
