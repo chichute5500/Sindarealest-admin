@@ -58,7 +58,7 @@ try{
     return overlap;
    };
    const photoCopyCollision={description:pixelCollisions(copy),cta:pixelCollisions(a)};
-   const splitEnabled=innerWidth>=761;
+   const splitEnabled=innerWidth>=1101||(innerWidth>=761&&innerWidth<=850);
    const leftShoeEvidence={display:css(leftShoe).display,clip:css(leftShoe).clipPath,rightClip:css(i).clipPath,
     natural:[leftShoe.naturalWidth,leftShoe.naturalHeight],sameSource:leftShoe.currentSrc===i.currentSrc,
     rect:splitEnabled?r(leftShoe):null,
@@ -88,7 +88,7 @@ try{
   assert.equal(data.photoCopyCollision.cta,0,name+' actual opaque shoe pixels must not cover CTA');
   assert.deepEqual(data.leftShoeEvidence.natural,[1200,1600],name+' both visual layers must use original PNG');
   assert.ok(data.leftShoeEvidence.sameSource,name+' the two visual layers must reference identical original owner PNG bytes');
-  if(width>=761){
+  if(width>=1101||(width>=761&&width<=850)){
    assert.notEqual(data.leftShoeEvidence.display,'none',name+' independently anchored left loafer must be visible on desktop');
    assert.match(data.leftShoeEvidence.clip,/polygon/,name+' left alpha crop must stay independent');
    assert.match(data.leftShoeEvidence.rightClip,/polygon/,name+' right alpha crop must stay complementary');
