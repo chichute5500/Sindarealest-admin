@@ -177,20 +177,20 @@ assert.ok(storefrontHtml.includes("t.classList.toggle('toast-detail-context',Boo
   && storefrontHtml.includes('.toast.toast-detail-context{bottom:calc(156px + env(safe-area-inset-bottom))}')
   && storefrontHtml.includes("t.classList.remove('show','toast-detail-context')"),
   'A successful detail toast must clear the fixed add-to-cart action instead of covering the button on mobile; card toasts keep their normal placement.');
-assert.ok(storefrontHtml.includes('function flyProductImageToCart(sourceImage,productId)')
-  && storefrontHtml.includes("clone.dataset.cartTargetId='cartOpen'")
-  && storefrontHtml.includes("clone.dataset.durationMs='720'")
+assert.ok(storefrontHtml.includes('function flyProductCardToCart(sourceElement,productId)')
+  && storefrontHtml.includes("clone.dataset.sourceType=sourceElement.classList.contains('product-card')?'product-card':'detail-image'")
+  && storefrontHtml.includes("clone.dataset.cartTargetId=target.id")
+  && storefrontHtml.includes("clone.dataset.durationMs='1100'")
   && storefrontHtml.includes("clone.dataset.productId=String(productId||'')")
   && storefrontHtml.includes("clone.className='sd-fly-to-cart-clone'")
-  && storefrontHtml.includes("const liveTarget=$('#cartOpen')"),
-  'A successful add may animate a non-interactive clone to the real header cart using the exact source image, product id, and 720ms target-tracking flight.');
-assert.ok(storefrontHtml.includes('if(cartMotionReduced()||!sourceImage||!sourceImage.complete||sourceImage.naturalWidth<1)return false')
+  && storefrontHtml.includes('function activeCartFlightTarget()'),
+  'Successful add flies the full actual clicked product tile in 1100ms to the visible desktop/mobile cart with a reduced-motion-safe fallback.');
+assert.ok(storefrontHtml.includes('if(cartMotionReduced()||!sourceElement||!sourceElement.isConnected)return false')
   && storefrontHtml.includes('function confirmCartTargets()')
   && storefrontHtml.includes('#cartOpen.sd-cart-bump svg,#mobileCartNav.sd-cart-bump svg{animation:sdCartIconShake 1s')
   && storefrontHtml.includes('#cartOpen.sd-cart-confirmed,#mobileCartNav.sd-cart-confirmed')
   && storefrontHtml.includes('@media(prefers-reduced-motion:reduce){#cartOpen.sd-cart-bump svg,#mobileCartNav.sd-cart-bump svg{animation:none!important;transform:none!important}'),
-  'Missing/broken source imagery must not block the cart mutation; both cart controls get success-only feedback and reduced-motion avoids shaking.');
-
+  'Missing source geometry must never block cart mutation; both cart controls keep successful-add acknowledgement and reduced-motion behavior.');
 
 assert.ok(storefrontHtml.includes('localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))') && storefrontHtml.includes('data-favorite-remove') && storefrontHtml.includes('data-favorite-open'), 'Favorites must persist locally and support opening or removing saved products.');
 assert.ok(storefrontHtml.includes('id="accountAddressAction"') && storefrontHtml.includes('id="accountAddressView"') && storefrontHtml.includes('id="accountAddressForm"'), 'Account must expose an editable shipping-address book.');
