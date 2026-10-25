@@ -4282,10 +4282,29 @@ html.dark #home .hero-visual::before{
    Responsive 3D plinth, enlarged/deepened so entire shoe sole is INSIDE its rim.
    The 1200×1600 owner's PNG is untouched, and the HTML remains interactive.
    This is the only authoritative rule group for the illustrated podium. */
-#home .hero-visual::before,
-#home .hero-visual::after { content:none!important;display:none!important }
+/* Dissolve the physical base into the surrounding page rather than drawing
+   a separate luminous object. All atmosphere remains BEHIND the owner PNG. */
+#home .hero-visual::after {content:none!important;display:none!important}
+#home .hero-visual::before {
+  content:""!important;display:block!important;
+  position:absolute!important;z-index:0!important;pointer-events:none!important;
+  inset:auto!important;left:calc(43% - 14px)!important;bottom:-6px!important;
+  width:560px!important;height:145px!important;max-width:none!important;
+  transform:translateX(-50%)!important;transform-origin:center!important;
+  border:0!important;border-radius:50%!important;box-shadow:none!important;
+  clip-path:none!important;mask-image:none!important;-webkit-mask-image:none!important;
+  background:radial-gradient(ellipse 66% 59% at 50% 56%,
+    rgba(73,131,167,.24) 0%,rgba(40,97,133,.12) 48%,
+    rgba(27,73,107,.045) 70%,transparent 100%)!important;
+  filter:blur(23px)!important;opacity:.74!important;
+}
 #home .hero-visual {
-  background:radial-gradient(ellipse 70% 43% at 49% 81%,rgba(66,123,158,.12),transparent 83%)!important;
+  background:radial-gradient(ellipse 67% 50% at 49% 83%,rgba(51,108,147,.11),transparent 88%)!important;
+}
+html:not(.dark) #home .hero-visual::before {
+  background:radial-gradient(ellipse 66% 59% at 50% 56%,
+    rgba(100,158,193,.22),rgba(105,159,190,.07) 56%,transparent 100%)!important;
+  opacity:.63!important;
 }
 #home .hero-visual .hero-pedestal-art {
   position:absolute!important;display:block!important;
@@ -4295,41 +4314,52 @@ html.dark #home .hero-visual::before{
   aspect-ratio:auto!important;transform:translateX(-50%)!important;
   border:0!important;border-radius:0!important;
   background:transparent url('/images/hero-upload/ai-marble-pedestal.webp?v=20261025-showcase6') center / 100% 100% no-repeat!important;
-  opacity:.98!important;
-  filter:saturate(.92) brightness(1.06) drop-shadow(0 10px 18px rgba(8,29,47,.11))!important;
+  opacity:.96!important;
+  /* Preserve the solid top under both shoes but melt the body and floor glow
+     into the website background; no box edge at the Hero boundary. */
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 48%,rgba(0,0,0,.94) 58%,rgba(0,0,0,.65) 69%,rgba(0,0,0,.17) 84%,transparent 100%)!important;
+  mask-image:linear-gradient(to bottom,#000 0%,#000 48%,rgba(0,0,0,.94) 58%,rgba(0,0,0,.65) 69%,rgba(0,0,0,.17) 84%,transparent 100%)!important;
+  filter:saturate(.80) brightness(1.01) contrast(.94) drop-shadow(0 7px 15px rgba(8,29,47,.065))!important;
 }
 html.dark #home .hero-visual .hero-pedestal-art {
-  filter:saturate(.98) brightness(1.10) drop-shadow(0 11px 17px rgba(0,8,20,.16))!important;
+  filter:saturate(.79) brightness(.99) contrast(.94) drop-shadow(0 9px 16px rgba(0,8,20,.105))!important;
 }
 html:not(.dark) #home .hero-visual .hero-pedestal-art {
-  filter:saturate(.73) brightness(1.66) drop-shadow(0 10px 17px rgba(38,76,105,.13))!important;
+  filter:saturate(.64) brightness(1.52) contrast(.90) drop-shadow(0 9px 15px rgba(38,76,105,.10))!important;
 }
 #home .hero-visual .hero-visual-glow {
-  opacity:.39!important;filter:blur(2.4px)!important;
+  opacity:.32!important;filter:blur(3.5px)!important;
 }
 #home #heroProductImage { z-index:2!important; }
 @media(min-width:900px) and (max-width:1100px) {
+  #home .hero-visual::before {left:calc(46% - 8px)!important;width:470px!important;height:116px!important;bottom:0!important}
   #home .hero-visual .hero-pedestal-art {
     left:calc(46% - 8px)!important;
     width:610px!important;height:390px!important;bottom:-176px!important;
   }
 }
 @media(min-width:761px) and (max-width:899px) {
+  #home .hero-visual::before {left:calc(46% - 8px)!important;width:370px!important;height:98px!important;bottom:0!important}
   #home .hero-visual .hero-pedestal-art {
     left:calc(46% - 8px)!important;
     width:clamp(450px,65vw,500px)!important;height:295px!important;bottom:-119px!important;
   }
 }
 @media(max-width:760px) {
+  #home .hero-visual::before {
+    left:calc(50% - 8px)!important;width:clamp(224px,59vw,256px)!important;
+    height:91px!important;bottom:10px!important;
+    filter:blur(15px)!important;opacity:.64!important;
+  }
   #home .hero-visual .hero-pedestal-art {
     left:calc(50% - 8px)!important;
     width:clamp(265px,73vw,285px)!important;height:265px!important;bottom:-110px!important;
-    filter:saturate(.92) brightness(1.10) drop-shadow(0 6px 11px rgba(3,20,35,.1))!important;
+    filter:saturate(.80) brightness(1.01) contrast(.94) drop-shadow(0 5px 10px rgba(3,20,35,.065))!important;
   }
   html:not(.dark) #home .hero-visual .hero-pedestal-art {
-    filter:saturate(.7) brightness(1.66) drop-shadow(0 6px 11px rgba(30,64,88,.10))!important;
+    filter:saturate(.64) brightness(1.52) contrast(.90) drop-shadow(0 5px 9px rgba(30,64,88,.07))!important;
   }
   #home .hero-visual .hero-visual-glow {
-    opacity:.33!important;filter:blur(1.3px)!important;
+    opacity:.29!important;filter:blur(2px)!important;
   }
 }
