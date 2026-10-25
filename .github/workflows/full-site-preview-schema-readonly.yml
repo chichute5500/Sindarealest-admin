@@ -1,0 +1,36 @@
+name: Read-only full-site isolated Preview D1 schema gate
+on:
+  push:
+    branches:
+      - integration/full-site-admin-storefront-2026-10-25
+    paths:
+      - "scripts/qa-full-site-preview-schema-readonly.mjs"
+      - ".github/workflows/full-site-preview-schema-readonly.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  d1-schema:
+    name: Isolated Preview D1 SKU/fulfillment/payment ledger shape, no writes
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Inspect only isolated D1 metadata and PRAGMA table_info
+        run: node scripts/qa-full-site-preview-schema-readonly.mjs
+      - name: Upload sanitized schema report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-site-preview-d1-schema-readonly
+          path: artifacts/full-site-preview-evidence/schema.json
+          if-no-files-found: ignore
+          retention-days: 14
