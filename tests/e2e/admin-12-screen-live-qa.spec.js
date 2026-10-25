@@ -20,8 +20,12 @@ const screens = [
 const matrix = [
   // Include narrow-phone viewport; navigation height differs from 390px.
   {width:320,height:640,theme:'light'}, {width:320,height:640,theme:'dark'},
+  {width:360,height:800,theme:'light'}, {width:360,height:800,theme:'dark'},
+  {width:375,height:812,theme:'light'}, {width:375,height:812,theme:'dark'},
   {width:390,height:844,theme:'light'}, {width:390,height:844,theme:'dark'},
-  {width:1280,height:800,theme:'light'}, {width:1280,height:800,theme:'dark'}
+  {width:412,height:915,theme:'light'}, {width:412,height:915,theme:'dark'},
+  {width:1280,height:800,theme:'light'}, {width:1280,height:800,theme:'dark'},
+  {width:1440,height:900,theme:'light'}, {width:1440,height:900,theme:'dark'}
 ];
 for (const {width,height,theme} of matrix) {
   test('isolated live Admin: 12 screens, read-only '+width+'x'+height+' '+theme, async ({browser}) => {

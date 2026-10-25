@@ -9,6 +9,16 @@ on:
       - feature/admin-isolated-handoff-2026-10-20
     paths:
       - 'public/admin/index.html'
+      # Ship tested Admin API fixes as well as UI changes, never a Storefront or main deployment.
+      - 'functions/api/admin/**'
+      - 'functions/_lib.js'
+      - 'functions/_lib/**'
+      - 'functions/_payments.js'
+      - 'functions/_notifications.js'
+      - '.github/workflows/deploy-admin-isolated-preview.yml'
+      # Reissue the pinned Preview deployment after QA-only changes to retain
+      # exact-source-SHA provenance for cross-workflow browser acceptance.
+      - 'tests/e2e/admin-security-a11y-perf.spec.js'
 
 permissions:
   contents: read
@@ -61,6 +71,8 @@ jobs:
         run: |
           npm run check
           npm test
+      - name: Check deploy dependencies for known high severity advisories
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Verify project production branch remains main
         shell: bash
@@ -97,6 +109,9 @@ jobs:
             --branch "$PREVIEW_BRANCH" \
             --commit-hash "$GITHUB_SHA" \
             --commit-message "ADMIN feature Preview $GITHUB_SHA"
+
+      - name: Confirm latest source SHA is mapped to isolated Preview alias
+        run: node scripts/qa-admin-preview-deployed-sha.mjs
 
       - name: Print expected Preview alias
         run: |

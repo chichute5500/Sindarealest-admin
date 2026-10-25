@@ -60,6 +60,9 @@ jobs:
           test "$remote" = "$GITHUB_SHA"
       - name: Verify QA lifecycle artifact preserves previous run-owned evidence
         run: node tests/qa-journal-resume.test.mjs
+      - name: Verify the isolated Admin Preview alias serves this exact source SHA
+        # Never write even synthetic D1 rows against a stale or unrelated deployment.
+        run: node scripts/qa-admin-preview-deployed-sha.mjs
       - name: Seed, capture, then clean all synthetic Preview D1 rows even on test failure
         run: node scripts/qa-admin-d1-synthetic-lifecycle.mjs run
       - name: Final best-effort cleanup on failure or cancellation
