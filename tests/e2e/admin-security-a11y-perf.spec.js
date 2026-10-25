@@ -47,6 +47,18 @@ for (const {width,height,theme} of [
       const loginButton=page.locator('#loginForm button[type="submit"]');
       await page.locator('#password').focus();
       await page.keyboard.press('Tab');
+      // A real keyboard user must encounter the show/hide password control
+      // between the password field and login. Test it instead of skipping it.
+      const passwordToggle=page.locator('#showPassword');
+      await expect(passwordToggle).toBeFocused();
+      await expect(passwordToggle).toHaveAttribute('aria-label','Hiện mật khẩu');
+      await page.keyboard.press('Enter');
+      await expect(page.locator('#password')).toHaveAttribute('type','text');
+      await expect(passwordToggle).toHaveAttribute('aria-pressed','true');
+      await page.keyboard.press('Enter');
+      await expect(page.locator('#password')).toHaveAttribute('type','password');
+      await expect(passwordToggle).toHaveAttribute('aria-pressed','false');
+      await page.keyboard.press('Tab');
       await expect(loginButton).toBeFocused();
       await page.locator('#password').fill(secret);
       await loginButton.click();

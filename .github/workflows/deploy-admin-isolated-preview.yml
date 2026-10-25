@@ -16,6 +16,9 @@ on:
       - 'functions/_payments.js'
       - 'functions/_notifications.js'
       - '.github/workflows/deploy-admin-isolated-preview.yml'
+      # Reissue the pinned Preview deployment after QA-only changes to retain
+      # exact-source-SHA provenance for cross-workflow browser acceptance.
+      - 'tests/e2e/admin-security-a11y-perf.spec.js'
 
 permissions:
   contents: read
