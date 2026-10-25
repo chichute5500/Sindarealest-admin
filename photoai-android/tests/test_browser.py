@@ -116,6 +116,37 @@ class PhotoAIWebUITest(unittest.TestCase):
         self.assertEqual(keep_after['priceVnd'],2790000)
         self.assertTrue(keep_after['editedByUser'])
 
+    def test_search_result_can_be_moved_to_folder(self):
+        all_before=self.page.evaluate('JSON.parse(JSON.stringify(window.__PhotoTest.state()))')
+        original=all_before['photos'][0]
+        target=next(m for m in all_before['models'] if m['category']=='Thắt lưng')
+        self.page.locator('#searchInput').fill(original['name'])
+        self.page.locator('#gallery .photo').first.click()
+        self.page.locator('#moveBtn').click()
+        self.page.wait_for_selector('input[name="destination"]')
+        selected=self.page.evaluate("""(id)=>{
+          const inputs=[...document.querySelectorAll('input[name="destination"]')];
+          const input=inputs.find(x=>{let d=JSON.parse(decodeURIComponent(x.value));return d.type==='model' && d.id===id});
+          if(!input)return false;input.checked=true;return true;
+        }""",target['id'])
+        self.assertTrue(selected)
+        self.page.locator('#modalConfirm').click()
+        photo=self.page.evaluate('(id)=>window.__PhotoTest.state().photos.find(p=>p.id===id)',original['id'])
+        self.assertEqual(photo['modelId'],target['id'])
+        self.assertEqual(photo['category'],'Thắt lưng')
+
+    def test_real_edit_form_locks_product_name_and_price(self):
+        model=self.page.evaluate('window.__PhotoTest.state().models[0]')
+        self.page.evaluate('(id)=>window.__PhotoTest.setActive({type:"model",id})',model['id'])
+        self.page.locator('#renameBtn').click()
+        self.page.locator('#editName').fill('Ví cầm tay mẫu đã chốt tên')
+        self.page.locator('#editPrice').fill('2450000')
+        self.page.locator('#modalConfirm').click()
+        updated=self.page.evaluate('(id)=>window.__PhotoTest.state().models.find(m=>m.id===id)',model['id'])
+        self.assertEqual(updated['name'],'Ví cầm tay mẫu đã chốt tên')
+        self.assertEqual(updated['priceVnd'],2450000)
+        self.assertTrue(updated['editedByUser'])
+
     def test_mobile_screenshot(self):
         self.page.screenshot(path='/mnt/data/PhotoAI_v0_5_Mobile_Preview.png',full_page=True)
 
