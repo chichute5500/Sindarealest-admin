@@ -357,7 +357,7 @@ try {
         // preserve shoe alpha, contact, viewport, theme and copy safety gates.
         if (!m.aiPodium || m.aiPodium.display === 'none'
             || m.aiPodium.opacity < .84
-            || !m.aiPodium.background.includes('/images/hero-upload/ai-marble-pedestal.svg')
+            || !m.aiPodium.background.includes('/images/hero-upload/ai-marble-pedestal.webp')
             || m.aiPodium.zIndex !== '0'
             || !m.aiPodium.rect
             || m.aiPodium.rect.width < (m.viewport.width <= 390 ? 245 : 400)) {
