@@ -35,10 +35,16 @@ assert.match(css,/--hero-red:#b71520/,'Highlight red is native CSS, not embedded
 assert.match(css,/#home \.hero-actions \.pill-btn\{/);
 assert.match(css,/font:600 clamp\(/,'CTA uses a visible responsive font size');
 assert.match(css,/#home \.hero-visual #heroProductImage\{/);
-assert.match(css,/ai-marble-pedestal\.webp/,'Marble stage must be a distinct image layer');
+assert.match(css,/marble-shelf-v14\.svg/,'Marble stage must remain a separate vector layer');
 assert.match(css,/@media\(max-width:760px\)/,'Mobile must have responsive native layout');
 assert.doesNotMatch(css,/!important|font-size:0|clip-path:inset\(50%\)/,
  'Live text must not be visually hidden behind screenshot');
+const stone=readFileSync(new URL('images/hero-rebuild/marble-shelf-v14.svg',base),'utf8');
+assert.match(stone,/<svg[^>]*viewBox=/);
+assert.match(stone,/sdGildedEdge/);
+assert.match(stone,/sdMarbleFace/);
+assert.doesNotMatch(stone,/<(?:image|text|foreignObject)\b|data:image|base64|Phong cách|Khám phá ngay/i,
+ 'Marble artwork contains no composites, embedded images or pre-rendered interface');
 const wave=readFileSync(new URL('images/hero-rebuild/silk-waves.svg',base),'utf8');
 assert.match(wave,/<svg[^>]*>/);
 assert.match(wave,/<path /);
