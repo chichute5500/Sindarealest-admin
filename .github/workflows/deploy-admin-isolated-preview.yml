@@ -25,6 +25,8 @@ on:
       - 'tests/disposable-sqlite-integration.test.mjs'
       - '.github/workflows/admin-preview-r2-canary.yml'
       - 'scripts/qa-admin-preview-r2-canary.mjs'
+      - '.github/workflows/admin-preview-wcag-axe.yml'
+      - 'tests/e2e/admin-wcag-axe.spec.js'
 
 permissions:
   contents: read
