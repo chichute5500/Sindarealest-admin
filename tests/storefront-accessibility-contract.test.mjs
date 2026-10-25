@@ -655,7 +655,7 @@ assert.equal(nativeShareSuccess.messages.length, 0,
     'exit must reset without animation; entering uses a short transition');
   assert.ok(css.includes('will-change:auto;') && !css.includes('translate3d'),
     'do not pin compositor layers or 3D transform each product card');
-  assert.ok(css.includes(':is(.hero-copy,.section-head,.order-cta)[data-reveal]'),
+  assert.ok(css.includes(':is(.section-head,.order-cta)[data-reveal]'),
     'only small editorial copy slides; photo cards remain stationary');
   assert.ok(html.includes('html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}'),
     'prefers-reduced-motion CSS must reveal content without motion');
