@@ -1,3 +1,15 @@
+## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
+- [x] **OWNER VISUAL ACCEPTANCE: PASS / LOCKED** for final blended Hero design at exact code SHA `5deacf37a9affe602affd064cdbb0f5ce2466c30`; owner explicitly confirmed "Pass". Supersedes earlier Hero owner-acceptance checkboxes below.
+- [x] Exact-source Hero browser audit 14/14 PASS [40166267532](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267532); Validate PASS 40166267533; branch Preview deploy PASS 40166267558; Gallery isolated regression PASS 40166267531. Original uploaded PNG unchanged.
+- [ ] **PR INTEGRATION / SCOPE BLOCKER:** PR #108 OPEN/unmerged, 303 paths vs historical classified 298, mergeable_state=dirty. Reconcile latest diff and isolate approved storefront code and its dependencies from Admin/backend/catalog/migrations/infra before requesting merge approval. Do not force-push or merge without owner decision.
+- [ ] **BACKEND EVIDENCE:** confirm real Preview D1 schema and migration `0008_product_sku_verification.sql`, authoritative per-product `skuVerified` from the approved API. No inferred SKU truth.
+- [ ] **LIVE ORDER CONTRACT:** confirm actual payment-ready/QR route and order state transitions against permitted backend endpoints; confirm persisted fulfillmentType through Admin/API. Static UI tests are not an end-to-end payment signoff.
+- [ ] **CROSS-WORKSTREAM:** separate Admin PR #111 remains open and must be independently reviewed. Do not mark whole site complete based on Hero-only PASS.
+- [ ] Real-device Gallery flicker acceptance evidence, where still required by historical scope, is separate from latest Gallery Chromium regression and should be resolved without editing the locked Gallery on this branch.
+- [ ] Owner decision about safe PR split/merge and Production deployment; neither is authorized from this Hero acceptance.
+
+---
+
 ## CURRENT HERO: REAL AI PHOTOGRAPHIC PODIUM — 2026-10-25
 - [x] Transform generated marble showcase into its own transparent 1200×610 WebP podium asset; exclude the generated shoe pixels and preserve the original PNG as the sole shoe artwork.
 - [x] Deploy asset on existing Hero Preview as background to independent decorative `.hero-pedestal-art`, not flatten the native webpage into an image.

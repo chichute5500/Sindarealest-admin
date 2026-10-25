@@ -1,3 +1,15 @@
+## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
+> This checkpoint supersedes the historical Hero "owner acceptance pending" entries below for the **current final Hero only**. Earlier CSS/SVG/WebP iterations are historical and are not independently accepted.
+
+- **Owner explicitly said "Pass" in this chat after reviewing the final blended Hero. HERO VISUAL ACCEPTANCE = PASS/LOCKED** at exact code/source SHA `5deacf37a9affe602affd064cdbb0f5ce2466c30`. Do not reopen/stylize the Hero without a new explicit owner request.
+- Technical exact-SHA evidence: Validate **PASS** [40166267533](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267533); Cloudflare branch Preview **PASS** [40166267558](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267558); Hero-only Chromium audit **14/14 PASS** [40166267532](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267532), [screenshots artifact 12587723630](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267532/artifacts/12587723630); isolated Gallery browser regression **PASS** [40166267531](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267531).
+- Original owner PNG hash remained unchanged as checked on source SHA `5deacf37a9affe602affd064cdbb0f5ce2466c30`. The only code path modified in the final blend commit was `public/index.html`. No production or main modifications.
+- **Not whole-project acceptance.** PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108) is still OPEN/unmerged and currently reports **303 changed files, 1,903 commits, mergeable=false / mergeable_state=dirty** against `main`. Existing scope inventory audits only 298 file paths; reconcile five newer paths and isolate restricted Admin/backend/migration/catalog/deploy changes before any integration or merge. Do not merge wholesale.
+- **Additional gates outside Hero:** authoritative live/Preview SKU verification and migration 0008 application not yet evidenced; order-payment QR endpoint and persisted fulfillment type remain unverified/blocked on restricted backend/Admin dependencies. The separate Admin PR #111 is open/unmerged. Do not claim these complete from static contract tests. Gallery code is preserved, and automated regression passed; historical requests for independent physical-device flicker evidence must not be retroactively called verified merely from CI.
+- Next step: owner-approved integration/scope decision and independent verification of restricted APIs/migration before production eligibility. Continue to protect locked Gallery and Hero.
+
+---
+
 ## LATEST — PHOTOGRAPHIC AI PODIUM LIVE ON PREVIEW — 2026-10-25
 > This is the newest authorized Hero status, superseding the earlier experimental **SVG podium** handoff. Read the current live HEAD before any further edits.
 

@@ -1,3 +1,21 @@
+## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
+| Gate | Current verified result |
+|---|---|
+| Final blended Hero code SHA | `5deacf37a9affe602affd064cdbb0f5ce2466c30` |
+| Owner Hero aesthetics | **PASS / LOCKED** — owner explicitly confirmed in conversation |
+| Validate | **PASS** [40166267533](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267533) |
+| Cloudflare branch Preview | **PASS** [40166267558](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267558) |
+| Hero Chromium, 7 widths × 2 themes | **14/14 PASS** [40166267532](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267532); [artifact 12587723630](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267532/artifacts/12587723630) |
+| Fullscreen Gallery isolated regression | **PASS** [40166267531](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166267531); does not itself establish every historical real-device owner acceptance gate |
+| PR #108 (303 files) | **OPEN / UNMERGED / CONFLICTED**, not production eligible |
+| Live SKU 0008 / authoritative product data | **NOT VERIFIED** |
+| Live QR/order payment and fulfillment persistence | **NOT VERIFIED / RESTRICTED BACKEND DEPENDENCY** |
+| Overall website integration and production | **NOT COMPLETE; NO DEPLOY** |
+
+The documentation-only commit after `5deacf37a9affe602affd064cdbb0f5ce2466c30` does not alter the already-tested site files. Historical test results and historical "Hero owner acceptance pending" sections below are superseded for the current final Hero only.
+
+---
+
 ## EXACT SHA — PHOTOGRAPHIC AI MARBLE ASSET ON ACTUAL WEBSITE — 2026-10-25
 | Gate | Status | Evidence |
 |---|---|---|

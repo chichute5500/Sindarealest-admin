@@ -1,3 +1,11 @@
+## 2026-10-25 — OWNER ACCEPTED HERO — CURRENT STATUS
+1. Owner explicitly confirmed "**Pass**" for the final blended Hero in conversation. Record **HERO DESIGN = OWNER PASS / LOCKED** for source SHA `5deacf37a9affe602affd064cdbb0f5ce2466c30`; previous handoffs saying the *latest* Hero still needs acceptance are superseded. Historical iterations' acceptance statements remain historical.
+2. Do not equate Hero acceptance with full storefront completion. Exact-SHA Validate, Cloudflare Preview, Hero 14/14 and Gallery regression are PASS; PR #108 is OPEN/unmerged and **currently unmergeable due to conflicts**. Its 303-file mixed-scope diff and historical 298-path inventory require reconciliation.
+3. Restricted live SKU/migration, order-payment and fulfillment persistence and independent Admin PR #111 remain outside Hero's acceptance. No backend, Admin, shared routing, API, payment, D1/R2, Product data or Production modification is authorized by this statement.
+4. Keep accepted Hero and Gallery source untouched, preserve owner shoe PNG and branch-only Preview. An owner-approved scope resolution is required before any PR split/merge and Production integration.
+
+---
+
 ## CURRENT HERO DECISION — AI-PHOTO PODIUM IMAGE — 2026-10-25
 1. The owner asked whether visual designs could be actually installed. Answer with an actual source edit: `public/images/hero-upload/ai-marble-pedestal.webp` is the standalone transparent AI-derived photo layer now served in Preview.
 2. Keep owner source PNG unchanged, native text/buttons and Gallery untouched. Decorative podium behind shoes; breakpoints separately calibrated for mobile/tablet/touch desktop/PC.
