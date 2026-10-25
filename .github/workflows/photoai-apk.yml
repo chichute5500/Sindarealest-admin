@@ -37,6 +37,11 @@ jobs:
       - name: Build Android debug APK
         working-directory: mobile/photoai/project
         run: gradle --no-daemon --stacktrace assembleDebug
+      - name: Verify Android package and signature
+        run: |
+          APK=mobile/photoai/project/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -12
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
