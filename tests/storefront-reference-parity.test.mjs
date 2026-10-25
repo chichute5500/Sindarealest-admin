@@ -458,7 +458,7 @@ assert.ok(nativeHeroCss.includes("grid-template-columns:minmax(0,46%) minmax(0,5
 assert.ok(nativeHeroCss.includes("width:clamp(250px,79vw,470px)") &&
   nativeHeroCss.includes('height:clamp(185px,61vw,326px)'),
   'Mobile independently layered plinth must be sized to support the shoe soles.');
-assert.ok(nativeHeroCss.includes('mask-image:linear-gradient(to bottom,transparent 0%,#000 8%,#000 64%') &&
+assert.ok(nativeHeroCss.includes('mask-image:linear-gradient(to bottom,transparent 0%,#000 5%,#000 74%,rgba(0,0,0,.80) 89%,transparent 100%)') &&
   nativeHeroCss.includes("url('/images/hero-rebuild/marble-shelf-v14.svg')"),
   'Marble face blends into icy floor rather than forming an opaque floating disk.');
 
