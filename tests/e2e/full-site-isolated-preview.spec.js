@@ -67,6 +67,43 @@ test('read-only Preview D1 public product API can be reached',async({request})=>
     expect(p.stock,'Public inventory should remain private').toBe(null);
   }
 });
+test('read-only buyer journey: live catalog, product SEO, detail gallery and local cart (no order submission)', async ({browser})=>{
+  const ctx=await browser.newContext({viewport:{width:1440,height:900},extraHTTPHeaders:headers,reducedMotion:'reduce'});
+  const page=await ctx.newPage();
+  await openStore(page);
+  const productsResponse=await ctx.request.get(root+'/api/products',{headers});
+  expect(productsResponse.status()).toBe(200);
+  const products=await productsResponse.json();
+  expect(Array.isArray(products)).toBe(true);
+  expect(products.length,'At least one published product is needed for real buyer journey acceptance').toBeGreaterThan(0);
+  await expect(page.locator('#catalogGrid [data-open-product]').first()).toBeVisible({timeout:20000});
+  await page.locator('#catalogGrid [data-open-product]').first().click();
+  await expect(page.locator('#productOverlay')).toHaveClass(/open/,{timeout:12000});
+  await expect(page.locator('#detailMainImage')).toBeVisible();
+  const url=new URL(page.url());
+  expect(url.pathname).toMatch(/^\/sanpham\/[a-z0-9-]+\/[a-z0-9._-]+$/i);
+  const response=await ctx.request.get(page.url(),{headers});
+  expect(response.status()).toBe(200);
+  const document=await response.text();
+  expect(document).toContain('rel="canonical"');
+  expect(document).toContain(url.pathname);
+  await page.screenshot({path:evidence+'/buyer-detail-desktop.png',animations:'disabled'});
+  await page.locator('#detailZoom').click();
+  await expect(page.locator('#sdFullscreenViewer')).toHaveClass(/open/,{timeout:12000});
+  await page.screenshot({path:evidence+'/buyer-fullscreen-gallery.png',animations:'disabled'});
+  await page.locator('#sdFullscreenClose').click();
+  await expect(page.locator('#sdFullscreenViewer')).not.toHaveClass(/open/);
+  await page.locator('#detailAdd').click();
+  await expect.poll(async ()=>Number.parseInt((await page.locator('#cartCount').textContent()) || '0',10)).toBeGreaterThan(0);
+  await page.locator('#detailClose').click();
+  await page.locator('#cartOpen').click();
+  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+  await expect(page.locator('#cartList')).toContainText(products[0].title ? products[0].title.slice(0,8) : '',{timeout:12000});
+  await page.screenshot({path:evidence+'/buyer-local-cart.png',animations:'disabled'});
+  // Stop before checkout submission. No remote order, payment or inventory mutations.
+
+  await ctx.close();
+});
 test('isolated Admin login visible, accessible and no Production routing',async({browser})=>{
   const ctx=await browser.newContext({viewport:{width:1366,height:768},extraHTTPHeaders:headers});
   const page=await ctx.newPage();
