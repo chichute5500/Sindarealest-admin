@@ -1,0 +1,68 @@
+name: SinDarealest PhotoAI Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/photoai-android-apk-2026-10-25]
+    paths:
+      - 'photoai-android/**'
+      - '.github/workflows/photoai-android.yml'
+permissions:
+  contents: read
+jobs:
+  debug-apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: photoai-android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+      - name: Download official MobileNetV3 Image Embedder model
+        run: |
+          set -euo pipefail
+          mkdir -p app/src/main/assets
+          curl --fail --location --retry 3 --retry-delay 2 \
+            'https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/1/mobilenet_v3_small.tflite' \
+            -o app/src/main/assets/mobilenet_v3_small.tflite
+          python3 - <<'PYMODEL'
+          from pathlib import Path
+          p=Path('app/src/main/assets/mobilenet_v3_small.tflite')
+          content=p.read_bytes()
+          assert len(content)>1_000_000, f'The AI model is unexpectedly small: {len(content)} bytes'
+          assert content[4:8]==b'TFL3', 'Downloaded file is not a TFLite model'
+          print('Offline model size:',len(content))
+          PYMODEL
+          sha256sum app/src/main/assets/mobilenet_v3_small.tflite
+      - name: Syntax check JavaScript
+        run: node --check app/src/main/assets/app.js
+      - name: Assemble complete debug APK
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Check offline AI is packaged
+        run: |
+          python3 - <<'PYAPK'
+          from pathlib import Path
+          from zipfile import ZipFile
+          p=Path('app/build/outputs/apk/debug/app-debug.apk')
+          with ZipFile(p) as z:
+              names=z.namelist()
+              required='assets/mobilenet_v3_small.tflite'
+              assert required in names,'The APK is missing MobileNet model'
+              assert z.getinfo(required).file_size > 1_000_000,'Empty/fake AI model'
+              assert any(n.startswith('lib/arm64-v8a/') for n in names), 'Missing native arm64 inference engine'
+              assert 'assets/app.js' in names and 'assets/index.html' in names
+          assert p.stat().st_size>1_000_000, 'The APK is too small and likely incomplete'
+          print('APK verified:',p.stat().st_size,'bytes')
+          PYAPK
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SinDarealest-PhotoAI-v0.5-Debug-APK
+          path: photoai-android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
