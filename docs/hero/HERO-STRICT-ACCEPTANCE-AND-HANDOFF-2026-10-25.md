@@ -173,3 +173,46 @@ Thus V18 fixes SOME geometry but **fails all strict visual approval gates**. Do 
 4. Keep PR #115 Draft until explicit owner approval, isolated Preview only after fail-closed D1/R2 checks, no Production, no merge. **No 95% acceptance claim.**
 
 **Owner instruction kept verbatim in spirit: multi-stream safe work, no lowering >95%, self-capture and self-evaluation; never ask owner to PASS a visibly unfinished build.**
+
+
+## 10. V24 strict screenshot and parameter-sweep checkpoint — 2026-10-26 (VN)
+
+> **VISUAL FAIL. Not 95% and NOT owner-approved.** No Production/main merge or deployment, PR #115 remains Draft. This supersedes the V18 visual metrics in §9 but preserves all historical rejected trials.
+
+### Exact safe source, tests and evidence
+
+- Latest V24 source+QA commit before documentation: `8fae2807f2bfbb3f4bd53758db4ab80397025779`; confirm GitHub HEAD again before further changes.
+- **Native Chromium [run 40225956576 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225956576)** and duplicate [run 40225960550 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225960550), 7 widths (320, 360, 390, 768, 980, 1280, 1440) × light/dark = **14 real screenshots** in [artifact 12611486771](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225956576/artifacts/12611486771) with `report.json`. All 14 report PASS: real h1/p/#products CTA, shoe alpha origin (two complementary crops on selected viewport widths), **zero opaque shoe pixels over text or CTA**, keyboard CTA, no overflow.
+- [Full-site integration 40225960520 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225960520), [source validation 40225956561 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225956561). Source guarded original shoe, preserved unrelated Admin/Storefront/QR/D1/R2 and separate decorative assets; no Production writes.
+- Existing public isolated Preview still serves **V14**, not V24. V24 is verified via real local GitHub Actions Chromium browser and artifacts, not falsely claimed live on Preview.
+
+### Owner-reference image vs actual DOM/CSS screenshot SSIM
+
+Primary master: Library `/SinDarealest/HERO-REFERENCE/REFERENCE-DESKTOP-luxury-red-text.png` (never a live site asset). Chromium `pc-1440-light.png` 1380×677 actual component, reference resized to same pixels (original 1779×884, LANCZOS), skimage RGB windowed `structural_similarity(data_range=255,channel_axis=2)`. Crop fractions from the exact same canvas.
+
+| Region | V18 baseline | V23 after stage lift | V24 right silk-shadow | Gate |
+|---|---:|---:|---:|---:|
+| Full HERO | 0.6213 | 0.6227 | **0.62453** | ≥0.950 |
+| Type | 0.5954 | ≈0.595 | **0.59504** | ≥0.950 |
+| Upper silk | 0.7848 | 0.7848 | **0.79394** | ≥0.950 |
+| Marble | 0.4495 | 0.4582 | **0.45811** | ≥0.950 |
+| Shoes + stage | 0.3505 | 0.3567 | **0.35713** | ≥0.950 |
+| Lower silk/floor | 0.7923 | 0.7955 | **0.79550** | ≥0.950 |
+
+Metric is **NOT a human-assessed similarity percent** and never an excuse to claim 95%. All visual regions still FAIL. Desktop letters, photo realism/lighting, mineral veins and shoes/platform appearance remain visibly far from rendered luxury master. Keep owner visual signoff as absolute final gate.
+
+### Work performed and rejected trials AFTER §9
+
+1. V20 `a597562e4`: independent marble SVG reshaped from oval to beveled angular slab, Chromium capture and side-by-side with master proved WORSE: whole SSIM .6196 vs V18 .6213, marble .4437 vs .4495. **Reverted** to original V18 marble blob `02b96a62417825b36dc2af3c54bb8c0537117726`.
+2. V21 `7d3120b1b`: darker blue satin material over entire independent silk SVG also worsened SSIM (whole .6116, upper silk .7626), thus **reverted** to silk blob `a3be5a0f11359bd7046584e117843b90ba55b036`.
+3. V22 `18fec0ef0`: tested externally loaded OFL Vietnamese Libre Bodoni font **only for HERO**; real Chromium showed red/title shape too wide, heading SSIM fell .595→.502; **reverted** to former native semantic font (no external font in current HERO).
+4. V23 `2599f9e9d`: lifted standalone podium 5% (desktop `bottom:-25%`→`-20%`), actual browser improved full .6213→.6227 and marble .4495→.4582, kept.
+5. QA-only **21 measured stage width/height/bottom/left variants** in actual Chromium, experiment [40224802238 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40224802238). Some geometries scored higher, but **picture showed FLOATING shoes**! Rejected even when numeric SSIM was superficially better. No screenshots embedded in site.
+6. QA-only **8 blue shadow strengths** applied temporarily to the actual pseudo-element, opt-in experimental browser snapshots. Experiment [40225695716 PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40225695716), e.g. `silk-light-right-280.png`. Chosen `rgba(36,89,141,.28)` as a localized top-right smooth radial fold shadow, measured full SSIM .62269→.62453 and upper silk .78481→.79394. Committed natively into the SAME authoritative HERO CSS block at `57f437621`.
+7. Reduced QA overhead by gating the 29-image parameter sweep to `HERO_GEOMETRY_SWEEP=1`; mandatory CI returns to 14 actual viewport/theme screenshots. No new CSS `!important` stacks or baked images; PR remains Draft.
+
+### Next non-negotiable actions
+
+- Truly improve *independent* photographic silk lighting/natural mineral gemstone pedestal with genuine believable materials; current vector treatment severely limits fidelity. Do not paste original master, text/CTA/product into any background, CSS or composite asset.
+- Keep original owner transparent PNG bytes, original semantic editable h1/description/button, safe mobile horizontal format and existing accepted Admin/Storefront.
+- For each candidate: run 14 actual Chromium captures, inspect **both** dark and light across sizes; compare normalized screenshot against unchanged master with named region SSIM and eyes. Visibly floating heels invalidate a candidate regardless of higher SSIM. Revert failures. Never claim >95% or visual pass until every critical part genuinely satisfies owner reference and owner explicitly agrees. No Production or merge. Existing Preview still V14.
