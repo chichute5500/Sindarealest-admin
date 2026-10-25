@@ -25,7 +25,7 @@ jobs:
         run: |
           set -euo pipefail
           BASE=777988063adabc3fac3796468f2ab0f77c5606ed
-          test "$(git hash-object public/index.html)" = "ca75506932efe1869f55e77570b6ed18dbe746f4"
+          test "$(git hash-object public/index.html)" = "47bef5327dad6e67b51df6ae9196bf29f1d9fc4c"
           test "$(git hash-object 'public/images/hero-upload/tb_image_share_1792519964514 (1).png')" = "c17cc9058ae3008dc662806d21d2cf8f7d83b8a9"
           test "$(git hash-object public/images/hero-upload/ai-marble-pedestal.webp)" = "25230efbf4d3c9457dc36ce91b75fbf60f56d157"
           test "$(git hash-object public/images/hero-rebuild/silk-waves.svg)" = "a3be5a0f11359bd7046584e117843b90ba55b036"
