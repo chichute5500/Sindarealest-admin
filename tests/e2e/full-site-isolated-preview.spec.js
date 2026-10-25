@@ -9,16 +9,20 @@ const headers = (process.env.CF_ACCESS_CLIENT_ID && process.env.CF_ACCESS_CLIENT
   'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID,
   'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET,
 } : {};
-test.use({ extraHTTPHeaders: headers });
+test.use({ extraHTTPHeaders: headers, screenshot: 'only-on-failure' });
 async function openStore(page) {
   const response = await page.goto(root + '/', { waitUntil:'domcontentloaded', timeout:45000 });
   expect(response?.status(), 'Storefront document must load in isolated Preview').toBe(200);
-  await expect(page.locator('#skipIntro')).toBeVisible({timeout:20000});
-  await page.locator('#skipIntro').click({timeout:15000});
+  // The welcome flow may dismiss automatically before a human could press Skip.
+  // Trigger its own handler only if the overlay is still active, rather than
+  // racing a disappearing button during its timed exit animation.
+  if (await page.locator('body').evaluate(el=>el.classList.contains('welcome-active'))) {
+    await page.locator('#skipIntro').evaluate(button => button.click());
+  }
   await expect(page.locator('body')).not.toHaveClass(/welcome-active/, {timeout:15000});
   await expect(page.locator('#heroProductImage')).toBeVisible({timeout:20000});
   await expect.poll(()=>page.locator('#heroProductImage').evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);
-  await expect(page.locator('#themeToggle')).toBeVisible();
+  await expect(page.locator('#mobileAccountNav, #themeToggle').filter({visible:true}).first()).toBeVisible();
   const pedestal=await page.locator('.hero-pedestal-art').evaluate(x=>getComputedStyle(x).backgroundImage);
   expect(pedestal).not.toBe('none');
   expect(pedestal).toContain('ai-marble-pedestal');
@@ -40,7 +44,14 @@ for (const dimensions of [{name:'desktop',width:1440,height:900},{name:'mobile',
         const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
         expect(overflow,'Mobile viewport must not overflow horizontally').toBeLessThanOrEqual(2);
       }
-      await page.locator('#themeToggle').click();
+      if(dimensions.name==='mobile') {
+        // Mobile theme control is in the account drawer by design.
+        await page.locator('#mobileAccountNav').click();
+        await expect(page.locator('#accountThemeAction')).toBeVisible();
+        await page.locator('#accountThemeAction').click();
+      } else {
+        await page.locator('#themeToggle').click();
+      }
       await expect.poll(()=>page.locator('html').evaluate(el=>el.classList.contains('dark'))).toBe(theme!=='dark');
       await ctx.close();
     });
