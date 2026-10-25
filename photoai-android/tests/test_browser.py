@@ -100,6 +100,22 @@ class PhotoAIWebUITest(unittest.TestCase):
         self.page.evaluate('window.__PhotoTest.movePhotos(["demo0"],{type:"category",id:"Giày tây"})')
         self.assertGreater(self.page.evaluate('window.__PhotoTest.revision()'),start)
 
+    def test_manual_name_and_price_survive_ai_suggestions(self):
+        keep=self.page.evaluate('window.__PhotoTest.state().models[0].id')
+        self.page.evaluate("""id=>{let m=window.__PhotoTest.state().models.find(x=>x.id===id);m.verified=false;m.editedByUser=true;m.priceVnd=2790000;m.name="Ví đã chỉnh tay";}""",keep)
+        self.page.evaluate("""()=>{
+          let s=window.__PhotoTest.state();
+          let pending=s.photos.filter(p=>!s.models.find(m=>m.id===p.modelId)?.editedByUser);
+          let cats=[...new Set(pending.map(p=>p.category))];
+          let models=cats.map((cat,i)=>({id:'REVIEW_AI_'+i,category:cat,name:'Gợi ý mới'}));
+          let photos=pending.map(p=>({id:p.id,modelId:models.find(m=>m.category===p.category).id,color:'Chưa rõ',confidence:.34}));
+          window.PhotoApp.onAnalysis({photos,models});
+        }""")
+        keep_after=self.page.evaluate('(id)=>window.__PhotoTest.state().models.find(m=>m.id===id)',keep)
+        self.assertEqual(keep_after['name'],'Ví đã chỉnh tay')
+        self.assertEqual(keep_after['priceVnd'],2790000)
+        self.assertTrue(keep_after['editedByUser'])
+
     def test_mobile_screenshot(self):
         self.page.screenshot(path='/mnt/data/PhotoAI_v0_5_Mobile_Preview.png',full_page=True)
 
