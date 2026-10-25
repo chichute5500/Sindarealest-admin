@@ -44,6 +44,29 @@ public class AndroidSmokeTest {
         }finally{b.recycle();}
     }
 
+    @Test public void exportDestinationAncestryGuard() throws Exception {
+        java.lang.reflect.Method method=MainActivity.class.getDeclaredMethod(
+            "exportInsideSource",android.net.Uri.class,android.net.Uri.class);
+        method.setAccessible(true);
+        android.net.Uri source=android.net.Uri.parse(
+            "content://com.android.externalstorage.documents/tree/primary%3APictures%2FProducts");
+        android.net.Uri child=android.net.Uri.parse(
+            "content://com.android.externalstorage.documents/tree/primary%3APictures%2FProducts%2FExport");
+        android.net.Uri sibling=android.net.Uri.parse(
+            "content://com.android.externalstorage.documents/tree/primary%3APictures%2FOther");
+        assertTrue("Must reject writing exports inside source",(boolean)method.invoke(null,source,child));
+        assertTrue("Must reject writing exports into source itself",(boolean)method.invoke(null,source,source));
+        assertFalse("Sibling directory should be accepted",(boolean)method.invoke(null,source,sibling));
+    }
+
+    @Test public void safeFilenameSanitization() throws Exception {
+        java.lang.reflect.Method method=MainActivity.class.getDeclaredMethod("clean",String.class);
+        method.setAccessible(true);
+        String result=(String)method.invoke(null,"Ví gù 6 hàng / Nâu: 2.500.000đ");
+        assertFalse(result.contains("/"));assertFalse(result.contains(":"));
+        assertFalse(result.isEmpty());assertTrue(result.length()<=100);
+    }
+
     @Test public void mainActivityStartsAndLoadsLocalApp() throws Exception {
         try(ActivityScenario<MainActivity> scenario=ActivityScenario.launch(MainActivity.class)){
             String result="";
