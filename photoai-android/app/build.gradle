@@ -1,0 +1,21 @@
+plugins { id 'com.android.application' }
+android {
+ namespace 'com.sindarealest.photoai'
+ compileSdk 35
+ defaultConfig {
+   applicationId 'com.sindarealest.photoai'
+   minSdk 28
+   targetSdk 35
+   versionCode 10
+   versionName '1.0.0-rc1'
+ }
+ androidResources { noCompress += ['tflite'] }
+ buildTypes { release { minifyEnabled false } }
+ compileOptions {
+   sourceCompatibility JavaVersion.VERSION_17
+   targetCompatibility JavaVersion.VERSION_17
+ }
+}
+dependencies {
+ implementation 'com.google.mediapipe:tasks-vision:1.1.1'
+}
