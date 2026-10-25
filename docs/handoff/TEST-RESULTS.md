@@ -1,3 +1,20 @@
+## 2026-10-25 — SCROLL REVEAL PERFORMANCE AND LAYERING AUDIT — LATEST
+| Test | Result / evidence |
+|---|---|
+| Exact source/test SHA | `bd88b86a7098e83101affa216927db4ea0694383` |
+| Full Validate & source tests | **PASS** [40169734160](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40169734160) |
+| Cloudflare branch Preview | **PASS** [40169734194](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40169734194) |
+| Chromium scroll-down / scroll-up, 390px & 1440px, light/dark | **4/4 PASS** [40169734248](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40169734248) |
+| Product/card layer: no full-card filter, transform or persistent will-change | **PASS in all 4 contexts** |
+| Category chip hit-test, search/chip overlap, horizontal overflow | **PASS in all 4 contexts** |
+| Browser captures & audit report | [Artifact 12589933107](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40169734248/artifacts/12589933107) |
+| Hero isolated browser audit | **PASS** [40169734192](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40169734192) |
+| Gallery isolated browser audit | **PASS** [40169734159](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40169734159) |
+| Real-device FPS or 60fps benchmark | **NOT MEASURED**, do not claim guaranteed frame rate |
+| PR #108 & Production | OPEN/unmerged, Production unchanged |
+
+---
+
 ## 2026-10-25 — BIDIRECTIONAL SCROLL REVEAL — LATEST CHECKPOINT
 | Gate | Result |
 |---|---|

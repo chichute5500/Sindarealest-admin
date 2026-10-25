@@ -1,3 +1,11 @@
+## 2026-10-25 — SCROLL REVEAL PERFORMANCE AND LAYERING AUDIT — LATEST
+1. Owner instructed optimization of repeat-on-scroll and inspection of potential overlapping Liquid Glass layers. Prefer opacity-only on image and frosted-glass content over `filter:blur(5px)` plus `backdrop-filter`, because combined effects can require expensive offscreen compositing; never leave `will-change` active on every card.
+2. Preserve bidirectional reveal: on entering >=8% add `is-visible`, remain visible until completely exited; when fully out, reset instantly. The reduced-motion fallback remains authoritative. Editorial text receives only a small 10px movement.
+3. Use branch Preview exact-SHA Chromium audit (390 light/dark and 1440 light/dark) to verify paint-layer simplification, hit targets, category/search separation, horizontal bounds and repeat scrolling in both directions, along with independent Hero/Gallery regression. All PASS at `bd88b86a7098e83101affa216927db4ea0694383`.
+4. Do not invent or promise FPS metrics: no physical-device GPU performance trace was recorded. Do not rework locked Hero, Gallery or previously accepted catalog chip styling or merge PR #108.
+
+---
+
 ## 2026-10-25 — BIDIRECTIONAL SCROLL REVEAL — LATEST CHECKPOINT
 1. Owner replaced prior one-time reveal behavior with viewport reentry replay on **both scroll directions** for all existing `[data-reveal]` sections and dynamically rendered product cards. Sticky navigation and modal surfaces not tagged `data-reveal` are deliberately excluded so persistent controls do not blur.
 2. Use a single `IntersectionObserver` with threshold 0 and existing 30px bottom margin: keep an element visible while still in the viewport; reset after it exits, then show again on re-entry. Prevent retained detached-product observations across filter and page changes.

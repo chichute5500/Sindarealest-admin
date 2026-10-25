@@ -1,3 +1,14 @@
+## 2026-10-25 — SCROLL REVEAL PERFORMANCE AND LAYERING AUDIT — LATEST
+- [x] Eliminate repeating whole-glass-subtree blur and full-card 3D scaling/transform; remove always-on `will-change`; restrict subtle movement to editorial headings.
+- [x] Keep two-direction replay; provide threshold hysteresis `[0,.08]` and immediate exit reset to avoid boundary oscillation and repaint during offscreen exit.
+- [x] Preserve reduced-motion/no-observer accessibility, dark/light themes, hover/press interactions, and catalog/featured observer cleanup.
+- [x] New Chromium read-only test on 390px touch mobile and 1440px PC, both themes: **4/4 PASS**, scroll down/up replay, no card filter/transform/pinned layer, controls clickable and non-overlapping, no horizontal overflow. [Artifact 12589933107](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40169734248/artifacts/12589933107).
+- [x] Exact source SHA `bd88b86a7098e83101affa216927db4ea0694383` Validate PASS 40169734160, Preview PASS 40169734194, Hero PASS 40169734192, Gallery PASS 40169734159.
+- [ ] Owner/device-specific real-world FPS/thermals benchmark or signoff remains optional and NOT MEASURED; do not imply universal 60fps.
+- [ ] Keep PR #108 open/unmerged and Production unchanged.
+
+---
+
 ## 2026-10-25 — BIDIRECTIONAL SCROLL REVEAL — LATEST CHECKPOINT
 - [x] Re-enable repeat reveal on viewport reentry, down and up, via a continuously observing IntersectionObserver; do not dim cards until fully outside its root.
 - [x] Preserve current blur/slide/timing, both themes, and reduced-motion/no-IntersectionObserver visibility.
