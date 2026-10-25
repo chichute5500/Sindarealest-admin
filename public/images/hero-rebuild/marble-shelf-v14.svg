@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 650" width="1600" height="650" role="presentation" aria-hidden="true">
+<!-- INDEPENDENT MARBLE ONLY: no text, shoes, CTA, screenshots, raster embeds or external links. -->
+<defs>
+  <linearGradient id="sdStoneTop" x1=".05" y1=".04" x2=".82" y2=".91">
+    <stop offset="0" stop-color="#dceefa"/><stop offset=".18" stop-color="#f9fdff"/>
+    <stop offset=".42" stop-color="#e9f5fc"/><stop offset=".62" stop-color="#d5e8f6"/>
+    <stop offset=".81" stop-color="#f4faff"/><stop offset="1" stop-color="#91b6d0"/>
+  </linearGradient>
+  <radialGradient id="sdStoneLight" cx=".52" cy=".12" rx=".61" ry=".9">
+    <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".43" stop-color="#fff" stop-opacity=".46"/><stop offset="1" stop-color="#c7e4f6" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="sdMarbleRim" x1="0" y1="0" x2=".09" y2="1">
+    <stop offset="0" stop-color="#ffffff"/><stop offset=".13" stop-color="#d3e9f6"/>
+    <stop offset=".30" stop-color="#c8dce9"/><stop offset=".57" stop-color="#c2d7e6"/>
+    <stop offset=".83" stop-color="#c8e1f0" stop-opacity=".60"/>
+    <stop offset="1" stop-color="#dcecf8" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="sdGildedEdge" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#c29c66" stop-opacity=".02"/>
+    <stop offset=".14" stop-color="#fff0c5" stop-opacity=".83"/>
+    <stop offset=".34" stop-color="#cc995d" stop-opacity=".31"/>
+    <stop offset=".63" stop-color="#fee5a6" stop-opacity=".67"/>
+    <stop offset=".86" stop-color="#fff7db" stop-opacity=".84"/>
+    <stop offset="1" stop-color="#bf9059" stop-opacity=".15"/>
+  </linearGradient>
+  <linearGradient id="sdFadeLower" x1="0" y1="0" x2="0" y2="1">
+    <stop offset=".0" stop-color="white"/><stop offset=".49" stop-color="white"/>
+    <stop offset=".7" stop-color="white" stop-opacity=".89"/>
+    <stop offset="1" stop-color="white" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="sdSideVein" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#6d9dbe" stop-opacity="0"/>
+    <stop offset=".36" stop-color="#6f99ba" stop-opacity=".31"/>
+    <stop offset=".71" stop-color="#b79569" stop-opacity=".31"/>
+    <stop offset="1" stop-color="#7ca9c8" stop-opacity=".02"/>
+  </linearGradient>
+  <radialGradient id="sdUnderShadow">
+    <stop offset="0" stop-color="#3a6785" stop-opacity=".15"/><stop offset=".65" stop-color="#5a88a4" stop-opacity=".055"/><stop offset="1" stop-color="#9fc3db" stop-opacity="0"/>
+  </radialGradient>
+  <mask id="sdShelfFade"><rect x="0" y="0" width="1600" height="650" fill="url(#sdFadeLower)"/></mask>
+  <clipPath id="sdMarbleFace"><path d="M95 244 C395 341 1207 350 1511 250 L1509 384 C1316 461 385 481 100 356Z"/></clipPath>
+  <clipPath id="sdMarbleDeck"><path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250 C1207 350 395 341 95 244Z"/></clipPath>
+</defs>
+<ellipse cx="809" cy="420" rx="754" ry="137" fill="url(#sdUnderShadow)"/>
+<g mask="url(#sdShelfFade)">
+ <path d="M95 244 C395 341 1207 350 1511 250 L1509 384 C1316 461 385 481 100 356Z" fill="url(#sdMarbleRim)"/>
+ <g clip-path="url(#sdMarbleFace)" fill="none">
+  <path d="M27 306 C345 354 516 342 705 376 S1232 420 1577 313" stroke="#e3f6ff" stroke-width="38" opacity=".43"/>
+  <path d="M1 333 C375 367 483 386 708 395 C1059 427 1358 384 1588 356" stroke="#84a8c5" stroke-width="6" opacity=".19"/>
+  <path d="M161 293 L212 322 L267 305 L315 358 L359 330 L420 385 L486 344 L531 406 L597 374 L655 430" stroke="url(#sdSideVein)" stroke-width="3" opacity=".47"/>
+  <path d="M722 335 L779 371 L818 357 L874 420 L938 378 L1004 405 L1089 364 L1153 419 L1224 355 L1284 383 L1369 340" stroke="url(#sdSideVein)" stroke-width="4" opacity=".53"/>
+  <path d="M238 314 L294 350 L338 327 L405 385 M826 354 L882 402 L946 365 L1008 408 M1143 367 L1214 408 L1267 364" stroke="#e5bc82" stroke-width="2" opacity=".65"/>
+  <path d="M52 355 C449 460 1184 469 1548 382" stroke="#fff" stroke-width="5" opacity=".32"/>
+ </g>
+ <path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250 C1207 350 395 341 95 244Z" fill="url(#sdStoneTop)"/>
+ <path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250 C1207 350 395 341 95 244Z" fill="url(#sdStoneLight)" opacity=".72"/>
+ <g clip-path="url(#sdMarbleDeck)" fill="none">
+   <path d="M-38 226 C278 158 505 81 794 142 S1311 228 1612 109" stroke="#fff" stroke-width="69" opacity=".19"/>
+   <path d="M-22 218 C302 173 558 91 754 167 S1301 263 1605 172" stroke="#74a4c6" stroke-width="4" opacity=".13"/>
+   <path d="M-15 280 C334 196 558 226 800 263 C1066 302 1366 226 1634 236" stroke="#fff" stroke-width="49" opacity=".30"/>
+   <path d="M200 222 L295 158 L382 196 L475 134 L534 189 L628 121 L710 155" stroke="url(#sdSideVein)" stroke-width="2" opacity=".37"/>
+   <path d="M873 196 L952 146 L1022 194 L1146 131 L1225 177 L1336 160" stroke="#c7a46d" stroke-width="1.7" opacity=".27"/>
+   <path d="M570 290 L641 224 L719 250 L793 206 L864 250 L910 219" stroke="#fef6df" stroke-width="1.5" opacity=".5"/>
+ </g>
+ <path d="M95 244 C395 341 1207 350 1511 250" fill="none" stroke="url(#sdGildedEdge)" stroke-width="5" opacity=".85"/>
+ <path d="M105 254 C400 344 1208 352 1499 263" fill="none" stroke="#fff" stroke-width="3" opacity=".38"/>
+ <path d="M95 244 C42 204 96 152 164 125 C458 -5 1199 4 1452 119 C1568 164 1592 224 1511 250" fill="none" stroke="#f9fdff" stroke-width="5" opacity=".65"/>
+</g>
+</svg>
