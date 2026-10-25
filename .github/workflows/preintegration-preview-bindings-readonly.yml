@@ -58,26 +58,33 @@ jobs:
             exit 1
           fi
           echo "PASS: Admin Preview D1/IMAGES separated from storefront Production D1/IMAGES/ORIGINALS (metadata only)."
+          blockers=()
           if [[ -z "$w_db" ]]; then
-            echo "::warning::STOREFRONT_PREVIEW_DB_MISSING: storefront Preview DB metadata unavailable, cannot approve cross-project writes."
+            echo "::error::STOREFRONT_PREVIEW_DB_MISSING: storefront Preview DB metadata unavailable; block integration."
+            blockers+=(STOREFRONT_PREVIEW_DB_MISSING)
           elif [[ "$w_db" == "$w_prod_db" ]]; then
-            echo "::warning::STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION: unsafe for preview write tests and integration."
+            echo "::error::STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION: unsafe for preview write tests and integration."
+            blockers+=(STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION)
           elif [[ "$w_db" == "$a_db" ]]; then
             echo "::notice::CROSS_PREVIEW_DB_SHARED_ISOLATED: both Preview projects use the same non-Production D1 (still requires API/schema contract audit)."
           else
             echo "::warning::CROSS_PREVIEW_DB_DISTINCT: writes in Admin Preview cannot reach storefront Preview automatically; do not assume synchronization."
           fi
           if [[ -z "$w_img" ]]; then
-            echo "::warning::STOREFRONT_PREVIEW_IMAGES_MISSING: cannot prove cross-project gallery compatibility."
+            echo "::error::STOREFRONT_PREVIEW_IMAGES_MISSING: cannot prove cross-project gallery compatibility."
+            blockers+=(STOREFRONT_PREVIEW_IMAGES_MISSING)
           elif [[ "$w_img" == "$prod_img" || "$w_img" == "$prod_priv" ]]; then
-            echo "::warning::STOREFRONT_PREVIEW_IMAGES_PRODUCTION_BACKED: never write test files from Preview into Production image buckets."
+            echo "::error::STOREFRONT_PREVIEW_IMAGES_PRODUCTION_BACKED: Preview public image storage cannot use Production buckets."
+            blockers+=(STOREFRONT_PREVIEW_IMAGES_PRODUCTION_BACKED)
           elif [[ "$w_img" == "$a_img" ]]; then
             echo "::notice::CROSS_PREVIEW_IMAGES_SHARED_ISOLATED: same non-Production images bucket."
           else
-            echo "::warning::CROSS_PREVIEW_IMAGES_DISTINCT: Admin uploads are not automatically visible to storefront Preview."
+            echo "::warning::CROSS_PREVIEW_IMAGES_DISTINCT: no automatic gallery sync; explicit architecture review required."
+            blockers+=(CROSS_PREVIEW_IMAGES_DISTINCT)
           fi
           if [[ -z "$a_orig" ]]; then
-            echo "::warning::ADMIN_PREVIEW_ORIGINALS_MISSING: Admin product upload and warranty attachment flows need isolated private ORIGINALS."
+            echo "::error::ADMIN_PREVIEW_ORIGINALS_MISSING: Admin product upload and warranty attachment flows need isolated private ORIGINALS."
+            blockers+=(ADMIN_PREVIEW_ORIGINALS_MISSING)
           elif [[ "$a_orig" == "$prod_img" || "$a_orig" == "$prod_priv" ]]; then
             echo "::error::ADMIN_PREVIEW_ORIGINALS_PRODUCTION_SHARED: product and warranty uploads must remain prohibited."
             exit 1
@@ -88,12 +95,22 @@ jobs:
             echo "PASS: Admin Preview ORIGINALS binding is distinct from Production IMAGES/ORIGINALS and Preview IMAGES (metadata only)."
           fi
           if [[ -z "$w_orig" ]]; then
-            echo "::warning::STOREFRONT_PREVIEW_ORIGINALS_MISSING: image/warranty writes cannot be approved."
+            echo "::error::STOREFRONT_PREVIEW_ORIGINALS_MISSING: image/warranty writes cannot be approved."
+            blockers+=(STOREFRONT_PREVIEW_ORIGINALS_MISSING)
           elif [[ "$w_orig" == "$prod_img" || "$w_orig" == "$prod_priv" ]]; then
-            echo "::warning::STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED: warranty image writes would touch Production bucket."
+            echo "::error::STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED: warranty image writes would touch Production bucket."
+            blockers+=(STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED)
           elif [[ "$w_orig" == "$w_img" ]]; then
-            echo "::warning::STOREFRONT_PREVIEW_ORIGINALS_PUBLIC_SHARED: private images are not isolated from public bucket."
+            echo "::error::STOREFRONT_PREVIEW_ORIGINALS_PUBLIC_SHARED: private images are not isolated from public bucket."
+            blockers+=(STOREFRONT_PREVIEW_ORIGINALS_PUBLIC_SHARED)
           else
             echo "PASS: Storefront Preview ORIGINALS distinct from Production and Preview public images."
           fi
           echo "Audit mode: no deployments, no database reads or writes, no R2 object requests, no bucket/database names logged."
+          # Discovery is not acceptance. Keep this job RED until every mandatory
+          # Preview resource is genuinely independent of Production.
+          if (( ${#blockers[@]} > 0 )); then
+            echo "::error::PREINTEGRATION_BLOCKED: ${#blockers[@]} unresolved resource gate(s): ${blockers[*]}"
+            exit 1
+          fi
+          echo "PASS: All inspected resource identities satisfy the mandatory pre-integration isolation gates; API/schema/design approval is still separate."
