@@ -3605,7 +3605,14 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:saturate(.90) brightness(
  #home .hero-copy h1{font-size:clamp(40px,5.3vw,60px)}
  #home .hero-description{font-size:clamp(12px,1.55vw,16px);max-width:360px}
  #home .hero-actions .pill-btn{width:clamp(204px,24vw,261px);min-height:50px;font-size:clamp(14px,1.8vw,19px)}
- #home .hero-visual #heroProductImage{width:clamp(395px,55vw,570px);top:-21%;left:52%}
+ #home .hero-visual #heroProductImage{width:clamp(395px,55vw,570px);top:-21%;left:52%;clip-path:polygon(51% 0,100% 0,100% 100%,72% 100%,66% 60%,57% 40%,49% 27%)}
+ #home .hero-visual #heroLeftShoe{
+  display:block;position:absolute;z-index:6;top:calc(-21% - clamp(18px,3vw,36px));left:52%;
+  transform:translateX(-50%);width:clamp(395px,55vw,570px);height:auto;max-width:none;
+  object-fit:contain;pointer-events:none;
+  clip-path:polygon(0 0,51% 0,49% 27%,57% 40%,66% 60%,72% 100%,0 100%);
+  filter:drop-shadow(0 6px 6px rgba(11,25,38,.16));
+ }
  #home .hero-visual .hero-pedestal-art{width:clamp(470px,66vw,650px);height:clamp(265px,39vw,360px);bottom:-35%;left:53%}
 }
 @media(max-width:760px){
