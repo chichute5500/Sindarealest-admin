@@ -80,6 +80,26 @@ class PhotoAIWebUITest(unittest.TestCase):
         self.page.evaluate('window.PhotoApp.onAnalysis({photos:[],models:[]})')
         after=self.page.evaluate('JSON.stringify(window.__PhotoTest.state())')
         self.assertEqual(before,after)
+    def test_stale_ai_result_does_not_override_manual_transfer(self):
+        self.page.evaluate('window.__PhotoTest.markAIStarted()')
+        first=self.page.evaluate('window.__PhotoTest.state().photos[0]')
+        target=self.page.evaluate('window.__PhotoTest.state().models.find(m=>m.category==="Thắt lưng")')
+        self.page.evaluate('(arg)=>window.__PhotoTest.movePhotos([arg.id],{type:"model",id:arg.target})',{'id':first['id'],'target':target['id']})
+        before=self.page.evaluate('JSON.stringify(window.__PhotoTest.state())')
+        self.page.evaluate("""()=>{
+          const s=window.__PhotoTest.state();
+          const cats=[...new Set(s.photos.map(p=>p.category))];
+          const models=cats.map((c,i)=>({id:'AI'+i,category:c,name:'AI mock'}));
+          const photos=s.photos.map(p=>({id:p.id,modelId:models.find(m=>m.category===p.category).id,color:'Đen',confidence:.92}));
+          window.PhotoApp.onAnalysis({photos,models});
+        }""")
+        self.assertEqual(before,self.page.evaluate('JSON.stringify(window.__PhotoTest.state())'))
+
+    def test_changed_version_increments_on_manual_edit(self):
+        start=self.page.evaluate('window.__PhotoTest.revision()')
+        self.page.evaluate('window.__PhotoTest.movePhotos(["demo0"],{type:"category",id:"Giày tây"})')
+        self.assertGreater(self.page.evaluate('window.__PhotoTest.revision()'),start)
+
     def test_mobile_screenshot(self):
         self.page.screenshot(path='/mnt/data/PhotoAI_v0_5_Mobile_Preview.png',full_page=True)
 
