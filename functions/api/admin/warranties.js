@@ -43,7 +43,12 @@ export async function onRequestPost(context) {
   const orderNumber = String(body?.orderNumber || "").trim().toUpperCase();
   const sku = String(body?.sku || "").trim().toUpperCase();
   const policyName = String(body?.policyName || "").trim().slice(0,160);
-  const months = Number(body?.durationMonths);
+  // Browser FormData sends decimal strings. Accept those and numeric JSON integers,
+  // but reject arrays/booleans that JavaScript Number() would silently coerce.
+  const rawMonths = body?.durationMonths;
+  const months = (typeof rawMonths === "number" ||
+    (typeof rawMonths === "string" && /^\d+$/.test(rawMonths)))
+    ? Number(rawMonths) : NaN;
   const startsAt = String(body?.startsAt || "").trim();
   if (!orderNumber || !sku || policyName.length < 3 || !Number.isInteger(months) || months < 1 || months > 120 || !/^\d{4}-\d{2}-\d{2}$/.test(startsAt)) return fail("Cần nhập mã đơn, SKU, tên chính sách, thời hạn 1–120 tháng và ngày bắt đầu hợp lệ.");
   const startDate = new Date(`${startsAt}T00:00:00.000Z`);

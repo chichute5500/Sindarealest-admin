@@ -32,7 +32,7 @@ function makeDB(inserted, { orderStatusAtBatch = "completed" } = {}) {
     },
   };
 }
-async function post(DB) {
+async function post(DB, overrides = {}) {
   return issueWarranty({
     request: new Request("https://shop.example/api/admin/warranties", {
       method: "POST",
@@ -44,12 +44,29 @@ async function post(DB) {
       },
       body: JSON.stringify({
         orderNumber: "ORD-0001", sku: "SD-SN001", policyName: "Bảo hành đường may",
-        durationMonths: 12, startsAt: "2026-10-17",
+        durationMonths: 12, startsAt: "2026-10-17", ...overrides,
       }),
     }),
     env: { DB, ADMIN_PASSWORD: PASSWORD, SESSION_SECRET: SECRET },
   });
 }
+
+// Reject malformed durations without touching D1; keep decimal strings from
+// the real browser's FormData serialization backwards-compatible.
+for (const [label, value] of [
+  ["boolean", true],
+  ["array", [12]],
+  ["object", { value: 12 }],
+  ["whitespace string", " 12 "],
+]) {
+  const db = makeDB(true);
+  const result = await post(db, { durationMonths: value });
+  assert.equal(result.status, 400, label + " duration must be rejected");
+  assert.equal(db.calls.batchCount, 0, label + " duration must not create warranty records");
+}
+const stringMonths = makeDB(true);
+assert.equal((await post(stringMonths, { durationMonths: "12" })).status, 201,
+  "numeric string durations from real HTML FormData must remain supported");
 
 const successDB = makeDB(true);
 const success = await post(successDB);
