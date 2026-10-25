@@ -1,4 +1,5 @@
 name: ADMIN 12-screen acceptance evidence (isolated, read-only)
+# Owner review screen 02: capture the single-title dashboard and red power-off logout across viewports.
 
 on:
   push:
