@@ -1,3 +1,5 @@
+> **LATEST COUNT WARNING — 2026-10-25:** Live PR #108 now has **307 changed files**, head source SHA `c23649de31e5bfe9ed0eaa2aaa3a1bb769a9ad84`, remains OPEN/unmerged and reports `mergeable=false / mergeable_state=dirty`. The 298-path inventory below was captured on 2026-10-24 and is HISTORICAL/INCOMPLETE for current merge decisions. Do not call it reconciled; regenerate and classify all 307 paths before any merge. Canonical handoff: [SESSION-HANDOFF-2026-10-25.md](./SESSION-HANDOFF-2026-10-25.md).
+
 # LIVE PR #108 SCOPE RECONCILIATION — 2026-10-24
 
 > This live inventory supersedes all historical file counts and scope groupings below. It is a read-only path classification; it does not remove, revert, approve, merge, or deploy any listed change.

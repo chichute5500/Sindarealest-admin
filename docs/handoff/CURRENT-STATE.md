@@ -1,3 +1,12 @@
+## LATEST CANONICAL HANDOFF — OWNER PASS / 2026-10-25
+- **OWNER PASS/LOCKED:** Hero (marble plinth blends into background), 38px catalog filter chips/44px pointer hit, optimized bidirectional scroll reveal, and whole-product-card cart flight **900ms** with +15 percentage-point ending opacity; accepted by owner in this conversation on 2026-10-25. No extra signoff necessary for these exact current versions.
+- **Exactly tested storefront runtime SHA `c23649de31e5bfe9ed0eaa2aaa3a1bb769a9ad84`**. Validate PASS #40171662234; Cloudflare Preview deploy PASS #40171662196; Hero browser PASS #40171662226; Gallery browser PASS #40171662192; Scroll/glass layer browser PASS #40171662178; Full-card flight browser 390px/1440px light/dark **4/4 PASS** #40171662229. Cart-flight artifact #12590242188. These are 6 separate exact-source PASS gates; guarded manual visual/order audits SKIPPED, not PASS.
+- GitHub confirmed PR #108 OPEN/unmerged **307 changed files**, mergeable=false/dirty; historical PR scope inventory of 298 is stale. Admin PR #111 OPEN/unmerged. No main/Production deployment.
+- Canonical next-chat handoff: [SESSION-HANDOFF-2026-10-25.md](./SESSION-HANDOFF-2026-10-25.md). Ready-to-paste prompt: [PROMPT-NEXT-CHAT-2026-10-25-CURRENT.md](./PROMPT-NEXT-CHAT-2026-10-25-CURRENT.md). These latest statements supersede old "owner acceptance pending" notes for accepted UI only.
+- Remaining integration blockers: PR #108 dirty mixed scope; live Preview D1/SKU migration and API proof; payment QR and fulfillment persistence; Admin cross-workstream; some manual/real-device evidence. No 100%-whole-project claim.
+
+---
+
 ## 2026-10-25 — SCROLL REVEAL PERFORMANCE AND LAYERING AUDIT — LATEST
 - Owner asked to optimize repeat-on-scroll performance and check for Liquid Glass compositing/overlap faults, preserving scrolling in both directions. Authorized branch only: `fix/liquid-glass-audit-2026-10-19`; final exact verified code SHA `bd88b86a7098e83101affa216927db4ea0694383`.
 - Removed expensive `filter:blur(5px)` from entire `[data-reveal]` subtree, `translate3d/scale` on all product/photo cards and persistent `will-change`. Product cards now fade in with a **0.38s opacity** transition; only editorial Hero copy/section headings/compact order CTA get an additional modest **10px vertical movement**. Exited elements reset immediately instead of running a second heavy transition. Light/dark themes preserve original styling.

@@ -1,3 +1,12 @@
+## LATEST CANONICAL HANDOFF — OWNER PASS / 2026-10-25
+1. Owner expressly accepted and LOCKED Hero, 38px catalog filter controls, optimized up/down scroll reveal, and final full-product-card cart flight at 900ms with +15 percentage-point final opacity. These acceptance statements supersede older "owner pending" notes about the same exact versions.
+2. Cart flight runtime at `c23649de31e5bfe9ed0eaa2aaa3a1bb769a9ad84`: 900ms, alpha end 0.37 (old 0.22), full original card clone with text/image and readable curved path to visible PC/mobile cart. Owner PASS after this refinement.
+3. All six exact-source regression/deploy actions PASS at `c23649de31e5bfe9ed0eaa2aaa3a1bb769a9ad84`. Guarded non-Hero order live audit and Liquid Glass manual visual did not run; do not label them PASS or universal FPS certification.
+4. PR #108 still OPEN, unmerged, `mergeable_state=dirty`, now **307 files**, beyond the old 298-path inventory; reconcile before safe integration. Admin PR #111 remains separate. No main/Production writes, no restricted backend/data/migration/auth/payment edits implied by approval.
+5. Canonical latest snapshot and next-chat prompt live in `docs/handoff/SESSION-HANDOFF-2026-10-25.md` and `docs/handoff/PROMPT-NEXT-CHAT-2026-10-25-CURRENT.md`.
+
+---
+
 ## 2026-10-25 — SCROLL REVEAL PERFORMANCE AND LAYERING AUDIT — LATEST
 1. Owner instructed optimization of repeat-on-scroll and inspection of potential overlapping Liquid Glass layers. Prefer opacity-only on image and frosted-glass content over `filter:blur(5px)` plus `backdrop-filter`, because combined effects can require expensive offscreen compositing; never leave `will-change` active on every card.
 2. Preserve bidirectional reveal: on entering >=8% add `is-visible`, remain visible until completely exited; when fully out, reset instantly. The reduced-motion fallback remains authoritative. Editorial text receives only a small 10px movement.

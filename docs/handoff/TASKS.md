@@ -1,3 +1,18 @@
+## LATEST CANONICAL HANDOFF — OWNER PASS / 2026-10-25
+- [x] **OWNER PASS/LOCKED: Hero** finished as marble pedestal with integrated navy/light background, grounded original loafers, PC/mobile and light/dark.
+- [x] **OWNER PASS/LOCKED: Catalog chip** 38px visible rim, 1px specular inset, >=44px pointer area, PC/mobile and themes.
+- [x] **OWNER PASS/LOCKED: Bidirectional scrolling reveal** optimized for Liquid Glass: full-card opacity 0.38s, no heavy blur or persistent GPU layer, 8% entry threshold, clean re-entry, reduced motion.
+- [x] **OWNER PASS/LOCKED: Whole card flight** actual clicked tile to active cart, 900ms, ending alpha 0.37 (+15pp from 0.22), 4/4 Chromium PASS, correct cart count and reduced motion.
+- [x] All exact-SHA `c23649de31e5bfe9ed0eaa2aaa3a1bb769a9ad84` runs PASS: Validate #40171662234, Preview #40171662196, Hero #40171662226, Gallery #40171662192, Scroll/Layers #40171662178, Cart Flight #40171662229.
+- [ ] PR #108 current 307-file scope and `dirty` conflict reconciliation against main; historical 298-file inventory is stale. Do not merge without specific approval.
+- [ ] Independently verify real Preview D1 migration 0008 / authoritative per-product skuVerified state.
+- [ ] Independently verify live QR/payment/order state and fulfillmentType through permitted backend/API, without modifying restricted paths.
+- [ ] Cross-check separate open Admin PR #111; preserve workstream boundaries.
+- [ ] Optional real-device FPS and authorized manual screenshot/physical flicker proof where historically required; do not confuse SKIPPED with PASS.
+- [ ] Owner authorization required for merge and/or Production; not granted by frontend PASS.
+
+---
+
 ## 2026-10-25 — SCROLL REVEAL PERFORMANCE AND LAYERING AUDIT — LATEST
 - [x] Eliminate repeating whole-glass-subtree blur and full-card 3D scaling/transform; remove always-on `will-change`; restrict subtle movement to editorial headings.
 - [x] Keep two-direction replay; provide threshold hysteresis `[0,.08]` and immediate exit reset to avoid boundary oscillation and repaint during offscreen exit.

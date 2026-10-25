@@ -1,3 +1,22 @@
+## LATEST CANONICAL HANDOFF — OWNER PASS / 2026-10-25
+| Source and gate | Latest verified status |
+|---|---|
+| Runtime/test SHA | `c23649de31e5bfe9ed0eaa2aaa3a1bb769a9ad84` |
+| Owner Hero, catalog filter, optimized 2-way scroll, final 900ms full-card cart flight | **OWNER PASS / LOCKED** |
+| Validate source and tests | **PASS** [40171662234](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40171662234) |
+| Cloudflare branch Preview | **PASS** [40171662196](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40171662196) |
+| Hero browser audit | **PASS** [40171662226](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40171662226) |
+| Gallery browser audit | **PASS** [40171662192](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40171662192) |
+| Scroll reveal & Liquid Glass stacking audit | **PASS** [40171662178](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40171662178) |
+| Full-card flight Chromium mobile/PC × light/dark | **4/4 PASS** [40171662229](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40171662229) |
+| Cart flight 900ms / final alpha 0.37 screenshot evidence | [Artifact #12590242188](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40171662229/artifacts/12590242188) (retention limited) |
+| Manual Liquid Glass and Non-Hero order live workflows | **SKIPPED, not PASS** |
+| Real-phone FPS / unconditional 60FPS | **NOT MEASURED** |
+| PR #108 (307 changed files) | **OPEN / DIRTY / UNMERGED** |
+| Production | **NOT DEPLOYED** |
+
+---
+
 ## 2026-10-25 — SCROLL REVEAL PERFORMANCE AND LAYERING AUDIT — LATEST
 | Test | Result / evidence |
 |---|---|
