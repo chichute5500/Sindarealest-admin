@@ -180,7 +180,7 @@ public class MainActivity extends Activity {
         Uri tree=data.getData();
         int flags=data.getFlags()&(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         try{getContentResolver().takePersistableUriPermission(tree,flags);}catch(Exception ignored){}
-        if(request==PICK_SOURCE){sourceTree=tree;worker.execute(()->scan(tree));}
+        if(request==PICK_SOURCE){worker.execute(()->scan(tree));}
         if(request==PICK_EXPORT){String state=pendingExport;pendingExport=null;
             if(exportInsideSource(sourceTree,tree)){
                 message("Để bảo vệ ảnh gốc, hãy chọn thư mục xuất nằm NGOÀI thư mục nguồn.");return;
@@ -230,6 +230,7 @@ public class MainActivity extends Activity {
         Map<String,Uri> importedUris=new HashMap<>();
         walk(tree,root,new ArrayList<String>(),rootName,photos,importedUris,new int[]{0},0);
         synchronized(photoUris){photoUris.clear();photoUris.putAll(importedUris);}
+        sourceTree=tree;
         synchronized(thumbCache){thumbCache.evictAll();}
         state.put("rootName",rootName);state.put("rootUri",tree.toString());state.put("photos",photos);
         js("onImported",state.toString());
