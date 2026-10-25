@@ -426,6 +426,21 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(payload.amount, 30000, "amount becomes visible only from a server-created pending installment");
   assert.equal(payload.qrImageUrl, "/payment-qr/" + QR_KEY);
 }
+// Financial amounts must arrive as JSON numeric integers. JavaScript coercion would
+// otherwise allow arrays and booleans to enter the verified payment ledger.
+for (const [label, amount] of [
+  ["boolean amount", true],
+  ["array amount", [1]],
+  ["string amount", "30000"],
+]) {
+  const db = makeDb();
+  const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {
+    orderId: "order-1", direction: "received", amount, transactionReference: "QA-TYPE-001"
+  })));
+  assert.equal(response.status, 400, label + " must be rejected");
+  assert.equal(db.batches.length, 0, label + " must cause no payment ledger write");
+}
+
 {
   const db = makeDb();
   const response = await postVerifiedTransaction(adminContext(db, request("/api/admin/payment-transactions", {

@@ -5,7 +5,8 @@ export async function onRequestPost(context) {
   const parsed=await readJsonBodyLimited(context.request,8*1024);
   if(parsed.error)return fail(parsed.error==="too_large"?"Thông tin giao dịch vượt giới hạn.":"Thông tin giao dịch không hợp lệ.",parsed.error==="too_large"?413:400);
   const body=parsed.value||{},orderId=String(body.orderId||""),requestId=String(body.paymentRequestId||"");
-  const direction=String(body.direction||"received"),amount=Number(body.amount);
+  // Only a JSON number is acceptable for a verified ledger entry; never coerce booleans, strings or arrays into money.
+  const direction=String(body.direction||"received"),amount=body.amount;
   const reference=String(body.transactionReference||"").trim().toUpperCase(),note=String(body.note||"").trim();
   if(!orderId||!["received","refunded"].includes(direction)||!Number.isSafeInteger(amount)||amount<=0||amount>2_000_000_000||reference.length<4||reference.length>80||!/^[A-Z0-9][A-Z0-9._/-]{2,79}$/.test(reference)||note.length>500)return fail("Thông tin giao dịch đã xác minh không hợp lệ.");
   try {
