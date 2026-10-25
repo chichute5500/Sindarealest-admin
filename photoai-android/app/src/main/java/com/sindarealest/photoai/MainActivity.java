@@ -270,7 +270,7 @@ public class MainActivity extends Activity {
             JSONObject m=models.getJSONObject(i);
             JSONObject item=new JSONObject().put("id",m.optString("id")).put("name",m.optString("name"))
                 .put("category",m.optString("category")).put("priceVnd",m.isNull("priceVnd")?JSONObject.NULL:m.opt("priceVnd"))
-                .put("verified",m.optBoolean("verified",false));
+                .put("verified",m.optBoolean("verified",false)).put("editedByUser",m.optBoolean("editedByUser",false));
             modelData.put(item);
         }
         metadata.put("models",modelData);
@@ -287,8 +287,11 @@ public class MainActivity extends Activity {
             }
             Uri src=Uri.parse(p.getString("uri"));String nm=p.optString("name","anh_"+i+".jpg");
             String mime=imageMime(src);
-            if(!nm.toLowerCase().matches(".*\\.(jpg|jpeg|png|webp|bmp|gif)$")){
-                String ext=mime.equals("image/png")?".png":mime.equals("image/webp")?".webp":".jpg";
+            if(!nm.toLowerCase(java.util.Locale.ROOT).matches(".*\\.(jpg|jpeg|png|webp|bmp|gif|heic|heif|avif)$")){
+                String ext=mime.equals("image/png")?".png":mime.equals("image/webp")?".webp":
+                    (mime.equals("image/heic")||mime.equals("image/heif"))?".heic":
+                    mime.equals("image/avif")?".avif":mime.equals("image/gif")?".gif":
+                    mime.equals("image/bmp")?".bmp":".jpg";
                 nm=nm+ext;
             }
             String originalName=nm;String unique=key+"/"+nm;int seq=2;
