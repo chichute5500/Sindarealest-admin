@@ -93,3 +93,5 @@ jobs:
           console.log('PASS exact Preview SHA; no production deployment');
           console.log('Preview URL: https://hero-v10-native-20261025.sindarealest-admin-preview.pages.dev');
           NODE
+
+# QA trigger: verify HTML/CSS native HERO against isolated Preview; NEVER Production.
