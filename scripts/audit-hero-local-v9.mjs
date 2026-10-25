@@ -29,6 +29,9 @@ try{
   assert.equal(response?.status(),200,'Homepage status');
   await page.waitForFunction(()=>{const img=document.querySelector('#heroReferenceArt');return img?.complete&&img.naturalWidth>0;});
   if(await page.locator('#skipIntro').count())await page.locator('#skipIntro').evaluate(el=>el.click()).catch(()=>{});
+  // Real welcome dismiss uses a 360ms exit and focus trap: do not test CTA until that finishes.
+  await page.waitForFunction(()=>!document.body.classList.contains('welcome-active'),null,{timeout:5000});
+  await page.waitForTimeout(100);
   // Hero-specific visual QA bypasses the separate welcome overlay.
   await page.addStyleTag({content:'#welcomeSplash{display:none!important}body{overflow:auto!important}'});
   const status=await page.evaluate(()=>{
@@ -57,8 +60,11 @@ try{
   },screenshot.toString('base64'));
   assert.ok(similarity.pixelMeanError<13,name+' '+theme+' mean pixel divergence '+JSON.stringify(similarity));
   assert.ok(similarity.pixelsWithin24>.93,name+' '+theme+' parity '+JSON.stringify(similarity));
-  await page.locator('#home .hero-actions .pill-btn').focus();await page.keyboard.press('Enter');
-  assert.equal(new URL(page.url()).hash,'#products',name+' keyboard CTA');
+  await page.locator('#home .hero-actions .pill-btn').focus();
+  const focused=await page.evaluate(()=>document.activeElement?.matches('#home .hero-actions .pill-btn'));
+  assert.ok(focused,name+' CTA must receive keyboard focus after Welcome closes');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(()=>location.hash==='#products',null,{timeout:2500});
   report.push({name,theme,...status,...similarity,pass:true});
   console.log('PASS '+name+' / '+theme+' '+JSON.stringify(similarity));
   await context.close();
