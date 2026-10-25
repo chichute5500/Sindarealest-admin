@@ -1,4 +1,4 @@
-name: HERO V11 isolated layered web Preview (NEVER Production)
+name: HERO V14 isolated layered web Preview (NEVER Production)
 on:
   push:
     branches:
@@ -78,7 +78,7 @@ jobs:
             --project-name "$CF_TARGET" \
             --branch "$PREVIEW_BRANCH" \
             --commit-hash "$GITHUB_SHA" \
-            --commit-message "native hero V10 Preview $GITHUB_SHA" 2>&1 | tee /tmp/hero-preview-deploy.log
+            --commit-message "native hero V14 Preview $GITHUB_SHA" 2>&1 | tee /tmp/hero-preview-deploy.log
           DEPLOYMENT_URL="$(grep -oE 'https://[[:xdigit:]]+\.sindarealest-admin-preview\.pages\.dev' /tmp/hero-preview-deploy.log | head -n 1 || true)"
           test -n "$DEPLOYMENT_URL" || { echo '::error::No immutable isolated deployment URL'; exit 1; }
           echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
@@ -101,11 +101,11 @@ jobs:
             args+=(-H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET")
           fi
           curl "${args[@]}" "$DEPLOYMENT_URL/" -o /tmp/hero-v10-live.html
-          grep -Fq 'HERO V10 — REAL WEB COMPOSITION' /tmp/hero-v10-live.html
-          grep -Fq 'HERO V11 — ACTUAL WEB LAYERS' /tmp/hero-v10-live.html
+          grep -Fq 'HERO V12 — SINGLE AUTHORITATIVE CSS COMPONENT' /tmp/hero-v10-live.html
+          grep -Fq 'id="sd-hero-component-authority"' /tmp/hero-v10-live.html
           grep -Fq 'silk-waves.svg' /tmp/hero-v10-live.html
-          grep -Fq '<h1 class="serif"><span>Phong cách</span><span>đẳng cấp</span><span>từ da cá sấu</span></h1>' /tmp/hero-v10-live.html
-          grep -Fq 'ai-marble-pedestal.webp' /tmp/hero-v10-live.html
+          grep -Fq '<h1 class="serif"><span>Phong cách</span><span>Đẳng cấp</span><span>từ da cá sấu</span></h1>' /tmp/hero-v10-live.html
+          grep -Fq 'marble-shelf-v14.svg' /tmp/hero-v10-live.html
           grep -Fq 'heroProductImage' /tmp/hero-v10-live.html
           if grep -Eq 'heroReferenceArt|hero-reference-(desktop|mobile)\.webp|hero-reference-art' /tmp/hero-v10-live.html; then
             echo '::error::Old flattened HERO remains in live HTML'; exit 1
@@ -113,10 +113,16 @@ jobs:
           curl "${args[@]}" "$DEPLOYMENT_URL/images/hero-rebuild/silk-waves.svg" -o /tmp/hero-v11-silk.svg
           grep -q '<svg' /tmp/hero-v11-silk.svg
           grep -q '<path ' /tmp/hero-v11-silk.svg
+          curl "${args[@]}" "$DEPLOYMENT_URL/images/hero-rebuild/marble-shelf-v14.svg" -o /tmp/hero-v14-stone.svg
+          grep -q 'sdMarbleFace' /tmp/hero-v14-stone.svg
+          grep -q 'sdGildedEdge' /tmp/hero-v14-stone.svg
+          if grep -Eiq '<image|<text|<foreignObject|data:image|base64' /tmp/hero-v14-stone.svg; then
+            echo '::error::Separate marble contains embedded image or interface text'; exit 1
+          fi
           if grep -Eiq '<image|<text|<foreignObject|Phong cách|Khám phá ngay' /tmp/hero-v11-silk.svg; then
             echo '::error::Decorative background contains baked text/image'; exit 1
           fi
-          echo 'PASS: immutable isolated Preview serves true HTML/CSS, distinct shoes, podium, decorative-only silk SVG; V9 flattened artwork absent'
+          echo 'PASS: immutable isolated Preview serves native V14 HTML/CSS, separate shoe PNG, marble SVG, decorative-only silk SVG; no composite artwork'
           echo "Verified test URL: $DEPLOYMENT_URL"
           echo 'Preview branch alias: https://hero-v11-native-20261025.sindarealest-admin-preview.pages.dev'
 
