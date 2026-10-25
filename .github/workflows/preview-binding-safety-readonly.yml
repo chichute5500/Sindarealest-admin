@@ -1,0 +1,45 @@
+name: Cloudflare Preview binding isolation — READ ONLY (no deploy)
+on:
+  push:
+    branches:
+      - integration/full-site-admin-storefront-2026-10-25
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Confirm Preview D1 and private R2 are distinct from Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+    steps:
+      - name: Read project configuration and compare resource identities only
+        run: |
+          node --input-type=module <<'NODE'
+          const { CLOUDFLARE_API_TOKEN: token, CLOUDFLARE_ACCOUNT_ID: account, CLOUDFLARE_PAGES_PROJECT: project } = process.env;
+          if (!token || !account || !project) throw new Error("Cloudflare read credentials/project variable missing; cannot certify Preview safety.");
+          if (project !== "sindarealest2") throw new Error("Unexpected project name; refusing unrelated environment check.");
+          const url = `https://api.cloudflare.com/client/v4/accounts/${account}/pages/projects/${project}`;
+          const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+          const payload = await response.json().catch(() => null);
+          if (!response.ok || payload?.success !== true || !payload?.result) throw new Error("Unable to read Cloudflare Pages Preview binding metadata safely.");
+          const config = payload.result;
+          if (config.production_branch !== "main") throw new Error("Pages Production branch is not confirmed as main. Stop all Preview deployment.");
+          const production = config.deployment_configs?.production;
+          const preview = config.deployment_configs?.preview;
+          if (!production || !preview) throw new Error("Missing production or preview configuration; stop.");
+          const prodDB = production.d1_databases?.DB?.id;
+          const testDB = preview.d1_databases?.DB?.id;
+          if (!prodDB || !testDB || prodDB === testDB) throw new Error("Preview D1 is missing or shares Production database; do not deploy/write test data.");
+          for (const name of ["IMAGES", "ORIGINALS"]) {
+            const live = production.r2_buckets?.[name]?.name;
+            const test = preview.r2_buckets?.[name]?.name;
+            if (!test || (live && test === live)) throw new Error("Preview R2 " + name + " missing or shared with Production; do not deploy/write test data.");
+          }
+          console.log("PASS: Pages production branch main; Preview D1 and both Preview R2 buckets isolated. No resource IDs/names/secrets logged.");
+          NODE
