@@ -36,4 +36,20 @@ for (const rule of logoRules) {
 assert.ok(src.includes('--sd-brand-gold:#8e622b') && src.includes('--sd-brand-gold:#e4c38a'),
   'Use neutral gold brand typography across light/dark, not the Admin blue skin');
 assert.ok(!src.includes('SD_ADMIN_FAKE_PRICES'),'No invented financial data in the design');
+// Approved screen 01 remains untouched; owner review requested these dashboard/topbar UI fixes.
+assert.ok(src.includes("head('BẢNG ĐIỀU KHIỂN','Tổng quan','Chào mừng, quản trị viên.'"),
+  'Dashboard must have one main Tổng quan title, not a duplicate eyebrow');
+assert.ok(!src.includes("head('Tổng quan','Tổng quan'"),
+  'Dashboard must not show two identical Tổng quan headings');
+const logoutMarkup=src.match(/<button[^>]*id="logout"[^>]*>[\\s\\S]*?<\\/button>/)?.[0]||'';
+assert.match(logoutMarkup,/aria-label="Đăng xuất"/,
+  'Red power-off logout must keep its accessible action name');
+assert.match(logoutMarkup,/class="logout-power-icon"/,
+  'Logout must show the power-off icon, not an ambiguous outgoing arrow');
+assert.match(logoutMarkup,/aria-hidden="true"/,
+  'Decorative power-off SVG must be hidden from screen readers');
+assert.ok(src.includes('#logout:focus-visible') && src.includes('#logout:hover'),
+  'Logout control must have keyboard focus and hover states');
+assert.ok(!src.includes('#logout::before{content:"↗"'),
+  'No responsive logout layout may reintroduce the arrow icon');
 console.log('PASS: Admin reference-inspired mobile skin covers 12 screens, retains business controls, dark mode and narrow/mobile accessibility.');
