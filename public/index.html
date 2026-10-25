@@ -4979,3 +4979,21 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:brightness(.78) saturate(
 }
 /* Drawn artwork retains the exact baked-in caption and CTA. Its transparent
    interaction layer still receives clicks, taps and keyboard focus. */
+
+
+/* HERO V9.3 HEADER SHADOW SEPARATION.
+   The sticky navigation has a broad 30–44px *external* dark-mode shadow that
+   physically overlays the top of the approved master artwork, creating
+   real screenshot pixel mismatches. Keep navbar glass/inset highlight but
+   remove only the external spill while preserving its 90-level stacking and
+   scroll/click behaviour. This is NOT a pixel-test threshold relaxation. */
+body:has(#home.hero.wrap) .nav-wrap .nav,
+html.dark body:has(#home.hero.wrap) .nav-wrap .nav{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.32)!important;
+}
+/* No extra mask, tint, or glass should composite over the approved art. */
+#home .hero-reference-art,#home .hero-reference-art img{
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  box-shadow:none!important;
+}
