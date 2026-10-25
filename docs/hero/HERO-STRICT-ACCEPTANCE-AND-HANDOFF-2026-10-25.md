@@ -54,3 +54,38 @@ For future chat: use `files__list` on the Library folder and `files__read` with 
 ## 6. User's latest instruction, faithfully retained
 
 "Yêu cầu tối cao. Mỗi lần làm xong sẽ tự chụp lại đánh giá, chưa đạt trên 95% tự làm lại đến khi hoàn thành. Kiểm tra cấm chồng css gây lỗi, cấm dùng ảnh để lừa." Do not ask the user to re-explain history, and do not make them evaluate obviously unfinished designs. No asynchronous promises; execute real work within each chat and leave a precise checkpoint.
+
+## 7. V14 native layered checkpoint — 2026-10-26 Asia/Ho_Chi_Minh
+
+> **VISUAL FAIL — NOT 95%, NOT OWNER-APPROVED, NO MERGE.** Technical CI success is not design acceptance.
+
+### Source, Preview and safety
+
+- Writable branch only: feature/hero-v9-integrated-2026-10-25. PR #115 remains Draft.
+- Exact Preview application SHA before the documentation-only checkpoint: e8497d4f764110007e41fb4797728581d0ce569b. Recheck latest GitHub HEAD before touching any file.
+- Verified immutable isolated deployment: https://82f400e8.sindarealest-admin-preview.pages.dev/
+- Historic branch alias for the same Preview: https://hero-v11-native-20261025.sindarealest-admin-preview.pages.dev/
+- Preview run #40217731968 PASS. D1/R2 independent identities verified before deployment; post-deploy checks proved native HTML, separate PNG shoes, vector stone and decorative-only silk SVG. The deploy target is isolated Admin Pages Preview, not Production.
+
+### Actual completed code work (not visual approval)
+
+1. Removed 392 obsolete HERO CSS selectors. public/index.html now has one isolated authoritative style#sd-hero-component-authority with no new !important overrides. Other accepted Storefront/Admin styling and protections retained.
+2. Actual native three-line HTML heading, CSS-only ruby gradient for Đẳng cấp, native description and clickable/keyboard-activated CTA. No composite full-banner bitmap, screenshot hitbox or embedded image masquerading as HTML.
+3. Original 1200×1600 owner transparent shoe PNG remains byte-identical and independent: public/images/hero-upload/tb_image_share_1792519964514 (1).png.
+4. Independent silk: public/images/hero-rebuild/silk-waves.svg — decorative gradients/paths only. Independent vector marble: public/images/hero-rebuild/marble-shelf-v14.svg — separate top/face, soft fade, curved gold veins, no text or baked composite. Separate localized contact shadows.
+5. Actual Chromium HTML screenshots in light+dark at widths 320, 360, 390, 768, 980, 1280, 1440 (14 captures). Additional pixel-alpha QA asserts no opaque shoe PNG pixels cover real description or CTA at any width.
+6. At source SHA 723d47e020e32dac447438f3171244ec5ecd422c: Validate #40217448593 PASS; native Chromium #40217452710 PASS; full integration #40217452804 PASS. Later isolated preview workflow also passed.
+7. Admin, orders, QR, payment, D1/R2 and protected source hashes remain outside modified application scope. No Production writes, merges or deployments.
+
+### Critical visual items still FAIL
+
+- Marble shelf/top/face: current pale vector stone is still too smooth and distinguishable as a standalone oval compared with naturally veined illuminated stone seamlessly blending into the master image floor. More authentic material and grounded transition required.
+- Silk backdrop: current separate gradient vector waves are still smoother and less photographic than the complex billowing satin/ice of the primary master. Need correct shadow/peak/refraction/light variation.
+- Native serif: relative proportions improved, but fine high-contrast luxury letterforms, baseline spacing and exact ruby treatment lack objective >=95% reference parity evidence.
+- Grounding: transparent shoe and local contact shadows are technically separate and positioned closer, but their optical contact on the natural stone still needs strict side-by-side review.
+- Mobile 320/360/390 remains horizontal text-left/shoes-right and has ZERO detected opaque shoe overlap with copy/CTA; it still lacks explicit >=95% visual acceptance.
+- Button is real/focusable and passes functional QA; exact premium shape/border/typography remains a visual approval gate.
+
+### Mandatory next action
+
+Open ChatGPT Library /SinDarealest/HERO-REFERENCE/ and the main REFERENCE-DESKTOP-luxury-red-text.png; retrieve latest exact-SHA Chromium screenshot artifact from run #40217452710 (or newer). Compare side-by-side at consistent crop/scale, region by region. Edit ONLY the authoritative HERO CSS and separate artwork, repeat all 14 real-browser screenshots and protection tests; keep Visual FAIL until >95% evidence in every important region AND the user explicitly approves. Preserve PR Draft and no Production deployment.
