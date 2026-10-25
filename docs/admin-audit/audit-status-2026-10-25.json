@@ -20,7 +20,7 @@
   "visualParityTotal": 12,
   "ownerAcceptance": "NOT_GRANTED",
   "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge.",
-  "latestVerifiedCodeAndTestSha": "3cbfc808fe0a7c9fde25c36ca6aab350ff3a42ac",
+  "latestVerifiedCodeAndTestSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
   "latestChanges": [
     {
       "sha": "d6da905c4ce53cbf0a84e426943927c978767923",
@@ -140,14 +140,18 @@
   "latestHandoffDate": "2026-10-25",
   "lastVerifiedCodeAndTestHeadBeforeHandoff": "3cbfc808fe0a7c9fde25c36ca6aab350ff3a42ac",
   "lastVerifiedExactShaCi": {
-    "sourceSha": "3cbfc808fe0a7c9fde25c36ca6aab350ff3a42ac",
-    "result": "5/5_SUCCESS",
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "9/9_WORKFLOWS_SUCCESS",
     "runs": [
-      40184069669,
-      40184065903,
-      40184069661,
-      40184069682,
-      40184065876
+      40184464603,
+      40184468224,
+      40184468208,
+      40184468219,
+      40184464600,
+      40184464693,
+      40184464611,
+      40184464602,
+      40184464715
     ]
   },
   "lastVerifiedDeployedAppSourceSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
@@ -197,17 +201,33 @@
     "requiredTables": 9
   },
   "lastVerifiedIsolatedAdminLiveQA": {
-    "workflowRun": 40182629881,
-    "sourceSha": "11138221b9af12e87ba543a19e80260829849043",
+    "workflowRun": 40184464715,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
     "result": "SUCCESS",
     "viewportThemeCases": 14,
     "screensPerCase": 12,
-    "runOwnedCleanupPasses": 2
+    "runOwnedCleanupPasses": 2,
+    "artifactId": 12596180300
   },
   "lastVerifiedSecurityKeyboardSmoke": {
-    "workflowRun": 40183492321,
-    "sourceSha": "75772c8ac1782f55ff158a9ce9989cf1353f8c57",
+    "workflowRun": 40184464602,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
     "result": "SUCCESS",
-    "unauthenticatedEndpointsChecked": 5
+    "scope": "SMOKE_NOT_COMPLETE_SECURITY_AUDIT"
+  },
+  "latestDeployedAndAcceptedTestSourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+  "lastVerifiedAdminPreviewDeployedSourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+  "lastVerifiedAdminResponsiveQA": {
+    "workflowRun": 40184464611,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "SUCCESS",
+    "artifactId": 12595746276
+  },
+  "lastVerifiedPreviewDeploy": {
+    "workflowRun": 40184464600,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "SUCCESS",
+    "targetProject": "sindarealest-admin-preview",
+    "environment": "preview"
   }
 }
