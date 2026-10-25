@@ -171,23 +171,19 @@ assert.ok(end >= 0, 'The final storefront visual-pass stylesheet must remain ide
 const finalCss = html.slice(end, html.indexOf('</style>', end));
 assert.match(finalCss, /\.theme-bg--light::after\{background:linear-gradient\(118deg,rgba\(225,241,255,\.07\),rgba\(211,231,249,\.03\) 52%,rgba\(237,247,255,\.07\)\)\}/);
 assert.match(finalCss, /\.theme-bg--dark::after\{background:linear-gradient\(118deg,rgba\(3,20,36,\.10\),rgba\(7,31,51,\.06\) 52%,rgba\(3,17,30,\.12\)\)\}/);
-assert.match(finalCss, /#home\.hero:has\(#heroProductImage\[hidden\]\)::before,[\s\S]*?content:none!important;display:none!important;background:none!important/,
-  'The hero must disable empty pseudo-card layers only while the approved presentation image is actually unavailable.');
-assert.match(finalCss, /\.hero-copy\{display:flex!important;min-height:0!important;height:auto!important;width:100%!important;/,
-  'The hero copy must determine its own height without a hidden image keeping a tall blank frame.');
-assert.match(finalCss, /\.hero-visual:has\(#heroProductImage\[hidden\]\)\{display:none!important;visibility:hidden!important;min-height:0!important;height:0!important;/,
-  'The unavailable product image frame must collapse completely.');
-assert.match(html, /<h1 class="serif"><span>Phong cách<\/span><span>đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
-  'The hero headline must keep the exact three-line hierarchy from the supplied mobile reference.');
-assert.match(finalCss, /#home \.hero h1 span:first-child\{max-width:6em\}/);
-assert.match(finalCss, /#home \.hero h1 span:last-child\{max-width:7em\}/);
-assert.match(finalCss, /#home \.hero-visual img\[hidden\]\{display:none!important\}/);
-assert.match(html, /#home\.hero:has\(#heroProductImage\[hidden\]\)\{grid-template-columns:minmax\(0,1fr\)!important\}/,
-  'The hero must not retain an empty second column if the approved presentation asset fails to load.');
-assert.match(html, /#home \.hero-visual:has\(#heroProductImage\[hidden\]\)\{display:none!important\}/,
-  'An unloaded presentation asset must not leave an empty image frame.');
-assert.match(html, /#home\.hero:has\(#heroProductImage\[hidden\]\) \.hero-copy\{width:100%;max-width:100%\}/,
-  'The hero copy must use the available width when no presentation image can be shown.');
+const nativeHeroCss = html.match(/<style id="sd-hero-component-authority">([\s\S]*?)<\/style>/)?.[1] || '';
+assert.ok(nativeHeroCss, 'A single native HERO CSS authority must exist.');
+assert.ok(nativeHeroCss.includes('#home.hero:has(#heroProductImage[hidden]){grid-template-columns:minmax(0,1fr)}')
+  && nativeHeroCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-visual{display:none}'),
+  'Missing independently loaded shoes must fail closed and restore a single readable copy column.');
+assert.match(html, /<h1 class="serif"><span>Phong cách<\/span><span>Đẳng cấp<\/span><span>từ da cá sấu<\/span><\/h1>/,
+  'Native heading retains three editable lines with uppercase red Đ.');
+assert.ok(nativeHeroCss.includes('--hero-red:#b71520') &&
+  nativeHeroCss.includes('#home .hero-copy h1 span:nth-child(2)') &&
+  nativeHeroCss.includes('#home .hero-visual #heroProductImage[hidden]{display:none}'),
+  'Red highlight and unloaded image presentation must use real CSS.');
+assert.ok(!nativeHeroCss.includes('!important'), 'The single HERO authority must not pile up CSS overrides.');
+
 assert.match(finalCss, /\.welcome-content\{[\s\S]*?background:transparent!important;[\s\S]*?box-shadow:none!important/);
 assert.match(finalCss, /\.welcome-skip\{margin-top:12px!important\}/);
 
@@ -218,14 +214,10 @@ assert.match(desktopDark, /data-satin-style="fine-satin-creases-v13"/);
 assert.match(mobileLight, /data-satin-style="fine-satin-creases-v12"/);
 assert.match(mobileDark, /data-satin-style="fine-satin-creases-v13"/);
 
-assert.ok(finalCss.includes('@media(min-width:761px){')
-  && finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-copy{')
-  && finalCss.includes('flex-direction:column!important;')
-  && finalCss.includes('max-width:980px!important;'),
-  'Desktop hero copy must stack vertically and use a generous editorial width when no verified image is available.');
-assert.ok(finalCss.includes('#home.hero:has(#heroProductImage[hidden]) .hero-copy h1{')
-  && finalCss.includes('font-size:clamp(42px,5.2vw,72px)!important;'),
-  'Desktop fallback headline must keep the reference three-line hierarchy rather than break each phrase into narrow columns.');
+assert.ok(nativeHeroCss.includes('@media(min-width:761px) and (max-width:1100px)') &&
+  nativeHeroCss.includes('grid-template-columns:minmax(0,49%) minmax(0,51%)'),
+  'Tablet native HERO must keep editorial horizontal product layout.');
+
 assert.ok(finalCss.includes('@media(max-width:760px){')
   && finalCss.includes('height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;')
   && finalCss.includes('top:calc(7px + env(safe-area-inset-top))!important;')
@@ -341,71 +333,24 @@ assert.doesNotMatch(performantThemeTransition, /transition:[^}]*backdrop-filter/
   'Theme switching must not animate expensive backdrop-filter changes across glass surfaces.');
 
  
-// The owner-supplied Hero remains intact; a separate derivative changes alpha only around the platform/canvas edges.
-const heroStyleContents = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1]).join("\n");
-const heroImageDeclarations = [...heroStyleContents.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-  .filter(([, selector]) => selector.includes(".hero-visual img"));
-assert.ok(heroImageDeclarations.length >= 5, "The protected hero must retain responsive display rules.");
-for (const [, selector, declarations] of heroImageDeclarations) {
-  assert.doesNotMatch(declarations, /object-fit\s*:\s*cover/i, "The owner-supplied image must not be cropped.");
-  for (const declaration of declarations.split(";").map(value => value.trim()).filter(Boolean)) {
-    const effect = declaration.match(/^(-webkit-)?(filter|mask(?:-image)?|clip-path|mix-blend-mode|opacity|transform)\s*:\s*(.*?)\s*$/i);
-    if (!effect) continue;
-    const property = effect[2].toLowerCase();
-    const value = effect[3].replace(/!important\s*$/i, "").trim().toLowerCase();
-    const neutral = ((property === "filter" && (value === "drop-shadow(0 12px 16px rgba(0,0,0,.18))" || value === "drop-shadow(0 5px 5px rgba(14,30,42,.10)) drop-shadow(0 2px 2px rgba(8,19,29,.16))")) || ((property === "filter" || property.startsWith("mask") || property === "clip-path" || property === "transform") && value === "none")
-      || (property === "mix-blend-mode" && value === "normal")
-      || (property === "opacity" && value === "1"));
-    assert.ok(neutral, "Hero image must preserve the source pixels apart from the explicitly approved drop shadow (" + selector.trim() + ": " + declaration + ").");
-  }
-}
-const heroAssetDisplayLock = html.slice(html.lastIndexOf("/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */"));
-assert.ok(html.includes("filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important") && heroAssetDisplayLock.includes("mask-image:none!important"),
-  "Hero experiment uses a restrained drop shadow only; the alpha-feathered PNG is not cropped or masked.");
-assert.ok(heroAssetDisplayLock.includes("mix-blend-mode:normal!important") && heroAssetDisplayLock.includes("opacity:1!important"),
-  "Hero image keeps full opacity and normal color blending; no brightness/multiply blend is permitted.");
-const heroBlendOverride = html.slice(html.lastIndexOf("/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */"));
-assert.ok(heroBlendOverride.includes('mix-blend-mode:normal!important')
-  && heroBlendOverride.includes("mask-image:none!important")
-  && !heroBlendOverride.includes("mask-image:radial-gradient(")
-  && heroBlendOverride.includes("width:clamp(244px,67vw,270px)!important")
-  && heroBlendOverride.includes("max-height:none!important"),
-  "The original mobile Hero PNG must stay enlarged, uncropped, unmasked, and color-preserving.");
-assert.ok(heroBlendOverride.includes("@media(min-width:761px) and (max-width:1000px)")
-  && heroBlendOverride.includes("width:113%!important")
-  && heroBlendOverride.includes("max-height:540px!important;margin-left:0!important"),
-  "The original tablet Hero PNG must be centered with no negative image offset.");
-assert.ok(heroAssetDisplayLock.includes("object-fit:contain!important") && heroAssetDisplayLock.includes("transform:none!important"),
-  "The Hero image must be fully visible with no CSS crop or transform; the source PNG alpha remains untouched.");
-assert.ok(heroAssetDisplayLock.includes("#home.hero:after{content:none!important;display:none!important;background:none!important}")
-  && !heroAssetDisplayLock.includes("#home .hero-visual::after,#home.hero:after{"),
-  "Only the outer Hero decoration is disabled; the pedestal front-face pseudo-element remains available.");
-const heroPedestalStyles = html.slice(html.lastIndexOf("/* Reference Hero pedestal:"));
-assert.ok(heroAssetDisplayLock.includes("#home .hero-visual::before,")
-  && !heroAssetDisplayLock.includes("inset:-8% -10%!important;")
-  && !heroAssetDisplayLock.includes("filter:blur(16px)!important;")
-  && heroAssetDisplayLock.includes("position:relative!important;z-index:1!important;")
-  && heroPedestalStyles.includes("#home .hero-visual::before,")
-  && heroPedestalStyles.includes("#home .hero-visual::after{")
-  && heroPedestalStyles.includes("radial-gradient(ellipse at 30% 28%")
-  && heroPedestalStyles.includes("clip-path:polygon(1% 0,99% 0,94% 100%,6% 100%)")
-  && heroPedestalStyles.includes("bottom:27%;")
-  && heroPedestalStyles.includes("width:136%;height:8%;bottom:27%")
-  && heroPedestalStyles.includes("width:145%;height:9%;bottom:30%;transform:translateX(-50%) rotate(-3deg)")
-  && heroPedestalStyles.includes("width:130%;height:7%;bottom:20%")
-  && heroPedestalStyles.includes("width:138%;height:7%;bottom:23%;transform:translateX(-50%) rotate(-3deg)"),
-  "The marble oval and slanted plinth stay visible and responsive; a legacy blur-only rule cannot override the platform.");
-assert.ok(heroAssetDisplayLock.includes("#home .hero-visual-caption{display:none!important}"),
-  "No page caption may cover any portion of the supplied image.");
-const mobileReferenceCss = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
-assert.ok(mobileReferenceCss.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
-  && mobileReferenceCss.includes("height:clamp(216px,57vw,230px)!important;")
-  && mobileReferenceCss.includes("position:absolute!important;top:0!important;right:0!important;")
-  && mobileReferenceCss.includes("top:-42px!important;left:-30px!important;")
-  && mobileReferenceCss.includes("width:clamp(244px,67vw,270px)!important;")
-  && mobileReferenceCss.includes("object-fit:contain!important")
-  && !mobileReferenceCss.includes("grid-template-rows:auto auto!important;"),
-  "Mobile Hero must follow the supplied side-by-side reference, not stack the shoe below its copy.");
+// V12 native visual-contract checks replace obsolete V2–V11 pseudo-element rules.
+assert.match(nativeHeroCss, /#home \.hero-visual #heroProductImage\{/,
+  'Native HERO shoe PNG must be an independent original asset.');
+assert.ok(nativeHeroCss.includes("url('/images/hero-upload/ai-marble-pedestal.webp')") &&
+  nativeHeroCss.includes("url('/images/hero-rebuild/silk-waves.svg')"),
+  'Marble and satin remain independent noncomposite decorative layers.');
+assert.ok(nativeHeroCss.includes('mask:none;-webkit-mask:none') &&
+  nativeHeroCss.includes('mix-blend-mode:normal;object-fit:contain'),
+  'Owner product PNG must not be masked, cropped or blended.');
+assert.ok(nativeHeroCss.includes('z-index:5;display:block;top:-23%'),
+  'Transparent shoe layer must render on top of the stone.');
+assert.ok(nativeHeroCss.includes('background:radial-gradient(ellipse 24% 17%') &&
+  nativeHeroCss.includes('ellipse 28% 19%'),
+  'The independently rendered front and heel contact shadows must remain intact.');
+assert.ok(nativeHeroCss.includes('grid-template-columns:minmax(0,55%) minmax(0,45%)') &&
+  nativeHeroCss.includes('width:47%;height:100%') &&
+  !nativeHeroCss.includes('grid-template-rows:auto auto'),
+  'Mobile HERO must be compact and horizontal with native left copy and right shoes.');
 
 // The approved icon board assigns the shopping-bag silhouette to Cart; Products remains a distinct catalogue/list destination.
 const mobileProductTab = html.match(/<a class="mobile-tab" href="#products" data-mobile-tab="products">([\s\S]*?)<\/a>/)?.[1] || '';
@@ -507,78 +452,13 @@ assert.ok(
 
 
 
-const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
-assert.ok(mobileHeroReferenceMatch.includes("grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;")
-  && mobileHeroReferenceMatch.includes("grid-template-rows:1fr!important;")
-  && mobileHeroReferenceMatch.includes("height:clamp(216px,57vw,230px)!important;")
-  && mobileHeroReferenceMatch.includes("top:-42px!important;left:-30px!important;")
-  && mobileHeroReferenceMatch.includes("max-height:none!important")
-  && mobileHeroReferenceMatch.includes("opacity:1!important;mix-blend-mode:normal!important;"),
-  "Mobile reference must use a short horizontal layout and undistorted transparent product asset.");
-assert.ok(heroPedestalStyles.includes("inset:auto!important;left:50%!important;bottom:27%!important;filter:none!important;")
-  && mobileHeroReferenceMatch.includes("bottom:35px!important;")
-  && mobileHeroReferenceMatch.includes("height:36px!important;")
-  && mobileHeroReferenceMatch.includes("bottom:-4px!important;")
-  && mobileHeroReferenceMatch.includes("height:38px!important;"),
-  "Mobile pedestal top/front must form a compact marble display below the shoe soles.");
-assert.ok(mobileHeroReferenceMatch.includes("filter:drop-shadow(0 5px 5px rgba(14,30,42,.10)) drop-shadow(0 2px 2px rgba(8,19,29,.16))!important;")
-  && mobileHeroReferenceMatch.includes("#home .hero-visual-glow{")
-  && mobileHeroReferenceMatch.includes("bottom:33px!important;")
-  && mobileHeroReferenceMatch.includes("at 41% 82%")
-  && mobileHeroReferenceMatch.includes("at 78% 26%")
-  && mobileHeroReferenceMatch.includes("z-index:1!important;pointer-events:none!important;"),
-  "Realistic mobile ground contact needs two separate shadows above the marble surface and below the shoes.");
+assert.ok(nativeHeroCss.includes("grid-template-columns:minmax(0,46%) minmax(0,54%)") &&
+  nativeHeroCss.includes("height:clamp(525px,47vw,688px)"),
+  'Desktop HERO expands to editorial proportions instead of the obsolete too-small banner.');
+assert.ok(nativeHeroCss.includes("width:clamp(250px,79vw,470px)") &&
+  nativeHeroCss.includes('height:clamp(185px,61vw,326px)'),
+  'Mobile independently layered plinth must be sized to support the shoe soles.');
+assert.ok(nativeHeroCss.includes('linear-gradient(to bottom,transparent 1%,#000 13%,#000 56%') &&
+  nativeHeroCss.includes('filter:saturate(.63) brightness(1.45) contrast(.49)'),
+  'Marble face blends into icy floor rather than forming an opaque floating disk.');
 
-assert.ok(heroPedestalStyles.includes("Tablet Hero pedestal stays under the shoes")
-  && heroPedestalStyles.includes("#home .hero-visual::before{left:40%!important;width:100%!important}")
-  && heroPedestalStyles.includes("#home .hero-visual::after{left:40%!important;width:95%!important}"),
-  "Tablet pedestal must remain entirely within the Hero presentation without clipping its right edge.");
-
-assert.ok(mobileHeroReferenceMatch.includes("clip-path:none!important;")
-  && mobileHeroReferenceMatch.includes("border-radius:0 0 22% 22% / 0 0 12% 12%!important;")
-  && mobileHeroReferenceMatch.includes("Irregular faint mineral veins")
-  && mobileHeroReferenceMatch.includes("rgba(203,224,236,.52)")
-  && mobileHeroReferenceMatch.includes("filter:blur(1.6px)!important;"),
-  "Marble needs a rounded stone shelf fading into the background, subtle mineral texture and tight contact shadows.");
-assert.ok(mobileHeroReferenceMatch.includes("mask-image:linear-gradient(to bottom,#000 0%,#000 32%,rgba(0,0,0,.76) 55%,rgba(0,0,0,.32) 78%,transparent 100%)!important;"),"The broad marble shelf must fade into the page rather than terminate as a floating disk.");
-
-const sharedHeroStyles=html.slice(html.lastIndexOf("/* Cross-device Hero design system: desktop and tablet inherit the same broad,"));
-assert.ok(sharedHeroStyles.includes("@media(min-width:761px){")
-  && sharedHeroStyles.includes("height:clamp(405px,32vw,460px)!important;")
-  && sharedHeroStyles.includes("width:clamp(470px,37vw,535px)!important;")
-  && sharedHeroStyles.includes("border-radius:0 0 22% 22% / 0 0 12% 12%!important;")
-  && sharedHeroStyles.includes("at 41% 82%")
-  && sharedHeroStyles.includes("at 78% 26%")
-  && sharedHeroStyles.includes("@media(min-width:761px) and (max-width:1000px)")
-  && sharedHeroStyles.includes("height:clamp(455px,60vw,550px)!important;"),
-  "Desktop/tablet Hero must use a compact layout and the same continuous marble shelf and two contact shadows as mobile.");
-
-assert.ok(sharedHeroStyles.includes("position:absolute!important;top:-107px!important;left:0!important;")
-  && sharedHeroStyles.includes("left:43%!important;bottom:20px!important;")
-  && sharedHeroStyles.includes("top:-20px!important;left:-28px!important;")
-  && sharedHeroStyles.includes("width:clamp(430px,58vw,490px)!important;")
-  && sharedHeroStyles.includes("@media (pointer:coarse) and (min-width:761px)")
-  && sharedHeroStyles.includes(".nav-wrap .navlinks{display:none!important}")
-  && sharedHeroStyles.includes(".featured-grid,.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;"),
-  "Desktop product must fit below the header; touch-requested desktop view must expose menu and larger two-column product cards.");
-
-assert.ok(sharedHeroStyles.includes("width:78%!important;max-width:505px!important;height:60px!important;")
-  && sharedHeroStyles.includes("width:76%!important;max-width:493px!important;height:52px!important;")
-  && sharedHeroStyles.includes("left:43%!important;bottom:35px!important;")
-  && sharedHeroStyles.includes("#home .hero-visual::before{left:50%!important;")
-  && sharedHeroStyles.includes("#home .hero-visual::after{left:50%!important;"),
-  "Shortened desktop Hero must shrink/recenter the marble shelf and preserve the tablet center.");
-
-assert.ok(sharedHeroStyles.includes("linear-gradient(to bottom,#000 0%,#000 32%,rgba(0,0,0,.76) 55%,rgba(0,0,0,.32) 78%,transparent 100%)")
-  && sharedHeroStyles.includes("rgba(203,224,236,.52)")
-  && sharedHeroStyles.includes("rgba(83,122,150,.50)")
-  && sharedHeroStyles.includes("border:1px solid rgba(196,214,226,.14)!important;")
-  && mobileHeroReferenceMatch.includes("rgba(239,248,253,.92)")
-  && mobileHeroReferenceMatch.includes("rgba(83,122,150,.50)"),
-  "Mobile, tablet and PC must softly blend the lower marble shelf into the icy-blue web background in light and dark without hiding the stone top or shoe contact shadows.");
-
-assert.ok(mobileHeroReferenceMatch.includes("max-width:218px!important;height:31px!important;min-height:0!important;")
-  && sharedHeroStyles.includes("max-width:480px!important;height:44px!important;")
-  && sharedHeroStyles.includes("max-width:475px!important;height:56px!important;bottom:24px!important")
-  && sharedHeroStyles.includes("max-width:448px!important;height:39px!important;bottom:38px!important"),
-  "Across phone/tablet/PC the rear shoe must rest above the rear edge of a deeper oval, with a real contact field rather than a detached hover shadow.");
