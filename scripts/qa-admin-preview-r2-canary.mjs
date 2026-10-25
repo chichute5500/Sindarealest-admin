@@ -60,19 +60,33 @@ function cli(type,object,file) {
  const child=spawnSync(join(process.cwd(),'node_modules','.bin','wrangler'),args,{
   env:process.env,encoding:'utf8',timeout:90000,maxBuffer:2*1024*1024
  });
- return {ok:child.status===0,status:child.status,error:child.error?.name||null,
-   notFound:/404|not found|does not exist|no such object/i.test((child.stderr||'')+' '+(child.stdout||''))};
+ // Keep credentials, object names, bucket names, account IDs and raw output out
+ // of retained Actions logs. A fixed diagnostic classification is sufficient.
+ const diagnostic=String(child.stderr||'')+' '+String(child.stdout||'');
+ const cause=/authentication|invalid api token|unauthorized|10000\b/i.test(diagnostic)
+   ? 'AUTHENTICATION_OR_TOKEN'
+   : /permission|forbidden|not authorized|10001\b|1003\d\b|403\b/i.test(diagnostic)
+   ? 'PERMISSION_OR_R2_SCOPE'
+   : /bucket.*(?:not found|does not exist)|404\b/i.test(diagnostic)
+   ? 'BUCKET_UNAVAILABLE'
+   : /unknown argument|unknown option|unrecognized|invalid option|missing required|unknown command/i.test(diagnostic)
+   ? 'WRANGLER_ARGUMENT_ERROR'
+   : /fetch failed|timed out|timeout|network error/i.test(diagnostic)
+   ? 'NETWORK_ERROR'
+   : child.error ? 'CLI_LAUNCH_ERROR' : 'UNCLASSIFIED_CLI_FAILURE';
+ return {ok:child.status===0,status:child.status,error:child.error?.name||null,cause,
+   notFound:/404|not found|does not exist|no such object/i.test(diagnostic)};
 }
 let error=null;
 try {
  for(const object of objects) {
    const result=cli('put',object,binary);
-   if(!result.ok)throw Error('CANARY_R2_PUT_DENIED_'+object.kind+'_STATUS_'+result.status);
+   if(!result.ok)throw Error('CANARY_R2_PUT_FAILED_'+object.kind+'_'+result.cause+'_STATUS_'+result.status);
  }
  for(const object of objects){
    const downloaded=join(tmp,'read-'+object.kind+'.webp');
    const result=cli('get',object,downloaded);
-   if(!result.ok)throw Error('CANARY_R2_GET_FAILED_'+object.kind+'_STATUS_'+result.status);
+   if(!result.ok)throw Error('CANARY_R2_GET_FAILED_'+object.kind+'_'+result.cause+'_STATUS_'+result.status);
    if(createHash('sha256').update(readFileSync(downloaded)).digest('hex')!==expectedHash)
      throw Error('CANARY_R2_READBACK_HASH_MISMATCH_'+object.kind);
  }
@@ -90,12 +104,12 @@ try {
  const cleanupErrors=[];
  for(const obj of objects){
    const result=cli('delete',obj,'');
-   if(!result.ok)cleanupErrors.push(obj.kind+': delete failed '+result.status);
+   if(!result.ok)cleanupErrors.push(obj.kind+': delete failed '+result.cause+'_'+result.status);
  }
  for(let pass=1;pass<=2;pass++){
    for(const obj of objects){
      const res=cli('get',obj,join(tmp,'confirm-'+pass+'-'+obj.kind+'.webp'));
-     if(res.ok||!res.notFound)cleanupErrors.push(obj.kind+': cleanup absence unverified pass '+pass);
+     if(res.ok||!res.notFound)cleanupErrors.push(obj.kind+': cleanup absence unverified '+res.cause+' pass '+pass);
    }
    if(cleanupErrors.length===0)record.cleanupPasses=pass;
  }
