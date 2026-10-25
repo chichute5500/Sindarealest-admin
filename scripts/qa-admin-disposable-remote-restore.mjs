@@ -74,7 +74,7 @@ const remote={
    bind(...values){params=values;return this;},
    async first(){return (await query({sql,params}))[0]?.results?.[0]||null;},
    async all(){return {results:(await query({sql,params}))[0]?.results||[]};},
-   async run(){return (await query({sql,params}))[0]};
+   async run(){return (await query({sql,params}))[0]}
   };
  },
  async batch(statements){
