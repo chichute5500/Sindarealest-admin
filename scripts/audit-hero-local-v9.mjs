@@ -99,6 +99,27 @@ try{
   assert.ok(data.overflowWidth<12,name+' no page horizontal overflow');
   const png=out+'/'+name+'-'+theme+'.png';
   await page.locator('#home').screenshot({path:png,animations:'disabled'});
+  // QA-ONLY PARAMETER SWEEP: real screenshots of temporary CSS offsets in a browser test.
+  // No production CSS mutation, no image compositing and no reference image in deployed assets.
+  // Used to choose measured marble geometry before modifying the actual single authority CSS.
+  if(name==='pc-1440'&&theme==='light'){
+   const stage=page.locator('#home .hero-pedestal-art');
+   const variants=[
+    ...[-38,-34,-30,-26,-22,-18,-14,-10,-6].map(x=>({bottom:x,left:53,height:null})),
+    ...[46,49,52,55,58,61].map(x=>({bottom:-20,left:x,height:null})),
+    ...[300,335,365,395,425,455].map(x=>({bottom:-20,left:53,height:x}))
+   ];
+   for(const v of variants){
+    await stage.evaluate((el,p)=>{
+     el.style.bottom=p.bottom+'%';el.style.left=p.left+'%';
+     if(p.height)el.style.height=p.height+'px';else el.style.removeProperty('height');
+    },v);
+    const file='stage-param-bottom'+String(v.bottom).replace('-','m')+'-left'+v.left+'-height'+(v.height||'original')+'.png';
+    await page.locator('#home').screenshot({path:out+'/'+file,animations:'disabled'});
+   }
+   await stage.evaluate(el=>{el.style.removeProperty('bottom');el.style.removeProperty('left');el.style.removeProperty('height');});
+   console.log('PASS QA-only marble parameter sweep '+variants.length+' genuine DOM browser captures; no website CSS edits.');
+  }
   await page.locator('#home .hero-actions .pill-btn').focus();
   assert.ok(await page.evaluate(()=>document.activeElement?.matches('#home .hero-actions .pill-btn')),name+' CTA takes keyboard focus');
   await page.keyboard.press('Enter');
