@@ -35,7 +35,11 @@ jobs:
           if (!production || !preview) throw new Error("Missing production or preview configuration; stop.");
           const prodDB = production.d1_databases?.DB?.id;
           const testDB = preview.d1_databases?.DB?.id;
-          if (!prodDB || !testDB || prodDB === testDB) throw new Error("Preview D1 is missing or shares Production database; do not deploy/write test data.");
+          // Report only booleans, never database identifiers, bucket names, secrets or API responses.
+          console.log("D1 binding: production configured=" + Boolean(prodDB) + "; Preview configured=" + Boolean(testDB) + "; isolated=" + Boolean(prodDB && testDB && prodDB !== testDB));
+          if (!prodDB) throw new Error("Production D1 identity unavailable; cannot establish safe Preview separation.");
+          if (!testDB) throw new Error("Preview D1 binding DB is NOT configured; Preview functions cannot be tested safely.");
+          if (prodDB === testDB) throw new Error("Preview D1 binding DB points to the SAME database as Production; Preview writes unsafe.");
           for (const name of ["IMAGES", "ORIGINALS"]) {
             const live = production.r2_buckets?.[name]?.name;
             const test = preview.r2_buckets?.[name]?.name;
