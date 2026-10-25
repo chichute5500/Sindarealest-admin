@@ -21,7 +21,7 @@ for (const {width,height,theme} of [
     if(!secret) throw Error('Missing ADMIN_TEST_PASSWORD; no authentication bypass allowed');
     const out={sha:process.env.GITHUB_SHA || 'unknown',
       viewport:{width,height},theme,evidenceScope:'ISOLATED_PREVIEW_NONDESTRUCTIVE_SMOKE_NOT_COMPLETE_SECURITY_AUDIT',
-      authProbes:[],navigationTiming:null,keyboardNavigation:false,unlabeledInteractive:0,overflow:false,
+      authProbes:[],navigationTiming:null,keyboardNavigation:false,notificationBellKeyboard:false,unlabeledInteractive:0,overflow:false,
       noStateChangingRequests:true,checkedAtUtc:new Date().toISOString()};
     const ctx=await browser.newContext({viewport:{width,height},colorScheme:theme,
       serviceWorkers:'block',extraHTTPHeaders:cfHeaders});
@@ -30,7 +30,7 @@ for (const {width,height,theme} of [
     page.on('request',r=>{if(new URL(r.url()).origin===base&&r.url().includes('/api/admin/')&&
       !['GET','HEAD','OPTIONS'].includes(r.method())&&!r.url().endsWith('/api/admin/login'))wrote=true;});
     try {
-      for(const path of ['/api/admin/products','/api/admin/orders','/api/admin/settings','/api/admin/backup','/api/admin/warranties']) {
+      for(const path of ['/api/admin/products','/api/admin/orders','/api/admin/settings','/api/admin/backup','/api/admin/warranties','/api/admin/customers','/api/admin/audit-logs','/api/admin/payment-transactions']) {
         const r=await ctx.request.get(base+path,{failOnStatusCode:false});
         out.authProbes.push({path,status:r.status()});
         expect([401,403],path+' unauthenticated access must be rejected').toContain(r.status());
@@ -63,6 +63,24 @@ for (const {width,height,theme} of [
       await page.locator('#password').fill(secret);
       await loginButton.click();
       await expect(page.locator('#appView')).toBeVisible({timeout:20000});
+      // Read-only keyboard check for the owner-approved shared notification bell.
+      // Do not click mark-as-read: it changes browser state and obscures evidence.
+      const bell=page.locator('#notificationToggle');
+      const bellBadge=page.locator('#notificationCount');
+      const bellPanel=page.locator('#notificationPanel');
+      await expect(bell).toBeVisible();
+      await expect(bell).toHaveAttribute('aria-controls','notificationPanel');
+      await expect(bell).toHaveAttribute('aria-expanded','false');
+      await expect(bellBadge).toHaveText(/^\\d+$/);
+      await bell.focus();
+      await page.keyboard.press('Enter');
+      await expect(bell).toHaveAttribute('aria-expanded','true');
+      await expect(bellPanel).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(bell).toHaveAttribute('aria-expanded','false');
+      await expect(bellPanel).toBeHidden();
+      await expect(bell).toBeFocused();
+      out.notificationBellKeyboard=true;
       const nav=page.locator('button[data-view="products"]:visible').first();
       await expect(nav).toBeVisible();
       await nav.focus();
