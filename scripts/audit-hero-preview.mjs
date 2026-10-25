@@ -357,7 +357,7 @@ try {
         // preserve shoe alpha, contact, viewport, theme and copy safety gates.
         if (!m.aiPodium || m.aiPodium.display === 'none'
             || m.aiPodium.opacity < .84
-            || !m.aiPodium.background.includes('/images/hero-upload/ai-marble-pedestal.webp')
+            || !m.aiPodium.background.includes('/images/hero-rebuild/marble-stage.svg')
             || m.aiPodium.zIndex !== '0'
             || !m.aiPodium.rect
             || m.aiPodium.rect.width < (m.viewport.width <= 390 ? 245 : 400)) {
@@ -365,22 +365,22 @@ try {
         }
         if (m.aiPodium?.rect && m.visibleProductRect) {
           const p=m.aiPodium.rect, s=m.visibleProductRect;
-          const planeTop=p.top+p.height*(153/610);
-          const planeBottom=p.top+p.height*(341/610);
+          const planeTop=p.top+p.height*(143/650);
+          const planeBottom=p.top+p.height*(463/650);
           if (s.bottom < planeTop-10 || s.bottom > planeBottom+27)
             fail('Shoe outsole does not meet the AI marble support plane.');
           // New owner-required safety check: the forward toe must NOT project
-          // below the front lip. The source WebP front rim is y≈295 / 610.
+          // below the front lip. The current SVG front rim is y=463 / 650.
           // We check the actual alpha-derived shoe bottom, not the img box.
-          const frontRim=p.top+p.height*(295/610);
+          const frontRim=p.top+p.height*(463/650);
           const toeInset=frontRim-s.bottom;
           const maxToeInset=m.viewport.width<=390?34:40;
           if (!Number.isFinite(toeInset)||toeInset<-5||toeInset>maxToeInset)
             fail('Front shoe toe protrudes beyond the marble rim or loses grounded contact: inset '+toeInset.toFixed(1)+'px');
-          // Source WebP contains its solid stone lip between x≈143 and x≈1063.
+          // New SVG stone face extends to x≈1120 of the 1200-unit viewBox.
           // On mobile that rightmost stone edge must be completely visible,
           // not cut by the browser screen boundary as in the prior version.
-          if(m.viewport.width<=390 && p.left + p.width*(1063/1200) > m.viewport.width+2)
+          if(m.viewport.width<=390 && p.left + p.width*(1120/1200) > m.viewport.width+2)
             fail('The marble podium right edge is clipped on mobile.');
           if (s.left < p.left+p.width*.07 || s.right > p.right-p.width*.03)
             fail('Shoe silhouette extends outside the AI plinth footprint.');

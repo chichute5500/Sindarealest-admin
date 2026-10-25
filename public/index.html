@@ -4709,8 +4709,7 @@ html.dark #home .hero-visual .hero-pedestal-art{opacity:.88!important}
   width:clamp(680px,67vw,930px)!important;height:clamp(470px,44vw,610px)!important;
   opacity:.96!important;visibility:visible!important;border:0!important;
   background:
-    url('/images/hero-rebuild/marble-stage.svg') center/100% 100% no-repeat,
-    url('/images/hero-upload/ai-marble-pedestal.webp') center/100% 100% no-repeat!important;
+    url('/images/hero-rebuild/marble-stage.svg') center/100% 100% no-repeat!important;
   filter:none!important;box-shadow:none!important;border-radius:0!important;
   -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 73%,rgba(0,0,0,.3) 88%,transparent 100%)!important;
   mask-image:linear-gradient(to bottom,#000 0%,#000 73%,rgba(0,0,0,.3) 88%,transparent 100%)!important;
@@ -4819,3 +4818,37 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:brightness(.78) saturate(
   #home .hero-visual .hero-pedestal-art{width:260px!important;height:215px!important;bottom:-78px!important}
 }
 @media(prefers-reduced-motion:reduce){#home .hero-actions .pill-btn{transition:none!important}}
+
+
+/* HERO REBUILD V8.1 — physically align the alpha shoe silhouette with the
+   actual visible SVG rim, not an imaginary offscreen CSS disk. */
+@media(min-width:1101px){
+ #home.hero.wrap{height:420px!important;min-height:0!important;padding:25px!important;grid-template-columns:minmax(0,47fr) minmax(0,53fr)!important}
+ #home .hero-copy h1{font-size:clamp(53px,4.65vw,64px)!important;line-height:1.11!important;margin-bottom:17px!important}
+ #home .hero-description{font-size:clamp(12.5px,1.14vw,15px)!important;line-height:1.62!important}
+ #home .hero-actions{margin-top:20px!important}
+ #home .hero-actions .pill-btn{min-height:47px!important;font-size:13.5px!important;padding:9px 22px!important}
+ #home .hero-visual img{width:clamp(480px,36vw,515px)!important;left:-82px!important;top:-115px!important}
+ #home .hero-visual .hero-pedestal-art{width:clamp(555px,44vw,650px)!important;height:350px!important;left:33%!important;bottom:clamp(-70px,calc(200px - 18.75vw),-40px)!important}
+ #home .hero-visual .hero-visual-glow{left:33%!important;bottom:56px!important;width:74%!important;height:32px!important;filter:blur(5px)!important}
+}
+@media(min-width:761px) and (max-width:1100px){
+ #home.hero.wrap{height:410px!important;min-height:0!important;width:calc(100% - 28px)!important;padding:25px!important;grid-template-columns:minmax(0,46fr) minmax(0,54fr)!important}
+ #home .hero-copy h1{font-size:clamp(37px,4.3vw,49px)!important;line-height:1.10!important;margin-bottom:15px!important}
+ #home .hero-description{font-size:clamp(11px,1.2vw,13.5px)!important;line-height:1.6!important}
+ #home .hero-actions{margin-top:17px!important}
+ #home .hero-actions .pill-btn{min-height:42px!important;font-size:12px!important;padding:9px 18px!important}
+ #home .hero-visual img{width:clamp(410px,45vw,440px)!important;left:-56px!important;top:-70px!important}
+ #home .hero-visual .hero-pedestal-art{width:clamp(495px,62vw,590px)!important;height:330px!important;left:33%!important;bottom:clamp(-56px,calc(29px - 8.5vw),-36px)!important}
+ #home .hero-visual .hero-visual-glow{left:33%!important;bottom:43px!important;width:75%!important;height:34px!important}
+}
+@media(max-width:760px){
+ #home .hero-visual .hero-pedestal-art{width:clamp(250px,67vw,258px)!important;height:190px!important;left:42%!important;bottom:-20px!important}
+ #home .hero-visual .hero-visual-glow{left:42%!important;bottom:37px!important;width:95%!important}
+ #home .hero-description{max-width:152px!important;line-height:1.44!important}
+}
+@media(max-width:375px){
+ #home .hero-visual img{width:224px!important;left:-12px!important;top:-34px!important}
+ #home .hero-visual .hero-pedestal-art{width:250px!important;height:190px!important;left:41%!important;bottom:-20px!important}
+ #home .hero-description{max-width:140px!important}
+}
