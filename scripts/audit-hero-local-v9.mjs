@@ -126,7 +126,7 @@ try{
    for(const strength of strengths){
     const extra='radial-gradient(ellipse 47% 82% at 97% 17%,rgba(36,89,141,'+strength+'),transparent 87%)';
     await lighting.evaluate((el,code)=>{el.textContent=code;},
-      '#home.hero.wrap::before{background-image:'+extra+','+baseBefore+'}');
+      '#home#home.hero.wrap::before{background-image:'+extra+','+baseBefore+'}');
     const file='silk-light-right-'+Math.round(strength*1000)+'.png';
     await page.locator('#home').screenshot({path:out+'/'+file,animations:'disabled'});
    }
