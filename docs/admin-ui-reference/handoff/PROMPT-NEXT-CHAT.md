@@ -2,17 +2,19 @@
 
 Tiếp tục trực tiếp dự án SinDarealest Admin trên GitHub. Chỉ sửa nhánh `feature/admin-isolated-handoff-2026-10-20`. PR #111 OPEN, không merge, không thay đổi main/Storefront PR #108/Production, không tích hợp Admin với website. Giữ logo SD vàng chính thức.
 
-## TRẠNG THÁI MỚI: OWNER ĐÃ DUYỆT 2/12
+## TRẠNG THÁI MỚI: 12/12 MÀN OWNER PASS VỀ BỐ CỤC; 10 MÀN 03–12 CÓ ĐIỀU KIỆN CHUÔNG THÔNG BÁO
+
+Chủ dự án đã nói: **“Sửa lại chuông thông báo đẹp hơn còn lại pass”**. Đã chỉnh chuông dùng chung PC/mobile trong `public/admin/index.html` (SVG bell-ring, vàng gold, glass, unread đỏ, dark mode, focus-visible và motion-safe). BỔ SUNG kiểm thử tĩnh tương ứng. **Phải xem GitHub CI, deploy Preview và ảnh mới đúng SHA trước khi kết luận chuông đã nghiệm thu kỹ thuật.** Không tự công bố 100% toàn dự án. Màn 01–02 vẫn duyệt như cũ.
 
 - Màn 01 — Đăng nhập: **OWNER APPROVED**, đã chấp thuận trước đó; giữ nguyên.
 - Màn 02 — Tổng quan: **OWNER APPROVED ngày 25/10/2026**, sau khi xem so sánh ảnh mobile 390×844 sáng và PC 1440×900 sáng từ Admin Preview mã `ab46d35311ab1ef7fb2f95428401076c70325ce7`. Đã sửa 2 lỗi tiêu đề lặp và logout arrow thành nút nguồn đỏ. Exact code SHA có 10/10 Actions PASS. Evidence run #40194565226, artifact #12599625737.
-- Chủ dự án đã yêu cầu gửi **một lần cả 10 màn còn lại (03–12)** để duyệt đồng loạt. **Chưa màn nào trong 03–12 được duyệt.** Dùng poster `docs/admin-ui-reference/admin-mobile-reference.png` và ảnh Preview mới `artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/<screen>.png`; thêm PC 1440×900 khi phù hợp.
+- Chủ dự án đã xem 10 ảnh 03–12 và **PASS tất cả phần còn lại trừ yêu cầu cải tiến chuông**; 10 màn ghi nhận OWNER_APPROVED_CONDITIONAL_BELL_POLISH.  Dùng poster `docs/admin-ui-reference/admin-mobile-reference.png` và ảnh Preview mới `artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/<screen>.png`; thêm PC 1440×900 khi phù hợp.
 - Chính xác 2/12 được chấp thuận, không đồng nghĩa sản phẩm hoàn thành 100%; không tự duyệt 10 màn còn lại, không tự suy đoán giao diện tối hoặc phiên bản khác được duyệt.
 
 ## Việc tiếp theo
 
 1. Xác minh HEAD/PR/Actions thực tế.
-2. Trình bộ ảnh đối chiếu màn 03–12 trực tiếp trong chat cho người dùng xem và ra quyết định **một lần**.
+2. Chạy exact-SHA CI + Admin Preview deploy/Playwright + screenshot mới mobile/PC sáng tối; kiểm tra chuông và badge, không tự nâng phần chuông thành PASS nếu không có bằng chứng.
 3. Sau quyết định của chủ dự án, ghi chính xác màn nào được duyệt và sửa màn chưa đạt; chạy CI/Preview/ảnh chụp trước khi yêu cầu duyệt lại.
 
 ---

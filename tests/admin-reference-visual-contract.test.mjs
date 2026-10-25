@@ -53,4 +53,24 @@ assert.ok(src.includes('#logout:focus-visible') && src.includes('#logout:hover')
   'Logout control must have keyboard focus and hover states');
 assert.ok(!src.includes('#logout::before{content:"↗"'),
   'No responsive logout layout may reintroduce the arrow icon');
+// Owner-requested topbar bell polish: visual-only, shared across mobile/PC and both themes.
+const bellStart=src.indexOf('id="notificationToggle"');
+const bellMarkup=bellStart<0?'':src.slice(bellStart,src.indexOf('</button>',bellStart)+9);
+assert.match(bellMarkup,/aria-label="Thông báo"/,'Bell must retain accessible name');
+assert.match(bellMarkup,/aria-expanded="false" aria-controls="notificationPanel"/,
+  'Bell must retain expanded state and notification panel association');
+assert.match(bellMarkup,/class="bell-icon"/,'Notification action must retain its bell SVG');
+assert.match(bellMarkup,/focusable="false" aria-hidden="true"/,
+  'Decorative icon cannot add a keyboard stop or accessible duplicate');
+assert.match(bellMarkup,/id="notificationCount"/,
+  'Bell must retain its live unread count badge');
+for(const selector of ['SD_ADMIN_BELL_POLISH_2026_10_25',
+ '#notificationToggle:hover','#notificationToggle:focus-visible',
+ '#notificationToggle[aria-expanded="true"]',
+ ':root[data-admin-theme="dark"] #notificationToggle',
+ ':root[data-admin-theme="dark"] #notificationToggle .notif-count',
+ '@media(prefers-reduced-motion:reduce){#notificationToggle']){
+ assert.ok(src.includes(selector),'Missing accessible bell visual treatment: '+selector);
+}
+console.log('PASS: Gold glass notification bell retains unread count, light/dark, keyboard focus and click semantics.');
 console.log('PASS: Admin reference-inspired mobile skin covers 12 screens, retains business controls, dark mode and narrow/mobile accessibility.');
