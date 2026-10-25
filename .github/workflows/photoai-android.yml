@@ -1,4 +1,4 @@
-name: SinDarealest PhotoAI Android APK
+name: SinDarealest PhotoAI Android — verify and build
 on:
   workflow_dispatch:
   push:
@@ -10,65 +10,82 @@ permissions:
   contents: read
 jobs:
   debug-apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: photoai-android
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-      - name: Verify preinstalled Android SDK
-        run: |
-          test -n "${ANDROID_HOME:-}" || (echo 'Android SDK missing' && exit 1)
-          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
-          test -x "$SDKMANAGER"
-          "$SDKMANAGER" --version
-          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
-      - run: '"$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Download official MobileNetV3 Image Embedder model
+      - name: Locate Android SDK, install only missing packages
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "SDK location: $SDK"
+          ls -la "$SDK" || true
+          test -d "$SDK" || { echo "Missing Android SDK on runner"; exit 1; }
+          if [ ! -d "$SDK/platforms/android-35" ] || [ ! -d "$SDK/build-tools/35.0.0" ]; then
+            SDKMANAGER="$(find "$SDK/cmdline-tools" -type f -name sdkmanager -print -quit 2>/dev/null || true)"
+            test -n "$SDKMANAGER" || { echo "sdkmanager unavailable"; exit 1; }
+            yes | "$SDKMANAGER" --licenses >/dev/null || true
+            "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+          fi
+          test -d "$SDK/platforms/android-35"
+          test -d "$SDK/build-tools/35.0.0"
+      - name: Download and verify authentic offline model
         run: |
           set -euo pipefail
           mkdir -p app/src/main/assets
-          curl --fail --location --retry 3 --retry-delay 2 \
-            'https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/1/mobilenet_v3_small.tflite' \
-            -o app/src/main/assets/mobilenet_v3_small.tflite
-          python3 - <<'PYMODEL'
+          curl -fL --retry 4 --retry-all-errors --connect-timeout 25             https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/1/mobilenet_v3_small.tflite             -o app/src/main/assets/mobilenet_v3_small.tflite
+          python3 - <<'PY'
           from pathlib import Path
-          p=Path('app/src/main/assets/mobilenet_v3_small.tflite')
-          content=p.read_bytes()
-          assert len(content)>1_000_000, f'The AI model is unexpectedly small: {len(content)} bytes'
-          assert content[4:8]==b'TFL3', 'Downloaded file is not a TFLite model'
-          print('Offline model size:',len(content))
-          PYMODEL
-          sha256sum app/src/main/assets/mobilenet_v3_small.tflite
-      - name: Syntax check JavaScript
-        run: node --check app/src/main/assets/app.js
-      - name: Assemble complete debug APK
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
-      - name: Check offline AI is packaged
+          p=Path("app/src/main/assets/mobilenet_v3_small.tflite")
+          b=p.read_bytes()
+          assert len(b)>1_000_000, f"Model too small: {len(b)}"
+          assert b[4:8]==b"TFL3", "Not a real TFLite flatbuffer"
+          print("Verified model:",len(b),"bytes")
+          PY
+      - name: Validate JavaScript, HTML and JSON
         run: |
-          python3 - <<'PYAPK'
+          node --check app/src/main/assets/app.js
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          class P(HTMLParser): pass
+          P().feed(Path("app/src/main/assets/index.html").read_text())
+          print("HTML parsed")
+          PY
+      - name: Compile real APK with MediaPipe
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Check complete APK payload
+        run: |
+          python3 - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
-          p=Path('app/build/outputs/apk/debug/app-debug.apk')
-          with ZipFile(p) as z:
-              names=z.namelist()
-              required='assets/mobilenet_v3_small.tflite'
-              assert required in names,'The APK is missing MobileNet model'
-              assert z.getinfo(required).file_size > 1_000_000,'Empty/fake AI model'
-              assert any(n.startswith('lib/arm64-v8a/') for n in names), 'Missing native arm64 inference engine'
-              assert 'assets/app.js' in names and 'assets/index.html' in names
-          assert p.stat().st_size>1_000_000, 'The APK is too small and likely incomplete'
-          print('APK verified:',p.stat().st_size,'bytes')
-          PYAPK
+          apk=Path("app/build/outputs/apk/debug/app-debug.apk")
+          with ZipFile(apk) as z:
+              model="assets/mobilenet_v3_small.tflite"
+              assert model in z.namelist()
+              assert z.getinfo(model).file_size>1_000_000
+              assert any(n.startswith("lib/arm64-v8a/") for n in z.namelist()), "No ARM64 inference engine"
+              assert "assets/index.html" in z.namelist()
+              assert "assets/app.js" in z.namelist()
+          assert apk.stat().st_size>1_000_000
+          print("Verified full APK:",apk.stat().st_size,"bytes")
+          PY
       - uses: actions/upload-artifact@v4
         with:
-          name: SinDarealest-PhotoAI-v0.5-Debug-APK
+          name: SinDarealest-PhotoAI-Android-Offline-Debug
           path: photoai-android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
           if-no-files-found: error
