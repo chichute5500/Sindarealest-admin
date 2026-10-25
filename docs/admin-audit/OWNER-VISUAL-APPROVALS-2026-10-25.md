@@ -4,7 +4,7 @@
 
 Chủ dự án đã xác nhận: **“Tôi duyệt màn hình 01 Đăng nhập với giao diện Preview hiện tại.”**
 Chủ dự án xác nhận thêm ngày 25/10/2026: **“Tôi duyệt màn hình 02 Tổng quan với giao diện Preview hiện tại. Ghi nhận vào GitHub và chuyển sang màn 03 Danh sách sản phẩm.”**
-Trạng thái duyệt: **12/12 màn đã được chủ dự án đồng ý về bố cục, trong đó 10 màn (03–12) PASS có điều kiện cần làm đẹp chuông thông báo**. Màn 01–02 đã duyệt không điều kiện trước đó. Cải tiến chuông chỉ áp dụng thành phần dùng chung, chưa được coi là Preview/CI PASS khi chưa kiểm thử sau commit. Phạm vi: ảnh đã trình bày, mobile 390×844 sáng, dựa trên mẫu `docs/admin-ui-reference/admin-mobile-reference.png` và ảnh chụp thực tế từ Preview. Giữ logo SD vàng đúng thương hiệu, không đổi thành xanh theo mẫu minh họa.
+Trạng thái duyệt: **12/12 màn đã được chủ dự án DUYỆT thiết kế; điều kiện chuông thông báo đã được chủ dự án xác nhận PASS**. Màn 01–02 đã duyệt không điều kiện trước đó. Cải tiến chuông chỉ áp dụng thành phần dùng chung và đã có 10/10 GitHub Actions SUCCESS trên đúng code SHA `1f0b7fe16e809e323caa8567d230fe34b4b87014`. Phạm vi: ảnh đã trình bày, mobile 390×844 sáng, dựa trên mẫu `docs/admin-ui-reference/admin-mobile-reference.png` và ảnh chụp thực tế từ Preview. Giữ logo SD vàng đúng thương hiệu, không đổi thành xanh theo mẫu minh họa.
 
 Bằng chứng: [Live/synthetic screenshots run #40191206728](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40191206728), artifact `12598276457`, `artifacts/admin-12-screen-live/0b9395721cfd/390x844_light/01_login.png`.
 
@@ -12,18 +12,18 @@ Bằng chứng: [Live/synthetic screenshots run #40191206728](https://github.com
 |---|---|---|
 | 01 | Đăng nhập | **OWNER APPROVED** (Preview 390×844 sáng, 0b939572) |
 | 02 | Tổng quan | **OWNER APPROVED** (Preview mobile 390×844 sáng và desktop 1440×900 sáng, code ab46d353) |
-| 03 | Danh sách sản phẩm | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 04 | Chỉnh sửa sản phẩm | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 05 | Gallery | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 06 | Đơn hàng | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 07 | Chi tiết đơn hàng | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 08 | Khách hàng | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 09 | Bảo hành / Hỗ trợ | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 10 | Cài đặt Website | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 11 | Sao lưu / Khôi phục | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
-| 12 | Nhật ký hoạt động | OWNER APPROVED — CÓ ĐIỀU KIỆN: đẹp hơn chuông thông báo |
+| 03 | Danh sách sản phẩm | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 04 | Chỉnh sửa sản phẩm | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 05 | Gallery | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 06 | Đơn hàng | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 07 | Chi tiết đơn hàng | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 08 | Khách hàng | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 09 | Bảo hành / Hỗ trợ | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 10 | Cài đặt Website | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 11 | Sao lưu / Khôi phục | **OWNER APPROVED** — đã PASS chuông thông báo |
+| 12 | Nhật ký hoạt động | **OWNER APPROVED** — đã PASS chuông thông báo |
 
-**Tiếp theo:** xác minh UI chuông thông báo mới trên mobile/PC sáng/tối và CI; 10 màn còn lại đã được chủ dự án PASS ngoại trừ yêu cầu làm đẹp chuông dùng chung.
+**Tiếp theo:** kiểm tra các điều kiện nghiệm thu kỹ thuật/tích hợp còn lại riêng biệt. Thiết kế 12/12 màn hình và chuông thông báo đã OWNER APPROVED; không đồng nghĩa toàn bộ hệ thống đủ điều kiện merge hoặc Production.
 
 Chấp thuận màn 01 không tự động chấp thuận các kích thước, màu tối hoặc commit giao diện về sau. Không merge PR #111, không thay đổi main/Storefront/Production.
 
@@ -47,3 +47,12 @@ Chủ dự án xác nhận **“Sửa lại chuông thông báo đẹp hơn còn
 - **PASS có điều kiện 10 màn 03–12**: bố cục và các phần khác được chủ dự án chấp thuận; riêng chuông thông báo cần được làm đẹp trên mobile/PC và sáng/tối.
 - Đã sửa trong code cùng đợt: chuông nét tinh tế, màu vàng thương hiệu, nền glass, viền/hover/focus, chấm số lượng chưa đọc đỏ; giữ nguyên ID/handlers/ARIA và chức năng.
 - **Vẫn chờ bằng chứng CI và Preview mới tại SHA chính xác** trước khi kết luận phần chuông đã nghiệm thu kỹ thuật; ảnh đã duyệt 03–12 là phiên bản trước chỉnh chuông. Không tự tuyên bố 100% hoàn tất dự án.
+
+## Chủ dự án duyệt chuông thông báo — 25/10/2026
+
+Sau khi được xác nhận rằng chuông có hiển thị **số lượng chưa đọc** và mô tả cách cập nhật/đánh dấu đã đọc, chủ dự án trả lời nguyên văn **“Pass”**. Điều kiện duyệt gộp màn 03–12 được coi là đã hoàn thành ở phạm vi giao diện/chức năng chuông đã trình bày. Duyệt trên mô tả và kiểm tra nguồn/CI; không khẳng định đã xem và duyệt từng pixel của ảnh phiên bản mới.
+
+- Source và Admin Preview deploy đã qua CI: [`1f0b7fe16e809e323caa8567d230fe34b4b87014`](https://github.com/chichute5500/Sindarealest-admin/commit/1f0b7fe16e809e323caa8567d230fe34b4b87014).
+- **10/10 GitHub Actions SUCCESS** trên SHA này: Validate ×2, Admin Preview Playwright, isolated Preview Playwright ×2, isolated Preview Deploy [#40200290452](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40200290452), WCAG axe [#40200290427](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40200290427), diagnostics, 12-screen visual evidence [#40200290474](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40200290474) artifact `12600964216`, synthetic D1 QA.
+- Ứng dụng có badge số chưa đọc, ẩn khi 0, cho đánh dấu đã đọc và polling định kỳ trong phiên Admin; không hứa push realtime khi app đã đóng. Giữ nguyên logo SD vàng, màn đã duyệt, chức năng và dữ liệu.
+- **Phạm vi OWNER VISUAL ACCEPTED: 12/12**. Không thay thế nghiệm thu an ninh, nghiệp vụ, kế toán, hiệu năng, điều kiện tích hợp hoặc cho phép merge/Production.

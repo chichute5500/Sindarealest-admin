@@ -1,21 +1,20 @@
 # PROMPT BÀN GIAO — SINDAREALEST ADMIN (25/10/2026)
 
-Tiếp tục trực tiếp dự án SinDarealest Admin trên GitHub. Chỉ sửa nhánh `feature/admin-isolated-handoff-2026-10-20`. PR #111 OPEN, không merge, không thay đổi main/Storefront PR #108/Production, không tích hợp Admin với website. Giữ logo SD vàng chính thức.
+Repository: `chichute5500/Sindarealest-admin`; writable branch: `feature/admin-isolated-handoff-2026-10-20`; PR #111 OPEN, **KHÔNG MERGE, không sửa main, PR #108, Storefront hay Production**, không tích hợp với website nếu chủ dự án chưa cấp phép. Giữ logo SD vàng.
 
-## TRẠNG THÁI MỚI: 12/12 MÀN OWNER PASS VỀ BỐ CỤC; 10 MÀN 03–12 CÓ ĐIỀU KIỆN CHUÔNG THÔNG BÁO
+## TRẠNG THÁI CHÍNH THỨC: OWNER ĐÃ PASS THIẾT KẾ 12/12
 
-Chủ dự án đã nói: **“Sửa lại chuông thông báo đẹp hơn còn lại pass”**. Đã chỉnh chuông dùng chung PC/mobile trong `public/admin/index.html` (SVG bell-ring, vàng gold, glass, unread đỏ, dark mode, focus-visible và motion-safe). BỔ SUNG kiểm thử tĩnh tương ứng. **Phải xem GitHub CI, deploy Preview và ảnh mới đúng SHA trước khi kết luận chuông đã nghiệm thu kỹ thuật.** Không tự công bố 100% toàn dự án. Màn 01–02 vẫn duyệt như cũ.
+- Màn 01 Đăng nhập, 02 Tổng quan đã duyệt riêng trước đó.
+- Màn 03–12 đã được chủ dự án nói **“Sửa lại chuông thông báo đẹp hơn còn lại pass”**. Sau khi thay chuông dùng chung bằng thiết kế vàng gold/glass, badge đỏ hiển thị số chưa đọc và giải thích chức năng, chủ dự án nói nguyên văn **“Pass”**. Điều kiện được xác nhận hoàn thành. Duyệt trên mô tả và chức năng, không suy diễn đã quan sát pixel-by-pixel ảnh màn mới.
+- Code chuông `1f0b7fe16e809e323caa8567d230fe34b4b87014`: **10/10 GitHub Actions SUCCESS** trên đúng SHA, bao gồm Deploy Admin Preview #40200290452, WCAG axe #40200290427, 12-screen #40200290474 artifact #12600964216, các Validate, Playwright, diagnostics và isolated synthetic D1.
+- Chủ dự án đã duyệt **12/12 giao diện** (owner signoff). **KHÔNG đồng nghĩa 100% toàn bộ hệ thống đủ phát hành**, không chứng minh ảnh pixel-perfect với mẫu, hoặc các cổng release độc lập hoàn tất.
+- Hồ sơ: `docs/admin-audit/OWNER-VISUAL-APPROVALS-2026-10-25.md` và `docs/admin-audit/audit-status-2026-10-25.json`.
 
-- Màn 01 — Đăng nhập: **OWNER APPROVED**, đã chấp thuận trước đó; giữ nguyên.
-- Màn 02 — Tổng quan: **OWNER APPROVED ngày 25/10/2026**, sau khi xem so sánh ảnh mobile 390×844 sáng và PC 1440×900 sáng từ Admin Preview mã `ab46d35311ab1ef7fb2f95428401076c70325ce7`. Đã sửa 2 lỗi tiêu đề lặp và logout arrow thành nút nguồn đỏ. Exact code SHA có 10/10 Actions PASS. Evidence run #40194565226, artifact #12599625737.
-- Chủ dự án đã xem 10 ảnh 03–12 và **PASS tất cả phần còn lại trừ yêu cầu cải tiến chuông**; 10 màn ghi nhận OWNER_APPROVED_CONDITIONAL_BELL_POLISH.  Dùng poster `docs/admin-ui-reference/admin-mobile-reference.png` và ảnh Preview mới `artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/<screen>.png`; thêm PC 1440×900 khi phù hợp.
-- Chính xác 2/12 được chấp thuận, không đồng nghĩa sản phẩm hoàn thành 100%; không tự duyệt 10 màn còn lại, không tự suy đoán giao diện tối hoặc phiên bản khác được duyệt.
+## CẦN LÀM TIẾP
 
-## Việc tiếp theo
-
-1. Xác minh HEAD/PR/Actions thực tế.
-2. Chạy exact-SHA CI + Admin Preview deploy/Playwright + screenshot mới mobile/PC sáng tối; kiểm tra chuông và badge, không tự nâng phần chuông thành PASS nếu không có bằng chứng.
-3. Sau quyết định của chủ dự án, ghi chính xác màn nào được duyệt và sửa màn chưa đạt; chạy CI/Preview/ảnh chụp trước khi yêu cầu duyệt lại.
+1. Reverify HEAD/PR #111/CI trước khi sửa; phân biệt SHA code chuông đã deploy với các commit tài liệu sau.
+2. Kiểm tra các cổng kỹ thuật/tiền tích hợp còn lại, bổ sung bằng chứng, không chạm Production hay Storefront Preview đang dùng chung tài nguyên Production.
+3. Không yêu cầu duyệt lại 12 màn trừ khi thay đổi giao diện đáng kể; không auto-merge hoặc tích hợp.
 
 ---
 

@@ -17,7 +17,7 @@
   ],
   "visualParityAccepted": 0,
   "visualParityTotal": 12,
-  "ownerAcceptance": "NOT_GRANTED",
+  "ownerAcceptance": "OWNER_VISUAL_DESIGN_APPROVED_12_OF_12_NOT_RELEASE_APPROVAL",
   "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge.",
   "latestVerifiedCodeAndTestSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
   "latestChanges": [
@@ -159,7 +159,7 @@
   "latestOwnerInstruction": "Continue to fix all Admin issues, but DO NOT integrate or merge the Storefront",
   "cloudflareBindingLastVerifiedByRun": 40167641001,
   "cloudflareImageBindingHistoricalGapResolved": true,
-  "ownerAcceptedScreenCount": 1,
+  "ownerAcceptedScreenCount": 12,
   "acceptanceEvidenceWeight": 32,
   "completionPercentNotEstablished": true,
   "handoffDocument": "docs/admin-ui-reference/handoff/CURRENT-CHECKPOINT-2026-10-25.md",
@@ -291,7 +291,7 @@
       "screenNumber": 3,
       "screenId": "03_product_list",
       "name": "Danh sách sản phẩm",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -301,13 +301,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/03_product_list.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 4,
       "screenId": "04_product_editor",
       "name": "Thêm / chỉnh sửa sản phẩm",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -317,13 +320,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/04_product_editor.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 5,
       "screenId": "05_product_gallery",
       "name": "Hình ảnh sản phẩm",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -333,13 +339,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/05_product_gallery.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 6,
       "screenId": "06_orders",
       "name": "Đơn hàng",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -349,13 +358,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/06_orders.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 7,
       "screenId": "07_order_detail",
       "name": "Chi tiết đơn hàng",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -365,13 +377,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/07_order_detail.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 8,
       "screenId": "08_customers",
       "name": "Khách hàng",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -381,13 +396,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/08_customers.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 9,
       "screenId": "09_warranty_support",
       "name": "Bảo hành / hỗ trợ",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -397,13 +415,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/09_warranty_support.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 10,
       "screenId": "10_website_settings",
       "name": "Cài đặt Website",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -413,13 +434,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/10_website_settings.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 11,
       "screenId": "11_backup_restore",
       "name": "Sao lưu / khôi phục",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -429,13 +453,16 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/11_backup_restore.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     },
     {
       "screenNumber": 12,
       "screenId": "12_activity_log",
       "name": "Nhật ký hoạt động",
-      "status": "OWNER_APPROVED_CONDITIONAL_BELL_POLISH",
+      "status": "OWNER_APPROVED",
       "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
       "environment": "Admin isolated Preview",
       "viewport": "390x844",
@@ -445,17 +472,22 @@
       "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/12_activity_log.png",
       "approvedOn": "2026-10-25",
       "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-      "scopeNote": "Screen body/layout approved; shared notification bell update must pass new Preview visual check and CI. Future unreviewed versions/themes not automatically approved."
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
     }
   ],
   "lastOwnerVisualAcceptance": {
     "accepted": 12,
-    "unconditionalAccepted": 2,
-    "conditionalAccepted": 10,
+    "unconditionalAccepted": 12,
+    "conditionalAccepted": 0,
     "total": 12,
-    "approvedAppSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+    "approvedAppSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
     "nextScreen": null,
-    "status": "BELL_POLISH_PREVIEW_QA_PENDING"
+    "status": "OWNER_APPROVED_12_OF_12_DESIGN_SCOPE",
+    "approvedOn": "2026-10-25",
+    "approvalEvidence": "User replied Pass after notification bell details and prior conditional acceptance"
   },
   "screen02VisualReview": {
     "screen": 2,
@@ -472,16 +504,28 @@
   },
   "remainingVisualReview": {
     "screens": [],
-    "state": "BELL_POLISH_QA_PENDING",
-    "issue": "Notification bell needs improved aesthetics on mobile/desktop, light/dark; main 10 screens owner-passed conditionally.",
-    "visualArtifactId": 12599625737
+    "state": "NO_OWNER_DESIGN_APPROVAL_PENDING",
+    "note": "12/12 design accepted; separate engineering and release gates remain"
   },
   "notificationBellPolish": {
     "ownerFeedback": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
-    "status": "CODE_CHANGED_PENDING_CI_AND_PREVIEW",
+    "status": "OWNER_APPROVED_WITH_EXACT_SHA_CI_DEPLOY_PASS",
     "scope": "SHARED_ADMIN_TOPBAR_ONLY",
     "styles": "brand gold, subtle glass, red unread count, hover/focus, responsive, dark theme",
     "businessLogicChanged": false,
-    "productionTouched": false
-  }
+    "productionTouched": false,
+    "ownerApprovalText": "Pass",
+    "ownerApprovedOn": "2026-10-25",
+    "sourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+    "visualRunId": 40200290474,
+    "visualArtifactId": 12600964216,
+    "deployRunId": 40200290452,
+    "accessibilityRunId": 40200290427,
+    "ciPasses": 10,
+    "ciTotal": 10,
+    "releaseAuthorized": false
+  },
+  "ownerVisualDesignApproved": true,
+  "remainingTechnicalReleaseGatesStatus": "NOT_FULLY_ACCEPTED_DO_NOT_MERGE_OR_DEPLOY_PRODUCTION",
+  "ownerBellApprovalScope": "Owner affirmed bell behavior/design as described; no claim of independent pixel-by-pixel owner inspection of latest bell screenshots"
 }

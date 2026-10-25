@@ -1,3 +1,7 @@
+> **CHECKPOINT CHÍNH THỨC 25/10/2026 — 12/12 MÀN OWNER APPROVED**: Người dùng đã duyệt 01–02 và nói “Sửa lại chuông thông báo đẹp hơn còn lại pass” cho 03–12; sau khi xác nhận chuông thông báo có badge số lượng chưa đọc, người dùng trả lời “Pass”, chốt điều kiện duyệt 03–12. Source `1f0b7fe16e809e323caa8567d230fe34b4b87014`, **10/10 workflows SUCCESS**, Deploy Admin Preview #40200290452, WCAG #40200290427, ảnh #40200290474/artifact #12600964216. Đây là nghiệm thu GIAO DIỆN, không có nghĩa project/Production release 100%; PR #111 OPEN, main/Storefront/Production không chỉnh. Các phần lịch sử dưới chứa trạng thái trước thời điểm này.
+
+---
+
 > **CHECKPOINT 25/10/2026 — CHỦ DỰ ÁN ĐÃ DUYỆT 2/12**: Màn 01 Đăng nhập và màn 02 Tổng quan **OWNER APPROVED**. Màn 02 được duyệt trên Preview `ab46d35311ab1ef7fb2f95428401076c70325ce7`, evidence run #40194565226, artifact #12599625737, sau khi sửa hai lỗi tiêu đề và nút đăng xuất. Chủ dự án yêu cầu trình cùng lúc 10 màn 03–12 để duyệt một lần; chưa màn nào trong 03–12 được duyệt. PR #111 chưa merge; không chỉnh main/Storefront/Production. Lưu ý các dòng lịch sử phía dưới có trạng thái cũ chưa cập nhật.
 
 ---
