@@ -42,7 +42,7 @@ try{
   // Expose only SQL error codes/messages from disposable D1 for test diagnosis.
   // The real handler intentionally hides database details from HTTP clients.
   const tracedDB={
-    prepare:(...args)=>DB.prepare(...args),
+    prepare:(...args)=>{try{return DB.prepare(...args)}catch(e){console.error('[LOCAL_D1_PREPARE_ERROR]',String(args[0]).slice(0,110),String(e?.message||e));throw e}},
     async batch(statements){
       try{return await DB.batch(statements)}
       catch(error){console.error('[LOCAL_DISPOSABLE_D1_SQL_ERROR]',String(error?.message||error));throw error}
