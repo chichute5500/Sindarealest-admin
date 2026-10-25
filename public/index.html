@@ -655,6 +655,73 @@ html:not(.dark){--sd-icon-glass-bg:rgba(255,255,255,.46);--sd-icon-glass-bg-hove
 #sdFullscreenViewer .sd-fullscreen-image.sd-no-transition{transition:none!important;animation:none!important}
 @media(prefers-reduced-motion:reduce){#sdFullscreenViewer .sd-fullscreen-image{transition:none!important}}
 </style>
+<style id="sd-welcome-desktop-mobile-performance-2026-10-25">
+/* 2026-10-25: Dedicated desktop/phone welcome layout. Splash must fill the
+   physical browser viewport, without the double scrollbar in desktop Chrome.
+   This scope does NOT alter locked Hero, product gallery or the Admin UI. */
+html:has(body.welcome-active){overflow:hidden!important;scroll-behavior:auto!important}
+body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important}
+#welcomeSplash{
+  position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;
+  inset:0!important;width:100vw!important;min-width:100vw!important;
+  max-width:none!important;height:100dvh!important;max-height:100dvh!important;
+  margin:0!important;padding:clamp(10px,2vh,22px)!important;
+  display:grid!important;place-items:center!important;overflow:hidden!important;
+  transform:none!important;transition:opacity .30s ease,visibility .30s ease!important;
+}
+#welcomeSplash.is-leaving{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+#welcomeSplash .welcome-content{
+  min-width:0!important;max-width:100%!important;
+  max-height:calc(100dvh - 24px)!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  scrollbar-width:none!important;overscroll-behavior:contain;
+  animation:sdWelcomeLite .36s ease-out both!important;
+  will-change:auto!important;
+}
+#welcomeSplash .welcome-content::-webkit-scrollbar{display:none}
+@keyframes sdWelcomeLite{from{opacity:.65;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#welcomeSplash .welcome-content>*{animation:none!important;filter:none!important}
+#welcomeSplash .welcome-logo{filter:none!important}
+#welcomeSplash .welcome-texture{filter:none!important;transform:none!important;transition:none!important}
+#welcomeSplash .welcome-loader i{animation:welcomeLoading 1.9s linear infinite!important}
+@media(min-width:761px){
+  #welcomeSplash .welcome-content{
+    width:min(82vw,660px)!important;max-width:660px!important;
+    padding:clamp(12px,2.3vh,23px) clamp(16px,3vw,32px)!important;
+    overflow-y:hidden!important;
+  }
+  #welcomeSplash .welcome-logo{width:min(22vw,200px)!important;max-height:175px!important}
+  #welcomeSplash .welcome-title{font-size:clamp(27px,2.6vw,36px)!important;line-height:1.16!important}
+  #welcomeSplash .welcome-overline{font-size:8px!important}
+  #welcomeSplash .welcome-points{gap:7px!important}
+}
+@media(min-width:761px) and (max-height:740px){
+  #welcomeSplash .welcome-content{padding:7px 16px!important}
+  #welcomeSplash .welcome-rule{margin-bottom:6px!important}
+  #welcomeSplash .welcome-logo{width:min(18vw,135px)!important;max-height:125px!important}
+  #welcomeSplash .welcome-tagline{margin-top:5px!important}
+  #welcomeSplash .welcome-title{font-size:clamp(25px,2.3vw,30px)!important;margin:7px 0 5px!important}
+  #welcomeSplash .welcome-content p{font-size:12px!important;line-height:1.4!important;margin:7px 0 8px!important}
+  #welcomeSplash .welcome-points{margin:0 0 4px!important;gap:5px!important}
+  #welcomeSplash .welcome-points span{min-height:25px!important;padding:4px 8px!important}
+  #welcomeSplash .welcome-loader{margin-top:5px!important}
+  #welcomeSplash .welcome-skip{min-height:34px!important;margin-top:8px!important}
+}
+@media(max-width:760px){
+  #welcomeSplash{padding:8px!important}
+  #welcomeSplash .welcome-content{
+    width:min(94vw,420px)!important;max-width:420px!important;
+    max-height:calc(100dvh - 16px)!important;
+    overflow-y:auto!important;padding:12px 11px!important;
+  }
+  #welcomeSplash .welcome-logo{width:min(50vw,178px)!important;max-height:155px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #welcomeSplash .welcome-content{animation:none!important}
+  #welcomeSplash .welcome-loader i{animation:none!important}
+  #welcomeSplash{transition-duration:.01ms!important}
+}
+</style>
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -730,7 +797,7 @@ html:not(.dark){--sd-icon-glass-bg:rgba(255,255,255,.46);--sd-icon-glass-bg-hove
     window.setTimeout(function(){
       if(s&&s.parentNode)s.parentNode.removeChild(s);
       document.body.classList.remove('welcome-active');
-    },900);
+    },360);
   }
   window.__sdDismissWelcome=dismiss;
   if(skip)skip.addEventListener('click',dismiss);
@@ -738,7 +805,7 @@ html:not(.dark){--sd-icon-glass-bg:rgba(255,255,255,.46);--sd-icon-glass-bg-hove
   document.addEventListener('focusin',keepFocusInside,true);
   if(skip)skip.focus({preventScroll:true});
   var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(dismiss,reduced?500:2500);
+  window.setTimeout(dismiss,reduced?220:1450);
   fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
     if(!c)return;
     if(c.welcomeEnabled===false)dismiss();
