@@ -54,7 +54,7 @@ for (const {width,height,theme} of matrix) {
         await page.waitForTimeout(220);
         const m=await page.evaluate(captureContainer=>{
           const de=document.documentElement;
-          const target=document.querySelector(captureContainer==='#backdrop' ? '#backdrop' : '#main');
+          const target=document.querySelector(captureContainer==='#backdrop' ? '#backdrop' : captureContainer==='#loginView' ? '#loginView' : '#main');
           const interactive=target?[...target.querySelectorAll('button,input,select,textarea,a[href]')]:[];
           return {documentWidth:de.scrollWidth,viewportWidth:innerWidth,horizontalOverflow:de.scrollWidth>innerWidth+2,
             unlabeledInteractive:interactive.filter(el=>{
