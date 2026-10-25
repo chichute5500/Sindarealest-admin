@@ -56,7 +56,7 @@ try{
   assert.ok(data.btn.left>=data.hero.left-3&&data.btn.right<=data.hero.right+3,name+' CTA inside hero');
   assert.ok(data.shoeSrc.includes('tb_image_share_1792519964514'),name+' distinct transparent product PNG');
   assert.deepEqual(data.shoeNatural,[1200,1600]);
-  assert.ok(data.pedestalBg.includes('ai-marble-pedestal.webp'),name+' independent marble pedestal');
+  assert.ok(data.pedestalBg.includes('marble-shelf-v14.svg'),name+' independent marble pedestal');
   assert.ok(!data.background.includes('hero-reference-'),name+' must not use full banner as background');
   assert.ok(data.overflowWidth<12,name+' no page horizontal overflow');
   const png=out+'/'+name+'-'+theme+'.png';
