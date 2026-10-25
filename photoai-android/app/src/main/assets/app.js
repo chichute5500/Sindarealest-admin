@@ -6,6 +6,7 @@ const $=id=>document.getElementById(id);
 const native=typeof window.Native!=='undefined';
 const empty=()=>({schema:1,rootName:'',rootUri:'',photos:[],models:[],expanded:[],checked:{}});
 let s=empty(),active=null,chosen=new Set(),tab='tree',take=60,history=[],search='',busy=false,callback=null,dragging=null;
+let projectRevision=0, analysisRevision=null;
 const SETTINGS_KEY='sindarealest-photoai-settings-v2';
 const defaultSettings=()=>({aiEnabled:true,mode:'local',cloudEndpoint:'',cloudConsent:false});
 let settings=defaultSettings(),sessionToken='';
@@ -20,7 +21,7 @@ const norm=x=>(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/�
 const id=()=>('M'+Math.random().toString(36).slice(2,10));
 function notify(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(notify.t);notify.t=setTimeout(()=>el.classList.remove('show'),3000)}
 function remember(){history.push(JSON.stringify({photos:s.photos,models:s.models,checked:s.checked,expanded:s.expanded}));if(history.length>25)history.shift()}
-function autosave(){if(native){window.Native.saveState(JSON.stringify(s))}else{try{localStorage.setItem('sindarealest-photoai-project',JSON.stringify(s))}catch(e){console.warn(e)}}}
+function autosave(){projectRevision++;if(native){window.Native.saveState(JSON.stringify(s))}else{try{localStorage.setItem('sindarealest-photoai-project',JSON.stringify(s))}catch(e){console.warn(e)}}}
 function load(json){try{const v=typeof json==='string'?JSON.parse(json):json;if(!v||!Array.isArray(v.photos)||!Array.isArray(v.models))return;s={...empty(),...v};history=[];chosen.clear();active=null;render();notify('Đã mở dự án đã lưu')}catch(e){notify('Không mở được dự án: '+e.message)}}
 function countReview(){return s.photos.filter(p=>{const m=modelById(p.modelId);return !m?.verified||m.priceVnd===null||m.priceVnd===undefined||p.color==='Chưa rõ'}).length}
 function selection(){return s.photos.filter(p=>chosen.has(p.id))}
@@ -152,7 +153,7 @@ const body=`<p>Chế độ: <b>${escapeHtml(modeText())}</b>. Quét toàn bộ �
 (settings.mode==='cloud'||(settings.mode==='hybrid'&&settings.cloudConsent&&settings.cloudEndpoint)?'<p>Ảnh thu nhỏ sẽ được gửi đến dịch vụ HTTPS bạn cấu hình sau khi bạn xác nhận.</p>':'')+
 '<div class="progress"><div id="analysisBar"></div></div><p id="analysisInfo">Đang chuẩn bị...</p>';
 modal('Xác nhận phân nhóm',body,()=>{
-    $('modalConfirm').disabled=true;setBusy(true);
+    $('modalConfirm').disabled=true;analysisRevision=projectRevision;setBusy(true);
     const req={photos:eligible.map(p=>({id:p.id,name:p.name,category:p.category})),rootUri:s.rootUri,
       mode:settings.mode,cloudEndpoint:settings.cloudEndpoint,cloudToken:sessionToken,cloudConsent:settings.cloudConsent};
     if(native)window.Native.analyze(JSON.stringify(req));else{notify('Môi trường thử giao diện không có mô hình AI.');setBusy(false);hideModal()}
@@ -162,6 +163,8 @@ function onProgress(done,total){const bar=$('analysisBar');if(bar)bar.style.widt
 function onAnalysis(result){setBusy(false);$('modalConfirm').disabled=false;hideModal();try{
 const data=typeof result==='string'?JSON.parse(result):result;
 if(data.error)throw Error(data.error);
+if(!settings.aiEnabled)throw Error('AI đã bị tắt. Kết quả cũ không được áp dụng.');
+if(analysisRevision!==null && analysisRevision!==projectRevision)throw Error('Dự án đã thay đổi trong lúc AI phân tích. Không ghi đè dữ liệu mới.');
 if(!Array.isArray(data.photos)||!Array.isArray(data.models))throw Error('Dữ liệu kết quả không hợp lệ');
 const mutable=s.photos.filter(p=>!modelById(p.modelId)?.verified),mutableIds=new Set(mutable.map(p=>p.id));
 const suggestions=new Map();
@@ -223,7 +226,7 @@ function updateModeLabel(){$('aiModeLabel').textContent=modeText();$('analyzeBtn
 $('menuBtn').onclick=settingsModal;$('modeOpenBtn').onclick=settingsModal;
 $('browserFolder').addEventListener('change',e=>browserFiles([...e.target.files]));
 window.PhotoApp={onImported,onProgress,onAnalysis,onExportUpdate,load,render};
-window.__PhotoTest={demo,state:()=>s,select:id=>{chosen.add(id);renderGallery()},movePhotos,handleDrop,undo:doUndo,search:q=>{search=q;$('searchInput').value=q;renderGallery()},setActive,mergeModels};
+window.__PhotoTest={demo,state:()=>s,select:id=>{chosen.add(id);renderGallery()},movePhotos,handleDrop,undo:doUndo,search:q=>{search=q;$('searchInput').value=q;renderGallery()},setActive,mergeModels,markAIStarted:()=>{analysisRevision=projectRevision},revision:()=>projectRevision};
 if(native){try{const saved=window.Native.loadState();if(saved)load(saved);else render()}catch(e){render()}}else{const saved=localStorage.getItem('sindarealest-photoai-project');if(saved)load(saved);else render();if(new URLSearchParams(location.search).has('demo'))demo()}
 updateModeLabel();
 })();
