@@ -377,6 +377,11 @@ try {
           const maxToeInset=m.viewport.width<=390?34:40;
           if (!Number.isFinite(toeInset)||toeInset<-5||toeInset>maxToeInset)
             fail('Front shoe toe protrudes beyond the marble rim or loses grounded contact: inset '+toeInset.toFixed(1)+'px');
+          // Source WebP contains its solid stone lip between x≈143 and x≈1063.
+          // On mobile that rightmost stone edge must be completely visible,
+          // not cut by the browser screen boundary as in the prior version.
+          if(m.viewport.width<=390 && p.left + p.width*(1063/1200) > m.viewport.width+2)
+            fail('The marble podium right edge is clipped on mobile.');
           if (s.left < p.left+p.width*.07 || s.right > p.right-p.width*.03)
             fail('Shoe silhouette extends outside the AI plinth footprint.');
           if (p.left+p.width*.15 < -24 || p.right-p.width*.15 > m.viewport.width+24)
