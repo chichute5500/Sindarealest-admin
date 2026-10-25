@@ -1362,13 +1362,13 @@ function flyProductCardToCart(sourceElement,productId){
  clone.className='sd-fly-to-cart-clone';clone.setAttribute('aria-hidden','true');clone.setAttribute('inert','');
  clone.dataset.productId=String(productId||'');
  clone.dataset.sourceType=sourceElement.classList.contains('product-card')?'product-card':'detail-image';
- clone.dataset.cartTargetId=target.id;clone.dataset.durationMs='1100';clone.dataset.flightProgress='0';
+ clone.dataset.cartTargetId=target.id;clone.dataset.durationMs='900';clone.dataset.flightProgress='0';
  clone.style.left=sourceRect.left+'px';clone.style.top=sourceRect.top+'px';
  clone.style.width=sourceRect.width+'px';clone.style.height=sourceRect.height+'px';
  clone.style.opacity='1';clone.style.transform='translate3d(0,0,0) scale(1)';
  clone.appendChild(snapshot);document.body.appendChild(clone);
  const centerX=sourceRect.left+sourceRect.width/2,centerY=sourceRect.top+sourceRect.height/2;
- const duration=1100,distance=Math.hypot(destRect.left+destRect.width/2-centerX,destRect.top+destRect.height/2-centerY);
+ const duration=900,distance=Math.hypot(destRect.left+destRect.width/2-centerX,destRect.top+destRect.height/2-centerY);
  const arc=Math.min(100,Math.max(24,distance*.095)),started=performance.now();
  let frame=0,done=false;
  const cleanup=confirm=>{
@@ -1387,7 +1387,7 @@ function flyProductCardToCart(sourceElement,productId){
   const eased=raw*raw*(3-2*raw);
   const dx=(rect.left+rect.width/2-centerX)*eased;
   const dy=(rect.top+rect.height/2-centerY)*eased-Math.sin(Math.PI*raw)*arc;
-  const scale=1-.84*eased,opacity=raw<.76?1:1-.78*((raw-.76)/.24);
+  const scale=1-.84*eased,opacity=raw<.76?1:1-.63*((raw-.76)/.24);
   clone.dataset.flightProgress=raw.toFixed(3);clone.dataset.cartTargetId=live.id;
   clone.style.transform='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+scale.toFixed(3)+')';
   clone.style.opacity=opacity.toFixed(3);

@@ -84,7 +84,7 @@ try{
    });
    assert.equal(start.sourceType,'product-card','The complete card must be the flight source');
    assert.equal(start.cartTargetId,expectedTarget,'Landing control must match active viewport cart');
-   assert.equal(start.duration,1100,'Flight is deliberately slower (1.1s)');
+   assert.equal(start.duration,900,'Flight is 0.9s as requested');
    assert.ok(Math.abs(start.x-initial.x)<12&&Math.abs(start.y-initial.y)<12,
       'Flight must originate at actual card top-left, not the plus button or image center');
    assert.ok(Math.abs(start.width-initial.width)<2&&Math.abs(start.height-initial.height)<2,

@@ -79,10 +79,11 @@ assert.ok(html.includes('function activeCartFlightTarget()') &&
 assert.ok(html.includes("const snapshot=sourceElement.cloneNode(true)") &&
  html.includes("clone.appendChild(snapshot)"),
  'Flight duplicates the entire clicked product tile including photo and information.');
-assert.ok(html.includes("clone.dataset.durationMs='1100'") &&
- html.includes("const duration=1100"),
- 'The flight is longer and readable at 1.1 seconds.');
+assert.ok(html.includes("clone.dataset.durationMs='900'") &&
+ html.includes("const duration=900"),
+ 'The full product card now flies for exactly 0.9 seconds.');
 assert.ok(html.includes("const scale=1-.84*eased") &&
+ html.includes("opacity=raw<.76?1:1-.63*((raw-.76)/.24)") &&
  html.includes("clone.style.transform='translate3d('"),
  'The entire tile flies as one composited layer while shrinking toward the cart.');
 assert.ok(html.includes("if(activeCartFlight){activeCartFlight.cancel();activeCartFlight=null}"),

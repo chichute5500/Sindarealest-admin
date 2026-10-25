@@ -180,11 +180,12 @@ assert.ok(storefrontHtml.includes("t.classList.toggle('toast-detail-context',Boo
 assert.ok(storefrontHtml.includes('function flyProductCardToCart(sourceElement,productId)')
   && storefrontHtml.includes("clone.dataset.sourceType=sourceElement.classList.contains('product-card')?'product-card':'detail-image'")
   && storefrontHtml.includes("clone.dataset.cartTargetId=target.id")
-  && storefrontHtml.includes("clone.dataset.durationMs='1100'")
+  && storefrontHtml.includes("clone.dataset.durationMs='900'")
   && storefrontHtml.includes("clone.dataset.productId=String(productId||'')")
   && storefrontHtml.includes("clone.className='sd-fly-to-cart-clone'")
-  && storefrontHtml.includes('function activeCartFlightTarget()'),
-  'Successful add flies the full actual clicked product tile in 1100ms to the visible desktop/mobile cart with a reduced-motion-safe fallback.');
+  && storefrontHtml.includes('function activeCartFlightTarget()')
+  && storefrontHtml.includes('opacity=raw<.76?1:1-.63*((raw-.76)/.24)'),
+  'Successful add flies the full actual clicked product tile in 900ms to the visible desktop/mobile cart with a reduced-motion-safe fallback.');
 assert.ok(storefrontHtml.includes('if(cartMotionReduced()||!sourceElement||!sourceElement.isConnected)return false')
   && storefrontHtml.includes('function confirmCartTargets()')
   && storefrontHtml.includes('#cartOpen.sd-cart-bump svg,#mobileCartNav.sd-cart-bump svg{animation:sdCartIconShake 1s')
