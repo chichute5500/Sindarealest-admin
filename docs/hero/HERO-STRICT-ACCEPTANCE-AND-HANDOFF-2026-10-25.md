@@ -89,3 +89,44 @@ For future chat: use `files__list` on the Library folder and `files__read` with 
 ### Mandatory next action
 
 Open ChatGPT Library /SinDarealest/HERO-REFERENCE/ and the main REFERENCE-DESKTOP-luxury-red-text.png; retrieve latest exact-SHA Chromium screenshot artifact from run #40217452710 (or newer). Compare side-by-side at consistent crop/scale, region by region. Edit ONLY the authoritative HERO CSS and separate artwork, repeat all 14 real-browser screenshots and protection tests; keep Visual FAIL until >95% evidence in every important region AND the user explicitly approves. Preserve PR Draft and no Production deployment.
+
+
+## 8. V17 rigorously compared checkpoint — 2026-10-26 VN / 2026-10-25 UTC
+
+> **VISUAL FAIL. Objective similarity remains far below 0.95 in EVERY region. Do not describe the HERO as 95%, approved, complete or production ready.** The owner's refusal to reduce the threshold stands. Technical PASS does not override visual FAIL.
+
+### Exact implementation and true browser evidence
+
+- Last exact source + integration workflow commit before this documentation add: `ff901d333983ea6c35f392e2b6948e212aa83e3e`. Requery latest HEAD after doc writes.
+- Native Chromium run **[40220877828 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40220877828)**: all 7 widths (320, 360, 390, 768, 980, 1280, 1440) × light/dark = **14 actual screenshot PNGs**, [artifact 12608909260](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40220877828/artifacts/12608909260). All original 1200x1600 transparent shoe PNG alpha/contact guards, no description/CTA opaque pixel collisions; scroll overflow zero.
+- [Full-site integration run 40220877862 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40220877862): exact original owner-shoe and protected Admin/Storefront hashes retained. [Validate source 40220872983 — PASS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40220872983). **No Production write / merge / D1/R2 mutation.**
+- PR **#115 Draft**, branch `feature/hero-v9-integrated-2026-10-25`.
+- **No V17 Preview deployment** was made because V17 is visually FAIL. Existing isolated Preview alias still serves the earlier V14 deployment, not V17: `https://hero-v11-native-20261025.sindarealest-admin-preview.pages.dev/`. Do not mislabel Preview V14 as V17.
+
+### Measured screenshot versus original ground truth (strict, not inferred)
+
+Primary owner-approved *visual design target* remains `/SinDarealest/HERO-REFERENCE/REFERENCE-DESKTOP-luxury-red-text.png` in ChatGPT Library, NOT checked into repo. Browser screenshot `pc-1440-light.png` from artifact 12608909260 is the actual DOM/CSS render, never a design export. Reference resized to browser screenshot 1380×677 for same 2:1 hero canvas. RGB, direct structural similarity index **SSIM, windowed via skimage.metrics.structural_similarity(channel_axis=2, data_range=255)**. Region coordinates are fractions `(left, right, top, bottom)` of the exact same canvas:
+
+| Region | Relative crop | V14 baseline | V16 | Current V17 | Required |
+|---|---|---:|---:|---:|---:|
+| Heading/type | (.07,.50,.11,.60) | .606 | .599 | **.599** | ≥.950 |
+| Upper-right satin | (.50,.98,.00,.42) | .795 | .787 | **.787** | ≥.950 |
+| Lower silk/floor | (.00,.48,.78,.98) | .748 | .773 | **.794** | ≥.950 |
+| Shoes plus stage | (.52,.97,.30,.90) | .356 | .341 | **.328** | ≥.950 |
+| Lower marble | (.40,.98,.70,.98) | .448 | .381 | **.418** | ≥.950 |
+| CTA | (.07,.33,.65,.92) | .589 | .651 | **.651** | ≥.950 |
+| Overall frame | (0,1,0,1) | .622 | .609 | **.615** | ≥.950 |
+
+SSIM is a strict screenshot metric, NOT an arbitrary visual-approval percentage; perceptual and human visual check remain mandatory. It proves that V17 **does not remotely justify a 95% claim**, and even the aggregate measure is slightly below V14. Do not cherry-pick the best region or redefine the target as internal functional test pass.
+
+### Trials, results and precise remaining failures
+
+1. V15 `74aad7aa`/ `5bcb5ee2`: independently authored SVG mineral facets/veins and new layered satin background. True V15 Chromium screenshot showed **cartoonish looping gold lines and evenly spaced vector ribbons**; V15 SSIM worsened globally to .609. **Rejected generated spaghetti-gold lines**.
+2. V16 `98d088fc`: reverted gold-squiggle approach; restored V14 marble geometry with localized faceted, branching microfaults, natural grain (all vector only); `089c56fb` refined native desktop headline spacing, actual semantic copy balancing, CTA and horizontal shoe anchoring. V16 technical tests pass but visually FAIL.
+3. Tried original preserved `ai-marble-pedestal.webp` as standalone stage layer at `76480c07`; screenshot exposed a **dark navy circular platter**, clearly inconsistent with pale blue/gold reference. **Reverted at `7ff5094a`** after real screenshot; do not repeat.
+4. V17 `8b34b1f2` compacted ONLY desktop standalone marble height and repositioned it to match reference floor depth more closely. Actual Chromium compared after `ff901d333`: floor SSIM improved (.773→.794), marble (.381→.418), but shoes-stage (.341→.328) and full frame (.609→.615) remain clearly FAIL.
+5. Essential unresolved: reference contains **photorealistic natural satin specular folds, authentic semitranslucent gold-veined stone**, and **a different left-loafer relative height/shape** from the owner's original paired-shoe PNG. Right upright shoe now reasonably aligned but left flat shoe in browser is visibly ~50px too low relative to master after normalization. Do not claim it can be solved by global translation alone. Current V17 stone is still faceted-vector, not the photographed mineral surface; studio lighting and reflection remain wrong.
+6. Only permitted solution direction: redesign *separate* background/pedestal art or geometry with high-quality genuine texture/lighting, keep native live heading, copy and working CTA, preserve original shoe source bytes, no baked hero screenshot, no font/button imitation, no accumulated CSS `!important`. If proposing crop/layer of the same owner source image, independently validate genuine DOM assets, contact, photo-copy collision, and all 14 responsive screenshots. Never weaken a test merely to get green.
+7. Next strict loop: start from actual V17 14-view artifact and primary master. Fix visual FAIL (especially stage, silk, relative left-shoe geometry); run local browser QA/compare same-sized screenshots and record per-region SSIM & owner-facing screenshot. Any essential region below 0.95 => FAIL. Reconfirm isolated Preview D1/R2 safety before any future *Preview-only* deploy, maintain Draft and no Production.
+
+**Latest owner instruction:** no lowering the original assistant-promised 95–99% quality bar; assistant must inspect its OWN browser renders before presenting. This checkpoint is intentionally FAIL and preserves the truth.
