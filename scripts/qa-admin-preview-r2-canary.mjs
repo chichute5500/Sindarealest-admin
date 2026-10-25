@@ -1,133 +1,144 @@
-/** Remote R2 canary for the isolated Admin Preview ONLY.
- * Uses unique run-owned UUID keys, reads and deletes only those same keys.
- * Does not create/edit a product, D1 record, payment, Pages binding or Production resource.
+/** Self-cleaning S3-compatible R2 canary against exactly two Admin Preview buckets.
+ * Fail closed on Cloudflare project/binding/provenance, no Production operations,
+ * no mutation of D1, no real image keys, and no secrets or object keys in artifacts.
  */
-import {readFileSync,writeFileSync,mkdirSync,mkdtempSync,rmSync} from 'node:fs';
-import {tmpdir} from 'node:os';
+import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
-import {spawnSync} from 'node:child_process';
+import {S3Client,HeadObjectCommand,PutObjectCommand,GetObjectCommand,DeleteObjectCommand} from '@aws-sdk/client-s3';
 
-const sha=String(process.env.GITHUB_SHA||''),run=String(process.env.GITHUB_RUN_ID||'');
-const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
-if(process.env.GITHUB_REPOSITORY!=='chichute5500/Sindarealest-admin' ||
-   process.env.GITHUB_REF!=='refs/heads/feature/admin-isolated-handoff-2026-10-20' ||
-   !/^[a-f0-9]{40}$/i.test(sha)|| !/^\d{8,16}$/.test(run)||!account||!token)
-  throw Error('QA_R2_UNSAFE_CONTEXT: no object operation allowed');
-const outdir=join(process.cwd(),'artifacts','admin-r2-canary',sha.slice(0,12));
-mkdirSync(outdir,{recursive:true});
-const record={sourceSha:sha,environment:'ISOLATED_ADMIN_PREVIEW_ONLY',
-  proofType:'REAL_CLOUDFLARE_R2_OBJECT_GET_PUT_DELETE_AND_PUBLIC_DERIVATIVE',
-  readbackVerified:false,publicRouteVerified:false,cleanupPasses:0,
-  objectNamesExposed:false,productionTouched:false,checkedAtUtc:new Date().toISOString()};
-const save=()=>writeFileSync(join(outdir,'manifest.json'),JSON.stringify(record,null,2)+'\n');
-const api='https://api.cloudflare.com/client/v4/accounts/'+encodeURIComponent(account);
-async function pages(name) {
-  const r=await fetch(api+'/pages/projects/'+name,{
-    headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(20000)});
+const repo='chichute5500/Sindarealest-admin';
+const branch='refs/heads/feature/admin-isolated-handoff-2026-10-20';
+const sha=String(process.env.GITHUB_SHA||'');
+const account=String(process.env.CLOUDFLARE_ACCOUNT_ID||'');
+const pagesToken=String(process.env.CLOUDFLARE_API_TOKEN||'');
+const accessKeyId=String(process.env.R2_ACCESS_KEY_ID||'');
+const secretAccessKey=String(process.env.R2_SECRET_ACCESS_KEY||'');
+if(process.env.GITHUB_REPOSITORY!==repo||process.env.GITHUB_REF!==branch||
+  !/^[a-f0-9]{40}$/i.test(sha)|| !/^\d{8,16}$/.test(String(process.env.GITHUB_RUN_ID||''))||
+  !/^[a-f0-9]{32}$/i.test(account)||!pagesToken||!accessKeyId||!secretAccessKey)
+  throw Error('R2_QA_UNSAFE_BRANCH_ACCOUNT_OR_MISSING_CREDENTIALS');
+const folder=join(process.cwd(),'artifacts/admin-r2-canary',sha.slice(0,12));
+mkdirSync(folder,{recursive:true});
+const manifest={sourceSha:sha,environment:'ISOLATED_ADMIN_PREVIEW_ONLY',protocol:'S3_SIGV4',
+  proofType:'RUN_OWNED_OBJECT_PUT_READBACK_PUBLIC_MEDIA_DELETE_HEAD_ABSENCE',
+  bindingIsolationVerified:false,readbackVerified:false,publicRouteVerified:false,
+  cleanupPasses:0,cleanupVerified:false,productionTouched:false,
+  objectNamesExposed:false,checkedAtUtc:new Date().toISOString(),status:'NOT_ACCEPTED'};
+const save=()=>writeFileSync(join(folder,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+const classify=e=>{
+  const code=String(e?.name||e?.Code||'');
+  const safe=['NoSuchKey','NotFound','AccessDenied','InvalidAccessKeyId',
+    'SignatureDoesNotMatch','ExpiredToken','Forbidden','TimeoutError','NetworkingError',
+    'CredentialsProviderError','AbortError','UnknownEndpoint','InvalidBucketName','InvalidRequest'];
+  return safe.includes(code)?code:'S3_REQUEST_FAILED';
+};
+const absent=e=>e?.$metadata?.httpStatusCode===404||['NotFound','NoSuchKey'].includes(e?.name);
+const digest=b=>createHash('sha256').update(b).digest('hex');
+async function project(name){
+  const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+encodeURIComponent(account)+
+    '/pages/projects/'+name,{headers:{Authorization:'Bearer '+pagesToken},signal:AbortSignal.timeout(20000)});
   const j=await r.json().catch(()=>null);
   if(!r.ok||j?.success!==true||j.result?.name!==name||j.result?.production_branch!=='main')
-    throw Error('CLOUDFLARE_PREVIEW_PROJECT_IDENTITY_NOT_VERIFIED');
+    throw Error('CLOUDFLARE_PROJECT_METADATA_NOT_VERIFIED');
   return j.result;
 }
-const binding=(config,name)=>String(config?.r2_buckets?.[name]?.name||config?.r2_buckets?.[name]?.bucket_name||'');
+const binding=(c,n)=>String(c?.r2_buckets?.[n]?.name||c?.r2_buckets?.[n]?.bucket_name||'');
 const d1=c=>String(c?.d1_databases?.DB?.id||c?.d1_databases?.DB?.database_id||'');
-const [a,s]=await Promise.all([pages('sindarealest-admin-preview'),pages('sindarealest2')]);
-const admin=a.deployment_configs.preview,prod=s.deployment_configs.production;
-const images=binding(admin,'IMAGES'),originals=binding(admin,'ORIGINALS'),
- pImages=binding(prod,'IMAGES'),pOriginals=binding(prod,'ORIGINALS');
-const nameOk=x=>/^[a-z0-9][a-z0-9-]{2,62}$/.test(x);
-if(![images,originals,pImages,pOriginals].every(nameOk)||!d1(admin)||!d1(prod)||
-  d1(admin)===d1(prod)||images===originals||
-  [pImages,pOriginals].includes(images)||[pImages,pOriginals].includes(originals))
-  throw Error('QA_R2_PRODUCTION_OR_PUBLIC_BUCKET_OVERLAP: no write authorized');
-record.bindingIsolationVerified=true;save();
+const [admin,store]=await Promise.all([project('sindarealest-admin-preview'),project('sindarealest2')]);
+const preview=admin.deployment_configs?.preview;
+const shopProd=store.deployment_configs?.production;
+const adminProd=admin.deployment_configs?.production;
+const images=binding(preview,'IMAGES'),originals=binding(preview,'ORIGINALS');
+const expectedImage='sindarealest-images-preview',expectedOriginal='sindarealest-preview-original';
+const productionBuckets=[binding(shopProd,'IMAGES'),binding(shopProd,'ORIGINALS'),
+  binding(adminProd,'IMAGES'),binding(adminProd,'ORIGINALS')].filter(Boolean);
+if(images!==expectedImage||originals!==expectedOriginal||images===originals||
+  !d1(preview)||!d1(shopProd)||d1(preview)===d1(shopProd)||
+  (d1(adminProd)&&d1(preview)===d1(adminProd))||
+  productionBuckets.includes(images)||productionBuckets.includes(originals))
+  throw Error('R2_QA_BINDING_ISOLATION_NOT_VERIFIED');
+manifest.bindingIsolationVerified=true;save();
 
-const uid=randomUUID(),imageKey=uid+'.webp',originalKey='private-originals/'+uid+'.webp';
-const objects=[{bucket:images,key:imageKey,kind:'public'},{bucket:originals,key:originalKey,kind:'private'}];
-const source=readFileSync('public/watermark.webp');
-if(source.byteLength<20||source.subarray(0,4).toString()!=='RIFF'||
- source.subarray(8,12).toString()!=='WEBP') throw Error('INVALID_CANARY_WEBP');
-const expectedHash=createHash('sha256').update(source).digest('hex');
-const tmp=mkdtempSync(join(tmpdir(),'admin-r2-qa-'));
-const binary=join(tmp,'canary.webp');writeFileSync(binary,source);
-function cli(type,object,file) {
- const args=['r2','object',type,object.bucket+'/'+object.key];
- if(type==='put')args.push('--file',file,'--content-type','image/webp','--force');
- if(type==='get')args.push('--file',file);
- if(type==='delete')args.push('--force');
- args.push('--remote');
- const child=spawnSync(join(process.cwd(),'node_modules','.bin','wrangler'),args,{
-  env:process.env,encoding:'utf8',timeout:90000,maxBuffer:2*1024*1024
- });
- // Keep credentials, object names, bucket names, account IDs and raw output out
- // of retained Actions logs. A fixed diagnostic classification is sufficient.
- const diagnostic=String(child.stderr||'')+' '+String(child.stdout||'');
- const cause=/authentication|invalid api token|unauthorized|10000\b/i.test(diagnostic)
-   ? 'AUTHENTICATION_OR_TOKEN'
-   : /permission|forbidden|not authorized|10001\b|1003\d\b|403\b/i.test(diagnostic)
-   ? 'PERMISSION_OR_R2_SCOPE'
-   : /bucket.*(?:not found|does not exist)|404\b/i.test(diagnostic)
-   ? 'BUCKET_UNAVAILABLE'
-   : /unknown argument|unknown option|unrecognized|invalid option|missing required|unknown command/i.test(diagnostic)
-   ? 'WRANGLER_ARGUMENT_ERROR'
-   : /fetch failed|timed out|timeout|network error/i.test(diagnostic)
-   ? 'NETWORK_ERROR'
-   : child.error ? 'CLI_LAUNCH_ERROR' : 'UNCLASSIFIED_CLI_FAILURE';
- return {ok:child.status===0,status:child.status,error:child.error?.name||null,cause,
-   notFound:/404|not found|does not exist|no such object/i.test(diagnostic)};
-}
-let error=null;
+// UUID generated exclusively for this run. Do not list, delete, or read
+// existing catalog images, including other QA runs.
+const uid=randomUUID();
+const objects=[
+  {kind:'public',Bucket:images,Key:uid+'.webp'},
+  {kind:'private',Bucket:originals,Key:'private-originals/'+uid+'.webp'}
+];
+const bytes=readFileSync('public/watermark.webp');
+if(bytes.length<20||bytes.toString('ascii',0,4)!=='RIFF'||bytes.toString('ascii',8,12)!=='WEBP')
+  throw Error('R2_QA_SOURCE_NOT_WEBP');
+const checksum=digest(bytes);
+const s3=new S3Client({region:'auto',endpoint:'https://'+account+'.r2.cloudflarestorage.com',
+  forcePathStyle:true,credentials:{accessKeyId,secretAccessKey},maxAttempts:2});
+const readHead=async obj=>{
+  try{await s3.send(new HeadObjectCommand({Bucket:obj.Bucket,Key:obj.Key}));return 'PRESENT';}
+  catch(e){if(absent(e))return 'ABSENT';throw Error('R2_QA_HEAD_'+obj.kind+'_'+classify(e));}
+};
+const cleanup=async ()=>{
+  const errors=[];
+  // Delete only the two random keys created/attempted by this run.
+  for(const obj of objects){
+    try{await s3.send(new DeleteObjectCommand({Bucket:obj.Bucket,Key:obj.Key}));}
+    catch(e){errors.push('DELETE_'+obj.kind+'_'+classify(e));}
+  }
+  for(let i=1;i<=2;i++){
+    for(const obj of objects){
+      try{
+        if(await readHead(obj)!=='ABSENT')errors.push('STILL_PRESENT_'+obj.kind+'_PASS_'+i);
+      }catch(e){errors.push('ABSENCE_UNVERIFIED_'+obj.kind+'_PASS_'+i);}
+    }
+    if(errors.length===0)manifest.cleanupPasses=i;
+  }
+  manifest.cleanupVerified=errors.length===0;
+  manifest.cleanupErrorCodes=errors;
+};
+let failure=null;
 try {
- for(const object of objects) {
-   const result=cli('put',object,binary);
-   if(!result.ok)throw Error('CANARY_R2_PUT_FAILED_'+object.kind+'_'+result.cause+'_STATUS_'+result.status);
- }
- for(const object of objects){
-   const downloaded=join(tmp,'read-'+object.kind+'.webp');
-   const result=cli('get',object,downloaded);
-   if(!result.ok)throw Error('CANARY_R2_GET_FAILED_'+object.kind+'_'+result.cause+'_STATUS_'+result.status);
-   if(createHash('sha256').update(readFileSync(downloaded)).digest('hex')!==expectedHash)
-     throw Error('CANARY_R2_READBACK_HASH_MISMATCH_'+object.kind);
- }
- record.readbackVerified=true;save();
- const url='https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/media/'+imageKey;
- const res=await fetch(url,{headers:{'Cache-Control':'no-store'},signal:AbortSignal.timeout(20000)});
- if(res.status!==200||!String(res.headers.get('Content-Type')).includes('image/webp'))
-   throw Error('CANARY_PUBLIC_MEDIA_ROUTE_NOT_VERIFIED_HTTP_'+res.status);
- const buf=Buffer.from(await res.arrayBuffer());
- if(createHash('sha256').update(buf).digest('hex')!==expectedHash)
-   throw Error('CANARY_PUBLIC_MEDIA_HASH_MISMATCH');
- record.publicRouteVerified=true;
-} catch(e){error=e;} finally {
- // Key names are UUIDs generated by this run only; NEVER delete other records.
- const cleanupErrors=[];
- for(const obj of objects){
-   const result=cli('delete',obj,'');
-   if(!result.ok)cleanupErrors.push(obj.kind+': delete failed '+result.cause+'_'+result.status);
- }
- for(let pass=1;pass<=2;pass++){
-   for(const obj of objects){
-     const res=cli('get',obj,join(tmp,'confirm-'+pass+'-'+obj.kind+'.webp'));
-     if(res.ok||!res.notFound)cleanupErrors.push(obj.kind+': cleanup absence unverified '+res.cause+' pass '+pass);
-   }
-   if(cleanupErrors.length===0)record.cleanupPasses=pass;
- }
- record.cleanupVerified=cleanupErrors.length===0;
- record.status=(!error&&record.readbackVerified&&record.publicRouteVerified&&record.cleanupVerified)
-   ? 'PASS_REMOTE_R2_RUN_OWNED_LIFECYCLE':'NOT_ACCEPTED';
- record.errorCode=error?.message||null;
- record.cleanupErrors=cleanupErrors;
- record.finishedAtUtc=new Date().toISOString();save();
- rmSync(tmp,{recursive:true,force:true});
- if(cleanupErrors.length)console.error('[QA_R2_CLEANUP] FAILED: '+cleanupErrors.join('; '));
- else console.info('[QA_R2_CLEANUP] Verified two independent remote absent-object checks on both isolated Preview R2 buckets.');
+  for(const obj of objects){
+    if(await readHead(obj)!=='ABSENT')throw Error('R2_QA_UUID_COLLISION_ABORT');
+  }
+  for(const obj of objects){
+    try{
+      await s3.send(new PutObjectCommand({Bucket:obj.Bucket,Key:obj.Key,
+        Body:bytes,ContentType:'image/webp',
+        CacheControl:obj.kind==='private'?'private, no-store':'public, max-age=31536000, immutable',
+        Metadata:{visibility:obj.kind==='private'?'private-original':'public-optimized-derivative'}}));
+    }catch(e){throw Error('R2_QA_PUT_'+obj.kind+'_'+classify(e));}
+  }
+  for(const obj of objects){
+    try{
+      const result=await s3.send(new GetObjectCommand({Bucket:obj.Bucket,Key:obj.Key}));
+      const read=Buffer.from(await result.Body.transformToByteArray());
+      if(digest(read)!==checksum)throw Error('HASH_MISMATCH');
+    }catch(e){throw Error('R2_QA_READBACK_'+obj.kind+'_'+classify(e));}
+  }
+  manifest.readbackVerified=true;save();
+  let response;
+  try {
+    response=await fetch('https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/media/'+uid+'.webp',
+      {headers:{'Cache-Control':'no-store'},signal:AbortSignal.timeout(25000)});
+  }catch{throw Error('R2_QA_PUBLIC_MEDIA_NETWORK_FAILURE');}
+  if(response.status!==200||!String(response.headers.get('Content-Type')).includes('image/webp'))
+    throw Error('R2_QA_PUBLIC_MEDIA_HTTP_'+response.status);
+  if(digest(Buffer.from(await response.arrayBuffer()))!==checksum)
+    throw Error('R2_QA_PUBLIC_MEDIA_HASH_MISMATCH');
+  manifest.publicRouteVerified=true;save();
+}catch(e){failure=String(e.message||'R2_QA_FAILED');}
+finally{
+  try{await cleanup();}catch{manifest.cleanupVerified=false;failure=failure||'R2_QA_CLEANUP_EXCEPTION';}
+  manifest.status=!failure&&manifest.readbackVerified&&manifest.publicRouteVerified&&manifest.cleanupVerified&&manifest.cleanupPasses===2
+    ? 'PASS_REMOTE_R2_RUN_OWNED_LIFECYCLE':'NOT_ACCEPTED';
+  manifest.errorCode=failure;
+  manifest.finishedAtUtc=new Date().toISOString();save();
+  s3.destroy();
 }
-console.info('[QA_ADMIN_R2_CANARY] '+JSON.stringify({
- status:record.status,sourceSha:sha,readbackVerified:record.readbackVerified,
- publicRouteVerified:record.publicRouteVerified,cleanupPasses:record.cleanupPasses,
- bindingIsolationVerified:record.bindingIsolationVerified,
- errorCode:record.errorCode,productionTouched:false
-}));
-if(record.status!=='PASS_REMOTE_R2_RUN_OWNED_LIFECYCLE')
-  throw Error('QA_R2_NOT_ACCEPTED: '+(record.errorCode||'remote canary failed'));
+console.info('[QA_ADMIN_R2_S3_CANARY] '+JSON.stringify({status:manifest.status,
+  sourceSha:sha,protocol:'S3',bindingIsolationVerified:manifest.bindingIsolationVerified,
+  readbackVerified:manifest.readbackVerified,publicRouteVerified:manifest.publicRouteVerified,
+  cleanupPasses:manifest.cleanupPasses,cleanupVerified:manifest.cleanupVerified,
+  errorCode:manifest.errorCode,cleanupErrorCodes:manifest.cleanupErrorCodes,productionTouched:false}));
+if(manifest.status!=='PASS_REMOTE_R2_RUN_OWNED_LIFECYCLE')
+  throw Error('R2_QA_NOT_ACCEPTED: '+(failure||'cleanup unverified'));
