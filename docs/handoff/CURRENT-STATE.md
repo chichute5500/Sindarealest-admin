@@ -1,3 +1,16 @@
+## LIVE HERO DESIGN UPDATE — INDEPENDENT AI MARBLE ART — 2026-10-25
+> Supersedes all older CSS-plinth status. The owner's request is to actually integrate the visual concept on the website, NOT to show a mockup only.
+
+- Live PR #108 OPEN, unmerged, branch `fix/liquid-glass-audit-2026-10-19`. Verified storefront **source SHA** `ab71253fd020f3ac89715a2dbc17560fd2a4a29a`; the following docs-only commit does not require another storefront deploy. Cloudflare Preview alias: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+- Hero pedestal is now a **separate AI-authored marble illustration asset**, `public/images/hero-upload/ai-marble-pedestal.svg` (transparent, blue-black marble, restrained mineral veins, diffuse grounding shadows). It is a real SVG artwork served by Pages, not a screenshot of the whole webpage or a purely CSS-drawn ellipse. The site uses `<span class="hero-pedestal-art">` with an SVG background behind the owner's ORIGINAL, UNCHANGED 1200×1600 shoe PNG. Old CSS pseudo-platform `::before/::after` is suppressed. Text, CTA and other interactive site content remain native.
+- The SVG is **a web-ready recreation inspired by the AI mockup**, not a pixel-exact extract of the generative screenshot. Art direction: blend navy/gray marble and subtle gold/cyan rims with the website navy background without harsh neon.
+- Positioning tuned independently: PC >=1101px, touch desktop 900–1100px, tablet 761–899px and mobile <=760px. First deployed source `8775d5e` failed exact-SHA browser audit because shoe sole and illustration plane were vertically misaligned at 980/1365/1440; inspect artifact 12587540362 if needed. Final `ab71253fd020f3ac89715a2dbc17560fd2a4a29a` corrected these offsets and brightened the marble face.
+- **Exact-SHA final technical evidence:** Validate **PASS** [40162741741](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741741), Preview deploy **PASS** [40162741746](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741746), Hero-only browser audit **14/14 PASS** [40162741690](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741690), actual screenshots [artifact 12587615585](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741690/artifacts/12587615585); Gallery regression **PASS** [40162741744](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741744). Browser checked 360,390,768,980 touch,1280,1365,1440 light/dark.
+- **Owner visual acceptance STILL OPEN**: source/CI success is not proof of pixel-exact mockup matching or flawless visual contact on physical hardware. User has previously rejected green builds. Request owner to compare real PC and mobile preview against the generated mockup. Do not claim 100%. 
+- Safe boundaries: do not merge PR #108, edit main/Production, locked Gallery, Admin/backend/API/auth, product/catalog data, DB, payment, secrets or Cloudflare infrastructure.
+
+---
+
 ## LATEST HERO OWNER FEEDBACK — HEEL CONTACT V5 — 2026-10-25
 > Supersedes previous claims that 14/14 Hero PASS means shoes no longer appear to float. The owner specifically rejected V3's visibly floating heel and authorized continued PC + mobile work.
 

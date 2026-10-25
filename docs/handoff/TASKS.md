@@ -1,3 +1,14 @@
+## HERO AI IMAGE IMPLEMENTATION — 2026-10-25
+- [x] Replace CSS-built pedestal with a separate, original SVG artwork asset in `public/images/hero-upload/ai-marble-pedestal.svg` and integrate it into the existing native webpage.
+- [x] Preserve original shoe PNG pixels and layering; preserve live copy/CTA and all Gallery functionality.
+- [x] Scale and position independently for PC, tablet, mobile and 980px touch desktop; inspect actual captured screenshots after deploy.
+- [x] Preview and Validate PASS on source `ab71253fd020f3ac89715a2dbc17560fd2a4a29a`: [Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741741), [Preview](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741746).
+- [x] Hero-only Chrome audit 14/14 PASS, 7 widths × 2 themes [run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741690), [screenshots](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741690/artifacts/12587615585). Gallery isolated regression PASS [40162741744](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741744).
+- [ ] **OWNER VISUAL ACCEPTANCE REQUIRED:** compare real Preview PC/mobile with AI mockup. Independent vector art is visually inspired, not pixel-identical to the AI-rendered photograph; do not misrepresent.
+- [ ] Continue image-level polish only on owner feedback; no merge/main/Production.
+
+---
+
 ## HERO HEEL CONTACT V5 — LATEST CHECKPOINT — 2026-10-25
 - [x] Reopen specifically unresolved heel-floating problem for desktop, tablet, mobile and touch desktop.
 - [x] Inspect V3/V4/V5 actual screenshots for ground contact; reject V4's over-tilted slab despite CI green.

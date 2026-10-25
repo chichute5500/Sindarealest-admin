@@ -1,3 +1,19 @@
+## HERO AI PODIUM — EXACT SOURCE SHA — 2026-10-25
+| Gate | Result | Evidence |
+|---|---|---|
+| Source/test SHA | `ab71253fd020f3ac89715a2dbc17560fd2a4a29a` | SVG podium artwork + native CSS/DOM + Hero-only audit |
+| Full Validate | **PASS** | [40162741741](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741741) |
+| Cloudflare Pages Preview deploy | **PASS** | [40162741746](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741746) |
+| Hero browser audit | **14/14 PASS** | [40162741690](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741690), [14 captured screenshots](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741690/artifacts/12587615585) |
+| Fullscreen Gallery isolated regression | **PASS** | [40162741744](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40162741744) |
+| Original uploaded shoe PNG | **UNCHANGED** | No binary edit, only new independent illustration added |
+| Pixel-level match to generative reference | **NOT VERIFIED** | SVG illustration is a separate implementation, NOT a re-used screenshot |
+| Owner acceptance on physical PC/mobile | **REQUIRED** | Await direct visual sign-off |
+| PR/main/Production | **OPEN/unmerged; untouched** | Intentional |
+First AI-podium source SHA `8775d5e` passed Validate and Preview but FAILED Hero audit in 980/1365/1440 light+dark due to physically disconnected shoe/support plane. Corrected version `ab71253fd020f3ac89715a2dbc17560fd2a4a29a` passed 14/14; do not relabel initial failure as PASS.
+
+---
+
 ## HERO V5 HEEL CONTACT — EXACT-SHA CHECKS — 2026-10-25
 | Gate | Result | Source and evidence |
 |---|---|---|

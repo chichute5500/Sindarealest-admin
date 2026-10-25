@@ -1,3 +1,12 @@
+## DESIGN DECISION — HERO MARBLE IMAGE LAYER — 2026-10-25
+1. Implement a separate transparent illustration file at `/images/hero-upload/ai-marble-pedestal.svg` instead of trying to replicate luxury mineral materials with dozens of CSS gradients.
+2. Position art independently for desktop/tablet/mobile, keep original shoe PNG unmodified above it, and remove the legacy CSS ellipse/face from visible rendering.
+3. Keep typography, CTA, navigation and all accepted/locked Gallery elements as actual interactive HTML—not flattened into a screenshot mockup.
+4. Protect shoe-to-platform contact with browser tests that read the art's real bounding rect and compute the support-plane region, and continue checks for shoe size/aspect/alpha/overlap/overflow/theme. The original `8775d5e` failed contact at 6 contexts, the corrected `ab71253fd020f3ac89715a2dbc17560fd2a4a29a` passes 14/14.
+5. Visual source `ab71253fd020f3ac89715a2dbc17560fd2a4a29a` deployed only to Preview and QA green. **Exact photorealistic parity with the AI screenshot is NOT verified and owner has not approved.** PR #108 stays open/unmerged; no main, Production, Admin/backend/API/DB, locked Gallery or infrastructure edits.
+
+---
+
 ## DECISION — HERO HEEL CONTACT V5 — 2026-10-25
 1. Treat visible rear heel flotation as OPEN when owner reports it, even if the older Hero audit passes. V3 was owner-rejected; V4 was also visually rejected after direct screenshot inspection for excessive slope.
 2. Use V5 (`c29f830` CSS) as current compact visual candidate. Keep the original RGBA shoe PNG, owner-PASS Gallery and all unrelated features untouched.
