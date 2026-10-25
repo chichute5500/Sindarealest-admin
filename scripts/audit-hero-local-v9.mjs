@@ -121,7 +121,7 @@ try{
    console.log('PASS QA-only marble parameter sweep '+variants.length+' genuine DOM browser captures; no website CSS edits.');
    // QA-only right-side soft lighting sweep. Photos are from live DOM, not saved artwork.
    const baseBefore=await page.locator('#home').evaluate(el=>getComputedStyle(el,'::before').backgroundImage);
-   const lighting=await page.addStyleTag({content:''});
+   const lighting=await page.addStyleTag({content:'/* QA-only lighting controls */'});
    const strengths=[.035,.07,.105,.14,.175,.21,.245,.28];
    for(const strength of strengths){
     const extra='radial-gradient(ellipse 47% 82% at 97% 17%,rgba(36,89,141,'+strength+'),transparent 87%)';
