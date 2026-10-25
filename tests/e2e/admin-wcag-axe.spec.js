@@ -44,7 +44,13 @@ for(const profile of [{width:390,height:844,theme:'light'},
    const scan=async name=>{
      const r=await new AxeBuilder({page})
       .withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();
-     const violations=r.violations.map(v=>({id:v.id,impact:v.impact,nodeCount:v.nodes.length}));
+     const violations=r.violations.map(v=>({id:v.id,impact:v.impact,nodeCount:v.nodes.length,
+       // Sanitize sensitive attribute values; retain structural CSS targets for fixes.
+       targets:v.nodes.slice(0,12).map(n=>n.target.join(' ')
+         .replace(/\\[[^\\]]+\\]/g,'[attr]')
+         .replace(/#[A-Za-z0-9_-]{18,}/g,'#redacted')
+         .slice(0,140))
+     }));
      results.push({view:name,violations,violationCount:violations.length,
        seriousCount:violations.filter(v=>v.impact==='critical'||v.impact==='serious').length});
    };
