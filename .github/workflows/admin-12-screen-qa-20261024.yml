@@ -8,6 +8,7 @@ on:
       - ".github/workflows/admin-12-screen-qa-20261024.yml"
       - "tests/e2e/admin-12-screen-live-qa.spec.js"
       - "functions/api/admin/orders.js"
+      - "public/admin/index.html"
 
 permissions:
   contents: read

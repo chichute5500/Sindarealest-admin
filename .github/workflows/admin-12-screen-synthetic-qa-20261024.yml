@@ -16,6 +16,7 @@ on:
       - "tests/e2e/admin-qa-write-persistence.spec.js"
       - "tests/e2e/admin-qa-order-persistence.spec.js"
       - "functions/api/admin/orders.js"
+      - "public/admin/index.html"
 
 permissions:
   contents: read

@@ -7,6 +7,8 @@ on:
       - '.github/workflows/admin-preview-wcag-axe.yml'
       - 'tests/e2e/admin-wcag-axe.spec.js'
       - 'public/admin/index.html'
+      - '.github/workflows/admin-12-screen-qa-20261024.yml'
+      - '.github/workflows/admin-12-screen-synthetic-qa-20261024.yml'
   workflow_dispatch:
 
 permissions:
