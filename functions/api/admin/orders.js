@@ -130,7 +130,16 @@ export async function onRequestPatch(context) {
     const terminalStatusGuardSql = " AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled')";
     const cancellationRequestGuardSql =
       " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
-    for (const update of priceUpdates) {
+    // Saves with unchanged prices must not rewrite order-item prices.
+    // Such a write could roll back a concurrently verified price snapshot.
+    const unchangedItemGuardSql =
+      " AND (SELECT COUNT(*) FROM order_items WHERE order_id=?)=?" +
+      items.map(() => " AND EXISTS (SELECT 1 FROM order_items WHERE order_id=? AND id=? AND quantity=? AND unit_price IS ?)").join("");
+    const unchangedItemGuardBindings = [
+      id, items.length,
+      ...items.flatMap(item => [id, item.id, item.quantity, item.unit_price == null ? null : Number(item.unit_price)]),
+    ];
+    for (const update of (priceChanged ? priceUpdates : [])) {
       const itemGuardSql = priceChanged ? priceGuardSql + (status === "cancelled" ? "" : terminalStatusGuardSql) : (status === "cancelled" ? cancellationRequestGuardSql : "");
       const sql = "UPDATE order_items SET unit_price=?,line_total=? WHERE id=? AND order_id=?" + itemGuardSql;
       const values = [update.unitPrice,update.lineTotal,update.itemId,id];
@@ -147,13 +156,14 @@ export async function onRequestPatch(context) {
       "payment_terms_confirmed_at=CASE WHEN ?=1 THEN ? WHEN ?=1 THEN NULL ELSE payment_terms_confirmed_at END," +
       "payment_terms_confirmed_by=CASE WHEN ?=1 THEN 'admin' WHEN ?=1 THEN '' ELSE payment_terms_confirmed_by END," +
       "payment_terms_note=CASE WHEN ?=1 THEN ? ELSE payment_terms_note END,updated_at=datetime('now') WHERE id=?" +
-      (priceChanged ? priceGuardSql : "") +
+      (priceChanged ? priceGuardSql : unchangedItemGuardSql) +
       (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'");
     const orderUpdateValues = [
       status,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
       priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id
     ];
     if (priceChanged) orderUpdateValues.push(id,id);
+    else orderUpdateValues.push(...unchangedItemGuardBindings);
     // Non-cancelled UPDATE uses a literal status guard with no extra SQL bind.
     // Binding one more ID here previously made every ordinary order save fail (503).
     if (status === "cancelled") orderUpdateValues.push(id);

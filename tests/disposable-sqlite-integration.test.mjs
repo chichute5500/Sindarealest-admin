@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { createSession } from '../functions/_lib.js';
 import { onRequestPost as restore } from '../functions/api/admin/restore.js';
 import { onRequestPost as ledger } from '../functions/api/admin/payment-transactions.js';
+import { onRequestPatch as patchAdminOrder } from '../functions/api/admin/orders.js';
 
 const PASSWORD = 'disposable-sqlite-qa-password-not-real';
 const SECRET = 'disposable-sqlite-qa-session-secret-not-real';
@@ -27,6 +28,7 @@ for (const name of migrationNames)
 
 let batches=0;
 let rolledBack=0;
+let beforeNextBatch=null;
 const database = {
   prepare(text) {
     let values = [];
@@ -44,6 +46,11 @@ const database = {
   },
   async batch(statements) {
     batches++;
+    if (beforeNextBatch) {
+      const simulateExternalCommit=beforeNextBatch;
+      beforeNextBatch=null;
+      simulateExternalCommit();
+    }
     sql.exec('BEGIN IMMEDIATE');
     try {
       const results=statements.map(statement=>{
@@ -119,6 +126,40 @@ try {
   assert.equal(scalar('SELECT full_name FROM order_contact_details').full_name,qaCustomer.full_name);
   assert.equal(scalar("SELECT value FROM settings WHERE key='show_prices'").value,'1');
   assert.equal(rows('PRAGMA foreign_key_check').length,0);
+
+  // An ordinary admin status save submits existing price values. If a second
+  // writer reprices before its D1 batch, the stale save must not overwrite
+  // either item price or confirmed order total, even with unchanged user input.
+  beforeNextBatch=() => {
+    sql.prepare("UPDATE order_items SET unit_price=130000,line_total=130000 WHERE id=?").run(qaItem.id);
+    sql.prepare("UPDATE orders SET subtotal=130000,total=130000 WHERE id=?").run(qaOrder.id);
+  };
+  const staleSave=await patchAdminOrder({
+    request:new Request('https://qa.invalid/api/admin/orders',{
+      method:'PATCH',
+      headers:{
+        Origin:'https://qa.invalid',
+        'Sec-Fetch-Site':'same-origin',
+        Cookie:'sd_admin_session='+session,
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        id:qaOrder.id,status:'confirmed',
+        prices:[{itemId:qaItem.id,unitPrice:120000}]
+      })
+    }),
+    env
+  });
+  assert.equal(staleSave.status,409,'stale status save must reject a concurrently repriced order');
+  assert.equal(scalar('SELECT unit_price FROM order_items').unit_price,130000,
+    'stale status save must not overwrite a fresh item price');
+  assert.equal(scalar('SELECT total FROM orders').total,130000,
+    'stale status save must not overwrite freshly confirmed order total');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM audit_logs').n,0,
+    'stale status save must not emit phantom success audit');
+  // Restore disposable baseline for the remaining independent ledger tests.
+  sql.prepare("UPDATE order_items SET unit_price=120000,line_total=120000 WHERE id=?").run(qaItem.id);
+  sql.prepare("UPDATE orders SET subtotal=120000,total=120000 WHERE id=?").run(qaOrder.id);
 
   // Validation failure must happen before D1 batch and preserve all existing rows.
   const preBatch=batches;
