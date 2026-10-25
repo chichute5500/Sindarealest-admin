@@ -12,7 +12,7 @@ const sha=String(process.env.GITHUB_SHA||''),run=String(process.env.GITHUB_RUN_I
 const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
 if(process.env.GITHUB_REPOSITORY!=='chichute5500/Sindarealest-admin' ||
    process.env.GITHUB_REF!=='refs/heads/feature/admin-isolated-handoff-2026-10-20' ||
-   !/^[a-f0-9]{40}$/i.test(sha)|| !/^\\d{8,16}$/.test(run)||!account||!token)
+   !/^[a-f0-9]{40}$/i.test(sha)|| !/^\d{8,16}$/.test(run)||!account||!token)
   throw Error('QA_R2_UNSAFE_CONTEXT: no object operation allowed');
 const outdir=join(process.cwd(),'artifacts','admin-r2-canary',sha.slice(0,12));
 mkdirSync(outdir,{recursive:true});

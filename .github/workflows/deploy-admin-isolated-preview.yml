@@ -24,6 +24,7 @@ on:
       - '.github/workflows/admin-security-a11y-perf-readonly.yml'
       - 'tests/disposable-sqlite-integration.test.mjs'
       - '.github/workflows/admin-preview-r2-canary.yml'
+      - 'scripts/qa-admin-preview-r2-canary.mjs'
 
 permissions:
   contents: read
