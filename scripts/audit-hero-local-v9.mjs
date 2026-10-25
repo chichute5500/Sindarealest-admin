@@ -28,13 +28,14 @@ try{
   assert.equal(resp.status(),200,'Homepage response');
   await page.waitForFunction(()=>{
    const i=document.querySelector('#heroProductImage');
-   return i&&!i.hidden&&i.complete&&i.naturalWidth===1200;
+   const l=document.querySelector('#heroLeftShoe');
+   return i&&!i.hidden&&i.complete&&i.naturalWidth===1200&&l&&l.complete&&l.naturalWidth===1200;
   },null,{timeout:12000});
   const skip=page.locator('#skipIntro');if(await skip.count())await skip.evaluate(el=>el.click()).catch(()=>{});
   await page.waitForFunction(()=>!document.body.classList.contains('welcome-active'),null,{timeout:6000});
   await page.waitForTimeout(80);
   const data=await page.evaluate(()=>{
-   const h=document.querySelector('#home'),s=h.querySelector('h1'),sp=[...s.querySelectorAll('span')],copy=h.querySelector('.hero-description'),a=h.querySelector('.hero-actions a'),i=h.querySelector('#heroProductImage'),p=h.querySelector('.hero-pedestal-art');
+   const h=document.querySelector('#home'),s=h.querySelector('h1'),sp=[...s.querySelectorAll('span')],copy=h.querySelector('.hero-description'),a=h.querySelector('.hero-actions a'),i=h.querySelector('#heroProductImage'),leftShoe=h.querySelector('#heroLeftShoe'),p=h.querySelector('.hero-pedestal-art');
    const r=el=>{const b=el.getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width,height:b.height};};
    const css=el=>getComputedStyle(el);
    // QA-only pixel-alpha geometry: never changes the site, embeds images or renders a composite banner.
@@ -43,8 +44,8 @@ try{
    const alphaContext=alphaCanvas.getContext('2d',{willReadFrequently:true});
    alphaContext.drawImage(i,0,0,240,320);
    const alpha=alphaContext.getImageData(0,0,240,320).data;
-   const pixelCollisions=(node)=>{
-    const box=node.getBoundingClientRect(),shoe=i.getBoundingClientRect();
+   const pixelCollisions=(node,photo=i)=>{
+    const box=node.getBoundingClientRect(),shoe=photo.getBoundingClientRect();
     const left=Math.max(box.left,shoe.left),right=Math.min(box.right,shoe.right);
     const top=Math.max(box.top,shoe.top),bottom=Math.min(box.bottom,shoe.bottom);
     if(left>=right||top>=bottom)return 0;
@@ -57,11 +58,16 @@ try{
     return overlap;
    };
    const photoCopyCollision={description:pixelCollisions(copy),cta:pixelCollisions(a)};
+   const splitEnabled=innerWidth>=1101;
+   const leftShoeEvidence={display:css(leftShoe).display,clip:css(leftShoe).clipPath,rightClip:css(i).clipPath,
+    natural:[leftShoe.naturalWidth,leftShoe.naturalHeight],sameSource:leftShoe.currentSrc===i.currentSrc,
+    rect:splitEnabled?r(leftShoe):null,
+    collisions:splitEnabled?{description:pixelCollisions(copy,leftShoe),cta:pixelCollisions(a,leftShoe)}:null};
    return {hero:r(h),title:r(s),titleText:s.innerText,spans:sp.map(x=>({text:x.innerText,rect:r(x),color:css(x).color,display:css(x).display})),desc:r(copy),descText:copy.innerText,
     btn:r(a),btnText:a.innerText,btnColor:css(a).color,btnFont:parseFloat(css(a).fontSize),btnBg:css(a).backgroundImage+' '+css(a).backgroundColor,
     href:a.getAttribute('href'),shoe:r(i),shoeSrc:i.currentSrc,shoeNatural:[i.naturalWidth,i.naturalHeight],
     pedestalBg:css(p).backgroundImage,pedestal:r(p),pedestalOpacity:css(p).opacity,
-    photoCopyCollision,
+    photoCopyCollision,leftShoeEvidence,
     background:css(h).backgroundImage,overflowWidth:document.documentElement.scrollWidth-innerWidth};
   });
   await page.locator('#home').screenshot({path:out+'/'+name+'-'+theme+'.png',animations:'disabled'});
@@ -80,6 +86,15 @@ try{
   assert.ok(data.pedestalBg.includes('marble-shelf-v14.svg'),name+' independent marble pedestal');
   assert.equal(data.photoCopyCollision.description,0,name+' actual opaque shoe pixels must not cover description');
   assert.equal(data.photoCopyCollision.cta,0,name+' actual opaque shoe pixels must not cover CTA');
+  assert.deepEqual(data.leftShoeEvidence.natural,[1200,1600],name+' both visual layers must use original PNG');
+  assert.ok(data.leftShoeEvidence.sameSource,name+' the two visual layers must reference identical original owner PNG bytes');
+  if(width>=1101){
+   assert.notEqual(data.leftShoeEvidence.display,'none',name+' independently anchored left loafer must be visible on desktop');
+   assert.match(data.leftShoeEvidence.clip,/polygon/,name+' left alpha crop must stay independent');
+   assert.match(data.leftShoeEvidence.rightClip,/polygon/,name+' right alpha crop must stay complementary');
+   assert.equal(data.leftShoeEvidence.collisions.description,0,name+' shifted left shoe must not overlap copy');
+   assert.equal(data.leftShoeEvidence.collisions.cta,0,name+' shifted left shoe must not overlap CTA');
+  }else assert.equal(data.leftShoeEvidence.display,'none',name+' compact layouts retain safe original paired shoes');
   assert.ok(!data.background.includes('hero-reference-'),name+' must not use full banner as background');
   assert.ok(data.overflowWidth<12,name+' no page horizontal overflow');
   const png=out+'/'+name+'-'+theme+'.png';
