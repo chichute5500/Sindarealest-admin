@@ -11,6 +11,8 @@ assert.deepEqual(PRODUCT_CATEGORY_ROUTE_SLUGS,JSON.parse(map[1]));
 assert.equal(productCategoryRouteSlug("dress-shoes"),"giaytay");
 const old={id:"internal-abc123",slug:"shoe-abc123",sku:"SD001",title:"Giày da cá sấu",description:"Mô tả",category:"dress-shoes",category_label:"Giày tây",images_json:'["images/demo.webp"]',published:1,price:500,stock:1,source_price_confirmed:1,updated_at:"2026-10-25 08:00:00"};
 const verified={...old,sku:"REAL-001",sku_verified:1};
+const missingFlagButLooksReal={...old,id:"older-human-sku-id",sku:"CUSTOM-HUMAN-SKU-919"};
+
 assert.equal(isVerifiedCommercialSku(old),false,"missing 0008 must fail closed");
 assert.equal(canonicalProductPath(old),"/sanpham/giaytay/internal-abc123");
 assert.equal(canonicalProductPath(verified),"/sanpham/giaytay/REAL-001");
@@ -54,6 +56,16 @@ assert.equal(items[0].skuVerified,false);
 assert.equal(items[0].fulfillmentType,"unclassified");
 assert.equal(items[0].price,null);
 assert.equal(items[1].sku,"REAL-001");
+const historicalDB={prepare(sql){
+  if(sql.includes("FROM settings"))return {bind(){return {async first(){return {value:"0"}}}}};
+  return {async all(){return {results:[missingFlagButLooksReal]}}};
+}};
+const historicalResponse=await publicProducts({request:new Request("https://shop.example/api/products"),env:{DB:historicalDB}});
+assert.equal(historicalResponse.status,200);
+const historicalProducts=await historicalResponse.json();
+assert.equal(historicalProducts[0].sku,null,"No migration flag means public SKU must be hidden despite plausible human formatting");
+assert.equal(historicalProducts[0].skuVerified,false);
+
 assert.equal(items[1].skuVerified,true);
 const listing=await sitemap({request:new Request("https://shop.example/sitemap.xml"),env:{DB}});
 assert.equal(listing.status,200);
