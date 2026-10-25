@@ -431,7 +431,11 @@ try {
             fail('Desktop Hero product must be scaled realistically (not cropped by header or exaggerated).');
           const ovalTop=m.frameRect.top + m.pedestal.oval.top;
           const shoeToOval=m.visibleProductRect?.bottom - ovalTop;
-          if(!Number.isFinite(shoeToOval) || shoeToOval < -3 || shoeToOval > 46)
+          // Perspective ellipse support: compare the sole to the actual curved stone
+          // plane depth, rather than V3's obsolete fixed 46px top-only threshold.
+          // The rear heel has an additional localized-shadow coverage assertion.
+          const stoneDepth=m.pedestal?.oval?.height || 0;
+          if(!Number.isFinite(shoeToOval) || shoeToOval < -3 || shoeToOval > stoneDepth + 4)
             fail('Compact desktop shoe soles must touch the downsized marble plane, not hover or sink through it.');
           if (m.heroRect.height > 470) fail('Owner-marked desktop Hero boundary must stay above 470px.');
 
