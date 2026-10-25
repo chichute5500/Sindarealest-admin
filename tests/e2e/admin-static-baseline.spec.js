@@ -115,6 +115,8 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
         await expect(page.locator('#loginView')).toBeVisible();
 
         const metrics = await page.evaluate(() => {
+          const logo = document.querySelector('#loginView .brand-logo');
+          const topbarLogo = document.querySelector('.topbar > .brand .brand-logo');
           const fitsViewport = element => {
             if (!element) return false;
             const rect = element.getBoundingClientRect();
@@ -124,6 +126,9 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
           return {
             title: document.title,
             lang: document.documentElement.lang,
+            brandImagePath: new URL(logo?.getAttribute('src')||'',document.baseURI).pathname,
+            brandImageFilter: logo?getComputedStyle(logo).filter:null,
+            topbarImageFilter: topbarLogo?getComputedStyle(topbarLogo).filter:null,
             theme: document.documentElement.dataset.adminTheme || null,
             backgroundToken: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
             viewportWidth: window.innerWidth,
@@ -138,6 +143,9 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
         });
         metadata.metrics.push(metrics);
 
+        expect(metrics.brandImagePath, 'Official SD emblem path must not be substituted').toBe('/images/brand-emblem.png');
+        expect(metrics.brandImageFilter, 'Login brand mark must preserve original gold in '+theme+' at '+viewport.width+'px').toBe('none');
+        expect(metrics.topbarImageFilter, 'Header brand mark must preserve original color even when hidden at login').toBe('none');
         expect(metrics.loginCardFitsViewport, `Login card fits within ${viewport.width}px viewport`).toBe(true);
         expect(metrics.passwordFieldFitsViewport, `Password field fits within ${viewport.width}px viewport`).toBe(true);
         expect(metrics.passwordToggleFitsViewport, `Password visibility toggle fits within ${viewport.width}px viewport`).toBe(true);

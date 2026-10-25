@@ -1038,15 +1038,15 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   --reference-border:rgba(142,188,224,.27);
   --reference-sheet:rgba(18,38,55,.89);
 }
-/* Recolor the original SD emblem; do not replace it with a generated logo. */
-.brand-logo {
-  filter:grayscale(1) sepia(.95) saturate(2.6) hue-rotate(164deg) contrast(1.2);
-}
-:root[data-admin-theme="dark"] .brand-logo {
-  filter:grayscale(1) brightness(1.35) sepia(.85) saturate(2) hue-rotate(162deg);
-}
-.topbar .brand h1{color:var(--reference-navy);font-weight:760;letter-spacing:.17em}
-.topbar .brand p{color:#467ca6;letter-spacing:.14em}
+/* Brand identity is not a theme token. Preserve the original SD emblem pixels:
+   never hue-rotate, grayscale, brighten, or recolor the approved logo asset.
+   Header, login, mobile and dark mode share this immutable treatment. */
+:root { --sd-brand-gold:#8e622b; }
+:root[data-admin-theme="dark"] { --sd-brand-gold:#e4c38a; }
+.brand-logo { filter:none; }
+:root[data-admin-theme="dark"] .brand-logo { filter:none; }
+.topbar .brand h1,.logincard .brand h1{color:var(--sd-brand-gold);font-weight:760;letter-spacing:.17em}
+.topbar .brand p{color:var(--muted);letter-spacing:.14em}
 .panel,.stat,.setting,.shortcut,.logincard,.editor,
 #main .mobilecards tbody tr,.activity-log-card {
   border-color:var(--reference-border);
