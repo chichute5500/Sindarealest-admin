@@ -4314,18 +4314,19 @@ html:not(.dark) #home .hero-visual::before {
   aspect-ratio:auto!important;transform:translateX(-50%)!important;
   border:0!important;border-radius:0!important;
   background:transparent url('/images/hero-upload/ai-marble-pedestal.webp?v=20261025-showcase6') center / 100% 100% no-repeat!important;
-  opacity:.96!important;
+  opacity:.94!important;
   /* Preserve the solid top under both shoes but melt the body and floor glow
      into the website background; no box edge at the Hero boundary. */
-  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 48%,rgba(0,0,0,.94) 58%,rgba(0,0,0,.65) 69%,rgba(0,0,0,.17) 84%,transparent 100%)!important;
-  mask-image:linear-gradient(to bottom,#000 0%,#000 48%,rgba(0,0,0,.94) 58%,rgba(0,0,0,.65) 69%,rgba(0,0,0,.17) 84%,transparent 100%)!important;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 40%,rgba(0,0,0,.93) 48%,rgba(0,0,0,.68) 58%,rgba(0,0,0,.36) 70%,transparent 87%,transparent 100%)!important;
+  mask-image:linear-gradient(to bottom,#000 0%,#000 40%,rgba(0,0,0,.93) 48%,rgba(0,0,0,.68) 58%,rgba(0,0,0,.36) 70%,transparent 87%,transparent 100%)!important;
   filter:saturate(.80) brightness(1.01) contrast(.94) drop-shadow(0 7px 15px rgba(8,29,47,.065))!important;
 }
 html.dark #home .hero-visual .hero-pedestal-art {
-  filter:saturate(.79) brightness(.99) contrast(.94) drop-shadow(0 9px 16px rgba(0,8,20,.105))!important;
+  filter:saturate(.76) brightness(.96) contrast(.93) drop-shadow(0 9px 16px rgba(0,8,20,.095))!important;
 }
 html:not(.dark) #home .hero-visual .hero-pedestal-art {
-  filter:saturate(.64) brightness(1.52) contrast(.90) drop-shadow(0 9px 15px rgba(38,76,105,.10))!important;
+  opacity:.91!important;
+  filter:saturate(.59) brightness(1.60) contrast(.84) drop-shadow(0 8px 14px rgba(38,76,105,.075))!important;
 }
 #home .hero-visual .hero-visual-glow {
   opacity:.32!important;filter:blur(3.5px)!important;
@@ -4357,7 +4358,7 @@ html:not(.dark) #home .hero-visual .hero-pedestal-art {
     filter:saturate(.80) brightness(1.01) contrast(.94) drop-shadow(0 5px 10px rgba(3,20,35,.065))!important;
   }
   html:not(.dark) #home .hero-visual .hero-pedestal-art {
-    filter:saturate(.64) brightness(1.52) contrast(.90) drop-shadow(0 5px 9px rgba(30,64,88,.07))!important;
+    filter:saturate(.59) brightness(1.60) contrast(.84) drop-shadow(0 5px 9px rgba(30,64,88,.055))!important;
   }
   #home .hero-visual .hero-visual-glow {
     opacity:.29!important;filter:blur(2px)!important;
