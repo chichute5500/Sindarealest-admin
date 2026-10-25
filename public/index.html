@@ -3562,6 +3562,27 @@ html.dark #home .hero-copy h1 span{color:#f3f7fa;-webkit-text-fill-color:current
 html.dark #home .hero-copy h1 span:nth-child(2){color:#f19c9f;-webkit-text-fill-color:#f19c9f}
 html.dark #home .hero-description{color:#d3e2ee}
 html.dark #home .hero-visual .hero-pedestal-art{filter:saturate(.65) brightness(.86) contrast(.8)}
+/* DESKTOP EDITORIAL TYPE — dimensional three-line art-directed hierarchy, still live semantic text.
+   Line boxes are intentionally individually positioned; the red center word is larger, as in the reference.
+   Compact phone/tablet rules below retain natural text flow. */
+@media(min-width:1101px){
+ #home .hero-copy h1{height:clamp(224px,18.4vw,269px);flex:0 0 auto;margin-bottom:clamp(16px,1.7vw,26px)}
+ #home .hero-copy h1 span{
+  position:absolute;left:0;width:max-content;max-width:none;
+  line-height:1;letter-spacing:-.06em;white-space:nowrap;
+ }
+ #home .hero-copy h1 span:first-child{
+  top:0;font-size:clamp(78px,7.1vw,102px);font-weight:400;
+ }
+ #home .hero-copy h1 span:nth-child(2){
+  top:29%;font-size:clamp(99px,9.1vw,131px);font-weight:600;
+  letter-spacing:-.065em;
+ }
+ #home .hero-copy h1 span:last-child{
+  top:70%;font-size:clamp(81px,7.3vw,105px);font-weight:400;
+  letter-spacing:-.06em;
+ }
+}
 @media(min-width:761px) and (max-width:1100px){
  #home.hero.wrap{grid-template-columns:minmax(0,49%) minmax(0,51%);height:clamp(405px,53vw,550px);padding:clamp(27px,3vw,43px)}
  #home .hero-copy h1{font-size:clamp(40px,5.3vw,60px)}
