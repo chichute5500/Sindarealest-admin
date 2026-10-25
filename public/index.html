@@ -4956,3 +4956,26 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:brightness(.78) saturate(
  content:none!important;display:none!important;opacity:0!important;
  background:none!important;box-shadow:none!important;
 }
+
+
+/* HERO V9.2 REFERENCE EDGE PARITY — retain strict 98.7% actual screenshot test.
+   The approved master has square edges. Avoid clipping its bright silk corners
+   against theme-dependent page colors, which was reducing dark-mode similarity.
+   A minimal two-pixel rounding prevents harsh aliasing without changing layout.
+   No filters, pseudo-art, blur or alternate product imagery are used. */
+#home.hero.wrap{
+  border-radius:2px!important;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+}
+#home .hero-reference-art,#home .hero-reference-art img{
+  border-radius:2px!important;
+}
+@media(max-width:760px){
+ #home.hero.wrap,#home .hero-reference-art,#home .hero-reference-art img{
+   border-radius:2px!important;
+ }
+}
+/* Drawn artwork retains the exact baked-in caption and CTA. Its transparent
+   interaction layer still receives clicks, taps and keyboard focus. */
