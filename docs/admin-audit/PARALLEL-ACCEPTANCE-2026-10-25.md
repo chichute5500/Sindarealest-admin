@@ -46,3 +46,12 @@ Actual remote end-to-end [#40184464715](https://github.com/chichute5500/Sindarea
 - Cloudflare project binding identity checks passed previously; these are not proof the GitHub token has R2 *object* permissions.
 - Cloudflare docs confirm Object Read & Write R2-scoped API tokens work through S3 SigV4 API, not Cloudflare REST API. Preferred least-privilege resolution: owner issues Object Read & Write S3 credentials restricted to only two Admin Preview buckets and stores them in GitHub Actions secrets; then the QA canary must be adapted to S3 PUT/GET/DELETE without printing secrets. No existing secret values should be exposed or requested in chat.
 - Do not enable account-wide R2 scope on the deployment token without explicit owner decision; non-production resource isolation and PR boundaries remain unchanged.
+
+
+## Final R2 S3 success — supersedes earlier Wrangler API blocker
+
+- **[Workflow #40187426696](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40187426696): SUCCESS** on deployed source `04f115405699434431b51216f31c311ef8bea333`; sanitized evidence artifact #12597070312.
+- Scoped S3 credentials from GitHub Actions Secrets worked with `S3Client` using SigV4 and R2 endpoint. Only two verified isolated Preview buckets were eligible for writes: `sindarealest-images-preview` and `sindarealest-preview-original`.
+- Run-owned UUID WebP objects in public `IMAGES` and private `ORIGINALS`: **PUT ×2, GET ×2 + hash matching, publicly served media GET + hash matching, DELETE ×2, and two rounds of HEAD absence confirmation ×2 objects**. Manifest: `status: PASS_REMOTE_R2_RUN_OWNED_LIFECYCLE`, `bindingIsolationVerified: true`, `readbackVerified: true`, `publicRouteVerified: true`, `cleanupPasses: 2`, `cleanupVerified: true`, `productionTouched: false`.
+- Earlier Wrangler `AUTHENTICATION_OR_TOKEN` errors were due to testing bucket-scoped S3-only credentials over incompatible API access. The successful S3-specific test **resolves the R2 remote canary blocker**, but does not prove exhaustive product Gallery UI upload UX or visual reference approval.
+- **Remaining:** owner 12/12 reference signoff, destructive Restore on truly separate disposable D1, real financial reconciliation/approval and full pentest/screen-reader/accessibility/load acceptance, plus storefront storage separation before integration. Keep Admin PR #111 OPEN, main/Production untouched.

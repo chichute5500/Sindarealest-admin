@@ -13,7 +13,6 @@
   "uploadRollback": "LOCAL_TEST_PASS",
   "blockers": [
     "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
-    "ADMIN_PREVIEW_ORIGINALS_MISSING",
     "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
   ],
   "visualParityAccepted": 0,
@@ -229,5 +228,21 @@
     "result": "SUCCESS",
     "targetProject": "sindarealest-admin-preview",
     "environment": "preview"
-  }
+  },
+  "lastVerifiedRemoteR2": {
+    "workflowRun": 40187426696,
+    "sourceSha": "04f115405699434431b51216f31c311ef8bea333",
+    "artifactId": 12597070312,
+    "result": "PASS_REMOTE_R2_RUN_OWNED_LIFECYCLE",
+    "bindingIsolationVerified": true,
+    "readbackVerified": true,
+    "publicRouteVerified": true,
+    "cleanupPasses": 2,
+    "cleanupVerified": true,
+    "productionTouched": false,
+    "protocol": "S3_SIGV4",
+    "bucketScope": "ADMIN_PREVIEW_IMAGES_AND_ORIGINALS_ONLY"
+  },
+  "lastVerifiedR2SourceSha": "04f115405699434431b51216f31c311ef8bea333",
+  "lastObservedStorefrontStorage": "PREVIEW_DB_AND_ORIGINALS_STILL_PRODUCTION_BACKED_NO_WRITES"
 }
