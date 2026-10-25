@@ -132,7 +132,7 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-assert.ok(nativeHeroCss.includes("url('/images/hero-upload/ai-marble-pedestal.webp')") &&
+assert.ok(nativeHeroCss.includes("url('/images/hero-rebuild/marble-shelf-v14.svg')") &&
   nativeHeroCss.includes("url('/images/hero-rebuild/silk-waves.svg')"),
   "HERO V12 must use separate true marble pedestal and purely decorative silk assets.");
 assert.ok(nativeHeroCss.includes("width:clamp(218px,66vw,400px)") &&
