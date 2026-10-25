@@ -25,10 +25,10 @@ jobs:
         run: |
           set -euo pipefail
           BASE=777988063adabc3fac3796468f2ab0f77c5606ed
-          test "$(git hash-object public/index.html)" = "2215f85f86e19ba45007c3c7a8e130fb77cabafd"
+          test "$(git hash-object public/index.html)" = "65a839ee3b035f4cecbc6a2b9518210b51288bf7"
           test "$(git hash-object 'public/images/hero-upload/tb_image_share_1792519964514 (1).png')" = "c17cc9058ae3008dc662806d21d2cf8f7d83b8a9"
           test "$(git hash-object public/images/hero-upload/ai-marble-pedestal.webp)" = "25230efbf4d3c9457dc36ce91b75fbf60f56d157"
-          test "$(git hash-object public/images/hero-rebuild/silk-waves.svg)" = "a22afaeb54b40e1d8c65f807935f6766114a93ff"
+          test "$(git hash-object public/images/hero-rebuild/silk-waves.svg)" = "a3be5a0f11359bd7046584e117843b90ba55b036"
           test "$(git hash-object public/images/hero-rebuild/marble-shelf-v14.svg)" = "02b96a62417825b36dc2af3c54bb8c0537117726"
           for path in public/admin/index.html functions/_lib.js functions/api/orders.js functions/api/admin/products.js migrations/0008_product_sku_verification.sql; do
             test "$(git hash-object "$path")" = "$(git rev-parse "$BASE:$path")" || {
