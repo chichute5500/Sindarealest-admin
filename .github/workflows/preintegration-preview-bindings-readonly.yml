@@ -45,6 +45,8 @@ jobs:
           w_prod_db="$(get_db "$w" production)"
           a_img="$(get_img "$a" preview IMAGES)"
           w_img="$(get_img "$w" preview IMAGES)"
+          a_orig="$(get_img "$a" preview ORIGINALS)"
+          w_orig="$(get_img "$w" preview ORIGINALS)"
           prod_img="$(get_img "$w" production IMAGES)"
           prod_priv="$(get_img "$w" production ORIGINALS)"
           if [[ -z "$a_db" || -z "$w_prod_db" || -z "$a_img" || -z "$prod_img" || -z "$prod_priv" ]]; then
@@ -73,5 +75,25 @@ jobs:
             echo "::notice::CROSS_PREVIEW_IMAGES_SHARED_ISOLATED: same non-Production images bucket."
           else
             echo "::warning::CROSS_PREVIEW_IMAGES_DISTINCT: Admin uploads are not automatically visible to storefront Preview."
+          fi
+          if [[ -z "$a_orig" ]]; then
+            echo "::warning::ADMIN_PREVIEW_ORIGINALS_MISSING: Admin product upload and warranty attachment flows need isolated private ORIGINALS."
+          elif [[ "$a_orig" == "$prod_img" || "$a_orig" == "$prod_priv" ]]; then
+            echo "::error::ADMIN_PREVIEW_ORIGINALS_PRODUCTION_SHARED: product and warranty uploads must remain prohibited."
+            exit 1
+          elif [[ "$a_orig" == "$a_img" ]]; then
+            echo "::error::ADMIN_PREVIEW_ORIGINALS_PUBLIC_SHARED: private uploads would enter public IMAGES."
+            exit 1
+          else
+            echo "PASS: Admin Preview ORIGINALS binding is distinct from Production IMAGES/ORIGINALS and Preview IMAGES (metadata only)."
+          fi
+          if [[ -z "$w_orig" ]]; then
+            echo "::warning::STOREFRONT_PREVIEW_ORIGINALS_MISSING: image/warranty writes cannot be approved."
+          elif [[ "$w_orig" == "$prod_img" || "$w_orig" == "$prod_priv" ]]; then
+            echo "::warning::STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED: warranty image writes would touch Production bucket."
+          elif [[ "$w_orig" == "$w_img" ]]; then
+            echo "::warning::STOREFRONT_PREVIEW_ORIGINALS_PUBLIC_SHARED: private images are not isolated from public bucket."
+          else
+            echo "PASS: Storefront Preview ORIGINALS distinct from Production and Preview public images."
           fi
           echo "Audit mode: no deployments, no database reads or writes, no R2 object requests, no bucket/database names logged."
