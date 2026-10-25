@@ -78,8 +78,22 @@ img{display:block;max-width:100%}button,input{font:inherit}button{color:inherit;
 
 .toast.toast-detail-context{bottom:calc(156px + env(safe-area-inset-bottom))}
 @media(max-width:760px){.toast.toast-detail-context{bottom:calc(156px + env(safe-area-inset-bottom))}}
-/* Shared successful-add feedback: fly a non-interactive image clone to the real header cart. */
-.sd-fly-to-cart-clone{position:fixed;z-index:2147483646;display:block;pointer-events:none!important;max-width:none!important;max-height:none!important;margin:0!important;border:0!important;box-sizing:border-box;will-change:transform,opacity;transform-origin:center center;filter:drop-shadow(0 8px 16px rgba(20,42,60,.20))}
+/* Entire clicked product tile flies in a light frozen snapshot to its visible cart. */
+.sd-fly-to-cart-clone{
+ position:fixed;display:block;z-index:2147483646;pointer-events:none!important;
+ margin:0!important;padding:0!important;border:0!important;box-sizing:border-box;
+ transform-origin:center center;will-change:transform,opacity;contain:layout paint style;
+}
+.sd-fly-to-cart-snapshot{
+ box-sizing:border-box;display:block;width:100%;height:100%;
+ margin:0!important;pointer-events:none!important;
+ transform:none!important;transition:none!important;animation:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ box-shadow:0 15px 34px rgba(7,28,47,.24),0 0 0 1px rgba(165,210,240,.38)!important;
+}
+.sd-fly-to-cart-snapshot *{pointer-events:none!important;transition:none!important;animation:none!important}
+@media(prefers-reduced-motion:reduce){.sd-fly-to-cart-clone{display:none!important}}
+
 #cartOpen.sd-cart-bump svg,#mobileCartNav.sd-cart-bump svg{animation:sdCartIconShake 1s cubic-bezier(.36,.07,.19,.97) both;transform-origin:50% 65%}
 #cartOpen.sd-cart-confirmed,#mobileCartNav.sd-cart-confirmed{color:#5c91b9!important}
 @keyframes sdCartIconShake{0%,100%{transform:translateX(0) rotate(0)}10%,30%,50%,70%,90%{transform:translateX(-1.7px) rotate(-4deg)}20%,40%,60%,80%{transform:translateX(1.7px) rotate(4deg)}}
@@ -1308,65 +1322,86 @@ function confirmCartTargets(){
  targets.forEach(target=>{void target.offsetWidth;target.classList.add('sd-cart-bump')});
  cartFeedbackTimer=window.setTimeout(()=>targets.forEach(target=>target.classList.remove('sd-cart-bump')),1000);
 }
-function flyProductImageToCart(sourceImage,productId){
- if(cartMotionReduced()||!sourceImage||!sourceImage.complete||sourceImage.naturalWidth<1)return false;
- const sourceUrl=sourceImage.currentSrc||sourceImage.src;
- const sourceRect=sourceImage.getBoundingClientRect();
- const target=$('#cartOpen');
- const targetRect=target?.getBoundingClientRect();
- if(!sourceUrl||!sourceRect||sourceRect.width<1||sourceRect.height<1||!targetRect||targetRect.width<1||targetRect.height<1)return false;
- const sourceStyle=getComputedStyle(sourceImage);
- const clone=document.createElement('img');
- clone.className='sd-fly-to-cart-clone';
- clone.alt='';clone.setAttribute('aria-hidden','true');
- clone.dataset.productId=String(productId||'');
- clone.dataset.sourceImage=sourceUrl;
- clone.dataset.cartTargetId='cartOpen';
- clone.dataset.durationMs='720';
- clone.dataset.flightProgress='0';
- clone.src=sourceUrl;
- clone.style.cssText='position:fixed;left:'+(sourceRect.left+sourceRect.width/2)+'px;top:'+(sourceRect.top+sourceRect.height/2)+'px;width:'+sourceRect.width+'px;height:'+sourceRect.height+'px;object-fit:'+(sourceStyle.objectFit||'contain')+';object-position:'+(sourceStyle.objectPosition||'50% 50%')+';border-radius:'+(sourceStyle.borderRadius||'0')+';opacity:0;transform:translate(-50%,-50%);z-index:2147483646;pointer-events:none;will-change:transform,opacity;';
- let started=false,finished=false;
- const finish=()=>{if(finished)return;finished=true;clone.remove()};
- const begin=()=>{
-  if(finished||started)return;started=true;
-  if(!clone.naturalWidth){finish();return}
-  clone.style.opacity='1';
-  const startX=sourceRect.left+sourceRect.width/2;
-  const startY=sourceRect.top+sourceRect.height/2;
-  const duration=720;
-  const arcHeight=Math.min(92,Math.max(24,Math.abs((targetRect.left+targetRect.width/2)-startX)*.10));
-  const startedAt=performance.now();
-  const tick=(now)=>{
-   if(finished)return;
-   if(cartMotionReduced()){finish();return}
-   const liveTarget=$('#cartOpen');
-   const rect=liveTarget?.getBoundingClientRect();
-   if(!liveTarget||!rect||rect.width<1||rect.height<1){finish();return}
-   const raw=Math.min(1,Math.max(0,(now-startedAt)/duration));
-   const eased=1-Math.pow(1-raw,3);
-   const dx=(rect.left+rect.width/2)-startX;
-   const dy=(rect.top+rect.height/2)-startY-Math.sin(Math.PI*eased)*arcHeight;
-   const scale=1-.82*eased;
-   clone.dataset.flightProgress=raw.toFixed(3);
-   clone.style.transform='translate(-50%,-50%) translate('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px) scale('+scale.toFixed(3)+')';
-   clone.style.opacity=String(1-.12*eased);
-   if(raw<1)window.requestAnimationFrame(tick);else finish();
-  };
-  window.requestAnimationFrame(tick);
+let activeCartFlight=null;
+function activeCartFlightTarget(){
+ const targets=[$('#mobileCartNav'),$('#cartOpen')].filter(Boolean);
+ const visible=target=>{
+  if(!target)return false;
+  const r=target.getBoundingClientRect(),style=getComputedStyle(target);
+  return r.width>0&&r.height>0&&r.bottom>0&&r.top<window.innerHeight
+   &&r.right>0&&r.left<window.innerWidth
+   &&style.display!=='none'&&style.visibility!=='hidden'&&Number(style.opacity)>0;
  };
- clone.addEventListener('load',begin,{once:true});
- clone.addEventListener('error',finish,{once:true});
- document.body.appendChild(clone);
- if(clone.complete){if(clone.naturalWidth>0)begin();else finish()}
+ if(window.innerWidth<=760 && visible($('#mobileCartNav')))return $('#mobileCartNav');
+ return targets.find(visible)||null;
+}
+function flyProductCardToCart(sourceElement,productId){
+ if(cartMotionReduced()||!sourceElement||!sourceElement.isConnected)return false;
+ const target=activeCartFlightTarget();
+ if(!target)return false;
+ const sourceRect=sourceElement.getBoundingClientRect(),destRect=target.getBoundingClientRect();
+ if(sourceRect.width<12||sourceRect.height<12||destRect.width<10||destRect.height<10)return false;
+ if(activeCartFlight){activeCartFlight.cancel();activeCartFlight=null}
+ const snapshot=sourceElement.cloneNode(true);
+ snapshot.removeAttribute('id');snapshot.removeAttribute('data-reveal');
+ snapshot.removeAttribute('data-reveal-bound');snapshot.removeAttribute('data-product');
+ snapshot.classList.add('sd-fly-to-cart-snapshot');
+ snapshot.style.width=sourceRect.width+'px';snapshot.style.height=sourceRect.height+'px';
+ snapshot.querySelectorAll('[id],[data-reveal],[data-reveal-bound],[data-add],[data-open-product]').forEach(node=>{
+  node.removeAttribute('id');node.removeAttribute('data-reveal');node.removeAttribute('data-reveal-bound');
+  node.removeAttribute('data-add');node.removeAttribute('data-open-product');
+ });
+ snapshot.querySelectorAll('button,a,input,[tabindex]').forEach(node=>{node.tabIndex=-1;node.setAttribute('aria-hidden','true')});
+ const originals=sourceElement.querySelectorAll('img'),photos=snapshot.querySelectorAll('img');
+ photos.forEach((img,n)=>{
+  const source=originals[n];
+  if(source?.complete&&source.naturalWidth>0)img.src=source.currentSrc||source.src;
+  img.loading='eager';img.decoding='async';
+ });
+ const clone=document.createElement('div');
+ clone.className='sd-fly-to-cart-clone';clone.setAttribute('aria-hidden','true');clone.setAttribute('inert','');
+ clone.dataset.productId=String(productId||'');
+ clone.dataset.sourceType=sourceElement.classList.contains('product-card')?'product-card':'detail-image';
+ clone.dataset.cartTargetId=target.id;clone.dataset.durationMs='1100';clone.dataset.flightProgress='0';
+ clone.style.left=sourceRect.left+'px';clone.style.top=sourceRect.top+'px';
+ clone.style.width=sourceRect.width+'px';clone.style.height=sourceRect.height+'px';
+ clone.style.opacity='1';clone.style.transform='translate3d(0,0,0) scale(1)';
+ clone.appendChild(snapshot);document.body.appendChild(clone);
+ const centerX=sourceRect.left+sourceRect.width/2,centerY=sourceRect.top+sourceRect.height/2;
+ const duration=1100,distance=Math.hypot(destRect.left+destRect.width/2-centerX,destRect.top+destRect.height/2-centerY);
+ const arc=Math.min(100,Math.max(24,distance*.095)),started=performance.now();
+ let frame=0,done=false;
+ const cleanup=confirm=>{
+  if(done)return;done=true;if(frame)window.cancelAnimationFrame(frame);
+  clone.remove();if(activeCartFlight?.cancel===cancel)activeCartFlight=null;
+  if(confirm)confirmCartTargets();
+ };
+ const cancel=()=>cleanup(false);
+ activeCartFlight={cancel};
+ const tick=now=>{
+  if(done)return;
+  if(cartMotionReduced()||document.hidden||!sourceElement.isConnected){cleanup(true);return}
+  const live=activeCartFlightTarget();
+  if(!live){cleanup(true);return}
+  const rect=live.getBoundingClientRect(),raw=Math.max(0,Math.min(1,(now-started)/duration));
+  const eased=raw*raw*(3-2*raw);
+  const dx=(rect.left+rect.width/2-centerX)*eased;
+  const dy=(rect.top+rect.height/2-centerY)*eased-Math.sin(Math.PI*raw)*arc;
+  const scale=1-.84*eased,opacity=raw<.76?1:1-.78*((raw-.76)/.24);
+  clone.dataset.flightProgress=raw.toFixed(3);clone.dataset.cartTargetId=live.id;
+  clone.style.transform='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+scale.toFixed(3)+')';
+  clone.style.opacity=opacity.toFixed(3);
+  if(raw<1)frame=window.requestAnimationFrame(tick);else cleanup(true);
+ };
+ frame=window.requestAnimationFrame(tick);
  return true;
 }
 function addToCartFromControl(id,button){
- const sourceImage=selectedCartSourceImage(button);
+ const source=button?.closest('.product-card')||selectedCartSourceImage(button);
  const added=addToCart(id);
  if(!added)return false;
- confirmCartTargets();
- try{flyProductImageToCart(sourceImage,id)}catch(error){}
+ try{if(!flyProductCardToCart(source,id))confirmCartTargets()}
+ catch(error){confirmCartTargets()}
  return true;
 }
 function favoriteKey(product){return String(product&&(product.id||product.slug)||'')}

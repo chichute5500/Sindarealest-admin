@@ -70,7 +70,19 @@ assert.match(html, /\.welcome-splash\.is-leaving\{opacity:0;visibility:hidden/);
 // Both cart controls must react together to every successful add, using a gentle 1-second icon shake.
 assert.match(html, /function confirmCartTargets\(\)[\s\S]*?\$\('#cartOpen'\),\$\('#mobileCartNav'\)[\s\S]*?targets\.forEach\(target=>\{void target\.offsetWidth;target\.classList\.add\('sd-cart-bump'\)\}\)/);
 assert.match(html, /#cartOpen\.sd-cart-bump svg,#mobileCartNav\.sd-cart-bump svg\{animation:sdCartIconShake 1s/);
-assert.match(html, /function addToCartFromControl\(id,button\)[\s\S]*?confirmCartTargets\(\)[\s\S]*?flyProductImageToCart\(sourceImage,id\)/);
+assert.match(html,/function addToCartFromControl\\(id,button\\)[\\s\\S]*?button\\?\\.closest\\('\\.product-card'\\)[\\s\\S]*?flyProductCardToCart\\(source,id\\)/,
+ 'Flight starts at whole clicked product tile, not the photo or plus button.');
+assert.match(html,/function activeCartFlightTarget\\(\\)[\\s\\S]*?window\\.innerWidth<=760[\\s\\S]*?return targets\\.find\\(visible\\)/,
+ 'Flight must target mobile bottom cart or visible desktop header cart.');
+assert.match(html,/snapshot=sourceElement\\.cloneNode\\(true\\)/,'Cloned tile preserves real image, text and layout.');
+assert.match(html,/clone\\.dataset\\.durationMs='1100'/,'Flight is clear and slower than old 720ms.');
+assert.match(html,/const scale=1-\\.84\\*eased/,'Entire tile shrinks into destination.');
+assert.match(html,/clone\\.style\\.transform='translate3d\\('/,'GPU-efficient single flight animation.');
+assert.match(html,/if\\(activeCartFlight\\)\\{activeCartFlight\\.cancel\\(\\);activeCartFlight=null\\}/,
+ 'Repeated taps cancel old in-flight clones.');
+assert.match(html,/if\\(confirm\\)confirmCartTargets\\(\\)/,'Arrival triggers cart visual acknowledgement.');
+assert.match(html,/if\\(cartMotionReduced\\(\\)\\|\\|!sourceElement\\|\\|!sourceElement\\.isConnected\\)return false/,
+ 'Reduced motion bypasses fly animation.');
 assert.doesNotMatch(html, /confirmHeaderCartAdd/);
 
 // Cart and account are true toggles on both the desktop cart and mobile controls.
