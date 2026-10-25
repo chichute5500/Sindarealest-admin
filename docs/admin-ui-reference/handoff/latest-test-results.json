@@ -1,6 +1,6 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-24T19:02:50.880Z",
+  "capturedAtUtc": "2026-10-25T01:24:06Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
   "branchHeadAtCheckpointStart": "b5c3e1d7bf72efafb488821674586691908f3d8d",
@@ -1312,5 +1312,87 @@
     "visualReferenceAcceptance": "0_OF_12_NOT_VERIFIED",
     "rubricEvidenceWeight": 32,
     "note": "Screenshot test does not independently check deployed Cloudflare application SHA; accepted screenshots do not imply visual pixel parity."
+  },
+  "latestLiveVerification": {
+    "capturedAtUtc": "2026-10-25T01:24:06Z",
+    "repository": "chichute5500/Sindarealest-admin",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "branchHeadObservedBeforeCheckpointWrites": "76ee79b341b3e3389fc727fc73e440409796ba63",
+    "exactHeadWorkflowRuns": [
+      {
+        "id": 40125566809,
+        "name": "Validate source and tests (pull_request)",
+        "conclusion": "success",
+        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566809"
+      },
+      {
+        "id": 40125566760,
+        "name": "Admin Preview Playwright",
+        "conclusion": "success",
+        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566760"
+      },
+      {
+        "id": 40125566758,
+        "name": "Admin isolated Preview Playwright",
+        "conclusion": "success",
+        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566758"
+      },
+      {
+        "id": 40125563037,
+        "name": "Validate source and tests (push)",
+        "conclusion": "success",
+        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125563037"
+      }
+    ],
+    "pullRequests": {
+      "108": {
+        "state": "open",
+        "merged": false,
+        "mergeable": false,
+        "headSha": "5b175cc7a5867376084a90908ed7cf39dd19d90a",
+        "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108"
+      },
+      "111": {
+        "state": "open",
+        "merged": false,
+        "mergeable": true,
+        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
+        "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111"
+      }
+    },
+    "viewportQaEvidence": {
+      "codeTestSha": "40137cbdb7ac2c473cde981cd8214c28b00a6ef5",
+      "syntheticQaRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714",
+      "syntheticArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551",
+      "readOnlyCaptureRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202712",
+      "diagnosticsRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202720",
+      "captures": 48,
+      "dimensions": "24 x 390x844 and 24 x 1280x800",
+      "duplicateHashes": 0,
+      "cleanup": "two passes; zero run-owned QA rows across seven tables",
+      "referenceParity": "0/12 accepted; NOT VERIFIED",
+      "note": "These QA/capture runs belong to code/test SHA 40137cb... (parent of the current docs-only commit), not the exact docs HEAD."
+    },
+    "acceptance": {
+      "historicProgressPercent": 50,
+      "progressStatus": "PROVISIONAL",
+      "weightedEvidenceScore": "32/100 evidence-weighted criteria, not project completion",
+      "approvedReferenceParity": "0/12 accepted",
+      "remaining": "exact reference visual sign-off, payment/refund settlement, QR/R2 acceptance, disposable Restore POST validation, owner final sign-off"
+    },
+    "requestedMasterPromptPath": {
+      "path": "docs/admin-ui-reference/handoff/MASTER-PROMPT-AUTO-HANDOFF.md",
+      "exists": false,
+      "canonicalExistingPath": "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
+      "canonicalBlobSha": "dd69c12196d284142fb155d747988267143d9ede",
+      "action": "Not modified: requested nested path is absent and scope is restricted to the seven listed paths; do not create a duplicate without explicit scope correction."
+    },
+    "safety": "Only handoff files in the requested handoff directory were eligible for edits. No source code, merge, deploy, Production, Cloudflare Access/secrets, D1/R2, or migration changes."
   }
 }
