@@ -1,34 +1,19 @@
 # PROMPT BÀN GIAO — SINDAREALEST ADMIN (25/10/2026)
 
-Tiếp tục trực tiếp dự án **SinDarealest Admin** trên GitHub. KHÔNG hỏi lại lịch sử. Ưu tiên **duyệt thiết kế 12 màn hình lần lượt**.
+Tiếp tục trực tiếp dự án SinDarealest Admin trên GitHub. Chỉ sửa nhánh `feature/admin-isolated-handoff-2026-10-20`. PR #111 OPEN, không merge, không thay đổi main/Storefront PR #108/Production, không tích hợp Admin với website. Giữ logo SD vàng chính thức.
 
-Repository: `chichute5500/Sindarealest-admin`
-Chỉ sửa branch `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN, chưa merge.
-Latest deployed/tested app SHA: `ab46d35311ab1ef7fb2f95428401076c70325ce7` (**10/10 GitHub workflows PASS**). Branch HEAD tại thời điểm viết: `0f0dcba2ecb0bce0ecd46f6104ef371a5c0ff301` (tài liệu có thể có commit sau). PHẢI reverify GitHub HEAD trước khi làm.
-Admin Preview: https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/
+## TRẠNG THÁI MỚI: OWNER ĐÃ DUYỆT 2/12
 
-## Đã làm
-- **Màn 01 Đăng nhập: CHỦ DỰ ÁN ĐÃ DUYỆT (1/12)**. Giữ nguyên giao diện và logo vàng SD.
-- **Màn 02 Tổng quan: CHƯA DUYỆT**. Chủ dự án chê 2 nhãn "Tổng quan" trùng nhau và nút đăng xuất mũi tên không rõ nghĩa. Đã sửa: eyebrow thành "BẢNG ĐIỀU KHIỂN", chỉ một tiêu đề "Tổng quan"; nút logout SVG icon nguồn tắt **màu đỏ** trên mobile/PC, `aria-label="Đăng xuất"`, không còn mũi tên. Không sửa chức năng logout.
-- Sửa lỗi WCAG ở danh sách Nhật ký trống: chỉ có role=list khi có item.
-- Exact deployed source `ab46d35`: **10/10 workflow PASS**: deploy #40194565202, WCAG axe #40194565239, live 12-screen screenshots #40194565226, synthetic D1 QA #40194565196, cùng các nguồn/Playwright/diagnostics.
-- **Artifact live ảnh MỚI** từ run #40194565226: `12599625737`, tên `admin-12-screen-live-evidence-20` (43 MB). Chụp nhiều kích thước mobile/desktop sáng/tối. CẦN download artifact để lấy **02_dashboard mới nhất**, so với mẫu gốc `docs/admin-ui-reference/admin-mobile-reference.png`; đừng sử dụng ảnh màn 02 cũ còn hai tiêu đề và nút mũi tên.
-- R2 S3 end-to-end 2 bucket Preview PUT/GET/media/DELETE + 2 HEAD absent PASS run #40187426696; Restore POST thật trên D1 hoàn toàn mới, rollback, xóa DB dùng một lần PASS #40188752986.
-- Hồ sơ owner approval: `docs/admin-audit/OWNER-VISUAL-APPROVALS-2026-10-25.md`. Màn 01 YES; màn 02 NO, chưa duyệt.
+- Màn 01 — Đăng nhập: **OWNER APPROVED**, đã chấp thuận trước đó; giữ nguyên.
+- Màn 02 — Tổng quan: **OWNER APPROVED ngày 25/10/2026**, sau khi xem so sánh ảnh mobile 390×844 sáng và PC 1440×900 sáng từ Admin Preview mã `ab46d35311ab1ef7fb2f95428401076c70325ce7`. Đã sửa 2 lỗi tiêu đề lặp và logout arrow thành nút nguồn đỏ. Exact code SHA có 10/10 Actions PASS. Evidence run #40194565226, artifact #12599625737.
+- Chủ dự án đã yêu cầu gửi **một lần cả 10 màn còn lại (03–12)** để duyệt đồng loạt. **Chưa màn nào trong 03–12 được duyệt.** Dùng poster `docs/admin-ui-reference/admin-mobile-reference.png` và ảnh Preview mới `artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/<screen>.png`; thêm PC 1440×900 khi phù hợp.
+- Chính xác 2/12 được chấp thuận, không đồng nghĩa sản phẩm hoàn thành 100%; không tự duyệt 10 màn còn lại, không tự suy đoán giao diện tối hoặc phiên bản khác được duyệt.
 
-## CẦN LÀM NGAY TRONG CHAT MỚI
-1. Kiểm tra HEAD, PR #111, latest Actions.
-2. Download và giải nén GitHub artifact `12599625737` (run #40194565226). Tách ảnh 02 Dashboard mobile sáng 390×844 và PC, đối chiếu với crop 02 của poster `docs/admin-ui-reference/admin-mobile-reference.png`.
-3. Tạo **ảnh so sánh mới**, trình bày cho user duyệt màn 02. Nếu user không đạt, sửa tiếp code ở branch Admin, deploy và test lại. KHÔNG tự tick APPROVED.
-4. Khi user duyệt màn 02, ghi rõ 2/12 vào GitHub và chuyển sang ảnh 03 Danh sách sản phẩm. Duyệt lần lượt 12 màn hình.
+## Việc tiếp theo
 
-## Tuyệt đối không
-- Không merge PR #111, không ghi Production/main, không sửa Storefront PR #108 và nhánh `fix/liquid-glass-audit-2026-10-19`.
-- Storefront Preview D1 và ORIGINALS vẫn dùng chung Production; cấm thử ghi hay tích hợp với Storefront.
-- Không đổi logo SD vàng sang xanh; không giả giá/doanh thu thực.
-- Đừng coi CI xanh là chủ dự án đã duyệt thiết kế.
-
-Hồ sơ khác: `docs/admin-audit/PARALLEL-ACCEPTANCE-2026-10-25.md`, `docs/admin-ui-reference/reference-instructions.md`.
+1. Xác minh HEAD/PR/Actions thực tế.
+2. Trình bộ ảnh đối chiếu màn 03–12 trực tiếp trong chat cho người dùng xem và ra quyết định **một lần**.
+3. Sau quyết định của chủ dự án, ghi chính xác màn nào được duyệt và sửa màn chưa đạt; chạy CI/Preview/ảnh chụp trước khi yêu cầu duyệt lại.
 
 ---
 

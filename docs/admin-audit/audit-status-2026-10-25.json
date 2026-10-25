@@ -126,7 +126,7 @@
     "previewBrandFilter": "none"
   },
   "appDeploymentNote": "Latest code/test branch includes backend fixes NOT yet redeployed to isolated Admin Preview. Browser visual captures are static/local source and existing Admin Preview checks, not backend live integration proof.",
-  "designParityAccepted": 1,
+  "designParityAccepted": 2,
   "remainingBlockers": [
     "ADMIN_PREVIEW_ORIGINALS_MISSING",
     "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
@@ -261,24 +261,68 @@
       "approvedOn": "2026-10-25",
       "approvalText": "Tôi duyệt màn hình 01 Đăng nhập với giao diện Preview hiện tại.",
       "scopeNote": "Approval applies to the shown mobile-light current Preview comparison, not unseen breakpoints or future UI versions."
+    },
+    {
+      "screenNumber": 2,
+      "screenId": "02_dashboard",
+      "name": "Tổng quan",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "reviewedViews": [
+        {
+          "viewport": "390x844",
+          "theme": "light",
+          "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/02_dashboard.png"
+        },
+        {
+          "viewport": "1440x900",
+          "theme": "light",
+          "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/1440x900_light/02_dashboard.png"
+        }
+      ],
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "approvedOn": "2026-10-25",
+      "approvalText": "Tôi duyệt màn hình 02 Tổng quan với giao diện Preview hiện tại. Ghi nhận vào GitHub và chuyển sang màn 03 Danh sách sản phẩm.",
+      "scopeNote": "Owner approved presented Preview mobile-light and desktop-light screenshots, not pixel-perfect parity or other modes and future versions."
     }
   ],
   "lastOwnerVisualAcceptance": {
-    "accepted": 1,
+    "accepted": 2,
     "total": 12,
-    "approvedAppSha": "0b9395721cfd58ec0d1dace922ffc3372b7bba60",
-    "nextScreen": "02_dashboard",
+    "approvedAppSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+    "nextScreen": "03_to_12_batch",
     "status": "IN_PROGRESS"
   },
   "screen02VisualReview": {
     "screen": 2,
     "name": "Tổng quan",
-    "state": "AWAITING_REAPPROVAL",
+    "state": "OWNER_APPROVED",
     "ownerFeedback": "Duplicate dashboard heading; replace ambiguous logout arrow with red power-off icon",
     "fixedDeployedSourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
     "visualWorkflowRun": 40194565226,
     "visualArtifactId": 12599625737,
     "ciPasses": 10,
-    "ciTotal": 10
+    "ciTotal": 10,
+    "approvedOn": "2026-10-25",
+    "ownerApproved": true
+  },
+  "remainingVisualReview": {
+    "screens": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "state": "AWAITING_OWNER_BATCH_DECISION",
+    "previewSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+    "artifactId": 12599625737
   }
 }
