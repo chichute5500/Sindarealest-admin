@@ -63,4 +63,26 @@ assert.equal(missingOriginal.status, 400, "missing original file must be rejecte
 assert.equal(missingOriginals.puts.length, 0, "missing original must not write to private storage");
 assert.equal(missingImages.puts.length, 0, "missing original must not write a public derivative");
 
+// Preview lacking ORIGINALS must fail closed *before* the public derivative is put.
+const missingBindingImages = bucket();
+const missingBinding = await uploadProductImage({
+  request: makeRequest(),
+  env: { DB: {}, ADMIN_PASSWORD, SESSION_SECRET, IMAGES: missingBindingImages },
+});
+assert.equal(missingBinding.status, 503, "unbound private ORIGINALS is a hard upload blocker");
+assert.equal(missingBindingImages.puts.length, 0, "no orphaned public R2 derivative when ORIGINALS binding is absent");
+
+// R2 is nontransactional; if the second (public) write fails, roll back ONLY
+// the newly created private key, never a previously existing product image.
+const rolledBackOriginals = bucket();
+const failedPublicImages = { async put() { throw new Error("simulated public R2 write outage"); } };
+const failedDerivative = await uploadProductImage({
+  request: makeRequest(),
+  env: { DB: {}, ADMIN_PASSWORD, SESSION_SECRET, ORIGINALS: rolledBackOriginals, IMAGES: failedPublicImages },
+});
+assert.equal(failedDerivative.status, 503, "partial image upload cannot claim success");
+assert.equal(rolledBackOriginals.puts.length, 1, "private original was staged first");
+assert.deepEqual(rolledBackOriginals.deletes, [rolledBackOriginals.puts[0].key],
+  "failed public derivative must delete exactly its own newly staged private original");
+
 console.log("PASS: admin image uploads validate original file signatures and keep originals private.");
