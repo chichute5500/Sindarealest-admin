@@ -3,8 +3,10 @@
  * Fails closed without create permission. Deletes only the newly-created UUID.
  */
 import assert from 'node:assert/strict';
-import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
-import {join} from 'node:path';
+import {readFileSync,mkdirSync,writeFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {join,resolve} from 'node:path';
+import {tmpdir} from 'node:os';
+import {spawnSync} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {createSession} from '../functions/_lib.js';
 import {onRequestPost as restore} from '../functions/api/admin/restore.js';
@@ -57,6 +59,7 @@ if(!idString(admin.deployment_configs?.preview?.d1_databases?.DB?.id)||
 proof.bindingPreflight=true;save();
 const dbName='qa-admin-restore-'+run+'-'+randomUUID().slice(0,8);
 let id=null,failed=null,rollbackFailure=null;
+let tempConfig=null;
 const migrations=['0001_schema.sql','0003_storefront_operations.sql',
   '0004_admin_notifications.sql','0005_address_warranty_verification.sql',
   '0006_remove_warranty_otp.sql','0007_order_contact_details.sql',
@@ -118,10 +121,29 @@ try{
  if(!idString(id)||liveIds.includes(id)||newDb?.name!==dbName)
    throw Error('CREATED_D1_ID_OR_NAME_NOT_VERIFIED_STOP');
  proof.created=true;save();
+ // Use Wrangler's remote D1 SQL import pathway, not REST /query for full
+ // migration scripts containing multiple statements and PRAGMAs.
+ tempConfig=mkdtempSync(join(tmpdir(),'qa-d1-unbound-'));
+ const configPath=join(tempConfig,'wrangler.toml');
+ writeFileSync(configPath,[
+   'name = "qa-disposable-restore"',
+   'compatibility_date = "2026-10-12"',
+   '[[d1_databases]]',
+   'binding = "DB"',
+   'database_name = "'+dbName+'"',
+   'database_id = "'+id+'"',
+ ].join('\\n')+'\\n');
  for(const filename of migrations){
-  const sql=readFileSync('migrations/'+filename,'utf8');
-  await query({sql});
+  proof.currentMigration=filename;save();
+  const wrangler=resolve('node_modules/wrangler/bin/wrangler.js');
+  const child=spawnSync(process.execPath,[wrangler,'d1','execute',dbName,
+    '--remote','--config',configPath,'--file',resolve('migrations',filename)],{
+      encoding:'utf8',env:process.env,timeout:90000,maxBuffer:512*1024
+    });
+  if(child.error||child.status!==0)
+    throw Error('REMOTE_D1_WRANGLER_MIGRATION_FAILED_'+filename+'_STATUS_'+child.status);
  }
+ proof.currentMigration=null;
  proof.migrations=true;save();
  const tables=(await query({sql:"SELECT name FROM sqlite_master WHERE type='table'"}))[0]?.results||[];
  for(const name of ['products','customers','orders','order_items','audit_logs','warranties','order_payment_transactions'])
@@ -168,6 +190,7 @@ finally{
   ?'PASS_REMOTE_DISPOSABLE_RESTORE_ROUTE_AND_ROLLBACK':'NOT_ACCEPTED';
  proof.errorCode=failed;
  proof.cleanupErrorCode=rollbackFailure;
+ if(tempConfig)rmSync(tempConfig,{recursive:true,force:true});
  proof.finishedAtUtc=new Date().toISOString();save();
 }
 console.info('[QA_DISPOSABLE_REMOTE_RESTORE] '+JSON.stringify({

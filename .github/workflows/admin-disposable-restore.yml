@@ -36,6 +36,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
+      - name: Install pinned Wrangler migration executor
+        run: npm install --no-fund
       - name: Execute real Restore POST handler against brand-new unbound remote D1; delete by verified UUID
         run: node scripts/qa-admin-disposable-remote-restore.mjs
       - name: Upload sanitized evidence
