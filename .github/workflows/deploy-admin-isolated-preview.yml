@@ -27,6 +27,8 @@ on:
       - 'scripts/qa-admin-preview-r2-canary.mjs'
       - '.github/workflows/admin-preview-wcag-axe.yml'
       - 'tests/e2e/admin-wcag-axe.spec.js'
+      - 'tests/admin-reference-visual-contract.test.mjs'
+      - 'tests/admin-liquid-glass-contract.test.mjs'
 
 permissions:
   contents: read

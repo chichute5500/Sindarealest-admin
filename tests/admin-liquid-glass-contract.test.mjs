@@ -266,8 +266,8 @@ const topbarEnd = adminHtml.indexOf('</header>', topbarStart);
 assert.ok(topbarStart >= 0 && topbarEnd > topbarStart
   && adminHtml.slice(topbarStart, topbarEnd).includes('<p>Luxury in Every Detail</p>'),
   'Admin chrome should use the approved brand tagline');
-assert.ok(adminHtml.includes("head('Tổng quan','Tổng quan','Chào mừng, quản trị viên.'"),
-  'Dashboard heading should match the approved reference rather than a marketing-style label');
+assert.ok(adminHtml.includes("head('BẢNG ĐIỀU KHIỂN','Tổng quan','Chào mừng, quản trị viên.'"),
+  'Dashboard now has a single Tổng quan title with a separate BẢNG ĐIỀU KHIỂN eyebrow, per owner direction');
 const dashboardStart = adminHtml.indexOf('function dashboard(){');
 const dashboardEnd = adminHtml.indexOf('\nfunction ', dashboardStart + 20);
 const dashboardSource = adminHtml.slice(dashboardStart, dashboardEnd > dashboardStart ? dashboardEnd : undefined);
