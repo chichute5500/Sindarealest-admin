@@ -1,6 +1,11 @@
 name: SinDarealest PhotoAI Android — verify and build
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'photoai-android/**'
+      - '.github/workflows/photoai-android.yml'
   push:
     branches: [feature/photoai-android-apk-2026-10-25]
     paths:
