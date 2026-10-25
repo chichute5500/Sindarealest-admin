@@ -306,4 +306,30 @@ for (const [label, mutate] of [
   assert.equal(db.batchCalls, 0, "invalid payment ledger relationships must be rejected before destructive restore");
 }
 
+{
+  const backup = validRelationshipsBackup();
+  backup.operations.orderPaymentTransactions = [
+    {
+      id: "payment-net-received", order_id: "order-1", payment_request_id: null,
+      direction: "received", amount: 10000, transaction_reference: "BANKNETREC001",
+      note: "", actor: "admin", verified_at: "2026-01-02 12:00:00", created_at: "2026-01-02 12:00:00"
+    },
+    {
+      id: "payment-net-refunded", order_id: "order-1", payment_request_id: null,
+      direction: "refunded", amount: 10001, transaction_reference: "BANKNETREF001",
+      note: "", actor: "admin", verified_at: "2026-01-02 12:01:00", created_at: "2026-01-02 12:01:00"
+    },
+  ];
+  const invalidDb = makeDB();
+  const invalid = await restoreBackup({ request: request(backup), env: { ...env, DB: invalidDb } });
+  assert.equal(invalid.status, 400, "restore must reject a ledger with refunds exceeding verified receipts");
+  assert.equal(invalidDb.batchCalls, 0, "invalid ledger must not initiate destructive restore");
+  backup.operations.orderPaymentTransactions[1].amount = 10000;
+  backup.operations.orders[0].payment_status = "refunded";
+  const validDb = makeDB();
+  const valid = await restoreBackup({ request: request(backup), env: { ...env, DB: validDb } });
+  assert.equal(valid.status, 200, "full refund of exactly received money is a valid backup state");
+  assert.equal(validDb.batchCalls, 1);
+}
+
 console.log("PASS: restore safety — v1 preservation, invalid/oversized rejection, legacy v2 snapshot backfill, larger valid backup acceptance, and single-batch failure handling.");

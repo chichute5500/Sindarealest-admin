@@ -90,7 +90,7 @@ function validateOperations(operations) {
     paymentReferences.add(normalizedReference);
     if (request.status === "pending") pendingPaymentOrders.add(request.order_id);
   }
-  const transactionIds = new Set(), transactionReferences = new Set();
+  const transactionIds = new Set(), transactionReferences = new Set(), ledgerNetByOrder = new Map();
   for (const transaction of orderPaymentTransactions) {
     if (!str(transaction.id,100,true) || !orderIds.has(transaction.order_id) ||
         (transaction.payment_request_id != null && transaction.payment_request_id !== "" &&
@@ -109,6 +109,14 @@ function validateOperations(operations) {
     }
     transactionIds.add(transaction.id);
     transactionReferences.add(normalizedReference);
+    const priorNet = ledgerNetByOrder.get(transaction.order_id) || 0;
+    const signedAmount = Number(transaction.amount) * (transaction.direction === "received" ? 1 : -1);
+    ledgerNetByOrder.set(transaction.order_id, priorNet + signedAmount);
+  }
+  // A verified refund can never exceed the money received for that order.
+  // Check the full imported ledger before constructing any destructive D1 batch.
+  if ([...ledgerNetByOrder.values()].some(net => net < 0)) {
+    return { error: "Bản sao lưu có tổng tiền hoàn vượt khoản đã nhận của đơn hàng." };
   }
   for (const w of warranties) {
     if (!str(w.id,100,true) || !orderIds.has(w.order_id) || !itemIds.has(w.order_item_id) || itemById.get(w.order_item_id)?.order_id !== w.order_id || !str(w.warranty_code,100,true) || !str(w.policy_name,160,true) || !integer(w.duration_months,1,120) || !str(w.starts_at,10,true) || !str(w.ends_at,10,true) || !["active","expired","void"].includes(w.status) || !timestamp(w.created_at)) return { error: "Bản sao lưu có bản ghi bảo hành không hợp lệ hoặc dòng sản phẩm không thuộc đúng đơn hàng." };
