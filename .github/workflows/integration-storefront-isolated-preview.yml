@@ -108,6 +108,8 @@ jobs:
         run: node scripts/audit-storefront-main-preview.mjs
       - name: Browser checkout to actual order/Admin handlers on disposable local D1 (no remote writes)
         run: node scripts/audit-storefront-checkout-disposable-browser.mjs
+      - name: Verify atomic Light/Dark switches and owner material slideshow in Chromium (no remote writes)
+        run: node scripts/qa-storefront-theme-material.mjs
       - name: Upload SHA-bound browser proof
         if: always()
         uses: actions/upload-artifact@v4
