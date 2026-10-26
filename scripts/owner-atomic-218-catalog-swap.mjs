@@ -22,7 +22,7 @@ async function cf(path,body){
   body:body?JSON.stringify(body):undefined,redirect:"error",signal:AbortSignal.timeout(30000)
  });
  const j=await r.json().catch(()=>null);
- guard(r.ok&&j?.success===true,"CLOUDFLARE_CALL_REJECTED");
+ if(!r.ok||j?.success!==true)console.log("CLOUDFLARE_SQL_STATUS="+JSON.stringify({status:r.status,codes:(j?.errors||[]).map(e=>e.code).slice(0,3),detail:(j?.errors||[]).map(e=>String(e.message||"").slice(0,100)).slice(0,2)}));\n guard(r.ok&&j?.success===true,"CLOUDFLARE_CALL_REJECTED");
  return j.result;
 }
 async function d1(db,sql,params=[]){
@@ -114,15 +114,22 @@ async function main(){
  const allIds=existing.map(p=>p.id);
  const newIds=staged.map(p=>p.id);
  const oldIds=old.map(p=>p.id);
- const clause=(n)=>Array.from({length:n},()=>"?").join(",");
- const whereAll=clause(allIds.length),newList=clause(newIds.length),oldList=clause(oldIds.length);
+ // Cloudflare D1's API rejected the former 673-bind UPDATE. Keys are
+ // validated UUIDs from the exact preflight cohort before SQL quoting.
+ // This preserves the one-statement atomic flip without oversized bind arrays.
+ const uuidList=(ids)=>{
+   guard(ids.every(x=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(x))),
+     "INVALID_UUID_IN_CATALOG_SWAP");
+   return ids.map(x=>"'"+x+"'").join(",");
+ };
+ const allList=uuidList(allIds),newList=uuidList(newIds),oldList=uuidList(oldIds);
  // UPDATE is one D1 SQL statement: old and new visibility switch atomically.
- const swapSql="UPDATE products SET published=CASE WHEN id IN ("+newList+") THEN 1 ELSE 0 END WHERE id IN ("+whereAll+")";
- const restoreSql="UPDATE products SET published=CASE WHEN id IN ("+oldList+") THEN 1 ELSE 0 END WHERE id IN ("+whereAll+")";
+ const swapSql="UPDATE products SET published=CASE WHEN id IN ("+newList+") THEN 1 ELSE 0 END WHERE id IN ("+allList+")";
+ const restoreSql="UPDATE products SET published=CASE WHEN id IN ("+oldList+") THEN 1 ELSE 0 END WHERE id IN ("+allList+")";
  let updated=false;
  try{
   report.attempted=true;
-  await d1(liveDb,swapSql,[...newIds,...allIds]);
+  await d1(liveDb,swapSql);
   updated=true;report.productionWrites++;
   const rows=await d1(liveDb,"SELECT id,published FROM products");
   guard(rows.length===455,"POST_SWAP_UNEXPECTED_TOTAL");
@@ -147,7 +154,7 @@ async function main(){
  }catch(e){
   if(updated){
    try{
-    await d1(liveDb,restoreSql,[...oldIds,...allIds]);
+    await d1(liveDb,restoreSql);
     report.productionWrites++;report.rolledBack=true;
    }catch(re){report.rollbackError=String(re.message||re).slice(0,110);}
   }
