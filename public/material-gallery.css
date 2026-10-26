@@ -58,6 +58,11 @@ html.theme-transitioning body .mobile-bottom-nav{
   transition-property:background-color,border-color,color!important;
   transition-duration:.22s!important;
   transition-timing-function:ease-out!important;
+  /* The near-opaque (.94) navbar colour is already its approved surface.
+     Suspend the expensive backdrop sampling for only the 220ms fade, then
+     restore the exact original 24px Liquid Glass blur automatically. */
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
 }
 /* All other surfaces switch immediately; no expensive paint-heavy shadow or
    blur animation across the product catalog. */
