@@ -83,3 +83,45 @@ html.theme-transitioning,html.theme-transitioning body{
   #materialTile .sd-material-slide,
   #materialTile::before,#materialTile::after{transition:none!important}
 }
+
+
+/* Owner-requested dedicated 0.5–1s theme-change interstitial. Independent of
+   Light/Dark, existing satin wallpaper, Liquid Glass and approved components. */
+#sdThemeSwitchOverlay{
+  position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;
+  box-sizing:border-box;padding:24px;text-align:center;
+  background:#091723;color:#f5f1e8;opacity:0;visibility:hidden;
+  pointer-events:none;
+  transition:opacity .16s ease-out,visibility 0s linear .16s;
+}
+#sdThemeSwitchOverlay.is-visible{
+  opacity:1;visibility:visible;pointer-events:auto;transition:none;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-content{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:13px;max-width:min(88vw,460px);
+  font-family:"SD Sans",Arial,sans-serif;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-brand{
+  font-family:"SD Serif",Georgia,serif;font-size:clamp(19px,4.5vw,28px);
+  letter-spacing:.17em;font-weight:500;color:#d7b67d;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-rule{
+  width:72px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#d9b77b,transparent);
+}
+#sdThemeSwitchOverlay .sd-theme-switch-message{
+  font-size:clamp(14px,3.8vw,17px);letter-spacing:.07em;font-weight:600;color:#f7f4ef;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-note{
+  font-size:12px;letter-spacing:.04em;color:rgba(247,244,239,.67);
+}
+/* Prevent hidden underlay transitions from leaking out as the cover exits. */
+html.sd-theme-overlay-active body .theme-bg,
+html.sd-theme-overlay-active body .nav-wrap .nav,
+html.sd-theme-overlay-active body .mobile-bottom-nav{
+  transition:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  #sdThemeSwitchOverlay{transition:none!important}
+}

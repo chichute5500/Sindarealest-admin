@@ -22,16 +22,19 @@ test('Owner-controlled material photos are config-driven and have no manual cont
  assert.match(css,/#materialTile\.has-real-material-gallery .material-photo/);
  execFileSync(process.execPath,['--check',new URL('../public/material-gallery.js',import.meta.url).pathname]);
 });
-test('Theme crossfades smoothly with one synchronized duration and no stagger',()=>{
+test('User-selected theme interstitial covers palette changes without redesigning owner-PASS surfaces',()=>{
  const page=read('public/index.html'),css=read('public/material-gallery.css');
  const browserQA=read('scripts/qa-storefront-theme-material.mjs');
  assert.match(browserQA,/const strictCycles=process\.env\.SD_THEME_DIAGNOSTIC_VARIANTS==='1'\?1:3/);
  assert.match(browserQA,/for\(let cycle=0;cycle<strictCycles;cycle\+\+\)/);
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
- assert.match(page,/nav\.addEventListener\('transitionstart',onStart\)/);
- assert.match(page,/nav\.addEventListener\('transitionend',onEnd\)/);
- assert.match(page,/commitPalette\(\)/);
- assert.match(page,/__sdThemeTimer=setTimeout\(finish,560\)/);
+ assert.match(page,/id="sdThemeSwitchOverlay"/);
+ assert.match(page,/Đang đổi giao diện/);
+ assert.match(page,/const durationMs=720/);
+ assert.match(page,/rafTwo=requestAnimationFrame\(commit\)/);
+ assert.match(page,/window\.__sdThemeTimer=setTimeout\(reveal/);
+ assert.match(css,/#sdThemeSwitchOverlay\.is-visible/);
+ assert.match(css,/html\.sd-theme-overlay-active body \.theme-bg/);
  assert.match(page,/__sdCancelThemeStage/);
  assert.doesNotMatch(page,/function applyThemeMode[^\n]*void document\.body\.offsetHeight/);
  assert.match(css,/html\.theme-transitioning body \.theme-bg\{[\s\S]*?opacity \.22s/);

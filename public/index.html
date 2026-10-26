@@ -892,6 +892,15 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
   }).catch(function(){});
 })();
 </script>
+
+<div id="sdThemeSwitchOverlay" class="sd-theme-switch-overlay" role="status" aria-live="polite" aria-atomic="true" aria-hidden="true">
+  <div class="sd-theme-switch-content">
+    <span class="sd-theme-switch-brand">SINDAREALEST</span>
+    <span class="sd-theme-switch-rule" aria-hidden="true"></span>
+    <span class="sd-theme-switch-message">Đang đổi giao diện</span>
+    <span class="sd-theme-switch-note">Một trải nghiệm tinh tế hơn</span>
+  </div>
+</div>
 <div class="theme-bg theme-bg--dark" aria-hidden="true"></div><div class="theme-bg theme-bg--light" aria-hidden="true"></div>
 <header class="nav-wrap">
   <nav class="nav tap-target" aria-label="Điều hướng chính">
@@ -1115,80 +1124,78 @@ function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDra
 function iconBag(){return '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>'}
 function setThemeIcon(){const dark=document.documentElement.classList.contains('dark');$('#themeIcon').innerHTML=dark?'<path d="M20.2 15.4A8 8 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42-1.42m11.3-11.3 1.42-1.42"/>';const mode=document.documentElement.dataset.themeMode||'auto';$('#themeToggle').setAttribute('aria-label',mode==='auto'?'Đang theo giao diện thiết bị. Nhấn để đổi chế độ thủ công':dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối');$('#themeToggle').title=mode==='auto'?'Theo giao diện thiết bị':`Chế độ ${dark?'tối':'sáng'} (thủ công)`}
 function syncThemeMeta(){const dark=document.documentElement.classList.contains('dark');const meta=$('meta[name="theme-color"]');if(meta)meta.content=dark?'#061522':'#eaf3fb'}
-// Begin the three visible 220ms transitions without invalidating hundreds
-// of root-dependent catalog styles. Commit the full palette on the FIRST
-// observed nav transition frame, never at an arbitrary click-time delay.
-// This preserves the approved glass/SVG and lets the compositor lead.
+// Owner-selected 0.5–1 second theme-changing screen. The visual cover is
+// painted before touching the global palette, protecting approved components
+// from half-light/half-dark frames under expensive Chromium raster work.
+// This is a UX containment solution, not a claim that the old 80/300ms raw
+// navbar/backdrop benchmark is now met.
 function applyThemeMode(mode,animate=true){
   const root=document.documentElement;
   const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const smooth=animate&&!reduced;
-  const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const targetDark=mode==='dark'||(mode==='auto'&&systemDark);
+  const targetDark=mode==='dark'||(mode==='auto'&&!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches));
+  const overlay=$('#sdThemeSwitchOverlay');
+  const hadPending=typeof window.__sdCancelThemeStage==='function';
+  if(hadPending)window.__sdCancelThemeStage();
   clearTimeout(window.__sdThemeTimer);
-  if(typeof window.__sdCancelThemeStage==='function')window.__sdCancelThemeStage();
-  const nav=$('.nav'),lightBg=$('.theme-bg--light'),darkBg=$('.theme-bg--dark');
-  const bottomNav=$('.mobile-bottom-nav');
   root.dataset.themeMode=mode;
-  if(!smooth||!nav||!lightBg||!darkBg||targetDark===root.classList.contains('dark')){
+  if(!animate||reduced||!overlay||(!hadPending&&targetDark===root.classList.contains('dark'))){
     root.classList.toggle('dark',targetDark);
-    root.classList.remove('theme-transitioning');
+    root.classList.remove('sd-theme-overlay-active','theme-transitioning');
+    overlay?.classList.remove('is-visible');
+    overlay?.setAttribute('aria-hidden','true');
     window.__sdThemeTargetDark=null;
+    window.__sdCancelThemeStage=null;
     syncThemeMeta();setThemeIcon();
     return;
   }
+  const started=performance.now();
+  const durationMs=720;
+  let finished=false,committed=false,rafOne=0,rafTwo=0,rafThree=0,rafFour=0;
   window.__sdThemeTargetDark=targetDark;
-  let committed=false,finished=false;
-  const releaseStyles=()=>{
-    nav.style.removeProperty('background-color');
-    lightBg.style.removeProperty('opacity');
-    darkBg.style.removeProperty('opacity');
-    bottomNav?.style.removeProperty('background-color');
-  };
-  const commitPalette=()=>{
-    if(committed)return;
-    committed=true;
-    root.classList.toggle('theme-transitioning',smooth);
-    root.classList.toggle('dark',targetDark);
-    syncThemeMeta();setThemeIcon();
-  };
-  const finish=()=>{
-    if(finished)return;
-    finished=true;
+  overlay.classList.add('is-visible');
+  overlay.setAttribute('aria-hidden','false');
+  root.classList.add('sd-theme-overlay-active');
+  const clearScheduled=()=>{
     clearTimeout(window.__sdThemeTimer);
-    nav.removeEventListener('transitionstart',onStart);
-    nav.removeEventListener('transitionend',onEnd);
-    commitPalette();
-    releaseStyles();
-    root.classList.remove('theme-transitioning');
+    for(const id of [rafOne,rafTwo,rafThree,rafFour])if(id)cancelAnimationFrame(id);
+  };
+  const cleanup=()=>{
+    clearScheduled();
+    overlay.classList.remove('is-visible');
+    overlay.setAttribute('aria-hidden','true');
+    root.classList.remove('sd-theme-overlay-active','theme-transitioning');
     window.__sdThemeTargetDark=null;
     window.__sdCancelThemeStage=null;
-  };
-  const onStart=event=>{
-    if(event.target===nav&&event.propertyName==='background-color')commitPalette();
-  };
-  const onEnd=event=>{
-    if(event.target===nav&&event.propertyName==='background-color')finish();
   };
   window.__sdCancelThemeStage=()=>{
     if(finished)return;
     finished=true;
-    clearTimeout(window.__sdThemeTimer);
-    nav.removeEventListener('transitionstart',onStart);
-    nav.removeEventListener('transitionend',onEnd);
-    releaseStyles();
-    root.classList.remove('theme-transitioning');
-    window.__sdCancelThemeStage=null;
+    cleanup();
   };
-  nav.addEventListener('transitionstart',onStart);
-  nav.addEventListener('transitionend',onEnd);
-  nav.style.setProperty('background-color',targetDark?'rgba(4,20,34,.94)':'rgba(244,250,255,.94)','important');
-  lightBg.style.setProperty('opacity',targetDark?'0':'1','important');
-  darkBg.style.setProperty('opacity',targetDark?'1':'0','important');
-  if(bottomNav)bottomNav.style.setProperty('background-color',targetDark?'rgba(4,20,34,.995)':'rgba(247,252,255,.995)','important');
-  // Safety fallback if the element loses its transition events (e.g. hidden
-  // tab). Real devices complete via transitionend; never cut off a live fade.
-  window.__sdThemeTimer=setTimeout(finish,560);
+  const reveal=()=>{
+    if(finished)return;
+    finished=true;
+    cleanup();
+  };
+  const commit=()=>{
+    if(finished||committed)return;
+    committed=true;
+    root.classList.toggle('dark',targetDark);
+    syncThemeMeta();setThemeIcon();
+    // Only reveal after the new palette has had a chance to render in the
+    // hidden-under-overlay page. Never expose a partially recoloured frame.
+    rafThree=requestAnimationFrame(()=>{
+      rafFour=requestAnimationFrame(()=>{
+        if(finished)return;
+        window.__sdThemeTimer=setTimeout(reveal,Math.max(0,durationMs-(performance.now()-started)));
+      });
+    });
+  };
+  // Double rAF guarantees that the covering screen receives a paint before
+  // the large html.dark cascade invalidation begins.
+  rafOne=requestAnimationFrame(()=>{
+    rafTwo=requestAnimationFrame(commit);
+  });
 }
 function toggleTheme(){
   const root=document.documentElement;

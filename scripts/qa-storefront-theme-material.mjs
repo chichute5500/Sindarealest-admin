@@ -249,6 +249,8 @@ try{
       const nav=document.querySelector('.nav');
       const bgs=[document.querySelector('.theme-bg--light'),document.querySelector('.theme-bg--dark')];
       const materialPhoto=document.querySelector('.material-photo');
+      const overlay=document.querySelector('#sdThemeSwitchOverlay');
+      if(!overlay)throw Error('Theme-changing screen missing from isolated Preview');
       // Independently prove the real computed 220ms declarations before
       // measuring a click; do not trigger expensive style reads in its path.
       const already=root.classList.contains('theme-transitioning');
@@ -271,13 +273,36 @@ try{
         arm(direction){
           const baseline=snapshot();
           const result={direction,now:{...baseline,dark:direction},samples:[],frameTimes:[],
-            transitionEvents:[],longTasks:[]};
+            transitionEvents:[],longTasks:[],overlayEvents:[],paletteCommitAt:null,paletteCovered:false,firstOverlayFrameMs:null};
           const cleanup=[];
           const obs=typeof PerformanceObserver==='function'
             ?new PerformanceObserver(list=>result.longTasks.push(...list.getEntries().map(e=>({start:Math.round(e.startTime),duration:Math.round(e.duration)}))))
             :null;
           try{obs?.observe({entryTypes:['longtask']})}catch{}
           let started=0,active=true;
+          const overlayObserver=new MutationObserver(()=>{
+            if(!started||!active)return;
+            const shown=overlay.classList.contains('is-visible');
+            result.overlayEvents.push({type:shown?'show':'hide',time:Math.round(performance.now())});
+            if(shown){
+              requestAnimationFrame(()=>{
+                if(!active)return;
+                if(result.firstOverlayFrameMs===null)
+                  result.firstOverlayFrameMs=Math.round(performance.now()-started);
+              });
+            }
+          });
+          overlayObserver.observe(overlay,{attributes:true,attributeFilter:['class']});
+          cleanup.push(()=>overlayObserver.disconnect());
+          const paletteObserver=new MutationObserver(()=>{
+            if(!started||!active||result.paletteCommitAt!==null)return;
+            if(root.classList.contains('dark')===direction){
+              result.paletteCommitAt=Math.round(performance.now()-started);
+              result.paletteCovered=overlay.classList.contains('is-visible');
+            }
+          });
+          paletteObserver.observe(root,{attributes:true,attributeFilter:['class']});
+          cleanup.push(()=>paletteObserver.disconnect());
           let midSampleRecorded=false;
           for(const elem of [nav,...bgs]){
             for(const type of ['transitionrun','transitionstart','transitionend']){
@@ -323,6 +348,9 @@ try{
             result.stable=snapshot();
             result.durationMs=Math.round(performance.now()-started);
             result.transitionEvents=result.transitionEvents.map(e=>({...e,relativeMs:e.time-Math.round(started)}));
+            result.overlayEvents=result.overlayEvents.map(e=>({...e,relativeMs:e.time-Math.round(started)}));
+            result.overlayHidden=!overlay.classList.contains('is-visible')&&getComputedStyle(overlay).visibility==='hidden';
+            result.stagingCleared=!root.classList.contains('sd-theme-overlay-active');
             result.longTasks=result.longTasks.map(e=>({...e,relativeMs:e.start-Math.round(started)}));
             return result;
           }};
@@ -342,7 +370,7 @@ try{
       const perfBefore=await perfSnapshot();
       // One discrete real click. Never inject CSS into live Production.
       await page.locator('#themeToggle').dispatchEvent('click');
-      await page.waitForTimeout(850);
+      await page.waitForTimeout(1150);
       const perfAfter=await perfSnapshot();
       const measured=await page.evaluate(()=>window.__sdThemeTiming.finish());
       measured.variant=variant;
@@ -366,7 +394,7 @@ try{
     }
     // Run experimental CSS only in the explicitly isolated read-only
     // diagnostic workflow, never in release-gated Chromium matrices.
-    if(process.env.SD_THEME_DIAGNOSTIC_VARIANTS==='1'){
+    if(process.env.SD_THEME_DIAGNOSTIC_VARIANTS==='1'&&process.env.SD_THEME_LEGACY_AB==='1'){
       const experiments=[
         {label:'prepromote-visual-compositor',css:
           'html body .nav-wrap .nav{will-change:background-color;transform:translateZ(0)}html body .theme-bg{transform:translateZ(0);backface-visibility:hidden}'},
@@ -817,7 +845,7 @@ try{
         await runThemeTrial(false,'reset-after-trace');
       }
     }else{
-          console.log('THEME_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
+          console.log('THEME_OVERLAY_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
             dark:r.direction,variant:'baseline',
             startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
             endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
@@ -849,33 +877,30 @@ try{
       const target=r.direction?1:0;
       if(![r.now,...r.samples,r.stable].every(s=>s.dark===r.direction))
         throw Error('Theme state changed twice: '+JSON.stringify(r));
-      // Strict event-timing gate: animation must *start* promptly and *end*
-      // before 300ms after the user click. Not a relaxation of QA; this
-      // avoids causing delays by repeatedly forcing style layout during paint.
-      const navStart=r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart'&&e.property==='background-color');
-      const backgroundStart=r.transitionEvents.find(e=>e.element==='lightBg'&&e.type==='transitionstart'&&e.property==='opacity');
-      const navEnd=r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend'&&e.property==='background-color');
-      const backgroundEnd=r.transitionEvents.find(e=>e.element==='lightBg'&&e.type==='transitionend'&&e.property==='opacity');
-      if(!navStart||!backgroundStart||!navEnd||!backgroundEnd)
-        throw Error('Theme transition events missing: '+JSON.stringify(r));
-      if(navStart.relativeMs>80||backgroundStart.relativeMs>80)
-        throw Error('Theme began too late after click (80ms start limit): '+JSON.stringify(r));
-      if(navEnd.relativeMs>300||backgroundEnd.relativeMs>300)
-        throw Error('Theme continued past 300ms after click: '+JSON.stringify(r));
-      if(Math.abs(navStart.relativeMs-backgroundStart.relativeMs)>40)
-        throw Error('Navbar/background transitions desynchronized (>40ms): '+JSON.stringify(r));
-      if(Math.abs(navEnd.elapsed-220)>25||Math.abs(backgroundEnd.elapsed-220)>25)
-        throw Error('Theme transition does not preserve 220ms duration: '+JSON.stringify(r));
-      if(!r.samples.some(s=>s.darkBg>.05&&s.darkBg<.95&&s.lightBg>.05&&s.lightBg<.95&&
-         s.navColor!==r.now.navColor&&s.navColor!==r.stable.navColor))
-        throw Error('Theme did not visibly crossfade in the middle: '+JSON.stringify(r));
-      if(Math.abs(r.stable.darkBg-target)>.02||Math.abs(r.stable.lightBg-(1-target))>.02)
-        throw Error('Theme did not settle after 900ms: '+JSON.stringify(r));
-      for(const key of ['bgTransition','navTransition','materialTransition']){
-        const duration=parseFloat(r.now[key]);
-        if(!(duration>=.2&&duration<=.25))
-          throw Error('Theme should transition quickly, without heavy shadows: '+key+' '+JSON.stringify(r.now));
-      }
+      // New owner-authorized UX acceptance: a visible covering screen appears
+      // on click, remains about 0.5–1s, palette commits while fully covered,
+      // and both themes settle before removing it. This replaces, not silently
+      // weakens, the retired bare-navbar 80/300ms exposure benchmark.
+      const shows=r.overlayEvents.filter(e=>e.type==='show');
+      const hides=r.overlayEvents.filter(e=>e.type==='hide');
+      if(shows.length!==1||hides.length!==1)
+        throw Error('Theme interstitial did not show/hide exactly once: '+JSON.stringify(r));
+      const show=shows[0].relativeMs, hide=hides[0].relativeMs;
+      if(show>80||show<0)
+        throw Error('Theme screen not activated promptly: '+JSON.stringify(r));
+      if(r.firstOverlayFrameMs===null||r.firstOverlayFrameMs>180)
+        throw Error('Theme screen first frame delayed: '+JSON.stringify(r));
+      if(hide<500||hide>1000)
+        throw Error('Theme screen exceeded 0.5-1s requested interval: '+JSON.stringify(r));
+      if(r.paletteCommitAt===null||r.paletteCommitAt>hide||!r.paletteCovered)
+        throw Error('Theme palette exposed before cover was ready: '+JSON.stringify(r));
+      if(!r.overlayHidden||!r.stagingCleared)
+        throw Error('Theme screen failed cleanup: '+JSON.stringify(r));
+      if(r.stable.dark!==r.direction||Math.abs(r.stable.darkBg-target)>.02||
+         Math.abs(r.stable.lightBg-(1-target))>.02)
+        throw Error('Final Light/Dark palette not stable when cover exits: '+JSON.stringify(r));
+      if(r.stable.navColor!==(r.direction?'rgba(4, 20, 34, 0.94)':'rgba(244, 250, 255, 0.94)'))
+        throw Error('Approved navbar colour lost after theme cover: '+JSON.stringify(r));
     }
     if(sync.slides!==2||sync.photoCrossfadeMs!==580||!sync.slideshowChanged||!sync.noControls||!sync.noPhotoWash||!sync.readableCaption)
       throw Error('Material crossfade/autoplay failed: '+JSON.stringify(sync));
@@ -890,7 +915,7 @@ try{
         await new Promise(resolve=>setTimeout(resolve,55));
       }
     });
-    await page.waitForTimeout(760);
+    await page.waitForTimeout(1150);
     const rapid=await page.evaluate(()=>{
       const root=document.documentElement;
       const nav=document.querySelector('.nav');
@@ -907,14 +932,17 @@ try{
         lightOpacity:Number(getComputedStyle(light).opacity),
         darkOpacity:Number(getComputedStyle(dark).opacity),
         meta:document.querySelector('meta[name="theme-color"]')?.content,
+        overlayHidden:!document.querySelector('#sdThemeSwitchOverlay')?.classList.contains('is-visible'),
+        overlayStageCleared:!root.classList.contains('sd-theme-overlay-active'),
         labelled:document.querySelector('#themeToggle')?.getAttribute('aria-label')?.includes('tối')
       };
     });
     if(!rapid.lightMode||rapid.mode!=='light'||rapid.staged||rapid.activeCancel||
        rapid.target!==null||rapid.overrideCount!==0||rapid.lightOpacity<.98||
-       rapid.darkOpacity>.02||rapid.meta!=='#eaf3fb'||!rapid.labelled)
+       rapid.darkOpacity>.02||rapid.meta!=='#eaf3fb'||!rapid.labelled||
+       !rapid.overlayHidden||!rapid.overlayStageCleared)
       throw Error('Rapid theme taps left inconsistent state: '+JSON.stringify(rapid));
-    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',strictCycles,rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
+    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',strictCycles,ux:'720ms theme cover',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});
   }finally{await context.close()}
  }
