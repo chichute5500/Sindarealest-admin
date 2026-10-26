@@ -60,5 +60,24 @@
     "STORE_PREVIEW_D1_PRODUCTION_SHARED",
     "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED",
     "CROSS_PROJECT_WRITE_QA_NOT_SAFE"
-  ]
+  ],
+  "canonicalHandoff20261026": {
+    "checkpoint": "docs/preintegration/ONLY-OPEN-WORK-2026-10-26.md",
+    "headAtCheck": "ff0dd138ae38f967c5728555f0b9fb7448aef35a",
+    "latestVerifiedDeployedSourceSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "priority": "NON_D1_R2_ONLY_NOT_YET_PASS",
+    "deferredNotPassed": [
+      "STORE_PREVIEW_D1_PRODUCTION_SHARED",
+      "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED"
+    ],
+    "lockedPassNotToRerun": [
+      "OWNER_12_UI_BELL",
+      "ADMIN_R2_LIFECYCLE",
+      "ADMIN_DISPOSABLE_D1_RESTORE",
+      "ADMIN_SMOKE",
+      "PREVIOUSLY_PASSING_QA"
+    ],
+    "integrationApproved": false,
+    "releaseApproved": false
+  }
 }

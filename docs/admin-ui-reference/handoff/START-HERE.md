@@ -1,5 +1,13 @@
+# START HERE — CANONICAL HANDOFF (26/10/2026)
+
+> **CHECKPOINT CANONICAL 26/10/2026 — CHỈ LÀM CÁC MỤC CHƯA PASS.** Admin branch lúc kiểm tra: `ff0dd138ae38f967c5728555f0b9fb7448aef35a` (commit tài liệu); [Validate PR #40254568611](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254568611), [Admin Preview Playwright #40254568615](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254568615), [Admin isolated Preview Playwright #40254568694](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254568694), [Validate push #40254565090](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254565090) đều **SUCCESS trên đúng SHA**. Code Admin được triển khai Preview gần nhất đã xác minh: `f9c992a614193722d2510755a24fb46dac20c4eb` (deploy [#40208396978](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40208396978) PASS). **Owner đã duyệt thiết kế 12/12 + chuông**; R2 Admin lifecycle, disposable D1 Restore, auth/keyboard/performance smoke đều PASS — **KHÔNG TEST LẠI**. D1/R2 bị loại khỏi ưu tiên theo yêu cầu mới; 2 binding Storefront Preview trỏ Production vẫn DEFERRED/UNSAFE, **KHÔNG PASS**, do đó **KHÔNG TÍCH HỢP / KHÔNG MERGE / KHÔNG CHẠM PRODUCTION**. Các mốc “0/12”, “50% PROVISIONAL”, thiếu ORIGINALS của Admin nằm trong phần lịch sử và **không được lấy làm trạng thái duyệt hiện tại**. Xem [danh sách chỉ việc còn mở](../../preintegration/ONLY-OPEN-WORK-2026-10-26.md), [prompt bàn giao](./PROMPT-NEXT-CHAT.md) và [OWNER approvals](../../admin-audit/OWNER-VISUAL-APPROVALS-2026-10-25.md). Mọi việc mới phải fetch live HEAD trước.
+
+**Điểm vào:** [PROMPT-NEXT-CHAT.md](./PROMPT-NEXT-CHAT.md) → [ONLY-OPEN-WORK-2026-10-26.md](../../preintegration/ONLY-OPEN-WORK-2026-10-26.md). **Fetch live** HEAD và workflow trước khi tiếp tục; không khởi động lại mục PASS. Các đoạn phía dưới chỉ là lịch sử hoặc rubric khác phạm vi.
 
 
+---
+
+<!-- 2026-10-26 LIVE HANDOFF: prior lines below retain history only -->
 > **LIVE CHECKPOINT — 2026-10-26 01:28 UTC (verified before handoff-only refresh)**
 >
 > - Repository `chichute5500/Sindarealest-admin`; branch `feature/admin-isolated-handoff-2026-10-20`; branch HEAD at verification start: `c904d3b5bf8daed49a4744223cd2696dbbc7fcee`.

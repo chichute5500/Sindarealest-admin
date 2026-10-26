@@ -599,5 +599,64 @@
     "artifactId": 12597562027,
     "result": "PASS_REMOTE_DISPOSABLE_RESTORE_ROUTE_AND_ROLLBACK",
     "productionTouched": false
+  },
+  "canonicalHandoff20261026": {
+    "priority": "ONLY_UNPASSED_NON_D1_R2_WORK",
+    "path": "docs/preintegration/ONLY-OPEN-WORK-2026-10-26.md",
+    "verifiedAt": "2026-10-26",
+    "headAtCheck": "ff0dd138ae38f967c5728555f0b9fb7448aef35a",
+    "adminDeployedCodeSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "headCi": {
+      "passed": 4,
+      "total": 4,
+      "runs": [
+        {
+          "run": 40254568611,
+          "name": "Validate PR",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        },
+        {
+          "run": 40254568615,
+          "name": "Admin Preview Playwright",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        },
+        {
+          "run": 40254568694,
+          "name": "Admin isolated Preview Playwright",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        },
+        {
+          "run": 40254565090,
+          "name": "Validate push",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        }
+      ]
+    },
+    "lockedPass": [
+      "OWNER_VISUAL_DESIGN_12_OF_12",
+      "SHARED_NOTIFICATION_BELL",
+      "ADMIN_PREVIEW_R2_RUN_OWNED_LIFECYCLE",
+      "DISPOSABLE_REMOTE_D1_RESTORE",
+      "ADMIN_AUTH_KEYBOARD_PERF_SMOKE",
+      "PREVIOUSLY_PASSING_PRODUCT_ORDER_WARRANTY_GALLERY_QA"
+    ],
+    "onlyOpen": [
+      "INDEPENDENT_SECURITY_DEEP_AUDIT",
+      "ASSISTIVE_SCREEN_READER_MANUAL_A11Y",
+      "ISOLATED_PERFORMANCE_LOAD_BUDGETS",
+      "EXTERNAL_BANK_SETTLEMENT_REFUND_SIGNOFF",
+      "READ_ONLY_ADMIN_STOREFRONT_API_SCHEMA_CONTRACT"
+    ],
+    "deferredNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "allowD1R2ReQA": false,
+    "allowMerge": false,
+    "allowProductionChanges": false
   }
 }

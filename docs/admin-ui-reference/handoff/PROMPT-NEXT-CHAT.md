@@ -1,5 +1,21 @@
+# NEXT CHAT — SINDAREALEST ADMIN: ONLY OPEN WORK (26/10/2026)
+
+**KHÔNG HỎI LẠI LỊCH SỬ. KHÔNG LÀM LẠI CÁC MỤC PASS. KHÔNG ƯU TIÊN D1/R2.**
+
+> **CHECKPOINT CANONICAL 26/10/2026 — CHỈ LÀM CÁC MỤC CHƯA PASS.** Admin branch lúc kiểm tra: `ff0dd138ae38f967c5728555f0b9fb7448aef35a` (commit tài liệu); [Validate PR #40254568611](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254568611), [Admin Preview Playwright #40254568615](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254568615), [Admin isolated Preview Playwright #40254568694](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254568694), [Validate push #40254565090](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40254565090) đều **SUCCESS trên đúng SHA**. Code Admin được triển khai Preview gần nhất đã xác minh: `f9c992a614193722d2510755a24fb46dac20c4eb` (deploy [#40208396978](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40208396978) PASS). **Owner đã duyệt thiết kế 12/12 + chuông**; R2 Admin lifecycle, disposable D1 Restore, auth/keyboard/performance smoke đều PASS — **KHÔNG TEST LẠI**. D1/R2 bị loại khỏi ưu tiên theo yêu cầu mới; 2 binding Storefront Preview trỏ Production vẫn DEFERRED/UNSAFE, **KHÔNG PASS**, do đó **KHÔNG TÍCH HỢP / KHÔNG MERGE / KHÔNG CHẠM PRODUCTION**. Các mốc “0/12”, “50% PROVISIONAL”, thiếu ORIGINALS của Admin nằm trong phần lịch sử và **không được lấy làm trạng thái duyệt hiện tại**. Xem [danh sách chỉ việc còn mở](../../preintegration/ONLY-OPEN-WORK-2026-10-26.md), [prompt bàn giao](./PROMPT-NEXT-CHAT.md) và [OWNER approvals](../../admin-audit/OWNER-VISUAL-APPROVALS-2026-10-25.md). Mọi việc mới phải fetch live HEAD trước.
+
+## Yêu cầu thực thi trong chat mới
+
+1. Đọc **[START-HERE.md](./START-HERE.md)**, [ONLY-OPEN-WORK-2026-10-26.md](../../preintegration/ONLY-OPEN-WORK-2026-10-26.md) và [audit-status](../../admin-audit/audit-status-2026-10-25.json). Sau đó fetch live branch, 2 PR và Actions.
+2. Chỉ thực hiện security chuyên sâu mới, accessibility với screen reader, performance/load an toàn, kiểm toán tài chính dạng read-only/chứng từ owner, hợp đồng Admin–Storefront chỉ đọc. Tách nhóm song song, chỉ sửa mã Admin khi có lỗi mới có bằng chứng; chạy test trực tiếp liên quan, không rerun PASS.
+3. Giữ mọi OWNER signoff 12/12 và chuông; không sửa giao diện, không đòi duyệt lại; R2/Restore và smoke đã PASS không làm lại.
+4. D1/R2 Storefront isolation còn **hai rủi ro hoãn xử lý**, integration BLOCKED, **không merge PR #111, không sửa PR #108/main/Production, không tác động Cloudflare/Storefront**.
+5. Báo cáo phần mới hoàn thành, phần chưa đủ bằng chứng và phần chờ owner; không tuyên bố 100% toàn dự án. Historical 0/12 hoặc “50% PROVISIONAL” không phải trạng thái owner duyệt hiện tại.
 
 
+---
+
+<!-- 2026-10-26 LIVE HANDOFF: prior lines below retain history only -->
 > **LIVE CHECKPOINT — 2026-10-26 01:28 UTC (verified before handoff-only refresh)**
 >
 > - Repository `chichute5500/Sindarealest-admin`; branch `feature/admin-isolated-handoff-2026-10-20`; branch HEAD at verification start: `c904d3b5bf8daed49a4744223cd2696dbbc7fcee`.
