@@ -7,7 +7,7 @@ test('Owner-controlled material photos are config-driven and have no manual cont
  const page=read('public/index.html'),js=read('public/material-gallery.js'),css=read('public/material-gallery.css');
  const config=JSON.parse(read('public/images/crocodile-leather/gallery.json'));
  assert.ok(Array.isArray(config.images)&&config.images.length>0);
- assert.ok(config.images.every(s=>/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}\\.(?:avif|webp|jpe?g|png)$/i.test(s)));
+ assert.ok(config.images.every(s=>/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}\.(?:avif|webp|jpe?g|png)$/i.test(s)));
  assert.equal(new Set(config.images).size,config.images.length);
  assert.equal(config.intervalMs,1500);
  assert.match(page,/id="materialTile"[^>]+data-reveal/);
