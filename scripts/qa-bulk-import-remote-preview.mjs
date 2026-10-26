@@ -102,15 +102,15 @@ try{
  record("Public optimized media readback",media.status===200&&
    (media.headers.get("content-type")||"").includes("image/webp"));
  const payload={title,category:"Sneaker",categoryLabel:"Giày thể thao",description:"",
-   price:null,stock:null,images:[uploaded.body.url],published:false,
+   price:2200000,stock:null,images:[uploaded.body.url],imageColors:["Nâu"],published:false,
    skuVerified:false,fulfillmentType:"unclassified"};
  const created=await local("/api/admin/products",{method:"POST",body:payload});
  record("Create exactly one real unpublished D1 draft",created.res.status===201&&created.body?.ok===true&&
    /^[0-9a-f-]{36}$/i.test(created.body?.product?.id||"")&&created.body?.product?.published===false);
  productId=created.body.product.id;report.createdDrafts=1;
  const listing=await local("/api/admin/products");
- record("Admin sees draft with image and no price/stock",listing.res.status===200&&listing.body?.products?.some(p=>p.id===productId&&
-   p.published===false&&p.price===null&&p.stock===null&&p.images?.[0]===uploaded.body.url));
+ record("Admin sees seller-confirmed VND price and corrected photo color in hidden draft",listing.res.status===200&&listing.body?.products?.some(p=>p.id===productId&&
+   p.published===false&&p.price===2200000&&p.stock===null&&p.images?.[0]===uploaded.body.url&&p.imageColors?.[0]==="Nâu"&&/^SD-/.test(p.sku)));
  const publicListing=await local("/api/products",{authenticated:false});
  record("Unpublished QA product absent from public storefront",publicListing.res.status===200&&
    Array.isArray(publicListing.body)&&!publicListing.body.some(p=>p.id===productId));
