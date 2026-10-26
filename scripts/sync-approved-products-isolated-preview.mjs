@@ -21,7 +21,7 @@ async function api(path,body){
   body:body?JSON.stringify(body):undefined,redirect:"error",signal:AbortSignal.timeout(30000)
  });
  const obj=await response.json().catch(()=>null);
- requireTrue(response.ok&&obj?.success===true,"CLOUDFLARE_API_HTTP_"+response.status);
+ requireTrue(response.ok&&obj?.success===true,"CLOUDFLARE_API_HTTP_"+response.status+"_"+String(obj?.errors?.[0]?.code??"unknown")+"_"+String(obj?.errors?.[0]?.message??"").slice(0,95));
  return obj.result;
 }
 async function query(db,sql,params=[],writes=false){
@@ -87,11 +87,14 @@ try{
  requireTrue(original||already,"PREVIEW_HAS_PARTIAL_OR_UNRELATED_CATALOG");
  report.checks.previewStartingState=already?"ALREADY_SYNCED":"OLD_235_PUBLISHED_NEW_218_DRAFT";
  if(mode==="cutover"&&!already){
-  const marks=Array.from({length:218},()=>"?").join(",");
-  const sql="UPDATE products SET published = CASE WHEN id IN ("+marks+") THEN 1 ELSE 0 END "+
-   "WHERE (SELECT COUNT(*) FROM products)=453 AND (SELECT SUM(published) FROM products)=235 "+
-   "AND published != CASE WHEN id IN ("+marks+") THEN 1 ELSE 0 END";
-  const updated=await query(previewDB,sql,[...prodNew.map(x=>x.id),...prodNew.map(x=>x.id)],true);
+  // JSON1 makes an exact 218-ID allowlist with ONE bound value. Avoid
+  // hundreds of individual bindings rejected by some remote D1 API limits.
+  const idsJson=JSON.stringify(prodNew.map(x=>x.id));
+  const probe=await query(previewDB,"SELECT value FROM json_each(?) LIMIT 2",[idsJson]);
+  requireTrue(probe.rows.length===2,"PREVIEW_JSON_ALLOWLIST_NOT_SUPPORTED");
+  const sql="UPDATE products SET published = CASE WHEN id IN "+
+   "(SELECT value FROM json_each(?)) THEN 1 ELSE 0 END";
+  const updated=await query(previewDB,sql,[idsJson],true);
   requireTrue(updated.changes===null||updated.changes===453,"PREVIEW_CUTOVER_ROWCOUNT_FAILED");
  }
  const check=await query(previewDB,
