@@ -18,7 +18,7 @@ permissions:
   contents: read
 concurrency:
   group: bulk-import-isolated-preview
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   deploy:
     name: Prove separate D1/R2, test and deploy isolated Preview
