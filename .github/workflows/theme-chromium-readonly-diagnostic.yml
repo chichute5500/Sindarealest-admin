@@ -48,5 +48,5 @@ jobs:
           }
       - name: Measure independent empty-page Chromium compositor baseline
         run: node scripts/qa-theme-frame-scheduler-baseline.mjs
-      - name: Measure HERO paint and theme render A-B (GET only)
+      - name: Enforce strict 80ms start and 300ms end theme gates (GET only)
         run: node scripts/qa-storefront-theme-material.mjs
