@@ -1,7 +1,7 @@
 /**
  * Real browser -> Storefront form -> actual orders handler -> disposable SQLite -> Admin handler.
  * Loads the isolated Preview's exact UI while intercepting ALL write methods.
- * The only authorized intercepted POST is /api/orders, executed locally in-process.
+ * Only /api/orders and read-only /api/checkout-quote are intercepted and executed locally.
  * No remote mutation and no real payment or shipment is possible.
  */
 import assert from 'node:assert/strict';
@@ -11,6 +11,7 @@ import { chromium } from 'playwright';
 import { createSession } from '../functions/_lib.js';
 import { onRequestGet as publicProducts } from '../functions/api/products.js';
 import { onRequestPost as createOrder } from '../functions/api/orders.js';
+import { onRequestPost as quoteOrder } from '../functions/api/checkout-quote.js';
 import { onRequestGet as adminOrders } from '../functions/api/admin/orders.js';
 import { buildCloudflareAccessHeaders } from './cloudflare-access-service-token.mjs';
 import { isApprovedPreviewExternalRead } from './preview-external-read-allowlist.mjs';
@@ -53,8 +54,11 @@ const productId='00000000-1111-4222-8333-000000000086';
 db.prepare("INSERT INTO products(id,slug,sku,sku_verified,title,category,category_label,price,stock,published,source_price_confirmed,fulfillment_type) VALUES(?,?,'QA-BROWSER-001',1,'Ví TEST KHÔNG BÁN','wallets','Ví',150000,50,1,1,'in_stock')")
  .run(productId,'qa-e2e-browser-only');
 db.prepare("UPDATE settings SET value='1' WHERE key='show_prices'").run();
+const qrKey='qr-550e8400-e29b-41d4-a716-446655440000.png';
+for(const [key,value] of Object.entries({payment_qr_active:'1',payment_qr_active_key:qrKey,payment_qr_bank_name:'QA BANK ONLY',payment_qr_account_number:'000000000',payment_qr_account_name:'DISPOSABLE QA ONLY'}))
+ db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(key,value);
 const SESSION_SECRET='E2E_BROWSER_DISPOSABLE_ONLY_NOT_PRODUCTION';
-const env={DB,ADMIN_PASSWORD:'NO_REAL_ADMIN_PASSWORD',SESSION_SECRET};
+const env={DB,ADMIN_PASSWORD:'NO_REAL_ADMIN_PASSWORD',SESSION_SECRET,IMAGES:{head:async key=>key===qrKey?{size:100}:null}};
 const adminCookie='sd_admin_session='+await createSession(SESSION_SECRET);
 const auth=buildCloudflareAccessHeaders();
 const dir='artifacts/storefront-integration-preview';
@@ -78,7 +82,7 @@ try{
    try{localStorage.setItem('sd-theme-mode',mode)}catch{}
   },spec.dark?'dark':'light');
   const page=await ctx.newPage();
-  const results={name:spec.name,pass:false,errors:[],locallyCreatedOrders:0};
+  const results={name:spec.name,pass:false,errors:[],locallyCreatedOrders:0,locallyQuotedOrders:0};
   page.on('pageerror',e=>results.errors.push('pageerror: '+e.message));
   let attemptedRemoteWrites=0;
   await page.route('**/*',async route=>{
@@ -92,6 +96,17 @@ try{
     if(response.status===201)results.locallyCreatedOrders++;
     await route.fulfill({status:response.status,contentType:'application/json',body:await response.text()});
     return;
+   }
+   if(req.method()==='POST'&&url.origin===alias&&url.pathname==='/api/checkout-quote'){
+    const local=new Request(alias+'/api/checkout-quote',{method:'POST',headers:{Origin:alias,'Content-Type':'application/json'},body:req.postData()});
+    const response=await quoteOrder({request:local,env});
+    if(response.status===200)results.locallyQuotedOrders++;
+    await route.fulfill({status:response.status,contentType:'application/json',body:await response.text()});return;
+   }
+   if(req.method()==='GET'&&url.origin===alias&&url.pathname==='/payment-qr/'+qrKey){
+    // A real PNG transfer fixture, never a real bank QR and never a remote write.
+    const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAOb+YwAAAABJRU5ErkJggg==','base64');
+    await route.fulfill({status:200,contentType:'image/png',body:png});return;
    }
    if(req.method()!=='GET'&&req.method()!=='HEAD'){
     attemptedRemoteWrites++;
@@ -135,6 +150,17 @@ try{
    await page.locator('#checkoutWard').selectOption({label:'Phường kiểm thử'});
    await page.locator('#checkoutStreet').fill('DIA CHI GIA — KHONG GIAO HANG');
    await page.locator('#checkoutSubmit').click();
+   await page.locator('#sdCheckoutPaymentStep').waitFor({state:'visible',timeout:15000});
+   assert.equal(results.locallyQuotedOrders,1,'Quote must be computed locally by real server handler');
+   assert.equal(await page.locator('#sdCheckoutOptions [data-sd-payment-option]').count(),2,'In-stock checkout must offer exactly deposit and full transfer');
+   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'100.000đ');
+   await page.locator('[data-sd-payment-option="full"]').click();
+   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'150.000đ');
+   await page.locator('[data-sd-payment-option="deposit"]').click();
+   await page.screenshot({path:dir+'/'+spec.name+'-payment-step.png',animations:'disabled'});
+   await page.locator('#checkoutSubmit').click();
+   await page.locator('#sdCheckoutReviewStep').waitFor({state:'visible',timeout:10000});
+   await page.locator('#checkoutSubmit').click();
    await page.locator('#checkoutMessage').filter({hasText:/Mã yêu cầu SD-/}).waitFor({timeout:15000});
    assert.equal(results.locallyCreatedOrders,1,'Actual browser POST must call local checkout handler exactly once');
    assert.equal(attemptedRemoteWrites,0,'Browser must not send writes to Preview');
@@ -148,6 +174,9 @@ try{
    const view=await admin.json();
    assert.equal(view.orders.length,index+1);
    assert.ok(view.orders.every(o=>o.items.length===1));
+   const latest=view.orders.find(o=>o.order_number===last[last.length-1].n);
+   assert.equal(latest?.customer_payment_option,'deposit','Admin must see customer's selected deposit preference');
+   assert.equal(Number(latest?.customer_payment_amount),100000,'Admin must receive server-derived amount, not browser amount');
    await page.screenshot({path:dir+'/'+spec.name+'.png',animations:'disabled'});
    results.pass=true;
   }catch(error){
