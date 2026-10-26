@@ -91,6 +91,8 @@ const report={
  topPotentialOverrides:top
 };
 const homepage=load('public/index.html');
+assert.match(homepage,/<\/style>\s*<\/body>\s*<\/html>\s*$/i,
+  'Storefront HTML must close the last stylesheet, body and document');
 assert.doesNotMatch(homepage,/transition:background-color 1\.05s ease,border-color 1\.05s ease,box-shadow 1\.05s ease/);
 assert.doesNotMatch(homepage,/transition:background-color 1s ease,border-color 1s ease,box-shadow \.3s ease,color \.8s ease/);
 console.log('PASS: CSS syntax balance and obsolete transition guard. '+JSON.stringify(report));

@@ -5099,53 +5099,8 @@ html.dark #home .hero-visual .hero-pedestal-art{filter:brightness(.78) saturate(
 }
 
 
-/* HERO V9.2 REFERENCE EDGE PARITY — retain strict 98.7% actual screenshot test.
-   The approved master has square edges. Avoid clipping its bright silk corners
-   against theme-dependent page colors, which was reducing dark-mode similarity.
-   A minimal two-pixel rounding prevents harsh aliasing without changing layout.
-   No filters, pseudo-art, blur or alternate product imagery are used. */
-#home.hero.wrap{
-  border-radius:2px!important;
-  border:0!important;
-  outline:0!important;
-  background:transparent!important;
-}
-#home .hero-reference-art,#home .hero-reference-art img{
-  border-radius:2px!important;
-}
-@media(max-width:760px){
- #home.hero.wrap,#home .hero-reference-art,#home .hero-reference-art img{
-   border-radius:2px!important;
- }
-}
-/* Drawn artwork retains the exact baked-in caption and CTA. Its transparent
-   interaction layer still receives clicks, taps and keyboard focus. */
-
-
-/* HERO V9.3 HEADER SHADOW SEPARATION.
-   The sticky navigation has a broad 30–44px *external* dark-mode shadow that
-   physically overlays the top of the approved master artwork, creating
-   real screenshot pixel mismatches. Keep navbar glass/inset highlight but
-   remove only the external spill while preserving its 90-level stacking and
-   scroll/click behaviour. This is NOT a pixel-test threshold relaxation. */
-body:has(#home.hero.wrap) .nav-wrap .nav,
-html.dark body:has(#home.hero.wrap) .nav-wrap .nav{
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.32)!important;
-}
-/* No extra mask, tint, or glass should composite over the approved art. */
-#home .hero-reference-art,#home .hero-reference-art img{
-  -webkit-backdrop-filter:none!important;
-  backdrop-filter:none!important;
-  box-shadow:none!important;
-}
-
-
-/* HERO V9.4 CHROMIUM SAMPLING ALIGNMENT.
-   Measured on actual Chromium at 980px with the untouched approved WebP:
-   fractional .4px vertical subpixel alignment eliminates two-step resize error.
-   Applies only to 900–1100px; no crop, recolor or test threshold change. */
-@media(min-width:900px) and (max-width:1100px){
-  #home .hero-reference-art img{
-    transform:translateY(.4px)!important;
-  }
-}
+/* Retired V9.2–V9.4 image-HERO-only rules removed. The current Owner-approved
+   component is #home.sd-code-hero and uses code-hero.css. */
+</style>
+</body>
+</html>

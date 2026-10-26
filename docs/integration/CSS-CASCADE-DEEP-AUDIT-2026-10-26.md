@@ -32,3 +32,12 @@ Added `scripts/audit-css-cascade.mjs` to `npm run check`: it scans every inline/
 - Chromium frame timing under heavy load was not yet proven within the existing <=80ms start / <=300ms finish gate. The experimental pause of sticky glass backdrop filtering must be measured before retention.
 - A full CSS flattening/reorganization is a separate high-risk task because of Owner-approved screenshots and accumulated responsive/variant contracts. No 100% cascade-clean or complete visual PASS claim is authorized from a static scan.
 - Isolated Preview only; no Production merge/deploy; no writes to Production D1/R2.
+
+
+## EOF markup repair and inactive image-HERO cleanup
+
+The file scan found the final `<style id="sd-unified-icon-system-final">` was not explicitly closed, and `</body></html>` were missing. Added those closing tags (which browsers otherwise imply at EOF) without changing live declarations or the markup for the approved code-only HERO. Removed the completely dead V9.2–V9.4 CSS block, which matched only `#home.hero.wrap` / `.hero-reference-art`, while the only live `#home` is `<section class="sd-code-hero wrap"...>`. No dynamic HERO class mutation exists in the storefront source. CI now protects these closing tags.
+
+**Remaining high-risk HTML/CSS structural debt:** Inside the preceding `<style id="sd-modal-navigation-promise-icons-2026-10-22">`, a literal nested `<style id="sd-catalog-liquid-glass-reference-2026-10-23">` occurs before its next closing tag. HTML raw-text rules mean the nested opening tag is CSS text, not a new stylesheet. Fixing that tag might activate a currently ignored first `:root` rule and alter Owner-approved catalog colours. It was deliberately *not* changed without Chromium screenshot comparison. This prevents claiming the cascade is fully cleaned.
+
+The older counts above are initial static-match baseline, excluding the formerly unterminated final stylesheet; the updated automated report counts the now-closed stylesheet too. Do not interpret previous 326 groups as a total for every final style rule.
