@@ -25,7 +25,8 @@
   `https://sd-import-review-20261026.sindarealest-admin-preview.pages.dev/admin/import.html`
 - Workflow `.github/workflows/bulk-import-isolated-preview.yml` kiểm tra danh tính D1/R2 (khác Production) trước khi deploy, chạy toàn bộ test, verify exact SHA và chạy Chromium trên PC/mobile; thao tác upload, POST sản phẩm trong browser QA **được mock**, nên không gọi đây là nhập ảnh thực tế.
 - Bằng chứng QA Chromium source `5900378a7a3fe2f959893c0aebfa49d0d711ff3d`: [workflow #40285200675](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40285200675) PASS, [3 ảnh nghiệm thu](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40285200675/artifacts/12633986695). Hai ảnh được ghép từ cấu trúc folder thật qua chooser, tạo đúng một draft mock với title, category, `published=false`, giá/tồn kho null; screenshot desktop/mobile. No Production, remote D1/R2, payment writes.
-- Chạy lại workflow cho **commit HEAD mới nhất** để xác minh sau những cải tiến mã nguồn.
+- **BỔ SUNG E2E THẬT:** Source `963758eee46044e3c699a509478c67f4c9cb6b54` có [workflow #40286016583](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40286016583): đã đăng nhập Admin Preview, tải một WebP qua API thật vào R2 public + R2 originals riêng tư, xác minh GET ảnh, tạo một sản phẩm nháp D1 với giá/tồn kho null, xác nhận sản phẩm không xuất hiện trong `GET /api/products`, sau đó xóa chính xác sản phẩm, audit và cả hai ảnh; `cleanupVerified=true`, `productionWrites=0`. [Remote QA report artifact](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40286016583/artifacts/12634345809). Không phải kiểm thử toàn bộ 921 ảnh thật của owner.
+- Khi thay đổi code sau QA, chạy lại workflow trên **commit HEAD**; các commit chỉ tài liệu không đổi SHA ứng dụng được nghiệm thu.
 
 ## Hành động khi owner sử dụng PC
 
