@@ -225,16 +225,16 @@ assert.match(storefrontHtml, /\.nav-wrap \.nav \.brand-tagline\{margin-top:2px;f
 assert.ok(storefrontHtml.includes('html.theme-transitioning body:after') && storefrontHtml.includes('html.theme-transitioning .theme-bg') && storefrontHtml.includes('transition-duration:.25s!important;transition-timing-function:ease!important'), 'Theme-related transitions must be capped at 250 ms when switching themes');
 assert.ok(!storefrontHtml.includes('CRAFTED WITH<br>CHARACTER') && !storefrontHtml.includes('hero-stamp-image-spacer') && !storefrontHtml.includes('.hero-stamp{'), 'Entire unwanted hero stamp and glass styling must be removed while preserving the sneaker hero');
 assert.ok(!storefrontHtml.includes('id="heroDarkShoe"') && !storefrontHtml.includes('id="heroLightShoe"') && !storefrontHtml.includes('hero-art'), 'Hero product images must be removed from the storefront intro');
-const heroStart = storefrontHtml.indexOf('<section class="hero wrap" id="home">');
-const heroEnd = storefrontHtml.indexOf('<section class="wrap" aria-label="Quyền lợi thương hiệu"', heroStart);
-const heroMarkup = storefrontHtml.slice(heroStart, heroEnd);
-assert.ok(heroMarkup.includes('Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.') && heroMarkup.includes('Khám phá ngay') && !heroMarkup.includes('Khám phá bộ sưu tập') && !heroMarkup.includes('Khám phá sản phẩm'), 'Hero copy and its single reference CTA must remain concise after removing product imagery');
-assert.ok(storefrontHtml.includes('#home.hero:has(#heroProductImage[hidden]){\n  min-height:0!important;') && storefrontHtml.includes('background:transparent!important;'),
-  'When the verified SD-GL052 image is unavailable, the hero must collapse its empty frame rather than use a substitute product.');
-
-/* Missing verified hero SKU must never leave a blank glass card or borrow another product image. */
-assert.ok(storefrontHtml.includes('#home.hero:has(#heroProductImage[hidden])::before,') && storefrontHtml.includes('content:none!important;display:none!important;background:none!important') && storefrontHtml.includes('.hero-copy{display:flex!important;min-height:0!important;') && storefrontHtml.includes('.hero-visual:has(#heroProductImage[hidden]){display:none!important;visibility:hidden!important;'),
-  'When SD-GL052 is unavailable, pseudo-card, visual frame, and fixed hero min-height must all collapse without substituting a different product.');
+const heroMarkup = storefrontHtml.match(/<section class="sd-code-hero wrap" id="home"[\s\S]*?<\/section>/)?.[0] || '';
+assert.ok(heroMarkup.includes('Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.')
+ && heroMarkup.includes('Khám phá ngay') && heroMarkup.includes('từ da cá sấu'),
+ 'Code-only Hero must keep the established concise Vietnamese copy and one CTA.');
+assert.ok(!/<(?:img|picture|canvas|video)\b/.test(heroMarkup) && !heroMarkup.includes('heroProductImage'),
+ 'Code-only Hero must not load presentation photography or leave an empty image frame.');
+const heroCss = readFileSync(new URL('../public/code-hero.css', import.meta.url), 'utf8');
+assert.ok(heroCss.includes('height:420px') && heroCss.includes('height:clamp(236px,66vw,270px)')
+ && heroCss.includes('html.dark .sd-code-hero') && !heroCss.includes('!important'),
+ 'Compact responsive Liquid Glass Hero must be isolated and render in light/dark without override stacks.');
 assert.ok(storefrontHtml.includes('.theme-bg{position:fixed;inset:0') && storefrontHtml.includes('transform:none;will-change:opacity'), 'Background artwork should not scale or drift while scrolling');
 const themeCacheHeaders = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
 assert.ok(storefrontHtml.includes('theme-croc-dark.webp?v='), 'Dark crocodile background URL must be versioned to invalidate old immutable cache entries');

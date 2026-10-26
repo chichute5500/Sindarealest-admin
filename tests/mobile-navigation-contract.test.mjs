@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
 const start = html.indexOf('function setupMobileBottomNav()');
-const end = html.indexOf('function syncHeroProductImage()', start);
+const end = html.indexOf('function renderFeatured()', start);
 assert.ok(start >= 0 && end > start, 'Mobile navigation setup must exist and remain isolated.');
 const setup = html.slice(start, end);
 assert.match(setup, /const tabs=\$\$\('\[data-mobile-tab\]'\)/, 'Mobile navigation must collect every tab as an array; a single-element query breaks setup and prevents cart/account click handlers from binding.');
