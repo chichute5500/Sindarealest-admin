@@ -88,7 +88,7 @@ function render(){
     const colors=[...new Set(g.images.map(x=>x.color))].join(", ");
     const problems = [];
     if(g.missing.length)problems.push("Thiếu "+g.missing.length+" ảnh");
-    if(g.images.length>MAX_IMAGES_PER_PRODUCT)problems.push("Có "+g.images.length+" ảnh; tối đa 30 ảnh/sản phẩm");
+    if(g.images.length>MAX_IMAGES_PER_PRODUCT)problems.push("Có "+g.images.length+" ảnh; tối đa 50 ảnh/sản phẩm");
     if(g.warnings.length)problems.push(g.warnings[0]);
     if(done)problems.push("Đã lưu bản nháp: "+checkpoint.drafts[g.key]);
     info.textContent="Mã thư mục: "+g.modelFolder+" · Màu theo CSV: "+colors+
