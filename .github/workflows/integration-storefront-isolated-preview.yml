@@ -1,0 +1,114 @@
+name: Integrated Storefront on isolated Admin Preview (NO PRODUCTION)
+on:
+  push:
+    branches:
+      - integration/storefront-locked-on-main-2026-10-26
+    paths:
+      - 'public/**'
+      - 'functions/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'scripts/audit-storefront-main-preview.mjs'
+      - 'scripts/qa-storefront-integration-preview-sha.mjs'
+      - '.github/workflows/integration-storefront-isolated-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storefront-on-admin-isolated-preview
+  cancel-in-progress: false
+
+jobs:
+  safely-deploy:
+    name: Validate exact staging SHA, compare Preview D1/R2, then deploy isolated branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH_ALIAS: integration-storefront-locked-on-main-20261026
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Refuse unexpected repo, branch or Cloudflare target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/integration/storefront-locked-on-main-2026-10-26"
+          test "$CF_TARGET" = "sindarealest-admin-preview"
+          test "$CF_BRANCH_ALIAS" = "integration-storefront-locked-on-main-20261026"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Read-only metadata proof Preview D1/R2 are not Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-preview.json"
+          curl -fsSS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/sindarealest2" > "$RUNNER_TEMP/production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-preview.json" "$RUNNER_TEMP/production.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const p=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/admin-preview.json','utf8'));
+          const r=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/production.json','utf8'));
+          const a=p?.result?.deployment_configs?.preview, b=r?.result?.deployment_configs?.production;
+          const db=v=>v?.d1_databases?.DB?.id||v?.d1_databases?.DB?.database_id||'';
+          const r2=(v,k)=>v?.r2_buckets?.[k]?.name||v?.r2_buckets?.[k]?.bucket_name||'';
+          if(!db(a)||!db(b)||db(a)===db(b))throw Error('Isolated D1 identity unverified');
+          if(!r2(a,'IMAGES')||!r2(a,'ORIGINALS')||r2(a,'IMAGES')===r2(a,'ORIGINALS'))throw Error('Isolated R2 IMAGES/ORIGINALS identity unverified');
+          if([r2(b,'IMAGES'),r2(b,'ORIGINALS')].some(x=>!x||[r2(a,'IMAGES'),r2(a,'ORIGINALS')].includes(x)))throw Error('Preview R2 references Production storage');
+          console.log('PASS: exact isolated Preview DB and both R2 buckets distinct from Production; no remote mutation.');
+          NODE
+      - name: Install, audit dependencies and run full Main + Storefront tests
+        run: |
+          npm install --no-fund
+          npm audit --audit-level=high
+          npm run check
+          npm test
+      - name: Publish only an isolated Pages branch, never main
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH_ALIAS" --commit-hash "$GITHUB_SHA" --commit-message "integrated Storefront isolated Preview $GITHUB_SHA"
+      - name: Verify deployed exact SHA/alias via Cloudflare metadata
+        run: node scripts/qa-storefront-integration-preview-sha.mjs
+
+  browser-qa:
+    name: Chromium PC/Mobile × Light/Dark, Welcome/HERO/catalog/API read-only
+    needs: safely-deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PREVIEW_URL: https://integration-storefront-locked-on-main-20261026.sindarealest-admin-preview.pages.dev/
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install Chromium for read-only screenshots
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Capture exact integrated Preview and enforce functional/layout checks
+        run: node scripts/audit-storefront-main-preview.mjs
+      - name: Upload SHA-bound browser proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storefront-main-integration-${{ github.sha }}
+          path: artifacts/storefront-integration-preview/
+          if-no-files-found: warn
+          retention-days: 14

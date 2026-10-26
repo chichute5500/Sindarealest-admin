@@ -2,11 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const html = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
-const visualWorkflow = readFileSync(new URL('../.github/workflows/liquid-glass-visual-preview.yml', import.meta.url), 'utf8');
-assert.match(visualWorkflow, /confirm_hero_coverage:[\s\S]*?default: false/,
-  'Manual comprehensive visual capture must default to no Hero coverage while Hero is paused.');
-assert.match(visualWorkflow, /github\.event_name == 'push' && contains\(github\.event\.head_commit\.message, '\[hero-capture-approved\]'\)/,
-  'Push-triggered comprehensive capture must require an explicit Hero-coverage approval marker.');
+assert.match(html, /<section class="sd-code-hero wrap" id="home"/,
+  'Owner-approved code-only HERO must remain active alongside gallery, without pulling a legacy capture workflow.');
 
 const count = text => html.split(text).length - 1;
 
