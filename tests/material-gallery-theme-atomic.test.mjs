@@ -30,7 +30,11 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
  assert.match(page,/id="sdThemeSwitchOverlay"/);
  assert.match(page,/Đang đổi giao diện/);
- assert.match(page,/const durationMs=700,minimumCoveredAfterCommitMs=320/);
+ assert.match(page,/const durationMs=mobileThemeGuard\?1180:700,minimumCoveredAfterCommitMs=mobileThemeGuard\?580:320/);
+ assert.match(page,/root\.classList\.remove\('sd-theme-repaint-isolated'\)/);
+ assert.match(page,/if\(mobileThemeGuard\)root\.classList\.add\('sd-theme-repaint-isolated'\)/);
+ assert.match(page,/typeof window\.__sdCancelThemeStage==='function'\)return/);
+ assert.match(css,/html\.sd-theme-repaint-isolated body :is\(/);
  assert.match(page,/rafFour=requestAnimationFrame\(commit\)/);
  assert.match(page,/window\.__sdThemeTimer=setTimeout\(reveal,/);
  assert.match(css,/#sdThemeSwitchOverlay\.is-visible/);
@@ -46,6 +50,8 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(page,/overlay\.classList\.add\('is-dismissing'\)/);
  assert.match(browserQA,/overlayOrigin/);
  assert.match(browserQA,/coverEvents/);
+ assert.match(browserQA,/mobileIsolationDuringCommit/);
+ assert.match(browserQA,/mobileGlassRecovered/);
  assert.match(browserQA,/mobile-account-theme-/);
  assert.match(browserQA,/accountThemeMatrix/);
  assert.match(browserQA,/for\(const \[dark,suffix\] of/);

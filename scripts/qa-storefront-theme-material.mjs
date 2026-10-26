@@ -273,7 +273,7 @@ try{
         arm(direction){
           const baseline=snapshot();
           const result={direction,now:{...baseline,dark:direction},samples:[],frameTimes:[],
-            transitionEvents:[],longTasks:[],overlayEvents:[],coverEvents:[],overlayOrigin:null,paletteCommitAt:null,paletteCovered:false,firstOverlayFrameMs:null};
+            transitionEvents:[],longTasks:[],overlayEvents:[],coverEvents:[],overlayOrigin:null,paletteCommitAt:null,paletteCovered:false,mobileIsolationDuringCommit:false,firstOverlayFrameMs:null};
           const cleanup=[];
           const obs=typeof PerformanceObserver==='function'
             ?new PerformanceObserver(list=>result.longTasks.push(...list.getEntries().map(e=>({start:Math.round(e.startTime),duration:Math.round(e.duration)}))))
@@ -310,6 +310,7 @@ try{
             if(root.classList.contains('dark')===direction){
               result.paletteCommitAt=Math.round(performance.now()-started);
               result.paletteCovered=overlay.classList.contains('is-covered')&&getComputedStyle(overlay).opacity==='1';
+              result.mobileIsolationDuringCommit=root.classList.contains('sd-theme-repaint-isolated');
             }
           });
           paletteObserver.observe(root,{attributes:true,attributeFilter:['class']});
@@ -362,6 +363,7 @@ try{
             result.overlayEvents=result.overlayEvents.map(e=>({...e,relativeMs:e.time-Math.round(started)}));
             result.overlayHidden=!overlay.classList.contains('is-visible')&&getComputedStyle(overlay).visibility==='hidden';
             result.stagingCleared=!root.classList.contains('sd-theme-overlay-active');
+            result.mobileGlassRecovered=!root.classList.contains('sd-theme-repaint-isolated');
             result.longTasks=result.longTasks.map(e=>({...e,relativeMs:e.start-Math.round(started)}));
             return result;
           }};
@@ -381,7 +383,7 @@ try{
       const perfBefore=await perfSnapshot();
       // One discrete real click. Never inject CSS into live Production.
       await page.locator('#themeToggle').dispatchEvent('click');
-      await page.waitForTimeout(1340);
+      await page.waitForTimeout(spec.mobile?1940:1340);
       const perfAfter=await perfSnapshot();
       const measured=await page.evaluate(()=>window.__sdThemeTiming.finish());
       measured.variant=variant;
@@ -904,7 +906,7 @@ try{
         throw Error('Theme screen not activated promptly: '+JSON.stringify(r));
       if(r.firstOverlayFrameMs===null||r.firstOverlayFrameMs>180)
         throw Error('Theme screen first frame delayed: '+JSON.stringify(r));
-      if(hide<500||hide>1280)
+      if(hide<500||hide>(spec.mobile?1900:1280))
          throw Error('Theme safe-cover reveal did not finish near one second: '+JSON.stringify(r));
        if(r.overlayOrigin!==(r.direction?'light':'dark'))
          throw Error('Cover source colour reversed: '+JSON.stringify(r));
@@ -912,8 +914,10 @@ try{
          throw Error('Opaque sheet did not fade in safely: '+JSON.stringify(r));
        if(r.paletteCommitAt===null||r.paletteCommitAt>hide||!r.paletteCovered)
         throw Error('Theme palette exposed before cover was ready: '+JSON.stringify(r));
-      if(!r.overlayHidden||!r.stagingCleared)
+      if(!r.overlayHidden||!r.stagingCleared||!r.mobileGlassRecovered)
         throw Error('Theme screen failed cleanup: '+JSON.stringify(r));
+       if(spec.mobile&&!r.mobileIsolationDuringCommit)
+         throw Error('Mobile palette flipped without blur raster isolation: '+JSON.stringify(r));
       if(r.stable.dark!==r.direction||Math.abs(r.stable.darkBg-target)>.02||
          Math.abs(r.stable.lightBg-(1-target))>.02)
         throw Error('Final Light/Dark palette not stable when cover exits: '+JSON.stringify(r));
@@ -933,7 +937,7 @@ try{
         await new Promise(resolve=>setTimeout(resolve,55));
       }
     });
-    await page.waitForTimeout(1340);
+    await page.waitForTimeout(spec.mobile?1940:1340);
     const rapid=await page.evaluate(()=>{
       const root=document.documentElement;
       const nav=document.querySelector('.nav');
@@ -952,13 +956,14 @@ try{
         meta:document.querySelector('meta[name="theme-color"]')?.content,
         overlayHidden:!document.querySelector('#sdThemeSwitchOverlay')?.classList.contains('is-visible'),
         overlayStageCleared:!root.classList.contains('sd-theme-overlay-active'),
+        mobileGlassRecovered:!root.classList.contains('sd-theme-repaint-isolated'),
         labelled:document.querySelector('#themeToggle')?.getAttribute('aria-label')?.includes('tối')
       };
     });
     if(!rapid.lightMode||rapid.mode!=='light'||rapid.staged||rapid.activeCancel||
        rapid.target!==null||rapid.overrideCount!==0||rapid.lightOpacity<.98||
        rapid.darkOpacity>.02||rapid.meta!=='#eaf3fb'||!rapid.labelled||
-       !rapid.overlayHidden||!rapid.overlayStageCleared)
+       !rapid.overlayHidden||!rapid.overlayStageCleared||!rapid.mobileGlassRecovered)
       throw Error('Rapid theme taps left inconsistent state: '+JSON.stringify(rapid));
 
     // Owner-reported regression: Android account drawer remains OPEN while the
@@ -987,6 +992,7 @@ try{
           bodyBg:getRgb,
           overlayHidden:!overlay.classList.contains('is-visible')&&getComputedStyle(overlay).visibility==='hidden',
           stageCleared:!root.classList.contains('sd-theme-overlay-active'),
+          mobileGlassRecovered:!root.classList.contains('sd-theme-repaint-isolated'),
           accountThemeActionVisible:!!document.querySelector('#accountThemeAction')?.getBoundingClientRect().width
         };
       });
@@ -995,10 +1001,10 @@ try{
         throw Error('Light account panel not open before owner regression test: '+JSON.stringify(accountBefore));
       for(const [dark,suffix] of [[true,'dark'],[false,'light']]){
         await page.locator('#accountThemeAction').dispatchEvent('click');
-        await page.waitForTimeout(1400);
+        await page.waitForTimeout(2040);
         const state=await inspectAccount();
         const within=(rect,b)=>rect.width>b.width*.68&&rect.left>=b.left-2&&rect.right<=b.right+2;
-        if(state.dark!==dark||!state.open||!state.overlayHidden||!state.stageCleared||
+        if(state.dark!==dark||!state.open||!state.overlayHidden||!state.stageCleared||!state.mobileGlassRecovered||
            !within(state.guestRect,state.drawerRect)||!within(state.orderRect,state.drawerRect)||
            state.drawerRect.bottom>spec.height+2)
           throw Error('Theme+account panel failed after '+suffix+' switch: '+JSON.stringify(state));
@@ -1011,7 +1017,7 @@ try{
       await page.locator('#accountClose').dispatchEvent('click');
       await page.waitForTimeout(320);
     }
-    matrix.push({label:spec.label,pass:true,accountThemeMatrix,switches:'Light > Dark > Light',strictCycles,ux:'~1s Android-safe solid-sheet dissolve',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
+    matrix.push({label:spec.label,pass:true,accountThemeMatrix,switches:'Light > Dark > Light',strictCycles,ux:'two-phase covered Android palette + glass recompose',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});
   }finally{await context.close()}
  }
