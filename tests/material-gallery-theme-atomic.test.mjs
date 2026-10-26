@@ -31,14 +31,14 @@ test('Theme crossfades smoothly with one synchronized duration and no stagger',(
  assert.match(page,/__sdThemeTimer=setTimeout\(finish,560\)/);
  assert.match(page,/__sdCancelThemeStage/);
  assert.doesNotMatch(page,/function applyThemeMode[^\n]*void document\.body\.offsetHeight/);
- assert.match(css,/html\.theme-transitioning body \.theme-bg\{[\s\S]*?opacity \.205s/);
+ assert.match(css,/html\.theme-transitioning body \.theme-bg\{[\s\S]*?opacity \.22s/);
  assert.match(css,/#materialTile \.sd-material-slide\{[\s\S]*?opacity \.58s/);
  assert.match(css,/#materialTile::before\{/);
  assert.match(css,/#materialTile\.has-real-material-gallery::before/);
  assert.match(css,/#materialTile\.has-real-material-gallery::after/);
  assert.match(css,/background:none!important;/);
  assert.match(css,/text-shadow:0 1px 3px/);
- assert.match(css,/html body \.nav-wrap \.nav,[\s\S]*?transition-duration:\.205s!important;/);
+ assert.match(css,/html body \.nav-wrap \.nav,[\s\S]*?transition-duration:\.22s!important;/);
  assert.match(css,/html\.theme-transitioning body \.nav-wrap \.nav/);
  assert.match(css,/html\.theme-transitioning,html\.theme-transitioning body\{[\s\S]*?transition:none!important;/);
  assert.match(page,/const themeMeta=document\.querySelector\('meta\[name="theme-color"\]'\)/);

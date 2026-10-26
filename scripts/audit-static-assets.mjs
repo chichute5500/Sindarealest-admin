@@ -36,7 +36,7 @@ for(const name of manifest.images){
 assert.match(html,/<section class="sd-code-hero wrap" id="home"/);
 assert.doesNotMatch(html,/html\.theme-transitioning \.nav,html\.theme-transitioning \.glass/);
 assert.doesNotMatch(html,/transition:background-color 1\.15s/);
-assert.match(css,/html body \.nav-wrap \.nav,[\s\S]*?transition-duration:\.205s!important/);
+assert.match(css,/html body \.nav-wrap \.nav,[\s\S]*?transition-duration:\.22s!important/);
 assert.match(css,/html\.theme-transitioning body :is\([\s\S]*?transition:none!important/);
 const count=(s,part)=>s.split(part).length-1;
 console.log('PASS: static/CSS safety '+JSON.stringify({
