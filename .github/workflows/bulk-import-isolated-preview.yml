@@ -1,0 +1,79 @@
+name: Bulk Import isolated Preview QA (NO PRODUCTION)
+on:
+  push:
+    branches:
+      - feature/admin-bulk-folder-import-2026-10-26
+    paths:
+      - 'public/**'
+      - 'functions/**'
+      - 'tests/**'
+      - 'scripts/qa-bulk-import-preview-sha.mjs'
+      - 'package.json'
+      - '.github/workflows/bulk-import-isolated-preview.yml'
+permissions:
+  contents: read
+concurrency:
+  group: bulk-import-isolated-preview
+  cancel-in-progress: false
+jobs:
+  deploy:
+    name: Prove separate D1/R2, test and deploy isolated Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH: sd-import-review-20261026
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Fail closed on any unexpected repository, branch or project
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feature/admin-bulk-folder-import-2026-10-26'
+          test "$CF_TARGET" = 'sindarealest-admin-preview'
+          test "$CF_BRANCH" = 'sd-import-review-20261026'
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Verify isolated Preview D1 and both R2 buckets are distinct from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl -fsSS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-preview.json"
+          curl -fsSS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest2" > "$RUNNER_TEMP/production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-preview.json" "$RUNNER_TEMP/production.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const a=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/admin-preview.json','utf8')).result;
+          const b=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/production.json','utf8')).result;
+          const id=v=>v?.id||v?.database_id||'';
+          const bucket=v=>v?.name||v?.bucket_name||'';
+          const av=a?.deployment_configs?.preview,bv=b?.deployment_configs?.production;
+          const d=id(av?.d1_databases?.DB),prod=id(bv?.d1_databases?.DB);
+          const x=bucket(av?.r2_buckets?.IMAGES),y=bucket(av?.r2_buckets?.ORIGINALS);
+          const px=bucket(bv?.r2_buckets?.IMAGES),py=bucket(bv?.r2_buckets?.ORIGINALS);
+          if(!d||!prod||d===prod||!x||!y||x===y||!px||!py||[x,y].some(v=>v===px||v===py))throw Error('D1/R2 isolation cannot be proven');
+          console.log('PASS: separate isolated Preview D1, public R2 and private-original R2; no Production writes');
+          NODE
+      - name: Install dependencies, validate and run full tests
+        run: |
+          npm install --no-fund
+          npm audit --audit-level=high
+          npm run check
+          npm test
+      - name: Deploy only non-production branch on isolated Pages project
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "bulk photo import Preview $GITHUB_SHA"
+      - name: Read back exact deployed Preview SHA and branch
+        run: node scripts/qa-bulk-import-preview-sha.mjs
