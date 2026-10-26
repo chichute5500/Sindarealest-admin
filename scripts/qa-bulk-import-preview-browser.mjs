@@ -32,7 +32,7 @@ const csvPath=join(fixtureRoot,"DANH_SACH_ANH.csv");await writeFile(csvPath,csv)
 await mkdir("artifacts/bulk-import-preview/screenshots",{recursive:true});
 let browser, uploads=0, drafts=[],leakedWrites=0;
 try{
-  browser=await chromium.launch({headless:true});
+  browser=await chromium.launch({headless:true,channel:"chrome"});
   const ctx=await browser.newContext({viewport:{width:1280,height:850},extraHTTPHeaders:ACCESS});
   const page=await ctx.newPage();
   const failures=[];
