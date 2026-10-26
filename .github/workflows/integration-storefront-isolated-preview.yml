@@ -9,6 +9,7 @@ on:
       - 'tests/**'
       - 'package.json'
       - 'scripts/audit-storefront-main-preview.mjs'
+      - 'scripts/audit-storefront-checkout-disposable-browser.mjs'
       - 'scripts/qa-storefront-integration-preview-sha.mjs'
       - '.github/workflows/integration-storefront-isolated-preview.yml'
   workflow_dispatch:
@@ -104,6 +105,8 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Capture exact integrated Preview and enforce functional/layout checks
         run: node scripts/audit-storefront-main-preview.mjs
+      - name: Browser checkout to actual order/Admin handlers on disposable local D1 (no remote writes)
+        run: node scripts/audit-storefront-checkout-disposable-browser.mjs
       - name: Upload SHA-bound browser proof
         if: always()
         uses: actions/upload-artifact@v4
