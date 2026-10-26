@@ -1984,7 +1984,10 @@ img { -webkit-user-drag:none; user-select:none; }
  let config={watermarkEnabled:true,watermarkLogoUrl:'/watermark.webp',watermarkPosition:'bottom-right',watermarkSize:16,watermarkOpacity:68};
  const positions=new Set(['top-left','top-right','bottom-left','bottom-right','center']);
  function styleWatermark(mark){
-  mark.src=config.watermarkLogoUrl||'/watermark.webp';
+  const logo=config.watermarkLogoUrl||'/watermark.webp';
+  // MutationObserver also watches this subtree's src attributes: only assign
+  // when the URL changes, otherwise a real product image causes a microtask loop.
+  if(mark.getAttribute('src')!==logo)mark.src=logo;
   mark.style.setProperty('--sd-watermark-size',config.watermarkSize+'%');
   mark.style.setProperty('--sd-watermark-opacity',String(config.watermarkOpacity/100));
   mark.style.top='';mark.style.right='';mark.style.bottom='';mark.style.left='';mark.style.transform='';

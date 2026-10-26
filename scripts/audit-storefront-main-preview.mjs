@@ -99,6 +99,28 @@ try{
    throw Error("LIVE_CATEGORY_CLICK_DISPLAYS_WRONG_PRODUCTS");
   liveProof.categories=shown.size;liveProof.filterChecked=sample;
   await page.screenshot({path:path.join(destination,'real-new-catalog-mobile.png'),fullPage:false,animations:'disabled'});
+  // Real published R2 image: a synthetic no-image product does not exercise the watermark observer.
+  const opener=page.locator('#catalogGrid [data-open-product]').first();
+  const liveProductId=await opener.getAttribute('data-open-product');
+  const liveProduct=liveRows.find(x=>String(x.id||x.slug)===liveProductId);
+  if(!liveProduct)throw Error('LIVE_PRODUCT_NOT_FOUND');
+  await opener.click({timeout:8500});
+  await page.locator('#productOverlay.open').waitFor({state:'visible',timeout:7000});
+  const detail=await page.evaluate(()=>({
+   title:document.querySelector('#detailTitle')?.textContent?.trim(),
+   url:location.pathname,
+   interactive:!document.querySelector('#productOverlay')?.hasAttribute('inert'),
+   watermark:!!document.querySelector('.detail-image-stage > .sd-viewer-watermark')
+  }));
+  if(detail.title!==liveProduct.title||!detail.url.startsWith('/sanpham/')||!detail.interactive)
+   throw Error('LIVE_PRODUCT_DETAIL_NOT_INTERACTIVE');
+  const image=Array.isArray(liveProduct.images)?String(liveProduct.images[0]||''):'';
+  if(image.startsWith('/media/')&&image.endsWith('.webp')&&!detail.watermark)
+   throw Error('LIVE_PRODUCT_DETAIL_WATERMARK_MISSING');
+  await page.waitForTimeout(350);
+  await page.locator('#detailClose').click({timeout:6500});
+  await page.waitForFunction(()=>!document.querySelector('#productOverlay')?.classList.contains('open'),null,{timeout:6500});
+  liveProof.detail={productId:liveProductId,opens:true,closes:true,watermark:detail.watermark};
   const media=liveRows.flatMap(x=>Array.isArray(x.images)?x.images:[]).find(x=>/^\/media\/[a-z0-9-]+\.webp$/i.test(String(x)));
   if(media){
    const img=await liveContext.request.get(alias+media,{headers:auth,timeout:25000});
