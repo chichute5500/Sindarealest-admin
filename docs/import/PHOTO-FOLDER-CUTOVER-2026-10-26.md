@@ -44,3 +44,14 @@
 - Không thể kiểm thử 921 ảnh/400MB, lỗi MIME/giải mã ảnh, ảnh sai màu/trùng nội dung, hay tỷ lệ thất bại mạng khi chưa được chọn thư mục nguồn trên PC.
 - Chưa có giá/tồn kho xác minh. Không gán giá từ tên thư mục vào dữ liệu thương mại.
 - Chưa triển khai/kiểm thử cutover production. Không tuyên bố đã thay thế dữ liệu web.
+
+
+## Chỉnh sửa theo yêu cầu chủ sở hữu: giá, màu CSV và SKU SD-...
+
+- Mã thư mục **Mxxxx KHÔNG phải SKU sản phẩm**. Chỉ là khóa nhóm ảnh để đối chiếu dữ liệu cục bộ. API hiện hành tự cấp SKU nội bộ bắt đầu `SD-` theo danh mục khi lưu nháp; UI hiển thị SKU thực do API trả về sau khi tạo, không bịa ra SKU trước khi lưu.
+- Mỗi mẫu có ô **Giá bán (VND)** nhập trực tiếp trong màn duyệt. Trống = `price:null`; khi nhập số nguyên hợp lệ, API lưu giá và `sourcePriceConfirmed=true`, song sản phẩm vẫn `published=false`. Chuỗi `2200K` trong tên thư mục chỉ là giá gợi ý chưa xác nhận, không tự lưu.
+- Mỗi ảnh có **màu đọc từ cột Màu trong CSV**, được hiển thị trong khối mở rộng cùng tên ảnh, có thể sửa trực tiếp; hỗ trợ các màu thực tế bao gồm Đen, Nâu, Xanh, Xám, Cam, Đỏ, Trắng, Xanh dương, Chưa rõ hoặc nhãn hợp lệ khác. Màu được lưu theo URL/ảnh trong trường `image_colors_json` để không mất khi tải lại.
+- Cập nhật migration `migrations/0010_product_image_colors.sql` bổ sung trường `image_colors_json`. **Phải áp dụng migration trên D1 đích trước khi triển khai code API mới**. Workflow isolated Preview tự xác minh tách biệt Production rồi mới áp dụng migration thêm cột trên *Preview D1 duy nhất*. Không tự áp dụng vào Production, cần rollout/backup và owner duyệt riêng.
+- Bản nhập chưa có dữ liệu tồn kho chính thức (`stock:null`) và không tự công khai sản phẩm.
+- Với ảnh theo từng mẫu có nhiều màu: cấu trúc vẫn là **1 mẫu / 1 SKU SD-... với ảnh gắn nhãn màu**, không tự tạo SKU từ mỗi nhãn màu. Nếu sau này muốn SKU riêng cho biến thể màu thì cần thiết kế dữ liệu biến thể riêng, không tự suy diễn ở bước này.
+- Checkpoint trình duyệt giữ giá, tên, màu đã sửa của từng mẫu/ảnh để có thể tiếp tục sau khi đăng nhập lại. Chỉ sửa giá/màu trước khi tạo nháp; sau khi lưu, chỉnh tiếp trong Admin thông qua backend và UI quản lý được nâng cấp.
