@@ -67,8 +67,17 @@ try{
   });
   const response=await page.goto(alias+'/',{waitUntil:'domcontentloaded',timeout:45000});
   if(response?.status()!==200)throw Error('Live catalog home HTTP not 200');
-  await page.locator('#skipIntro').click({timeout:13000});
-  await page.waitForFunction(()=>!document.querySelector('#welcomeSplash'),null,{timeout:8000});
+  // With the real catalog, Welcome may have already auto-closed before
+  // our read-only QA reaches the button (unlike the synthetic delayed case).
+  const splash=page.locator('#welcomeSplash');
+  if(await splash.isVisible()){
+   const skip=page.locator('#skipIntro');
+   if(await skip.isVisible())await skip.click({timeout:5000});
+  }
+  await page.waitForFunction(()=>{
+   const el=document.querySelector('#welcomeSplash');
+   return !el||getComputedStyle(el).display==='none'||getComputedStyle(el).visibility==='hidden';
+  },null,{timeout:12000});
   await page.waitForFunction(()=>document.querySelectorAll('#categoryFilters [data-category]').length>=15,null,{timeout:15000});
   const pills=await page.locator('#categoryFilters [data-category]').evaluateAll(nodes=>nodes.map(n=>({key:n.dataset.category,label:n.textContent?.trim()||''})));
   const expected=new Map();
