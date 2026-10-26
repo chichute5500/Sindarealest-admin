@@ -1,0 +1,81 @@
+# SINDAREALEST — BÀN GIAO MỚI NHẤT / THEME TWO-PHASE
+**Thời điểm:** 26/10/2026, Việt Nam. **Đây là trạng thái GitHub đã xác minh**, không phải lời hứa công việc chạy nền. Các checkpoint 26/10 trước đó chỉ là lịch sử; phải lấy PR/Actions mới nhất khi chat mới bắt đầu.
+
+## 0. Thông tin an toàn và nguồn chính thức
+
+- **Repo:** `chichute5500/Sindarealest-admin`.
+- **Nhánh duy nhất được phép sửa:** `integration/storefront-locked-on-main-2026-10-26`. **KHÔNG sửa `main` hay nhánh khác.**
+- **PR #118:** OPEN, DRAFT, NOT MERGED, mergeable = true: https://github.com/chichute5500/Sindarealest-admin/pull/118.
+- **HEAD ứng dụng trước commit tài liệu bàn giao:** `7ef00dce06177e9718975c0df0e05b7074be8dba` (`7ef00dce`). Sau khi commit file bàn giao, HEAD thay đổi nhưng **mã nguồn ứng dụng vẫn ở `7ef00dce`** nếu chỉ có diff tài liệu.
+- **Production `main` lúc xác minh:** `db40af63965678598b0ebd3f3fe63865849dcf2e`.
+- **Isolated Preview:** https://integration-storefront-locke.sindarealest-admin-preview.pages.dev/ (không phải Production). Có thể phải xác nhận URL/deploy hiện hành từ Actions thay vì đoán alias.
+- **Cấm:** merge PR, deploy Production, thay đổi D1/R2 Production, thử chuyển khoản/ngân hàng thật, ghi dữ liệu QA vào Production; chỉ Owner cho phép mới phát hành.
+- **Người dùng yêu cầu:** không hỏi lại lịch sử, không làm lại phần đã PASS, ưu tiên xử lý tận gốc lag Light/Dark, tự dùng GitHub connector, tận dụng các luồng kiểm thử độc lập song song; không dừng ở báo lỗi.
+
+## 1. LATEST QA — phân biệt chính xác PASS / FAIL
+
+| SHA hoặc workflow | Kết quả xác minh | Ghi chú |
+|---|---|---|
+| `7ef00dce` — [Source CI #40336211284](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40336211284) | **SUCCESS** | Contract, source, CSS/asset auditor |
+| `7ef00dce` — [Admin Preview #40336211225](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40336211225) | **SUCCESS** | Admin |
+| `7ef00dce` — [Integrated isolated Preview #40336201444](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40336201444) | **FAIL tổng do Chromium theme** | Deploy+ D1/R2 isolation SUCCESS; remote D1 checkout/Admin QA fixture+cleanup SUCCESS; Chromium light/dark FAIL |
+| `b99295ae0969ac3189cf3ec23238cc7f3297f089` — [Integrated #40334252328](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40334252328) | **SUCCESS 3/3** | Nền tảng code **220ms** với two-phase và mobile color parity; không chứa các thay đổi mới sau commit này |
+| `6490c02416668d728e115f6a2120dedd08bd1acb` | Source/Admin CI SUCCESS nhưng integrated #40335174410 FAIL | Bổ sung rapid-tap test; cần đọc log nếu phân tích |
+| `dcbaeda4741142d5c8e6ca65d15302a219073afb` | Source CI FAIL, integrated FAIL | Chuyển fade **220ms → 205ms**, sau đó assertion CSS test chưa sửa |
+| `de31b36e660d3ecc1811568f09fa4ce4a9dc96d4` | Source CI SUCCESS, integrated tiếp theo vẫn FAIL | Cập nhật CSS static auditor kiểm 205ms |
+| `7ef00dce` | **HEAD gần nhất**, chưa đủ gate theme | Chỉ thêm trigger integrated workflow theo các file CSS/audit |
+
+**Log lỗi chính xác `7ef00dce`:**
+- Chromium Dark: `transitionstart` **123ms** sau click (quá gate 80ms), `transitionend` **343ms** (quá gate 300ms), thời lượng CSS thực `205ms`, **nav + dark/light backdrop cùng bắt đầu tại 123ms**, không bị lệch màu riêng.
+- Chromium Light: start **64ms**, end **287ms** (đạt riêng lượt Light).
+- Dark có **120ms long task**, `TaskDuration≈252ms`, `RecalcStyle≈46ms`, `Layout≈16ms`, `ScriptDuration≈3ms` ⇒ nguyên nhân chủ yếu là CSS root invalidation / paint/compositor và timing jitter, **không phải handler JS tính toán lâu**.
+- Source QA screenshot, checkout và các thiết kế trước đó PASS không cho phép suy luận rằng theme HEAD đã PASS. Đừng tô xanh toàn bộ PR dựa trên CI nguồn.
+
+## 2. Cơ chế two-phase theme ĐÃ CÓ trong code
+
+Cần **đọc thực tế `public/index.html`**, tránh xây lại từ đầu:
+- `applyThemeMode(mode, animate=true)`: khi nhấn theme, đưa màu và opacity 3 bề mặt (navbar, `.theme-bg--light`, `.theme-bg--dark`) bằng inline important trước; còn có mobile-bottom-nav.
+- Gắn `transitionstart/transitionend` tại navbar. Chỉ khi transition bắt đầu mới commit lớp `html.dark`, cập nhật meta/theme icon để tránh invalidation của toàn trang trước frame đầu tiên.
+- Khi end: gỡ inline overrides, gỡ lớp `theme-transitioning`; có fallback 560ms nếu browser thiếu events, và hàm `__sdCancelThemeStage` để xử lý rapid taps.
+- Target tạm: `window.__sdThemeTargetDark`; `toggleTheme` dựa vào target này để lần bấm nhanh kế tiếp không đảo sai chiều.
+- `public/material-gallery.css` đang đặt opacity wallpaper và nav transition duration **0.205s**; **trước đó PASS 0.22s** (nhưng một lượt 220ms từng kết thúc 305ms). Ngưỡng thực tế vẫn **start <=80ms, end <=300ms, nav/bg skew <=40ms**, CSS duration kỳ vọng ~220±25ms (205ms nằm trong khoảng này).
+- `tests/material-gallery-theme-atomic.test.mjs` và `scripts/audit-static-assets.mjs` hiện kiểm `.205s` — nếu thay duration phải cập nhật test cùng code.
+- `scripts/qa-storefront-theme-material.mjs`: strict PC 1440 và Mobile 390 Light→Dark→Light, Welcome cold font, material 1500ms/crossfade 580ms và **rapid interrupts (4 taps)**, kiểm meta/aria/inline override sau lượt bấm nhanh. Chỉ khi cả hai chiều/môi trường PASS mới chấp nhận.
+
+**Gợi ý tiếp theo có căn cứ:** diff `b99295ae` (SUCCESS integrated, 220ms) với `7ef00dce` (FAIL 205ms) tập trung **205ms và các test/trigger thêm sau**; xem lại first-frame jitter 120ms, không dùng 1 lần PASS duy nhất để chứng minh hết lỗi. Có thể thử hoàn nguyên **riêng 205ms về 220ms** mà giữ two-phase, mobile màu và rapid-tap fixes, rồi chạy 2–3 lượt stress + visual matrix trên exact SHA. **Không nới 80/300ms, không tăng fade theo cảm giác, không sửa Owner-PASS layout.** Đây là hướng điều tra, không phải sửa đã xác nhận.
+
+## 3. Các thiết kế Owner PASS — BẢO VỆ
+
+- **HERO code-only** `#home.sd-code-hero` / `public/code-hero.css`, text và bố cục PC/Mobile đã Owner duyệt. CTA mới **“Tư Vấn Đặt sản phẩm theo yêu cầu của bạn”** → `https://zalo.me/0827049192`, chỉ **viền** nhấp nháy (reduced-motion tắt); glass card nâng chữ **“SINDAREALEST · SIGNATURE”**, thêm 2 dòng **“Da cá sấu thật” / “Phong cách sống thật”**. Owner **đã PASS**.
+- **Welcome** first paint dấu tiếng Việt: Noto Serif/Sans phải load và kiểm `document.fonts.check` trước khi hiện chữ; Welcome exit và cold-font PC/Mobile đã có bằng chứng QA, **không thiết kế lại**.
+- **Chất liệu cao cấp**: 12 ảnh thật trong `public/images/crocodile-leather/` cùng `gallery.json`; tự chạy **1.5s** / 1 ảnh, crossfade **580ms**, không arrows/dots, không phủ sáng/tối lên ảnh thật. **Đừng ghi đè/xóa manifest**.
+- Product gallery/fullscreen, product card, giỏ hàng/checkout, tài khoản, Admin PC/Mobile, Liquid Glass, theme Light/Dark màu sắc, watermark & logo: đã từng được Owner/QA PASS ở phạm vi cụ thể; **không đổi giao diện để đổi lấy vài ms**.
+- E2E synthetic click thẻ sản phẩm cả PC/Mobile từng 8/8 PASS. Vấn đề sản phẩm deep-route cá biệt có thể là workflow khác; không tự đánh đồng synthetic PASS với mọi URL Production.
+
+## 4. Đã dọn code / CSS — ranh giới
+
+- CSS legacy HERO ảnh cũ V2–V9 không khớp với `#home.sd-code-hero` đã xóa có bằng chứng; 2 PNG HERO mồ côi (~913KB) đã xóa. Không kéo chúng trở lại.
+- CI có `scripts/audit-css-cascade.mjs`, `scripts/audit-static-assets.mjs`; kiểm toán trước đó phát hiện nhiều nhóm selector lặp/chồng trong các style blocks, **không có nghĩa tất cả là bug**.
+- **Chưa tự ý sửa** `<style>` lồng trong `public/index.html` tại catalog CSS do nguy cơ kích hoạt selector cũ làm sai hình đã PASS. Đọc `docs/integration/CSS-CASCADE-DEEP-AUDIT-2026-10-26.md`.
+- 526 ảnh sản phẩm WebP theo hash và hồ sơ QA lịch sử có thể được dữ liệu động D1/API sử dụng; **không xóa hàng loạt**.
+- Đã thử và hoàn nguyên các hướng không đạt: bỏ navbar blur trong fade, `content-visibility` ngoài màn hình, ẩn HERO, đổi SVG sang PNG lớn, pre-promote compositor, cắt hiệu ứng toàn trang; các phép thử chỉ trong QA được ghi tại tài liệu theme. KHÔNG lặp lại mù.
+
+## 5. Việc chat mới phải xử lý — ưu tiên, không chạy nền
+
+1. Dùng GitHub connector **get_pr_info, branch HEAD, main SHA và Actions**; xác minh trạng thái thời điểm mới chứ không dùng mỗi checkpoint.
+2. Đọc **toàn bộ file này** và `docs/integration/PROMPT-NEXT-CHAT-2026-10-26-THEME-TWO-PHASE.md`, `docs/integration/THEME-CHROMIUM-PERF-INVESTIGATION-2026-10-26.md`, `docs/integration/CSS-CASCADE-DEEP-AUDIT-2026-10-26.md`.
+3. Phân tích diff từ **last full integrated PASS SHA `b99295ae`** tới hiện tại; đọc log #40336201444 và run #40334252328; xác minh root-cause/failure rate. Lưu ý có nhiều commit test/docs không sửa giao diện.
+4. Chỉ sửa bug đã xác định trên branch integration, so sánh visual PC/Mobile Light/Dark, cold-font Welcome, Gallery, Zalo CTA, menu nav, product card, click deep route, checkout; **không đụng Admin/Production nếu không có bằng chứng**.
+5. CI và isolated Preview phải PASS trên **cùng mã SHA**; đo theme start/end + rapid taps nhiều lượt, không thay ngưỡng để PASS.
+6. Nếu chưa đạt: ghi log, dữ liệu, commit, blockers và tiếp tục sửa; chỉ dừng khi cần Owner thao tác hoặc hết quyền tool. Không báo 100% và không merge PR.
+
+## 6. Căn cứ và prompt mới
+
+- Latest handoff (file này): `docs/integration/HANDOFF-LATEST-2026-10-26-THEME-TWO-PHASE.md`
+- **Prompt mở chat mới:** `docs/integration/PROMPT-NEXT-CHAT-2026-10-26-THEME-TWO-PHASE.md`
+- Historical accepted design: `docs/integration/STOREFRONT-MAIN-OWNER-PASS-STAGING-2026-10-26.md`
+- Isolated checkout boundary: `docs/integration/QA-DISPOSABLE-CHECKOUT-RELEASE-GATE-2026-10-26.md`
+- Previous broad handoff: `docs/integration/HANDOFF-LATEST-2026-10-26-WELCOME-THEME-MATERIAL.md` (lịch sử, **không thay thế file này**)
+- PR: https://github.com/chichute5500/Sindarealest-admin/pull/118
+
+**Đầu ra mong đợi:** sửa dứt điểm lỗi theme + kiểm toán code còn lại trên Preview, rồi báo cáo có thể nghiệm thu; **không** tự phát hành Production.
