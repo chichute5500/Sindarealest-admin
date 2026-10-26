@@ -6,6 +6,7 @@ on:
     paths:
       - scripts/monitor-prod-r2-import-readonly.mjs
       - .github/workflows/monitor-prod-r2-import-readonly.yml
+      - docs/import/R2-COPY-PROGRESS.trigger
 permissions:
   contents: read
 jobs:
