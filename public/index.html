@@ -799,12 +799,13 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-review-row p{grid-column:1/-1;font-size:10px;color:var(--muted);line-height:1.6;margin:0;overflow-wrap:anywhere}
 .checkout-drawer .sd-checkout-review-row button{border:0;background:none;color:var(--gold);font-size:10px;text-decoration:underline}
 .checkout-drawer .sd-checkout-caution{color:var(--muted);line-height:1.6;display:block}
-.checkout-drawer .sd-checkout-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:5px}
+.checkout-drawer .sd-checkout-footer{flex:0 0 auto;display:grid;gap:5px;padding:8px 3px 2px;border-top:1px solid var(--line);background:var(--sd-reference-surface-strong,var(--glass))}
+.checkout-drawer .sd-checkout-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:0}
 .checkout-drawer .sd-checkout-actions .pill-btn{width:100%;min-height:44px}
 .checkout-drawer .sd-checkout-actions #checkoutSubmit{margin:0;max-height:none;height:auto;min-height:44px;font-size:10px;padding:10px 13px}
 .checkout-drawer .sd-checkout-actions #sdCheckoutPrev{font-size:10px}
 .checkout-drawer .sd-checkout-actions button:disabled{opacity:.62;cursor:wait}
-.checkout-drawer #checkoutMessage:not(:empty){padding:8px 4px}
+.checkout-drawer #checkoutMessage:not(:empty){padding:6px 4px;font-size:10px;line-height:1.45;max-height:72px;overflow:auto}
 @media(max-width:360px){.checkout-drawer .sd-checkout-qr-main{grid-template-columns:100px minmax(0,1fr)}.checkout-drawer .sd-checkout-step{font-size:8px}.checkout-drawer .sd-checkout-stepper{gap:3px}}
 </style>
 </head>
@@ -1182,10 +1183,13 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 <div class="sd-checkout-box"><div class="sd-checkout-summary-pair"><span>Số tiền khách chọn chuyển</span><strong id="sdCheckoutReviewAmount">Chờ xác nhận</strong></div><p class="sd-checkout-hint">Chuyển khoản toàn bộ đủ điều kiện miễn phí vận chuyển sau khi Admin xác minh đã nhận đủ tiền.</p></div>
 <div class="sd-checkout-box sd-checkout-caution">Nhấn <strong>Gửi đơn hàng</strong> để chuyển đơn và hình thức thanh toán đã chọn tới Admin. Quét QR không đồng nghĩa đã thanh toán.</div>
 </section>
-<div class="sd-checkout-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutPrev">Quay lại</button><button class="pill-btn primary tap-target" id="checkoutSubmit" type="submit">Tiếp tục chọn thanh toán →</button></div>
-<p id="checkoutMessage" class="checkout-message" role="status" aria-live="polite"></p>
+
 <div id="paymentInstructions" class="payment-instructions" role="status" aria-live="polite" hidden></div>
 </form>
+<div class="sd-checkout-footer">
+<div class="sd-checkout-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutPrev">Quay lại</button><button class="pill-btn primary tap-target" id="checkoutSubmit" type="submit" form="checkoutForm">Tiếp tục chọn thanh toán →</button></div>
+<p id="checkoutMessage" class="checkout-message" role="status" aria-live="polite"></p>
+</div>
 </aside>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
