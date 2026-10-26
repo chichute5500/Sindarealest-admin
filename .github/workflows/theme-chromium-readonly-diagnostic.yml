@@ -51,4 +51,5 @@ jobs:
       - name: Run compositor isolation trials with original strict gates (GET only)
         env:
           SD_THEME_DIAGNOSTIC_VARIANTS: '1'
+          SD_THEME_TRACE: '1'
         run: node scripts/qa-storefront-theme-material.mjs

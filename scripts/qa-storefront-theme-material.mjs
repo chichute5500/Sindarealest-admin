@@ -380,6 +380,55 @@ try{
         chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
       });
       console.log('THEME_COMPOSITOR_ABA_DIAGNOSTIC '+JSON.stringify([...results,...variants].map(metric)));
+      if(process.env.SD_THEME_TRACE==='1'&&spec.label==='pc-1440'){
+        // CDP GPU/style trace of one additional dark toggle, not used as
+        // proof of 80/300ms because instrumentation adds overhead.
+        const traceNames=new Set([
+          'Paint','PrePaint','CompositeLayers','UpdateLayerTree','RecalculateStyles',
+          'Layout','RasterTask','Rasterize','DrawFrame','BeginMainThreadFrame',
+          'PipelineReporter','RunTask','FunctionCall','ScheduleStyleRecalculation',
+          'Layerize','UpdateLayoutTree','Commit','ActivateLayerTree'
+        ]);
+        const collected=[];
+        let seen=0;
+        const onTrace=packet=>{
+          for(const event of packet.value||[]){
+            seen++;
+            if(event.ph==='X'&&traceNames.has(event.name)){
+              collected.push({
+                name:event.name,
+                ms:Math.round((event.dur||0)/100)/10,
+                at:Math.round((event.ts||0)/1000),
+                tid:event.tid
+              });
+            }
+          }
+        };
+        perfClient.on('Tracing.dataCollected',onTrace);
+        await perfClient.send('Tracing.start',{
+          categories:'devtools.timeline,disabled-by-default-devtools.timeline,blink,cc,renderer.scheduler',
+          transferMode:'ReportEvents'
+        });
+        const traced=await runThemeTrial(true,'traced-dark-compositor');
+        const completion=new Promise(resolve=>perfClient.once('Tracing.tracingComplete',resolve));
+        await perfClient.send('Tracing.end');
+        await completion;
+        perfClient.off('Tracing.dataCollected',onTrace);
+        const groups={};
+        for(const event of collected){
+          const group=groups[event.name]||(groups[event.name]={count:0,totalMs:0,longestMs:0});
+          group.count++;
+          group.totalMs=Math.round((group.totalMs+event.ms)*10)/10;
+          group.longestMs=Math.max(group.longestMs,event.ms);
+        }
+        console.log('THEME_CHROME_PAINT_TRACE '+JSON.stringify({
+          navStartMs:metric(traced).startMs,navEndMs:metric(traced).endMs,
+          totalEvents:seen,matchedEvents:collected.length,
+          topGroups:Object.entries(groups).sort((a,b)=>b[1].totalMs-a[1].totalMs).slice(0,18),
+          longest:collected.sort((a,b)=>b.ms-a.ms).slice(0,20)
+        }));
+        await runThemeTrial(false,'reset-after-trace');
+      }
     }else{
           console.log('THEME_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
             dark:r.direction,variant:'baseline',
