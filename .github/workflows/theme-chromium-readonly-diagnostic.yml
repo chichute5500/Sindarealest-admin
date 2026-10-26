@@ -48,7 +48,7 @@ jobs:
           }
       - name: Measure independent empty-page Chromium compositor baseline
         run: node scripts/qa-theme-frame-scheduler-baseline.mjs
-      - name: Compare staged root swap with and without transition class (GET only)
+      - name: Isolate CSS cascade blocks responsible for theme repaint (GET only)
         env:
           SD_THEME_DIAGNOSTIC_VARIANTS: '1'
           SD_THEME_TRACE: '1'
