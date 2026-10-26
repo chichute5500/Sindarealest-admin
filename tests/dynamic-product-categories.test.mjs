@@ -24,7 +24,12 @@ const rows=[
  {category:"vi-cam-tay",categoryLabel:"Ví cầm tay"},
  {category:"bags-x",categoryLabel:'<img src=x onerror=alert(1)>'}
 ];
+const categoryNameStart=html.indexOf('function displayProductName(');
+const categoryNameEnd=html.indexOf('\nfunction preferred(',categoryNameStart);
+assert.ok(categoryNameStart>0&&categoryNameEnd>categoryNameStart);
+const productNameDisplay=runInNewContext(html.slice(categoryNameStart,categoryNameEnd)+'\ndisplayProductName',{}, {timeout:1000});
 const ctx={
+ displayProductName:productNameDisplay,
  products:rows,
  categoryLabels:{all:"Tất cả",sneakers:"Sneaker",loafers:"Giày lười",belts:"Thắt lưng"},
  categoryOrder:["all","sneakers","loafers","dress-shoes","belts","wallets","sandals","watch-straps","phone-cases"],
