@@ -48,4 +48,58 @@ runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,"all","Stale filter selection resets");
 assert.match(box.innerHTML,/data-category="new-2027"/,"Future categories need no code change");
 assert.ok(!box.innerHTML.includes("tui-golf"),"Stale categories must be removed");
+
+// The newly uploaded catalog may have no legacy "wallets" category. The
+// owner-approved featured grid must still contain four distinct real products.
+const featuredStart=html.indexOf("function renderFeatured(){");
+const featuredEnd=html.indexOf("\nfunction changeFeaturedImage(",featuredStart);
+assert.ok(featuredStart>=0&&featuredEnd>featuredStart);
+const sampleCatalog=[
+ ...Array.from({length:12},(_,i)=>({id:"s-"+i,category:"sneakers",title:"Giày "+i})),
+ {id:"l-1",category:"loafers",title:"Giày lười"},
+ {id:"b-1",category:"belts",title:"Thắt lưng"},
+ {id:"v-1",category:"vi-nam",title:"Ví nam"},
+ {id:"v-2",category:"vi-cam-tay",title:"Ví cầm tay"},
+ {id:"g-1",category:"tui-golf",title:"Túi golf"},
+ {id:"cl-1",category:"clutch",title:"Clutch"},
+ {id:"mu-1",category:"mu",title:"Mũ"},
+ {id:"dep-1",category:"sandals",title:"Dép"}
+];
+const featuredBox={innerHTML:""};
+const featuredCtx={
+ products:sampleCatalog,
+ $:selector=>selector==="#featuredGrid"?featuredBox:null,
+ preferredGallery:category=>sampleCatalog.find(p=>p.category===category),
+ unbindReveal(){},bindReveal(){},setupFeaturedAutoplay(){},
+ featuredProductCard:p=>'<article data-featured-card data-product="'+p.id+'"></article>'
+};
+runInNewContext(html.slice(featuredStart,featuredEnd)+"\nrenderFeatured();",featuredCtx,{timeout:1000});
+assert.equal((featuredBox.innerHTML.match(/data-featured-card/g)||[]).length,4,
+ "Featured grid must restore four distinct slots when the old wallets category is absent");
+assert.match(featuredBox.innerHTML,/data-product="v-1"/,
+ "New wallet category should fill the missing legacy featured slot");
+assert.equal(new Set([...featuredBox.innerHTML.matchAll(/data-product="([^"]+)"/g)].map(x=>x[1])).size,4,
+ "Featured cards must be unique");
+
+// The All tab must show different categories on its first page instead of the
+// leading batch of sneakers; individual category tabs still preserve their data.
+const filterStart=html.indexOf("function getFiltered(){");
+const filterEnd=html.indexOf("\nfunction renderCatalog(",filterStart);
+assert.ok(filterStart>=0&&filterEnd>filterStart);
+const catalogCtx={
+ products:sampleCatalog,categoryOrder:ctx.categoryOrder,selectedCategory:"all",
+ $:selector=>selector==="#catalogSearch"?{value:""}:null,
+ visibleSku:p=>p.sku||"",
+ foldSearch:value=>String(value||"").toLocaleLowerCase("vi")
+};
+const filterSource=html.slice(filterStart,filterEnd);
+const mixed=runInNewContext(filterSource+"\ngetFiltered();",catalogCtx,{timeout:1000});
+assert.equal(mixed.length,sampleCatalog.length,"All tab must retain every published product");
+assert.equal(new Set(mixed.slice(0,8).map(p=>p.category)).size,8,
+ "First All-products page must show eight different categories, not eight sneakers");
+catalogCtx.selectedCategory="sneakers";
+const sneakerOnly=runInNewContext(filterSource+"\ngetFiltered();",catalogCtx,{timeout:1000});
+assert.equal(sneakerOnly.length,12,"Choosing sneakers must still show only sneakers");
+assert.ok(sneakerOnly.every(p=>p.category==="sneakers"));
+
 console.log("PASS: published Admin/D1 product categories stay distinct, safe and auto-updated.");

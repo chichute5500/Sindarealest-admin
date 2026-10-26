@@ -1263,7 +1263,30 @@ function preferredGallery(category){const candidates=products.filter(p=>p.catego
 function featuredProductCard(p,flag='SELECTED',idx=0){const images=allImages(p);const id=escapeHtml(p.id||p.slug);const price=customerPriceLabel(p);const count=images.length;const track=count>1?`<span class="feature-track" data-feature-track style="--slide-count:${count};width:${count*100}%">${images.map((src,i)=>`<img class="feature-slide" ${i===0?`src="${escapeHtml(imgPath(src))}"`:`data-src="${escapeHtml(imgPath(src))}"`} alt="${escapeHtml(p.title)} — ảnh ${i+1}" ${i===0?'loading="eager"':'loading="lazy"'} decoding="async" style="flex:0 0 ${100/count}%;width:${100/count}%">`).join('')}</span>`:`<img class="feature-single" src="${escapeHtml(imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1'))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">`;return `<article class="product-card featured-product-card tap-target" data-reveal style="--reveal-delay:${Math.min(idx,3)*65}ms" data-featured-card data-feature-count="${count}" data-feature-index="0" data-product="${id}"><div class="featured-media"><button class="product-open featured-open" data-open-product="${id}" aria-label="Xem chi tiết ${escapeHtml(p.title)}"><span class="product-photo feature-photo">${track}<span class="photo-shade"></span><span class="product-flag">${escapeHtml(flag)}</span></span></button>${count>1?`<button type="button" class="featured-arrow featured-prev tap-target" data-feature-step="-1" aria-label="Ảnh trước của ${escapeHtml(p.title)}">${arrowIcon('left')}</button><button type="button" class="featured-arrow featured-next tap-target" data-feature-step="1" aria-label="Ảnh tiếp theo của ${escapeHtml(p.title)}">${arrowIcon('right')}</button><span class="featured-image-count" data-feature-count-label>01 / ${String(count).padStart(2,'0')}</span>`:''}</div><div class="product-info"><span class="product-sku">Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}</span><button class="featured-title product-title" data-open-product="${id}">${escapeHtml(p.title||'Sản phẩm tuyển chọn')}</button><div class="product-category">${escapeHtml(p.categoryLabel||categoryLabels[p.category]||'Sản phẩm')}</div><div class="product-card-bottom">${price?`<span class="product-price">${escapeHtml(price)}</span>`:'' }<button class="product-detail-cta" data-open-product="${id}">Xem chi tiết <span>↗</span></button></div></div><button class="mini-add quick-add tap-target" data-add="${id}" aria-label="Thêm ${escapeHtml(p.title)} vào giỏ chọn">${iconBag()}</button></article>`}
 function setupMobileBottomNav(){const nav=$('#mobileBottomNav');if(!nav)return;const tabs=$$('[data-mobile-tab]');const activate=key=>tabs.forEach(tab=>{const active=tab.dataset.mobileTab===key;tab.classList.toggle('is-active',active);if(active)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current')});tabs.forEach(tab=>{if(tab.dataset.mobileTab==='cart'){tab.addEventListener('click',()=>{activate('cart');toggleStorefrontModal('cart')})}else if(tab.dataset.mobileTab==='account'){tab.addEventListener('click',()=>{activate('account');toggleStorefrontModal('account')})}else tab.addEventListener('click',()=>activate(tab.dataset.mobileTab))});if('IntersectionObserver'in window){const targets=[['home',$('#home')],['home',$('#order')],['home',$('#featured')],['home',$('#promise')],['home',$('#collections')],['products',$('#products')],['home',$('#siteFooter')]].filter(([,el])=>el);const observer=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible){const found=targets.find(([,el])=>el===visible.target);if(found)activate(found[0])}},{rootMargin:'-25% 0px -55% 0px',threshold:[0,.1,.25,.5]});targets.forEach(([,el])=>observer.observe(el))}}
 /* Legacy shoe-art synchronization removed: HERO is HTML/CSS only. */
-function renderFeatured(){unbindReveal($('#featuredGrid'));const categories=['sneakers','loafers','belts','wallets'];const flags=['SIGNATURE','CRAFT','ACCESSORY','ESSENTIAL'];const choices=categories.map(c=>preferredGallery(c)).filter(Boolean);$('#featuredGrid').innerHTML=choices.map((p,i)=>featuredProductCard(p,flags[i]||'SELECTED',i)).join('');bindReveal($('#featuredGrid'));setupFeaturedAutoplay()}
+function renderFeatured(){
+ unbindReveal($('#featuredGrid'));
+ const flags=['SIGNATURE','CRAFT','ACCESSORY','ESSENTIAL'];
+ // Keep the four owner-approved slots even when a legacy category has no
+ // published products. New Admin categories must be eligible automatically.
+ const categories=['sneakers','loafers','belts','wallets','vi-nam','vi-cam-tay',
+  ...new Set(products.map(p=>p.category).filter(Boolean))];
+ const choices=[],used=new Set();
+ const include=p=>{
+  if(!p)return;
+  const key=String(p.id||p.slug||'');
+  if(!key||used.has(key))return;
+  used.add(key);choices.push(p);
+ };
+ for(const category of categories){
+  include(preferredGallery(category));
+  if(choices.length===4)break;
+ }
+ // If fewer than four categories exist, fill with other real products, never
+ // fabricated cards or duplicates.
+ if(choices.length<4)for(const p of products){include(p);if(choices.length===4)break}
+ $('#featuredGrid').innerHTML=choices.map((p,i)=>featuredProductCard(p,flags[i]||'SELECTED',i)).join('');
+ bindReveal($('#featuredGrid'));setupFeaturedAutoplay();
+}
 function changeFeaturedImage(card,step=1){if(!card)return;const track=card.querySelector('[data-feature-track]');const count=Number(card.dataset.featureCount||0);if(!track||count<2)return;const base=Number(card.dataset.featureRequestIndex??card.dataset.featureIndex??0);const index=(base+step+count)%count;card.dataset.featureRequestIndex=String(index);const requestId=String(Number(card.dataset.featureRequestId||0)+1);card.dataset.featureRequestId=requestId;const commit=()=>{if(card.dataset.featureRequestId!==requestId)return;card.dataset.featureIndex=String(index);track.style.transform=`translate3d(${-index*100/count}%,0,0)`;const label=card.querySelector('[data-feature-count-label]');if(label)label.textContent=String(index+1).padStart(2,'0')+' / '+String(count).padStart(2,'0');const ahead=track.children[(index+1)%count];if(ahead&&ahead.dataset.src&&!ahead.dataset.preloading){ahead.dataset.preloading='1';const preload=new Image();preload.onload=()=>{ahead.dataset.preloaded='1';delete ahead.dataset.preloading};preload.onerror=()=>{delete ahead.dataset.preloading};preload.src=ahead.dataset.src}};const target=track.children[index];if(target&&target.dataset.src&&!target.getAttribute('src')){target.onload=()=>{target.onload=null;target.dataset.loaded='1';commit()};target.onerror=()=>{target.onerror=null;commit()};target.src=target.dataset.src;delete target.dataset.src;return}commit()}
 let featuredPausedUntil=0, featuredAutoplayPaused=false;
 function updateFeaturedAutoplayButton(){const button=$('#featuredAutoplayToggle');if(!button)return;const reduceMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);const paused=featuredAutoplayPaused||reduceMotion;const label=reduceMotion?'Tự động chuyển ảnh đang tắt theo cài đặt giảm chuyển động':paused?'Tiếp tục tự động chuyển ảnh':'Tạm dừng tự động chuyển ảnh';button.setAttribute('aria-pressed',String(paused));button.setAttribute('aria-label',label);button.title=label;button.disabled=reduceMotion;button.innerHTML=paused?'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m8 5 11 7-11 7z" fill="currentColor" stroke="none"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14"/></svg>'}
@@ -1291,7 +1314,26 @@ function renderFilters(){
   $('#categoryFilters').innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target '+(selectedCategory===c?'active':'')+'" data-category="'+escapeHtml(c)+'" aria-pressed="'+(selectedCategory===c)+'">'+escapeHtml(c==='all'?categoryLabels.all:(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
 }
 function foldSearch(value){return String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
-function getFiltered(){const q=foldSearch(($('#catalogSearch').value||'').trim());return products.filter(p=>(selectedCategory==='all'||p.category===selectedCategory)&&(!q||foldSearch((p.title||'')+' '+visibleSku(p)+' '+(p.categoryLabel||'')+' '+(p.description||'')).includes(q)))}
+function getFiltered(){
+ const q=foldSearch(($('#catalogSearch').value||'').trim());
+ const matches=products.filter(p=>(selectedCategory==='all'||p.category===selectedCategory)&&(!q||foldSearch((p.title||'')+' '+visibleSku(p)+' '+(p.categoryLabel||'')+' '+(p.description||'')).includes(q)));
+ if(selectedCategory!=='all'||q)return matches;
+ // The API groups many sneakers first. Interleave published categories only
+ // for the unfiltered "All products" tab so page one is not all sneakers.
+ // Keep server order within each group and preserve category-only filtering.
+ const groups=new Map();
+ for(const p of matches){
+  const key=String(p.category||'');
+  if(!groups.has(key))groups.set(key,[]);
+  groups.get(key).push(p);
+ }
+ const keys=[...categoryOrder.filter(c=>c!=='all'&&groups.has(c)),
+  ...[...groups.keys()].filter(c=>!categoryOrder.includes(c))];
+ const mixed=[];
+ for(let index=0;mixed.length<matches.length;index++)
+  for(const key of keys)if(groups.get(key)[index])mixed.push(groups.get(key)[index]);
+ return mixed;
+}
 function renderCatalog(){unbindReveal($('#catalogGrid'));filtered=getFiltered();const maxPage=Math.max(1,Math.ceil(filtered.length/perPage));page=Math.min(page,maxPage);const start=(page-1)*perPage;const items=filtered.slice(start,start+perPage);$('#catalogGrid').innerHTML=items.map((p,i)=>productCard(p,(p.categoryLabel||'SELECTED').toUpperCase(),i)).join('');$('#pageSummary').textContent=filtered.length?`Hiển thị ${start+1}–${Math.min(start+perPage,filtered.length)} trong ${filtered.length} sản phẩm`:'Không tìm thấy sản phẩm phù hợp.';const nums=[];let from=Math.max(1,page-2),to=Math.min(maxPage,page+2);if(from>1)nums.push(1,'…');for(let i=from;i<=to;i++)nums.push(i);if(to<maxPage)nums.push('…',maxPage);$('#pagination').innerHTML=filtered.length?`<button type="button" class="page-btn page-arrow tap-target" data-page="prev" ${page===1?'disabled':''} aria-label="Trang trước">${arrowIcon('left')}</button>${nums.map(n=>n==='…'?'<span class="page-summary">…</span>':`<button class="page-btn tap-target ${n===page?'active':''}" data-page="${n}" ${n===page?'aria-current="page"':''}>${n}</button>`).join('')}<button type="button" class="page-btn page-arrow tap-target" data-page="next" ${page===maxPage?'disabled':''} aria-label="Trang sau">${arrowIcon('right')}</button>`:'';bindReveal($('#catalogGrid'))}
 function scheduleDetailAutoplay(){clearTimeout(detailTimer);if(!currentProduct||detailImages.length<2||!$('#productOverlay').classList.contains('open')||$('#sdFullscreenViewer').classList.contains('open')||document.hidden)return;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;detailTimer=setTimeout(()=>changeDetailImage((detailIndex+1)%detailImages.length,false),2000)}
 function fullscreenImages(){return [$('#sdFullscreenImage'),$('#sdFullscreenImageNext')].filter(Boolean)}

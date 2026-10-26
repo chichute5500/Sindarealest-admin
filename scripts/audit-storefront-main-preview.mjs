@@ -85,6 +85,19 @@ try{
   const shown=new Set(pills.filter(x=>x.key!=='all').map(x=>x.key));
   if(pills.length!==16||shown.size!==15||[...expected.keys()].some(k=>!shown.has(k)))
    throw Error("LIVE_CATEGORY_FILTER_NOT_SYNCED");
+  // Verify real Preview data restores four owner-approved featured tiles.
+  const featuredIds=await page.locator('#featuredGrid [data-featured-card]').evaluateAll(nodes=>nodes.map(n=>n.dataset.product));
+  if(featuredIds.length!==4||new Set(featuredIds).size!==4)
+   throw Error("LIVE_FEATURED_MISSING_ONE_OF_FOUR_CARDS");
+  // Initial unfiltered All tab must represent several categories, not only
+  // sneakers because that group happens to sort first in the D1 response.
+  const firstPageIds=await page.locator('#catalogGrid [data-product]').evaluateAll(nodes=>nodes.map(n=>n.dataset.product));
+  const allCategories=new Map(liveRows.map(x=>[String(x.id||x.slug),String(x.category)]));
+  const initialKinds=new Set(firstPageIds.map(id=>allCategories.get(String(id))).filter(Boolean));
+  if(initialKinds.size<Math.min(4,firstPageIds.length))
+   throw Error("LIVE_ALL_PRODUCTS_FIRST_PAGE_NOT_DIVERSE");
+  liveProof.featuredCount=featuredIds.length;
+  liveProof.firstPageCategoryCount=initialKinds.size;
   for(const item of pills){
    if(item.key!=='all'&&!item.label.includes(String(expected.get(item.key)||0)))
     throw Error("LIVE_CATEGORY_COUNT_MISMATCH");
