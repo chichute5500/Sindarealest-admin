@@ -138,6 +138,20 @@ async function verifyWelcomeExit(spec){
     }));
     if(!blocked.stillVisible||!blocked.bodyLocked||blocked.appReady)
       throw Error('Welcome exposed unready page: '+JSON.stringify(blocked));
+    // Observe actual fade lifecycle *before* releasing the async catalog.
+    // Polling only for an intermediate opacity is unreliable when a browser
+    // runner skips a paint frame, even if the approved fade is correct.
+    await page.evaluate(()=>{
+      window.__sdWelcomeFadeEvents=[];
+      document.querySelector('#welcomeSplash')?.addEventListener('transitionstart',event=>{
+        if(event.target.id==='welcomeSplash'&&event.propertyName==='opacity')
+          window.__sdWelcomeFadeEvents.push({type:'start',property:event.propertyName});
+      });
+      document.querySelector('#welcomeSplash')?.addEventListener('transitionend',event=>{
+        if(event.target.id==='welcomeSplash'&&event.propertyName==='opacity')
+          window.__sdWelcomeFadeEvents.push({type:'end',property:event.propertyName});
+      });
+    });
     releaseProducts();
     await page.waitForFunction(()=>document.querySelector('#welcomeSplash')?.classList.contains('is-leaving'),null,{timeout:8500});
     const fade=await page.evaluate(()=>({
@@ -148,28 +162,34 @@ async function verifyWelcomeExit(spec){
     }));
     if(!fade.ready||!fade.bodyUnlocked||!fade.fullPage||!fade.heroPresent)
       throw Error('Welcome exit began before storefront layout was stable: '+JSON.stringify(fade));
-    // Inspect an actual overlapping-paint frame: only the intro's blank
-    // backdrop may fade, never its headline/logo against the incoming HERO.
-    await page.waitForFunction(()=>{
-      const splash=document.querySelector('#welcomeSplash');
-      if(!splash)return false;
-      const opacity=Number(getComputedStyle(splash).opacity);
-      return opacity>.18&&opacity<.82;
-    },null,{timeout:1800});
+    // Validate the approved 200ms/100ms fade transition and ensure the
+    // welcome text disappears at the *start* of the backdrop fade. The
+    // transitionstart event below is a real browser lifecycle proof, not
+    // a loosened sampling threshold or a stubbed animation.
     const layers=await page.evaluate(()=>{
       const splash=document.querySelector('#welcomeSplash');
-      return {splashOpacity:Number(getComputedStyle(splash).opacity),
-        textOpacity:Number(getComputedStyle(splash.querySelector('.welcome-content')).opacity)};
+      const splashStyle=getComputedStyle(splash);
+      return {splashOpacity:Number(splashStyle.opacity),
+        textOpacity:Number(getComputedStyle(splash.querySelector('.welcome-content')).opacity),
+        transitionProperty:splashStyle.transitionProperty,
+        transitionDuration:splashStyle.transitionDuration,
+        transitionDelay:splashStyle.transitionDelay};
     });
     if(layers.textOpacity>.02)
       throw Error('Welcome text ghosted over the storefront: '+JSON.stringify(layers));
+    if(!layers.transitionProperty.split(',').map(x=>x.trim()).includes('opacity')||
+       !layers.transitionDuration.split(',').map(x=>x.trim()).includes('0.2s')||
+       !layers.transitionDelay.split(',').map(x=>x.trim()).includes('0.1s'))
+      throw Error('Approved welcome fade duration/delay changed: '+JSON.stringify(layers));
     await page.screenshot({path:'artifacts/storefront-integration-preview/'+spec.label+'-welcome-exit.png',fullPage:false,animations:'allow'});
     await page.waitForFunction(()=>!document.querySelector('#welcomeSplash'),null,{timeout:5000});
     const final=await page.evaluate(()=>({
       unlocked:!document.body.classList.contains('welcome-active'),
-      pageHeight:document.body.scrollHeight
+      pageHeight:document.body.scrollHeight,
+      fadeEvents:window.__sdWelcomeFadeEvents||[]
     }));
-    if(!final.unlocked||errors.length)throw Error('Welcome exit final state: '+JSON.stringify({final,errors}));
+    if(!final.unlocked||errors.length||!final.fadeEvents.some(e=>e.type==='start'))
+      throw Error('Welcome exit/fade lifecycle invalid: '+JSON.stringify({final,errors}));
     welcomeExitMatrix.push({label:spec.label,pass:true,waitedForProducts:true,
       unlockedBeforeFade:true,completedWithoutHalfLayout:true});
   }finally{
