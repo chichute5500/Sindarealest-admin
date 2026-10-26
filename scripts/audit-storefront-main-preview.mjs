@@ -28,15 +28,78 @@ const synthetic=[{
 const report={sha,sourceBranch:branch,alias,scope:'READ_ONLY_BROWSER_WITH_SYNTHETIC_PUBLIC_CATALOG',realOrderWrites:0,prodWrites:0,matrix:[],errors:[],livePublicCatalog:null,createdAt:new Date().toISOString()};
 const browser=await chromium.launch({headless:true});
 const auth=buildCloudflareAccessHeaders();
+let liveRows=[];
 try{
  const probe=await browser.newContext();
  try{
   const response=await probe.request.get(alias+'/api/products',{headers:auth,timeout:25000});
   const result={httpStatus:response.status(),isArray:false};
-  if(response.ok()){try{const body=await response.json();result.isArray=Array.isArray(body);result.count=Array.isArray(body)?body.length:null}catch{}}
+  if(response.ok()){try{
+    const body=await response.json();result.isArray=Array.isArray(body);
+    liveRows=Array.isArray(body)?body:[];
+    result.count=liveRows.length;result.categoryCount=new Set(liveRows.map(x=>x.category)).size;
+    result.imageReferences=liveRows.reduce((n,x)=>n+(Array.isArray(x.images)?x.images.length:0),0);
+   }catch{}}
   report.livePublicCatalog=result;
  }catch(error){report.livePublicCatalog={error:String(error).slice(0,180)}}
  await probe.close();
+ // Real catalog read-only contract: the old tests stubbed the API, so the
+ // 235-old-vs-218-new isolation error was invisible even when Chromium PASSed.
+ // This extra mobile session reads the *actual* isolated Preview D1 and uses
+ // its product categories as the single source of truth for the rendered pills.
+ const liveProof={pass:false,count:liveRows.length,categories:0,filterChecked:null,firstMedia:null};
+ report.realCatalog=liveProof;
+ let liveContext;
+ try{
+  if(liveRows.length!==218||new Set(liveRows.map(x=>x.category)).size!==15)
+   throw Error("ISOLATED_PREVIEW_CATALOG_NOT_APPROVED_218_IN_15");
+  liveContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1,colorScheme:'light',reducedMotion:'reduce'});
+  await liveContext.addInitScript(()=>{try{localStorage.setItem('sd-theme-mode','light')}catch{}});
+  const page=await liveContext.newPage();
+  page.on('pageerror',e=>report.errors.push({label:'live-catalog-mobile',type:'pageerror',message:e.message.slice(0,180)}));
+  await page.route('**/*',async route=>{
+   const request=route.request();let url;
+   try{url=new URL(request.url())}catch{await route.abort();return}
+   if(!['GET','HEAD'].includes(request.method())){await route.abort('blockedbyclient');return}
+   if(url.origin===alias){await route.continue({headers:{...request.headers(),...auth}});return}
+   if(isApprovedPreviewExternalRead(request.url(),request.method())){await route.continue();return}
+   await route.abort('blockedbyclient');
+  });
+  const response=await page.goto(alias+'/',{waitUntil:'domcontentloaded',timeout:45000});
+  if(response?.status()!==200)throw Error('Live catalog home HTTP not 200');
+  await page.locator('#skipIntro').click({timeout:13000});
+  await page.waitForFunction(()=>!document.querySelector('#welcomeSplash'),null,{timeout:8000});
+  await page.waitForFunction(()=>document.querySelectorAll('#categoryFilters [data-category]').length>=15,null,{timeout:15000});
+  const pills=await page.locator('#categoryFilters [data-category]').evaluateAll(nodes=>nodes.map(n=>({key:n.dataset.category,label:n.textContent?.trim()||''})));
+  const expected=new Map();
+  for(const x of liveRows){const key=String(x.category||'');expected.set(key,(expected.get(key)||0)+1)}
+  const shown=new Set(pills.filter(x=>x.key!=='all').map(x=>x.key));
+  if(pills.length!==16||shown.size!==15||[...expected.keys()].some(k=>!shown.has(k)))
+   throw Error("LIVE_CATEGORY_FILTER_NOT_SYNCED");
+  for(const item of pills){
+   if(item.key!=='all'&&!item.label.includes(String(expected.get(item.key)||0)))
+    throw Error("LIVE_CATEGORY_COUNT_MISMATCH");
+  }
+  const oldSet=new Set(['sneakers','loafers','dress-shoes','belts','wallets','sandals','watch-straps','phone-cases']);
+  const sample=[...expected.keys()].find(key=>!oldSet.has(key))||[...expected.keys()][0];
+  await page.locator('#categoryFilters [data-category="'+sample+'"]').click({timeout:6500});
+  await page.waitForFunction(()=>document.querySelector('#catalogGrid .product-card'),null,{timeout:10000});
+  const ids=await page.locator('#catalogGrid .product-card').evaluateAll(nodes=>nodes.map(n=>n.dataset.product));
+  const lookup=new Map(liveRows.map(row=>[String(row.id||row.slug),String(row.category)]));
+  if(!ids.length||ids.some(id=>lookup.get(String(id))!==sample))
+   throw Error("LIVE_CATEGORY_CLICK_DISPLAYS_WRONG_PRODUCTS");
+  liveProof.categories=shown.size;liveProof.filterChecked=sample;
+  await page.screenshot({path:path.join(destination,'real-new-catalog-mobile.png'),fullPage:false,animations:'disabled'});
+  const media=liveRows.flatMap(x=>Array.isArray(x.images)?x.images:[]).find(x=>/^\/media\/[a-z0-9-]+\.webp$/i.test(String(x)));
+  if(media){
+   const img=await liveContext.request.get(alias+media,{headers:auth,timeout:25000});
+   liveProof.firstMedia={httpStatus:img.status(),contentType:img.headers()['content-type']||''};
+   if(!img.ok()||!liveProof.firstMedia.contentType.includes('image/'))
+    throw Error("APPROVED_MEDIA_MISSING_FROM_PREVIEW_R2");
+  }else throw Error("NO_APPROVED_MEDIA_REFERENCE_FOUND");
+  liveProof.pass=true;
+ }catch(error){report.errors.push({label:'live-catalog-mobile',type:'real-data',message:String(error?.message||error).slice(0,340)})}
+ finally{if(liveContext)await liveContext.close()}
  for(const spec of specs){
   const context=await browser.newContext({viewport:{width:spec.width,height:spec.height},deviceScaleFactor:1,isMobile:spec.mobile,hasTouch:spec.mobile,colorScheme:spec.theme,reducedMotion:'reduce'});
   await context.addInitScript(theme=>{
@@ -139,8 +202,8 @@ try{
 }finally{await browser.close()}
 report.visualTechnicalPass=report.matrix.length===specs.length&&report.matrix.every(v=>v.pass);
 report.apiReadOnlyPass=report.livePublicCatalog?.httpStatus===200&&report.livePublicCatalog?.isArray===true;
-report.pass=report.visualTechnicalPass&&report.apiReadOnlyPass&&report.errors.length===0;
+report.pass=report.visualTechnicalPass&&report.apiReadOnlyPass&&report.realCatalog.pass&&report.errors.length===0;
 await fs.writeFile(path.join(destination,'browser-audit.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify({visualTechnicalPass:report.visualTechnicalPass,apiReadOnlyPass:report.apiReadOnlyPass,pass:report.pass,
- livePublicCatalog:report.livePublicCatalog,matrix:report.matrix.map(x=>({label:x.label,pass:x.pass,failed:Object.entries(x.checks||{}).filter(([,ok])=>!ok).map(([k])=>k),error:x.errors})),errors:report.errors},null,2));
+ livePublicCatalog:report.livePublicCatalog,realCatalog:report.realCatalog,matrix:report.matrix.map(x=>({label:x.label,pass:x.pass,failed:Object.entries(x.checks||{}).filter(([,ok])=>!ok).map(([k])=>k),error:x.errors})),errors:report.errors},null,2));
 if(!report.pass)process.exitCode=1;
