@@ -63,12 +63,14 @@ for (const path of boundedRoutes) {
   assert.match(source, /readJsonBodyLimited/,
     path + " must use the shared bounded JSON parser");
 }
-for (const path of [
-  "../functions/api/admin/upload.js",
-  "../functions/api/warranty-claim-uploads.js",
-]) {
-  const source = readFileSync(new URL(path, import.meta.url), "utf8");
-  assert.match(source, /readBodyBytesLimited/,
-    path + " must use the shared streaming body size limit");
-}
+// Multipart can be bounded by the shared reader or a TransformStream which
+// avoids duplicating a 26MB request in Pages Function memory. Both must reject
+// actual streamed bytes, not just trust Content-Length.
+const productImageUpload = readFileSync(new URL("../functions/api/admin/upload.js", import.meta.url), "utf8");
+assert.match(productImageUpload,/MAX_MULTIPART_BYTES = MAX_ORIGINAL_BYTES \+ MAX_DERIVATIVE_BYTES/);
+assert.match(productImageUpload,/TransformStream/,"Photo uploads use one-pass bounded multipart parsing");
+assert.match(productImageUpload,/consumed>MAX_MULTIPART_BYTES/,"Unknown-length photo streams enforce same cap");
+assert.match(productImageUpload,/exceeded\)return fail\([^\n]+413\)/,"Overflow returns JSON HTTP 413");
+const warrantyImageUpload=readFileSync(new URL("../functions/api/warranty-claim-uploads.js", import.meta.url), "utf8");
+assert.match(warrantyImageUpload,/readBodyBytesLimited/,"Warranty upload retains the shared reader");
 console.log("PASS: bounded JSON and multipart parsers reject oversized request bodies before unbounded buffering.");
