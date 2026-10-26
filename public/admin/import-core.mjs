@@ -1,5 +1,5 @@
 // Local-only CSV/directory reconciliation. Never mutates D1 or R2.
-export const MAX_IMAGES_PER_PRODUCT = 30;
+export const MAX_IMAGES_PER_PRODUCT = 50;
 export const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024;
 export const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const REQUIRED_COLUMNS = ["Ảnh kết quả", "Danh mục", "Mẫu"];
