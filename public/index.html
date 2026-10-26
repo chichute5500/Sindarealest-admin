@@ -126,7 +126,7 @@ html.js-enabled :is(.hero-copy,.section-head,.order-cta)[data-reveal].is-visible
   transform:none;
   transition:opacity .38s cubic-bezier(.22,.7,.25,1),transform .42s cubic-bezier(.22,.7,.25,1);
   transition-delay:min(var(--reveal-delay,0ms),90ms);
-}html.theme-transitioning .nav,html.theme-transitioning .glass,html.theme-transitioning .glass-soft,html.theme-transitioning .product-card,html.theme-transitioning .promise,html.theme-transitioning .mosaic-card,html.theme-transitioning .custom-text,html.theme-transitioning .footer,html.theme-transitioning .contact-link{transition:background-color 1.15s cubic-bezier(.22,.61,.36,1),border-color 1.15s cubic-bezier(.22,.61,.36,1),box-shadow 1.15s cubic-bezier(.22,.61,.36,1),color 1.15s cubic-bezier(.22,.61,.36,1),backdrop-filter 1.15s ease!important}
+
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}}
 @media(min-width:1500px){.hero{padding-top:48px;padding-bottom:40px}}
 @media(max-width:1050px){.wrap{width:min(100% - 36px,1390px)}.navlinks{gap:0}.navlink{padding:0 9px}.brand-name{font-size:17px}.hero{grid-template-columns:1fr;min-height:unset}.hero h1{font-size:clamp(38px,5vw,58px)}.promise{grid-template-columns:1fr;gap:15px}.promise-tags{grid-template-columns:repeat(4,minmax(0,1fr))}.mosaic{grid-template-rows:180px 145px}.contact-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -390,8 +390,6 @@ html.dark .welcome-footnote i{color:#cbe5fa}
 html{transition:background-color .25s ease,color .25s ease}
 .theme-bg{transition:opacity .25s cubic-bezier(.22,.61,.36,1),filter .25s ease}
 .glass{transition:background-color .25s ease,border-color .25s ease,box-shadow .3s ease,color .25s ease}
-html.theme-transitioning .nav,html.theme-transitioning .glass,html.theme-transitioning .glass-soft,html.theme-transitioning .product-card,html.theme-transitioning .promise,html.theme-transitioning .mosaic-card,html.theme-transitioning .custom-text,html.theme-transitioning .footer,html.theme-transitioning .contact-link{transition:background-color .25s ease,border-color .25s ease,box-shadow .25s ease,color .25s ease,backdrop-filter .25s ease!important}
-html.theme-transitioning body,html.theme-transitioning body:after,html.theme-transitioning .theme-bg,html.theme-transitioning .hero-product,html.theme-transitioning .welcome-splash,html.theme-transitioning .welcome-content,html.theme-transitioning .welcome-texture,html.theme-transitioning .welcome-shade,html.theme-transitioning .nav-wrap .nav,html.theme-transitioning .promise-tag{transition-duration:.25s!important;transition-timing-function:ease!important}
 .mobile-nav-backdrop{display:none;position:fixed;inset:0;z-index:80;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;opacity:0;transition:opacity .25s ease}
 .mobile-nav-backdrop.open{display:block;opacity:1}
 @media(max-width:760px){.mobile-nav{position:fixed!important;top:0!important;bottom:0!important;left:0!important;right:auto!important;width:min(86vw,340px);height:100dvh;max-width:none!important;margin:0!important;padding:calc(24px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));border-radius:0 24px 24px 0;display:flex!important;flex-direction:column;align-items:stretch;gap:8px;transform:translateX(-105%);opacity:0;visibility:hidden;overflow-y:auto;z-index:101;background:var(--nav-bg);border:1px solid var(--line);box-shadow:0 20px 65px rgba(0,0,0,.25);transition:transform .28s cubic-bezier(.2,.75,.25,1),opacity .25s ease,visibility .25s ease}.mobile-nav.open{display:flex!important;transform:translateX(0);opacity:1;visibility:visible}.mobile-nav .navlink{min-height:48px;border-radius:13px}.menu-btn{display:inline-flex}}
@@ -3180,9 +3178,7 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
 }
 
 
-/* Keep theme toggles responsive on phones: avoid repaint-heavy backdrop-filter transitions. */
-html.theme-transitioning .nav,html.theme-transitioning .glass,html.theme-transitioning .glass-soft,html.theme-transitioning .product-card,html.theme-transitioning .promise,html.theme-transitioning .mosaic-card,html.theme-transitioning .custom-text,html.theme-transitioning .footer,html.theme-transitioning .contact-link{transition:background-color .22s ease,border-color .22s ease,box-shadow .22s ease,color .22s ease!important}
-
+/* Theme-only transitions are centralized in material-gallery.css; old global shadow/blur selectors removed. */
 
 /* Historical satin layout correction; the protected hero image may not be veiled or faded. */
 #home.hero.wrap{

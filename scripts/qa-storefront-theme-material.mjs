@@ -294,11 +294,23 @@ try{
         throw Error('Theme state changed twice: '+JSON.stringify(r));
       if(!r.samples.some(s=>s.darkBg>.05&&s.darkBg<.95&&s.lightBg>.05&&s.lightBg<.95))
         throw Error('Theme does not crossfade progressively: '+JSON.stringify(r));
-      const during=r.samples.slice(0,6);
-      if(!during.some(s=>s.navColor!==r.now.navColor&&s.navColor!==r.stable.navColor))
+      // Use real elapsed time, not a 50ms setTimeout index: a busy Chromium
+      // runner may deliver timers late and mislabel sample 6 as "300ms".
+      // This retains the same 300ms completion gate and records frame stalls.
+      const early=r.samples.filter(s=>s.elapsedMs<=300);
+      const late=r.samples.filter(s=>s.elapsedMs>300);
+      const middle=early.filter(s=>s.elapsedMs>=16);
+      if(!middle.some(s=>s.navColor!==r.now.navColor&&s.navColor!==r.stable.navColor))
         throw Error('Navigation must crossfade during the same early frames: '+JSON.stringify(r));
-      if(r.samples.slice(6).some(s=>s.navColor!==r.stable.navColor))
+      if(late.some(s=>s.navColor!==r.stable.navColor))
         throw Error('Navigation still changing after 300ms: '+JSON.stringify(r));
+      const navStart=r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart'&&e.property==='background-color');
+      const backgroundStart=r.transitionEvents.find(e=>e.element==='lightBg'&&e.type==='transitionstart'&&e.property==='opacity');
+      const meaningfulFrames=r.frameTimes.filter(t=>t>=0&&t<=300);
+      // Compare compositor event start rather than only final color. A
+      // simultaneous dark class flip must not stagger navbar vs wallpaper.
+      if(navStart&&backgroundStart&&Math.abs(navStart.relativeMs-backgroundStart.relativeMs)>40&&meaningfulFrames.length>=4)
+        throw Error('Navigation and background transition start desynchronized (>40ms): '+JSON.stringify(r));
       if(Math.abs(r.stable.darkBg-target)>.02||Math.abs(r.stable.lightBg-(1-target))>.02)
         throw Error('Theme did not settle after 900ms: '+JSON.stringify(r));
       for(const key of ['bgTransition','navTransition','materialTransition']){
