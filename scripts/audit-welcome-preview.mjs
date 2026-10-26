@@ -75,7 +75,7 @@ try{
      contentFitsWidth:box.left>=0&&box.right<=innerWidth+1,
      scrollLocked:root.overflowY==='hidden'&&body.overflowY==='hidden',
      noWhitePanel:ps.backgroundColor==='rgba(0, 0, 0, 0)'&&ps.borderTopWidth==='0px'&&ps.boxShadow==='none',
-     noExpensiveBackdrop:ps.backdropFilter==='none'&&ps.webkitBackdropFilter==='none',
+     noExpensiveBackdrop:(ps.backdropFilter||'none')==='none'&&(ps.webkitBackdropFilter||'none')==='none',
      noFullScreenFilter:texture.filter==='none',
      styleBeforeFirstPaint:early.includes('background:transparent')&&!early.includes('background:var(--welcome-panel)'),
      welcomeCopy:!!splash.querySelector('.welcome-title')?.textContent.includes('Dấu ấn da cá sấu'),
@@ -84,7 +84,7 @@ try{
      responsiveApproved:!!document.getElementById('sd-welcome-desktop-mobile-performance-2026-10-25'),
      approvedHeroIntact:!!document.querySelector('#home.sd-code-hero')
     };
-    return {checks,rect:{x:overlay.x,y:overlay.y,width:overlay.width,height:overlay.height},content:{x:box.x,y:box.y,width:box.width,height:box.height,scrollHeight:panel.scrollHeight,clientHeight:panel.clientHeight}};
+    return {checks,backdrop:{standard:ps.backdropFilter??null,webkit:ps.webkitBackdropFilter??null},rect:{x:overlay.x,y:overlay.y,width:overlay.width,height:overlay.height},content:{x:box.x,y:box.y,width:box.width,height:box.height,scrollHeight:panel.scrollHeight,clientHeight:panel.clientHeight}};
    });
    await splash.screenshot({path:path.join(directory,v.id+'-welcome.png'),animations:'disabled'});
    await page.locator('#skipIntro').click();
