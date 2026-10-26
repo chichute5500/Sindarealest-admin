@@ -64,15 +64,26 @@ async function verifyWelcomeColdFonts(spec){
     if(first.ready||first.visible!=='hidden'||!first.copied.includes('Dấu ấn da cá sấu'))
       throw Error('Unstable Vietnamese glyphs appeared before fonts loaded: '+JSON.stringify({first,delayed}));
     await page.waitForFunction(()=>document.documentElement.classList.contains('sd-welcome-font-ready'),null,{timeout:4500});
-    const after=await page.evaluate(()=>({
-      visible:getComputedStyle(document.querySelector('#welcomeSplash .welcome-title')).visibility,
-      serifLoaded:document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.'),
-      sansLoaded:document.fonts.check('400 12px "SD Sans"','Chất liệu cao cấp')
-    }));
-    if(after.visible!=='visible'||!after.serifLoaded||!after.sansLoaded||delayed<2||errors.length)
+    const after=await page.evaluate(()=>{
+      const splash=document.querySelector('#welcomeSplash');
+      const title=splash?.querySelector('.welcome-title');
+      const autoExiting=!splash||splash.classList.contains('is-leaving');
+      return {
+        visible:title?getComputedStyle(title).visibility:'removed',
+        autoExiting,
+        serifLoaded:document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.'),
+        sansLoaded:document.fonts.check('400 12px "SD Sans"','Chất liệu cao cấp')
+      };
+    });
+    // The approved 1450ms welcome auto-close may legally hide/remove the text
+    // before our delayed-font assertion. Require actual Noto font readiness;
+    // only require visible text while the overlay remains in its OPEN state.
+    const stillOpen=!after.autoExiting;
+    if((stillOpen&&after.visible!=='visible')||!after.serifLoaded||!after.sansLoaded||delayed<2||errors.length)
       throw Error('Welcome fonts not stabilized: '+JSON.stringify({after,delayed,errors}));
     coldFontMatrix.push({label:spec.label,pass:true,delayedFontRequests:delayed,
-      fallbackTextNeverPainted:true,correctVietnameseFontsReady:true});
+      fallbackTextNeverPainted:true,correctVietnameseFontsReady:true,
+      naturallyExitedBeforeRead:after.autoExiting});
   }finally{await context.close()}
 }
 
