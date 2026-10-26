@@ -355,8 +355,19 @@ try{
     };
     const results=[];
     for(const direction of [true,false])results.push(await runThemeTrial(direction,'baseline-cold'));
-    console.log('THEME_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
-      dark:r.direction,variant:'baseline',
+    // A/B/A diagnostic only: test whether SVG satin background compositing
+    // is the costly first-frame bottleneck. Never alter Owner-approved assets
+    // in the actual Preview, and restore full art before subsequent checks.
+    const svgBypass=await page.addStyleTag({content:
+      'html body .theme-bg--light,html body .theme-bg--dark{background-image:none!important}'
+    });
+    const withoutSvg=[];
+    for(const direction of [true,false])withoutSvg.push(await runThemeTrial(direction,'test-only-no-svg-texture'));
+    await svgBypass.evaluate(node=>node.remove());
+    const warmedBaseline=[];
+    for(const direction of [true,false])warmedBaseline.push(await runThemeTrial(direction,'baseline-warm'));
+    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...warmedBaseline].map(r=>({
+      dark:r.direction,variant:r.variant,
       startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
       endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
       chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
