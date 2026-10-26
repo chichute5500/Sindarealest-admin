@@ -754,6 +754,59 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 }
 </style>
 <script src="/material-gallery.js" defer></script>
+
+<style id="sd-checkout-steps-source-backed-2026-10-27">
+/* Source-backed checkout additions: inherit the real glass, light/dark tokens
+   and mobile drawer positioning; do not restyle other accepted storefront UI. */
+.checkout-drawer .sd-checkout-stepper{display:flex;align-items:center;justify-content:space-between;gap:5px;min-height:23px;flex:0 0 auto}
+.checkout-drawer .sd-checkout-stepper i{height:1px;min-width:4px;flex:1;background:var(--line)}
+.checkout-drawer .sd-checkout-step{display:inline-flex;gap:4px;align-items:center;color:var(--muted);font-size:9px;white-space:nowrap}
+.checkout-drawer .sd-checkout-step b{display:grid;place-items:center;width:19px;height:19px;font-size:10px;border-radius:50%;font-weight:650;background:var(--glass);border:1px solid var(--line)}
+.checkout-drawer .sd-checkout-step.active{color:var(--ink);font-weight:700}
+.checkout-drawer .sd-checkout-step.active b{background:var(--panel-strong);border-color:var(--gold)}
+.checkout-drawer .sd-checkout-step.past b{border-color:var(--gold)}
+.checkout-drawer .sd-checkout-panel{display:grid;align-content:start;gap:9px;min-height:0}
+.checkout-drawer .sd-checkout-panel[hidden],.checkout-drawer .sd-checkout-qr-wrap[hidden]{display:none!important}
+.checkout-drawer .sd-checkout-box{border:1px solid var(--sd-reference-edge,var(--line));border-radius:15px;padding:11px;background:var(--sd-reference-surface,var(--glass));display:grid;gap:9px;font-size:11px}
+.checkout-drawer .sd-checkout-box>strong{font-size:11px}
+.checkout-drawer .sd-checkout-item-list{display:grid;gap:7px}
+.checkout-drawer .sd-checkout-item{display:flex;align-items:center;gap:8px;min-width:0;font-size:10px}
+.checkout-drawer .sd-checkout-item img{width:42px;height:46px;flex:0 0 42px;object-fit:cover;border:1px solid var(--line);border-radius:9px}
+.checkout-drawer .sd-checkout-item-text{display:grid;gap:2px;min-width:0;flex:1}
+.checkout-drawer .sd-checkout-item-text strong{font-size:11px;overflow-wrap:anywhere}
+.checkout-drawer .sd-checkout-item-text small{font-size:9px;color:var(--muted);overflow-wrap:anywhere}
+.checkout-drawer .sd-checkout-options{display:grid;gap:8px}
+.checkout-drawer .sd-checkout-option{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:10px 11px;text-align:left;border-radius:14px;border:1px solid var(--sd-reference-edge,var(--line));background:var(--sd-reference-surface,var(--glass));color:var(--ink)}
+.checkout-drawer .sd-checkout-option.selected{border-color:var(--gold);background:var(--panel-strong);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 3px 14px rgba(92,145,185,.10)}
+.checkout-drawer .sd-checkout-radio{width:18px;height:18px;flex:0 0 18px;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center}
+.checkout-drawer .sd-checkout-option.selected .sd-checkout-radio:after{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.checkout-drawer .sd-checkout-option-label{min-width:0;flex:1;display:grid;gap:3px;font-size:11px}
+.checkout-drawer .sd-checkout-option-label small{font-size:10px;color:var(--muted);line-height:1.5}
+.checkout-drawer .sd-checkout-option-price{font-size:11px;white-space:nowrap}
+.checkout-drawer .sd-checkout-qr-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.checkout-drawer .sd-checkout-qr-head small{font-size:9px;color:var(--muted)}
+.checkout-drawer .sd-checkout-qr-main{display:grid;grid-template-columns:minmax(92px,39%) minmax(0,1fr);gap:10px;align-items:start}
+.checkout-drawer #sdCheckoutQrImage{width:100%;aspect-ratio:1;object-fit:contain;border-radius:10px;padding:7px;background:#fff;border:1px solid var(--line)}
+.checkout-drawer .sd-checkout-bank-lines{min-width:0;display:grid;gap:7px}
+.checkout-drawer .sd-checkout-bank-lines>div{display:grid;gap:2px}
+.checkout-drawer .sd-checkout-bank-lines span{font-size:9px;color:var(--muted)}
+.checkout-drawer .sd-checkout-bank-lines b{font-size:10px;overflow-wrap:anywhere}
+.checkout-drawer .sd-checkout-bank-lines #sdCheckoutAmount{color:var(--gold);font-size:12px}
+.checkout-drawer .sd-checkout-hint{margin:0;font-size:10px;color:var(--muted);line-height:1.6}
+.checkout-drawer .sd-checkout-summary-pair{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px}
+.checkout-drawer .sd-checkout-summary-pair strong{font-size:12px;white-space:nowrap}
+.checkout-drawer .sd-checkout-review-row{display:grid;grid-template-columns:1fr auto;gap:4px;padding:8px 0;border-top:1px solid var(--line);font-size:11px}
+.checkout-drawer .sd-checkout-review-row p{grid-column:1/-1;font-size:10px;color:var(--muted);line-height:1.6;margin:0;overflow-wrap:anywhere}
+.checkout-drawer .sd-checkout-review-row button{border:0;background:none;color:var(--gold);font-size:10px;text-decoration:underline}
+.checkout-drawer .sd-checkout-caution{color:var(--muted);line-height:1.6;display:block}
+.checkout-drawer .sd-checkout-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:5px}
+.checkout-drawer .sd-checkout-actions .pill-btn{width:100%;min-height:44px}
+.checkout-drawer .sd-checkout-actions #checkoutSubmit{margin:0;max-height:none;height:auto;min-height:44px;font-size:10px;padding:10px 13px}
+.checkout-drawer .sd-checkout-actions #sdCheckoutPrev{font-size:10px}
+.checkout-drawer .sd-checkout-actions button:disabled{opacity:.62;cursor:wait}
+.checkout-drawer #checkoutMessage:not(:empty){padding:8px 4px}
+@media(max-width:360px){.checkout-drawer .sd-checkout-qr-main{grid-template-columns:100px minmax(0,1fr)}.checkout-drawer .sd-checkout-step{font-size:8px}.checkout-drawer .sd-checkout-stepper{gap:3px}}
+</style>
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -1101,8 +1154,38 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
     <div class="checkout-heading"><button type="button" class="checkout-backlink tap-target" id="checkoutBack">← Giỏ hàng</button><h2>Đặt hàng</h2></div>
     <button class="icon-btn tap-target" type="button" id="checkoutClose" aria-label="Đóng đặt hàng">×</button>
   </div>
-  <div class="checkout-intro"><p>Thông tin liên hệ và địa chỉ nhận hàng</p><small>Đơn hàng sẽ được cửa hàng xác nhận. Không thực hiện thanh toán trực tuyến tại bước này.</small></div>
-  <form id="checkoutForm" class="checkout-form"><div class="checkout-fields"><input name="fullName" maxlength="120" required autocomplete="name" placeholder="Họ tên *" aria-label="Họ tên"><input name="phone" maxlength="24" required autocomplete="tel" inputmode="tel" placeholder="Số điện thoại *" aria-label="Số điện thoại"><input name="email" type="email" maxlength="160" autocomplete="email" placeholder="Email (không bắt buộc)" aria-label="Email"><select name="province" id="checkoutProvince" required aria-label="Tỉnh/thành phố"><option value="">Đang tải tỉnh/thành…</option></select><input type="hidden" name="provinceCode" id="checkoutProvinceCode"><select name="ward" id="checkoutWard" required disabled aria-label="Xã/phường"><option value="">Chọn tỉnh/thành trước</option></select><input type="hidden" name="wardCode" id="checkoutWardCode"><input name="streetAddress" id="checkoutStreet" maxlength="300" required autocomplete="street-address" placeholder="Số nhà, tên đường, thôn/tổ *" aria-label="Địa chỉ chi tiết"><p id="checkoutAddressMessage" class="checkout-message" role="status" aria-live="polite"></p><textarea name="note" maxlength="1200" rows="2" placeholder="Ghi chú thêm (không bắt buộc)" aria-label="Ghi chú thêm"></textarea></div><button class="pill-btn primary tap-target" id="checkoutSubmit" type="submit">Gửi yêu cầu đặt hàng</button><p id="checkoutMessage" class="checkout-message" role="status" aria-live="polite"></p><div id="paymentInstructions" class="payment-instructions" role="status" aria-live="polite" hidden></div></form>
+  <nav class="sd-checkout-stepper" id="sdCheckoutStepper" aria-label="Tiến độ đặt hàng">
+  <span data-sd-step="1" class="sd-checkout-step active"><b>1</b>Thông tin</span><i></i>
+  <span data-sd-step="2" class="sd-checkout-step"><b>2</b>Thanh toán</span><i></i>
+  <span data-sd-step="3" class="sd-checkout-step"><b>3</b>Gửi đơn</span>
+</nav><div class="checkout-intro"><p id="sdCheckoutStepTitle">Thông tin liên hệ và địa chỉ nhận hàng</p><small id="sdCheckoutStepSubtitle">Điền thông tin nhận hàng để tiếp tục chọn hình thức thanh toán.</small></div>
+  <form id="checkoutForm" class="checkout-form">
+<section class="sd-checkout-panel" id="sdCheckoutShippingStep">
+<div class="checkout-fields"><input name="fullName" maxlength="120" required autocomplete="name" placeholder="Họ tên *" aria-label="Họ tên"><input name="phone" maxlength="24" required autocomplete="tel" inputmode="tel" placeholder="Số điện thoại *" aria-label="Số điện thoại"><input name="email" type="email" maxlength="160" autocomplete="email" placeholder="Email (không bắt buộc)" aria-label="Email"><select name="province" id="checkoutProvince" required aria-label="Tỉnh/thành phố"><option value="">Đang tải tỉnh/thành…</option></select><input type="hidden" name="provinceCode" id="checkoutProvinceCode"><select name="ward" id="checkoutWard" required disabled aria-label="Xã/phường"><option value="">Chọn tỉnh/thành trước</option></select><input type="hidden" name="wardCode" id="checkoutWardCode"><input name="streetAddress" id="checkoutStreet" maxlength="300" required autocomplete="street-address" placeholder="Số nhà, tên đường, thôn/tổ *" aria-label="Địa chỉ chi tiết"><p id="checkoutAddressMessage" class="checkout-message" role="status" aria-live="polite"></p><textarea name="note" maxlength="1200" rows="2" placeholder="Ghi chú thêm (không bắt buộc)" aria-label="Ghi chú thêm"></textarea></div>
+<div class="sd-checkout-box"><strong>Thông tin đơn hàng</strong><div id="sdCheckoutItemSummary" class="sd-checkout-item-list"></div></div>
+</section>
+<section class="sd-checkout-panel" id="sdCheckoutPaymentStep" hidden>
+<div class="sd-checkout-box" id="sdCheckoutQuoteNotice">Đang kiểm tra tình trạng hàng và giá từ hệ thống…</div>
+<div class="sd-checkout-options" id="sdCheckoutOptions" role="radiogroup" aria-label="Chọn hình thức thanh toán"></div>
+<div class="sd-checkout-box sd-checkout-qr-wrap" id="sdCheckoutQrWrap" hidden>
+<div class="sd-checkout-qr-head"><strong>Chuyển khoản ngân hàng</strong><small>QR đã kích hoạt trên Admin</small></div>
+<div class="sd-checkout-qr-main"><img id="sdCheckoutQrImage" alt="QR nhận chuyển khoản ngân hàng" referrerpolicy="no-referrer"><div class="sd-checkout-bank-lines"><div><span>Ngân hàng</span><b id="sdCheckoutBankName"></b></div><div><span>Chủ tài khoản</span><b id="sdCheckoutAccountName"></b></div><div><span>Số tài khoản</span><b id="sdCheckoutAccountNumber"></b></div><div><span>Số tiền cần chuyển</span><b id="sdCheckoutAmount"></b></div><div><span>Nội dung CK</span><b>Sau khi gửi đơn, dùng mã đơn</b></div></div></div>
+<p class="sd-checkout-hint">QR không nhúng số tiền. Hãy nhập đúng số tiền bên ngoài QR. Sau khi gửi đơn, dùng mã đơn để đối chiếu. Admin xác nhận tiền thực nhận.</p>
+</div>
+<div class="sd-checkout-box"><strong>Thông tin đơn hàng</strong><div id="sdCheckoutPaymentSummary" class="sd-checkout-item-list"></div><div class="sd-checkout-summary-pair"><span>Số tiền khách chọn chuyển</span><strong id="sdCheckoutSelectedAmount">Chờ xác nhận</strong></div></div>
+</section>
+<section class="sd-checkout-panel" id="sdCheckoutReviewStep" hidden>
+<div class="sd-checkout-box"><strong>Kiểm tra thông tin trước khi gửi</strong>
+<div class="sd-checkout-review-row"><span>Thông tin nhận hàng</span><button type="button" data-sd-review-step="1">Sửa</button><p id="sdCheckoutReviewAddress"></p></div>
+<div class="sd-checkout-review-row"><span>Hình thức thanh toán</span><button type="button" data-sd-review-step="2">Sửa</button><p id="sdCheckoutReviewPayment"></p></div>
+<div class="sd-checkout-review-row"><span>Đơn hàng</span><p id="sdCheckoutReviewItems"></p></div></div>
+<div class="sd-checkout-box"><div class="sd-checkout-summary-pair"><span>Số tiền khách chọn chuyển</span><strong id="sdCheckoutReviewAmount">Chờ xác nhận</strong></div><p class="sd-checkout-hint">Chuyển khoản toàn bộ đủ điều kiện miễn phí vận chuyển sau khi Admin xác minh đã nhận đủ tiền.</p></div>
+<div class="sd-checkout-box sd-checkout-caution">Nhấn <strong>Gửi đơn hàng</strong> để chuyển đơn và hình thức thanh toán đã chọn tới Admin. Quét QR không đồng nghĩa đã thanh toán.</div>
+</section>
+<div class="sd-checkout-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutPrev">Quay lại</button><button class="pill-btn primary tap-target" id="checkoutSubmit" type="submit">Tiếp tục chọn thanh toán →</button></div>
+<p id="checkoutMessage" class="checkout-message" role="status" aria-live="polite"></p>
+<div id="paymentInstructions" class="payment-instructions" role="status" aria-live="polite" hidden></div>
+</form>
 </aside>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
