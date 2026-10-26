@@ -186,6 +186,34 @@ try{
    await glow.evaluate(el=>{for(const key of ['bottom','opacity','filter','width'])el.style.removeProperty(key);});
    console.log('PASS QA-only contact-shadow sweep '+options.length+' Chromium screenshots; committed markup/CSS unchanged.');
   }
+  // QA-only authentic semantic text trial. Never bake a headline into artwork.
+  if(name==='pc-1440'&&theme==='light'&&process.env.HERO_TYPE_SWEEP==='1'){
+   const title=page.locator('#home .hero-copy h1'),words=title.locator('span');
+   const candidates=[
+    {id:'times-400',family:'"Times New Roman",Georgia,serif',red:400},
+    {id:'times-500',family:'"Times New Roman",Georgia,serif',red:500},
+    {id:'times-700',family:'"Times New Roman",Georgia,serif',red:700},
+    {id:'georgia-400',family:'Georgia,serif',red:400},
+    {id:'georgia-600',family:'Georgia,serif',red:600},
+    {id:'georgia-700',family:'Georgia,serif',red:700},
+    {id:'noto-400',family:'"SD Serif",Georgia,serif',red:400},
+    {id:'noto-600',family:'"SD Serif",Georgia,serif',red:600},
+    {id:'noto-700',family:'"SD Serif",Georgia,serif',red:700},
+    {id:'times-wide',family:'"Times New Roman",Georgia,serif',red:600,spacing:'-.045em'},
+    {id:'times-tight',family:'"Times New Roman",Georgia,serif',red:600,spacing:'-.075em'}
+   ];
+   for(const c of candidates){
+    await title.evaluate((el,p)=>{el.style.fontFamily=p.family;},c);
+    await words.nth(1).evaluate((el,p)=>{
+     el.style.fontWeight=String(p.red);
+     if(p.spacing)el.style.letterSpacing=p.spacing;else el.style.removeProperty('letter-spacing');
+    },c);
+    await page.locator('#home').screenshot({path:out+'/typography-'+c.id+'.png',animations:'disabled'});
+   }
+   await title.evaluate(el=>el.style.removeProperty('font-family'));
+   await words.nth(1).evaluate(el=>{el.style.removeProperty('font-weight');el.style.removeProperty('letter-spacing')});
+   console.log('PASS QA-only real-title font trial '+candidates.length+' screenshots; no CSS source edits.');
+  }
   await page.locator('#home .hero-actions .pill-btn').focus();
   assert.ok(await page.evaluate(()=>document.activeElement?.matches('#home .hero-actions .pill-btn')),name+' CTA takes keyboard focus');
   await page.keyboard.press('Enter');
