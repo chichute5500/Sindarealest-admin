@@ -39,7 +39,7 @@ assert.match(performance,/#welcomeSplash\.is-leaving\{\n  transition:opacity \.2
 // Cold-cache first-paint guard: wait for the correct Noto Serif/Sans glyphs.
 assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular\.ttf"/);
 assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.ttf"/);
-assert.match(performance,/html\.js-enabled:not\(\.sd-welcome-font-ready\) #welcomeSplash \.welcome-title/);
+assert.match(performance,/html\.js-enabled:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title/);
 assert.match(html,/document\.fonts\.load\('400 30px "SD Serif"'/);
 assert.match(html,/classList\.add\('sd-welcome-font-ready'\)/);
 
