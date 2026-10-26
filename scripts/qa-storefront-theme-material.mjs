@@ -473,6 +473,74 @@ try{
         return entries;
       });
       console.log('THEME_DIRECT_SURFACE_CONTROL '+JSON.stringify(surfaceTest));
+
+      // A staged visual transition: kick off three visible surfaces first;
+      // only upon their first compositor transitionstart switch the large
+      // html.dark-dependent catalog/theme subtree. Browser-only prototype:
+      // no persistent CSS or site JS change, with exact event timings.
+      const staged=await page.evaluate(async()=>{
+        const root=document.documentElement,nav=document.querySelector('.nav');
+        const light=document.querySelector('.theme-bg--light');
+        const dark=document.querySelector('.theme-bg--dark');
+        const navLight='rgba(244,250,255,.94)',navDark='rgba(4,20,34,.94)';
+        const out=[];
+        for(const desiredDark of [true,false,true,false]){
+          root.classList.toggle('dark',!desiredDark);
+          nav.style.removeProperty('background-color');
+          light.style.removeProperty('opacity');
+          dark.style.removeProperty('opacity');
+          await new Promise(r=>setTimeout(r,400));
+          let zero=performance.now(),didRestyle=false;
+          const ev=[];
+          const listeners=[];
+          const push=(element,property,name,kind)=>{
+            const handler=e=>{
+              if(e.target!==element||e.propertyName!==property)return;
+              ev.push({type:kind,element:name,at:Math.round(performance.now()-zero)});
+              if(name==='nav'&&kind==='transitionstart'&&!didRestyle){
+                didRestyle=true;
+                root.classList.toggle('dark',desiredDark);
+                ev.push({type:'root-class-switched',at:Math.round(performance.now()-zero)});
+              }
+            };
+            element.addEventListener(kind,handler);
+            listeners.push(()=>element.removeEventListener(kind,handler));
+          };
+          for(const [el,property,name] of [
+            [nav,'background-color','nav'],
+            [light,'opacity','light'],[dark,'opacity','dark']
+          ])for(const type of ['transitionstart','transitionend'])push(el,property,name,type);
+          zero=performance.now();
+          nav.style.setProperty('background-color',desiredDark?navDark:navLight,'important');
+          light.style.setProperty('opacity',desiredDark?'0':'1','important');
+          dark.style.setProperty('opacity',desiredDark?'1':'0','important');
+          await new Promise(r=>setTimeout(r,610));
+          listeners.forEach(fn=>fn());
+          // Read final real class-based computed color, then release inline
+          // overrides. They match final CSS targets, so no reverse flash.
+          const before={
+            nav:getComputedStyle(nav).backgroundColor,
+            light:getComputedStyle(light).opacity,
+            dark:getComputedStyle(dark).opacity
+          };
+          nav.style.removeProperty('background-color');
+          light.style.removeProperty('opacity');
+          dark.style.removeProperty('opacity');
+          const after={
+            nav:getComputedStyle(nav).backgroundColor,
+            light:getComputedStyle(light).opacity,
+            dark:getComputedStyle(dark).opacity
+          };
+          out.push({dark:desiredDark,events:ev,
+            start:ev.find(e=>e.element==='nav'&&e.type==='transitionstart')?.at,
+            end:ev.find(e=>e.element==='nav'&&e.type==='transitionend')?.at,
+            restyleAt:ev.find(e=>e.type==='root-class-switched')?.at,
+            before,after});
+        }
+        return out;
+      });
+      console.log('THEME_STAGED_ROOT_SWAP_PROTOTYPE '+JSON.stringify(staged));
+
       // Control experiment on the *same fully loaded page*: animate only
       // the navbar and background layers without touching html.dark, which
       // invalidates typography/cards across the Storefront. This preserves
