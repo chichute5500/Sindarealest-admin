@@ -46,8 +46,13 @@ try{
     } else if(method==="POST"&&pathname==="/api/admin/upload"){
       uploads++;
       if(!(req.headers()["content-type"]||"").includes("multipart/form-data"))throw Error("Upload request not multipart");
-      await route.fulfill({status:201,contentType:"application/json",
-        body:JSON.stringify({ok:true,url:"/media/"+randomUUID()+".webp",originalStoredPrivately:true})});
+      if(uploads===1){
+        await route.fulfill({status:503,contentType:"application/json",headers:{"Retry-After":"1"},
+          body:JSON.stringify({ok:false,error:"Kho ảnh gốc ORIGINALS tạm thời không ghi được."})});
+      }else{
+        await route.fulfill({status:201,contentType:"application/json",
+          body:JSON.stringify({ok:true,url:"/media/"+randomUUID()+".webp",originalStoredPrivately:true})});
+      }
     } else if(method==="POST"&&pathname==="/api/admin/products"){
       const draft=JSON.parse(req.postData()||"{}");drafts.push(draft);
       await route.fulfill({status:201,contentType:"application/json",
@@ -79,7 +84,7 @@ try{
   page.once("dialog",dialog=>dialog.accept());
   await page.locator("#import").click();
   await page.waitForFunction(()=>document.querySelector("#status")?.textContent?.includes("Đã tạo 1/1 mẫu nháp"),null,{timeout:35000});
-  assert.equal(uploads,2);
+  assert.equal(uploads,3,"One transient R2 503 is retried and two unique images succeed");
   assert.equal(drafts.length,1);
   assert.equal(drafts[0].published,false);
   assert.equal(drafts[0].price,2200000);
