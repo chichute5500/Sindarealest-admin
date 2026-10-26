@@ -1,0 +1,62 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { parseCsv, buildImportPlan, normPath, MAX_IMAGES_PER_PRODUCT } from "../public/admin/import-core.mjs";
+
+const csv = "\uFEFFẢnh gốc,Ảnh kết quả,Danh mục,Mẫu,Màu,Ghi chú\r\n" +
+ '"A,1","Clutch\\M0023 - Clutch Nap\\Nâu\\anh (1).webp",Clutch,"Clutch, Nắp",Nâu,Cần xem lại\r\n' +
+ '","Clutch\\M0023 - Clutch Nap\\Đen\\anh (2).webp",Clutch,Clutch,Đen,\r\n';
+const rows = parseCsv(csv);
+assert.equal(rows.length, 2);
+assert.equal(rows[0]["Ảnh gốc"], "A,1");
+assert.equal(rows[0]["Mẫu"], "Clutch, Nắp");
+assert.equal(rows[0]["Màu"], "Nâu");
+assert.equal(normPath(rows[0]["Ảnh kết quả"]), "clutch/m0023 - clutch nap/nâu/anh (1).webp");
+const files = [
+  { name:"anh (1).webp", size:500, type:"image/webp",
+    webkitRelativePath:"KET_QUA_NHOM_MAU/Clutch/M0023 - Clutch Nap/Nâu/anh (1).webp" },
+  { name:"anh (2).webp", size:700, type:"image/webp",
+    webkitRelativePath:"KET_QUA_NHOM_MAU/Clutch/M0023 - Clutch Nap/Đen/anh (2).webp" }
+];
+const plan=buildImportPlan(rows,files);
+assert.equal(plan.groups.length,1);
+assert.equal(plan.groups[0].images.length,2);
+assert.equal(plan.groups[0].status,"ready");
+assert.equal(plan.groups[0].selected,true);
+assert.equal(plan.groups[0].title,"Clutch Nap");
+assert.equal(plan.matched,2);
+assert.equal(plan.missing,0);
+assert.deepEqual(plan.groups[0].images.map(x=>x.color),["Nâu","Đen"]);
+
+const noPhoto=buildImportPlan(rows,[]);
+assert.equal(noPhoto.groups[0].status,"blocked");
+assert.equal(noPhoto.missing,2);
+
+const duplicated=buildImportPlan([...rows,rows[0]],files);
+assert.equal(duplicated.duplicates,1);
+assert.equal(duplicated.groups[0].status,"blocked");
+
+const largeRows=Array.from({length:MAX_IMAGES_PER_PRODUCT+14},(_,i)=>({
+  "Ảnh kết quả":"Cặp-tab-laptop\\M0062 - Tui Hop 4000K\\Chưa rõ\\anh-"+i+".webp",
+  "Danh mục":"Cặp-tab-laptop","Mẫu":"Tui Hop 4000K",
+}));
+const largeFiles=largeRows.map((r,i)=>({
+  name:"anh-"+i+".webp", size:100, type:"image/webp",
+  webkitRelativePath:"KET_QUA_NHOM_MAU/"+r["Ảnh kết quả"].replace(/\\/g,"/")
+}));
+const over=buildImportPlan(largeRows,largeFiles);
+assert.equal(over.groups[0].images.length,44);
+assert.equal(over.groups[0].status,"blocked", "Do not silently drop 14 photos");
+
+assert.throws(()=>parseCsv("a,b\n1"),/Thiếu cột/);
+assert.throws(()=>parseCsv("Ảnh kết quả,Danh mục,Mẫu\n\"unfinished"),/nháy chưa đóng/);
+assert.throws(()=>buildImportPlan([{...rows[0],"Ảnh kết quả":"Clutch\\..\\a.webp"}],files),/Đường dẫn/);
+
+const importer=readFileSync(new URL("../public/admin/import.html",import.meta.url),"utf8");
+assert.match(importer,/webkitdirectory/);
+assert.match(importer,/published:false/, "Only draft products may be created");
+assert.match(importer,/\/api\/admin\/upload/, "Existing authenticated private-original upload must be reused");
+assert.match(importer,/\/api\/admin\/products/, "Existing authenticated product API must be reused");
+assert.doesNotMatch(importer,/method\s*:\s*["']DELETE["']/i, "Importer must never erase live catalog");
+const admin=readFileSync(new URL("../public/admin/index.html",import.meta.url),"utf8");
+assert.match(admin,/href="\/admin\/import\.html"/);
+console.log("PASS: folder/CSV reconciliation, missing/duplicate/44-photo blocking, safe draft-only import entry.");
