@@ -1,4 +1,4 @@
-import { fail, json, readBodyBytesLimited, requireAdmin, storageOrFail } from "../../_lib.js";
+import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
 
 const MAX_DERIVATIVE_BYTES = 5 * 1024 * 1024;
 const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024;
@@ -55,23 +55,36 @@ export async function onRequestPost(context) {
     return fail("Kho ảnh gốc chưa được cấu hình. Hãy gắn R2 bucket riêng tư bằng binding ORIGINALS trước khi tải ảnh sản phẩm mới lên.", 503);
   }
 
-  const parsedMultipart = await readBodyBytesLimited(context.request, MAX_MULTIPART_BYTES);
-  if (parsedMultipart.error === "too_large") return fail("Biểu mẫu tải ảnh vượt giới hạn 26 MB.", 413);
-  if (parsedMultipart.error) return fail("Không đọc được tệp ảnh.");
-
-  let form;
+  // Large photo batches must not copy the whole 26 MB multipart body into a
+  // second buffer before parsing; that can exhaust a Pages Function's memory.
+  // Stream with a hard byte cap, then let the runtime parse form-data once.
+  const declared=Number(context.request.headers.get("Content-Length")||0);
+  if(Number.isFinite(declared)&&declared>MAX_MULTIPART_BYTES)
+    return fail("Biểu mẫu tải ảnh vượt giới hạn 26 MB.",413);
+  if(!context.request.body)return fail("Không đọc được tệp ảnh.");
+  let exceeded=false,consumed=0,form;
   try {
-    const headers = new Headers(context.request.headers);
+    const headers=new Headers(context.request.headers);
     headers.delete("Content-Length");
     headers.delete("Transfer-Encoding");
-    const boundedRequest = new Request(context.request.url, {
-      method: "POST",
-      headers,
-      body: parsedMultipart.bytes,
+    const limited=context.request.body.pipeThrough(new TransformStream({
+      transform(chunk,controller){
+        consumed+=chunk.byteLength;
+        if(consumed>MAX_MULTIPART_BYTES){
+          exceeded=true;
+          throw new Error("photo_multipart_too_large");
+        }
+        controller.enqueue(chunk);
+      }
+    }));
+    const boundedRequest=new Request(context.request.url,{
+      method:"POST",headers,body:limited,duplex:"half"
     });
-    form = await boundedRequest.formData();
-  } catch {
-    return fail("Không đọc được tệp ảnh.");
+    form=await boundedRequest.formData();
+  } catch(error) {
+    if(exceeded)return fail("Biểu mẫu tải ảnh vượt giới hạn 26 MB.",413);
+    console.error("product-photo form-data parsing failed",{code:String(error?.name||"InvalidMultipart").slice(0,80)});
+    return fail("Không đọc được tệp ảnh. Hãy kiểm tra định dạng JPEG/PNG/WebP và tải lại ảnh này.",400);
   }
   const file = form.get("file");
   const original = form.get("original");
