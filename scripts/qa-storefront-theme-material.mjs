@@ -66,11 +66,11 @@ try{
       for(const direction of [true,false]){
         button.click();
         const now=snapshot();
-        await new Promise(resolve=>requestAnimationFrame(resolve));
-        const frame=snapshot();
-        await new Promise(resolve=>setTimeout(resolve,350));
+        await new Promise(resolve=>setTimeout(resolve,180));
+        const middle=snapshot();
+        await new Promise(resolve=>setTimeout(resolve,430));
         const stable=snapshot();
-        results.push({direction,now,frame,stable});
+        results.push({direction,now,middle,stable});
       }
       const first=layer.find(img=>img.classList.contains('is-visible'))?.src;
       await new Promise(resolve=>setTimeout(resolve,1600));
@@ -78,19 +78,26 @@ try{
       await new Promise(resolve=>setTimeout(resolve,1600));
       const third=layer.find(img=>img.classList.contains('is-visible'))?.src;
       return {results,slides:layer.length,slideshowChanged:first!==second&&first===third,
+        photoCrossfadeMs:Math.round(parseFloat(getComputedStyle(layer[0]).transitionDuration)*1000),
         noControls:!document.querySelector('#materialGallery button,#materialGallery [role=button],#materialGallery .slide-count'),
         files:[first,second,third].map(x=>x?.split('/').pop())};
     });
     for(const r of sync.results){
-      for(const state of [r.now,r.frame,r.stable]){
-        if(state.dark!==r.direction||state.darkBg!==(r.direction?1:0)||state.lightBg!==(r.direction?0:1))
-          throw Error('Theme layers are not synchronized in '+spec.label+': '+JSON.stringify(r));
-      }
+      const target=r.direction?1:0;
+      if(![r.now,r.middle,r.stable].every(s=>s.dark===r.direction))
+        throw Error('Theme state changed twice: '+JSON.stringify(r));
+      if(!(r.middle.darkBg>0&&r.middle.darkBg<1&&r.middle.lightBg>0&&r.middle.lightBg<1))
+        throw Error('Theme does not crossfade gradually: '+JSON.stringify(r));
+      if(Math.abs(r.stable.darkBg-target)>.02||Math.abs(r.stable.lightBg-(1-target))>.02)
+        throw Error('Theme did not settle after 610ms: '+JSON.stringify(r));
       for(const key of ['bgTransition','navTransition','materialTransition']){
-        if(r.now[key]!=='0s')throw Error('Non-atomic '+key+' during switch '+JSON.stringify(r.now));
+        const duration=parseFloat(r.now[key]);
+        if(!(duration>=.4&&duration<=.5))
+          throw Error('Staggered/instant theme timing '+key+': '+JSON.stringify(r.now));
       }
     }
-    if(sync.slides!==2||!sync.slideshowChanged||!sync.noControls)throw Error('Material gallery autoplay failed: '+JSON.stringify(sync));
+    if(sync.slides!==2||sync.photoCrossfadeMs!==580||!sync.slideshowChanged||!sync.noControls)
+      throw Error('Material crossfade/autoplay failed: '+JSON.stringify(sync));
     if(errors.length)throw Error('Runtime/page errors: '+JSON.stringify(errors));
     matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});

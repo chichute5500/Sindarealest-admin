@@ -6,7 +6,9 @@ const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 test('Owner-controlled material photos are config-driven and have no manual controls',()=>{
  const page=read('public/index.html'),js=read('public/material-gallery.js'),css=read('public/material-gallery.css');
  const config=JSON.parse(read('public/images/crocodile-leather/gallery.json'));
- assert.deepEqual(config.images,[]);
+ assert.ok(Array.isArray(config.images)&&config.images.length>0);
+ assert.ok(config.images.every(s=>/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}\\.(?:avif|webp|jpe?g|png)$/i.test(s)));
+ assert.equal(new Set(config.images).size,config.images.length);
  assert.equal(config.intervalMs,1500);
  assert.match(page,/id="materialTile"[^>]+data-reveal/);
  assert.match(page,/id="materialGallery" aria-hidden="true"/);
@@ -20,11 +22,13 @@ test('Owner-controlled material photos are config-driven and have no manual cont
  assert.match(css,/#materialTile\.has-real-material-gallery .material-photo/);
  execFileSync(process.execPath,['--check',new URL('../public/material-gallery.js',import.meta.url).pathname]);
 });
-test('Theme changes in a single paint without staggered old transitions',()=>{
+test('Theme crossfades smoothly with one synchronized duration and no stagger',()=>{
  const page=read('public/index.html'),css=read('public/material-gallery.css');
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
- assert.match(page,/root\.classList\.add\('sd-theme-atomic'\)/);
- assert.match(page,/requestAnimationFrame\(\(\)=>root\.classList\.remove\('sd-theme-atomic'\)\)/);
- assert.match(css,/html\.sd-theme-atomic \*::after\{[\s\S]*?transition:none!important/);
+ assert.match(page,/root\.classList\.add\('theme-transitioning'\)/);
+ assert.match(page,/setTimeout\(\(\)=>root\.classList\.remove\('theme-transitioning'\),550\)/);
+ assert.match(css,/html\.theme-transitioning body \.theme-bg\{[\s\S]*?opacity \.46s/);
+ assert.match(css,/#materialTile \.sd-material-slide\{[\s\S]*?opacity \.58s/);
+ assert.match(css,/#materialTile::before\{/);
  assert.match(page,/const themeMeta=document\.querySelector\('meta\[name="theme-color"\]'\)/);
 });

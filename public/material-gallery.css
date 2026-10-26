@@ -1,12 +1,52 @@
-/* Only the approved "Chất liệu cao cấp" photo area; no new slideshow controls. */
+/* Owner-requested smooth 580ms crossfade in the material tile only. */
 #materialTile .sd-material-gallery{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-#materialTile .sd-material-slide{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;opacity:0;filter:none;transform:none;transition:opacity .24s ease}
+#materialTile .sd-material-slide{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  object-fit:cover;opacity:0;filter:none;transform:none;
+  transition:opacity .58s cubic-bezier(.42,0,.58,1)!important
+}
 #materialTile .sd-material-slide.is-visible{opacity:1}
 #materialTile.has-real-material-gallery .material-photo{opacity:0!important;visibility:hidden!important}
 #materialTile.has-real-material-gallery .mosaic-content{z-index:1}
-/* Theme is committed in one paint, not in 0.22s / 0.25s / 1.05s / 1s staggered layers.
-   Do not disable ordinary hover/reveal animations outside the brief theme switch. */
-html.sd-theme-atomic,html.sd-theme-atomic body,
-html.sd-theme-atomic *,html.sd-theme-atomic *::before,html.sd-theme-atomic *::after{
-  transition:none!important;transition-delay:0s!important
+
+/* Fade the light/dark caption overlay, avoiding an instant gradient swap. */
+#materialTile::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(242,249,255,.78),rgba(242,249,255,.16));
+  opacity:0;transition:opacity .46s ease!important
+}
+#materialTile::after{
+  background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.16))!important;
+  opacity:1;transition:opacity .46s ease!important
+}
+html:not(.dark) #materialTile::before{opacity:1}
+html:not(.dark) #materialTile::after{opacity:0}
+
+/* All theme-dependent surfaces share one smooth 460ms window.
+   Avoid animating costly backdrop-filter / blur and respect owner colors. */
+html.theme-transitioning body .theme-bg{
+  transition:opacity .46s cubic-bezier(.22,.61,.36,1),filter .46s ease!important;
+  transition-delay:0s!important
+}
+html.theme-transitioning body :is(
+  .nav,.mobile-nav,.glass,.glass-soft,.product-card,.promise,.promise-tag,
+  .mosaic-card,.mosaic-content,.custom-text,.footer,.contact-link,
+  .service-copy,.service-icon,.cart-drawer,.account-drawer,
+  .product-overlay-panel,.checkout-drawer,.pill-btn,.search-field
+){
+  transition-property:background-color,border-color,box-shadow,color,opacity!important;
+  transition-duration:.46s!important;
+  transition-timing-function:cubic-bezier(.22,.61,.36,1)!important;
+  transition-delay:0s!important
+}
+html.theme-transitioning body #materialTile .material-photo{
+  transition:opacity .46s cubic-bezier(.22,.61,.36,1)!important;
+  transition-delay:0s!important
+}
+html.theme-transitioning,html.theme-transitioning body{
+  transition:background-color .46s ease,color .46s ease!important
+}
+@media(prefers-reduced-motion:reduce){
+  #materialTile .sd-material-slide,
+  #materialTile::before,#materialTile::after{transition:none!important}
 }
