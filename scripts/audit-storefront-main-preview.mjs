@@ -265,7 +265,8 @@ try{
      expanded:document.querySelector('#productOverlay')?.getAttribute('aria-hidden')==='false',
      interactive:!document.querySelector('#productOverlay')?.hasAttribute('inert')
    }));
-   result.checks.productDetailOpens=detailProof.title==='Ví da cá sấu — dữ liệu kiểm thử'&&
+   const expectedSyntheticTitle=synthetic[0].title.replace(/\p{L}[\p{L}\p{M}\p{N}]*/gu,w=>w.charAt(0).toLocaleUpperCase('vi')+w.slice(1));
+   result.checks.productDetailOpens=detailProof.title===expectedSyntheticTitle&&
      detailProof.path.startsWith('/sanpham/vida/')&&detailProof.expanded&&detailProof.interactive;
    result.detail=detailProof;
    if(!result.checks.productDetailOpens)throw Error('Synthetic product was not clickable: '+JSON.stringify(detailProof));
