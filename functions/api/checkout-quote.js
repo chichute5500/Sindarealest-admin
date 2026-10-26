@@ -1,5 +1,5 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, readJsonBodyLimited } from "../_lib.js";
-import { calculateCheckoutQuote, validPublicQrImageKey } from "../_payments.js";
+import { calculateCheckoutQuote, validPublicQrImageKey, checkoutTransferSku, makeCheckoutTransferReference } from "../_payments.js";
 
 const NO_STORE={"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"};
 
@@ -20,13 +20,16 @@ export async function onRequestPost({request,env}) {
   if([...requested.values()].some(q=>q>50))return fail("Số lượng mỗi sản phẩm vượt giới hạn.");
   try{
     const ids=[...requested.keys()];
-    const result=await env.DB.prepare("SELECT id,title,price,published,source_price_confirmed,stock,fulfillment_type FROM products WHERE id IN ("+ids.map(()=>"?").join(",")+")").bind(...ids).all();
+    const result=await env.DB.prepare("SELECT id,sku,title,price,published,source_price_confirmed,stock,fulfillment_type FROM products WHERE id IN ("+ids.map(()=>"?").join(",")+")").bind(...ids).all();
     const byId=new Map((result.results||[]).map(p=>[p.id,p]));
     if(ids.some(id=>!byId.has(id)||Number(byId.get(id).published)!==1))return fail("Sản phẩm đã thay đổi. Vui lòng tải lại trang.",409);
     for(const id of ids){
       const stock=byId.get(id).stock;
       if(stock!==null&&stock!==undefined&&requested.get(id)>Number(stock))return fail("Số lượng hàng vượt tồn kho ghi nhận; vui lòng liên hệ cửa hàng.",409);
     }
+    const sku=checkoutTransferSku(ids.map(id=>byId.get(id)));
+    const phone=String(parsed.value?.phone||"");
+    const transferReference=makeCheckoutTransferReference(phone,sku);
     const showPrices=(await getSetting(env.DB,"show_prices","0"))==="1";
     const quote=calculateCheckoutQuote(ids.map(id=>{
       const p=byId.get(id);const raw=p.price;
@@ -37,13 +40,13 @@ export async function onRequestPost({request,env}) {
     if(!quote.eligible)return json({ok:true,paymentReady:false,reason:quote.reason,fulfillmentType:quote.fulfillmentType||"unclassified",options:[]},200,NO_STORE);
     const keys=await Promise.all(["payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name","payment_qr_instructions"].map(k=>getSetting(env.DB,k,"")));
     const [active,key,bankName,accountNumber,accountName,instructions]=keys;
-    const configured=active==="1"&&validPublicQrImageKey(key)&&!!bankName&&!!accountNumber&&!!accountName
+    const configured=Boolean(transferReference)&&active==="1"&&validPublicQrImageKey(key)&&!!bankName&&!!accountNumber&&!!accountName
       &&typeof env.IMAGES?.head==="function"&&Boolean(await env.IMAGES.head(key));
     return json({ok:true,paymentReady:Boolean(configured),fulfillmentType:quote.fulfillmentType,total:quote.total,options:quote.options,
       qrImageUrl:configured?"/payment-qr/"+key:"",bankName:configured?bankName:"",accountNumber:configured?accountNumber:"",
       accountName:configured?accountName:"",instructions:configured?instructions:"",
-      reason:configured?"":"QR ngân hàng chưa được Admin kích hoạt hoặc xác minh. Chưa chuyển khoản; vẫn có thể gửi yêu cầu đặt hàng.",
-      transferReference:"",transferReferenceAvailableAfterSubmit:true
+      reason:configured?"":(!transferReference?"Cần số điện thoại hợp lệ và mã SKU trước khi hiện QR.":"QR ngân hàng chưa được Shop kích hoạt hoặc xác minh. Chưa chuyển khoản; vẫn có thể gửi yêu cầu đặt hàng."),
+      transferReference:configured?transferReference:"",transferReferenceAvailableAfterSubmit:false
     },200,NO_STORE);
   }catch{return fail("Không kiểm tra được hình thức thanh toán. Vui lòng thử lại.",503)}
 }
