@@ -422,6 +422,57 @@ try{
         chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
       });
       console.log('THEME_COMPOSITOR_ABA_DIAGNOSTIC '+JSON.stringify([...results,...variants].map(metric)));
+      // Directly toggle only the three displayed surfaces, rather than
+      // invalidating :root descendants. Visual-only browser experiment.
+      const surfaceTest=await page.evaluate(async()=>{
+        const nav=document.querySelector('.nav');
+        const light=document.querySelector('.theme-bg--light');
+        const dark=document.querySelector('.theme-bg--dark');
+        const lightNav='rgba(244,250,255,.94)';
+        const darkNav='rgba(4,20,34,.94)';
+        const btn=document.createElement('button');
+        btn.id='sd-direct-surface-test';
+        btn.hidden=true;document.body.append(btn);
+        const entries=[];
+        for(const targetDark of [true,false,true,false]){
+          const events=[];
+          let started=0;
+          const watch=(element,type,prop)=>ev=>{
+            if(ev.target!==element||ev.propertyName!==prop)return;
+            events.push({event:type,element:element===nav?'nav':element===light?'light':'dark',
+              elapsed:Math.round(performance.now()-started)});
+          };
+          const listeners=[];
+          for(const elem of [nav,light,dark]){
+            const property=elem===nav?'background-color':'opacity';
+            for(const type of ['transitionstart','transitionend']){
+              const fn=watch(elem,type,property);elem.addEventListener(type,fn);
+              listeners.push(()=>elem.removeEventListener(type,fn));
+            }
+          }
+          const click=()=>{
+            started=performance.now();
+            nav.style.setProperty('background-color',targetDark?darkNav:lightNav,'important');
+            light.style.setProperty('opacity',targetDark?'0':'1','important');
+            dark.style.setProperty('opacity',targetDark?'1':'0','important');
+          };
+          btn.addEventListener('click',click,{once:true});
+          btn.click();
+          await new Promise(r=>setTimeout(r,590));
+          listeners.forEach(fn=>fn());
+          entries.push({targetDark,
+            start:events.find(v=>v.element==='nav'&&v.event==='transitionstart')?.elapsed,
+            end:events.find(v=>v.element==='nav'&&v.event==='transitionend')?.elapsed,
+            bgStart:events.find(v=>v.element==='light'&&v.event==='transitionstart')?.elapsed,
+            bgEnd:events.find(v=>v.element==='light'&&v.event==='transitionend')?.elapsed});
+        }
+        nav.style.removeProperty('background-color');
+        light.style.removeProperty('opacity');
+        dark.style.removeProperty('opacity');
+        btn.remove();
+        return entries;
+      });
+      console.log('THEME_DIRECT_SURFACE_CONTROL '+JSON.stringify(surfaceTest));
       // Control experiment on the *same fully loaded page*: animate only
       // the navbar and background layers without touching html.dark, which
       // invalidates typography/cards across the Storefront. This preserves
