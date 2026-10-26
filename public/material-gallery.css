@@ -22,6 +22,20 @@ html body #materialTile.has-real-material-gallery .mosaic-content{
   color:#fff!important;
   text-shadow:0 1px 3px rgba(0,0,0,.94),0 1px 8px rgba(0,0,0,.72);
 }
+/* The original Light/Dark fallback caption washes remain only for legacy
+   placeholder material art; real leather photos are explicitly kept unwashed. */
+#materialTile::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(242,249,255,.78),rgba(242,249,255,.16));
+  opacity:0;transition:opacity .22s ease-out!important;
+}
+#materialTile::after{
+  background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.16))!important;
+  opacity:1;transition:opacity .22s ease-out!important;
+}
+html:not(.dark) #materialTile::before{opacity:1}
+html:not(.dark) #materialTile::after{opacity:0}
+
 /* Fast theme response: avoid forced layout, full-screen filter and hundreds
    of costly box-shadow/backdrop-filter transitions on catalog cards. */
 html body .theme-bg{
