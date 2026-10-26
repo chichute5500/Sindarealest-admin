@@ -815,7 +815,9 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-copy{width:100%;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 6px;align-items:center;text-align:left;padding:6px 8px;border:1px solid var(--sd-reference-edge,var(--line));border-radius:10px;background:var(--sd-reference-surface,var(--glass));color:var(--ink);font:inherit;overflow-wrap:anywhere}
 .checkout-drawer .sd-checkout-copy span:first-child{grid-column:1;color:var(--muted);font-size:9px}
 .checkout-drawer .sd-checkout-copy b{grid-column:1;font-size:10px;word-break:break-all}
-.checkout-drawer .sd-checkout-copy .sd-copy-icon{grid-column:2;grid-row:1/3;color:var(--gold);font-size:15px}
+.checkout-drawer .sd-checkout-copy .sd-copy-icon{grid-column:2;grid-row:1/3;display:block;position:relative;width:18px;height:18px;color:var(--gold)}
+.checkout-drawer .sd-checkout-copy .sd-copy-icon::before{content:"";position:absolute;left:3px;top:2px;width:10px;height:11px;border:1.5px solid currentColor;border-radius:2px}
+.checkout-drawer .sd-checkout-copy .sd-copy-icon::after{content:"";position:absolute;left:6px;top:5px;width:10px;height:11px;border:1.5px solid currentColor;border-radius:2px;background:var(--sd-reference-surface,var(--glass))}
 .checkout-drawer .sd-checkout-copy:active{background:var(--panel-strong)}
 .checkout-drawer .sd-checkout-qr-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .checkout-drawer .sd-checkout-qr-actions .pill-btn{min-height:38px;padding:7px;font-size:10px;white-space:normal}
@@ -1188,11 +1190,11 @@ html.dark .checkout-drawer .sd-checkout-qr-warning{color:#ff7d85}
 <div class="sd-checkout-box sd-checkout-qr-wrap" id="sdCheckoutQrWrap" hidden>
 <div class="sd-checkout-qr-head"><strong>Chuyển khoản ngân hàng</strong></div>
 <div class="sd-checkout-qr-main"><img id="sdCheckoutQrImage" alt="QR nhận chuyển khoản ngân hàng" referrerpolicy="no-referrer"><div class="sd-checkout-bank-lines">
-<button type="button" class="sd-checkout-copy" data-sd-copy="bank"><span>Ngân hàng</span><b id="sdCheckoutBankName"></b><span class="sd-copy-icon">⧉</span></button>
-<button type="button" class="sd-checkout-copy" data-sd-copy="accountName"><span>Chủ tài khoản</span><b id="sdCheckoutAccountName"></b><span class="sd-copy-icon">⧉</span></button>
-<button type="button" class="sd-checkout-copy" data-sd-copy="account"><span>Số tài khoản</span><b id="sdCheckoutAccountNumber"></b><span class="sd-copy-icon">⧉</span></button>
-<button type="button" class="sd-checkout-copy" data-sd-copy="amount"><span>Số tiền cần chuyển</span><b id="sdCheckoutAmount"></b><span class="sd-copy-icon">⧉</span></button>
-<button type="button" class="sd-checkout-copy" data-sd-copy="reference"><span>Nội dung chuyển khoản</span><b id="sdCheckoutTransferContent"></b><span class="sd-copy-icon">⧉</span></button>
+<button type="button" class="sd-checkout-copy" data-sd-copy="bank"><span>Ngân hàng</span><b id="sdCheckoutBankName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
+<button type="button" class="sd-checkout-copy" data-sd-copy="accountName"><span>Chủ tài khoản</span><b id="sdCheckoutAccountName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
+<button type="button" class="sd-checkout-copy" data-sd-copy="account"><span>Số tài khoản</span><b id="sdCheckoutAccountNumber"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
+<button type="button" class="sd-checkout-copy" data-sd-copy="amount"><span>Số tiền cần chuyển</span><b id="sdCheckoutAmount"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
+<button type="button" class="sd-checkout-copy" data-sd-copy="reference"><span>Nội dung chuyển khoản</span><b id="sdCheckoutTransferContent"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 </div></div>
 <div class="sd-checkout-qr-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutSaveQr">⇩ Lưu ảnh QR</button><button type="button" class="pill-btn tap-target" id="sdCheckoutOpenBank">↗ Mở ứng dụng ngân hàng</button></div>
 <p class="sd-checkout-qr-warning">QR KHÔNG NHÚNG SỐ TIỀN. Vui lòng tự nhập chính xác số tiền và nội dung chuyển khoản hiển thị phía trên. Shop xác nhận sau khi đối chiếu tiền thực nhận.</p>
