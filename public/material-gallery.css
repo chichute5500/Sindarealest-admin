@@ -71,8 +71,11 @@ html.theme-transitioning body :is(
 html.theme-transitioning body #materialTile .material-photo{
   transition:opacity .22s ease-out!important;
 }
+/* No full-viewport background/text repaint on every animation frame.
+   The fixed theme-bg layers and navbar perform the approved 220ms fade;
+   html/body palette changes immediately, preserving the existing appearance. */
 html.theme-transitioning,html.theme-transitioning body{
-  transition:background-color .22s ease-out,color .22s ease-out!important;
+  transition:none!important;
 }
 @media(prefers-reduced-motion:reduce){
   #materialTile .sd-material-slide,

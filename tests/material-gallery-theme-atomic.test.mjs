@@ -37,6 +37,7 @@ test('Theme crossfades smoothly with one synchronized duration and no stagger',(
  assert.match(css,/text-shadow:0 1px 3px/);
  assert.match(css,/html body \.nav-wrap \.nav,[\s\S]*?transition-duration:\.22s!important;/);
  assert.match(css,/html\.theme-transitioning body \.nav-wrap \.nav/);
+ assert.match(css,/html\.theme-transitioning,html\.theme-transitioning body\{[\s\S]*?transition:none!important;/);
  assert.match(page,/const themeMeta=document\.querySelector\('meta\[name="theme-color"\]'\)/);
  assert.doesNotMatch(page,/transition:background-color 1\.15s/,'Stale slow theme CSS must not reappear');
  assert.doesNotMatch(page,/html\.theme-transitioning \.nav,html\.theme-transitioning \.glass/,'Duplicate theme transition overrides must not reappear');
