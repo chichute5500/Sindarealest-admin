@@ -1922,34 +1922,40 @@ function sdCheckoutSummary(selector){
 }
 function sdCheckoutSelected(){return sdCheckoutQuote?.paymentReady===true?sdCheckoutQuote.options?.find(x=>x.value===sdCheckoutChoice):null}
 function sdCheckoutRefreshChoice(){
- const value=sdCheckoutSelected(),amount=value?formatVnd(value.amount):'Chờ Admin xác nhận';
+ const value=sdCheckoutSelected(),amount=value?formatVnd(value.amount):'Chờ Shop xác nhận';
+ const remainder=value?formatVnd(value.remainingAmount):'Chờ Shop xác nhận';
+ const discount=value?.discountAmount?'-'+formatVnd(value.discountAmount):'Không áp dụng';
  document.querySelectorAll('#sdCheckoutOptions .sd-checkout-option').forEach(b=>{const active=b.dataset.sdPaymentOption===sdCheckoutChoice;b.classList.toggle('selected',active);b.setAttribute('aria-checked',String(active))});
  for(const id of ['#sdCheckoutAmount','#sdCheckoutSelectedAmount','#sdCheckoutReviewAmount'])$(id).textContent=amount;
+ for(const id of ['#sdCheckoutRemaining','#sdCheckoutReviewRemaining'])$(id).textContent=remainder;
+ $('#sdCheckoutDiscount').textContent=discount;
  $('#sdCheckoutReviewPayment').textContent=value?(value.value==='deposit'?'Đặt cọc · ':'Chuyển khoản toàn bộ · ')+amount:'Chờ tư vấn và xác nhận hình thức thanh toán';
 }
 function sdCheckoutRenderQuote(){
  const q=sdCheckoutQuote,ready=q?.paymentReady===true,notice=$('#sdCheckoutQuoteNotice'),options=$('#sdCheckoutOptions'),qrBox=$('#sdCheckoutQrWrap');
- notice.textContent=ready?('Loại hàng: '+(q.fulfillmentType==='in_stock'?'Hàng Có Sẵn':'Hàng Đặt Riêng')+' · Tổng tiền: '+formatVnd(q.total)):(q?.reason||'Chưa thể xác minh QR hoặc giá. Bạn vẫn có thể gửi yêu cầu để Admin xác nhận.');
+ notice.textContent=ready?('Loại hàng: '+(q.fulfillmentType==='in_stock'?'Hàng Có Sẵn':'Hàng Đặt Riêng')+' · Tổng tiền: '+formatVnd(q.total)):(q?.reason||'Chưa thể xác minh QR hoặc giá. Bạn vẫn có thể gửi yêu cầu để Shop xác nhận.');
  options.replaceChildren();
  if(ready)for(const choice of q.options||[]){
   const b=document.createElement('button'),radio=document.createElement('span'),details=document.createElement('span'),label=document.createElement('b'),hint=document.createElement('small'),amount=document.createElement('strong');
   b.type='button';b.className='sd-checkout-option tap-target';b.dataset.sdPaymentOption=choice.value;b.setAttribute('role','radio');radio.className='sd-checkout-radio';details.className='sd-checkout-option-label';amount.className='sd-checkout-option-price';
-  label.textContent=choice.label;hint.textContent=choice.value==='full'?'100% tổng tiền · Đủ điều kiện Freeship':'Cửa hàng xác nhận khoản cọc sau khi đối chiếu';amount.textContent=formatVnd(choice.amount);details.append(label,hint);b.append(radio,details,amount);options.append(b);
+  label.textContent=choice.label;hint.textContent=choice.value==='full'?'Giảm 5% · Freeship · Còn lại 0₫':'Cọc làm tròn lên 100.000₫ · Thanh toán phần còn lại khi nhận hàng';amount.textContent=formatVnd(choice.amount);details.append(label,hint);b.append(radio,details,amount);options.append(b);
  }
  const path=String(q?.qrImageUrl||''),safe=ready&&/^\/payment-qr\/qr-[0-9a-f-]{36}\.(?:png|jpe?g|webp)$/.test(path);
  qrBox.hidden=!safe;
- if(safe){const img=$('#sdCheckoutQrImage');img.onerror=()=>{qrBox.hidden=true;notice.textContent='Không tải được QR. Chưa chuyển tiền; hãy gửi yêu cầu để Admin xác nhận.';sdCheckoutQuote.paymentReady=false;sdCheckoutRefreshChoice()};img.src=path;$('#sdCheckoutBankName').textContent=q.bankName||'';$('#sdCheckoutAccountName').textContent=q.accountName||'';$('#sdCheckoutAccountNumber').textContent=q.accountNumber||''}
+ if(safe){const img=$('#sdCheckoutQrImage');img.onerror=()=>{qrBox.hidden=true;notice.textContent='Không tải được QR. Chưa chuyển tiền; hãy gửi yêu cầu để Shop xác nhận.';sdCheckoutQuote.paymentReady=false;sdCheckoutRefreshChoice()};img.src=path;$('#sdCheckoutBankName').textContent=q.bankName||'';$('#sdCheckoutAccountName').textContent=q.accountName||'';$('#sdCheckoutAccountNumber').textContent=q.accountNumber||'';
+ $('#sdCheckoutTransferContent').textContent=q.transferReference||'';
+ $('#sdCheckoutBankFeedback').textContent='Nhấn vào từng ô để sao chép thông tin chuyển khoản.'}
  sdCheckoutSummary('#sdCheckoutPaymentSummary');sdCheckoutRefreshChoice();
 }
 async function sdCheckoutLoadQuote(){
- const response=await fetch('/api/checkout-quote',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:sdCheckoutItems()})});
+ const response=await fetch('/api/checkout-quote',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:sdCheckoutItems(),phone:$('#checkoutForm').elements.phone.value.trim()})});
  let data={};try{data=await response.json()}catch{}
  if(!response.ok||data.ok!==true)throw Error(data.error||'Không kiểm tra được QR và số tiền.');
  sdCheckoutQuote=data;sdCheckoutChoice='deposit';sdCheckoutRenderQuote();
 }
 function sdCheckoutSetStep(step){
  sdCheckoutStep=Math.max(1,Math.min(3,Number(step)||1));
- const captions=[['Thông tin liên hệ và địa chỉ nhận hàng','Điền thông tin nhận hàng để tiếp tục chọn hình thức thanh toán.'],['Chọn hình thức thanh toán','Số tiền được máy chủ tính theo loại hàng do Admin thiết lập.'],['Kiểm tra và gửi đơn','Gửi đơn để Admin đối chiếu và xác nhận giao dịch.']];
+ const captions=[['Thông tin liên hệ và địa chỉ nhận hàng','Điền thông tin nhận hàng để tiếp tục chọn hình thức thanh toán.'],['Chọn hình thức thanh toán','Chọn đặt cọc hoặc thanh toán toàn bộ.'],['Kiểm tra và gửi đơn','Gửi đơn để Shop đối chiếu và xác nhận giao dịch.']];
  $('#sdCheckoutStepTitle').textContent=captions[sdCheckoutStep-1][0];$('#sdCheckoutStepSubtitle').textContent=captions[sdCheckoutStep-1][1];
  [[1,'#sdCheckoutShippingStep'],[2,'#sdCheckoutPaymentStep'],[3,'#sdCheckoutReviewStep']].forEach(([n,id])=>$(id).hidden=n!==sdCheckoutStep);
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
@@ -1959,11 +1965,11 @@ function sdCheckoutSetStep(step){
  if(sdCheckoutStep===3){
   const f=$('#checkoutForm').elements;
   $('#sdCheckoutReviewAddress').textContent=[f.fullName.value.trim(),f.phone.value.trim(),[f.streetAddress.value.trim(),f.ward.value,f.province.value].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
-  const count=sdCheckoutItems().reduce((sum,item)=>sum+item.quantity,0);$('#sdCheckoutReviewItems').textContent=count+' sản phẩm · '+(Number.isSafeInteger(sdCheckoutQuote?.total)?formatVnd(sdCheckoutQuote.total):'Giá chờ xác nhận')+' · Chờ Admin xác nhận.';
+  const count=sdCheckoutItems().reduce((sum,item)=>sum+item.quantity,0);$('#sdCheckoutReviewItems').textContent=count+' sản phẩm · '+(Number.isSafeInteger(sdCheckoutQuote?.total)?formatVnd(sdCheckoutQuote.total):'Giá chờ xác nhận')+' · Chờ Shop xác nhận.';
   sdCheckoutRefreshChoice();
  }
 }
-function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected();return selected?{paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total}:{}}
+function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected();return selected?{paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total,transferReference:sdCheckoutQuote.transferReference}:{}}
 
 function openCheckout(){
  dismissToast();
@@ -2135,12 +2141,58 @@ async function optimizeWarrantyPhoto(file){let bitmap;try{bitmap=await createIma
 $('#warrantyClaimForm').addEventListener('submit',async e=>{e.preventDefault();const b=$('#warrantySubmit'),m=$('#warrantyClaimMessage'),message=$('#claimWarrantyMessage').value.trim(),claimToken=$('#claimWarrantyCode').value,issueType=$('#claimIssueType').value,contactPhone=$('#claimContactPhone').value.trim(),photo=$('#warrantyPhoto').files&&$('#warrantyPhoto').files[0];if(!claimToken){m.textContent='Hãy tra cứu và chọn bảo hành trước khi gửi yêu cầu.';return}b.disabled=true;b.textContent='Đang gửi…';m.textContent='';try{let imageKey='';if(photo){const file=await optimizeWarrantyPhoto(photo),form=new FormData();form.append('claimToken',claimToken);form.append('file',file,'warranty-issue.webp');const ur=await fetch('/api/warranty-claim-uploads',{method:'POST',credentials:'same-origin',body:form});let uj={};try{uj=await ur.json()}catch{}if(!ur.ok)throw Error(uj.error||'Không tải được ảnh lỗi.');imageKey=uj.imageKey||''}const r=await fetch('/api/warranty-claims',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({claimToken,issueType,contactPhone,message,imageKey})});let j={};try{j=await r.json()}catch{}if(!r.ok)throw Error(j.error||'Chưa thể gửi yêu cầu bảo hành.');m.textContent=j.message||'Đã tiếp nhận yêu cầu bảo hành.';$('#claimWarrantyMessage').value='';$('#warrantyPhoto').value=''}catch(err){m.textContent=err.message||'Không thể gửi yêu cầu.'}finally{b.disabled=false;b.textContent='Gửi yêu cầu bảo hành'}});
 function safePaymentQrUrl(value){if(typeof value!=='string'||!value.trim())return '';try{const url=new URL(value,window.location.origin);if(url.protocol!=='https:'&&url.origin!==window.location.origin)return '';return url.href}catch{return ''}}
 function renderPaymentInstructions(result,accessToken=''){const panel=$('#paymentInstructions');if(!panel)return;panel.replaceChildren();panel.hidden=false;const orderNumber=String(result?.orderNumber||''),payment=result?.paymentInstructions,qrUrl=safePaymentQrUrl(payment?.qrImageUrl),amount=payment?.amount;const ready=result?.paymentReady===true&&result?.status==='confirmed'&&result?.priceConfirmationRequired===false&&payment?.status==='ready'&&payment?.qrIncludesAmount===false&&Number.isSafeInteger(amount)&&amount>0&&amount<=2000000000&&!!qrUrl&&!!String(payment?.bankName||'').trim()&&!!String(payment?.accountName||'').trim()&&!!String(payment?.accountNumber||'').trim()&&!!String(payment?.transferContent||'').trim();const add=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;panel.append(node);return node};if(!ready){if((result?.selectedPaymentOption==='deposit'||result?.selectedPaymentOption==='full')&&Number.isSafeInteger(result?.selectedPaymentAmount)&&result.selectedPaymentAmount>0){
-add('h3','','Đã gửi đơn · Chờ Admin xác nhận');
+add('h3','','Đã gửi đơn · Chờ Shop xác nhận');
 add('p','','Mã đơn: '+(orderNumber||'Chưa được cấp'));
 add('p','','Khách chọn: '+(result.selectedPaymentOption==='full'?'Chuyển khoản toàn bộ':'Đặt cọc')+' · '+formatVnd(result.selectedPaymentAmount));
-add('p','payment-warning','Nếu đã chuyển khoản, Admin sẽ đối chiếu giao dịch ngân hàng rồi xác nhận. QR không tự ghi nhận đã thanh toán.');return}
+add('p','','Nội dung chuyển khoản: '+String(result.transferReference||'—'));
+add('p','','Còn lại thanh toán khi nhận hàng: '+(Number.isSafeInteger(result.selectedRemainingAmount)?formatVnd(result.selectedRemainingAmount):'Shop xác nhận'));
+if(result.selectedDiscountAmount>0)add('p','','Đã giảm 5%: '+formatVnd(result.selectedDiscountAmount)+' · Freeship sau khi Shop xác minh đủ tiền.');
+add('p','payment-warning','Nếu đã chuyển khoản, Shop sẽ đối chiếu ngân hàng rồi xác nhận. QR không tự ghi nhận đã thanh toán.');return}
 add('h3','','Chờ cửa hàng xác nhận');add('p','payment-warning','Vui lòng chưa chuyển tiền. Đơn hàng chưa có hướng dẫn chuyển khoản được máy chủ xác nhận; cửa hàng sẽ xác nhận giá, tình trạng hàng và số tiền cần chuyển trước khi hiển thị QR.');const serverMessage=String(result?.message||'').trim();if(serverMessage&&!/vui lòng chưa chuyển tiền/i.test(serverMessage))add('p','',serverMessage);add('p','payment-warning','Mã yêu cầu: '+(orderNumber||'Chưa được cấp'));const token=String(accessToken||'');if(orderNumber&&token.length>=40){const check=add('button','pill-btn tap-target','Kiểm tra cập nhật thanh toán');check.type='button';check.addEventListener('click',()=>refreshOrderPayment(orderNumber,token,check));}return}add('h3','','Hướng dẫn chuyển khoản');add('p','','Quét QR để nhận thông tin tài khoản và nội dung chuyển khoản. Tự nhập số tiền dưới đây trong ứng dụng ngân hàng.');const img=add('img','payment-qr');img.alt='Mã QR chuyển khoản đã được cửa hàng xác minh không chứa số tiền';img.referrerPolicy='no-referrer';img.onerror=()=>{panel.replaceChildren();add('h3','','Không tải được mã QR');add('p','payment-warning','Vui lòng chưa chuyển tiền. Không thể tải mã QR đã được máy chủ xác nhận; hãy liên hệ cửa hàng để xác minh trước khi chuyển.');add('p','payment-warning','Mã yêu cầu: '+(orderNumber||'Chưa được cấp'))};img.src=qrUrl;const data=add('div','payment-data');const row=(label,value)=>{const line=document.createElement('div'),name=document.createElement('span'),val=document.createElement('strong');name.textContent=label;val.textContent=String(value);line.append(name,val);data.append(line)};row('Ngân hàng',payment.bankName);row('Chủ tài khoản',payment.accountName);row('Số tài khoản',payment.accountNumber);row('Nội dung chuyển khoản',payment.transferContent);row('Số tiền cần chuyển',formatVnd(amount));add('p','payment-warning','Thanh toán chỉ được ghi nhận sau khi cửa hàng kiểm tra giao dịch thực nhận. Quét QR hoặc gửi biên lai không đồng nghĩa với đã thanh toán.')}
 async function refreshOrderPayment(orderNumber,token,button){if(button?.disabled)return;const old=button?.textContent;if(button){button.disabled=true;button.textContent='Đang kiểm tra…'}try{const url='/api/order-payment?orderNumber='+encodeURIComponent(orderNumber)+'&token='+encodeURIComponent(token);const response=await fetch(url,{method:'GET',cache:'no-store',headers:{Accept:'application/json'}});let data={};try{data=await response.json()}catch{}if(!response.ok||data.ok===false)throw new Error(data.error||'Chưa thể kiểm tra trạng thái thanh toán.');const mapped={orderNumber:data.orderNumber||orderNumber,status:data.paymentReady===true?'confirmed':String(data.orderStatus||'pending_confirmation'),paymentReady:data.paymentReady===true,priceConfirmationRequired:data.priceConfirmationRequired!==false,message:data.message||'Chưa có hướng dẫn thanh toán mới.',paymentInstructions:data.paymentReady===true?{status:'ready',qrImageUrl:data.qrImageUrl,qrIncludesAmount:false,amount:data.amount,bankName:data.bankName,accountName:data.accountName,accountNumber:data.accountNumber,transferContent:data.transferReference}:null};if(data.paymentReady===true&&data.paymentTermsConfirmed!==true)throw new Error('Máy chủ chưa xác nhận điều kiện thanh toán; chưa hiển thị QR.');renderPaymentInstructions(mapped,token);const saved=localOrderHistory.find(x=>x.orderNumber===orderNumber);if(saved){saved.status=mapped.status;saved.priceConfirmationRequired=mapped.priceConfirmationRequired;if(Number.isSafeInteger(data.total)&&data.total>=0)saved.total=data.total;try{localStorage.setItem(LOCAL_ORDER_HISTORY_KEY,JSON.stringify(localOrderHistory))}catch{}renderOrderHistory()}}catch(error){if(button){button.textContent=old||'Kiểm tra cập nhật thanh toán';button.disabled=false}const panel=$('#paymentInstructions');if(panel){const notice=document.createElement('p');notice.className='payment-warning';notice.textContent=error.message||'Không thể kiểm tra trạng thái thanh toán. Vui lòng thử lại.';panel.append(notice)}}finally{if(button&&button.isConnected){button.disabled=false;if(button.textContent==='Đang kiểm tra…')button.textContent=old||'Kiểm tra cập nhật thanh toán'}}}
+async function sdCopyCheckoutText(value){
+ if(!value)return false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return true}}catch{}
+ const input=document.createElement('textarea');input.value=value;input.style.position='fixed';input.style.left='-9999px';document.body.append(input);input.select();
+ let ok=false;try{ok=document.execCommand('copy')}catch{}input.remove();return ok;
+}
+function sdCheckoutBankMessage(text){$('#sdCheckoutBankFeedback').textContent=text}
+function sdCheckoutBankDetails(){
+ const selected=sdCheckoutSelected(),q=sdCheckoutQuote;
+ return {bank:q?.bankName||'',accountName:q?.accountName||'',account:q?.accountNumber||'',amount:selected?String(selected.amount):'',reference:q?.transferReference||''}
+}
+async function sdCheckoutQrBlob(){
+ const image=$('#sdCheckoutQrImage');if(!sdCheckoutQuote?.paymentReady||!image?.src||!image.complete||!image.naturalWidth)throw Error('QR chưa sẵn sàng.');
+ const res=await fetch(image.src,{credentials:'same-origin',cache:'no-store'});
+ if(!res.ok)throw Error('Không tải được QR.');
+ const blob=await res.blob();if(!blob.type.startsWith('image/'))throw Error('Tệp QR không phải hình ảnh.');
+ return blob;
+}
+$('#sdCheckoutQrWrap').addEventListener('click',async event=>{
+ const btn=event.target.closest('[data-sd-copy]');if(!btn)return;
+ const data=sdCheckoutBankDetails(),value=data[btn.dataset.sdCopy];
+ const copied=await sdCopyCheckoutText(value);
+ sdCheckoutBankMessage(copied?'Đã sao chép thông tin.':'Thiết bị chưa cho phép sao chép tự động. Bạn có thể nhấn giữ thông tin để sao chép.');
+});
+$('#sdCheckoutSaveQr').addEventListener('click',async()=>{
+ try{
+  const blob=await sdCheckoutQrBlob(),url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='SinDarealest-QR.'+(blob.type.includes('jpeg')?'jpg':blob.type.includes('webp')?'webp':'png');document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);
+  sdCheckoutBankMessage('Đã yêu cầu lưu ảnh QR. Kiểm tra mục Tải xuống trên điện thoại.');
+ }catch(err){sdCheckoutBankMessage(err.message||'Không thể lưu ảnh QR.')}
+});
+$('#sdCheckoutOpenBank').addEventListener('click',async()=>{
+ try{
+  const blob=await sdCheckoutQrBlob(),filename='SinDarealest-QR.'+(blob.type.includes('jpeg')?'jpg':blob.type.includes('webp')?'webp':'png');
+  const file=new File([blob],filename,{type:blob.type}),details=sdCheckoutBankDetails();
+  const text=['Thông tin chuyển khoản SinDarealest',details.bank,details.account,details.accountName,'Số tiền: '+details.amount,'Nội dung: '+details.reference].join('\n');
+  if(typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&navigator.canShare({files:[file]})){
+   await navigator.share({files:[file],text,title:'SinDarealest - Chuyển khoản'});sdCheckoutBankMessage('Chọn ứng dụng ngân hàng hoặc ứng dụng hỗ trợ trong bảng chia sẻ của thiết bị.');return;
+  }
+  if(typeof navigator.share==='function'){await navigator.share({text,title:'SinDarealest - Chuyển khoản'});sdCheckoutBankMessage('Hãy mở ứng dụng ngân hàng từ bảng chia sẻ nếu có hỗ trợ.');return}
+  sdCheckoutBankMessage('Trình duyệt không hỗ trợ mở trực tiếp ứng dụng ngân hàng. Hãy lưu QR và mở app ngân hàng của bạn để quét/chọn ảnh QR.');
+ }catch(err){if(err?.name!=='AbortError')sdCheckoutBankMessage('Không mở được ứng dụng ngân hàng tự động. Hãy lưu QR, rồi mở ứng dụng ngân hàng để quét.')}
+});
 $('#sdCheckoutPrev').addEventListener('click',()=>{if(sdCheckoutStep>1)sdCheckoutSetStep(sdCheckoutStep-1);else $('#checkoutBack').click()});
 $('#sdCheckoutOptions').addEventListener('click',e=>{const b=e.target.closest('[data-sd-payment-option]');if(!b||!sdCheckoutQuote?.paymentReady)return;sdCheckoutChoice=b.dataset.sdPaymentOption;sdCheckoutRefreshChoice()});
 document.querySelectorAll('[data-sd-review-step]').forEach(b=>b.addEventListener('click',()=>sdCheckoutSetStep(b.dataset.sdReviewStep)));
