@@ -787,11 +787,37 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
     var items=focusableItems();
     (items[0]||s).focus({preventScroll:true});
   }
+  var waitingForStore=false;
   function dismiss(){
     if(closed)return;
+    // Never expose the unfinished storefront while its catalog or CSS parses.
+    if(!window.__sdStorefrontReady||document.readyState==='loading'){
+      if(!waitingForStore){
+        waitingForStore=true;
+        var release=function(){
+          if(!window.__sdStorefrontReady||document.readyState==='loading')return;
+          window.removeEventListener('sd-storefront-ready',release);
+          document.removeEventListener('DOMContentLoaded',release);
+          window.clearTimeout(fallback);
+          dismiss();
+        };
+        window.addEventListener('sd-storefront-ready',release);
+        document.addEventListener('DOMContentLoaded',release);
+        var fallback=window.setTimeout(function(){
+          window.removeEventListener('sd-storefront-ready',release);
+          document.removeEventListener('DOMContentLoaded',release);
+          window.__sdStorefrontReady=true;
+          dismiss();
+        },2400);
+      }
+      return;
+    }
     closed=true;
     document.removeEventListener('keydown',keepFocus,true);
     document.removeEventListener('focusin',keepFocusInside,true);
+    // Release the locked page geometry BEFORE fading the still-opaque splash.
+    document.body.classList.remove('welcome-active');
+    void document.body.offsetHeight;
     s.classList.add('is-leaving');
     var destination=document.querySelector('.brand');
     if(destination&&typeof destination.focus==='function')destination.focus({preventScroll:true});
@@ -1737,7 +1763,8 @@ $('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetai
 async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year').textContent=new Date().getFullYear();loadCart();loadFavorites();loadOrderHistory();loadLocalShippingAddress();bindEvents();try{const res=await fetch('/api/products',{cache:'no-store'});if(!res.ok)throw new Error('API sản phẩm trả về HTTP '+res.status);const payload=await res.json();products=Array.isArray(payload)?payload:(payload.products||payload.data||[]);if(!Array.isArray(products))throw new Error('Dữ liệu sản phẩm không hợp lệ');products=products.map(p=>({...p,images:(p.images||[]).map(imgPath)}));normalizeCart();normalizeFavorites();}catch(err){$('#catalogGrid').innerHTML='<p class="section-note">Không thể tải danh mục từ /api/products. Hãy kiểm tra Cloudflare Pages Functions, binding D1 tên DB và các tệp SQL trong migrations/. Website không dùng danh mục tĩnh cũ khi API gặp lỗi.</p>';return}
  renderFeatured();renderFilters();renderCatalog();renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}
 }
-init();
+const finishStorefrontStartup=()=>{window.__sdStorefrontReady=true;window.dispatchEvent(new Event('sd-storefront-ready'))};
+init().then(finishStorefrontStartup,finishStorefrontStartup);
 })();
 </script>
 

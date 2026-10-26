@@ -26,3 +26,8 @@ assert.ok(html.includes('<section class="sd-code-hero wrap" id="home"'),'Owner-a
 assert.ok(html.includes('<link rel="stylesheet" href="/code-hero.css?v=20261026-1">'),'HERO stylesheet remains untouched');
 assert.ok(!html.includes('<picture class="hero-reference-art"'),'Never bring back bitmap HERO');
 console.log('PASS: Owner-approved Welcome from PR #113 isolated into fix branch; code-only HERO protected.');
+
+// Guard the approved fade against uncovering a still-locked or unfinished page.
+assert.match(html,/if\(!window\.__sdStorefrontReady\|\|document\.readyState==='loading'\)/);
+assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);\n    void document\.body\.offsetHeight;\n    s\.classList\.add\('is-leaving'\)/);
+assert.match(html,/init\(\)\.then\(finishStorefrontStartup,finishStorefrontStartup\)/);
