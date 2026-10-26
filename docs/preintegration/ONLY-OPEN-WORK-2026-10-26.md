@@ -1,5 +1,8 @@
 # SINDAREALEST ADMIN — CHECKPOINT BÀN GIAO KHÔNG LÀM LẠI (26/10/2026)
 
+> **SỬA LỖI ĐƯỜNG DẪN AUDIT (26/10/2026):** Có chat trước đã đọc nhầm `docs/admin-audit/audit-status-2025-10-25.json` rồi kết luận 404. Đây là **sai năm** trong tên file, không phải file audit bị mất. Tệp tồn tại và đã kiểm tra thực tế là **[`docs/admin-audit/audit-status-2026-10-25.json`](../../admin-audit/audit-status-2026-10-25.json)** trên nhánh Admin. **Không thử đổi tên sang 2025, không tạo file audit trùng, không dừng khi gặp đường dẫn sai**; dùng đúng tên năm `2026` hoặc liệt kê repo tree trước khi kết luận 404. Đã xác minh đủ 4 tệp đọc theo thứ tự: `docs/admin-ui-reference/handoff/START-HERE.md`, `docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md`, `docs/preintegration/ONLY-OPEN-WORK-2026-10-26.md`, `docs/admin-audit/audit-status-2026-10-25.json`. Mốc kiểm tra live `e1310faf33c0539facb003906f1909eaeed7ad8e`: PR #111 OPEN, bốn Actions của mốc này **SUCCESS** ([Validate](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40264555332), [Validate push](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40264551738), [Admin Playwright](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40264555297), [isolated Preview Playwright](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40264555347)). **Commit tài liệu sau mốc này sẽ thay đổi HEAD; cần fetch lại HEAD/CI; không chạy lại bất cứ bài nghiệm thu PASS nào.**
+
+
 ## 0. Quyết định và phạm vi ưu tiên
 
 Chủ dự án đã yêu cầu: **“Những gì đã pass k thực hiện lại. Chỉ làm những cái cần hoàn thành”** và **“D1 r2 không còn quá quan trọng. Chỉ xử lý phần khác là được. Cập nhật file và pomt để chat sau tiếp tục thực hiện. Cập nhật toàn bộ mới nhất tránh làm lại.”**
