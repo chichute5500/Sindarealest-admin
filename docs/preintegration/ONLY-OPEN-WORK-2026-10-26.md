@@ -1,3 +1,14 @@
+# PRODUCTION PROMOTION RESULT — 26/10/2026 (main source 89f9120d51c8)
+
+- PR #111 was squash-merged after the owner confirmed immediate use: merge commit `89f9120d51c86b71a74c55bb40382e51e62449d1`; PR is closed/merged.
+- Exact-main Validate #40266895446 **SUCCESS** on that SHA. Production deployment #40266895448 **FAILED safely** during `npm run deploy`.
+- The deploy workflow verified Cloudflare project `sindarealest2`, Production branch `main`, and bindings: IMAGES → `sindarealest-images`; private ORIGINALS → `sindarealest-original` (public access disabled). Project and API/data smoke checks passed.
+- Read-only D1 preflight found migration `0009_fulfillment_and_manual_payments.sql` is not ready on Production D1 `sindarealest-db`. The script stopped before `wrangler pages deploy`; it did not execute the migration or alter D1 schema/data. Therefore the new application SHA is on main but **is not live in Production**.
+- Migration 0009 adds `fulfillment_type` and payment confirmation/token columns and creates payment request/transaction tables and indexes. It is an additive schema change, but still requires a separately authorized, backed-up Production D1 migration procedure. The existing setup script explicitly stops before seed/deploy when 0009 is absent; no automatic migration workflow is available here.
+- No migration was run, no backup/seed was written, no rollback was attempted. Do not rerun deploy unchanged; it will fail the same read-only check. Next action: owner/operator must apply and verify migration 0009 on the intended Production D1, then run the guarded deployment workflow again.
+- PASS LOCKED remains preserved. Manual screen-reader sign-off, isolated performance measurement, independent pentest and bank reconciliation remain OPEN/OWNER-ONLY. Storefront Preview DB/R2 isolation risks remain DEFERRED/UNSAFE.
+- This update is documentation-only; commit message uses `[skip ci]` so no second deploy is triggered.
+
 # FULL REVIEW / MAIN PROMOTION GATE — 26/10/2026 (reviewed source HEAD b8203d7aa746)
 
 - Admin source review: scanned changed Functions/runtime routes, middleware, payment, order, warranty, backup/restore and migrations; no concrete exploitable security or logic defect was substantiated. This is static review, not independent pentest.

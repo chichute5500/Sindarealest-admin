@@ -825,5 +825,51 @@
       "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
       "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
     ]
+  },
+  "productionPromotion20261026": {
+    "mainSha": "89f9120d51c86b71a74c55bb40382e51e62449d1",
+    "pr111": {
+      "state": "MERGED",
+      "mergeCommit": "89f9120d51c86b71a74c55bb40382e51e62449d1",
+      "method": "squash"
+    },
+    "validationRun": {
+      "id": 40266895446,
+      "result": "SUCCESS",
+      "headSha": "89f9120d51c86b71a74c55bb40382e51e62449d1"
+    },
+    "productionDeployRun": {
+      "id": 40266895448,
+      "result": "FAILURE_SAFE_PREFLIGHT",
+      "headSha": "89f9120d51c86b71a74c55bb40382e51e62449d1",
+      "failedAt": "npm run deploy → read-only migration 0009 schema verification",
+      "message": "Migration 0009_fulfillment_and_manual_payments.sql not ready on D1 sindarealest-db"
+    },
+    "cloudflarePreflight": {
+      "project": "sindarealest2",
+      "productionBranch": "main",
+      "imagesBinding": "sindarealest-images",
+      "originalsBinding": "sindarealest-original",
+      "originalsPublicAccess": false,
+      "result": "PASS"
+    },
+    "productionTouched": {
+      "migrationApplied": false,
+      "d1DataChanged": false,
+      "pagesDeployCommandReached": false
+    },
+    "deploymentStatus": "MAIN_UPDATED_PRODUCTION_APP_NOT_DEPLOYED",
+    "requiredNextAction": "Owner/operator applies and verifies migration 0009 on intended Production D1, then reruns guarded deployment.",
+    "lockedPassPreserved": true,
+    "openOwnerGates": [
+      "MANUAL_SCREEN_READER_ACCEPTANCE",
+      "ISOLATED_PERFORMANCE_MEASUREMENT",
+      "INDEPENDENT_PENTEST",
+      "REDACTED_BANK_RECONCILIATION_AND_OWNER_SIGNOFF"
+    ],
+    "deferredNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ]
   }
 }
