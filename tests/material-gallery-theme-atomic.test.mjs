@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
+test('Owner-controlled material photos are config-driven and have no manual controls',()=>{
+ const page=read('public/index.html'),js=read('public/material-gallery.js'),css=read('public/material-gallery.css');
+ const config=JSON.parse(read('public/images/crocodile-leather/gallery.json'));
+ assert.deepEqual(config.images,[]);
+ assert.equal(config.intervalMs,1500);
+ assert.match(page,/id="materialTile"[^>]+data-reveal/);
+ assert.match(page,/id="materialGallery" aria-hidden="true"/);
+ assert.match(page,/src="\/material-gallery.js" defer/);
+ assert.match(page,/href="\/material-gallery.css"/);
+ assert.match(js,/setInterval\(\(\)=>\{/);
+ assert.match(js,/\},1500\)/);
+ assert.doesNotMatch(js,/createElement\(['"]button['"]\)/);
+ assert.match(js,/if\(!names\.length\)return/);
+ assert.match(js,/if\(!loaded\.length\)return/);
+ assert.match(css,/#materialTile\.has-real-material-gallery .material-photo/);
+ execFileSync(process.execPath,['--check',new URL('../public/material-gallery.js',import.meta.url).pathname]);
+});
+test('Theme changes in a single paint without staggered old transitions',()=>{
+ const page=read('public/index.html'),css=read('public/material-gallery.css');
+ assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
+ assert.match(page,/root\.classList\.add\('sd-theme-atomic'\)/);
+ assert.match(page,/requestAnimationFrame\(\(\)=>root\.classList\.remove\('sd-theme-atomic'\)\)/);
+ assert.match(css,/html\.sd-theme-atomic \*::after\{[\s\S]*?transition:none!important/);
+ assert.match(page,/const themeMeta=document\.querySelector\('meta\[name="theme-color"\]'\)/);
+});
