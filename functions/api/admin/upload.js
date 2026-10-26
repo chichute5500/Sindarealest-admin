@@ -80,18 +80,25 @@ export async function onRequestPost(context) {
     const key = `${id}.webp`;
     const privateKey = `private-originals/${id}.${originalType}`;
 
-    await context.env.ORIGINALS.put(privateKey, originalBytes, {
-      httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
-      customMetadata: { visibility: "private-original" },
-    });
+    try {
+      await context.env.ORIGINALS.put(privateKey, originalBytes, {
+        httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
+        customMetadata: { visibility: "private-original" },
+      });
+    } catch (error) {
+      console.error("product-photo upload failure", { stage: "original", code: String(error?.name || "R2WriteError").slice(0, 80) });
+      return fail("Kho ảnh gốc ORIGINALS tạm thời không ghi được. Ảnh này chưa được xác nhận lưu; hãy thử tiếp tục sau.", 503, { "Retry-After": "5" });
+    }
     try {
       await context.env.IMAGES.put(key, bytes, {
         httpMetadata: { contentType: "image/webp", cacheControl: "public, max-age=31536000, immutable" },
         customMetadata: { visibility: "public-optimized-derivative", originalKey: privateKey },
       });
     } catch (error) {
-      try { await context.env.ORIGINALS.delete(privateKey); } catch {}
-      throw error;
+      try { await context.env.ORIGINALS.delete(privateKey); }
+      catch (cleanupError) { console.error("product-photo rollback failed", {stage:"original-cleanup",code:String(cleanupError?.name||"R2DeleteError").slice(0,80)}); }
+      console.error("product-photo upload failure", { stage: "derivative", code: String(error?.name || "R2WriteError").slice(0, 80) });
+      return fail("Kho ảnh hiển thị IMAGES tạm thời không ghi được. Đã cố gắng dọn ảnh gốc của lượt tải lỗi; hãy thử tiếp tục sau.", 503, { "Retry-After": "5" });
     }
 
     return json({
