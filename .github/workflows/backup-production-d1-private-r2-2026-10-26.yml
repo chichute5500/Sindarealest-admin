@@ -6,6 +6,7 @@ on:
     paths:
       - scripts/backup-production-d1-private-r2-2026-10-26.mjs
       - .github/workflows/backup-production-d1-private-r2-2026-10-26.yml
+      - docs/import/RUN-PRODUCTION-D1-BACKUP-2026-10-26.trigger
 permissions:
   contents: read
 concurrency:
