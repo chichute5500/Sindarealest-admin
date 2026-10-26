@@ -1,3 +1,5 @@
+> **CẬP NHẬT OWNER PASS — 26/10/2026 (mới hơn checkpoint cũ trong tài liệu này):** Người dùng đã xác nhận **“Pass”** cho hiệu ứng đổi Light/Dark trên điện thoại tại source SHA `e320808029d79b0d43de32744c4f7d8a5913a929`. Isolated Preview Actions [#40356875061](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40356875061) **3/3 PASS**. Theme Mobile đã được Owner nghiệm thu, **KHÔNG sửa lại, KHÔNG tái kiểm tra yêu cầu Owner duyệt nữa trừ khi có báo lỗi mới**. Mọi nhắc đến “theme chưa PASS” phía dưới là lịch sử trước bản chốt. Chỉ tiếp tục các đầu việc chưa PASS khác theo chỉ thị mới, giữ nguyên thiết kế đã PASS. PR #118 OPEN DRAFT, KHÔNG merge/Production.
+
 # PROMPT NEXT CHAT — SINDAREALEST: TIẾP TỤC SỬA TẬN GỐC LỖI THEME
 
 Tiếp tục **TRỰC TIẾP** dự án hiện hữu `chichute5500/Sindarealest-admin` trên GitHub, **không tạo dự án mới, không hỏi lại lịch sử và không làm lại bất kỳ thiết kế nào Owner đã PASS.** Người dùng yêu cầu **triển khai sửa/tối ưu**, tận dụng tối đa các kiểm tra độc lập song song, không dừng ở việc báo FAIL.
