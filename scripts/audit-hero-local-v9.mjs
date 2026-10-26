@@ -159,6 +159,33 @@ try{
    await stage.evaluate(el=>el.style.removeProperty('filter'));
    console.log('PASS QA-only independent marble photographic color sweep '+variants.length+' real Chromium screens; live styles remain unchanged.');
   }
+  // QA-only shoe/pedestal contact shadow sweep; never changes committed website.
+  // Compare actual browser screenshots to master before adopting a geometry.
+  if(name==='pc-1440'&&theme==='light'&&process.env.HERO_CONTACT_SWEEP==='1'){
+   const glow=page.locator('#home .hero-visual-glow');
+   const options=[
+    {name:'no-shadow',bottom:-4,opacity:0,blur:3},
+    {name:'lifted-m3',bottom:-3,opacity:.79,blur:3},
+    {name:'level0',bottom:0,opacity:.79,blur:3},
+    {name:'level3',bottom:3,opacity:.79,blur:3},
+    {name:'level6',bottom:6,opacity:.79,blur:3},
+    {name:'lower-m8',bottom:-8,opacity:.79,blur:3},
+    {name:'lifted-soft',bottom:3,opacity:.56,blur:7},
+    {name:'lifted-sharp',bottom:3,opacity:.95,blur:1},
+    {name:'deep-soft',bottom:-6,opacity:.5,blur:9},
+    {name:'contact-small',bottom:4,opacity:.83,blur:3,width:75}
+   ];
+   for(const option of options){
+    await glow.evaluate((el,q)=>{
+     el.style.bottom=q.bottom+'%';el.style.opacity=String(q.opacity);
+     el.style.filter='blur('+q.blur+'px)';
+     if(q.width)el.style.width=q.width+'%';else el.style.removeProperty('width');
+    },option);
+    await page.locator('#home').screenshot({path:out+'/contact-'+option.name+'.png',animations:'disabled'});
+   }
+   await glow.evaluate(el=>{for(const key of ['bottom','opacity','filter','width'])el.style.removeProperty(key);});
+   console.log('PASS QA-only contact-shadow sweep '+options.length+' Chromium screenshots; committed markup/CSS unchanged.');
+  }
   await page.locator('#home .hero-actions .pill-btn').focus();
   assert.ok(await page.evaluate(()=>document.activeElement?.matches('#home .hero-actions .pill-btn')),name+' CTA takes keyboard focus');
   await page.keyboard.press('Enter');
