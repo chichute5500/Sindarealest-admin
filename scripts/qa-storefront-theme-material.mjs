@@ -364,9 +364,39 @@ try{
     const withoutSvg=[];
     for(const direction of [true,false])withoutSvg.push(await runThemeTrial(direction,'test-only-no-svg-texture'));
     await svgBypass.evaluate(node=>node.remove());
+    // Same approved SVGs, but decoded as actual <img> content instead of
+    // CSS background-image. The entire experiment stays inside the browser
+    // test and is rolled back before the gallery assertions.
+    const imgBackgrounds=await page.evaluate(async()=>{
+      const layers=[...document.querySelectorAll('.theme-bg')];
+      const imgs=[];
+      for(const layer of layers){
+        const computed=getComputedStyle(layer).backgroundImage;
+        const match=computed.match(/url\(["']?([^"')]+)["']?\)/);
+        if(!match)throw Error('Satin asset missing on '+layer.className);
+        const img=document.createElement('img');
+        img.src=match[1];
+        img.alt='';
+        img.setAttribute('aria-hidden','true');
+        img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none';
+        layer.prepend(img);
+        imgs.push(img);
+      }
+      await Promise.all(imgs.map(img=>img.decode()));
+      return imgs.length;
+    });
+    if(imgBackgrounds!==2)throw Error('Satin img A/B missing backgrounds');
+    const imageStyle=await page.addStyleTag({content:
+      'html body .theme-bg--light,html body .theme-bg--dark{background-image:none!important}'
+    });
+    const decodedImageTrials=[];
+    for(const direction of [true,false])decodedImageTrials.push(await runThemeTrial(direction,'test-only-svg-as-img'));
+    await imageStyle.evaluate(node=>node.remove());
+    await page.evaluate(()=>document.querySelectorAll('.theme-bg > img[aria-hidden="true"]').forEach(img=>img.remove()));
+    // Re-measure the unchanged original theme after both diagnostic variants.
     const warmedBaseline=[];
     for(const direction of [true,false])warmedBaseline.push(await runThemeTrial(direction,'baseline-warm'));
-    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...warmedBaseline].map(r=>({
+    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...decodedImageTrials,...warmedBaseline].map(r=>({
       dark:r.direction,variant:r.variant,
       startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
       endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
