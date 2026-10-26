@@ -34,7 +34,9 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(page,/rafFour=requestAnimationFrame\(commit\)/);
  assert.match(page,/window\.__sdThemeTimer=setTimeout\(reveal,/);
  assert.match(css,/#sdThemeSwitchOverlay\.is-visible/);
- assert.match(css,/clip-path:circle\(150vmax at 50% 50%\)/);
+ assert.match(css,/clip-path:circle\(72vmax at 50% 50%\)/);
+ assert.doesNotMatch(css,/contain:layout paint style/);
+ assert.match(css,/html\.sd-theme-overlay-active body\{[\s\S]*?transition:none!important;/);
  assert.match(css,/transition:clip-path \.45s/);
  assert.match(css,/\[data-origin="light"\]/);
  assert.match(css,/\[data-origin="dark"\]/);
@@ -42,6 +44,9 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(page,/overlay\.classList\.add\('is-dismissing'\)/);
  assert.match(browserQA,/overlayOrigin/);
  assert.match(browserQA,/radialEvents/);
+ assert.match(browserQA,/mobile-account-theme-dark/);
+ assert.match(browserQA,/mobile-account-theme-light/);
+ assert.match(browserQA,/#accountThemeAction/);
  assert.match(css,/html\.sd-theme-overlay-active body \.theme-bg/);
  assert.match(page,/__sdCancelThemeStage/);
  assert.doesNotMatch(page,/function applyThemeMode[^\n]*void document\.body\.offsetHeight/);

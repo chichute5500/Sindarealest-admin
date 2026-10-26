@@ -960,7 +960,58 @@ try{
        rapid.darkOpacity>.02||rapid.meta!=='#eaf3fb'||!rapid.labelled||
        !rapid.overlayHidden||!rapid.overlayStageCleared)
       throw Error('Rapid theme taps left inconsistent state: '+JSON.stringify(rapid));
-    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',strictCycles,ux:'~1s source-colour circular wipe',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
+
+    // Owner-reported regression: Android account drawer remains OPEN while the
+    // account action switches themes. The old suite never exercised this layer.
+    let accountThemeMatrix=null;
+    if(spec.mobile){
+      await page.locator('#mobileAccountNav').click({timeout:5000});
+      await page.waitForTimeout(330);
+      const inspectAccount=()=>page.evaluate(()=>{
+        const root=document.documentElement,drawer=document.querySelector('#accountDrawer');
+        const guest=document.querySelector('#accountMenuView .account-guest');
+        const order=document.querySelector('#accountOrdersAction');
+        const overlay=document.querySelector('#sdThemeSwitchOverlay');
+        const dr=drawer.getBoundingClientRect(),gr=guest.getBoundingClientRect(),or=order.getBoundingClientRect();
+        const css=getComputedStyle(drawer),guestCss=getComputedStyle(guest);
+        const getRgb=getComputedStyle(document.body).backgroundColor;
+        return {
+          dark:root.classList.contains('dark'),
+          rootMode:root.dataset.themeMode,
+          open:drawer.classList.contains('open'),
+          drawerRect:{left:dr.left,right:dr.right,top:dr.top,bottom:dr.bottom,width:dr.width},
+          guestRect:{left:gr.left,right:gr.right,width:gr.width},
+          orderRect:{left:or.left,right:or.right,width:or.width},
+          drawerBg:css.backgroundColor,
+          guestBg:guestCss.backgroundColor,
+          bodyBg:getRgb,
+          overlayHidden:!overlay.classList.contains('is-visible')&&getComputedStyle(overlay).visibility==='hidden',
+          stageCleared:!root.classList.contains('sd-theme-overlay-active'),
+          accountThemeActionVisible:!!document.querySelector('#accountThemeAction')?.getBoundingClientRect().width
+        };
+      });
+      const accountBefore=await inspectAccount();
+      if(!accountBefore.open||accountBefore.dark||!accountBefore.accountThemeActionVisible)
+        throw Error('Light account panel not open before owner regression test: '+JSON.stringify(accountBefore));
+      for(const [dark,suffix] of [[true,'dark'],[false,'light']]){
+        await page.locator('#accountThemeAction').dispatchEvent('click');
+        await page.waitForTimeout(1400);
+        const state=await inspectAccount();
+        const within=(rect,b)=>rect.width>b.width*.68&&rect.left>=b.left-2&&rect.right<=b.right+2;
+        if(state.dark!==dark||!state.open||!state.overlayHidden||!state.stageCleared||
+           !within(state.guestRect,state.drawerRect)||!within(state.orderRect,state.drawerRect)||
+           state.drawerRect.bottom>spec.height+2)
+          throw Error('Theme+account panel failed after '+suffix+' switch: '+JSON.stringify(state));
+        await page.screenshot({path:'artifacts/storefront-integration-preview/mobile-account-theme-'+suffix+'.png',
+          fullPage:false,animations:'disabled'});
+        if(!accountThemeMatrix)accountThemeMatrix={};
+        accountThemeMatrix[suffix]=state;
+      }
+      // Leave the panel without changing the approved drawer behaviour.
+      await page.locator('#accountClose').dispatchEvent('click');
+      await page.waitForTimeout(320);
+    }
+    matrix.push({label:spec.label,pass:true,accountThemeMatrix,switches:'Light > Dark > Light',strictCycles,ux:'~1s source-colour circular wipe',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});
   }finally{await context.close()}
  }
