@@ -99,14 +99,15 @@ export async function onRequestPost(context) {
   if (!originalType) return fail("Ảnh gốc cần là JPEG, PNG hoặc WebP.");
 
   try {
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const isWebp = bytes.length >= 12 &&
-      new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
-      new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP";
+    // Validate only the header. R2.put() supports Blob directly; forwarding
+    // the already-parsed File avoids another 25 MB worth of ArrayBuffer copies
+    // in a 128 MB Workers runtime during hundreds of consecutive uploads.
+    const webpHeader = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    const isWebp = originalSignatureMatches(webpHeader, "image/webp");
     if (!isWebp) return fail("Nội dung tệp hiển thị không phải ảnh WebP hợp lệ.");
 
-    const originalBytes = new Uint8Array(await original.arrayBuffer());
-    if (!originalSignatureMatches(originalBytes, original.type)) {
+    const originalHeader = new Uint8Array(await original.slice(0, 12).arrayBuffer());
+    if (!originalSignatureMatches(originalHeader, original.type)) {
       return fail("Nội dung ảnh gốc không khớp định dạng JPEG, PNG hoặc WebP đã khai báo.");
     }
     const id = crypto.randomUUID();
@@ -114,7 +115,7 @@ export async function onRequestPost(context) {
     const privateKey = `private-originals/${id}.${originalType}`;
 
     try {
-      await putR2WithBackoff(context.env.ORIGINALS, privateKey, originalBytes, {
+      await putR2WithBackoff(context.env.ORIGINALS, privateKey, original, {
         httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
         customMetadata: { visibility: "private-original" },
       }, "original");
@@ -123,7 +124,7 @@ export async function onRequestPost(context) {
       return fail("Kho ảnh gốc ORIGINALS tạm thời không ghi được. Ảnh này chưa được xác nhận lưu; hãy thử tiếp tục sau.", 503, { "Retry-After": "5" });
     }
     try {
-      await putR2WithBackoff(context.env.IMAGES, key, bytes, {
+      await putR2WithBackoff(context.env.IMAGES, key, file, {
         httpMetadata: { contentType: "image/webp", cacheControl: "public, max-age=31536000, immutable" },
         customMetadata: { visibility: "public-optimized-derivative", originalKey: privateKey },
       }, "derivative");
