@@ -24,6 +24,9 @@ test('Owner-controlled material photos are config-driven and have no manual cont
 });
 test('Theme crossfades smoothly with one synchronized duration and no stagger',()=>{
  const page=read('public/index.html'),css=read('public/material-gallery.css');
+ const browserQA=read('scripts/qa-storefront-theme-material.mjs');
+ assert.match(browserQA,/const strictCycles=process\.env\.SD_THEME_DIAGNOSTIC_VARIANTS==='1'\?1:3/);
+ assert.match(browserQA,/for\(let cycle=0;cycle<strictCycles;cycle\+\+\)/);
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
  assert.match(page,/nav\.addEventListener\('transitionstart',onStart\)/);
  assert.match(page,/nav\.addEventListener\('transitionend',onEnd\)/);

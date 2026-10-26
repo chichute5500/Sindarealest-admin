@@ -353,8 +353,17 @@ try{
       }
       return measured;
     };
+    // Strict release gate: three full Light > Dark > Light cycles per viewport.
+    // A green isolated run cannot mask the intermittent first-frame stalls.
+    // Read-only exploratory diagnostics retain one pair to bound A/B duration.
+    const strictCycles=process.env.SD_THEME_DIAGNOSTIC_VARIANTS==='1'?1:3;
     const results=[];
-    for(const direction of [true,false])results.push(await runThemeTrial(direction,'baseline-cold'));
+    for(let cycle=0;cycle<strictCycles;cycle++){
+      for(const direction of [true,false]){
+        const variant=cycle===0?'baseline-cold':'baseline-repeat-'+(cycle+1);
+        results.push(await runThemeTrial(direction,variant));
+      }
+    }
     // Run experimental CSS only in the explicitly isolated read-only
     // diagnostic workflow, never in release-gated Chromium matrices.
     if(process.env.SD_THEME_DIAGNOSTIC_VARIANTS==='1'){
@@ -905,7 +914,7 @@ try{
        rapid.target!==null||rapid.overrideCount!==0||rapid.lightOpacity<.98||
        rapid.darkOpacity>.02||rapid.meta!=='#eaf3fb'||!rapid.labelled)
       throw Error('Rapid theme taps left inconsistent state: '+JSON.stringify(rapid));
-    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
+    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',strictCycles,rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});
   }finally{await context.close()}
  }
