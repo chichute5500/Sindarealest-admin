@@ -39,6 +39,7 @@ html.dark .sd-code-hero::after{border-color:rgba(50,145,245,.33)}
 html.dark .sd-code-hero .sdh-orbit{border-color:rgba(68,159,255,.75);box-shadow:0 0 15px rgba(40,144,255,.08)}
 html.dark .sd-code-hero .sdh-orbit--outer{border-color:rgba(64,158,255,.58)}
 html.dark .sd-code-hero .sdh-glass-card{border-color:rgba(138,207,255,.73);background:linear-gradient(135deg,rgba(91,168,249,.25),rgba(41,107,187,.17) 50%,rgba(18,80,159,.28));box-shadow:inset 1px 2px 1px rgba(201,235,255,.42),inset -2px -3px 17px rgba(27,95,178,.13),0 10px 32px rgba(3,14,33,.13),0 0 17px rgba(43,140,253,.15)}
+html.dark .sd-code-hero .sdh-glass-card::before{background:linear-gradient(114deg,transparent 12%,rgba(201,234,255,.13) 30%,transparent 46%,rgba(63,171,255,.08) 70%,transparent 86%)}
 html.dark .sd-code-hero .sdh-bubble{border-color:rgba(157,218,255,.76);background:radial-gradient(circle at 27% 19%,rgba(235,250,255,.89),rgba(68,163,255,.78) 23%,rgba(6,83,193,.61) 64%,rgba(5,41,121,.89) 91%);box-shadow:inset -7px -9px 17px rgba(0,18,77,.39),0 0 24px rgba(36,129,247,.33)}
 html.dark .sd-code-hero .sdh-stage{border-color:rgba(110,197,255,.8);background:linear-gradient(180deg,rgba(66,157,250,.27),rgba(23,82,174,.22) 60%,rgba(7,44,111,.52));box-shadow:0 4px 25px rgba(21,109,234,.29),0 0 17px rgba(61,157,255,.22),inset 0 -6px 18px rgba(5,73,175,.29)}
 html.dark .sd-code-hero .sdh-stage::after{border-color:rgba(105,190,255,.69);box-shadow:0 0 18px rgba(38,130,251,.23)}

@@ -10,6 +10,7 @@ assert.match(hero,/href="#products">Khám phá ngay/);
 assert.doesNotMatch(hero,/<(?:picture|img|canvas|video)\b|style=|\.png|\.jpe?g|\.webp/);
 assert.doesNotMatch(css,/url\(|!important/);
 assert.match(css,/html\.dark \.sd-code-hero/);
+assert.match(css,/font:700 clamp\(39px,4vw,59px\)/);
 assert.match(css,/@media\(max-width:760px\)/);
 assert.match(css,/height:clamp\(236px,66vw,270px\)/);
 assert.match(css,/height:420px/);
