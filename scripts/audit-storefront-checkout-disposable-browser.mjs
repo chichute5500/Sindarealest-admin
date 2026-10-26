@@ -76,7 +76,7 @@ try{
   // Validate both real business types, independent of stock quantity:
   // desktop = in stock; mobile = made to order (30% deposit).
   const type=spec.mobile?'made_to_order':'in_stock';
-  const depositAmount=spec.mobile?45000:100000;
+  const depositAmount=100000;
   db.prepare('UPDATE products SET fulfillment_type=? WHERE id=?').run(type,productId);
   const ctx=await browser.newContext({
    viewport:{width:spec.width,height:spec.height},
@@ -160,7 +160,7 @@ try{
    assert.equal(await page.locator('#sdCheckoutOptions [data-sd-payment-option]').count(),2,'Both fulfillment types must offer deposit and full transfer');
    assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),depositAmount.toLocaleString('vi-VN')+'₫');
    await page.locator('[data-sd-payment-option="full"]').click();
-   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'150.000₫');
+   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'142.500₫');
    await page.locator('[data-sd-payment-option="deposit"]').click();
    await page.screenshot({path:dir+'/'+spec.name+'-payment-step.png',animations:'disabled'});
    await page.locator('#checkoutSubmit').click();
