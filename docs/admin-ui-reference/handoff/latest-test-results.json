@@ -1,13 +1,13 @@
 {
   "schemaVersion": 5,
-  "capturedAtUtc": "2026-10-25T01:24:06Z",
+  "capturedAtUtc": "2026-10-26T01:28:44Z",
   "repository": "chichute5500/Sindarealest-admin",
   "targetBranch": "feature/admin-isolated-handoff-2026-10-20",
-  "branchHeadAtCheckpointStart": "b5c3e1d7bf72efafb488821674586691908f3d8d",
+  "branchHeadAtCheckpointStart": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
   "codeTestSha": "6bc34acb48fa98cb6ade5c56dcfb9c8fd4cbddef",
   "progressPercent": 50,
   "progressStatus": "PROVISIONAL",
-  "status": "48_SCREEN_CAPTURES_PRODUCT_AND_WARRANTY_QA_WRITE_PASS_BACKUP_GET_PASS_NO_QA_REMAINS_PARITY_NOT_ACCEPTED",
+  "status": "LIVE_RECHECK_2026-10-26; FOUR_EXACT_SHA_WORKFLOWS_SUCCESS_ON_START_HEAD; HANDOFF_6_OF_7_PATHS_EXIST; VISUAL_ACCEPTANCE_RECORD_CONFLICT; PROGRESS_50_PERCENT_PROVISIONAL",
   "latestRun": {
     "id": 40122810186,
     "workflow": "Owner-approved Gallery-aligned isolated Admin Preview deploy and QA",
@@ -1314,38 +1314,54 @@
     "note": "Screenshot test does not independently check deployed Cloudflare application SHA; accepted screenshots do not imply visual pixel parity."
   },
   "latestLiveVerification": {
-    "capturedAtUtc": "2026-10-25T01:24:06Z",
+    "capturedAtUtc": "2026-10-26T01:28:44Z",
     "repository": "chichute5500/Sindarealest-admin",
     "branch": "feature/admin-isolated-handoff-2026-10-20",
-    "branchHeadObservedBeforeCheckpointWrites": "76ee79b341b3e3389fc727fc73e440409796ba63",
+    "branchHeadObservedBeforeCheckpointWrites": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
+    "latestCommitAtStart": {
+      "sha": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
+      "message": "[CF-Pages-Skip] Fix canonical handoff entry and weighted evidence links",
+      "changedFiles": [
+        "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
+      ],
+      "sourceCodeChanged": false
+    },
     "exactHeadWorkflowRuns": [
       {
-        "id": 40125566809,
-        "name": "Validate source and tests (pull_request)",
-        "conclusion": "success",
-        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566809"
-      },
-      {
-        "id": 40125566760,
+        "id": 40211984118,
         "name": "Admin Preview Playwright",
+        "event": "pull_request",
+        "status": "completed",
         "conclusion": "success",
-        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566760"
+        "headSha": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211984118"
       },
       {
-        "id": 40125566758,
+        "id": 40211984130,
+        "name": "Validate source and tests",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "headSha": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211984130"
+      },
+      {
+        "id": 40211984139,
         "name": "Admin isolated Preview Playwright",
+        "event": "pull_request",
+        "status": "completed",
         "conclusion": "success",
-        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125566758"
+        "headSha": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211984139"
       },
       {
-        "id": 40125563037,
-        "name": "Validate source and tests (push)",
+        "id": 40211979464,
+        "name": "Validate source and tests",
+        "event": "push",
+        "status": "completed",
         "conclusion": "success",
-        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125563037"
+        "headSha": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
+        "url": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211979464"
       }
     ],
     "pullRequests": {
@@ -1353,46 +1369,46 @@
         "state": "open",
         "merged": false,
         "mergeable": false,
-        "headSha": "5b175cc7a5867376084a90908ed7cf39dd19d90a",
+        "headSha": "3ea4c88e4c8cc9954f7754b1f6d4e7518c6e4db0",
         "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108"
+        "url": "https://github.com/chichute5500/Sindarealest-admin/pull/108",
+        "readOnly": true
       },
       "111": {
         "state": "open",
         "merged": false,
         "mergeable": true,
-        "headSha": "76ee79b341b3e3389fc727fc73e440409796ba63",
+        "headSha": "c904d3b5bf8daed49a4744223cd2696dbbc7fcee",
         "baseSha": "28c768ba26b1d9f7d40e14efac5112526ed1c8b3",
-        "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111"
+        "url": "https://github.com/chichute5500/Sindarealest-admin/pull/111",
+        "action": "Do not merge"
       }
     },
-    "viewportQaEvidence": {
-      "codeTestSha": "40137cbdb7ac2c473cde981cd8214c28b00a6ef5",
-      "syntheticQaRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714",
-      "syntheticArtifact": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202714/artifacts/12573100551",
-      "readOnlyCaptureRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202712",
-      "diagnosticsRun": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40125202720",
-      "captures": 48,
-      "dimensions": "24 x 390x844 and 24 x 1280x800",
-      "duplicateHashes": 0,
-      "cleanup": "two passes; zero run-owned QA rows across seven tables",
-      "referenceParity": "0/12 accepted; NOT VERIFIED",
-      "note": "These QA/capture runs belong to code/test SHA 40137cb... (parent of the current docs-only commit), not the exact docs HEAD."
-    },
-    "acceptance": {
-      "historicProgressPercent": 50,
-      "progressStatus": "PROVISIONAL",
-      "weightedEvidenceScore": "32/100 evidence-weighted criteria, not project completion",
-      "approvedReferenceParity": "0/12 accepted",
-      "remaining": "exact reference visual sign-off, payment/refund settlement, QR/R2 acceptance, disposable Restore POST validation, owner final sign-off"
-    },
+    "mainHead": "227622d3e3b7c75724ffa1775b193da71089269a",
     "requestedMasterPromptPath": {
       "path": "docs/admin-ui-reference/handoff/MASTER-PROMPT-AUTO-HANDOFF.md",
       "exists": false,
       "canonicalExistingPath": "docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md",
       "canonicalBlobSha": "dd69c12196d284142fb155d747988267143d9ede",
-      "action": "Not modified: requested nested path is absent and scope is restricted to the seven listed paths; do not create a duplicate without explicit scope correction."
+      "action": "Not modified; the exact requested path is absent. Do not create a duplicate or edit the alternate path under the current scope."
     },
-    "safety": "Only handoff files in the requested handoff directory were eligible for edits. No source code, merge, deploy, Production, Cloudflare Access/secrets, D1/R2, or migration changes."
+    "acceptance": {
+      "progressPercent": 50,
+      "progressStatus": "PROVISIONAL",
+      "visualReferenceParity": "NOT_RECONFIRMED_IN_THIS_RUN",
+      "handoffRecordConflict": "LATEST-STATUS.md and PROMPT-NEXT-CHAT.md claim owner approval for 12/12 screens, while 12-SCREEN-REFERENCE-AUDIT.md states 0/12 accepted. This run did not independently revalidate the original owner approval event/artifact. Do not change progress or acceptance based on CI success alone."
+    },
+    "writeScope": {
+      "updatedPaths": [
+        "docs/admin-ui-reference/handoff/current-status.json",
+        "docs/admin-ui-reference/handoff/latest-test-results.json",
+        "docs/admin-ui-reference/handoff/LATEST-STATUS.md",
+        "docs/admin-ui-reference/handoff/12-SCREEN-REFERENCE-AUDIT.md",
+        "docs/admin-ui-reference/handoff/START-HERE.md",
+        "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md"
+      ],
+      "missingRequestedPath": "docs/admin-ui-reference/handoff/MASTER-PROMPT-AUTO-HANDOFF.md"
+    },
+    "safety": "Only the six existing requested handoff files are eligible for this checkpoint update. No source code, PR merge, Production deploy, Cloudflare Access/secrets, D1/R2, or migrations changed."
   }
 }
