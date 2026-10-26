@@ -15,6 +15,67 @@ const image=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR
 const browser=await chromium.launch({headless:true});
 const matrix=[];
 const welcomeExitMatrix=[];
+const coldFontMatrix=[];
+async function verifyWelcomeColdFonts(spec){
+  const context=await browser.newContext({
+    viewport:{width:spec.width,height:spec.height},
+    isMobile:spec.mobile,hasTouch:spec.mobile,deviceScaleFactor:1,
+    colorScheme:'light',reducedMotion:'no-preference'
+  });
+  await context.addInitScript(()=>{try{localStorage.setItem('sd-theme-mode','light')}catch{}});
+  const page=await context.newPage();
+  const errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  let delayed=0;
+  await page.route('**/*',async route=>{
+    const req=route.request();
+    let url;
+    try{url=new URL(req.url())}catch{await route.abort('blockedbyclient');return}
+    if(req.method()!=='GET'&&req.method()!=='HEAD'){
+      errors.push('Unexpected write '+url.pathname);await route.abort('blockedbyclient');return;
+    }
+    if(url.origin===alias){
+      if(/^\/fonts\/Noto(?:Serif|Sans)-Regular\.ttf$/.test(url.pathname)){
+        delayed++;await new Promise(resolve=>setTimeout(resolve,600));
+      }
+      if(url.pathname==='/api/products'){
+        await route.fulfill({status:200,contentType:'application/json',body:'[]'});return;
+      }
+      if(url.pathname==='/api/settings'){
+        await route.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":true}'});return;
+      }
+      await route.continue({headers:{...req.headers(),...auth}});return;
+    }
+    if(isApprovedPreviewExternalRead(req.url(),req.method())){await route.continue();return}
+    await route.abort('blockedbyclient');
+  });
+  try{
+    const response=await page.goto(alias+'/',{waitUntil:'domcontentloaded',timeout:45000});
+    if(response?.status()!==200)throw Error('Cold-font Preview HTTP '+response?.status());
+    const first=await page.evaluate(()=>{
+      const root=document.documentElement;
+      const title=document.querySelector('#welcomeSplash .welcome-title');
+      return {
+        ready:root.classList.contains('sd-welcome-font-ready'),
+        visible:getComputedStyle(title).visibility,
+        copied:title.textContent
+      };
+    });
+    if(delayed<2||first.ready||first.visible!=='hidden'||!first.copied.includes('Dấu ấn da cá sấu'))
+      throw Error('Unstable Vietnamese glyphs appeared before fonts loaded: '+JSON.stringify({first,delayed}));
+    await page.waitForFunction(()=>document.documentElement.classList.contains('sd-welcome-font-ready'),null,{timeout:4500});
+    const after=await page.evaluate(()=>({
+      visible:getComputedStyle(document.querySelector('#welcomeSplash .welcome-title')).visibility,
+      serifLoaded:document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.'),
+      sansLoaded:document.fonts.check('400 12px "SD Sans"','Chất liệu cao cấp')
+    }));
+    if(after.visible!=='visible'||!after.serifLoaded||!after.sansLoaded||errors.length)
+      throw Error('Welcome fonts not stabilized: '+JSON.stringify({after,errors}));
+    coldFontMatrix.push({label:spec.label,pass:true,delayedFontRequests:delayed,
+      fallbackTextNeverPainted:true,correctVietnameseFontsReady:true});
+  }finally{await context.close()}
+}
+
 async function verifyWelcomeExit(spec){
   const context=await browser.newContext({
     viewport:{width:spec.width,height:spec.height},
@@ -100,6 +161,8 @@ async function verifyWelcomeExit(spec){
 }
 try{
  await Promise.all([
+   verifyWelcomeColdFonts({label:'cold-font-pc-1440',width:1440,height:900,mobile:false}),
+   verifyWelcomeColdFonts({label:'cold-font-mobile-390',width:390,height:844,mobile:true}),
    verifyWelcomeExit({label:'pc-1440',width:1440,height:900,mobile:false}),
    verifyWelcomeExit({label:'mobile-390',width:390,height:844,mobile:true})
  ]);
@@ -210,4 +273,4 @@ try{
   }finally{await context.close()}
  }
 }finally{await browser.close()}
-console.log(JSON.stringify({sha,scope:'READ_ONLY_PREVIEW_WITH_SYNTHETIC_MATERIAL_PHOTOS',matrix,welcomeExitMatrix,pass:matrix.length===2&&welcomeExitMatrix.length===2},null,2));
+console.log(JSON.stringify({sha,scope:'READ_ONLY_PREVIEW_WITH_SYNTHETIC_MATERIAL_PHOTOS',matrix,welcomeExitMatrix,coldFontMatrix,pass:matrix.length===2&&welcomeExitMatrix.length===2&&coldFontMatrix.length===2},null,2));
