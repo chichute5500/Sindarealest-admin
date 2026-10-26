@@ -81,3 +81,11 @@ html.theme-transitioning,html.theme-transitioning body{
   #materialTile .sd-material-slide,
   #materialTile::before,#materialTile::after{transition:none!important}
 }
+
+/* Offscreen section rendering: Chromium A/B/A reduced initial dark-transition
+   scheduling from 220ms to 94ms when distant sections were skipped.
+   content-visibility:auto keeps visible sections fully rendered. */
+#order,#featured,#collections,#products,#siteFooter{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 900px;
+}
