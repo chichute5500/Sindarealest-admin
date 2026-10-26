@@ -273,18 +273,22 @@ try{
         arm(direction){
           const baseline=snapshot();
           const result={direction,now:{...baseline,dark:direction},samples:[],frameTimes:[],
-            transitionEvents:[],longTasks:[],overlayEvents:[],paletteCommitAt:null,paletteCovered:false,firstOverlayFrameMs:null};
+            transitionEvents:[],longTasks:[],overlayEvents:[],radialEvents:[],overlayOrigin:null,paletteCommitAt:null,paletteCovered:false,firstOverlayFrameMs:null};
           const cleanup=[];
           const obs=typeof PerformanceObserver==='function'
             ?new PerformanceObserver(list=>result.longTasks.push(...list.getEntries().map(e=>({start:Math.round(e.startTime),duration:Math.round(e.duration)}))))
             :null;
           try{obs?.observe({entryTypes:['longtask']})}catch{}
           let started=0,active=true;
+          let lastShown=false;
           const overlayObserver=new MutationObserver(()=>{
             if(!started||!active)return;
             const shown=overlay.classList.contains('is-visible');
+            if(shown===lastShown)return;
+            lastShown=shown;
             result.overlayEvents.push({type:shown?'show':'hide',time:Math.round(performance.now())});
             if(shown){
+              result.overlayOrigin=overlay.dataset.origin;
               requestAnimationFrame(()=>{
                 if(!active)return;
                 if(result.firstOverlayFrameMs===null)
@@ -294,11 +298,18 @@ try{
           });
           overlayObserver.observe(overlay,{attributes:true,attributeFilter:['class']});
           cleanup.push(()=>overlayObserver.disconnect());
+          const onRadial=e=>{
+            if(e.target!==overlay||e.propertyName!=='clip-path')return;
+            result.radialEvents.push({type:e.type,relativeMs:Math.round(performance.now()-started)});
+          };
+          overlay.addEventListener('transitionstart',onRadial);
+          overlay.addEventListener('transitionend',onRadial);
+          cleanup.push(()=>{overlay.removeEventListener('transitionstart',onRadial);overlay.removeEventListener('transitionend',onRadial)});
           const paletteObserver=new MutationObserver(()=>{
             if(!started||!active||result.paletteCommitAt!==null)return;
             if(root.classList.contains('dark')===direction){
               result.paletteCommitAt=Math.round(performance.now()-started);
-              result.paletteCovered=overlay.classList.contains('is-visible');
+              result.paletteCovered=overlay.classList.contains('is-covered')&&getComputedStyle(overlay).opacity==='1';
             }
           });
           paletteObserver.observe(root,{attributes:true,attributeFilter:['class']});
@@ -370,7 +381,7 @@ try{
       const perfBefore=await perfSnapshot();
       // One discrete real click. Never inject CSS into live Production.
       await page.locator('#themeToggle').dispatchEvent('click');
-      await page.waitForTimeout(1150);
+      await page.waitForTimeout(1340);
       const perfAfter=await perfSnapshot();
       const measured=await page.evaluate(()=>window.__sdThemeTiming.finish());
       measured.variant=variant;
@@ -848,6 +859,7 @@ try{
           console.log('THEME_OVERLAY_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
             dark:r.direction,variant:'baseline',
             startMs:r.overlayEvents.find(e=>e.type==='show')?.relativeMs,
+             origin:r.overlayOrigin,radialEvents:r.radialEvents,
             endMs:r.overlayEvents.find(e=>e.type==='hide')?.relativeMs,
             firstFrameMs:r.firstOverlayFrameMs,paletteCommitMs:r.paletteCommitAt,
             paletteCovered:r.paletteCovered,overlayClean:r.overlayHidden&&r.stagingCleared,
@@ -880,7 +892,7 @@ try{
       if(![r.now,...r.samples,r.stable].every(s=>s.dark===r.direction))
         throw Error('Theme state changed twice: '+JSON.stringify(r));
       // New owner-authorized UX acceptance: a visible covering screen appears
-      // on click, remains about 0.5–1s, palette commits while fully covered,
+      // outwards from central text, palette commits while fully covered,
       // and both themes settle before removing it. This replaces, not silently
       // weakens, the retired bare-navbar 80/300ms exposure benchmark.
       const shows=r.overlayEvents.filter(e=>e.type==='show');
@@ -892,9 +904,13 @@ try{
         throw Error('Theme screen not activated promptly: '+JSON.stringify(r));
       if(r.firstOverlayFrameMs===null||r.firstOverlayFrameMs>180)
         throw Error('Theme screen first frame delayed: '+JSON.stringify(r));
-      if(hide<500||hide>1000)
-        throw Error('Theme screen exceeded 0.5-1s requested interval: '+JSON.stringify(r));
-      if(r.paletteCommitAt===null||r.paletteCommitAt>hide||!r.paletteCovered)
+      if(hide<770||hide>1190)
+         throw Error('Circular theme cover did not last approximately one second: '+JSON.stringify(r));
+       if(r.overlayOrigin!==(r.direction?'light':'dark'))
+         throw Error('Cover source colour reversed: '+JSON.stringify(r));
+       if(!r.radialEvents.some(e=>e.type==='transitionstart')||!r.radialEvents.some(e=>e.type==='transitionend'))
+         throw Error('Clip-path did not spread outwards from centred text: '+JSON.stringify(r));
+       if(r.paletteCommitAt===null||r.paletteCommitAt>hide||!r.paletteCovered)
         throw Error('Theme palette exposed before cover was ready: '+JSON.stringify(r));
       if(!r.overlayHidden||!r.stagingCleared)
         throw Error('Theme screen failed cleanup: '+JSON.stringify(r));
@@ -917,7 +933,7 @@ try{
         await new Promise(resolve=>setTimeout(resolve,55));
       }
     });
-    await page.waitForTimeout(1150);
+    await page.waitForTimeout(1340);
     const rapid=await page.evaluate(()=>{
       const root=document.documentElement;
       const nav=document.querySelector('.nav');
@@ -944,7 +960,7 @@ try{
        rapid.darkOpacity>.02||rapid.meta!=='#eaf3fb'||!rapid.labelled||
        !rapid.overlayHidden||!rapid.overlayStageCleared)
       throw Error('Rapid theme taps left inconsistent state: '+JSON.stringify(rapid));
-    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',strictCycles,ux:'720ms theme cover',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
+    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',strictCycles,ux:'~1s source-colour circular wipe',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});
   }finally{await context.close()}
  }
