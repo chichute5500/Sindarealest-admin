@@ -81,13 +81,13 @@ const second=getFiltered().map(p=>p.id);
 renderFeatured();
 ({first,second,filtered:getFiltered().map(p=>p.id),randomized:orderedSessionProducts().map(p=>p.id)})
 `,productCtx,{timeout:1000});
-assert.deepEqual(result.first,result.second,'Paging and rerendering must keep order stable within session');
+assert.equal(result.first.join('|'),result.second.join('|'),'Paging and rerendering must keep order stable within session');
 assert.equal(result.first.length,sampleCatalog.length);
 assert.ok(result.first.slice(0,12).every(id=>id.startsWith('sn-')),
  'All products must exhaust all 12 sneakers BEFORE the next category');
 assert.ok(result.first.slice(12,16).every(id=>id.startsWith('lo-')),
  'Subsequent category must appear as a contiguous group');
-assert.notDeepEqual(result.randomized,sampleCatalog.map(p=>p.id),
+assert.notEqual(result.randomized.join('|'),sampleCatalog.map(p=>p.id).join('|'),
  'Shuffle must genuinely randomize order rather than retain raw D1 order');
 assert.equal((featuredBox.innerHTML.match(/data-featured-card/g)||[]).length,4,
  'Featured section must have exactly four real products');
@@ -102,11 +102,11 @@ getFiltered().map(p=>p.id)
 `,{...productCtx}, {timeout:1000});
 assert.equal(categoryResult.length,12);
 assert.ok(categoryResult.every(id=>id.startsWith('sn-')));
-assert.match(html, /class="product-price-label">Giá bán<\\/span>/,
- 'Product card prices need the premium label without changing actual amounts');
-assert.match(html, /class="product-price-amount"/);
-assert.match(html, /html.dark \\.product-card \\.product-price\\{/,
+assert.ok(html.includes('class="product-price-label">Giá bán</span>'),
+ 'Product card prices need an explicit label without changing actual amounts');
+assert.ok(html.includes('class="product-price-amount"'));
+assert.ok(html.includes('html.dark .product-card .product-price{'),
  'Price contrast must be explicit in dark mode');
-assert.match(html, /@media\\(max-width:760px\\)\\{[\\s\\S]*?\\.product-card \\.product-price-amount/,
- 'Mobile price amount should have responsive typography');
+assert.ok(html.includes('.product-card .product-price-amount{font-size:clamp(12px,3.7vw,15px)}'),
+ 'Mobile prices require responsive amount typography');
 console.log('PASS: grouped category-first randomized catalog, stable pagination, four varied featured products and price styling.');
