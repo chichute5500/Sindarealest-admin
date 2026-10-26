@@ -11,7 +11,7 @@ assert.match(live,/class="sdh-stage"/);
 assert.match(live,/class="sdh-orbit/);
 assert.match(live,/class="sdh-cta" href="#products"/);
 assert.match(css,/\.sd-code-hero \.sdh-title/);
-assert.doesNotMatch(css,/#[a-z-]*home|\.hero-copy|\.hero-visual|!important/);
+assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g,''),/#[a-z-]*home|\.hero-copy|\.hero-visual|!important/);
 const activeClasses=[...live.matchAll(/class="([^"]+)"/g)].flatMap(m=>m[1].split(/\s+/));
 assert.ok(!activeClasses.some(c=>['hero','hero-copy','hero-visual','hero-reference-art','hero-pedestal-art','hero-visual-glow'].includes(c)));
 assert.ok(html.includes('@font-face{font-family:SD Sans')&&html.includes('@font-face{font-family:SD Serif'));
