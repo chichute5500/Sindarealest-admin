@@ -37,3 +37,16 @@ Numbers fluctuate between runs, so no one-row improvement counts as a fix.
 - A separate nested `<style>` issue in catalog legacy CSS is documented in `docs/integration/CSS-CASCADE-DEEP-AUDIT-2026-10-26.md`; do not enable previously dormant declarations before visual comparison.
 
 **Latest conclusion: NOT RELEASE READY.** No production access needed for these tests.
+
+## Follow-up measurements — compositor trace and root-class isolation
+
+GitHub isolated read-only runs, after the baseline documented above:
+
+- [#40325340438](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40325340438): pre-promoting navbar and backdrop layers via temporary `will-change/translateZ(0)` improves some measurements to **158–180ms start** but does **not** meet 80ms; no change applied to real CSS.
+- [#40325760395](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40325760395): CDP tracing found **278 RasterTask events totaling ~248ms**, `UpdateLayoutTree` ~40ms and `Paint` ~19ms, alongside many renderer/GPU tasks. The real transition remained FAIL. Values across threads overlap and must not be summed as a single wall-clock duration.
+- [#40326476494](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40326476494): original `1440×1000` viewBox SVG rasterized to lossless PNG *only within Chromium*. Original Dark 286ms/Light 236ms start, lossless raster Dark 171ms/Light 175ms; still FAIL. PNGs were 1.6MB+ each and were **not committed as site assets**. Earlier 216×150 PNG trial was insufficient resolution and discarded.
+- [#40326865742](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40326865742): controlled animation of **only the existing wallpaper and navbar** on the *fully loaded Storefront* started after **130ms Dark / 102ms Light**, compared with the **315ms Dark / 210ms Light** full `html.dark` state switch. The test used an isolated `sd-layer-only-dark` CSS class and did **not** change the actual UI or persistent theme preference. This strengthens the conclusion that cascading/restyling *all* themed Storefront elements contributes significantly to the delay, beyond SVG rasterization; even the lighter controlled transition was not reliably <=80ms.
+
+**Do not release or weaken the thresholds.** Browser-only trials are kept behind `SD_THEME_DIAGNOSTIC_VARIANTS` and `SD_THEME_TRACE` and run in a separate read-only workflow. Main release QA remains exactly the strict real-click PC/Mobile 80ms start, 300ms finish, 220ms duration and navbar/background synchronization gate.
+
+Next candidate: prototype a correctly synchronized palette transition with isolated colour layers so that first-frame work does not invalidate all catalog and decoration styles. Require DOM/computed-style parity, screenshot matching for Light/Dark and PC/Mobile, keyboard/touch validation and a passing cold-load Chrome trace before applying to owner-approved site. This is a **proposed engineering direction**, not a verified fix.
