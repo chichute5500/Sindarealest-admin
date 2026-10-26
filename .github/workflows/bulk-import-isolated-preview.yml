@@ -9,6 +9,7 @@ on:
       - 'tests/**'
       - 'scripts/qa-bulk-import-preview-sha.mjs'
       - 'scripts/qa-bulk-import-preview-browser.mjs'
+      - 'scripts/qa-bulk-import-remote-preview.mjs'
       - 'package.json'
       - '.github/workflows/bulk-import-isolated-preview.yml'
 permissions:
@@ -107,5 +108,39 @@ jobs:
         with:
           name: bulk-import-preview-browser-${{ github.sha }}
           path: artifacts/bulk-import-preview/screenshots/
+          if-no-files-found: warn
+          retention-days: 14
+
+  real-photo-preview-qa:
+    name: Real Preview R2 original + D1 unpublished draft, then full fixture cleanup
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install S3 client for exact-run-key cleanup
+        run: npm install --no-save --no-package-lock --no-fund --no-audit @aws-sdk/client-s3@3.914.0
+      - name: Prove bindings/deployed SHA, run one real image upload and clean Preview-only D1/R2 fixture
+        run: node scripts/qa-bulk-import-remote-preview.mjs
+      - name: Publish bounded remote QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-import-remote-preview-${{ github.sha }}
+          path: artifacts/bulk-import-preview/remote/report.json
           if-no-files-found: warn
           retention-days: 14
