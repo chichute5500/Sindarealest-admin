@@ -4,6 +4,23 @@ export const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024;
 export const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const REQUIRED_COLUMNS = ["Ảnh kết quả", "Danh mục", "Mẫu"];
 
+/** Map legacy storefront groups to existing category slugs without merging distinct wallet types. */
+const KNOWN_CATEGORY_API_NAMES = Object.freeze({
+  "giày thể thao": "Sneaker",
+  "giày lười": "Giày lười",
+  "giày tây": "Giày tây",
+  "thắt lưng": "Thắt lưng",
+  "dép": "Dép",
+  "dây đồng hồ": "Dây đồng hồ",
+  "ốp": "Ốp điện thoại"
+});
+export function categoryForImport(name) {
+  const display = String(name || "").trim().normalize("NFC");
+  return { apiCategory: KNOWN_CATEGORY_API_NAMES[display.toLocaleLowerCase("vi")] || display,
+    categoryLabel: display };
+}
+
+
 export function parseCsv(text) {
   if (typeof text !== "string") throw Error("Không đọc được CSV.");
   text = text.replace(/^\uFEFF/, "");
