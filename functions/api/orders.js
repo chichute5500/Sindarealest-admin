@@ -1,5 +1,5 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
-import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote } from "../_payments.js";
+import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, checkoutTransferSku, checkoutTransferReferenceMatches } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
@@ -62,7 +62,13 @@ export async function onRequestPost({ request, env }) {
       if (!serverQuote.eligible) return fail("Giá hoặc tình trạng hàng đã thay đổi. Vui lòng kiểm tra lại bước thanh toán.", 409);
       if (!Number.isSafeInteger(body.quotedTotal) || body.quotedTotal !== serverQuote.total) return fail("Giá trị đơn đã thay đổi. Vui lòng xem lại lựa chọn thanh toán.", 409);
     }
-    const selectedAmount = selectedPaymentOption ? serverQuote.options.find(option=>option.value===selectedPaymentOption)?.amount : null;
+    const choice = selectedPaymentOption ? serverQuote.options.find(option=>option.value===selectedPaymentOption) : null;
+    const selectedAmount = choice?.amount ?? null;
+    const selectedRemainingAmount = choice?.remainingAmount ?? null;
+    const selectedDiscountAmount = choice?.discountAmount ?? 0;
+    const transferReference = selectedPaymentOption ? String(body.transferReference||"").trim().toUpperCase() : "";
+    if (selectedPaymentOption && !checkoutTransferReferenceMatches(transferReference,phone,checkoutTransferSku(items)))
+      return fail("Nội dung chuyển khoản không hợp lệ hoặc không khớp số điện thoại và SKU. Vui lòng kiểm tra lại bước QR.",409);
     const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
@@ -100,10 +106,10 @@ export async function onRequestPost({ request, env }) {
 
     statements.push(env.DB.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address) VALUES(?,?,?,?,?,?,?)").bind(orderId,provinceCode,province,wardCode,ward,streetAddress,address));
     for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.skuVerified?1:0,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity,item.fulfillmentType));
-    statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, selectedPaymentOption, selectedPaymentAmount:selectedAmount, customerPaymentVerified:false })));
+    statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, customerPaymentVerified:false })));
     await env.DB.batch(statements);
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
-    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", priceConfirmationRequired: !priceKnown, total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, message: priceKnown ? "Đã tiếp nhận đơn. SinDarealest sẽ liên hệ xác nhận." : "Đã tiếp nhận yêu cầu. Giá và tổng tiền sẽ được SinDarealest xác nhận trước khi chốt đơn." }, 201);
+    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", priceConfirmationRequired: !priceKnown, total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, message: priceKnown ? "Đã tiếp nhận đơn. SinDarealest sẽ liên hệ xác nhận." : "Đã tiếp nhận yêu cầu. Giá và tổng tiền sẽ được SinDarealest xác nhận trước khi chốt đơn." }, 201);
   } catch { return fail("Chưa thể lưu đơn hàng. Vui lòng thử lại hoặc liên hệ SinDarealest qua Zalo.", 503); }
 }
 
