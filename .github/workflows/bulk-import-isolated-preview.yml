@@ -17,7 +17,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: bulk-import-isolated-preview
+  group: bulk-import-recovery-2026-10-26
   cancel-in-progress: true
 jobs:
   deploy:
