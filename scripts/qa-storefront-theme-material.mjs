@@ -847,8 +847,10 @@ try{
     }else{
           console.log('THEME_OVERLAY_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
             dark:r.direction,variant:'baseline',
-            startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
-            endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
+            startMs:r.overlayEvents.find(e=>e.type==='show')?.relativeMs,
+            endMs:r.overlayEvents.find(e=>e.type==='hide')?.relativeMs,
+            firstFrameMs:r.firstOverlayFrameMs,paletteCommitMs:r.paletteCommitAt,
+            paletteCovered:r.paletteCovered,overlayClean:r.overlayHidden&&r.stagingCleared,
             chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
           }))));
     }
