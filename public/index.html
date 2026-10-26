@@ -785,8 +785,9 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-option-price{font-size:11px;white-space:nowrap}
 .checkout-drawer .sd-checkout-qr-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
 .checkout-drawer .sd-checkout-qr-head small{font-size:9px;color:var(--muted)}
-.checkout-drawer .sd-checkout-qr-main{display:grid;grid-template-columns:minmax(92px,39%) minmax(0,1fr);gap:10px;align-items:start}
-.checkout-drawer #sdCheckoutQrImage{width:100%;aspect-ratio:1;object-fit:contain;border-radius:10px;padding:7px;background:#fff;border:1px solid var(--line)}
+.checkout-drawer .sd-checkout-qr-main{display:flex;flex-direction:column;align-items:stretch;gap:12px}
+.checkout-drawer .sd-checkout-qr-art{box-sizing:border-box;display:grid;place-items:center;width:100%;max-width:340px;aspect-ratio:1/1;margin-inline:auto;overflow:hidden;border-radius:12px;background:#fff;border:1px solid var(--line)}
+.checkout-drawer #sdCheckoutQrImage{display:block;width:100%;height:100%;aspect-ratio:1/1;object-fit:contain;object-position:center;padding:0;margin:0;border:0;background:#fff}
 .checkout-drawer .sd-checkout-bank-lines{min-width:0;display:grid;gap:7px}
 .checkout-drawer .sd-checkout-bank-lines>div{display:grid;gap:2px}
 .checkout-drawer .sd-checkout-bank-lines span{font-size:9px;color:var(--muted)}
@@ -806,12 +807,10 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-actions #sdCheckoutPrev{font-size:10px}
 .checkout-drawer .sd-checkout-actions button:disabled{opacity:.62;cursor:wait}
 .checkout-drawer #checkoutMessage:not(:empty){padding:6px 4px;font-size:10px;line-height:1.45;max-height:72px;overflow:auto}
-@media(max-width:360px){.checkout-drawer .sd-checkout-qr-main{grid-template-columns:100px minmax(0,1fr)}.checkout-drawer .sd-checkout-step{font-size:8px}.checkout-drawer .sd-checkout-stepper{gap:3px}}
+@media(max-width:360px){.checkout-drawer .sd-checkout-step{font-size:8px}.checkout-drawer .sd-checkout-stepper{gap:3px}}
 
 /* Owner-approved compact banking actions — scoped to the existing Liquid Glass checkout. */
-.checkout-drawer .sd-checkout-qr-main{grid-template-columns:minmax(108px,38%) minmax(0,1fr)}
-.checkout-drawer #sdCheckoutQrImage{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;background:#fff}
-.checkout-drawer .sd-checkout-bank-lines{gap:5px}
+.checkout-drawer .sd-checkout-bank-lines{gap:7px}
 .checkout-drawer .sd-checkout-copy{width:100%;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 6px;align-items:center;text-align:left;padding:6px 8px;border:1px solid var(--sd-reference-edge,var(--line));border-radius:10px;background:var(--sd-reference-surface,var(--glass));color:var(--ink);font:inherit;overflow-wrap:anywhere}
 .checkout-drawer .sd-checkout-copy span:first-child{grid-column:1;color:var(--muted);font-size:9px}
 .checkout-drawer .sd-checkout-copy b{grid-column:1;font-size:10px;word-break:break-all}
@@ -825,7 +824,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 html.dark .checkout-drawer .sd-checkout-qr-warning{color:#ff7d85}
 .checkout-drawer .sd-checkout-remaining{border-top:1px solid var(--line);padding-top:8px}
 .checkout-drawer .sd-checkout-remaining strong{color:var(--gold)}
-@media(max-width:360px){.checkout-drawer .sd-checkout-qr-main{grid-template-columns:94px minmax(0,1fr)}.checkout-drawer .sd-checkout-copy{padding:5px 6px}.checkout-drawer .sd-checkout-qr-actions .pill-btn{font-size:9px}}
+@media(max-width:360px){.checkout-drawer .sd-checkout-copy{padding:5px 6px}.checkout-drawer .sd-checkout-qr-actions .pill-btn{font-size:9px}}
 </style>
 </head>
 <body class="welcome-active">
@@ -1189,7 +1188,7 @@ html.dark .checkout-drawer .sd-checkout-qr-warning{color:#ff7d85}
 <div class="sd-checkout-options" id="sdCheckoutOptions" role="radiogroup" aria-label="Chọn hình thức thanh toán"></div>
 <div class="sd-checkout-box sd-checkout-qr-wrap" id="sdCheckoutQrWrap" hidden>
 <div class="sd-checkout-qr-head"><strong>Chuyển khoản ngân hàng</strong></div>
-<div class="sd-checkout-qr-main"><img id="sdCheckoutQrImage" alt="QR nhận chuyển khoản ngân hàng" referrerpolicy="no-referrer"><div class="sd-checkout-bank-lines">
+<div class="sd-checkout-qr-main"><div class="sd-checkout-qr-art"><img id="sdCheckoutQrImage" alt="QR nhận chuyển khoản ngân hàng" referrerpolicy="no-referrer"></div><div class="sd-checkout-bank-lines">
 <button type="button" class="sd-checkout-copy" data-sd-copy="bank"><span>Ngân hàng</span><b id="sdCheckoutBankName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="accountName"><span>Chủ tài khoản</span><b id="sdCheckoutAccountName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="account"><span>Số tài khoản</span><b id="sdCheckoutAccountNumber"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
