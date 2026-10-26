@@ -22,7 +22,8 @@ async function cf(path,body){
   body:body?JSON.stringify(body):undefined,redirect:"error",signal:AbortSignal.timeout(30000)
  });
  const j=await r.json().catch(()=>null);
- if(!r.ok||j?.success!==true)console.log("CLOUDFLARE_SQL_STATUS="+JSON.stringify({status:r.status,codes:(j?.errors||[]).map(e=>e.code).slice(0,3),detail:(j?.errors||[]).map(e=>String(e.message||"").slice(0,100)).slice(0,2)}));\n guard(r.ok&&j?.success===true,"CLOUDFLARE_CALL_REJECTED");
+ if(!r.ok||j?.success!==true)console.log("CLOUDFLARE_SQL_STATUS="+JSON.stringify({status:r.status,codes:(j?.errors||[]).map(e=>e.code).slice(0,3),detail:(j?.errors||[]).map(e=>String(e.message||"").slice(0,100)).slice(0,2)}));
+ guard(r.ok&&j?.success===true,"CLOUDFLARE_CALL_REJECTED");
  return j.result;
 }
 async function d1(db,sql,params=[]){
