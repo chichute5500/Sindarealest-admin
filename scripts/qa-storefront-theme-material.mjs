@@ -420,10 +420,24 @@ try{
     const trulyOffscreen=[];
     for(const direction of [true,false])trulyOffscreen.push(await runThemeTrial(direction,'test-only-only-outside-viewport'));
     await offscreenStyle.evaluate(node=>node.remove());
+    // Determine whether the approved HERO's current visible glass/bubble
+    // treatment is the dominant repaint. Both variants are browser-only.
+    const hideHeroStyle=await page.addStyleTag({content:
+      'html body #home.sd-code-hero{visibility:hidden!important}'
+    });
+    const noHeroPaint=[];
+    for(const direction of [true,false])noHeroPaint.push(await runThemeTrial(direction,'test-only-hide-hero'));
+    await hideHeroStyle.evaluate(node=>node.remove());
+    const containHeroStyle=await page.addStyleTag({content:
+      'html body #home.sd-code-hero{contain:layout paint!important}'
+    });
+    const containedHero=[];
+    for(const direction of [true,false])containedHero.push(await runThemeTrial(direction,'test-only-hero-contain-paint'));
+    await containHeroStyle.evaluate(node=>node.remove());
     // Re-measure the unchanged original theme after all diagnostics.
     const warmedBaseline=[];
     for(const direction of [true,false])warmedBaseline.push(await runThemeTrial(direction,'baseline-warm'));
-    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...decodedImageTrials,...noBlurTrials,...noLowerSections,...trulyOffscreen,...warmedBaseline].map(r=>({
+    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...decodedImageTrials,...noBlurTrials,...noLowerSections,...trulyOffscreen,...noHeroPaint,...containedHero,...warmedBaseline].map(r=>({
       dark:r.direction,variant:r.variant,
       startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
       endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
