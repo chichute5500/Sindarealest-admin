@@ -9,6 +9,9 @@ assert.match(hero,/<span>Phong cách<\/span><span class="sdh-em">Đẳng cấp<\
 assert.match(hero,/href="#products">Khám phá ngay/);
 assert.doesNotMatch(hero,/<(?:picture|img|canvas|video)\b|style=|\.png|\.jpe?g|\.webp/);
 assert.doesNotMatch(css,/url\(|!important/);
+assert.match(css,/\.sd-code-hero \.sdh-stage::before/);
+assert.match(css,/\.sd-code-hero \.sdh-bubble--low\{right:auto;top:65%/);
+assert.doesNotMatch(hero,/sdh-kicker/);
 assert.match(css,/html\.dark \.sd-code-hero/);
 assert.match(css,/font:700 clamp\(39px,4vw,59px\)/);
 assert.match(css,/@media\(max-width:760px\)/);

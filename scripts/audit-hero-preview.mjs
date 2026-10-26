@@ -46,6 +46,8 @@ for(const theme of ['light','dark']){
    if(!hero)return {missing:true};
    const title=hero.querySelector('h1'),copy=hero.querySelector('.sdh-copy'),cta=hero.querySelector('.sdh-cta'),visual=hero.querySelector('.sdh-visual'),glass=hero.querySelector('.sdh-glass-card');
    const spans=[...title.querySelectorAll('span')],r=box(hero),cr=box(copy),vr=box(visual),br=box(cta);
+   const lowerSphere=hero.querySelector('.sdh-bubble--low'),upperSphere=hero.querySelector('.sdh-bubble:not(.sdh-bubble--low)'),stage=hero.querySelector('.sdh-stage');
+   const gr=box(glass),tr=box(title),sr=box(stage),lr=box(lowerSphere),ur=box(upperSphere);
    const css=getComputedStyle(hero),hcss=getComputedStyle(title),fcss=getComputedStyle(glass),ctaStyle=getComputedStyle(cta);
    const checks={
     sectionFound:!!hero,
@@ -67,20 +69,26 @@ for(const theme of ['light','dark']){
     hasGlassBlur:/blur\(/.test(fcss.backdropFilter)||/blur\(/.test(fcss.webkitBackdropFilter),
     themeApplied:document.documentElement.classList.contains('dark')===(theme==='dark'),
     backgroundIsGradient:css.backgroundImage.includes('gradient('),
-    noHiddenText:spans.every(x=>{const s=getComputedStyle(x);return s.visibility==='visible'&&s.opacity!=='0'&&box(x).width>0})
+    noHiddenText:spans.every(x=>{const s=getComputedStyle(x);return s.visibility==='visible'&&s.opacity!=='0'&&box(x).width>0}),
+    noRedundantKicker:!hero.querySelector('.sdh-kicker'),
+    headlineNotCoveredByGlass:tr.right+2<=gr.x,
+    lowerSphereBelowUpper:lr.y>ur.bottom+6,
+    lowerSphereNearStage:Math.abs(lr.y-sr.y)<Math.max(40,sr.height*.65),
+    stageDepthMadeByCss:getComputedStyle(stage,'::before').content!=='none',
+    glassCardWithinHero:gr.x>=r.x&&gr.right<=r.right+1&&gr.y>=r.y&&gr.bottom<=r.bottom+1
    };
-   return {rect:r,copy:cr,visual:vr,cta:br,checks,score:Object.values(checks).filter(Boolean).length/Object.keys(checks).length*100,computed:{font:hcss.fontFamily,background:css.backgroundImage,button:ctaStyle.backgroundImage,blur:fcss.backdropFilter},imageCount:hero.querySelectorAll('img').length};
+   return {rect:r,copy:cr,visual:vr,cta:br,checks,codeContractPassRatePercent:Object.values(checks).filter(Boolean).length/Object.keys(checks).length*100,geometry:{glass:gr,lowerSphere:lr,upperSphere:ur,stage:sr,title:tr},computed:{font:hcss.fontFamily,background:css.backgroundImage,button:ctaStyle.backgroundImage,blur:fcss.backdropFilter},imageCount:hero.querySelectorAll('img').length};
   },{width,height,theme});
   await page.locator('#home.sd-code-hero').screenshot({path:path.join(out,label+'-hero.png')});
   await page.screenshot({path:path.join(out,label+'-viewport.png'),fullPage:false});
-  const result={label,viewport:{width,height},theme,...m,pass:!m.missing&&m.score>95};
+  const result={label,viewport:{width,height},theme,...m,pass:!m.missing&&m.codeContractPassRatePercent===100};
   report.results.push(result);
-  if(!result.pass)report.errors.push({label,type:'layout-contract',failedChecks:Object.entries(m.checks||{}).filter(x=>!x[1]).map(x=>x[0]),score:m.score});
+  if(!result.pass)report.errors.push({label,type:'layout-contract',failedChecks:Object.entries(m.checks||{}).filter(x=>!x[1]).map(x=>x[0]),codeContractPassRatePercent:m.codeContractPassRatePercent});
  }catch(e){report.results.push({label,pass:false,error:String(e)});report.errors.push({label,type:'capture',error:String(e)})}
  await context.close();
 }}
 }finally{await browser.close()}
 report.layoutContractPass=report.results.length===14&&report.results.every(x=>x.pass);
 await fs.writeFile(path.join(out,'code-hero-audit.json'),JSON.stringify(report,null,2));
-console.log(JSON.stringify({layoutContractPass:report.layoutContractPass,visualSimilarityVerifiedOver95:false,contexts:report.results.map(x=>({label:x.label,pass:x.pass,score:x.score})),errors:report.errors},null,2));
+console.log(JSON.stringify({layoutContractPass:report.layoutContractPass,visualSimilarityVerifiedOver95:false,contexts:report.results.map(x=>({label:x.label,pass:x.pass,codeContractPassRatePercent:x.codeContractPassRatePercent})),errors:report.errors},null,2));
 if(!report.layoutContractPass)process.exitCode=1;
