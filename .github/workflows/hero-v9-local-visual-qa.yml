@@ -32,7 +32,9 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Native DOM contract
         run: node tests/hero-render-reference.test.mjs
-      - name: Audit 7 viewports, 2 themes, visible typography, shoe and podium layers, CTA focus
+      - name: Audit all 14 layouts plus 10 QA-only contact-shadow variants
+        env:
+          HERO_CONTACT_SWEEP: '1'
         run: node scripts/audit-hero-local-v9.mjs
       - name: Upload actual HERO screenshots and DOM metrics
         if: always()
