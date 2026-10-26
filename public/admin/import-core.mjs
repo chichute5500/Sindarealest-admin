@@ -4,6 +4,31 @@ export const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024;
 export const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const REQUIRED_COLUMNS = ["Ảnh kết quả", "Danh mục", "Mẫu"];
 
+/** Folder-price is an unconfirmed hint, never a selling price. */
+export function folderPriceHint(folderName) {
+  const name=String(folderName||"");
+  const matches=[...name.matchAll(/(?:^|[^a-z0-9])(\d{2,6})\s*[kK](?=$|[^a-z0-9])/g)];
+  if(matches.length!==1)return null;
+  const v=Number(matches[0][1])*1000;
+  return Number.isSafeInteger(v)&&v<=2_000_000_000?v:null;
+}
+/** Explicit seller input in VND, no implicit use of M-code or folder hint. */
+export function confirmedVndPrice(text) {
+  const raw=String(text??"").trim();
+  if(!raw)return null;
+  if(!/^(?:0|[1-9]\d{0,9})$/.test(raw))throw Error("Giá phải là số nguyên VND, ví dụ 2200000.");
+  const n=Number(raw);
+  if(!Number.isSafeInteger(n)||n>2_000_000_000)throw Error("Giá VND vượt giới hạn được phép.");
+  return n;
+}
+export function normalizeImageColor(value) {
+  const name=String(value??"").normalize("NFC").trim().replace(/\s+/g," ");
+  if(!name||name.length>40)throw Error("Tên màu phải có từ 1 đến 40 ký tự.");
+  if(/[<>]/.test(name))throw Error("Tên màu chứa ký tự không hợp lệ.");
+  return name;
+}
+
+
 /** Map legacy storefront groups to existing category slugs without merging distinct wallet types. */
 const KNOWN_CATEGORY_API_NAMES = Object.freeze({
   "giày thể thao": "Sneaker",
@@ -90,6 +115,7 @@ export function buildImportPlan(rows, files) {
       grouped.set(key, {
         key, category, modelFolder, modelId: /^M\d{3,6}/i.exec(modelFolder)?.[0] || "",
         title: name || (row["Mẫu"] || "").trim() || modelFolder,
+        priceInput: "", priceHint: folderPriceHint(modelFolder),
         images: [], missing: [], warnings: [], status: "ready", selected: true
       });
     }
@@ -106,7 +132,7 @@ export function buildImportPlan(rows, files) {
       group.warnings.push("Ảnh sai định dạng hoặc vượt 20 MB: " + file.name);
       continue;
     }
-    group.images.push({file, path, color: row["Màu"] || "Chưa rõ", review: row["Ghi chú"] || ""});
+    group.images.push({file, path, color: normalizeImageColor(row["Màu"] || "Chưa rõ"), csvColor: normalizeImageColor(row["Màu"] || "Chưa rõ"), review: row["Ghi chú"] || ""});
     usedFiles.add(file);
   }
   const groups = [...grouped.values()];
