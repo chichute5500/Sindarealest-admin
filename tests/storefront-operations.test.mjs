@@ -216,7 +216,7 @@ assert.ok(storefrontHtml.includes('không phải lịch sử tài khoản đồn
 
 
 assert.ok(storefrontHtml.includes('id="warrantyLookupForm"') && storefrontHtml.includes('/api/warranty-lookup') && !storefrontHtml.includes('warrantyOtpStep') && !storefrontHtml.includes('/api/warranty-verification'), 'Warranty lookup must work without OTP');
-assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('welcome-content>.welcome-logo') && storefrontHtml.includes('welcome-content>.welcome-skip'), 'Welcome should reveal the logo and brand intro sequentially before the entry button');
+assert.ok(storefrontHtml.includes('Sequential welcome reveal') && storefrontHtml.includes('.welcome-content>*{animation:none!important}') && storefrontHtml.includes('sd-welcome-desktop-mobile-performance-2026-10-25'), 'Approved Welcome must skip expensive staged blur/animations and use the dedicated PC/mobile first-paint contract');
 assert.ok(storefrontHtml.includes('<span class="brand-copy"><span class="brand-name">SinDarealest</span><small class="brand-tagline">Thời Trang Da Cá Sấu</small></span>'), 'The primary brand lockup must include its Vietnamese descriptor.');
 assert.match(storefrontHtml, /@media\(max-width:760px\)\{\s*\.nav-actions #contactJump,\.nav-actions #themeToggle\{display:none!important\}/, 'Mobile header should match the reference with compact search/cart actions; contact and theme remain in their dedicated account/footer destinations.');
 assert.match(storefrontHtml, /\.nav-actions #searchJump,\.nav-actions #cartOpen\{display:grid\}/, 'Search and cart must remain visible in the compact mobile header.');

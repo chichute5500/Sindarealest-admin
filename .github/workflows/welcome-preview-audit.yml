@@ -1,0 +1,67 @@
+name: Welcome owner-PASS parity on fix Preview
+on:
+  push:
+    branches:
+      - fix/liquid-glass-audit-2026-10-19
+    paths:
+      - 'public/index.html'
+      - 'package.json'
+      - 'scripts/audit-welcome-preview.mjs'
+      - 'tests/welcome-owner-approved.test.mjs'
+      - '.github/workflows/welcome-preview-audit.yml'
+permissions:
+  contents: read
+jobs:
+  welcome-browser:
+    if: github.ref == 'refs/heads/fix/liquid-glass-audit-2026-10-19'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PREVIEW_URL: https://fix-liquid-glass-audit-2026.sindarealest2.pages.dev/
+      EXPECTED_DEPLOYMENT_BRANCH: ${{ github.ref_name }}
+      EXPECTED_DEPLOYMENT_SHA: ${{ github.sha }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID || 'e520f2230ac9945b35f525adc2b99026' }}
+      CLOUDFLARE_PAGES_READ_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_READ_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Checkout exact authorized source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Playwright
+        run: npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Validate Preview URL
+        run: node scripts/validate-cloudflare-preview-url.mjs "$PREVIEW_URL"
+      - name: Wait for exact deployed Preview commit
+        shell: bash
+        run: |
+          set -u -o pipefail
+          valid=false
+          for attempt in $(seq 1 18); do
+            if node scripts/verify-cloudflare-preview-deployment.mjs; then
+              valid=true
+              break
+            fi
+            if [ "$attempt" -lt 18 ]; then sleep 10; fi
+          done
+          if [ "$valid" != true ]; then
+            echo '::error::Only the exact fix Preview SHA may be audited.'
+            exit 1
+          fi
+      - name: Check PC/mobile bright and dark Welcome first paint and exit
+        run: node scripts/audit-welcome-preview.mjs
+      - name: Upload Welcome screenshots and strict report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: welcome-owner-pass-parity-${{ github.sha }}
+          path: artifacts/welcome-preview-audit/
+          if-no-files-found: warn
+          retention-days: 14
