@@ -175,7 +175,7 @@ try{
    assert.equal(view.orders.length,index+1);
    assert.ok(view.orders.every(o=>o.items.length===1));
    const latest=view.orders.find(o=>o.phone==='000000030'+index);
-   assert.equal(latest?.customer_payment_option,'deposit','Admin must see customer's selected deposit preference');
+   assert.equal(latest?.customer_payment_option,'deposit','Admin must show customer-selected deposit preference');
    assert.equal(Number(latest?.customer_payment_amount),100000,'Admin must receive server-derived amount, not browser amount');
    await page.screenshot({path:dir+'/'+spec.name+'.png',animations:'disabled'});
    results.pass=true;
