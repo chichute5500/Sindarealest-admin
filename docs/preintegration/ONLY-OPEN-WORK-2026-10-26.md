@@ -1,3 +1,14 @@
+# FULL REVIEW / MAIN PROMOTION GATE — 26/10/2026 (reviewed source HEAD b8203d7aa746)
+
+- Admin source review: scanned changed Functions/runtime routes, middleware, payment, order, warranty, backup/restore and migrations; no concrete exploitable security or logic defect was substantiated. This is static review, not independent pentest.
+- CSS review: repeated rules in `public/admin/index.html` mostly represent approved palette/theme and responsive breakpoint overrides; no confirmed unintended selector/property collision. No UI refactor made.
+- File cleanup: no Admin file was proven redundant. Candidate zero-byte `public/code-hero.css` and two unreferenced hero PNG names belong to Storefront scope or lack whole-tree proof; none deleted. No duplicate public asset blobs found.
+- **MAIN PROMOTION GATE:** PR #111 is not Admin-only. It includes shared Storefront-facing Functions (including order creation/product listing/order payment/payment settings/QR/warranty lookup) and migrations `0008`/`0009`. It does not change `public/index.html` at this PR head, but shared API behavior changes.
+- A push to `main` triggers `.github/workflows/deploy.yml` with no path filter. The workflow verifies Production bindings and then deploys all `public` and Pages Functions to the configured Cloudflare Pages project; it does not apply migrations. Therefore merging #111 can deploy Admin plus shared API behavior to Production and is not an Admin-only staging operation.
+- No merge/push to `main`, Production deploy, file deletion, Storefront edit, or Cloudflare mutation was performed. Promotion remains blocked by the earlier production/integration safety boundary; before proceeding, confirm whether the requested main promotion is intended to authorize that automatic Production deploy and these shared Storefront API changes, or constrain promotion to a separately isolated Admin-only release.
+- Current tests on documentation commit `b8203d7aa7466bb9cf73e95c30f38e0206cfd184`: 4/4 SUCCESS (Validate PR #40265812858, Validate push #40265808691, Admin Preview #40265812903, isolated Preview #40265812856). Admin Preview app SHA remains `f9c992a614193722d2510755a24fb46dac20c4eb`.
+- PASS LOCKED remains unchanged. Screen-reader manual acceptance, isolated performance measurements, independent pentest, and redacted bank reconciliation remain OPEN/OWNER-ONLY. Storefront Preview DB/R2 risks remain DEFERRED/UNSAFE, not PASS.
+
 # CURRENT REVIEW UPDATE — 26/10/2026 (HEAD 7856cfce64c1)
 
 - **Live state:** branch `feature/admin-isolated-handoff-2026-10-20`, PR #111 OPEN/unmerged at `7856cfce64c173bb505bc65ad0116393509488d8`; Admin Preview deployed app SHA remains `f9c992a614193722d2510755a24fb46dac20c4eb`.

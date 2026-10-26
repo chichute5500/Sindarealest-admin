@@ -763,5 +763,67 @@
       "Storefront Preview writes",
       "repeat locked PASS tests"
     ]
+  },
+  "latestMainPromotionGate20261026": {
+    "reviewedSourceHead": "b8203d7aa7466bb9cf73e95c30f38e0206cfd184",
+    "css": {
+      "status": "NO_CONFIRMED_UNINTENDED_COLLISION",
+      "refactorMade": false
+    },
+    "cleanup": {
+      "status": "NO_ADMIN_FILE_PROVEN_REDUNDANT",
+      "deletions": 0,
+      "scopeNotes": [
+        "Storefront assets not deleted",
+        "Potential orphan filenames not conclusive"
+      ]
+    },
+    "pr111": {
+      "state": "OPEN",
+      "merged": false,
+      "adminOnly": false,
+      "sharedStorefrontFacingRuntimeChanges": true,
+      "sharedMigrations": [
+        "0008_product_sku_verification.sql",
+        "0009_fulfillment_and_manual_payments.sql"
+      ],
+      "publicIndexHtmlChanged": false
+    },
+    "mainPush": {
+      "workflow": ".github/workflows/deploy.yml",
+      "trigger": "push to main; no paths filter",
+      "deploysProduction": true,
+      "appliesMigrations": false
+    },
+    "promotion": {
+      "performed": false,
+      "reason": "Would deploy shared Functions to configured Production Pages project; earlier no-Production/integration boundary remains; scope confirmation needed."
+    },
+    "security": {
+      "status": "STATIC_REVIEW_NO_CONCRETE_EXPLOIT_SUBSTANTIATED",
+      "independentPentest": false
+    },
+    "ciOnSourceHead": {
+      "passed": 4,
+      "total": 4,
+      "runs": [
+        40265812858,
+        40265808691,
+        40265812903,
+        40265812856
+      ]
+    },
+    "deployedAdminAppSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "lockedPassUnchanged": true,
+    "open": [
+      "MANUAL_SCREEN_READER_ACCEPTANCE",
+      "ISOLATED_PERFORMANCE_MEASUREMENT",
+      "INDEPENDENT_PENTEST",
+      "REDACTED_BANK_RECONCILIATION_AND_OWNER_SIGNOFF"
+    ],
+    "deferredNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ]
   }
 }
