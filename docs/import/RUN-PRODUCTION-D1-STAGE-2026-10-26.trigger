@@ -1,0 +1,1 @@
+Owner approved replacement catalog. Verified backup PASS #40343065366; 921 WebP+921 original R2 Production staging PASS #40343494843. Stage 218 imported products UNPUBLISHED only, remap colliding internal SKUs; no old-product modifications or publishing. Verify before catalog cutover.
