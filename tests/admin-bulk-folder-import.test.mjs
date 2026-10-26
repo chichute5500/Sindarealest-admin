@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
+import { validateProduct } from "../functions/_lib.js";
 import { readFileSync } from "node:fs";
-import { parseCsv, buildImportPlan, normPath, MAX_IMAGES_PER_PRODUCT } from "../public/admin/import-core.mjs";
+import { parseCsv, buildImportPlan, normPath, MAX_IMAGES_PER_PRODUCT, categoryForImport } from "../public/admin/import-core.mjs";
 
 const csv = "\uFEFFẢnh gốc,Ảnh kết quả,Danh mục,Mẫu,Màu,Ghi chú\r\n" +
  '"A,1","Clutch\\M0023 - Clutch Nap\\Nâu\\anh (1).webp",Clutch,"Clutch, Nắp",Nâu,Cần xem lại\r\n' +
@@ -51,6 +52,19 @@ assert.equal(fortyFour.groups[0].images.length,44);
 assert.equal(fortyFour.groups[0].status,"ready", "All 44 photos must stay on one product");
 const over=groupedPhotos(MAX_IMAGES_PER_PRODUCT+1);
 assert.equal(over.groups[0].status,"blocked", "Never silently drop photos above ceiling");
+
+
+assert.deepEqual(categoryForImport("Giày thể thao"),{apiCategory:"Sneaker",categoryLabel:"Giày thể thao"});
+assert.deepEqual(categoryForImport("Ốp"),{apiCategory:"Ốp điện thoại",categoryLabel:"Ốp"});
+assert.deepEqual(categoryForImport("ví cầm tay"),{apiCategory:"ví cầm tay",categoryLabel:"ví cầm tay"});
+const sampleImages=Array.from({length:44},(_,i)=>"images/sample"+i+".webp");
+const accepted=validateProduct({title:"Một mẫu 44 ảnh",sku:"TEST-044",category:"Clutch",published:false,images:sampleImages});
+assert.equal(accepted.error,undefined,"Server must accept full 44 images within one model");
+assert.equal(accepted.value.images.length,44);
+assert.equal(accepted.value.published,0,"Imported 44-image model remains unpublished");
+const rejected=validateProduct({title:"Quá số ảnh",sku:"TEST-051",category:"Clutch",published:false,
+  images:[...sampleImages,...Array.from({length:7},(_,i)=>"images/extra"+i+".webp")]});
+assert.match(rejected.error,/Bộ ảnh không hợp lệ/,"Server blocks >50 images without dropping pictures");
 
 assert.throws(()=>parseCsv("a,b\n1"),/Thiếu cột/);
 assert.throws(()=>parseCsv("Ảnh kết quả,Danh mục,Mẫu\n\"unfinished"),/nháy chưa đóng/);
