@@ -73,7 +73,7 @@ export function buildImportPlan(rows, files) {
     if (available.has(path)) collisions.add(path);
     else available.set(path, file);
   }
-  const grouped = new Map(), seenPaths = new Set();
+  const grouped = new Map(), seenPaths = new Set(), usedFiles = new Set();
   let duplicates = 0;
   for (const row of rows) {
     const path = normPath(row["Ảnh kết quả"]);
@@ -107,6 +107,7 @@ export function buildImportPlan(rows, files) {
       continue;
     }
     group.images.push({file, path, color: row["Màu"] || "Chưa rõ", review: row["Ghi chú"] || ""});
+    usedFiles.add(file);
   }
   const groups = [...grouped.values()];
   for (const g of groups) {
@@ -118,6 +119,8 @@ export function buildImportPlan(rows, files) {
     groups, rows: rows.length, files: files.length,
     matched: groups.reduce((a,g)=>a+g.images.length,0),
     missing: groups.reduce((a,g)=>a+g.missing.length,0),
+    unlisted: files.filter(f=>ACCEPTED_IMAGE_TYPES.has(f.type)&&!usedFiles.has(f)).length,
+    reviewRows: groups.reduce((a,g)=>a+g.images.filter(x=>x.review.trim()).length,0),
     blocked: groups.filter((g)=>g.status==="blocked").length,
     duplicates
   };
