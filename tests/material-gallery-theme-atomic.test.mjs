@@ -38,7 +38,7 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(css,/#sdThemeSwitchOverlay\.is-visible\{[\s\S]*?opacity:1;transition:opacity \.18s/);
  assert.match(css,/#sdThemeSwitchOverlay\.is-dismissing\{[\s\S]*?transition:opacity \.28s/);
  assert.doesNotMatch(css,/contain:layout paint style/);
- assert.match(css,/html\.sd-theme-overlay-active body\{[\s\S]*?transition:none!important;/);
+ assert.match(css,/html\.sd-theme-overlay-active,\s*html\.sd-theme-overlay-active body\{[\s\S]*?transition:none!important;/);
  assert.doesNotMatch(css,/transition:clip-path/);
  assert.match(css,/\[data-origin="light"\]/);
  assert.match(css,/\[data-origin="dark"\]/);
