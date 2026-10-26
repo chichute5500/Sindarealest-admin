@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Nhập thư mục ảnh · SinDarealest Admin</title>
 <style>
-:root{font-family:Inter,system-ui,sans-serif;color:#262b33;background:#f4f6f8}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:24px 18px 80px}h1{font-size:clamp(22px,3vw,32px)}h2{font-size:18px}p{line-height:1.55}.muted{color:#596675}.panel{background:#fff;border:1px solid #dce2e9;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 6px 24px #192b400a}.warning{padding:13px;background:#fff6ed;border-left:4px solid #b67828;border-radius:8px}.error{color:#9d2020}.success{color:#13704b}label.filepicker{display:inline-grid;gap:6px;margin:9px 15px 9px 0;font-weight:600}label.filepicker input{display:block;max-width:100%;font-weight:400}button{border:1px solid #aebbc7;background:white;padding:11px 16px;border-radius:9px;cursor:pointer;font-weight:650}button.primary{background:#173b56;color:white;border-color:#173b56}button:disabled{opacity:.45;cursor:not-allowed}a{color:#175a91}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.stat{display:flex;gap:16px;flex-wrap:wrap}.stat b{font-size:21px}.progress{width:100%;height:14px;accent-color:#175b8d}.items{display:grid;gap:10px}.item{border:1px solid #dce2e9;border-radius:12px;padding:12px;display:grid;grid-template-columns:60px 1fr;gap:12px;align-items:start;background:white}.item.bad{background:#fff7f4;border-color:#efc7bb}.item.done{background:#f0faf5}.thumb{width:60px;height:60px;border-radius:8px;background:#edf0f2;object-fit:cover}.name{width:min(100%,540px);padding:9px;border-radius:7px;border:1px solid #c3ccd4;margin:7px 0}.metadata{font-size:12px;color:#596675;line-height:1.6;overflow-wrap:anywhere}.pick{display:flex;gap:8px;align-items:start}.notice{font-weight:650;overflow-wrap:anywhere}#status{white-space:pre-wrap}#groups{max-height:680px;overflow:auto;padding:2px}.busy{opacity:.75}@media(max-width:640px){main{padding:16px 10px}.panel{padding:14px}.item{grid-template-columns:48px 1fr;gap:9px}.thumb{width:48px;height:48px}}
+:root{font-family:Inter,system-ui,sans-serif;color:#262b33;background:#f4f6f8}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:24px 18px 80px}h1{font-size:clamp(22px,3vw,32px)}h2{font-size:18px}p{line-height:1.55}.muted{color:#596675}.panel{background:#fff;border:1px solid #dce2e9;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 6px 24px #192b400a}.warning{padding:13px;background:#fff6ed;border-left:4px solid #b67828;border-radius:8px}.error{color:#9d2020}.success{color:#13704b}label.filepicker{display:inline-grid;gap:6px;margin:9px 15px 9px 0;font-weight:600}label.filepicker input{display:block;max-width:100%;font-weight:400}button{border:1px solid #aebbc7;background:white;padding:11px 16px;border-radius:9px;cursor:pointer;font-weight:650}button.primary{background:#173b56;color:white;border-color:#173b56}button:disabled{opacity:.45;cursor:not-allowed}a{color:#175a91}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.stat{display:flex;gap:16px;flex-wrap:wrap}.stat b{font-size:21px}.progress{width:100%;height:14px;accent-color:#175b8d}.items{display:grid;gap:10px}.item{border:1px solid #dce2e9;border-radius:12px;padding:12px;display:grid;grid-template-columns:60px 1fr;gap:12px;align-items:start;background:white}.item.bad{background:#fff7f4;border-color:#efc7bb}.item.done{background:#f0faf5}.thumb{width:60px;height:60px;border-radius:8px;background:#edf0f2;object-fit:cover}.name{width:min(100%,540px);padding:9px;border-radius:7px;border:1px solid #c3ccd4;margin:7px 0}.metadata{font-size:12px;color:#596675;line-height:1.6;overflow-wrap:anywhere}.pick{display:flex;gap:8px;align-items:start}.notice{font-weight:650;overflow-wrap:anywhere}#status{white-space:pre-wrap}#groups{max-height:680px;overflow:auto;padding:2px}.busy{opacity:.75}.auth-panel{border-color:#d8b37c;background:#fffaf3}.auth-panel p{margin:9px 0}.auth-panel input{padding:11px;border:1px solid #c4cbd3;border-radius:9px;max-width:100%;width:310px}.auth-panel button{margin-top:9px}.auth-panel a{font-weight:600}.auth-panel[hidden]{display:none!important}@media(max-width:640px){main{padding:16px 10px}.panel{padding:14px}.item{grid-template-columns:48px 1fr;gap:9px}.thumb{width:48px;height:48px}}
 </style>
 </head>
 <body>
@@ -13,18 +13,29 @@
 <p><a href="/admin/">← Quay lại Admin</a></p>
 <h1>Nhập ảnh sản phẩm theo thư mục</h1>
 <p class="muted">Dùng file <b>DANH_SACH_ANH.csv</b> và thư mục <b>KET_QUA_NHOM_MAU...</b> trên máy tính. Ảnh được phân nhóm theo danh mục và mã Mxxxx. Chỉ tạo <b>sản phẩm nháp chưa công khai</b>.</p>
+<section class="panel auth-panel" id="loginPanel" aria-labelledby="loginTitle" hidden>
+<h2 id="loginTitle">Đăng nhập Admin Preview</h2>
+<p>Bạn đang sử dụng môi trường thử nghiệm. Cần đăng nhập bằng mật khẩu <strong>Admin Preview</strong> trước khi đối chiếu hoặc nhập ảnh. Mật khẩu Admin web chính có thể khác mật khẩu Preview.</p>
+<form id="loginImportForm">
+<label for="previewPassword">Mật khẩu Admin Preview</label>
+<div><input type="password" id="previewPassword" autocomplete="current-password" minlength="12" required placeholder="Nhập mật khẩu quản trị"></div>
+<button type="submit" class="primary" id="signIn">Đăng nhập để tiếp tục</button>
+</form>
+<p class="error" id="authError" role="alert" aria-live="polite"></p>
+<p class="muted">Bạn cũng có thể <a href="/admin/?view=products">mở trang đăng nhập Admin Preview</a> trên cùng địa chỉ website. Khi mở lại trang nhập ảnh, phiên đăng nhập phải còn hiệu lực.</p>
+</section>
 <div class="panel">
 <h2>1. Chọn dữ liệu trên máy tính</h2>
 <label class="filepicker">File CSV đã gửi trong chat
 <input id="csv" type="file" accept=".csv,text/csv"></label>
 <label class="filepicker">Thư mục kết quả chứa 15 danh mục
 <input id="folder" type="file" webkitdirectory directory multiple accept="image/jpeg,image/png,image/webp"></label>
-<div class="toolbar"><button id="preview" type="button" class="primary">Đối chiếu dữ liệu</button><span id="auth" class="muted">Đang kiểm tra quyền Admin…</span></div>
+<div class="toolbar"><button id="preview" type="button" class="primary" disabled>Đối chiếu dữ liệu</button><span id="auth" class="muted">Đang kiểm tra quyền Admin…</span></div>
 </div>
 <div class="panel" id="review" hidden>
 <h2>2. Duyệt danh sách trước khi nhập</h2>
 <p id="totals" class="notice"></p>
-<p class="warning">Chỉ tạo bản nháp, <b>không xóa sản phẩm cũ</b>, không ghi giá/tồn kho khi CSV chưa có dữ liệu. Các mẫu thiếu ảnh, đường dẫn sai hoặc quá 30 ảnh sẽ bị chặn. Tên và màu chưa xác minh phải được kiểm tra lại trước khi công khai.</p>
+<p class="warning">Chỉ tạo bản nháp, <b>không xóa sản phẩm cũ</b>, không ghi giá/tồn kho khi CSV chưa có dữ liệu. Các mẫu thiếu ảnh, đường dẫn sai hoặc quá 50 ảnh sẽ bị chặn. Tên và màu chưa xác minh phải được kiểm tra lại trước khi công khai.</p>
 <div class="toolbar">
 <button id="selectAll" type="button">Chọn mẫu đủ điều kiện</button>
 <button id="clearAll" type="button">Bỏ chọn tất cả</button>
@@ -42,9 +53,58 @@ const $ = (id) => document.getElementById(id);
 let plan = null, stop = false, busy = false, checkpoint = null, checkpointKey = "", urls = [];
 const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function setStatus(text, error=false) { $("status").textContent=text; $("status").className=error?"error":"muted"; }
+
+let authenticated = false;
+function showAuth(message="Phiên đăng nhập chưa hợp lệ. Hãy đăng nhập vào Admin Preview để tiếp tục.") {
+  authenticated=false;
+  $("loginPanel").hidden=false;
+  $("preview").disabled=true;
+  $("import").disabled=true;
+  $("auth").textContent="Chưa đăng nhập Admin Preview";
+  $("auth").className="error";
+  $("authError").textContent=message;
+  $("loginPanel").scrollIntoView({block:"start",behavior:"auto"});
+}
+function setAuthenticated(){
+  authenticated=true;
+  $("loginPanel").hidden=true;
+  $("authError").textContent="";
+  $("preview").disabled=false;
+  $("auth").textContent="Đã đăng nhập Admin Preview";
+  $("auth").className="success";
+  if(plan) updateSelection();
+}
+async function submitLogin(event){
+  event.preventDefault();
+  const password=$("previewPassword").value;
+  if(!password)return;
+  const button=$("signIn");
+  button.disabled=true;$("authError").textContent="";
+  try{
+    const res=await fetch("/api/admin/login",{
+      method:"POST",credentials:"same-origin",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password})
+    });
+    let body=null;try{body=await res.json()}catch{}
+    if(!res.ok||body?.ok!==true)throw Error(body?.error||"Đăng nhập thất bại ("+res.status+").");
+    $("previewPassword").value="";
+    await catalog();
+    setAuthenticated();
+  }catch(e){
+    $("authError").textContent=e.message||"Không thể đăng nhập. Hãy kiểm tra mật khẩu Preview.";
+    $("previewPassword").focus();
+  }finally{button.disabled=false;}
+}
+$("loginImportForm").addEventListener("submit",submitLogin);
+
 async function request(url, init) {
   const response = await fetch(url, {credentials:"same-origin",cache:"no-store",...init});
   let data;try{data=await response.json()}catch{throw Error("API trả về dữ liệu không hợp lệ ("+response.status+")");}
+  if(response.status===401){
+    showAuth("Phiên đăng nhập hết hạn hoặc chưa đăng nhập. Hãy nhập mật khẩu Admin Preview để tiếp tục; file đã chọn vẫn được giữ.");
+    throw Error("Cần đăng nhập Admin Preview.");
+  }
   if(!response.ok||data?.ok===false)throw Error(data?.error||"HTTP "+response.status);
   return data;
 }
@@ -61,7 +121,7 @@ async function fingerprint(csv,files) {
 }
 function saveCheckpoint(){localStorage.setItem(checkpointKey,JSON.stringify(checkpoint));}
 function updateSelection(){ const available=plan.groups.filter(g=>g.status==="ready"&&g.selected&&!checkpoint.drafts[g.key]);
-  $("import").disabled=busy||!available.length; $("totals").textContent=
+  $("import").disabled=busy||!authenticated||!available.length; $("totals").textContent=
   plan.groups.length+" mẫu / "+plan.rows+" dòng CSV / "+plan.matched+" ảnh khớp"+
   "; "+plan.blocked+" mẫu cần xử lý; "+plan.missing+" ảnh thiếu; "+plan.unlisted+" ảnh ngoài CSV; "+plan.reviewRows+" ảnh có ghi chú cần kiểm tra; "+Object.keys(checkpoint.drafts).length+" bản nháp đã tạo"+
   "; "+available.length+" mẫu đang chọn.";
@@ -177,10 +237,10 @@ async function prepare(){
     plan=next;$("review").hidden=false;$("progress").value=0;
     setStatus("Dữ liệu đã đối chiếu cục bộ. Chưa tải ảnh và chưa tạo sản phẩm.");
     render();
-  }catch(e){$("review").hidden=true;alert("Không thể đối chiếu: "+e.message);}
+  }catch(e){if(!authenticated)return; $("review").hidden=true; $("authError").textContent=""; $("auth").textContent="Không thể đối chiếu: "+e.message; $("auth").className="error";}
 }
 async function startImport(){
-  if(busy||!plan)return;
+  if(busy||!plan||!authenticated)return;
   const selected=plan.groups.filter(g=>g.selected&&g.status==="ready"&&!checkpoint.drafts[g.key]);
   if(!selected.length)return;
   if(!confirm("Tạo "+selected.length+" sản phẩm nháp chưa công khai trên D1 và tải ảnh lên R2? Không xóa dữ liệu cũ."))return;
@@ -206,7 +266,7 @@ $("import").addEventListener("click",startImport);
 $("stop").addEventListener("click",()=>{stop=true;$("stop").disabled=true;});
 $("selectAll").addEventListener("click",()=>{if(!plan||busy)return;for(const g of plan.groups)g.selected=g.status==="ready";render();});
 $("clearAll").addEventListener("click",()=>{if(!plan||busy)return;for(const g of plan.groups)g.selected=false;render();});
-catalog().then(()=>{$("auth").textContent="Đã xác minh phiên Admin.";})
-  .catch(e=>{$("auth").textContent="Chưa đăng nhập hoặc D1 không sẵn sàng: "+e.message;});
+catalog().then(setAuthenticated)
+  .catch(e=>{ if(!authenticated && $("loginPanel").hidden) showAuth(e.message); });
 </script>
 </body></html>
