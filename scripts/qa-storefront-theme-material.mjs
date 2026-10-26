@@ -367,6 +367,115 @@ try{
           'html body .theme-bg--light,html body .theme-bg--dark{filter:none!important}'},
       ];
       const variants=[];
+      // READ-ONLY A/B: isolate root palette invalidation from the critical
+      // opacity/navbar crossfade. This prototype never changes deployed CSS.
+      // Its measurements are diagnostics, not release acceptance.
+      const paletteProbes=[];
+      for(const scheduling of ['palette-on-end','palette-next-raf','palette-idle']){
+        const installed=await page.evaluate(scheduling=>{
+          const original=window.applyThemeMode;
+          if(typeof original!=='function')return false;
+          window.__sdProbeOriginalTheme=original;
+          window.__sdProbeCalls=0;
+          window.applyThemeMode=function(mode,animate=true){
+            const root=document.documentElement;
+            const nav=document.querySelector('.nav');
+            const light=document.querySelector('.theme-bg--light');
+            const dark=document.querySelector('.theme-bg--dark');
+            const mobile=document.querySelector('.mobile-bottom-nav');
+            const target=mode==='dark';
+            if(!animate||!nav||!light||!dark||matchMedia('(prefers-reduced-motion: reduce)').matches||
+              (mode!=='dark'&&mode!=='light')||target===root.classList.contains('dark'))
+              return original(mode,animate);
+            window.__sdProbeCalls++;
+            clearTimeout(window.__sdThemeTimer);
+            if(typeof window.__sdCancelThemeStage==='function')window.__sdCancelThemeStage();
+            root.dataset.themeMode=mode;
+            window.__sdThemeTargetDark=target;
+            let committed=false,finished=false,raf=0,idle=0;
+            const release=()=>{
+              nav.style.removeProperty('background-color');
+              light.style.removeProperty('opacity');
+              dark.style.removeProperty('opacity');
+              mobile?.style.removeProperty('background-color');
+            };
+            const commit=()=>{
+              if(committed||finished)return;
+              committed=true;
+              root.classList.add('theme-transitioning');
+              root.classList.toggle('dark',target);
+              window.syncThemeMeta?.();
+              window.setThemeIcon?.();
+            };
+            const cleanup=()=>{
+              nav.removeEventListener('transitionstart',onStart);
+              nav.removeEventListener('transitionend',onEnd);
+              if(raf)cancelAnimationFrame(raf);
+              if(idle&&window.cancelIdleCallback)cancelIdleCallback(idle);
+              clearTimeout(window.__sdThemeTimer);
+              release();
+              root.classList.remove('theme-transitioning');
+              window.__sdThemeTargetDark=null;
+              window.__sdCancelThemeStage=null;
+            };
+            const finish=()=>{
+              if(finished)return;
+              if(!committed)commit();
+              finished=true;
+              cleanup();
+            };
+            const onStart=e=>{
+              if(e.target!==nav||e.propertyName!=='background-color')return;
+              if(scheduling==='palette-next-raf')raf=requestAnimationFrame(()=>commit());
+              if(scheduling==='palette-idle'){
+                if(window.requestIdleCallback)idle=requestIdleCallback(()=>commit(),{timeout:170});
+                else raf=requestAnimationFrame(()=>commit());
+              }
+            };
+            const onEnd=e=>{
+              if(e.target!==nav||e.propertyName!=='background-color')return;
+              finish();
+            };
+            window.__sdCancelThemeStage=()=>{
+              if(finished)return;
+              finished=true;
+              cleanup();
+            };
+            nav.addEventListener('transitionstart',onStart);
+            nav.addEventListener('transitionend',onEnd);
+            nav.style.setProperty('background-color',target?'rgba(4,20,34,.94)':'rgba(244,250,255,.94)','important');
+            light.style.setProperty('opacity',target?'0':'1','important');
+            dark.style.setProperty('opacity',target?'1':'0','important');
+            if(mobile)mobile.style.setProperty('background-color',target?'rgba(4,20,34,.995)':'rgba(247,252,255,.995)','important');
+            window.__sdThemeTimer=setTimeout(finish,560);
+          };
+          return true;
+        },scheduling);
+        if(!installed)throw Error('Read-only palette scheduling prototype could not patch global theme handler');
+        try{
+          for(const direction of [true,false]){
+            const trial=await runThemeTrial(direction,'diagnostic-'+scheduling);
+            paletteProbes.push({
+              variant:scheduling,dark:direction,
+              startMs:trial.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
+              endMs:trial.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
+              finalDark:trial.stable.dark,navColor:trial.stable.navColor,
+              longTasks:trial.longTasks,
+              chromeMetrics:trial.chromeMetrics
+            });
+          }
+        }finally{
+          const calls=await page.evaluate(()=>{
+            const count=window.__sdProbeCalls;
+            window.applyThemeMode=window.__sdProbeOriginalTheme;
+            delete window.__sdProbeOriginalTheme;
+            delete window.__sdProbeCalls;
+            return count;
+          });
+          if(calls!==2)throw Error('Read-only palette scheduling did not intercept both theme toggles: '+scheduling+' '+calls);
+        }
+      }
+      console.log('THEME_ROOT_PALETTE_SCHEDULING_AB '+JSON.stringify(paletteProbes));
       for(const experiment of experiments){
         const temporaryStyle=await page.addStyleTag({content:experiment.css});
         for(const direction of [true,false])variants.push(await runThemeTrial(direction,experiment.label));

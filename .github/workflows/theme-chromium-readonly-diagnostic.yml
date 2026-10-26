@@ -5,6 +5,7 @@ on:
       - integration/storefront-locked-on-main-2026-10-26
     paths:
       - '.github/workflows/theme-chromium-readonly-diagnostic.yml'
+      - 'scripts/qa-storefront-theme-material.mjs'
   workflow_dispatch:
 
 permissions:
