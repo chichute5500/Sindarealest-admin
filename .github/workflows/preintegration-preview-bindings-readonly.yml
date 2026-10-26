@@ -1,0 +1,133 @@
+name: PRE-INTEGRATION read-only Admin vs Storefront Preview bindings
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - '.github/workflows/preintegration-preview-bindings-readonly.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-bindings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Read Pages project metadata only, never query D1 or R2 objects
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$CF_TOKEN"
+          test -n "$CF_ACCOUNT"
+          root="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/pages/projects"
+          curl -fsSS --max-time 20 -H "Authorization: Bearer ${CF_TOKEN}" "$root/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-project.json"
+          curl -fsSS --max-time 20 -H "Authorization: Bearer ${CF_TOKEN}" "$root/sindarealest2" > "$RUNNER_TEMP/storefront-project.json"
+          jq -e '.success == true and .result.name == "sindarealest-admin-preview" and .result.production_branch == "main"' "$RUNNER_TEMP/admin-project.json" >/dev/null
+          jq -e '.success == true and .result.name == "sindarealest2" and .result.production_branch == "main"' "$RUNNER_TEMP/storefront-project.json" >/dev/null
+          get_db(){
+            jq -r --arg env "$2" '.result.deployment_configs[$env].d1_databases.DB.id // .result.deployment_configs[$env].d1_databases.DB.database_id // empty' "$1"
+          }
+          get_img(){
+            jq -r --arg env "$2" --arg key "$3" '.result.deployment_configs[$env].r2_buckets[$key].name // .result.deployment_configs[$env].r2_buckets[$key].bucket_name // empty' "$1"
+          }
+          a="$RUNNER_TEMP/admin-project.json"
+          w="$RUNNER_TEMP/storefront-project.json"
+          a_db="$(get_db "$a" preview)"
+          w_db="$(get_db "$w" preview)"
+          w_prod_db="$(get_db "$w" production)"
+          a_img="$(get_img "$a" preview IMAGES)"
+          w_img="$(get_img "$w" preview IMAGES)"
+          a_orig="$(get_img "$a" preview ORIGINALS)"
+          w_orig="$(get_img "$w" preview ORIGINALS)"
+          prod_img="$(get_img "$w" production IMAGES)"
+          prod_priv="$(get_img "$w" production ORIGINALS)"
+          if [[ -z "$a_db" || -z "$w_prod_db" || -z "$a_img" || -z "$prod_img" || -z "$prod_priv" ]]; then
+            echo "::error::PREINTEGRATION_METADATA_MISSING: require Admin Preview D1/IMAGES and Storefront Production D1/IMAGES/ORIGINALS before safety decision."
+            exit 1
+          fi
+          if [[ "$a_db" == "$w_prod_db" || "$a_img" == "$prod_img" || "$a_img" == "$prod_priv" ]]; then
+            echo "::error::ADMIN_PREVIEW_PRODUCTION_SHARED_BINDING: integration or write QA is prohibited."
+            exit 1
+          fi
+          echo "PASS: Admin Preview D1/IMAGES separated from storefront Production D1/IMAGES/ORIGINALS (metadata only)."
+          blockers=()
+          if [[ -z "$w_db" ]]; then
+            echo "::error::STOREFRONT_PREVIEW_DB_MISSING: storefront Preview DB metadata unavailable; block integration."
+            blockers+=(STOREFRONT_PREVIEW_DB_MISSING)
+          elif [[ "$w_db" == "$w_prod_db" ]]; then
+            echo "::error::STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION: unsafe for preview write tests and integration."
+            blockers+=(STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION)
+          elif [[ "$w_db" == "$a_db" ]]; then
+            echo "::notice::CROSS_PREVIEW_DB_SHARED_ISOLATED: both Preview projects use the same non-Production D1 (still requires API/schema contract audit)."
+          else
+            echo "::warning::CROSS_PREVIEW_DB_DISTINCT: writes in Admin Preview cannot reach storefront Preview automatically; do not assume synchronization."
+          fi
+          if [[ -z "$w_img" ]]; then
+            echo "::error::STOREFRONT_PREVIEW_IMAGES_MISSING: cannot prove cross-project gallery compatibility."
+            blockers+=(STOREFRONT_PREVIEW_IMAGES_MISSING)
+          elif [[ "$w_img" == "$prod_img" || "$w_img" == "$prod_priv" ]]; then
+            echo "::error::STOREFRONT_PREVIEW_IMAGES_PRODUCTION_BACKED: Preview public image storage cannot use Production buckets."
+            blockers+=(STOREFRONT_PREVIEW_IMAGES_PRODUCTION_BACKED)
+          elif [[ "$w_img" == "$a_img" ]]; then
+            echo "::notice::CROSS_PREVIEW_IMAGES_SHARED_ISOLATED: same non-Production images bucket."
+          else
+            echo "::warning::CROSS_PREVIEW_IMAGES_DISTINCT: no automatic gallery sync; explicit architecture review required."
+            blockers+=(CROSS_PREVIEW_IMAGES_DISTINCT)
+          fi
+          if [[ -z "$a_orig" ]]; then
+            echo "::error::ADMIN_PREVIEW_ORIGINALS_MISSING: Admin product upload and warranty attachment flows need isolated private ORIGINALS."
+            blockers+=(ADMIN_PREVIEW_ORIGINALS_MISSING)
+          elif [[ "$a_orig" == "$prod_img" || "$a_orig" == "$prod_priv" ]]; then
+            echo "::error::ADMIN_PREVIEW_ORIGINALS_PRODUCTION_SHARED: product and warranty uploads must remain prohibited."
+            exit 1
+          elif [[ "$a_orig" == "$a_img" ]]; then
+            echo "::error::ADMIN_PREVIEW_ORIGINALS_PUBLIC_SHARED: private uploads would enter public IMAGES."
+            exit 1
+          else
+            echo "PASS: Admin Preview ORIGINALS binding is distinct from Production IMAGES/ORIGINALS and Preview IMAGES (metadata only)."
+          fi
+          if [[ -z "$w_orig" ]]; then
+            echo "::error::STOREFRONT_PREVIEW_ORIGINALS_MISSING: image/warranty writes cannot be approved."
+            blockers+=(STOREFRONT_PREVIEW_ORIGINALS_MISSING)
+          elif [[ "$w_orig" == "$prod_img" || "$w_orig" == "$prod_priv" ]]; then
+            echo "::error::STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED: warranty image writes would touch Production bucket."
+            blockers+=(STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED)
+          elif [[ "$w_orig" == "$w_img" ]]; then
+            echo "::error::STOREFRONT_PREVIEW_ORIGINALS_PUBLIC_SHARED: private images are not isolated from public bucket."
+            blockers+=(STOREFRONT_PREVIEW_ORIGINALS_PUBLIC_SHARED)
+          else
+            echo "PASS: Storefront Preview ORIGINALS distinct from Production and Preview public images."
+          fi
+          echo "Audit mode: read-only Cloudflare Pages metadata; no deployments, D1 reads/writes, R2 object requests, or binding identifiers in logs."
+          # Keep a dated, sanitized audit summary even when a mandatory safety
+          # gate intentionally FAILS. This is evidence of a recheck, not release approval.
+          if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+            {
+              echo '### Storefront/Admin Preview storage separation'
+              echo
+              echo "Source SHA: \`$GITHUB_SHA\`"
+              echo "Run: \`$GITHUB_RUN_ID\`"
+              echo "Read-only: yes; Production writes: none"
+              if (( ${#blockers[@]} > 0 )); then
+                echo "**INTEGRATION BLOCKED** — unresolved binding gates:"
+                printf -- '- \`%s\`\n' "${blockers[@]}"
+              else
+                echo "**RESOURCE ISOLATION PASS** — independent contract/release authorization still required."
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # Discovery is not acceptance. Keep this job RED until every mandatory
+          # Preview resource is genuinely independent of Production.
+          if (( ${#blockers[@]} > 0 )); then
+            echo "::error::PREINTEGRATION_BLOCKED: ${#blockers[@]} unresolved resource gate(s): ${blockers[*]}"
+            exit 1
+          fi
+          echo "PASS: All inspected resource identities satisfy the mandatory pre-integration isolation gates; API/schema/design approval is still separate."

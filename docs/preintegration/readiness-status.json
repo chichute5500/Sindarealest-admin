@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "auditedDate": "2026-10-25",
+  "integrationApproved": false,
+  "readyForMerge": false,
+  "overall": "BLOCKED",
+  "independentCIStatus": "PASS_NOT_INTEGRATION",
+  "adminShaAtAuditStart": "c64e07fca248dc527361c4d018dc26c11f5b3570",
+  "websiteShaAtAudit": "7558ab4cdc329b7b3786a37e20a3c3eca5e9eaa4",
+  "cloudflareReadOnlyWorkflow": "https://github.com/chichute5500/Sindarealest-admin/actions/runs/40166237135",
+  "immutableKnownFacts": {
+    "adminPreviewD1IsolatedFromProduction": true,
+    "websitePreviewD1SharesProduction": true,
+    "adminPreviewImagesSeparatedFromProduction": true,
+    "bothPreviewPublicImagesShareIsolatedBucket": true,
+    "adminPreviewOriginalsBindingPresent": true,
+    "websitePreviewOriginalsSharesProduction": true
+  },
+  "criticalBlockers": [
+    "STORE_PREVIEW_D1_PRODUCTION_SHARED",
+    "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED",
+    "MIGRATION_0009_NOT_ON_STORE_BRANCH",
+    "ORDER_PAYMENT_ENDPOINT_NOT_ON_STORE_BRANCH",
+    "STORE_ORDER_CREATE_RETURNS_NO_ACCESS_TOKEN",
+    "INDEPENDENT_FULL_SECURITY_A11Y_LOAD_SIGNOFF_MISSING",
+    "EXTERNAL_SETTLEMENT_RECONCILIATION_PENDING",
+    "CROSS_PROJECT_WRITE_QA_NOT_SAFE"
+  ],
+  "readinessScoreLabel": "NO_MEANINGFUL_PERCENT_WITH_OPEN_BLOCKERS",
+  "gateTotal": 15,
+  "gateFullyApproved": 0,
+  "ownerApproval": "OWNER_VISUAL_DESIGN_12_OF_12_APPROVED_INTEGRATION_NOT_AUTHORIZED",
+  "notes": "This status intentionally does not mark 100%; audit workflow SUCCESS means read-only metadata check finished, not that integration is safe.",
+  "currentGateEvidence": {
+    "latestReadOnlyRun": 40207822357,
+    "unresolvedExact": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "adminPreviewOriginals": "PASS_PRESENT_ISOLATED",
+    "designOwnerApprovedScreens": 12,
+    "r2PassRun": 40187426696,
+    "remoteRestorePassRun": 40188752986,
+    "securitySmokePassRun": 40208397077,
+    "retestPassedWorkflows": false,
+    "checkedOn": "2026-10-25"
+  },
+  "currentHandoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md",
+  "latestOwnerPriority": "NON_D1_R2_UNFINISHED_ONLY_NO_PASS_RETEST",
+  "lastOwnerScopeUpdate": "2026-10-25",
+  "priorityGates": [
+    "INDEPENDENT_DEEP_SECURITY_REVIEW",
+    "ASSISTIVE_TECH_ACCESSIBILITY_SIGNOFF",
+    "NONDESTRUCTIVE_PERFORMANCE_AND_LOAD_ANALYSIS",
+    "REAL_FINANCIAL_RECONCILIATION_SIGNOFF",
+    "ADMIN_STOREFRONT_API_SCHEMA_READONLY_PLAN"
+  ],
+  "d1R2Decision": "DEFERRED_BY_OWNER; previously passed D1/R2 evidence locked; Storefront Production-shared binding risks remain real but not current priority",
+  "deferredRisksNotApproved": [
+    "STORE_PREVIEW_D1_PRODUCTION_SHARED",
+    "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED",
+    "CROSS_PROJECT_WRITE_QA_NOT_SAFE"
+  ],
+  "canonicalHandoff20261026": {
+    "checkpoint": "docs/preintegration/ONLY-OPEN-WORK-2026-10-26.md",
+    "headAtCheck": "ff0dd138ae38f967c5728555f0b9fb7448aef35a",
+    "latestVerifiedDeployedSourceSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "priority": "NON_D1_R2_ONLY_NOT_YET_PASS",
+    "deferredNotPassed": [
+      "STORE_PREVIEW_D1_PRODUCTION_SHARED",
+      "STORE_PREVIEW_ORIGINALS_PRODUCTION_SHARED"
+    ],
+    "lockedPassNotToRerun": [
+      "OWNER_12_UI_BELL",
+      "ADMIN_R2_LIFECYCLE",
+      "ADMIN_DISPOSABLE_D1_RESTORE",
+      "ADMIN_SMOKE",
+      "PREVIOUSLY_PASSING_QA"
+    ],
+    "integrationApproved": false,
+    "releaseApproved": false
+  }
+}

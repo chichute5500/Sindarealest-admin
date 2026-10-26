@@ -1,0 +1,115 @@
+name: ADMIN 12-screen acceptance evidence (isolated, read-only)
+# Owner review screen 02: capture the single-title dashboard and red power-off logout across viewports.
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - ".github/workflows/admin-12-screen-qa-20261024.yml"
+      - "tests/e2e/admin-12-screen-live-qa.spec.js"
+      - "functions/api/admin/orders.js"
+      - "public/admin/index.html"
+
+permissions:
+  contents: read
+
+jobs:
+  d1-isolation-preflight:
+    name: Read-only confirm Preview D1 is distinct from Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Verify exact test branch and token present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Compare Preview DB binding against both production configurations (GET only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          p="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl -fsSS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$p/sindarealest-admin-preview" > "$RUNNER_TEMP/qa-preview-project.json"
+          curl -fsSS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$p/sindarealest2" > "$RUNNER_TEMP/qa-storefront-project.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const preview=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/qa-preview-project.json'));
+          const storefront=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/qa-storefront-project.json'));
+          const result={checkedAt:new Date().toISOString(),source:'CLOUDFLARE_PAGES_CONFIG_GET_ONLY',
+            previewProjectNameMatches:preview.result?.name==='sindarealest-admin-preview',
+            storefrontProjectNameMatches:storefront.result?.name==='sindarealest2',
+            previewDbConfigured:false,storefrontProductionDbConfigured:false,
+            differsFromStorefrontProduction:false,differsFromPreviewProjectProduction:false,
+            result:'NOT_VERIFIED'};
+          const a=preview.result?.deployment_configs?.preview?.d1_databases?.DB?.id;
+          const b=storefront.result?.deployment_configs?.production?.d1_databases?.DB?.id;
+          const c=preview.result?.deployment_configs?.production?.d1_databases?.DB?.id;
+          const isId=value=>typeof value==='string'&&/^[0-9a-f-]{36}$/i.test(value);
+          result.previewDbConfigured=isId(a);
+          result.storefrontProductionDbConfigured=isId(b);
+          result.differsFromStorefrontProduction=isId(a)&&isId(b)&&a!==b;
+          result.differsFromPreviewProjectProduction=isId(a)&&(!isId(c)||a!==c);
+          if(preview.success===true&&storefront.success===true&&result.previewProjectNameMatches&&
+            result.storefrontProjectNameMatches&&result.previewDbConfigured&&result.storefrontProductionDbConfigured&&
+            result.differsFromStorefrontProduction&&result.differsFromPreviewProjectProduction)
+            result.result='ISOLATED_DB_BINDING_VERIFIED';
+          console.log('[QA_D1_ISOLATION] '+JSON.stringify(result));
+          if(process.env.GITHUB_STEP_SUMMARY) {
+            const {appendFileSync}=await import('node:fs');
+            appendFileSync(process.env.GITHUB_STEP_SUMMARY,'## Isolated D1 binding preflight\n\n'+result.result+' (GET only; IDs withheld)\n');
+          }
+          if(result.result!=='ISOLATED_DB_BINDING_VERIFIED')process.exitCode=1;
+          NODE
+  live-readonly-visual:
+    name: Capture all accessible 12 Admin screens in mobile/desktop light/dark
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Guard repository and feature branch
+        run: |
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$ADMIN_TEST_PASSWORD"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-fund
+          npm install --no-save --no-package-lock @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Verify deployed SHA before collecting live visual evidence
+        run: node scripts/qa-admin-preview-deployed-sha.mjs
+      - name: Capture actual Preview screens only by authenticated read operations
+        run: npx playwright test tests/e2e/admin-12-screen-live-qa.spec.js --workers=2 --reporter=line,html
+      - name: Verify branch HEAD still matches evidence SHA
+        if: always()
+        run: |
+          remote="$(git ls-remote origin refs/heads/feature/admin-isolated-handoff-2026-10-20 | awk '{print $1}')"
+          test "$remote" = "$GITHUB_SHA" || { echo "::error::Evidence stale: HEAD moved"; exit 1; }
+      - name: Save screenshots and manifests
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-12-screen-live-evidence-${{ github.run_number }}
+          path: |
+            artifacts/admin-12-screen-live/
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14

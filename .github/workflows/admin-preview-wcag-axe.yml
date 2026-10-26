@@ -1,0 +1,56 @@
+name: ADMIN isolated Preview axe WCAG 2.1 AA automated audit
+
+on:
+  push:
+    branches: [feature/admin-isolated-handoff-2026-10-20]
+    paths:
+      - '.github/workflows/admin-preview-wcag-axe.yml'
+      - 'tests/e2e/admin-wcag-axe.spec.js'
+      - 'public/admin/index.html'
+      - '.github/workflows/admin-12-screen-qa-20261024.yml'
+      - '.github/workflows/admin-12-screen-synthetic-qa-20261024.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  axe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Guard Admin Preview branch
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$ADMIN_TEST_PASSWORD"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install temporary axe and Playwright runner
+        run: |
+          npm install --no-fund
+          npm install --no-save --no-package-lock --no-fund @playwright/test @axe-core/playwright
+          npx playwright install --with-deps chromium
+      - name: Verify exact Admin Preview branch alias deployment metadata
+        run: node scripts/qa-admin-preview-deployed-sha.mjs
+      - name: Audit authenticated Admin views in mobile light and desktop dark
+        run: npx playwright test tests/e2e/admin-wcag-axe.spec.js --workers=2 --reporter=line
+      - name: Upload sanitized axe results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-axe-wcag-report-${{ github.run_number }}
+          path: artifacts/admin-wcag-axe/
+          if-no-files-found: warn
+          retention-days: 14

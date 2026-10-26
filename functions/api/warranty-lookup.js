@@ -34,7 +34,7 @@ function shapeWarranty(row, today, claimToken) {
     claimToken,
     maskedWarrantyCode: code ? "••••" + code.slice(-4) : "••••",
     title: String(row.title || "Sản phẩm"),
-    sku: String(row.sku || ""),
+    sku: Number(row.skuVerified) === 1 ? String(row.sku || "") : "",
     size: String(row.size || ""),
     image: images[0] || "",
     purchasedAt: String(row.purchasedAt || "").slice(0, 10),
@@ -50,7 +50,7 @@ function shapeWarranty(row, today, claimToken) {
     maskedOrderNumber: maskOrderNumber(row.orderNumber)
   };
 }
-const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
+const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("Origin");

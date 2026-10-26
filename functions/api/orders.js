@@ -1,4 +1,5 @@
-import { dbOrFail, fail, getSetting, json, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
+import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
+import { createOrderAccessToken, hashOrderAccessToken } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
@@ -32,16 +33,29 @@ export async function onRequestPost({ request, env }) {
   if ([...requested.values()].some(q => q > 50)) return fail("Số lượng mỗi sản phẩm tối đa là 50.");
   try {
     const ids = [...requested.keys()];
-    const rows = await env.DB.prepare(`SELECT id,sku,title,price,stock,published,source_price_confirmed FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
+    const rows = await env.DB.prepare(`SELECT id,sku,sku_verified,title,price,stock,published,source_price_confirmed,fulfillment_type FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
     const byId = new Map((rows.results || []).map(p => [p.id, p]));
     if (byId.size !== ids.length || ids.some(id => !byId.has(id) || Number(byId.get(id).published) !== 1)) return fail("Một hoặc nhiều sản phẩm không còn khả dụng. Vui lòng tải lại danh mục.", 409);
-    for (const id of ids) { const stock = byId.get(id).stock; if (stock !== null && stock !== undefined && requested.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của SKU ${byId.get(id).sku} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
+    for (const id of ids) { const product = byId.get(id), stock = product.stock; if (stock !== null && stock !== undefined && requested.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của ${Number(product.sku_verified) === 1 ? "SKU " + product.sku : "sản phẩm " + product.title} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
     const showPrices = (await getSetting(env.DB, "show_prices", "0")) === "1";
-    const items = ids.map(id => { const p = byId.get(id), quantity = requested.get(id); return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, title: p.title, quantity, price: showPrices && p.price !== null && Number(p.source_price_confirmed) === 1 ? Number(p.price) : null }; });
+    const items = ids.map(id => {
+      const p = byId.get(id), quantity = requested.get(id);
+      const rawPrice = p.price;
+      const candidatePrice = rawPrice === null || rawPrice === undefined || (typeof rawPrice === "string" && !rawPrice.trim())
+        ? null
+        : Number(rawPrice);
+      const confirmedPrice = showPrices && Number(p.source_price_confirmed) === 1
+        && Number.isSafeInteger(candidatePrice) && candidatePrice >= 0
+        ? candidatePrice
+        : null;
+      return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, fulfillmentType: normalizeFulfillmentType(p.fulfillment_type), title: p.title, quantity, price: confirmedPrice };
+    });
     const priceKnown = items.every(i => Number.isSafeInteger(i.price) && i.price >= 0);
     const subtotal = priceKnown ? items.reduce((sum, i) => sum + i.price * i.quantity, 0) : null;
     if (subtotal !== null && !Number.isSafeInteger(subtotal)) return fail("Tổng giá trị đơn vượt giới hạn hợp lệ.");
     const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
+    const orderAccessToken = createOrderAccessToken();
+    const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
     const statements = [];
 
@@ -63,9 +77,9 @@ export async function onRequestPost({ request, env }) {
     // Select the canonical customer ID after the conflict-safe insert. The
     // statement stays inside the D1 batch so the FK is satisfied atomically.
     statements.push(env.DB.prepare(
-      "INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,customer_note) " +
-      "SELECT ?,?,c.id,'pending_confirmation',?,?,?,? FROM customers c WHERE c.phone=?",
-    ).bind(orderId, orderNumber, subtotal, subtotal, priceKnown ? 0 : 1, customerNote, phone));
+      "INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,customer_note,public_access_token_hash) " +
+      "SELECT ?,?,c.id,'pending_confirmation',?,?,?,?,? FROM customers c WHERE c.phone=?",
+    ).bind(orderId, orderNumber, subtotal, subtotal, priceKnown ? 0 : 1, customerNote, orderAccessTokenHash, phone));
 
     // Immutable snapshot: admin order views and warranty lookup must describe
     // the contact details used for this purchase, not a subsequently changed
@@ -75,11 +89,11 @@ export async function onRequestPost({ request, env }) {
     ).bind(orderId, fullName, phone, email));
 
     statements.push(env.DB.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address) VALUES(?,?,?,?,?,?,?)").bind(orderId,provinceCode,province,wardCode,ward,streetAddress,address));
-    for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity));
+    for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.skuVerified?1:0,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity,item.fulfillmentType));
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length })));
     await env.DB.batch(statements);
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
-    return json({ ok: true, orderNumber, status: "pending_confirmation", priceConfirmationRequired: !priceKnown, total: subtotal, message: priceKnown ? "Đã tiếp nhận đơn. SinDarealest sẽ liên hệ xác nhận." : "Đã tiếp nhận yêu cầu. Giá và tổng tiền sẽ được SinDarealest xác nhận trước khi chốt đơn." }, 201);
+    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", priceConfirmationRequired: !priceKnown, total: subtotal, message: priceKnown ? "Đã tiếp nhận đơn. SinDarealest sẽ liên hệ xác nhận." : "Đã tiếp nhận yêu cầu. Giá và tổng tiền sẽ được SinDarealest xác nhận trước khi chốt đơn." }, 201);
   } catch { return fail("Chưa thể lưu đơn hàng. Vui lòng thử lại hoặc liên hệ SinDarealest qua Zalo.", 503); }
 }
 

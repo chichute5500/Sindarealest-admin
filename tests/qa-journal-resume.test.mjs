@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import { recoverQaJournal } from '../scripts/qa-journal-state.mjs';
+const base = {tag:'qa_40111072318',environment:'ISOLATED_PREVIEW_ONLY',seeded:false,authenticatedAdminSaveVerified:false,d1ReadbackVerified:false,cleanupVerified:false,records:{}};
+const previous = {...base,seeded:true,authenticatedAdminSaveVerified:true,d1ReadbackVerified:true,records:{products:'REMOVED'}};
+const got = recoverQaJournal(JSON.stringify(previous),base.tag,base);
+assert.equal(got.authenticatedAdminSaveVerified,true);
+assert.equal(got.d1ReadbackVerified,true);
+assert.equal(got.seeded,true);
+assert.deepEqual(got.records,{products:'REMOVED'});
+assert.equal(recoverQaJournal(JSON.stringify({...previous,tag:'qa_WRONG'}),base.tag,base),base);
+assert.equal(recoverQaJournal('{bad',base.tag,base),base);
+assert.equal(recoverQaJournal(null,base.tag,base),base);
+console.log('PASS: QA lifecycle manifest retains authenticated-write and D1-readback evidence across second cleanup while rejecting foreign runs.');

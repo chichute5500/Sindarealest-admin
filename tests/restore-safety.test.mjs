@@ -161,6 +161,20 @@ const validRelationshipsBackup = () => ({
     },
 });
 
+// Reject coercible-but-invalid numbers before any destructive D1 batch.
+for (const [label, mutate] of [
+  ["whitespace order total", backup => { backup.operations.orders[0].total = " "; }],
+  ["array item quantity", backup => { backup.operations.orderItems[0].quantity = [1]; }],
+  ["boolean item line total", backup => { backup.operations.orderItems[0].line_total = false; }],
+]) {
+  const backup = validRelationshipsBackup();
+  mutate(backup);
+  const db = makeDB();
+  const response = await restoreBackup({ request: request(backup), env: { ...env, DB: db } });
+  assert.equal(response.status, 400, label + " must be rejected before restore");
+  assert.equal(db.batchCalls, 0, label + " must cause no destructive D1 writes");
+}
+
 {
   const mismatchedWarranty = validRelationshipsBackup();
   mismatchedWarranty.operations.warranties.push({
@@ -237,6 +251,85 @@ const validRelationshipsBackup = () => ({
   const response = await restoreBackup({ request: request(duplicateWarrantyIds), env: { ...env, DB: db } });
   assert.equal(response.status, 400, "duplicate warranty IDs must be rejected as invalid backup data");
   assert.equal(db.batchCalls, 0, "duplicate warranty IDs must be rejected before destructive writes");
+}
+
+
+{
+  const backup = validRelationshipsBackup();
+  backup.operations.orders[0].payment_terms_confirmed_at = "2026-01-02 12:00:00";
+  backup.operations.orders[0].payment_terms_confirmed_by = "admin";
+  backup.operations.orders[0].payment_terms_note = "Đã chốt tổng tiền và đặt cọc";
+  backup.operations.orderItems[0].fulfillment_type = "made_to_order";
+  backup.operations.orderPaymentRequests = [{
+    id: "request-1", order_id: "order-1", installment_type: "deposit", amount: 30000, shipping_benefit: "standard_shipping",
+    transfer_reference: "SDREF123456", qr_image_key: "qr-550e8400-e29b-41d4-a716-446655440000.png",
+    bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A",
+    status: "settled", created_by: "admin", created_at: "2026-01-02 12:01:00", updated_at: "2026-01-02 12:02:00"
+  }];
+  backup.operations.orderPaymentTransactions = [{
+    id: "transaction-1", order_id: "order-1", payment_request_id: "request-1", direction: "received",
+    amount: 30000, transaction_reference: "BANKREF12345", note: "Đã đối chiếu sao kê", actor: "admin",
+    verified_at: "2026-01-02 12:02:00", created_at: "2026-01-02 12:02:00"
+  }];
+  const db = makeDB();
+  const response = await restoreBackup({ request: request(backup), env: { ...env, DB: db } });
+  assert.equal(response.status, 200, "v2 backups with verified payment ledger and fulfillment snapshots should restore");
+  assert.ok(db.statements.some(statement => statement.sql.startsWith("INSERT INTO order_payment_requests")), "payment requests must be restored");
+  const requestInsert = db.statements.find(statement => statement.sql.startsWith("INSERT INTO order_payment_requests"));
+  assert.ok(requestInsert.sql.includes("shipping_benefit"), "shipping benefit must survive backup/restore");
+  assert.equal(requestInsert.values[4], "standard_shipping");
+  assert.ok(db.statements.some(statement => statement.sql.startsWith("INSERT INTO order_payment_transactions")), "verified payment transactions must be restored");
+  const itemInsert = db.statements.find(statement => statement.sql.startsWith("INSERT INTO order_items"));
+  assert.ok(itemInsert.sql.includes("fulfillment_type"), "order-item fulfillment snapshots must be restored");
+  assert.equal(itemInsert.values[9], "made_to_order", "restore must preserve the original order-item fulfillment snapshot");
+  const orderInsert = db.statements.find(statement => statement.sql.startsWith("INSERT INTO orders"));
+  assert.ok(orderInsert.sql.includes("payment_terms_confirmed_at"), "order confirmation details must survive backup/restore");
+  assert.equal(orderInsert.values[9], "2026-01-02 12:00:00");
+}
+
+{
+  const backup = validRelationshipsBackup();
+  backup.operations.orderPaymentRequests = [{
+    id: "request-bad", order_id: "order-1", installment_type: "deposit", amount: 30000,
+    transfer_reference: "SDREF123456", qr_image_key: "qr-550e8400-e29b-41d4-a716-446655440000.png",
+    bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A",
+    status: "pending", created_by: "admin", created_at: "2026-01-02 12:01:00", updated_at: "2026-01-02 12:01:00"
+  }];
+  backup.operations.orderPaymentTransactions = [{
+    id: "transaction-bad", order_id: "order-2", payment_request_id: "request-bad", direction: "received",
+    amount: 30000, transaction_reference: "BANKREF12345", note: "", actor: "admin",
+    verified_at: "2026-01-02 12:02:00", created_at: "2026-01-02 12:02:00"
+  }];
+  const db = makeDB();
+  const response = await restoreBackup({ request: request(backup), env: { ...env, DB: db } });
+  assert.equal(response.status, 400, "a payment request reference must belong to the same order as its transaction");
+  assert.equal(db.batchCalls, 0, "invalid payment ledger relationships must be rejected before destructive restore");
+}
+
+{
+  const backup = validRelationshipsBackup();
+  backup.operations.orderPaymentTransactions = [
+    {
+      id: "payment-net-received", order_id: "order-1", payment_request_id: null,
+      direction: "received", amount: 10000, transaction_reference: "BANKNETREC001",
+      note: "", actor: "admin", verified_at: "2026-01-02 12:00:00", created_at: "2026-01-02 12:00:00"
+    },
+    {
+      id: "payment-net-refunded", order_id: "order-1", payment_request_id: null,
+      direction: "refunded", amount: 10001, transaction_reference: "BANKNETREF001",
+      note: "", actor: "admin", verified_at: "2026-01-02 12:01:00", created_at: "2026-01-02 12:01:00"
+    },
+  ];
+  const invalidDb = makeDB();
+  const invalid = await restoreBackup({ request: request(backup), env: { ...env, DB: invalidDb } });
+  assert.equal(invalid.status, 400, "restore must reject a ledger with refunds exceeding verified receipts");
+  assert.equal(invalidDb.batchCalls, 0, "invalid ledger must not initiate destructive restore");
+  backup.operations.orderPaymentTransactions[1].amount = 10000;
+  backup.operations.orders[0].payment_status = "refunded";
+  const validDb = makeDB();
+  const valid = await restoreBackup({ request: request(backup), env: { ...env, DB: validDb } });
+  assert.equal(valid.status, 200, "full refund of exactly received money is a valid backup state");
+  assert.equal(validDb.batchCalls, 1);
 }
 
 console.log("PASS: restore safety — v1 preservation, invalid/oversized rejection, legacy v2 snapshot backfill, larger valid backup acceptance, and single-batch failure handling.");

@@ -21,9 +21,10 @@ export async function onRequestGet(context) {
     // New attachments live in the private ORIGINALS bucket.
     // Fall back to IMAGES only for legacy attachments created before this fix.
     let object = null;
-    if (context.env.ORIGINALS) {
-      try { object = await context.env.ORIGINALS.get(key); } catch {}
-    }
+    // A failed private-bucket read is a service error, not proof the legacy
+    // object is missing. Never silently substitute a public object after a
+    // private R2 outage; the outer handler returns a safe 503 instead.
+    if (context.env.ORIGINALS) object = await context.env.ORIGINALS.get(key);
     if (!object) object = await context.env.IMAGES.get(key);
     if (!object) return fail("Không tìm thấy ảnh đính kèm.", 404);
 

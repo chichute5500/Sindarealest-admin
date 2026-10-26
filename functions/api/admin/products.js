@@ -37,19 +37,24 @@ export async function onRequestPost(context) {
   };
   const category = Object.hasOwn(categories, normalized) ? categories[normalized] : (normalized ? [normalized, makeCategoryPrefix(normalized)] : null);
   if (!category) return fail("Vui lòng chọn một danh mục hợp lệ trong danh sách.");
-  try {
-    const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();
-    let max = 0;
-    for (const row of rows.results || []) {
-      const sku = String(row.sku || "").toUpperCase();
-      if (!sku.startsWith(category[1])) continue;
-      const suffix = sku.slice(category[1].length);
-      if (/^\d+$/.test(suffix)) { const number = Number(suffix); if (Number.isSafeInteger(number)) max = Math.max(max, number); }
-    }
-    body.sku = category[1] + String(max + 1).padStart(3, "0");
-    body.category = category[0];
-    body.categoryLabel = rawCategory;
-  } catch { return fail("Không thể tạo SKU từ danh mục. Vui lòng thử lại.", 503); }
+  if (body.skuVerified === true) {
+    body.sku = String(body.sku ?? "").trim().toUpperCase();
+    body.skuVerified = true;
+    if (!body.sku) return fail("Nhập SKU thương mại đã xác nhận, hoặc bỏ chọn trạng thái SKU chính thức để cấp mã nội bộ.", 400);
+  } else {
+    try {
+      const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();
+      let max = 0;
+      for (const row of rows.results || []) {
+        const sku = String(row.sku || "").toUpperCase();
+        if (!sku.startsWith(category[1])) continue;
+        const suffix = sku.slice(category[1].length);
+        if (/^\d+$/.test(suffix)) { const number = Number(suffix); if (Number.isSafeInteger(number)) max = Math.max(max, number); }
+      }
+      body.sku = category[1] + String(max + 1).padStart(3, "0");
+      body.skuVerified = false;
+    } catch { return fail("Không thể tạo mã sản phẩm nội bộ từ danh mục. Vui lòng thử lại.", 503); }
+  }
   const checked = validateProduct(body);
   if (checked.error) return fail(checked.error);
   let p = checked.value;
@@ -66,8 +71,9 @@ export async function onRequestPost(context) {
       if (!/UNIQUE constraint failed:\s*products\.sku/i.test(String(error?.message || ""))) {
         return genericDbError(error);
       }
+      if (p.skuVerified) return fail("SKU thương mại này đã tồn tại. Hãy kiểm tra mã đã nhập; hệ thống không tự đổi SKU thương mại.", 409);
       if (attempt === 4) {
-        return fail("Không thể cấp SKU duy nhất sau nhiều lần thử đồng thời. Hãy tải lại danh sách rồi thử lại.", 409);
+        return fail("Không thể cấp mã nội bộ duy nhất sau nhiều lần thử đồng thời. Hãy tải lại danh sách rồi thử lại.", 409);
       }
       try {
         const rows = await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(category[1] + "%").all();

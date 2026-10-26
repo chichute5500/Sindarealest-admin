@@ -90,7 +90,98 @@ try {
     run(["d1", "migrations", "apply", databaseName, "--local", "--config", configPath],
       "Apply migrations after 0007 to temporary local D1");
   }
-  console.log("PASS: all D1 migrations apply locally, required tables exist, and migration 0007 backfills historic order contacts.");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT sku_verified FROM products LIMIT 0;"],
+    "Verify product SKU verification column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT sku_verified FROM order_items LIMIT 0;"],
+    "Verify order-item SKU snapshot column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT fulfillment_type FROM products LIMIT 0;"],
+    "Verify product fulfillment type column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT fulfillment_type FROM order_items LIMIT 0;"],
+    "Verify order-item fulfillment snapshot column");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT payment_terms_confirmed_at, public_access_token_hash FROM orders LIMIT 0;"],
+    "Verify order payment confirmation and scoped access fields");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT shipping_benefit FROM order_payment_requests LIMIT 0;"],
+    "Verify payment shipping benefit field");
+  const fulfillmentCountResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
+    "--command", "SELECT COUNT(*) AS unclassified_seed_count FROM products WHERE fulfillment_type='unclassified';"],
+    "Verify historical product types remain unclassified");
+  const fulfillmentCountPayload = parseCliJson(fulfillmentCountResult.stdout, "kết quả kiểm tra loại hàng seed chưa phân loại");
+  const findUnclassifiedCount = (value) => {
+    if (Array.isArray(value)) { for (const item of value) { const found = findUnclassifiedCount(item); if (found !== null) return found; } }
+    else if (value && typeof value === "object") {
+      if (Object.hasOwn(value, "unclassified_seed_count")) {
+        const count = Number(value.unclassified_seed_count);
+        return Number.isSafeInteger(count) && count >= 0 ? count : null;
+      }
+      for (const item of Object.values(value)) { const found = findUnclassifiedCount(item); if (found !== null) return found; }
+    }
+    return null;
+  };
+  if (findUnclassifiedCount(fulfillmentCountPayload) !== 235) throw new Error("Migration 0009 must leave all 235 historical products unclassified until a human reviews them.");
+  const skuCountResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
+    "--command", "SELECT COUNT(*) AS unverified_seed_count FROM products WHERE sku_verified=0;"],
+    "Verify existing seed SKUs default to unverified");
+  const skuCountPayload = parseCliJson(skuCountResult.stdout, "kết quả kiểm tra SKU seed chưa xác minh");
+  const findUnverifiedCount = (value) => {
+    if (Array.isArray(value)) { for (const item of value) { const found = findUnverifiedCount(item); if (found !== null) return found; } }
+    else if (value && typeof value === "object") {
+      if (Object.hasOwn(value, "unverified_seed_count")) {
+        const count = Number(value.unverified_seed_count);
+        return Number.isSafeInteger(count) && count >= 0 ? count : null;
+      }
+      for (const item of Object.values(value)) { const found = findUnverifiedCount(item); if (found !== null) return found; }
+    }
+    return null;
+  };
+  if (findUnverifiedCount(skuCountPayload) !== 235) throw new Error("Migration 0008 must conservatively mark all 235 generated seed identifiers as unverified.");
+  // Exercise the migrated payment-ledger schema with synthetic data in this temporary local D1 only.
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "UPDATE orders SET status='confirmed',subtotal=100000,total=100000,price_confirmation_required=0,payment_terms_confirmed_at='2026-10-24T00:00:00.000Z',payment_terms_confirmed_by='local-d1-test',payment_terms_note='Synthetic local D1 fixture' WHERE id='audit-order';"],
+    "Prepare synthetic local D1 payment-test order");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total,fulfillment_type) VALUES('audit-item','audit-order','audit-product','AUDIT-SKU-001','Synthetic D1 test item',1,100000,100000,'made_to_order');"],
+    "Insert synthetic local D1 order item");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "INSERT INTO order_payment_requests(id,order_id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by) VALUES('audit-payment-request','audit-order','deposit',30000,'standard_shipping','SD-AUDIT-REQUEST-001','qr/audit-test.png','TEST BANK','0000000000','SYNTHETIC TEST','pending','local-d1-test');"],
+    "Insert synthetic local D1 payment request");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) VALUES('audit-payment-transaction','audit-order','audit-payment-request','received',30000,'AUDIT-BANK-RECEIPT-001','Synthetic fixture; not a real bank transfer','local-d1-test');"],
+    "Insert synthetic local D1 payment-ledger receipt");
+  const ledgerResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
+    "--command", "SELECT o.total AS order_total, SUM(CASE WHEN t.direction='received' THEN t.amount ELSE -t.amount END) AS net_received, COUNT(DISTINCT r.id) AS request_count, COUNT(DISTINCT t.id) AS transaction_count FROM orders o JOIN order_payment_requests r ON r.order_id=o.id JOIN order_payment_transactions t ON t.order_id=o.id WHERE o.id='audit-order' GROUP BY o.id;"],
+    "Verify synthetic local D1 payment ledger totals");
+  const ledgerPayload = parseCliJson(ledgerResult.stdout, "kết quả kiểm tra payment ledger D1 cục bộ");
+  const findLedger = (value) => {
+    if (Array.isArray(value)) { for (const item of value) { const found = findLedger(item); if (found !== null) return found; } }
+    else if (value && typeof value === "object" && Object.hasOwn(value, "net_received")) return value;
+    else if (value && typeof value === "object") {
+      for (const item of Object.values(value)) { const found = findLedger(item); if (found !== null) return found; }
+    }
+    return null;
+  };
+  const ledger = findLedger(ledgerPayload);
+  if (!ledger || Number(ledger.order_total) !== 100000 || Number(ledger.net_received) !== 30000
+      || Number(ledger.request_count) !== 1 || Number(ledger.transaction_count) !== 1) {
+    throw new Error("Synthetic local D1 payment-ledger fixture did not produce the expected order/request/receipt totals.");
+  }
+
+  // A duplicate bank reference must be rejected by the real local SQLite/D1 unique constraint.
+  const duplicateReference = spawnSync(process.execPath, [wrangler, "d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "INSERT INTO order_payment_transactions(id,order_id,direction,amount,transaction_reference,note,actor) VALUES('audit-payment-duplicate','audit-order','received',1000,'AUDIT-BANK-RECEIPT-001','duplicate reference test','local-d1-test');"], {
+    cwd: temp, encoding: "utf8", env: process.env
+  });
+  if (duplicateReference.status === 0 || !/UNIQUE constraint failed/i.test((duplicateReference.stderr || "") + (duplicateReference.stdout || ""))) {
+    throw new Error("Local D1 must reject duplicate transaction references; the expected UNIQUE constraint failure was not observed.");
+  }
+  console.log("PASS: synthetic local D1 order, payment request, verified receipt, aggregate ledger totals, and duplicate transaction-reference constraint.");
+
+  console.log("PASS: temporary local D1 migrations; 0007 backfills historic order contacts; 0008 keeps seed SKUs unverified; 0009 leaves historical fulfillment unclassified and adds payment-ledger fields.");
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }

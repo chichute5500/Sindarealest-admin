@@ -1,0 +1,1510 @@
+{
+  "test": "local-static-admin-baseline",
+  "sourceCommit": "d74de3c6adbb6be6b0a59ac4d45e869738a016e4",
+  "capturedAt": "2026-10-20T20:50:00.385Z",
+  "route": "/admin/",
+  "screenshots": [
+    "admin-login__320x640__light.png",
+    "admin-login__320x640__dark.png",
+    "admin-login__360x800__light.png",
+    "admin-login__360x800__dark.png",
+    "admin-login__375x812__light.png",
+    "admin-login__375x812__dark.png",
+    "admin-login__390x844__light.png",
+    "admin-login__390x844__dark.png",
+    "admin-login__412x915__light.png",
+    "admin-login__412x915__dark.png",
+    "admin-login__768x1024__light.png",
+    "admin-login__768x1024__dark.png",
+    "admin-login__1280x800__light.png",
+    "admin-login__1280x800__dark.png",
+    "admin-login__1440x900__light.png",
+    "admin-login__1440x900__dark.png"
+  ],
+  "viewportMatrix": [
+    {
+      "width": 320,
+      "height": 640
+    },
+    {
+      "width": 360,
+      "height": 800
+    },
+    {
+      "width": 375,
+      "height": 812
+    },
+    {
+      "width": 390,
+      "height": 844
+    },
+    {
+      "width": 412,
+      "height": 915
+    },
+    {
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "metrics": [
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 320,
+      "viewportHeight": 640,
+      "documentWidth": 320,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 320,
+      "viewportHeight": 640,
+      "documentWidth": 320,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 360,
+      "viewportHeight": 800,
+      "documentWidth": 360,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 360,
+      "viewportHeight": 800,
+      "documentWidth": 360,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 375,
+      "viewportHeight": 812,
+      "documentWidth": 375,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 375,
+      "viewportHeight": 812,
+      "documentWidth": 375,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 390,
+      "viewportHeight": 844,
+      "documentWidth": 390,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 390,
+      "viewportHeight": 844,
+      "documentWidth": 390,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 412,
+      "viewportHeight": 915,
+      "documentWidth": 412,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 412,
+      "viewportHeight": 915,
+      "documentWidth": 412,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 768,
+      "viewportHeight": 1024,
+      "documentWidth": 768,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 768,
+      "viewportHeight": 1024,
+      "documentWidth": 768,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "documentWidth": 1280,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 1280,
+      "viewportHeight": 800,
+      "documentWidth": 1280,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "light",
+      "backgroundToken": "#eaf3fb",
+      "viewportWidth": 1440,
+      "viewportHeight": 900,
+      "documentWidth": 1440,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    },
+    {
+      "title": "Quản trị SinDarealest",
+      "lang": "vi",
+      "theme": "dark",
+      "backgroundToken": "#09131d",
+      "viewportWidth": 1440,
+      "viewportHeight": 900,
+      "documentWidth": 1440,
+      "horizontalOverflow": false,
+      "loginCardFitsViewport": true,
+      "passwordFieldFitsViewport": true,
+      "passwordToggleFitsViewport": true,
+      "submitButtonFitsViewport": true
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "httpErrors": [],
+  "completed": true,
+  "failure": null,
+  "uiFixtureVisualAudit": {
+    "test": "local-static-admin-ui-fixture-visuals",
+    "sourceCommit": "d74de3c6adbb6be6b0a59ac4d45e869738a016e4",
+    "capturedAt": "2026-10-20T20:50:14.504Z",
+    "fixtureOnly": true,
+    "auth": "Local session API is stubbed to enter appView for layout screenshots only; no live authentication is tested.",
+    "data": "All returned API objects are synthetic fixture data with explicit UI-ONLY IDs, no real PII, no real price/stock/warranty facts.",
+    "writePolicy": "Every non-GET API request is blocked and recorded; no backend, D1, R2 or production data is read or mutated.",
+    "viewportMatrix": [
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      }
+    ],
+    "screenshots": [
+      {
+        "file": "dashboard__390x844__light.png",
+        "screen": "dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "dashboard__390x844__light__full.png",
+        "screen": "dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "fullPage": true
+      },
+      {
+        "file": "dashboard__390x844__dark.png",
+        "screen": "dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "dashboard__1280x800__light.png",
+        "screen": "dashboard",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "products__390x844__light.png",
+        "screen": "products",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "products__390x844__light__full.png",
+        "screen": "products",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "fullPage": true
+      },
+      {
+        "file": "products__390x844__dark.png",
+        "screen": "products",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "products__1280x800__light.png",
+        "screen": "products",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "product-editor__390x844__light.png",
+        "screen": "product-editor",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "dialog": true
+      },
+      {
+        "file": "product-gallery__390x844__light.png",
+        "screen": "product-gallery",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "dialog": true,
+        "fixtureImages": 0
+      },
+      {
+        "file": "product-editor__390x844__dark.png",
+        "screen": "product-editor",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "dialog": true
+      },
+      {
+        "file": "product-gallery__390x844__dark.png",
+        "screen": "product-gallery",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "dialog": true,
+        "fixtureImages": 0
+      },
+      {
+        "file": "product-editor__1280x800__light.png",
+        "screen": "product-editor",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "dialog": true
+      },
+      {
+        "file": "product-gallery__1280x800__light.png",
+        "screen": "product-gallery",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "dialog": true,
+        "fixtureImages": 0
+      },
+      {
+        "file": "orders__390x844__light.png",
+        "screen": "orders",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "orders__390x844__light__full.png",
+        "screen": "orders",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "fullPage": true
+      },
+      {
+        "file": "orders__390x844__dark.png",
+        "screen": "orders",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "orders__1280x800__light.png",
+        "screen": "orders",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "order-row-details__390x844__light.png",
+        "screen": "order-row-details",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "order-row-details__390x844__dark.png",
+        "screen": "order-row-details",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "order-row-details__1280x800__light.png",
+        "screen": "order-row-details",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "customers__390x844__light.png",
+        "screen": "customers",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "customers__390x844__light__full.png",
+        "screen": "customers",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "fullPage": true
+      },
+      {
+        "file": "customers__390x844__dark.png",
+        "screen": "customers",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "customers__1280x800__light.png",
+        "screen": "customers",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "warranties__390x844__light.png",
+        "screen": "warranties",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "warranties__390x844__light__full.png",
+        "screen": "warranties",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "fullPage": true
+      },
+      {
+        "file": "warranties__390x844__dark.png",
+        "screen": "warranties",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "warranties__1280x800__light.png",
+        "screen": "warranties",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "settings__390x844__light.png",
+        "screen": "settings",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "settings__390x844__light__full.png",
+        "screen": "settings",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "fullPage": true
+      },
+      {
+        "file": "settings__390x844__dark.png",
+        "screen": "settings",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "settings__1280x800__light.png",
+        "screen": "settings",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "backup-restore__390x844__light.png",
+        "screen": "backup-restore",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "backup-restore__390x844__dark.png",
+        "screen": "backup-restore",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "backup-restore__1280x800__light.png",
+        "screen": "backup-restore",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "dashboard-activity__390x844__light.png",
+        "screen": "dashboard-activity",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "dashboard-activity__390x844__dark.png",
+        "screen": "dashboard-activity",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "dashboard-activity__1280x800__light.png",
+        "screen": "dashboard-activity",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      },
+      {
+        "file": "notifications__390x844__light.png",
+        "screen": "notifications",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light"
+      },
+      {
+        "file": "notifications__390x844__dark.png",
+        "screen": "notifications",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark"
+      },
+      {
+        "file": "notifications__1280x800__light.png",
+        "screen": "notifications",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light"
+      }
+    ],
+    "metrics": [
+      {
+        "screen": "dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "dashboard",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "products",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "products",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "products",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "product-editor",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": [],
+        "dialog": true
+      },
+      {
+        "screen": "product-gallery",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": [],
+        "dialog": true,
+        "fixtureImages": 0
+      },
+      {
+        "screen": "product-editor",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": [],
+        "dialog": true
+      },
+      {
+        "screen": "product-gallery",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": [],
+        "dialog": true,
+        "fixtureImages": 0
+      },
+      {
+        "screen": "product-editor",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": [],
+        "dialog": true
+      },
+      {
+        "screen": "product-gallery",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": [],
+        "dialog": true,
+        "fixtureImages": 0
+      },
+      {
+        "screen": "orders",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "orders",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "orders",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "order-row-details",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "order-row-details",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "order-row-details",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "customers",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "customers",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "customers",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "warranties",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "warranties",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "warranties",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "settings",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "settings",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "settings",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "backup-restore",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "backup-restore",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "backup-restore",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "dashboard-activity",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "dashboard-activity",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "dashboard-activity",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "notifications",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "light",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "notifications",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      },
+      {
+        "screen": "notifications",
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "theme": "light",
+        "viewportWidth": 1280,
+        "viewportHeight": 800,
+        "documentWidth": 1280,
+        "horizontalOverflow": false,
+        "visibleTextContainsClosingTag": false,
+        "bodyTextClosingTagContext": null,
+        "lang": "vi",
+        "rawClosingTagNodes": [],
+        "rawClosingTagPseudoContent": [],
+        "hitTestDiagnostics": []
+      }
+    ],
+    "pageErrors": [],
+    "consoleErrors": [],
+    "attemptedWrites": [],
+    "unexpectedApiPaths": [],
+    "completed": true,
+    "failure": null,
+    "visibleClosingTagIssues": [],
+    "fixtureApiRequests": [
+      {
+        "method": "GET",
+        "path": "/api/admin/session"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/products"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/settings"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/customers"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/warranties"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/audit-logs"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/products"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/settings"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/customers"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/warranties"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/audit-logs"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/products"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/settings"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/customers"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/warranties"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/audit-logs"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/products"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/settings"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/customers"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/warranties"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/audit-logs"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/products"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/settings"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/orders"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/customers"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/warranties"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/audit-logs"
+      }
+    ],
+    "fixtureApiErrors": []
+  }
+}

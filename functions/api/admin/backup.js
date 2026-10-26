@@ -16,7 +16,9 @@ const TOTAL_RECORD_COUNT_SQL = `SELECT
   (SELECT COUNT(*) FROM (SELECT 1 FROM order_shipping_addresses LIMIT 5001)) +
   (SELECT COUNT(*) FROM (SELECT 1 FROM order_contact_details LIMIT 5001)) +
   (SELECT COUNT(*) FROM (SELECT 1 FROM order_item_details LIMIT 5001)) +
-  (SELECT COUNT(*) FROM (SELECT 1 FROM warranty_claim_attachments LIMIT 5001)) AS total_count`;
+  (SELECT COUNT(*) FROM (SELECT 1 FROM warranty_claim_attachments LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_payment_requests LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_payment_transactions LIMIT 5001)) AS total_count`;
 
 function boundedTableQuery(db, table, orderBy) {
   return db.prepare(
@@ -40,6 +42,7 @@ export async function onRequestGet(context) {
       "welcome_title_line_2",
       "welcome_text",
       "watermark_enabled",
+      "watermark_logo",
       "watermark_position",
       "watermark_size",
       "watermark_opacity",
@@ -61,9 +64,11 @@ export async function onRequestGet(context) {
       boundedTableQuery(db, "order_contact_details", "order_id"),
       boundedTableQuery(db, "order_item_details", "item_id"),
       boundedTableQuery(db, "warranty_claim_attachments", "claim_id"),
-      db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?,?,?,?,?)").bind(...settingKeys),
+      boundedTableQuery(db, "order_payment_requests", "created_at, id"),
+      boundedTableQuery(db, "order_payment_transactions", "created_at, id"),
+      db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?,?,?,?,?,?)").bind(...settingKeys),
     ]);
-    if (!Array.isArray(resultSets) || resultSets.length !== 14) {
+    if (!Array.isArray(resultSets) || resultSets.length !== 16) {
       throw new Error("D1 snapshot returned an incomplete result set");
     }
     const totalRecords = Number(resultSets[0]?.results?.[0]?.total_count);
@@ -74,7 +79,7 @@ export async function onRequestGet(context) {
       return fail("Bản sao lưu vượt giới hạn 5.000 bản ghi cho một lần xử lý. Hãy lên kế hoạch xuất/nhập theo lô trước khi tiếp tục.", 413);
     }
     const rowsAt = (index) => resultSets[index]?.results || [];
-    const settingMap = new Map(rowsAt(13).map((row) => [row.key, row.value]));
+    const settingMap = new Map(rowsAt(15).map((row) => [row.key, row.value]));
     const setting = (key, fallback) => settingMap.get(key) ?? fallback;
     const productRows = { results: rowsAt(1) };
     const customers = { results: rowsAt(2) };
@@ -88,17 +93,21 @@ export async function onRequestGet(context) {
     const orderContactDetails = { results: rowsAt(10) };
     const orderItemDetails = { results: rowsAt(11) };
     const warrantyClaimAttachments = { results: rowsAt(12) };
+    const orderPaymentRequests = { results: rowsAt(13) };
+    const orderPaymentTransactions = { results: rowsAt(14) };
     const showPrices = setting("show_prices", "0");
     const welcomeEnabled = setting("welcome_enabled", "1");
     const welcomeTitleLine1 = setting("welcome_title_line_1", "Đẳng cấp thật.");
     const welcomeTitleLine2 = setting("welcome_title_line_2", "Từ chất liệu thật.");
     const welcomeText = setting("welcome_text", "Từ vân da tự nhiên đến từng đường nét hoàn thiện, mỗi thiết kế được chăm chút để tôn lên chất liệu và phong cách riêng của người sở hữu.");
     const watermarkEnabled = setting("watermark_enabled", WATERMARK_DEFAULTS.watermark_enabled);
+    const watermarkLogo = setting("watermark_logo", WATERMARK_DEFAULTS.watermark_logo);
     const watermarkPosition = setting("watermark_position", WATERMARK_DEFAULTS.watermark_position);
     const watermarkSize = setting("watermark_size", WATERMARK_DEFAULTS.watermark_size);
     const watermarkOpacity = setting("watermark_opacity", WATERMARK_DEFAULTS.watermark_opacity);
     const watermark = normalizeWatermarkSettings({
       watermark_enabled: watermarkEnabled,
+      watermark_logo: watermarkLogo,
       watermark_position: watermarkPosition,
       watermark_size: watermarkSize,
       watermark_opacity: watermarkOpacity,
@@ -113,6 +122,7 @@ export async function onRequestGet(context) {
         welcomeTitleLine2,
         welcomeText,
         watermarkEnabled: watermark.watermarkEnabled,
+        watermarkLogoUrl: watermark.watermarkLogoUrl,
         watermarkPosition: watermark.watermarkPosition,
         watermarkSize: watermark.watermarkSize,
         watermarkOpacity: watermark.watermarkOpacity,
@@ -130,6 +140,8 @@ export async function onRequestGet(context) {
         orderContactDetails: orderContactDetails.results || [],
         orderItemDetails: orderItemDetails.results || [],
         warrantyClaimAttachments: warrantyClaimAttachments.results || [],
+        orderPaymentRequests: orderPaymentRequests.results || [],
+        orderPaymentTransactions: orderPaymentTransactions.results || [],
       },
     };
 

@@ -203,6 +203,20 @@ const legacyImage = await readClaimPhoto({ request: legacyRequest, env: adminEnv
 assert.equal(legacyImage.status, 200, "older evidence already in IMAGES must remain accessible to admins");
 assert.equal(images.calls.gets.at(-1), legacyKey, "legacy fallback should use IMAGES only when ORIGINALS has no object");
 
+// A private R2 outage must never trigger the legacy public-bucket fallback.
+const outageLegacyReads = bucket({ [legacyKey]: objectFor() });
+const brokenPrivateBucket = {
+  async get() { throw new Error("simulated private R2 outage"); },
+};
+const outage = await readClaimPhoto({
+  request: legacyRequest,
+  env: { ...adminEnv, ORIGINALS: brokenPrivateBucket, IMAGES: outageLegacyReads },
+});
+assert.equal(outage.status, 503, "private R2 read errors must fail closed");
+assert.equal(outageLegacyReads.calls.gets.length, 0,
+  "a private R2 outage is not evidence that a public legacy image should be substituted");
+assert.equal((await outage.json()).ok, false);
+
 const publicResponse = await publicMedia({ params: { key: uploaded.imageKey }, env: { IMAGES: images } });
 assert.equal(publicResponse.status, 404, "public media routing must reject private warranty evidence paths");
 assert.equal(images.calls.gets.at(-1), legacyKey, "the public media route must not fetch a warranty attachment from IMAGES");

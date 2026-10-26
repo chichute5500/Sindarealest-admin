@@ -1,0 +1,61 @@
+name: ADMIN isolated Preview security and accessibility smoke (read-only)
+
+on:
+  push:
+    branches:
+      - feature/admin-isolated-handoff-2026-10-20
+    paths:
+      - '.github/workflows/admin-security-a11y-perf-readonly.yml'
+      - 'tests/e2e/admin-security-a11y-perf.spec.js'
+      - 'functions/api/admin/orders.js'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-a11y-perf:
+    name: Auth, keyboard and navigation timing on isolated Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Restrict to exact approved repository and Admin-only feature branch
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20"
+          test -n "$ADMIN_TEST_PASSWORD"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install dependencies and Chromium
+        run: |
+          npm install --no-fund
+          npm install --no-save --no-package-lock @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Verify deployed exact SHA using Cloudflare read-only metadata
+        run: node scripts/qa-admin-preview-deployed-sha.mjs
+      - name: Run unauthenticated access, keyboard and performance smoke
+        run: npx playwright test tests/e2e/admin-security-a11y-perf.spec.js --workers=2 --reporter=line
+      - name: Verify branch has not moved
+        if: always()
+        run: |
+          remote="$(git ls-remote origin refs/heads/feature/admin-isolated-handoff-2026-10-20 | awk '{print $1}')"
+          test "$remote" = "$GITHUB_SHA"
+      - name: Upload sanitized smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-security-a11y-perf-${{ github.run_number }}
+          path: artifacts/admin-security-a11y-perf/
+          if-no-files-found: warn
+          retention-days: 14

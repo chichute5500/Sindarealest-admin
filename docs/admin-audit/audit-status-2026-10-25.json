@@ -1,0 +1,829 @@
+{
+  "auditDate": "2026-10-25",
+  "adminHeadBeforeDocumentation": "f0bd664fa359aa197c274e8648e71c79e67567a9",
+  "pr": 111,
+  "preintegration": "BLOCKED_DEFERRED_BY_OWNER",
+  "integrationAuthorized": false,
+  "merged": false,
+  "productionModified": false,
+  "websiteModified": false,
+  "routesAudited": 22,
+  "deployGate": "STATIC_TEST_PASS_D1_R2_PREVIEW_GUARD_ADDED",
+  "uploadMissingOriginals": "LOCAL_TEST_PASS",
+  "uploadRollback": "LOCAL_TEST_PASS",
+  "blockers": [
+    "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+    "STOREFRONT_ADMIN_PAYMENT_API_MIGRATION_CONTRACT_DRIFT",
+    "REAL_BANK_SETTLEMENT_REFUND_RECONCILIATION_NOT_APPROVED",
+    "FULL_INDEPENDENT_PENTEST_SCREENREADER_LOAD_SIGNOFF_NOT_VERIFIED"
+  ],
+  "visualParityAccepted": 0,
+  "visualParityTotal": 12,
+  "ownerAcceptance": "OWNER_VISUAL_DESIGN_APPROVED_12_OF_12_NOT_RELEASE_APPROVAL",
+  "notes": "Admin functionality has tests, but complete remote D1/R2, design parity, accessibility/security and cross-platform validation are not approved. No merge.",
+  "latestVerifiedCodeAndTestSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+  "latestChanges": [
+    {
+      "sha": "d6da905c4ce53cbf0a84e426943927c978767923",
+      "finding": "Private R2 read outage incorrectly triggered public bucket fallback",
+      "resolution": "Fail closed with HTTP 503, without public read",
+      "test": "tests/private-warranty-attachments.test.mjs"
+    },
+    {
+      "sha": "192a4374f13bb9d918e85eabf167b6573efcf1b7",
+      "finding": "Stale product UPDATE/DELETE returned success plus phantom audit",
+      "resolution": "Guard D1 changes count; conditional audit; HTTP 409 on stale writes",
+      "test": "tests/admin-product-write-race-sqlite.test.mjs"
+    },
+    {
+      "sha": "9b6bb3145145b1399391dd235f1a2efb9ee66b99",
+      "finding": "Only static Admin handler authorization sweep existed",
+      "resolution": "Dynamic 401/403 test of 31 protected handlers before DB access",
+      "test": "tests/admin-route-runtime-auth.test.mjs"
+    },
+    {
+      "sha": "e047395ee5f4823deec22d4a1f721a0ef6a0ebc2",
+      "finding": "Backup Restore accepted whitespace, arrays or booleans as financial/integer fields through JavaScript coercion",
+      "resolution": "Reject non-numeric JSON types and non-decimal integer strings before D1 write",
+      "test": "tests/restore-safety.test.mjs"
+    },
+    {
+      "sha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+      "finding": "Backup Restore accepted payment ledger where refunded aggregate exceeds received aggregate for the same order",
+      "resolution": "Validate net ledger per order before constructing destructive batch",
+      "test": "tests/restore-safety.test.mjs"
+    },
+    {
+      "sha": "30b193a640dd6bad826265bf3b982b05558616cc",
+      "finding": "Payment POST coerced non-numeric JSON input into financial amounts",
+      "resolution": "Only JSON numbers accepted; tests reject boolean/array/string before D1",
+      "test": "tests/payment-ledger-route.test.mjs"
+    },
+    {
+      "sha": "27a145253c71bc887b536611e9fece3ddd51779d",
+      "finding": "Warranty issuance coerced array/object/boolean values into durations",
+      "resolution": "Strict number or decimal-only string validation for real FormData compatibility",
+      "test": "tests/warranty-issuance-race.test.mjs"
+    },
+    {
+      "sha": "030a39928204a5b091b27880adf645f57e343593",
+      "finding": "Admin order status saves with unchanged user-supplied prices could replay stale item prices after a concurrent reprice",
+      "resolution": "Skip unchanged item updates and gate order summary update against exact preflight item/quantity/unit-price snapshot in the D1 batch",
+      "test": "tests/disposable-sqlite-integration.test.mjs"
+    },
+    {
+      "sha": "d59098a19fc4c45580fbdd5cd4ac3cd4b23a93c3",
+      "finding": "Concurrent Admin repricing and status changes could overwrite stale data",
+      "resolution": "Order-first snapshot compare-and-swap, status/item consistency and duplicate price rejection",
+      "test": "tests/disposable-sqlite-integration.test.mjs"
+    },
+    {
+      "sha": "3cbfc808fe0a7c9fde25c36ca6aab350ff3a42ac",
+      "finding": "SQLite test fixture reset had not restored payment terms after the reprice scenario",
+      "resolution": "Reset only disposable test fixture signed terms; business validation unchanged",
+      "test": "tests/disposable-sqlite-integration.test.mjs"
+    }
+  ],
+  "qaEvidence": {
+    "sourceSha": "9b6bb3145145b1399391dd235f1a2efb9ee66b99",
+    "workflows": [
+      {
+        "run": 40169836229,
+        "result": "SUCCESS",
+        "type": "Validate & runtime tests"
+      },
+      {
+        "run": 40169836222,
+        "result": "SUCCESS",
+        "type": "Admin Preview Playwright"
+      },
+      {
+        "run": 40169836334,
+        "result": "SUCCESS",
+        "type": "Isolated Preview Playwright"
+      },
+      {
+        "run": 40169833547,
+        "result": "SUCCESS",
+        "type": "Isolated Preview Playwright"
+      },
+      {
+        "run": 40169833551,
+        "result": "SUCCESS",
+        "type": "Validate & runtime tests"
+      },
+      {
+        "run": 40169833613,
+        "result": "SUCCESS",
+        "type": "Admin Preview visual diagnostics"
+      }
+    ],
+    "runtimeAuthProtectedHandlers": 31,
+    "unauthorizedD1Operations": 0,
+    "sqliteProductRace": "PASS",
+    "privateR2FallbackGuard": "PASS",
+    "artifactId": 12589933479,
+    "artifactName": "admin-preview-evidence-587",
+    "visibleScreenshotsCount": 142,
+    "previewBrandFilter": "none"
+  },
+  "appDeploymentNote": "Latest code/test branch includes backend fixes NOT yet redeployed to isolated Admin Preview. Browser visual captures are static/local source and existing Admin Preview checks, not backend live integration proof.",
+  "designParityAccepted": 12,
+  "remainingBlockers": [
+    "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+    "STOREFRONT_ADMIN_PAYMENT_API_MIGRATION_CONTRACT_DRIFT",
+    "REAL_BANK_SETTLEMENT_REFUND_RECONCILIATION_NOT_APPROVED",
+    "FULL_INDEPENDENT_PENTEST_SCREENREADER_LOAD_SIGNOFF_NOT_VERIFIED"
+  ],
+  "overallStatus": "NOT_100_PERCENT_ACCEPTED",
+  "latestHandoffDate": "2026-10-25",
+  "lastVerifiedCodeAndTestHeadBeforeHandoff": "3cbfc808fe0a7c9fde25c36ca6aab350ff3a42ac",
+  "lastVerifiedExactShaCi": {
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "9/9_WORKFLOWS_SUCCESS",
+    "runs": [
+      40184464603,
+      40184468224,
+      40184468208,
+      40184468219,
+      40184464600,
+      40184464693,
+      40184464611,
+      40184464602,
+      40184464715
+    ]
+  },
+  "lastVerifiedDeployedAppSourceSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
+  "lastVerifiedDeployedRun": 40165551327,
+  "storefrontHeadAsOfHandoff": "632a64c09a47d71bb1461c2937c44b9c2d3dc028",
+  "latestOwnerInstruction": "Do not repeat already PASS tests. D1/R2 are not a current priority; only continue other unfinished work. Update GitHub handoff and prompt for next chat.",
+  "cloudflareBindingLastVerifiedByRun": 40167641001,
+  "cloudflareImageBindingHistoricalGapResolved": true,
+  "ownerAcceptedScreenCount": 12,
+  "acceptanceEvidenceWeight": 32,
+  "completionPercentNotEstablished": true,
+  "handoffDocument": "docs/admin-ui-reference/handoff/CURRENT-CHECKPOINT-2026-10-25.md",
+  "latestFixesAtSourceSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+  "latestHandoffSourceSha": "181e1ff3e843c9984ce5889095e3913290a038a7",
+  "lastRoundTwoDiagnostic": {
+    "id": 40173676045,
+    "status": "success"
+  },
+  "latestHandoffCodeSha": "27a145253c71bc887b536611e9fece3ddd51779d",
+  "latestIndependentAuditDocument": "docs/admin-audit/PARALLEL-ACCEPTANCE-2026-10-25.md",
+  "visualArtifactIndependentReview": {
+    "sourceSha": "30b193a640dd6bad826265bf3b982b05558616cc",
+    "artifactId": 12591429398,
+    "pngCount": 132,
+    "allPngDecoded": true,
+    "viewportMismatches": 0,
+    "overallUniqueHashes": 112,
+    "canonical12DistinctAt390Light": true,
+    "canonical12DistinctAt390Dark": true,
+    "canonical12DistinctAt1280Light": true,
+    "ownerAccepted": 0
+  },
+  "deploymentProvenanceMostRecentViewed": {
+    "artifactId": 12592052512,
+    "expectedSha": "30b193a640dd6bad826265bf3b982b05558616cc",
+    "observedSha": "c64e07fca248dc527361c4d018dc26c11f5b3570",
+    "status": "REPORTED_SHA_MISMATCH"
+  },
+  "lastVerifiedAdminPreviewBindingCheck": {
+    "workflowRun": 40183717239,
+    "status": "SUCCESS_READONLY",
+    "previewDbImagesOriginalsSeparatedFromProduction": true
+  },
+  "lastVerifiedRemoteD1Schema": {
+    "workflowRun": 40183717244,
+    "status": "SCHEMA_AND_LEDGER_SHAPE_VERIFIED",
+    "requiredTables": 9
+  },
+  "lastVerifiedIsolatedAdminLiveQA": {
+    "workflowRun": 40184464715,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "SUCCESS",
+    "viewportThemeCases": 14,
+    "screensPerCase": 12,
+    "runOwnedCleanupPasses": 2,
+    "artifactId": 12596180300
+  },
+  "lastVerifiedSecurityKeyboardSmoke": {
+    "workflowRun": 40184464602,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "SUCCESS",
+    "scope": "SMOKE_NOT_COMPLETE_SECURITY_AUDIT"
+  },
+  "latestDeployedAndAcceptedTestSourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+  "lastVerifiedAdminPreviewDeployedSourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+  "lastVerifiedAdminResponsiveQA": {
+    "workflowRun": 40184464611,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "SUCCESS",
+    "artifactId": 12595746276
+  },
+  "lastVerifiedPreviewDeploy": {
+    "workflowRun": 40184464600,
+    "sourceSha": "3f65965c6015f0c4f97c17aa06022416875e552b",
+    "result": "SUCCESS",
+    "targetProject": "sindarealest-admin-preview",
+    "environment": "preview"
+  },
+  "lastVerifiedRemoteR2": {
+    "workflowRun": 40187426696,
+    "sourceSha": "04f115405699434431b51216f31c311ef8bea333",
+    "artifactId": 12597070312,
+    "result": "PASS_REMOTE_R2_RUN_OWNED_LIFECYCLE",
+    "bindingIsolationVerified": true,
+    "readbackVerified": true,
+    "publicRouteVerified": true,
+    "cleanupPasses": 2,
+    "cleanupVerified": true,
+    "productionTouched": false,
+    "protocol": "S3_SIGV4",
+    "bucketScope": "ADMIN_PREVIEW_IMAGES_AND_ORIGINALS_ONLY"
+  },
+  "lastVerifiedR2SourceSha": "04f115405699434431b51216f31c311ef8bea333",
+  "lastObservedStorefrontStorage": "PREVIEW_DB_AND_ORIGINALS_STILL_PRODUCTION_BACKED_NO_WRITES",
+  "ownerApprovedScreens": [
+    {
+      "screenNumber": 1,
+      "screenId": "01_login",
+      "name": "Đăng nhập",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "0b9395721cfd58ec0d1dace922ffc3372b7bba60",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40191206728,
+      "artifactId": 12598276457,
+      "screenshotPath": "artifacts/admin-12-screen-live/0b9395721cfd/390x844_light/01_login.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Tôi duyệt màn hình 01 Đăng nhập với giao diện Preview hiện tại.",
+      "scopeNote": "Approval applies to the shown mobile-light current Preview comparison, not unseen breakpoints or future UI versions."
+    },
+    {
+      "screenNumber": 2,
+      "screenId": "02_dashboard",
+      "name": "Tổng quan",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "reviewedViews": [
+        {
+          "viewport": "390x844",
+          "theme": "light",
+          "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/02_dashboard.png"
+        },
+        {
+          "viewport": "1440x900",
+          "theme": "light",
+          "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/1440x900_light/02_dashboard.png"
+        }
+      ],
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "approvedOn": "2026-10-25",
+      "approvalText": "Tôi duyệt màn hình 02 Tổng quan với giao diện Preview hiện tại. Ghi nhận vào GitHub và chuyển sang màn 03 Danh sách sản phẩm.",
+      "scopeNote": "Owner approved presented Preview mobile-light and desktop-light screenshots, not pixel-perfect parity or other modes and future versions."
+    },
+    {
+      "screenNumber": 3,
+      "screenId": "03_product_list",
+      "name": "Danh sách sản phẩm",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/03_product_list.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 4,
+      "screenId": "04_product_editor",
+      "name": "Thêm / chỉnh sửa sản phẩm",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/04_product_editor.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 5,
+      "screenId": "05_product_gallery",
+      "name": "Hình ảnh sản phẩm",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/05_product_gallery.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 6,
+      "screenId": "06_orders",
+      "name": "Đơn hàng",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/06_orders.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 7,
+      "screenId": "07_order_detail",
+      "name": "Chi tiết đơn hàng",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/07_order_detail.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 8,
+      "screenId": "08_customers",
+      "name": "Khách hàng",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/08_customers.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 9,
+      "screenId": "09_warranty_support",
+      "name": "Bảo hành / hỗ trợ",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/09_warranty_support.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 10,
+      "screenId": "10_website_settings",
+      "name": "Cài đặt Website",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/10_website_settings.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 11,
+      "screenId": "11_backup_restore",
+      "name": "Sao lưu / khôi phục",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/11_backup_restore.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    },
+    {
+      "screenNumber": 12,
+      "screenId": "12_activity_log",
+      "name": "Nhật ký hoạt động",
+      "status": "OWNER_APPROVED",
+      "sourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+      "environment": "Admin isolated Preview",
+      "viewport": "390x844",
+      "theme": "light",
+      "captureRunId": 40194565226,
+      "artifactId": 12599625737,
+      "screenshotPath": "artifacts/admin-12-screen-live/ab46d35311ab/390x844_light/12_activity_log.png",
+      "approvedOn": "2026-10-25",
+      "approvalText": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+      "scopeNote": "Original screen layout approved from presented 390x844 light Preview screenshots; bell approved after user said Pass to the explained function and updated design. CI/deploy succeeded on bell SHA. Does not imply exhaustive pixel parity, every device/theme, business or Production release acceptance.",
+      "bellApprovalSourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+      "bellApprovalText": "Pass",
+      "bellApprovalOn": "2026-10-25"
+    }
+  ],
+  "lastOwnerVisualAcceptance": {
+    "accepted": 12,
+    "unconditionalAccepted": 12,
+    "conditionalAccepted": 0,
+    "total": 12,
+    "approvedAppSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+    "nextScreen": null,
+    "status": "OWNER_APPROVED_12_OF_12_DESIGN_SCOPE",
+    "approvedOn": "2026-10-25",
+    "approvalEvidence": "User replied Pass after notification bell details and prior conditional acceptance"
+  },
+  "screen02VisualReview": {
+    "screen": 2,
+    "name": "Tổng quan",
+    "state": "OWNER_APPROVED",
+    "ownerFeedback": "Duplicate dashboard heading; replace ambiguous logout arrow with red power-off icon",
+    "fixedDeployedSourceSha": "ab46d35311ab1ef7fb2f95428401076c70325ce7",
+    "visualWorkflowRun": 40194565226,
+    "visualArtifactId": 12599625737,
+    "ciPasses": 10,
+    "ciTotal": 10,
+    "approvedOn": "2026-10-25",
+    "ownerApproved": true
+  },
+  "remainingVisualReview": {
+    "screens": [],
+    "state": "NO_OWNER_DESIGN_APPROVAL_PENDING",
+    "note": "12/12 design accepted; separate engineering and release gates remain"
+  },
+  "notificationBellPolish": {
+    "ownerFeedback": "Sửa lại chuông thông báo đẹp hơn còn lại pass",
+    "status": "OWNER_APPROVED_WITH_EXACT_SHA_CI_DEPLOY_PASS",
+    "scope": "SHARED_ADMIN_TOPBAR_ONLY",
+    "styles": "brand gold, subtle glass, red unread count, hover/focus, responsive, dark theme",
+    "businessLogicChanged": false,
+    "productionTouched": false,
+    "ownerApprovalText": "Pass",
+    "ownerApprovedOn": "2026-10-25",
+    "sourceSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+    "visualRunId": 40200290474,
+    "visualArtifactId": 12600964216,
+    "deployRunId": 40200290452,
+    "accessibilityRunId": 40200290427,
+    "ciPasses": 10,
+    "ciTotal": 10,
+    "releaseAuthorized": false
+  },
+  "ownerVisualDesignApproved": true,
+  "remainingTechnicalReleaseGatesStatus": "NON_D1_R2_SIGNOFFS_OUTSTANDING_INTEGRATION_BLOCKED_NO_MERGE",
+  "ownerBellApprovalScope": "Owner affirmed bell behavior/design as described; no claim of independent pixel-by-pixel owner inspection of latest bell screenshots",
+  "previousRemainingBlockersHistorical": [
+    "ADMIN_PREVIEW_ORIGINALS_MISSING",
+    "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+    "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+    "12_SCREEN_OWNER_VISUAL_ACCEPTANCE_PENDING",
+    "REMOTE_R2_PRIVATE_WRITE_READ_CLEANUP_NOT_VERIFIED",
+    "REMOTE_RESTORE_POST_TO_DISPOSABLE_D1_NOT_VERIFIED"
+  ],
+  "currentOpenGates": {
+    "recordedOn": "2026-10-25",
+    "scope": "NON_D1_R2_UNFINISHED_ONLY_NO_PASS_RETEST",
+    "passEvidenceLocked": true,
+    "ownerDesignScreensApproved": 12,
+    "adminBellSha": "1f0b7fe16e809e323caa8567d230fe34b4b87014",
+    "r2CanaryPassRun": 40187426696,
+    "disposableRestorePassRun": 40188752986,
+    "securitySmokePassRun": 40208397077,
+    "latestBindingRun": 40207822357,
+    "actualProductionSharedBindings": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "adminPreviewOriginals": "PRESENT_AND_ISOLATED",
+    "contractDrift": [
+      "Storefront missing order-payment.js, payment-settings.js, payment-qr/[key].js, migration 0009",
+      "Storefront create order does not return orderAccessToken"
+    ],
+    "remaining": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED",
+      "STOREFRONT_ADMIN_PAYMENT_API_MIGRATION_CONTRACT_DRIFT",
+      "REAL_BANK_SETTLEMENT_REFUND_RECONCILIATION_NOT_APPROVED",
+      "FULL_INDEPENDENT_PENTEST_SCREENREADER_LOAD_SIGNOFF_NOT_VERIFIED"
+    ],
+    "productionTouched": false,
+    "mergeAuthorized": false,
+    "handoff": "docs/preintegration/REMAINING-ONLY-HANDOFF-2026-10-25.md",
+    "d1R2Priority": "DEFERRED_BY_OWNER_NOT_BLOCKER_RESOLVED",
+    "activelyPrioritized": [
+      "INDEPENDENT_DEEP_SECURITY_REVIEW",
+      "ASSISTIVE_TECH_ACCESSIBILITY_SIGNOFF",
+      "PERFORMANCE_LOAD_INDEPENDENT_ACCEPTANCE",
+      "REAL_FINANCIAL_RECONCILIATION_SIGNOFF",
+      "ADMIN_STOREFRONT_API_SCHEMA_READONLY_CONTRACT_PLAN"
+    ],
+    "deferredWork": [
+      "REPEAT_R2_CANARY",
+      "REPEAT_DISPOSABLE_RESTORE",
+      "NEW_REMOTE_D1_R2_QA",
+      "STOREFRONT_PREVIEW_CLOUDFLARE_DB_ORIGINALS_REBINDING",
+      "CROSS_PROJECT_WRITE_INTEGRATION"
+    ],
+    "deferredIntegrationRisksNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "lastVerifiedDocsCheckpoint": "a29a46abe88516456ee23078ad29015649b31e53",
+    "docsCheckpointWorkflowResults": "4/4 SUCCESS",
+    "lastVerifiedCodeDeployedSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "lastVerifiedCodeDeployWorkflow": 40208396978,
+    "handoffPromptPath": "docs/admin-ui-reference/handoff/PROMPT-NEXT-CHAT.md",
+    "handoffScopeInstructionDate": "2026-10-25"
+  },
+  "lastVerifiedRemoteDisposableRestore": {
+    "run": 40188752986,
+    "sourceSha": "7dc38dbef59ebce049ab40af35734dae6467f478",
+    "artifactId": 12597562027,
+    "result": "PASS_REMOTE_DISPOSABLE_RESTORE_ROUTE_AND_ROLLBACK",
+    "productionTouched": false
+  },
+  "canonicalHandoff20261026": {
+    "priority": "ONLY_UNPASSED_NON_D1_R2_WORK",
+    "path": "docs/preintegration/ONLY-OPEN-WORK-2026-10-26.md",
+    "verifiedAt": "2026-10-26",
+    "headAtCheck": "ff0dd138ae38f967c5728555f0b9fb7448aef35a",
+    "adminDeployedCodeSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "headCi": {
+      "passed": 4,
+      "total": 4,
+      "runs": [
+        {
+          "run": 40254568611,
+          "name": "Validate PR",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        },
+        {
+          "run": 40254568615,
+          "name": "Admin Preview Playwright",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        },
+        {
+          "run": 40254568694,
+          "name": "Admin isolated Preview Playwright",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        },
+        {
+          "run": 40254565090,
+          "name": "Validate push",
+          "result": "SUCCESS",
+          "sourceSha": "ff0dd138ae38f967c5728555f0b9fb7448aef35a"
+        }
+      ]
+    },
+    "lockedPass": [
+      "OWNER_VISUAL_DESIGN_12_OF_12",
+      "SHARED_NOTIFICATION_BELL",
+      "ADMIN_PREVIEW_R2_RUN_OWNED_LIFECYCLE",
+      "DISPOSABLE_REMOTE_D1_RESTORE",
+      "ADMIN_AUTH_KEYBOARD_PERF_SMOKE",
+      "PREVIOUSLY_PASSING_PRODUCT_ORDER_WARRANTY_GALLERY_QA"
+    ],
+    "onlyOpen": [
+      "INDEPENDENT_SECURITY_DEEP_AUDIT",
+      "ASSISTIVE_SCREEN_READER_MANUAL_A11Y",
+      "ISOLATED_PERFORMANCE_LOAD_BUDGETS",
+      "EXTERNAL_BANK_SETTLEMENT_REFUND_SIGNOFF",
+      "READ_ONLY_ADMIN_STOREFRONT_API_SCHEMA_CONTRACT"
+    ],
+    "deferredNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "allowD1R2ReQA": false,
+    "allowMerge": false,
+    "allowProductionChanges": false
+  },
+  "latestReview20261026": {
+    "head": "7856cfce64c173bb505bc65ad0116393509488d8",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "pr111": {
+      "state": "OPEN",
+      "merged": false
+    },
+    "ci": {
+      "passed": 4,
+      "total": 4,
+      "runs": [
+        {
+          "id": 40265235004,
+          "name": "Validate source and tests (pull_request)",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        },
+        {
+          "id": 40265231897,
+          "name": "Validate source and tests (push)",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        },
+        {
+          "id": 40265234942,
+          "name": "Admin Preview Playwright",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        },
+        {
+          "id": 40265234943,
+          "name": "Admin isolated Preview Playwright",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        }
+      ]
+    },
+    "deployedAdminAppSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "lockedPassPreserved": [
+      "OWNER_12_UI_AND_BELL",
+      "ADMIN_R2_LIFECYCLE",
+      "DISPOSABLE_D1_RESTORE",
+      "SECURITY_KEYBOARD_PERFORMANCE_SMOKE",
+      "PREVIOUS_BUSINESS_UI_CHECKS"
+    ],
+    "newReview": {
+      "security": {
+        "state": "STATIC_REVIEW_NO_SUBSTANTIATED_EXPLOIT_FOUND",
+        "pentestSignoff": false,
+        "edits": 0,
+        "smokeRerun": false,
+        "residual": "Bearer token is request query input; Referrer-Policy no-referrer present; edge/access log handling unverified."
+      },
+      "accessibility": {
+        "state": "OPEN_MANUAL_ASSISTIVE_TECH_SIGNOFF",
+        "sourceReview": true,
+        "axeRerun": false,
+        "focusAndDialogSupportObserved": true,
+        "fieldErrorAssociationNeedsManualReview": true
+      },
+      "performance": {
+        "state": "OPEN_NEEDS_ISOLATED_MEASUREMENT",
+        "findings": [
+          "Serial startup data-load waterfall",
+          "Loads bounded lists before all screens are opened"
+        ],
+        "provenRegression": false,
+        "benchmarkRun": false,
+        "stressRun": false,
+        "edits": 0
+      },
+      "finance": {
+        "state": "OPEN_OWNER_RECONCILIATION_REQUIRED",
+        "sourceGuardsReviewed": true,
+        "bankEvidenceAvailable": false,
+        "realTransactions": false
+      },
+      "adminStorefrontContract": {
+        "state": "READ_ONLY_SOURCE_DRIFT_CONFIRMED",
+        "storefrontPR": 108,
+        "missingOnStorefront": [
+          "orderAccessToken returned by order creation",
+          "/api/order-payment",
+          "/api/payment-settings",
+          "public QR route",
+          "migrations/0009_fulfillment_and_manual_payments.sql"
+        ],
+        "adminSourceHasCorrespondingContracts": true,
+        "integrationApproved": false
+      }
+    },
+    "deferredNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "prohibited": [
+      "merge",
+      "main changes",
+      "Storefront PR #108 changes",
+      "Production changes",
+      "Cloudflare binding/secret changes",
+      "Storefront Preview writes",
+      "repeat locked PASS tests"
+    ]
+  },
+  "latestMainPromotionGate20261026": {
+    "reviewedSourceHead": "b8203d7aa7466bb9cf73e95c30f38e0206cfd184",
+    "css": {
+      "status": "NO_CONFIRMED_UNINTENDED_COLLISION",
+      "refactorMade": false
+    },
+    "cleanup": {
+      "status": "NO_ADMIN_FILE_PROVEN_REDUNDANT",
+      "deletions": 0,
+      "scopeNotes": [
+        "Storefront assets not deleted",
+        "Potential orphan filenames not conclusive"
+      ]
+    },
+    "pr111": {
+      "state": "OPEN",
+      "merged": false,
+      "adminOnly": false,
+      "sharedStorefrontFacingRuntimeChanges": true,
+      "sharedMigrations": [
+        "0008_product_sku_verification.sql",
+        "0009_fulfillment_and_manual_payments.sql"
+      ],
+      "publicIndexHtmlChanged": false
+    },
+    "mainPush": {
+      "workflow": ".github/workflows/deploy.yml",
+      "trigger": "push to main; no paths filter",
+      "deploysProduction": true,
+      "appliesMigrations": false
+    },
+    "promotion": {
+      "performed": false,
+      "reason": "Would deploy shared Functions to configured Production Pages project; earlier no-Production/integration boundary remains; scope confirmation needed."
+    },
+    "security": {
+      "status": "STATIC_REVIEW_NO_CONCRETE_EXPLOIT_SUBSTANTIATED",
+      "independentPentest": false
+    },
+    "ciOnSourceHead": {
+      "passed": 4,
+      "total": 4,
+      "runs": [
+        40265812858,
+        40265808691,
+        40265812903,
+        40265812856
+      ]
+    },
+    "deployedAdminAppSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "lockedPassUnchanged": true,
+    "open": [
+      "MANUAL_SCREEN_READER_ACCEPTANCE",
+      "ISOLATED_PERFORMANCE_MEASUREMENT",
+      "INDEPENDENT_PENTEST",
+      "REDACTED_BANK_RECONCILIATION_AND_OWNER_SIGNOFF"
+    ],
+    "deferredNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ]
+  }
+}
