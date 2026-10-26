@@ -26,6 +26,10 @@ assert.equal(plan.groups[0].selected,true);
 assert.equal(plan.groups[0].title,"Clutch Nap");
 assert.equal(plan.matched,2);
 assert.equal(plan.missing,0);
+assert.equal(plan.unlisted,0,"Every source image is accounted for");
+assert.equal(plan.reviewRows,1,"CSV review markers remain visible");
+const unlisted=buildImportPlan(rows,[...files,{name:"not-in-CSV.webp",size:500,type:"image/webp",webkitRelativePath:"KET_QUA_NHOM_MAU/Clutch/M0023 - Clutch Nap/Đen/not-in-CSV.webp"}]);
+assert.equal(unlisted.unlisted,1,"An image missing from the CSV must be reported, not silently discarded");
 assert.deepEqual(plan.groups[0].images.map(x=>x.color),["Nâu","Đen"]);
 
 const noPhoto=buildImportPlan(rows,[]);
