@@ -111,6 +111,27 @@ try{
    result.pass=Object.values(result.checks).every(Boolean)&&result.errors.length===0;
    await page.locator('#home.sd-code-hero').screenshot({path:path.join(destination,spec.label+'-hero.png'),animations:'disabled'});
    await page.screenshot({path:path.join(destination,spec.label+'-viewport.png'),fullPage:false,animations:'disabled'});
+   // Real click/tap contract: the storefront's in-memory, clearly synthetic
+   // card must open its detail dialog and canonical product route. This only
+   // reads the isolated Preview and writes no orders or Production state.
+   const openCard=page.locator('#catalogGrid [data-open-product]').first();
+   await openCard.waitFor({state:'visible',timeout:8000});
+   await openCard.click({timeout:6500});
+   await page.locator('#productOverlay.open').waitFor({state:'visible',timeout:4500});
+   const detailProof=await page.evaluate(()=>({
+     title:document.querySelector('#detailTitle')?.textContent?.trim(),
+     path:location.pathname,
+     expanded:document.querySelector('#productOverlay')?.getAttribute('aria-hidden')==='false',
+     interactive:!document.querySelector('#productOverlay')?.hasAttribute('inert')
+   }));
+   result.checks.productDetailOpens=detailProof.title==='Ví da cá sấu — dữ liệu kiểm thử'&&
+     detailProof.path.startsWith('/sanpham/vida/')&&detailProof.expanded&&detailProof.interactive;
+   result.detail=detailProof;
+   if(!result.checks.productDetailOpens)throw Error('Synthetic product was not clickable: '+JSON.stringify(detailProof));
+   await page.locator('#detailClose').click({timeout:4500});
+   await page.waitForFunction(()=>!document.querySelector('#productOverlay')?.classList.contains('open'),null,{timeout:4500});
+   result.checks.detailCloses=true;
+   result.pass=Object.values(result.checks).every(Boolean)&&result.errors.length===0;
   }catch(err){result.pass=false;result.errors.push({type:'capture',message:String(err).slice(0,340)})}
   report.matrix.push(result);
   await context.close();
