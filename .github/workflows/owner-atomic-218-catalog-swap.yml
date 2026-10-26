@@ -1,0 +1,38 @@
+name: Owner 218-For-237 Catalog Swap (Protected)
+on:
+  push:
+    branches:
+      - audit/import-218-921-readonly-2026-10-26
+    paths:
+      - docs/import/RUN-OWNER-218-CATALOG-SWAP.trigger
+permissions:
+  contents: read
+concurrency:
+  group: sindarealest-owner-production-catalog-atomic-swap
+  cancel-in-progress: false
+jobs:
+  swap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      R2_PRODUCTION_ACCESS_KEY_ID: ${{ secrets.R2_PRODUCTION_ACCESS_KEY_ID }}
+      R2_PRODUCTION_SECRET_ACCESS_KEY: ${{ secrets.R2_PRODUCTION_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Explicit branch guard
+        run: |
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/audit/import-218-921-readonly-2026-10-26"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install R2 readback client
+        run: npm install --no-save --no-package-lock --no-audit --no-fund @aws-sdk/client-s3@3.914.0
+      - name: Verify source syntax
+        run: node --check scripts/owner-atomic-218-catalog-swap.mjs
+      - name: Verify frontend deployment and replace 237 old with 218 new (atomic D1 SQL, rollback on failure)
+        run: node scripts/owner-atomic-218-catalog-swap.mjs
