@@ -32,9 +32,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Native DOM contract
         run: node tests/hero-render-reference.test.mjs
-      - name: Audit all 14 screens and 11 QA-only semantic headline typography trials
-        env:
-          HERO_TYPE_SWEEP: '1'
+      - name: Audit 7 viewports, 2 themes, visible typography, shoe and podium layers, CTA focus
         run: node scripts/audit-hero-local-v9.mjs
       - name: Upload actual HERO screenshots and DOM metrics
         if: always()
