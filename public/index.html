@@ -1139,31 +1139,32 @@ function applyThemeMode(mode,animate=true){
   root.dataset.themeMode=mode;
   if(!animate||reduced||!overlay||(!hadPending&&targetDark===root.classList.contains('dark'))){
     root.classList.toggle('dark',targetDark);
-    root.classList.remove('sd-theme-overlay-active','theme-transitioning');
+    root.classList.remove('sd-theme-overlay-active','sd-theme-repaint-isolated','theme-transitioning');
     overlay?.classList.remove('is-preparing','is-visible','is-covered','is-dismissing');
     overlay?.setAttribute('aria-hidden','true');
     window.__sdThemeTargetDark=null;window.__sdCancelThemeStage=null;
     syncThemeMeta();setThemeIcon();return;
   }
   const started=performance.now();
-  const durationMs=700,minimumCoveredAfterCommitMs=320;
+  const mobileThemeGuard=!!(window.matchMedia&&window.matchMedia('(max-width:760px)').matches);
+  const durationMs=mobileThemeGuard?1180:700,minimumCoveredAfterCommitMs=mobileThemeGuard?580:320;
   let finished=false,committed=false,coverStarted=false;
-  let rafOne=0,rafTwo=0,rafThree=0,rafFour=0,rafFive=0,rafSix=0,coverFallback=0,exitTimer=0;
+  let rafOne=0,rafTwo=0,rafThree=0,rafFour=0,rafFive=0,rafSix=0,rafSeven=0,rafEight=0,coverFallback=0,exitTimer=0,restoreTimer=0;
   window.__sdThemeTargetDark=targetDark;
   overlay.dataset.origin=root.classList.contains('dark')?'dark':'light';
   overlay.classList.remove('is-visible','is-covered','is-dismissing');
   overlay.classList.add('is-preparing');
   overlay.setAttribute('aria-hidden','false');
   const clearScheduled=()=>{
-    clearTimeout(window.__sdThemeTimer);clearTimeout(coverFallback);clearTimeout(exitTimer);
-    for(const id of [rafOne,rafTwo,rafThree,rafFour,rafFive,rafSix])if(id)cancelAnimationFrame(id);
+    clearTimeout(window.__sdThemeTimer);clearTimeout(coverFallback);clearTimeout(exitTimer);clearTimeout(restoreTimer);
+    for(const id of [rafOne,rafTwo,rafThree,rafFour,rafFive,rafSix,rafSeven,rafEight])if(id)cancelAnimationFrame(id);
     overlay.removeEventListener('transitionend',onCoverEnd);
   };
   const cleanup=()=>{
     clearScheduled();
     overlay.classList.remove('is-preparing','is-visible','is-covered','is-dismissing');
     overlay.setAttribute('aria-hidden','true');
-    root.classList.remove('sd-theme-overlay-active','theme-transitioning');
+    root.classList.remove('sd-theme-overlay-active','sd-theme-repaint-isolated','theme-transitioning');
     window.__sdThemeTargetDark=null;window.__sdCancelThemeStage=null;
   };
   window.__sdCancelThemeStage=()=>{if(finished)return;finished=true;cleanup()};
@@ -1179,13 +1180,27 @@ function applyThemeMode(mode,animate=true){
     committed=true;
     root.classList.toggle('dark',targetDark);
     syncThemeMeta();setThemeIcon();
-    // Root style invalidation may stall Android while the FULLY opaque sheet
-    // is over the page. Allow two frames plus a bounded quiet hold.
+    // Change the full palette while blur layers are temporarily disabled
+    // behind the fully opaque overlay. Restore the approved glass only once
+    // the new colour scheme has painted; reveal after a second settled pass.
     rafFive=requestAnimationFrame(()=>{rafSix=requestAnimationFrame(()=>{
       if(finished)return;
-      window.__sdThemeTimer=setTimeout(reveal,Math.max(
-        0,durationMs-(performance.now()-started),minimumCoveredAfterCommitMs
-      ));
+      if(!mobileThemeGuard){
+        window.__sdThemeTimer=setTimeout(reveal,Math.max(
+          0,durationMs-(performance.now()-started),minimumCoveredAfterCommitMs
+        ));
+        return;
+      }
+      restoreTimer=setTimeout(()=>{
+        if(finished)return;
+        root.classList.remove('sd-theme-repaint-isolated');
+        rafSeven=requestAnimationFrame(()=>{rafEight=requestAnimationFrame(()=>{
+          if(finished)return;
+          window.__sdThemeTimer=setTimeout(reveal,Math.max(
+            0,durationMs-(performance.now()-started),minimumCoveredAfterCommitMs
+          ));
+        })});
+      },170);
     })});
   };
   const coverComplete=()=>{
@@ -1194,6 +1209,7 @@ function applyThemeMode(mode,animate=true){
     overlay.removeEventListener('transitionend',onCoverEnd);
     overlay.classList.add('is-covered');
     root.classList.add('sd-theme-overlay-active');
+    if(mobileThemeGuard)root.classList.add('sd-theme-repaint-isolated');
     rafThree=requestAnimationFrame(()=>{rafFour=requestAnimationFrame(commit)});
   };
   function onCoverEnd(event){
@@ -1230,6 +1246,11 @@ function bindReveal(root=document){const els=root.querySelectorAll('[data-reveal
 const revealObserver='IntersectionObserver'in window?new IntersectionObserver(entries=>entries.forEach(entry=>{
  const el=entry.target;
  if(el.isConnected===false){revealObserver.unobserve(el);return}
+ // Freeze the already-visible sections during the palette swap. The
+ // IntersectionObserver may momentarily report nonintersection while the
+ // browser rasterizes glass surfaces after html.dark flips.
+ if(document.documentElement.classList.contains('sd-theme-overlay-active')||
+    typeof window.__sdCancelThemeStage==='function')return;
  // Hysteresis: show after 8% enters, reset only after completely leaving.
  // Prevent near-edge flicker and redundant DOM writes on fast reverse scrolls.
  if(entry.isIntersecting&&entry.intersectionRatio>=.08){

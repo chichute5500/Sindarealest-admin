@@ -160,3 +160,22 @@ html.sd-theme-overlay-active body .mobile-bottom-nav{transition:none!important}
 @media(prefers-reduced-motion:reduce){
   #sdThemeSwitchOverlay,#sdThemeSwitchOverlay .sd-theme-switch-content{transition:none!important}
 }
+
+/* Mobile theme-switch raster isolation. Applied ONLY behind the fully opaque
+   transition screen and removed before revealing the approved Liquid Glass. */
+@media(max-width:760px){
+  html.sd-theme-repaint-isolated body :is(
+    .glass,.glass-soft,.nav,.mobile-bottom-nav,.product-card,.account-drawer,
+    .cart-drawer,.checkout-drawer,.sdh-glass-card,.search-field,.mosaic-card,
+    .contact-link,.order-step,.service-strip,.service-copy,.footer,.custom-text,
+    .custom-image,.detail-modal,.detail-image-stage,.sd-fullscreen-viewer,
+    .promise-tag,.product-overlay-panel,.cart-row,.nav-wrap
+  ){
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  html.sd-theme-repaint-isolated body .theme-bg{filter:none!important}
+  html.sd-theme-overlay-active body .sd-code-hero .sdh-cta--zalo::before{
+    animation-play-state:paused!important;
+  }
+}
