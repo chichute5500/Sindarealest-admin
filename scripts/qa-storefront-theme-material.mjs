@@ -393,10 +393,24 @@ try{
     for(const direction of [true,false])decodedImageTrials.push(await runThemeTrial(direction,'test-only-svg-as-img'));
     await imageStyle.evaluate(node=>node.remove());
     await page.evaluate(()=>document.querySelectorAll('.theme-bg > img[aria-hidden="true"]').forEach(img=>img.remove()));
-    // Re-measure the unchanged original theme after both diagnostic variants.
+    // Isolate expensive glass blur vs broad section styling. These are
+    // transient read-only QA overrides; screenshot/Owner UI stays unchanged.
+    const blurStyle=await page.addStyleTag({content:
+      'html body :is(.nav,.glass,.glass-soft,.product-card,.promise,.mosaic-card,.custom-text,.footer,.search-field,.contact-link){backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'
+    });
+    const noBlurTrials=[];
+    for(const direction of [true,false])noBlurTrials.push(await runThemeTrial(direction,'test-only-no-glass-blur'));
+    await blurStyle.evaluate(node=>node.remove());
+    const restStyle=await page.addStyleTag({content:
+      'html body :is(#order,#featured,#collections,#products,#siteFooter){content-visibility:hidden!important;contain-intrinsic-size:auto 900px!important}'
+    });
+    const noLowerSections=[];
+    for(const direction of [true,false])noLowerSections.push(await runThemeTrial(direction,'test-only-hidden-below-hero'));
+    await restStyle.evaluate(node=>node.remove());
+    // Re-measure the unchanged original theme after all diagnostics.
     const warmedBaseline=[];
     for(const direction of [true,false])warmedBaseline.push(await runThemeTrial(direction,'baseline-warm'));
-    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...decodedImageTrials,...warmedBaseline].map(r=>({
+    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...decodedImageTrials,...noBlurTrials,...noLowerSections,...warmedBaseline].map(r=>({
       dark:r.direction,variant:r.variant,
       startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
       endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
