@@ -363,7 +363,7 @@ export function validateProduct(input, existing = null) {
   }
   const fulfillmentType = rawFulfillmentType;
   const images = input.images === undefined ? (existing?.images || []) : input.images;
-  if (!Array.isArray(images) || images.length > 30 || images.some((x) => typeof x !== "string" || x.length > 240 || (!/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) && !/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x)))) {
+  if (!Array.isArray(images) || images.length > 50 || images.some((x) => typeof x !== "string" || x.length > 240 || (!/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) && !/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x)))) {
     return { error: "Bộ ảnh không hợp lệ. Chỉ dùng ảnh WebP có sẵn trong images/ hoặc ảnh tải lên qua trang quản trị." };
   }
   const id = existing?.id || crypto.randomUUID();
