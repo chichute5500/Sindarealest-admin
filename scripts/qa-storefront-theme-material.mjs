@@ -603,6 +603,39 @@ try{
       });
       console.log('THEME_STAGED_ROOT_SWAP_PROTOTYPE '+JSON.stringify(staged));
 
+      // Binary-search candidate stylesheet blocks by their *real* theme
+      // transition cost. Disable only one block at a time in this test's
+      // isolated tab, never in the deployed page. Keep symmetric A/B/A.
+      const cssBlocks=await page.evaluate(()=>[...document.querySelectorAll('style')].map((el,index)=>({
+        index,id:el.id||'(anonymous)',bytes:el.textContent.length,
+        rootDarkRules:(el.textContent.match(/html\.dark/g)||[]).length
+      })).filter(v=>v.bytes>15000).sort((a,b)=>b.bytes-a.bytes));
+      console.log('THEME_STYLESHEET_BLOCKS '+JSON.stringify(cssBlocks));
+      const disabledTrials=[];
+      for(const block of cssBlocks.slice(0,6)){
+        const toggled=await page.evaluate(index=>{
+          const style=[...document.querySelectorAll('style')][index];
+          if(!style?.sheet)throw Error('Expected diagnostic stylesheet missing: '+index);
+          style.sheet.disabled=true;
+          return {index,id:style.id||'(anonymous)'};
+        },block.index);
+        try{
+          for(const direction of [true,false]){
+            const one=await runThemeTrial(direction,'test-only-disable-style-'+block.index);
+            disabledTrials.push({style:toggled,variant:one.variant,dark:one.direction,
+              start:one.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
+              end:one.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
+              taskMs:one.chromeMetrics.TaskDuration,
+              styleMs:one.chromeMetrics.RecalcStyleDuration});
+          }
+        }finally{
+          await page.evaluate(index=>{const sheet=[...document.querySelectorAll('style')][index]?.sheet;
+            if(sheet)sheet.disabled=false;},block.index);
+        }
+      }
+      console.log('THEME_STYLESHEET_ISOLATION '+JSON.stringify(disabledTrials));
+
+
       // Control experiment on the *same fully loaded page*: animate only
       // the navbar and background layers without touching html.dark, which
       // invalidates typography/cards across the Storefront. This preserves
