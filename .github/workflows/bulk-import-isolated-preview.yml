@@ -10,6 +10,7 @@ on:
       - 'scripts/qa-bulk-import-preview-sha.mjs'
       - 'scripts/qa-bulk-import-preview-browser.mjs'
       - 'scripts/qa-bulk-import-remote-preview.mjs'
+      - 'scripts/qa-bulk-import-sequential-photo-preview.mjs'
       - 'scripts/qa-bulk-import-preview-color-migration.mjs'
       - 'migrations/0010_product_image_colors.sql'
       - 'package.json'
@@ -149,3 +150,37 @@ jobs:
           path: artifacts/bulk-import-preview/remote/report.json
           if-no-files-found: warn
           retention-days: 14
+
+  sequential-photo-qa:
+    name: Sequential 30-photo R2 Preview upload stress (WebP, PNG, JPEG; cleanup)
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install AWS R2 cleanup client
+        run: npm install --no-save --no-package-lock --no-fund --no-audit @aws-sdk/client-s3@3.914.0
+      - name: Exercise thirty real photo uploads to isolated Preview then verify cleanup
+        run: node scripts/qa-bulk-import-sequential-photo-preview.mjs
+      - name: Upload bounded non-sensitive stress test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-import-sequential-photo-preview-${{ github.sha }}
+          path: artifacts/bulk-import-preview/remote/sequential-30-photo-report.json
+          retention-days: 14
+          if-no-files-found: warn
