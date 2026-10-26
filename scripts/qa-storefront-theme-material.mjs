@@ -407,10 +407,23 @@ try{
     const noLowerSections=[];
     for(const direction of [true,false])noLowerSections.push(await runThemeTrial(direction,'test-only-hidden-below-hero'));
     await restStyle.evaluate(node=>node.remove());
+    const geometry=await page.evaluate(()=>['order','featured','collections','products','siteFooter'].map(id=>{
+      const elem=document.getElementById(id);const box=elem?.getBoundingClientRect();
+      return {id,top:Math.round(box?.top??0),bottom:Math.round(box?.bottom??0),
+        height:Math.round(box?.height??0),offscreen:!!box&&(box.top>innerHeight+100||box.bottom< -100)}
+    }));
+    console.log('THEME_SECTION_GEOMETRY '+JSON.stringify({viewport:{width:spec.width,height:spec.height},geometry}));
+    const outside=geometry.filter(v=>v.offscreen).map(v=>'#'+v.id);
+    const offscreenStyle=await page.addStyleTag({content:outside.length
+      ?'html body :is('+outside.join(',')+'){content-visibility:hidden!important;contain-intrinsic-size:auto 900px!important}'
+      :'/* No offscreen sections to hide */'});
+    const trulyOffscreen=[];
+    for(const direction of [true,false])trulyOffscreen.push(await runThemeTrial(direction,'test-only-only-outside-viewport'));
+    await offscreenStyle.evaluate(node=>node.remove());
     // Re-measure the unchanged original theme after all diagnostics.
     const warmedBaseline=[];
     for(const direction of [true,false])warmedBaseline.push(await runThemeTrial(direction,'baseline-warm'));
-    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...decodedImageTrials,...noBlurTrials,...noLowerSections,...warmedBaseline].map(r=>({
+    console.log('THEME_SVG_PERF_DIAGNOSTIC '+JSON.stringify([...results,...withoutSvg,...decodedImageTrials,...noBlurTrials,...noLowerSections,...trulyOffscreen,...warmedBaseline].map(r=>({
       dark:r.direction,variant:r.variant,
       startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
       endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
