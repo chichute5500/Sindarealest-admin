@@ -61,7 +61,7 @@ async function verifyWelcomeColdFonts(spec){
         copied:title.textContent
       };
     });
-    if(delayed<2||first.ready||first.visible!=='hidden'||!first.copied.includes('Dấu ấn da cá sấu'))
+    if(first.ready||first.visible!=='hidden'||!first.copied.includes('Dấu ấn da cá sấu'))
       throw Error('Unstable Vietnamese glyphs appeared before fonts loaded: '+JSON.stringify({first,delayed}));
     await page.waitForFunction(()=>document.documentElement.classList.contains('sd-welcome-font-ready'),null,{timeout:4500});
     const after=await page.evaluate(()=>({
@@ -69,8 +69,8 @@ async function verifyWelcomeColdFonts(spec){
       serifLoaded:document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.'),
       sansLoaded:document.fonts.check('400 12px "SD Sans"','Chất liệu cao cấp')
     }));
-    if(after.visible!=='visible'||!after.serifLoaded||!after.sansLoaded||errors.length)
-      throw Error('Welcome fonts not stabilized: '+JSON.stringify({after,errors}));
+    if(after.visible!=='visible'||!after.serifLoaded||!after.sansLoaded||delayed<2||errors.length)
+      throw Error('Welcome fonts not stabilized: '+JSON.stringify({after,delayed,errors}));
     coldFontMatrix.push({label:spec.label,pass:true,delayedFontRequests:delayed,
       fallbackTextNeverPainted:true,correctVietnameseFontsReady:true});
   }finally{await context.close()}

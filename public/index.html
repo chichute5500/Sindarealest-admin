@@ -662,16 +662,21 @@ html:not(.dark){--sd-icon-glass-bg:rgba(255,255,255,.46);--sd-icon-glass-bg-hove
 <style id="sd-welcome-desktop-mobile-performance-2026-10-25">
 /* First paint: never expose fallback-font Vietnamese diacritics.
    The logo/background and loader remain visible while Noto fonts warm up. */
-html.js-enabled:not(.sd-welcome-font-ready) #welcomeSplash .welcome-title,
-html.js-enabled:not(.sd-welcome-font-ready) #welcomeSplash #welcomeText,
-html.js-enabled:not(.sd-welcome-font-ready) #welcomeSplash .welcome-overline,
-html.js-enabled:not(.sd-welcome-font-ready) #welcomeSplash .welcome-tagline,
-html.js-enabled:not(.sd-welcome-font-ready) #welcomeSplash .welcome-points,
-html.js-enabled:not(.sd-welcome-font-ready) #welcomeSplash .welcome-footnote,
-html.js-enabled:not(.sd-welcome-font-ready) #welcomeSplash .welcome-skip{
+html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-title,
+html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash #welcomeText,
+html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-overline,
+html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-tagline,
+html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-points,
+html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-footnote{
   visibility:hidden!important;
 }
 
+/* If font downloads fail, render Vietnamese text using system fonts, not
+   the less reliable fallback serif. */
+html.sd-welcome-font-fallback #welcomeSplash .welcome-title,
+html.sd-welcome-font-fallback #welcomeSplash #welcomeText{
+  font-family:system-ui,Arial,sans-serif!important;
+}
 /* 2026-10-25: Dedicated desktop/phone welcome layout. Splash must fill the
    physical browser viewport, without the double scrollbar in desktop Chrome.
    This scope does NOT alter locked Hero, product gallery or the Admin UI. */
@@ -779,18 +784,21 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
   // Warm the exact Vietnamese font faces before revealing any welcome copy.
   // Keep the approved intro composition/timing; do not swap text glyphs mid-paint.
   var fontReady=false;
-  function revealWelcomeCopy(){
+  function revealWelcomeCopy(fallback){
     if(fontReady)return;
     fontReady=true;
-    document.documentElement.classList.add('sd-welcome-font-ready');
+    document.documentElement.classList.add(fallback?'sd-welcome-font-fallback':'sd-welcome-font-ready');
   }
   if(document.fonts&&typeof document.fonts.load==='function'){
     Promise.all([
       document.fonts.load('400 30px "SD Serif"','Dấu ấn da cá sấu. Tinh tế trong từng chi tiết.'),
       document.fonts.load('400 12px "SD Sans"','Chất liệu cao cấp')
-    ]).then(revealWelcomeCopy,revealWelcomeCopy);
-    window.setTimeout(revealWelcomeCopy,1200);
-  }else revealWelcomeCopy();
+    ]).then(function(){
+      var valid=document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.')&&
+        document.fonts.check('400 12px "SD Sans"','Chất liệu cao cấp');
+      revealWelcomeCopy(!valid);
+    },function(){revealWelcomeCopy(true)});
+  }else revealWelcomeCopy(true);
   function focusableItems(){
     return Array.from(s.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
       .filter(function(el){return !el.closest('[inert]')&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'});

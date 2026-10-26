@@ -42,3 +42,8 @@ assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.ttf"/);
 assert.match(performance,/html\.js-enabled:not\(\.sd-welcome-font-ready\) #welcomeSplash \.welcome-title/);
 assert.match(html,/document\.fonts\.load\('400 30px "SD Serif"'/);
 assert.match(html,/classList\.add\('sd-welcome-font-ready'\)/);
+
+// Only allow first-paint text after successful Noto font readiness.
+assert.doesNotMatch(html,/window\.setTimeout\(revealWelcomeCopy,1200\)/);
+assert.match(html,/document\.fonts\.check\('400 30px "SD Serif"'/);
+assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);
