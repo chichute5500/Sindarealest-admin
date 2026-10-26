@@ -219,65 +219,98 @@ try{
     if(response?.status()!==200)throw Error('Preview HTTP '+response?.status());
     await page.waitForFunction(()=>document.querySelector('#themeToggle')?.title?.startsWith('Chế độ'),null,{timeout:15000});
     await page.waitForFunction(()=>document.querySelector('#materialTile')?.classList.contains('has-real-material-gallery'),null,{timeout:10000});
-    const sync=await page.evaluate(async()=>{
+    // Register passive frame/transition listeners once, then dispatch the
+    // click from Playwright as a separate browser task. Previously clicking
+    // inside a long async page.evaluate while repeatedly forcing styles
+    // could itself delay the first transition frame under runner load.
+    await page.evaluate(()=>{
       const root=document.documentElement;
       const button=document.querySelector('#themeToggle');
+      const nav=document.querySelector('.nav');
       const bgs=[document.querySelector('.theme-bg--light'),document.querySelector('.theme-bg--dark')];
-      const layer=[...document.querySelectorAll('#materialGallery .sd-material-slide')];
+      const materialPhoto=document.querySelector('.material-photo');
+      // Independently prove the real computed 220ms declarations before
+      // measuring a click; do not trigger expensive style reads in its path.
+      const already=root.classList.contains('theme-transitioning');
+      if(!already)root.classList.add('theme-transitioning');
+      const durations={
+        navTransition:getComputedStyle(nav).transitionDuration,
+        bgTransition:getComputedStyle(bgs[0]).transitionDuration,
+        materialTransition:getComputedStyle(materialPhoto).transitionDuration
+      };
+      if(!already)root.classList.remove('theme-transitioning');
       const snapshot=()=>({
         dark:root.classList.contains('dark'),
         darkBg:Number(getComputedStyle(bgs[1]).opacity),
         lightBg:Number(getComputedStyle(bgs[0]).opacity),
-        navTransition:getComputedStyle(document.querySelector('.nav')).transitionDuration,
-        navColor:getComputedStyle(document.querySelector('.nav')).backgroundColor,
-        materialTransition:getComputedStyle(document.querySelector('.material-photo')).transitionDuration,
-        bgTransition:getComputedStyle(bgs[0]).transitionDuration
+        navColor:getComputedStyle(nav).backgroundColor,
+        ...durations
       });
-      const results=[];
-      const nav=document.querySelector('.nav');
-      const transitionEvents=[];
-      const longTasks=[];
-      const observer=typeof PerformanceObserver==='function'
-        ?new PerformanceObserver(list=>longTasks.push(...list.getEntries().map(e=>({start:Math.round(e.startTime),duration:Math.round(e.duration)}))))
-        :null;
-      try{observer?.observe({entryTypes:['longtask']})}catch{}
-      for(const elem of [nav,...bgs]){
-        for(const type of ['transitionrun','transitionstart','transitionend']){
-          elem.addEventListener(type,event=>{
-            if(!['background-color','opacity'].includes(event.propertyName))return;
-            transitionEvents.push({type,element:elem===nav?'nav':elem===bgs[0]?'lightBg':'darkBg',
-              property:event.propertyName,time:Math.round(performance.now()),elapsed:Math.round(event.elapsedTime*1000)});
-          });
-        }
-      }
-      for(const direction of [true,false]){
-        const eventBase=transitionEvents.length;
-        const taskBase=longTasks.length;
-        const started=performance.now();
-        const frameTimes=[];
-        let watching=true;
-        const watchFrame=timestamp=>{
-          if(!watching)return;
-          frameTimes.push(Math.round(timestamp-started));
-          requestAnimationFrame(watchFrame);
-        };
-        requestAnimationFrame(watchFrame);
-        button.click();
-        const now=snapshot();
-        const samples=[];
-        while(performance.now()-started<660){
-          await new Promise(resolve=>setTimeout(resolve,50));
-          samples.push({...snapshot(),elapsedMs:Math.round(performance.now()-started)});
-        }
-        watching=false;
-        await new Promise(resolve=>setTimeout(resolve,240));
-        const stable=snapshot();
-        results.push({direction,now,samples,stable,
-          durationMs:Math.round(performance.now()-started),
-          frameTimes,transitionEvents:transitionEvents.slice(eventBase).map(e=>({...e,relativeMs:e.time-Math.round(started)})),
-          longTasks:longTasks.slice(taskBase).map(e=>({...e,relativeMs:e.start-Math.round(started)}))});
-      }
-      observer?.disconnect();
+      let probe;
+      window.__sdThemeTiming={
+        arm(direction){
+          const baseline=snapshot();
+          const result={direction,now:{...baseline,dark:direction},samples:[],frameTimes:[],
+            transitionEvents:[],longTasks:[]};
+          const cleanup=[];
+          const obs=typeof PerformanceObserver==='function'
+            ?new PerformanceObserver(list=>result.longTasks.push(...list.getEntries().map(e=>({start:Math.round(e.startTime),duration:Math.round(e.duration)}))))
+            :null;
+          try{obs?.observe({entryTypes:['longtask']})}catch{}
+          let started=0,active=true;
+          for(const elem of [nav,...bgs]){
+            for(const type of ['transitionrun','transitionstart','transitionend']){
+              const onTransition=e=>{
+                if(e.target!==elem||!['background-color','opacity'].includes(e.propertyName))return;
+                result.transitionEvents.push({type,
+                  element:elem===nav?'nav':elem===bgs[0]?'lightBg':'darkBg',
+                  property:e.propertyName,time:Math.round(performance.now()),
+                  elapsed:Math.round(e.elapsedTime*1000)});
+              };
+              elem.addEventListener(type,onTransition);
+              cleanup.push(()=>elem.removeEventListener(type,onTransition));
+            }
+          }
+          const onClick=()=>{
+            started=performance.now();
+            const tick=timestamp=>{
+              if(!active)return;
+              const elapsed=Math.round(performance.now()-started);
+              result.frameTimes.push(Math.round(timestamp-started));
+              if(elapsed<=700){
+                result.samples.push({...snapshot(),elapsedMs:elapsed});
+                requestAnimationFrame(tick);
+              }
+            };
+            requestAnimationFrame(tick);
+          };
+          button.addEventListener('click',onClick,{once:true});
+          cleanup.push(()=>button.removeEventListener('click',onClick));
+          probe={result,obs,cleanup,getStarted:()=>started,finish:()=>{
+            active=false;
+            obs?.disconnect();
+            cleanup.forEach(dispose=>dispose());
+            result.stable=snapshot();
+            result.durationMs=Math.round(performance.now()-started);
+            result.transitionEvents=result.transitionEvents.map(e=>({...e,relativeMs:e.time-Math.round(started)}));
+            result.longTasks=result.longTasks.map(e=>({...e,relativeMs:e.start-Math.round(started)}));
+            return result;
+          }};
+        },
+        finish(){if(!probe||!probe.getStarted())throw Error('Theme click was not recorded');return probe.finish()}
+      };
+    });
+    const results=[];
+    for(const direction of [true,false]){
+      await page.evaluate(direction=>window.__sdThemeTiming.arm(direction),direction);
+      // Dispatch outside page.evaluate's long-lived Promise so the browser
+      // can paint naturally after the interaction.
+      await page.locator('#themeToggle').dispatchEvent('click');
+      await page.waitForTimeout(850);
+      results.push(await page.evaluate(()=>window.__sdThemeTiming.finish()));
+    }
+    const materialResult=await page.evaluate(async()=>{
+      const layer=[...document.querySelectorAll('#materialGallery .sd-material-slide')];
       const first=layer.find(img=>img.classList.contains('is-visible'))?.src;
       await new Promise(resolve=>setTimeout(resolve,1600));
       const second=layer.find(img=>img.classList.contains('is-visible'))?.src;
@@ -287,7 +320,7 @@ try{
       const washBefore=getComputedStyle(material,'::before');
       const washAfter=getComputedStyle(material,'::after');
       const caption=getComputedStyle(material.querySelector('.mosaic-content'));
-      return {results,slides:layer.length,slideshowChanged:first!==second&&first===third,
+      return {slides:layer.length,slideshowChanged:first!==second&&first===third,
         noPhotoWash:parseFloat(washBefore.opacity)===0&&parseFloat(washAfter.opacity)===0&&
           washBefore.backgroundImage==='none'&&washAfter.backgroundImage==='none',
         readableCaption:caption.color==='rgb(255, 255, 255)'&&caption.textShadow!=='none',
@@ -295,6 +328,7 @@ try{
         noControls:!document.querySelector('#materialGallery button,#materialGallery [role=button],#materialGallery .slide-count'),
         files:[first,second,third].map(x=>x?.split('/').pop())};
     });
+    const sync={results,...materialResult};
     for(const r of sync.results){
       const target=r.direction?1:0;
       if(![r.now,...r.samples,r.stable].every(s=>s.dark===r.direction))
