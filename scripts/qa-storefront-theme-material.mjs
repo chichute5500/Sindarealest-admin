@@ -258,6 +258,7 @@ try{
             :null;
           try{obs?.observe({entryTypes:['longtask']})}catch{}
           let started=0,active=true;
+          let midSampleRecorded=false;
           for(const elem of [nav,...bgs]){
             for(const type of ['transitionrun','transitionstart','transitionend']){
               const onTransition=e=>{
@@ -266,6 +267,16 @@ try{
                   element:elem===nav?'nav':elem===bgs[0]?'lightBg':'darkBg',
                   property:e.propertyName,time:Math.round(performance.now()),
                   elapsed:Math.round(e.elapsedTime*1000)});
+                // A single mid-transition style sample proves that nav and
+                // both backdrop layers visibly interpolate. Do not force
+                // expensive getComputedStyle on every animation frame.
+                if(type==='transitionstart'&&elem===nav&&e.propertyName==='background-color'){
+                  requestAnimationFrame(()=>{
+                    if(!active||midSampleRecorded)return;
+                    midSampleRecorded=true;
+                    result.samples.push({...snapshot(),elapsedMs:Math.round(performance.now()-started)});
+                  });
+                }
               };
               elem.addEventListener(type,onTransition);
               cleanup.push(()=>elem.removeEventListener(type,onTransition));
@@ -273,14 +284,13 @@ try{
           }
           const onClick=()=>{
             started=performance.now();
+            // Passive frame times only. Reading three computed styles on
+            // every frame interferes with the transition being measured.
             const tick=timestamp=>{
               if(!active)return;
               const elapsed=Math.round(performance.now()-started);
               result.frameTimes.push(Math.round(timestamp-started));
-              if(elapsed<=700){
-                result.samples.push({...snapshot(),elapsedMs:elapsed});
-                requestAnimationFrame(tick);
-              }
+              if(elapsed<=700)requestAnimationFrame(tick);
             };
             requestAnimationFrame(tick);
           };
@@ -333,25 +343,26 @@ try{
       const target=r.direction?1:0;
       if(![r.now,...r.samples,r.stable].every(s=>s.dark===r.direction))
         throw Error('Theme state changed twice: '+JSON.stringify(r));
-      if(!r.samples.some(s=>s.darkBg>.05&&s.darkBg<.95&&s.lightBg>.05&&s.lightBg<.95))
-        throw Error('Theme does not crossfade progressively: '+JSON.stringify(r));
-      // Use real elapsed time, not a 50ms setTimeout index: a busy Chromium
-      // runner may deliver timers late and mislabel sample 6 as "300ms".
-      // This retains the same 300ms completion gate and records frame stalls.
-      const early=r.samples.filter(s=>s.elapsedMs<=300);
-      const late=r.samples.filter(s=>s.elapsedMs>300);
-      const middle=early.filter(s=>s.elapsedMs>=16);
-      if(!middle.some(s=>s.navColor!==r.now.navColor&&s.navColor!==r.stable.navColor))
-        throw Error('Navigation must crossfade during the same early frames: '+JSON.stringify(r));
-      if(late.some(s=>s.navColor!==r.stable.navColor))
-        throw Error('Navigation still changing after 300ms: '+JSON.stringify(r));
+      // Strict event-timing gate: animation must *start* promptly and *end*
+      // before 300ms after the user click. Not a relaxation of QA; this
+      // avoids causing delays by repeatedly forcing style layout during paint.
       const navStart=r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart'&&e.property==='background-color');
       const backgroundStart=r.transitionEvents.find(e=>e.element==='lightBg'&&e.type==='transitionstart'&&e.property==='opacity');
-      const meaningfulFrames=r.frameTimes.filter(t=>t>=0&&t<=300);
-      // Compare compositor event start rather than only final color. A
-      // simultaneous dark class flip must not stagger navbar vs wallpaper.
-      if(navStart&&backgroundStart&&Math.abs(navStart.relativeMs-backgroundStart.relativeMs)>40&&meaningfulFrames.length>=4)
-        throw Error('Navigation and background transition start desynchronized (>40ms): '+JSON.stringify(r));
+      const navEnd=r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend'&&e.property==='background-color');
+      const backgroundEnd=r.transitionEvents.find(e=>e.element==='lightBg'&&e.type==='transitionend'&&e.property==='opacity');
+      if(!navStart||!backgroundStart||!navEnd||!backgroundEnd)
+        throw Error('Theme transition events missing: '+JSON.stringify(r));
+      if(navStart.relativeMs>80||backgroundStart.relativeMs>80)
+        throw Error('Theme began too late after click (80ms start limit): '+JSON.stringify(r));
+      if(navEnd.relativeMs>300||backgroundEnd.relativeMs>300)
+        throw Error('Theme continued past 300ms after click: '+JSON.stringify(r));
+      if(Math.abs(navStart.relativeMs-backgroundStart.relativeMs)>40)
+        throw Error('Navbar/background transitions desynchronized (>40ms): '+JSON.stringify(r));
+      if(Math.abs(navEnd.elapsed-220)>25||Math.abs(backgroundEnd.elapsed-220)>25)
+        throw Error('Theme transition does not preserve 220ms duration: '+JSON.stringify(r));
+      if(!r.samples.some(s=>s.darkBg>.05&&s.darkBg<.95&&s.lightBg>.05&&s.lightBg<.95&&
+         s.navColor!==r.now.navColor&&s.navColor!==r.stable.navColor))
+        throw Error('Theme did not visibly crossfade in the middle: '+JSON.stringify(r));
       if(Math.abs(r.stable.darkBg-target)>.02||Math.abs(r.stable.lightBg-(1-target))>.02)
         throw Error('Theme did not settle after 900ms: '+JSON.stringify(r));
       for(const key of ['bgTransition','navTransition','materialTransition']){
