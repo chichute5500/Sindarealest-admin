@@ -29,7 +29,7 @@ export async function onRequestPost({request,env}) {
     }
     const sku=checkoutTransferSku(ids.map(id=>byId.get(id)));
     const phone=String(parsed.value?.phone||"");
-    const transferReference=makeCheckoutTransferReference(phone,sku);
+    const transferReference=/^[+0-9() .-]{9,20}$/.test(phone)?makeCheckoutTransferReference(phone,sku):"";
     const showPrices=(await getSetting(env.DB,"show_prices","0"))==="1";
     const quote=calculateCheckoutQuote(ids.map(id=>{
       const p=byId.get(id);const raw=p.price;
