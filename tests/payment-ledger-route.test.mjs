@@ -318,7 +318,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   })));
   assert.equal(response.status, 201, "confirmed order can create deposit request with active QR config");
   const payload = await response.json();
-  assert.equal(payload.amount, 30000, "made-to-order deposit is server-derived as 30% of the confirmed total");
+  assert.equal(payload.amount, 100000, "made-to-order deposit is rounded up to the next 100,000 by the server");
   assert.equal(payload.shippingBenefit, "standard_shipping");
   assert.equal(payload.freeShippingApplied, false);
   assert.match(payload.transferReference, /^SD[A-Z0-9]+$/);
