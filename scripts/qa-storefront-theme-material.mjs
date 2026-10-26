@@ -355,27 +355,12 @@ try{
     };
     const results=[];
     for(const direction of [true,false])results.push(await runThemeTrial(direction,'baseline-cold'));
-    // A/B/A, read-only experimental override of offscreen rendering. This
-    // determines whether heavy offscreen content drives the observed lag.
-    // The experiment does not change storefront files, QA limits or visuals
-    // on the deployed Preview; it is removed before other assertions.
-    const testStyle=await page.addStyleTag({content:
-      '#order,#featured,#collections,#products,#siteFooter{content-visibility:auto!important;contain-intrinsic-size:auto 900px!important}'
-    });
-    const offscreenTrials=[];
-    for(const direction of [true,false])offscreenTrials.push(await runThemeTrial(direction,'offscreen-culling'));
-    await testStyle.evaluate(el=>el.remove());
-    const warmedBaseline=[];
-    for(const direction of [true,false])warmedBaseline.push(await runThemeTrial(direction,'baseline-warm'));
-    const brief=r=>({
-      variant:r.variant,dark:r.direction,
+    console.log('THEME_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
+      dark:r.direction,variant:'baseline',
       startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
       endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
-      frameTimes:r.frameTimes.slice(0,10),chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
-    });
-    console.log('THEME_ABA_PERF_DIAGNOSTIC '+JSON.stringify({
-      source:'isolated-browser-only',variants:[...results,...offscreenTrials,...warmedBaseline].map(brief)
-    }));
+      chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
+    }))));
     await perfClient.detach();
     const materialResult=await page.evaluate(async()=>{
       const layer=[...document.querySelectorAll('#materialGallery .sd-material-slide')];
