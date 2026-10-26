@@ -44,8 +44,9 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(page,/overlay\.classList\.add\('is-dismissing'\)/);
  assert.match(browserQA,/overlayOrigin/);
  assert.match(browserQA,/radialEvents/);
- assert.match(browserQA,/mobile-account-theme-dark/);
- assert.match(browserQA,/mobile-account-theme-light/);
+ assert.match(browserQA,/mobile-account-theme-/);
+ assert.match(browserQA,/accountThemeMatrix/);
+ assert.match(browserQA,/for\(const \[dark,suffix\] of/);
  assert.match(browserQA,/#accountThemeAction/);
  assert.match(css,/html\.sd-theme-overlay-active body \.theme-bg/);
  assert.match(page,/__sdCancelThemeStage/);
