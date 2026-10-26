@@ -41,5 +41,5 @@ test('Theme crossfades smoothly with one synchronized duration and no stagger',(
  assert.match(page,/const themeMeta=document\.querySelector\('meta\[name="theme-color"\]'\)/);
  assert.doesNotMatch(page,/transition:background-color 1\.15s/,'Stale slow theme CSS must not reappear');
  assert.doesNotMatch(page,/html\.theme-transitioning \.nav,html\.theme-transitioning \.glass/,'Duplicate theme transition overrides must not reappear');
- assert.match(css,/#order,#featured,#collections,#products,#siteFooter\\{[\\s\\S]*?content-visibility:auto;/);
+ assert.match(css,/#order,#featured,#collections,#products,#siteFooter\{[\s\S]*?content-visibility:auto;/);
 });
