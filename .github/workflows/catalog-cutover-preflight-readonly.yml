@@ -1,0 +1,26 @@
+name: Catalog Replacement Preflight (Read-only)
+on:
+  push:
+    branches:
+      - audit/import-218-921-readonly-2026-10-26
+    paths:
+      - scripts/catalog-cutover-preflight-readonly.mjs
+      - .github/workflows/catalog-cutover-preflight-readonly.yml
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Read target and source metadata with SELECT only
+        run: node scripts/catalog-cutover-preflight-readonly.mjs
