@@ -227,19 +227,50 @@ try{
         bgTransition:getComputedStyle(bgs[0]).transitionDuration
       });
       const results=[];
+      const nav=document.querySelector('.nav');
+      const transitionEvents=[];
+      const longTasks=[];
+      const observer=typeof PerformanceObserver==='function'
+        ?new PerformanceObserver(list=>longTasks.push(...list.getEntries().map(e=>({start:Math.round(e.startTime),duration:Math.round(e.duration)}))))
+        :null;
+      try{observer?.observe({entryTypes:['longtask']})}catch{}
+      for(const elem of [nav,...bgs]){
+        for(const type of ['transitionrun','transitionstart','transitionend']){
+          elem.addEventListener(type,event=>{
+            if(!['background-color','opacity'].includes(event.propertyName))return;
+            transitionEvents.push({type,element:elem===nav?'nav':elem===bgs[0]?'lightBg':'darkBg',
+              property:event.propertyName,time:Math.round(performance.now()),elapsed:Math.round(event.elapsedTime*1000)});
+          });
+        }
+      }
       for(const direction of [true,false]){
+        const eventBase=transitionEvents.length;
+        const taskBase=longTasks.length;
+        const started=performance.now();
+        const frameTimes=[];
+        let watching=true;
+        const watchFrame=timestamp=>{
+          if(!watching)return;
+          frameTimes.push(Math.round(timestamp-started));
+          requestAnimationFrame(watchFrame);
+        };
+        requestAnimationFrame(watchFrame);
         button.click();
         const now=snapshot();
         const samples=[];
-        const started=performance.now();
         while(performance.now()-started<660){
           await new Promise(resolve=>setTimeout(resolve,50));
-          samples.push(snapshot());
+          samples.push({...snapshot(),elapsedMs:Math.round(performance.now()-started)});
         }
+        watching=false;
         await new Promise(resolve=>setTimeout(resolve,240));
         const stable=snapshot();
-        results.push({direction,now,samples,stable});
+        results.push({direction,now,samples,stable,
+          durationMs:Math.round(performance.now()-started),
+          frameTimes,transitionEvents:transitionEvents.slice(eventBase).map(e=>({...e,relativeMs:e.time-Math.round(started)})),
+          longTasks:longTasks.slice(taskBase).map(e=>({...e,relativeMs:e.start-Math.round(started)}))});
       }
+      observer?.disconnect();
       const first=layer.find(img=>img.classList.contains('is-visible'))?.src;
       await new Promise(resolve=>setTimeout(resolve,1600));
       const second=layer.find(img=>img.classList.contains('is-visible'))?.src;
