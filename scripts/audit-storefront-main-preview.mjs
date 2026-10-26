@@ -89,15 +89,26 @@ try{
   const featuredIds=await page.locator('#featuredGrid [data-featured-card]').evaluateAll(nodes=>nodes.map(n=>n.dataset.product));
   if(featuredIds.length!==4||new Set(featuredIds).size!==4)
    throw Error("LIVE_FEATURED_MISSING_ONE_OF_FOUR_CARDS");
-  // Initial unfiltered All tab must represent several categories, not only
-  // sneakers because that group happens to sort first in the D1 response.
+  // All tab must fill the first pages with sneakers before moving to the
+  // next category; the order is randomized once, then stable when paginating.
   const firstPageIds=await page.locator('#catalogGrid [data-product]').evaluateAll(nodes=>nodes.map(n=>n.dataset.product));
   const allCategories=new Map(liveRows.map(x=>[String(x.id||x.slug),String(x.category)]));
-  const initialKinds=new Set(firstPageIds.map(id=>allCategories.get(String(id))).filter(Boolean));
-  if(initialKinds.size<Math.min(4,firstPageIds.length))
-   throw Error("LIVE_ALL_PRODUCTS_FIRST_PAGE_NOT_DIVERSE");
+  const sneakerCount=liveRows.filter(x=>x.category==='sneakers').length;
+  if(!sneakerCount)throw Error("LIVE_SNEAKERS_CATEGORY_MISSING");
+  if(firstPageIds.slice(0,Math.min(firstPageIds.length,sneakerCount)).some(id=>allCategories.get(String(id))!=='sneakers'))
+   throw Error("LIVE_ALL_PRODUCTS_NOT_SNEAKERS_FIRST");
+  if(sneakerCount>=firstPageIds.length&&firstPageIds.some(id=>allCategories.get(String(id))!=='sneakers'))
+   throw Error("LIVE_ALL_PRODUCTS_INTERLEAVED_CATEGORIES");
+  const nextPage=page.locator('#pagination [data-page="next"]');
+  if(await nextPage.count()&&!await nextPage.isDisabled()){
+   await nextPage.click({timeout:6500});
+   await page.locator('#pagination [data-page="prev"]').click({timeout:6500});
+   const returned=await page.locator('#catalogGrid [data-product]').evaluateAll(nodes=>nodes.map(n=>n.dataset.product));
+   if(JSON.stringify(returned)!==JSON.stringify(firstPageIds))
+    throw Error("LIVE_RANDOM_CATALOG_SHUFFLES_ON_PAGINATION");
+  }
   liveProof.featuredCount=featuredIds.length;
-  liveProof.firstPageCategoryCount=initialKinds.size;
+  liveProof.sneakerFirst=true;
   for(const item of pills){
    if(item.key!=='all'&&!item.label.includes(String(expected.get(item.key)||0)))
     throw Error("LIVE_CATEGORY_COUNT_MISMATCH");
