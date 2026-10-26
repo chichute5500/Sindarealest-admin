@@ -43,6 +43,22 @@ assert.equal(settings.watermarkLogoUrl,'/watermark.webp');
 assert.equal(settings.watermarkEnabled,true);
 assert.equal(settings.watermarkPosition,'bottom-right');
 
+const home=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+const start=home.indexOf('<script id="sd-protection-script">');
+const end=home.indexOf('</script>',start);
+assert.ok(start>=0&&end>start);
+const script=home.slice(start,end);
+assert.ok(script.includes("document.querySelector('.detail-image-stage')"));
+assert.ok(script.includes('window.__sdUpdateDetailWatermark'));
+assert.ok(script.includes('function imageNeedsOverlay(src)'));
+assert.ok(!script.includes("document.querySelectorAll('.product-photo"));
+assert.ok(!script.includes('.detail-thumb'));
+assert.ok(!home.includes('.product-photo .sd-viewer-watermark'));
+assert.ok(!home.includes('.detail-thumb .sd-viewer-watermark'));
+assert.ok(home.includes("window.__sdSettingsPromise||window.__sdPublicSettings"));
+assert.ok(home.includes("mark.src=config.watermarkLogoUrl||'/watermark.webp'"), 'Detail viewer must use the configurable watermark logo');
+assert.ok(home.includes("watermarkLogoUrl:typeof next.watermarkLogoUrl==='string'"), 'Public viewer must validate and apply the selected internal logo path');
+
 const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
 assert.ok(admin.includes('watermarkSettingsForm'));
 assert.ok(admin.includes('saveWatermarkSettings'));
