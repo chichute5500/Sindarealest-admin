@@ -52,7 +52,7 @@ for(const theme of ['light','dark']){
     noRasterNodes:hero.querySelectorAll('picture,img,video,canvas').length===0,
     noCssRasterBackground:!String(css.backgroundImage).includes('url('),
     titleThreeLines:spans.length===3&&spans.every(x=>getComputedStyle(x).display==='block'),
-    headlineVietnamese:title.textContent.replace(/\s+/g,' ').trim()==='Phong cách Đẳng cấp từ da cá sấu',
+    headlineVietnamese:spans.map(x=>x.textContent.trim()).join(' ').replace(/\s+/g,' ').trim()==='Phong cách Đẳng cấp từ da cá sấu',
     fontIsSerif:/SD Serif/.test(hcss.fontFamily),
     serifRealLoaded:document.fonts.check('16px "SD Serif"'),
     sansRealLoaded:document.fonts.check('16px "SD Sans"'),
