@@ -4,7 +4,7 @@ import { parseCsv, buildImportPlan, normPath, MAX_IMAGES_PER_PRODUCT } from "../
 
 const csv = "\uFEFFẢnh gốc,Ảnh kết quả,Danh mục,Mẫu,Màu,Ghi chú\r\n" +
  '"A,1","Clutch\\M0023 - Clutch Nap\\Nâu\\anh (1).webp",Clutch,"Clutch, Nắp",Nâu,Cần xem lại\r\n' +
- ',Clutch\\M0023 - Clutch Nap\\Đen\\anh (2).webp",Clutch,Clutch,Đen,\r\n';
+ ',Clutch\\M0023 - Clutch Nap\\Đen\\anh (2).webp,Clutch,Clutch,Đen,\r\n';
 const rows = parseCsv(csv);
 assert.equal(rows.length, 2);
 assert.equal(rows[0]["Ảnh gốc"], "A,1");
