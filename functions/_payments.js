@@ -49,14 +49,14 @@ export function makeCheckoutTransferReference(phone,sku) {
   const digits=String(phone||"").replace(/\D/g,"");
   const cleanSku=String(sku||"").toUpperCase();
   if(digits.length<4||!/^[A-Z0-9-]{1,36}$/.test(cleanSku))return "";
-  const abc="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const abc="ABCDEFGHJKLMNPQRSTUVWXYZ";
   const bytes=crypto.getRandomValues(new Uint8Array(4));
   return digits.slice(-4)+"-"+cleanSku+"-"+Array.from(bytes,v=>abc[v%abc.length]).join("");
 }
 export function checkoutTransferReferenceMatches(reference,phone,sku) {
   const digits=String(phone||"").replace(/\D/g,"");
   return digits.length>=4&&String(reference||"").startsWith(digits.slice(-4)+"-"+sku+"-")&&
-    /^[A-Z2-9]{4}$/.test(String(reference).slice((digits.slice(-4)+"-"+sku+"-").length))&&
+    /^[A-Z]{4}$/.test(String(reference).slice((digits.slice(-4)+"-"+sku+"-").length))&&
     String(reference).length===(digits.slice(-4)+"-"+sku+"-").length+4;
 }
 export function calculateCheckoutQuote(items) {
