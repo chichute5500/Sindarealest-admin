@@ -54,6 +54,33 @@ assert.equal(mislabeled.status, 400, "original bytes must match the declared JPE
 assert.equal(badOriginals.puts.length, 0, "mislabeled originals must be rejected before storage");
 assert.equal(badImages.puts.length, 0, "rejecting the original must not leave a public derivative behind");
 
+// An existing browser tab cannot hot-reload JavaScript without losing file
+// inputs. Retry transient R2 outages *on the server* and return 201 normally.
+let firstOriginalAttempt=0, firstDerivativeAttempt=0;
+const flakyOriginals=bucket(), flakyDerivatives=bucket();
+const originalPut=flakyOriginals.put.bind(flakyOriginals);
+const derivativePut=flakyDerivatives.put.bind(flakyDerivatives);
+flakyOriginals.put=async(...args)=>{
+  firstOriginalAttempt++;
+  if(firstOriginalAttempt===1)throw new Error("temporary R2 originals outage");
+  return originalPut(...args);
+};
+flakyDerivatives.put=async(...args)=>{
+  firstDerivativeAttempt++;
+  if(firstDerivativeAttempt===1)throw new Error("temporary R2 images outage");
+  return derivativePut(...args);
+};
+const recovered=await uploadProductImage({
+  request:makeRequest(),
+  env:{DB:{},ADMIN_PASSWORD,SESSION_SECRET,ORIGINALS:flakyOriginals,IMAGES:flakyDerivatives}
+});
+assert.equal(recovered.status,201,"Server must recover transient R2 failures without browser refresh");
+assert.equal(firstOriginalAttempt,2,"Retry private original with same key");
+assert.equal(firstDerivativeAttempt,2,"Retry public derivative with same key");
+assert.equal(flakyOriginals.puts.length,1,"One original is finally stored");
+assert.equal(flakyDerivatives.puts.length,1,"One derivative is finally stored");
+assert.equal(flakyOriginals.deletes.length,0,"Recovery must not roll back a successful upload");
+
 const missingOriginals = bucket(), missingImages = bucket();
 const missingOriginal = await uploadProductImage({
   request: makeRequest({ includeOriginal: false }),
