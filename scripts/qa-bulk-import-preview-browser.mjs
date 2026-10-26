@@ -51,7 +51,7 @@ try{
     } else if(method==="POST"&&pathname==="/api/admin/products"){
       const draft=JSON.parse(req.postData()||"{}");drafts.push(draft);
       await route.fulfill({status:201,contentType:"application/json",
-        body:JSON.stringify({ok:true,product:{id:randomUUID()}})});
+        body:JSON.stringify({ok:true,product:{id:randomUUID(),sku:"SD-SN009"}})});
     } else {
       leakedWrites++;
       await route.abort();
@@ -67,6 +67,14 @@ try{
   assert.match(await page.locator("#totals").innerText(),/1 mẫu \/ 2 dòng CSV \/ 2 ảnh khớp/);
   assert.equal(await page.locator("#groups .item").count(),1);
   assert.equal(await page.locator("#groups .item input[type=checkbox]").isChecked(),true);
+  assert.match(await page.locator("#groups .sku-hint").innerText(),/SKU: Hệ thống tự cấp SD-/);
+  assert.match(await page.locator("#groups .photo-color-row").first().innerText(),/CSV: Đen/);
+  assert.equal(await page.locator("#groups .price-input").inputValue(),"","Folder hint cannot silently become the selling price");
+  await page.locator("#groups .price-input").fill("2200000");
+  await page.locator("#groups details").first().evaluate(el=>{el.open=true;});
+  await page.locator("#groups .photo-color-row input").first().fill("Nâu");
+  await page.locator("#groups .photo-color-row input").first().dispatchEvent("change");
+  assert.match(await page.locator("#groups .metadata").first().innerText(),/Nâu/);
   await page.screenshot({path:"artifacts/bulk-import-preview/screenshots/desktop-review.png",fullPage:true});
   page.once("dialog",dialog=>dialog.accept());
   await page.locator("#import").click();
@@ -74,12 +82,15 @@ try{
   assert.equal(uploads,2);
   assert.equal(drafts.length,1);
   assert.equal(drafts[0].published,false);
-  assert.equal(drafts[0].price,null);
+  assert.equal(drafts[0].price,2200000);
+  assert.deepEqual(drafts[0].imageColors,["Nâu","Đen"]);
+  assert.equal(drafts[0].sku,undefined,"M-folder code cannot leak as SKU");
   assert.equal(drafts[0].stock,null);
   assert.equal(drafts[0].skuVerified,false);
   assert.equal(drafts[0].category,"Sneaker");
   assert.equal(drafts[0].categoryLabel,"Giày thể thao");
   assert.equal(drafts[0].images.length,2);
+  assert.match(await page.locator("#groups .sku-hint").innerText(),/SD-SN009/);
   assert.equal(leakedWrites,0);
   assert.deepEqual(failures,[]);
   await page.screenshot({path:"artifacts/bulk-import-preview/screenshots/desktop-draft-confirmed.png",fullPage:true});
@@ -128,6 +139,7 @@ try{
   await authPage.locator("#preview").click();
   await authPage.locator("#review").waitFor({state:"visible",timeout:12000});
   assert.equal(await authPage.locator("#groups .item").count(),1);
+  assert.equal(await authPage.locator("#groups .price-input").count(),1);
   await authPage.screenshot({path:"artifacts/bulk-import-preview/screenshots/mobile-inline-login.png",fullPage:true});
   signedIn=false;
   await authPage.locator("#preview").click();
