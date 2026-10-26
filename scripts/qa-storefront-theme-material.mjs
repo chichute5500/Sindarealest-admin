@@ -422,6 +422,64 @@ try{
         chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
       });
       console.log('THEME_COMPOSITOR_ABA_DIAGNOSTIC '+JSON.stringify([...results,...variants].map(metric)));
+      // Control experiment on the *same fully loaded page*: animate only
+      // the navbar and background layers without touching html.dark, which
+      // invalidates typography/cards across the Storefront. This preserves
+      // the real opacity/color surfaces but is NOT a substitute acceptance.
+      await page.evaluate(()=>{
+        const root=document.documentElement,nav=document.querySelector('.nav');
+        const light=document.querySelector('.theme-bg--light'),dark=document.querySelector('.theme-bg--dark');
+        const style=document.createElement('style');
+        style.id='sd-theme-layer-only-probe-style';
+        style.textContent=[
+          'html.sd-layer-only-dark body .theme-bg--dark{opacity:1!important}',
+          'html.sd-layer-only-dark body .theme-bg--light{opacity:0!important}',
+          'html.sd-layer-only-dark body .nav-wrap .nav{background-color:rgba(4,20,34,.94)!important}'
+        ].join('\n');
+        document.head.append(style);
+        const btn=document.createElement('button');
+        btn.id='sd-layer-only-probe';
+        btn.type='button';
+        btn.hidden=true;
+        document.body.append(btn);
+        const eventLog=[];
+        let clickAt=0,activeIndex=-1;
+        btn.addEventListener('click',()=>{
+          activeIndex++;
+          clickAt=performance.now();
+          eventLog.push({index:activeIndex,type:'click',at:clickAt});
+          root.classList.toggle('sd-layer-only-dark');
+        });
+        for(const el of [nav,light,dark]){
+          for(const kind of ['transitionstart','transitionend']){
+            el.addEventListener(kind,e=>{
+              if(e.target!==el||!['background-color','opacity'].includes(e.propertyName))return;
+              eventLog.push({index:activeIndex,type:kind,
+                element:el===nav?'nav':el===light?'lightBg':'darkBg',
+                prop:e.propertyName,elapsedMs:Math.round(performance.now()-clickAt)});
+            });
+          }
+        }
+        window.__sdLayerOnlyEvents=eventLog;
+      });
+      for(const direction of [true,false]){
+        await page.locator('#sd-layer-only-probe').dispatchEvent('click');
+        await page.waitForTimeout(620);
+      }
+      const layerOnly=await page.evaluate(()=>{
+        const events=window.__sdLayerOnlyEvents;
+        document.documentElement.classList.remove('sd-layer-only-dark');
+        document.getElementById('sd-layer-only-probe')?.remove();
+        document.getElementById('sd-theme-layer-only-probe-style')?.remove();
+        return [0,1].map(index=>({
+          dark:index===0,
+          start:events.find(e=>e.index===index&&e.element==='nav'&&e.type==='transitionstart')?.elapsedMs,
+          end:events.find(e=>e.index===index&&e.element==='nav'&&e.type==='transitionend')?.elapsedMs,
+          backgroundStart:events.find(e=>e.index===index&&e.element==='lightBg'&&e.type==='transitionstart')?.elapsedMs,
+          backgroundEnd:events.find(e=>e.index===index&&e.element==='lightBg'&&e.type==='transitionend')?.elapsedMs
+        }));
+      });
+      console.log('THEME_LAYER_ONLY_CONTROL '+JSON.stringify(layerOnly));
       if(process.env.SD_THEME_TRACE==='1'&&spec.label==='pc-1440'){
         // CDP GPU/style trace of one additional dark toggle, not used as
         // proof of 80/300ms because instrumentation adds overhead.
