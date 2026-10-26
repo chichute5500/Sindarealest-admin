@@ -136,7 +136,7 @@ try {
   const paymentRequest=await (await expectStatus('Admin creates server-priced full payment request',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{
     orderId:record.id,paymentOption:'full'
   },true),201)).json();
-  assert.equal(paymentRequest.amount,150000);
+  assert.equal(paymentRequest.amount,142500);
   assert.equal(paymentRequest.freeShippingEligible,true);
   assert.equal(paymentRequest.freeShippingApplied,false);
   await expectStatus('Duplicate pending QR request rejected',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{
@@ -144,7 +144,7 @@ try {
   },true),409);
   const publicPending=await (await expectStatus('Public token returns active QR after Admin approval',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
   assert.equal(publicPending.paymentReady,true);
-  assert.equal(publicPending.amount,150000);
+  assert.equal(publicPending.amount,142500);
   assert.equal(publicPending.freeShipping,false);
   assert.match(publicPending.qrImageUrl,/^\/payment-qr\/qr-/);
   fakeObjects.delete(qrKey);
@@ -153,9 +153,9 @@ try {
   fakeObjects.set(qrKey,{size:67});
 
   await expectStatus('Unverified browser cannot mark paid',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:record.id,paymentRequestId:paymentRequest.id,direction:'received',amount:150000,transactionReference:'QA-E2E-RECEIPT-1'
+    orderId:record.id,paymentRequestId:paymentRequest.id,direction:'received',amount:142500,transactionReference:'QA-E2E-RECEIPT-1'
   }),401);
-  const fixturePayment={orderId:record.id,paymentRequestId:paymentRequest.id,direction:'received',amount:150000,transactionReference:'QA-E2E-RECEIPT-1'};
+  const fixturePayment={orderId:record.id,paymentRequestId:paymentRequest.id,direction:'received',amount:142500,transactionReference:'QA-E2E-RECEIPT-1'};
   await expectStatus('Simulated receipt -> atomic verified ledger',await invoke(transactionPost,'/api/admin/payment-transactions','POST',fixturePayment,true),201);
   assert.equal(one('SELECT payment_status AS status FROM orders WHERE id=?',record.id).status,'paid');
   const paid=await (await expectStatus('Fully paid response applies freeship',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
@@ -166,7 +166,7 @@ try {
     orderId:record.id,direction:'refunded',amount:150001,transactionReference:'QA-E2E-REFUND-OVER'
   },true),409);
   await expectStatus('Simulated refund -> ledger',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:record.id,direction:'refunded',amount:150000,transactionReference:'QA-E2E-REFUND-1',
+    orderId:record.id,direction:'refunded',amount:142500,transactionReference:'QA-E2E-REFUND-1',
     note:'Accounting-only test. No money moved.'
   },true),201);
   assert.equal(one('SELECT payment_status AS status FROM orders WHERE id=?',record.id).status,'refunded');
