@@ -134,6 +134,31 @@ try{
    console.log('PASS QA-only right-side silk lighting parameter sweep '+strengths.length+' actual Chromium captures.');
 
   }
+  // QA-only independent stone photometry sweep: no changes to website or build assets.
+  // Every candidate is a genuine native Chromium screenshot of the real HTML layers.
+  if(name==='pc-1440'&&theme==='light'&&process.env.HERO_MATERIAL_SWEEP==='1'){
+   const stage=page.locator('#home .hero-pedestal-art');
+   const variants=[
+    ['brightness78','saturate(1.08) contrast(1.08) brightness(.78)'],
+    ['brightness83','saturate(1.08) contrast(1.08) brightness(.83)'],
+    ['brightness88','saturate(1.08) contrast(1.08) brightness(.88)'],
+    ['brightness93','saturate(1.08) contrast(1.08) brightness(.93)'],
+    ['brightness102','saturate(1.08) contrast(1.08) brightness(1.02)'],
+    ['contrast85','saturate(1.08) contrast(.85) brightness(.99)'],
+    ['contrast95','saturate(1.08) contrast(.95) brightness(.99)'],
+    ['contrast115','saturate(1.08) contrast(1.15) brightness(.99)'],
+    ['contrast130','saturate(1.08) contrast(1.30) brightness(.99)'],
+    ['sat75','saturate(.75) contrast(1.08) brightness(.99)'],
+    ['sat125','saturate(1.25) contrast(1.08) brightness(.99)'],
+    ['photoDark','saturate(.82) contrast(1.25) brightness(.88)']
+   ];
+   for(const [label,filter] of variants){
+    await stage.evaluate((el,value)=>{el.style.filter=value;},filter);
+    await page.locator('#home').screenshot({path:out+'/material-'+label+'.png',animations:'disabled'});
+   }
+   await stage.evaluate(el=>el.style.removeProperty('filter'));
+   console.log('PASS QA-only independent marble photographic color sweep '+variants.length+' real Chromium screens; live styles remain unchanged.');
+  }
   await page.locator('#home .hero-actions .pill-btn').focus();
   assert.ok(await page.evaluate(()=>document.activeElement?.matches('#home .hero-actions .pill-btn')),name+' CTA takes keyboard focus');
   await page.keyboard.press('Enter');
