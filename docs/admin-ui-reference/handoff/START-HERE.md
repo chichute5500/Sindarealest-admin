@@ -1,3 +1,16 @@
+
+
+> **LIVE CHECKPOINT — 2026-10-26 01:28 UTC (verified before handoff-only refresh)**
+>
+> - Repository `chichute5500/Sindarealest-admin`; branch `feature/admin-isolated-handoff-2026-10-20`; branch HEAD at verification start: `c904d3b5bf8daed49a4744223cd2696dbbc7fcee`.
+> - Exact-SHA workflow runs on that HEAD: Validate PR [#40211984130](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211984130) **SUCCESS**; Admin Preview [#40211984118](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211984118) **SUCCESS**; isolated Admin Preview [#40211984139](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211984139) **SUCCESS**; Validate push [#40211979464](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40211979464) **SUCCESS**. Each reports `head_sha=c904d3b5bf8daed49a4744223cd2696dbbc7fcee`.
+> - PR [#111](https://github.com/chichute5500/Sindarealest-admin/pull/111) OPEN, unmerged, mergeable=true, head `c904d3b5bf8daed49a4744223cd2696dbbc7fcee`. PR [#108](https://github.com/chichute5500/Sindarealest-admin/pull/108) OPEN, unmerged, read-only, mergeable=false, head `3ea4c88e4c8cc9954f7754b1f6d4e7518c6e4db0`. Live main is `227622d3e3b7c75724ffa1775b193da71089269a`; no rebase/merge performed.
+> - The requested nested path `docs/admin-ui-reference/handoff/MASTER-PROMPT-AUTO-HANDOFF.md` is absent (GitHub 404). A similarly named file exists at `docs/admin-ui-reference/MASTER-PROMPT-AUTO-HANDOFF.md`, blob `dd69c12196d284142fb155d747988267143d9ede`; it was **not modified** because it is outside the exact requested path.
+> - **Acceptance record conflict:** this file/prompt set contains a claim that 12/12 screens were owner-approved, while `12-SCREEN-REFERENCE-AUDIT.md` still records 0/12 accepted. This run did not independently revalidate the original approval event/artifact. Keep progress at **50% PROVISIONAL**; CI success is not visual-reference sign-off.
+> - This checkpoint precedes the documentation-only commits made to refresh handoff files. Verify the final branch HEAD and exact-SHA workflows after those commits. No source code, merge, Production deploy, Cloudflare Access/secrets, D1/R2, or migrations changed.
+
+---
+
 > **BỔ SUNG NGHIỆM THU ĐỘC LẬP (Admin order race, 25/10/2026):** code/test SHA `030a39928204a5b091b27880adf645f57e343593`, commit sửa thêm điều kiện kiểm tra snapshot dòng hàng khi thao tác lưu giá không thay đổi. Test D1-contract bằng SQLite in-memory mô phỏng người khác đổi giá trước `DB.batch`; bản lưu cũ phải HTTP 409, giữ giá/tổng tiền mới, không tạo audit thành công giả. CI tại mốc cập nhật: 6/6 SUCCESS (xem báo cáo cập nhật), không coi job chưa kết thúc là PASS. Các blocker Cloudflare vẫn giữ nguyên; không deploy/merge/tích hợp. [Báo cáo](../../admin-audit/INDEPENDENT-QA-2026-10-25.md).
 
 ---
