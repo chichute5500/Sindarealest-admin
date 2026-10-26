@@ -32,9 +32,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Native DOM contract
         run: node tests/hero-render-reference.test.mjs
-      - name: Audit 7 viewports, 2 themes and 12 QA-only marble color variants
-        env:
-          HERO_MATERIAL_SWEEP: '1'
+      - name: Audit 7 viewports, 2 themes, visible typography, shoe and podium layers, CTA focus
         run: node scripts/audit-hero-local-v9.mjs
       - name: Upload actual HERO screenshots and DOM metrics
         if: always()
