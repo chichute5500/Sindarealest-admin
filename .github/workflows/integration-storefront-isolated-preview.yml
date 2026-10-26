@@ -10,6 +10,7 @@ on:
       - 'package.json'
       - 'scripts/audit-storefront-main-preview.mjs'
       - 'scripts/audit-storefront-checkout-disposable-browser.mjs'
+      - 'scripts/qa-storefront-remote-preview-order.mjs'
       - 'scripts/qa-storefront-integration-preview-sha.mjs'
       - '.github/workflows/integration-storefront-isolated-preview.yml'
   workflow_dispatch:
@@ -113,5 +114,37 @@ jobs:
         with:
           name: storefront-main-integration-${{ github.sha }}
           path: artifacts/storefront-integration-preview/
+          if-no-files-found: warn
+          retention-days: 14
+
+  remote-order-qa:
+    name: Remote isolated Preview D1 checkout + Admin (QA fixture, cleanup)
+    needs: safely-deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+    steps:
+      - name: Check out exactly the isolated integration SHA
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up Node.js for isolated D1 test
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Verify Preview D1/R2 vs both Production targets, then test and clean only own fixture
+        run: node scripts/qa-storefront-remote-preview-order.mjs
+      - name: Upload bounded QA report (no tokens or PII)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: remote-preview-e2e-${{ github.sha }}
+          path: artifacts/storefront-integration-remote-e2e/
           if-no-files-found: warn
           retention-days: 14
