@@ -474,6 +474,65 @@ try{
       });
       console.log('THEME_DIRECT_SURFACE_CONTROL '+JSON.stringify(surfaceTest));
 
+      // Root-cause experiment: start the exact approved navbar+wallpaper
+      // transition as isolated inline styles; synchronize the full document
+      // palette on a later task. Restore every inline style before leaving QA.
+      const stagedTheme=await page.evaluate(async()=>{
+        const root=document.documentElement,nav=document.querySelector('.nav');
+        const light=document.querySelector('.theme-bg--light'),dark=document.querySelector('.theme-bg--dark');
+        const button=document.createElement('button');
+        button.id='sd-two-phase-qa-only';button.hidden=true;document.body.append(button);
+        const output=[];
+        for(const deferMs of [48,80,120]){
+          for(const targetDark of [true,false]){
+            const listeners=[],events=[];let begin=0,flipAt=0;
+            const watch=(el,name)=>e=>{
+              if(e.target!==el||e.propertyName!==(name==='nav'?'background-color':'opacity'))return;
+              events.push({type:e.type,el:name,relativeMs:Math.round(performance.now()-begin)});
+            };
+            for(const [el,name] of [[nav,'nav'],[light,'light'],[dark,'dark']]){
+              for(const kind of ['transitionstart','transitionend']){
+                const fn=watch(el,name);el.addEventListener(kind,fn);
+                listeners.push(()=>el.removeEventListener(kind,fn));
+              }
+            }
+            const click=()=>{
+              begin=performance.now();
+              root.classList.add('theme-transitioning');
+              nav.style.setProperty('background-color',targetDark?'rgba(4,20,34,.94)':'rgba(244,250,255,.94)','important');
+              light.style.setProperty('opacity',targetDark?'0':'1','important');
+              dark.style.setProperty('opacity',targetDark?'1':'0','important');
+              setTimeout(()=>{
+                flipAt=Math.round(performance.now()-begin);
+                root.classList.toggle('dark',targetDark);
+              },deferMs);
+            };
+            button.addEventListener('click',click,{once:true});
+            button.click();
+            await new Promise(r=>setTimeout(r,510));
+            listeners.forEach(fn=>fn());
+            const navStart=events.find(e=>e.type==='transitionstart'&&e.el==='nav')?.relativeMs;
+            const bgStart=events.find(e=>e.type==='transitionstart'&&e.el==='light')?.relativeMs;
+            const navEnd=events.find(e=>e.type==='transitionend'&&e.el==='nav')?.relativeMs;
+            const bgEnd=events.find(e=>e.type==='transitionend'&&e.el==='light')?.relativeMs;
+            output.push({targetDark,deferMs,flipAt,navStart,bgStart,navEnd,bgEnd});
+            nav.style.removeProperty('background-color');
+            light.style.removeProperty('opacity');
+            dark.style.removeProperty('opacity');
+            root.classList.remove('theme-transitioning');
+            await new Promise(r=>setTimeout(r,60));
+          }
+        }
+        button.remove();
+        root.classList.remove('dark','theme-transitioning');
+        nav.style.removeProperty('background-color');
+        light.style.removeProperty('opacity');
+        dark.style.removeProperty('opacity');
+        return output;
+      });
+      console.log('THEME_TWO_PHASE_ROOT_CAUSE_DIAGNOSTIC '+JSON.stringify(stagedTheme));
+
+
       // A staged visual transition: kick off three visible surfaces first;
       // only upon their first compositor transitionstart switch the large
       // html.dark-dependent catalog/theme subtree. Browser-only prototype:
