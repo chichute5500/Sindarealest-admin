@@ -638,7 +638,22 @@ function changeFeaturedImage(card,step=1){if(!card)return;const track=card.query
 let featuredPausedUntil=0;
 function pauseFeaturedAutoplay(){featuredPausedUntil=Date.now()+6000}
 function setupFeaturedAutoplay(){if(featuredTimer)clearInterval(featuredTimer);if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;featuredTimer=setInterval(()=>{if(document.hidden||Date.now()<featuredPausedUntil)return;const section=$('#featured');if(!section)return;const rect=section.getBoundingClientRect();if(rect.bottom<0||rect.top>window.innerHeight)return;$$('[data-featured-card]').forEach(card=>changeFeaturedImage(card,1))},3000)}
-function renderFilters(){const counts=products.reduce((a,p)=>(a[p.category]=(a[p.category]||0)+1,a),{});$('#categoryFilters').innerHTML=categoryOrder.filter(c=>c==='all'||counts[c]).map(c=>`<button class="filter-pill tap-target ${selectedCategory===c?'active':''}" data-category="${c}">${escapeHtml(categoryLabels[c])}${c==='all'?'':` · ${counts[c]||0}`}</button>`).join('')}
+function renderFilters(){
+  // Keep owner-approved category order but include newly imported D1 categories
+  // (for example túi golf, clutch, mũ) instead of silently hiding them.
+  const counts=Object.create(null),labels=Object.create(null);
+  for(const p of products){
+    const category=String(p.category||'').trim();
+    if(!category||category==='all')continue;
+    counts[category]=(counts[category]||0)+1;
+    if(!labels[category])labels[category]=String(p.categoryLabel||categoryLabels[category]||category).trim()||category;
+  }
+  const extras=Object.keys(counts).filter(c=>!categoryOrder.includes(c))
+    .sort((a,b)=>labels[a].localeCompare(labels[b],'vi'));
+  const visible=['all',...categoryOrder.filter(c=>c!=='all'&&counts[c]),...extras];
+  if(selectedCategory!=='all'&&!counts[selectedCategory])selectedCategory='all';
+  $('#categoryFilters').innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target '+(selectedCategory===c?'active':'')+'" data-category="'+escapeHtml(c)+'" aria-pressed="'+(selectedCategory===c)+'">'+escapeHtml(c==='all'?categoryLabels.all:(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
+}
 let selectedCategory='all';
 function foldSearch(value){return String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function getFiltered(){const q=foldSearch(($('#catalogSearch').value||'').trim());return products.filter(p=>(selectedCategory==='all'||p.category===selectedCategory)&&(!q||foldSearch(`${p.title||''} ${p.sku||''} ${p.categoryLabel||''} ${p.description||''}`).includes(q)))}
