@@ -25,7 +25,7 @@ test('Owner-controlled material photos are config-driven and have no manual cont
 test('Theme crossfades smoothly with one synchronized duration and no stagger',()=>{
  const page=read('public/index.html'),css=read('public/material-gallery.css');
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
- assert.match(page,/root\.classList\.add\('theme-transitioning'\)/);
+ assert.match(page,/root\.classList\.toggle\('theme-transitioning',smooth\)/);
  assert.match(page,/setTimeout\(\(\)=>root\.classList\.remove\('theme-transitioning'\),290\)/);
  assert.doesNotMatch(page,/function applyThemeMode[^\n]*void document\.body\.offsetHeight/);
  assert.match(css,/html\.theme-transitioning body \.theme-bg\{[\s\S]*?opacity \.22s/);
