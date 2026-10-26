@@ -807,7 +807,41 @@ try{
     if(sync.slides!==2||sync.photoCrossfadeMs!==580||!sync.slideshowChanged||!sync.noControls||!sync.noPhotoWash||!sync.readableCaption)
       throw Error('Material crossfade/autoplay failed: '+JSON.stringify(sync));
     if(errors.length)throw Error('Runtime/page errors: '+JSON.stringify(errors));
-    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',photoFiles:sync.files,
+    // Rapid repeated taps must not leave the staged palette half-committed,
+    // stale inline colour overrides, inaccessible switch labels or timers.
+    // The accepted steady-state design must be identical after interruption.
+    await page.evaluate(async()=>{
+      const trigger=document.getElementById('themeToggle');
+      for(let i=0;i<4;i++){
+        trigger.click();
+        await new Promise(resolve=>setTimeout(resolve,55));
+      }
+    });
+    await page.waitForTimeout(760);
+    const rapid=await page.evaluate(()=>{
+      const root=document.documentElement;
+      const nav=document.querySelector('.nav');
+      const light=document.querySelector('.theme-bg--light');
+      const dark=document.querySelector('.theme-bg--dark');
+      const bottom=document.querySelector('.mobile-bottom-nav');
+      return {
+        lightMode:!root.classList.contains('dark'),
+        mode:root.dataset.themeMode,
+        staged:root.classList.contains('theme-transitioning'),
+        target:window.__sdThemeTargetDark,
+        activeCancel:typeof window.__sdCancelThemeStage==='function',
+        overrideCount:[nav.style.backgroundColor,light.style.opacity,dark.style.opacity,bottom?.style.backgroundColor].filter(Boolean).length,
+        lightOpacity:Number(getComputedStyle(light).opacity),
+        darkOpacity:Number(getComputedStyle(dark).opacity),
+        meta:document.querySelector('meta[name="theme-color"]')?.content,
+        labelled:document.querySelector('#themeToggle')?.getAttribute('aria-label')?.includes('tối')
+      };
+    });
+    if(!rapid.lightMode||rapid.mode!=='light'||rapid.staged||rapid.activeCancel||
+       rapid.target!==null||rapid.overrideCount!==0||rapid.lightOpacity<.98||
+       rapid.darkOpacity>.02||rapid.meta!=='#eaf3fb'||!rapid.labelled)
+      throw Error('Rapid theme taps left inconsistent state: '+JSON.stringify(rapid));
+    matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});
   }finally{await context.close()}
  }
