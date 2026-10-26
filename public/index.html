@@ -1079,7 +1079,22 @@ let selectedCategory='all';
 const fulfillmentLabels={in_stock:'Hàng có sẵn',made_to_order:'Hàng đặt riêng',unclassified:'Cần xác nhận'};
 function productFulfillmentType(p){const raw=p?.fulfillmentType??p?.fulfillment_type;return raw==='in_stock'||raw==='made_to_order'||raw==='unclassified'?raw:'unclassified'}
 function fulfillmentBadge(p,detail=false){const type=productFulfillmentType(p),label=fulfillmentLabels[type];return '<span class="fulfillment-badge fulfillment-'+type+'" data-fulfillment-type="'+type+'">'+(detail?'Tình trạng: ':'')+escapeHtml(label)+'</span>'}
-function renderFilters(){const counts=products.reduce((a,p)=>(a[p.category]=(a[p.category]||0)+1,a),{});$('#categoryFilters').innerHTML=categoryOrder.filter(c=>c==='all'||counts[c]).map(c=>'<button type="button" class="filter-pill tap-target '+(selectedCategory===c?'active':'')+'" data-category="'+c+'" aria-pressed="'+(selectedCategory===c)+'">'+escapeHtml(categoryLabels[c])+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('')}
+function renderFilters(){
+  // Keep owner-approved category order but include newly imported D1 categories
+  // (for example túi golf, clutch, mũ) instead of silently hiding them.
+  const counts=Object.create(null),labels=Object.create(null);
+  for(const p of products){
+    const category=String(p.category||'').trim();
+    if(!category||category==='all')continue;
+    counts[category]=(counts[category]||0)+1;
+    if(!labels[category])labels[category]=String(p.categoryLabel||categoryLabels[category]||category).trim()||category;
+  }
+  const extras=Object.keys(counts).filter(c=>!categoryOrder.includes(c))
+    .sort((a,b)=>labels[a].localeCompare(labels[b],'vi'));
+  const visible=['all',...categoryOrder.filter(c=>c!=='all'&&counts[c]),...extras];
+  if(selectedCategory!=='all'&&!counts[selectedCategory])selectedCategory='all';
+  $('#categoryFilters').innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target '+(selectedCategory===c?'active':'')+'" data-category="'+escapeHtml(c)+'" aria-pressed="'+(selectedCategory===c)+'">'+escapeHtml(c==='all'?categoryLabels.all:(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
+}
 function foldSearch(value){return String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function getFiltered(){const q=foldSearch(($('#catalogSearch').value||'').trim());return products.filter(p=>(selectedCategory==='all'||p.category===selectedCategory)&&(!q||foldSearch((p.title||'')+' '+visibleSku(p)+' '+(p.categoryLabel||'')+' '+(p.description||'')).includes(q)))}
 function renderCatalog(){unbindReveal($('#catalogGrid'));filtered=getFiltered();const maxPage=Math.max(1,Math.ceil(filtered.length/perPage));page=Math.min(page,maxPage);const start=(page-1)*perPage;const items=filtered.slice(start,start+perPage);$('#catalogGrid').innerHTML=items.map((p,i)=>productCard(p,(p.categoryLabel||'SELECTED').toUpperCase(),i)).join('');$('#pageSummary').textContent=filtered.length?`Hiển thị ${start+1}–${Math.min(start+perPage,filtered.length)} trong ${filtered.length} sản phẩm`:'Không tìm thấy sản phẩm phù hợp.';const nums=[];let from=Math.max(1,page-2),to=Math.min(maxPage,page+2);if(from>1)nums.push(1,'…');for(let i=from;i<=to;i++)nums.push(i);if(to<maxPage)nums.push('…',maxPage);$('#pagination').innerHTML=filtered.length?`<button type="button" class="page-btn page-arrow tap-target" data-page="prev" ${page===1?'disabled':''} aria-label="Trang trước">${arrowIcon('left')}</button>${nums.map(n=>n==='…'?'<span class="page-summary">…</span>':`<button class="page-btn tap-target ${n===page?'active':''}" data-page="${n}" ${n===page?'aria-current="page"':''}>${n}</button>`).join('')}<button type="button" class="page-btn page-arrow tap-target" data-page="next" ${page===maxPage?'disabled':''} aria-label="Trang sau">${arrowIcon('right')}</button>`:'';bindReveal($('#catalogGrid'))}
