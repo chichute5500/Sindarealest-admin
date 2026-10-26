@@ -26,9 +26,11 @@ test('Theme crossfades smoothly with one synchronized duration and no stagger',(
  const page=read('public/index.html'),css=read('public/material-gallery.css');
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
  assert.match(page,/root\.classList\.add\('theme-transitioning'\)/);
- assert.match(page,/setTimeout\(\(\)=>root\.classList\.remove\('theme-transitioning'\),550\)/);
+ assert.match(page,/setTimeout\(\(\)=>root\.classList\.remove\('theme-transitioning'\),720\)/);
+ assert.match(page,/void document\.body\.offsetHeight/);
  assert.match(css,/html\.theme-transitioning body \.theme-bg\{[\s\S]*?opacity \.46s/);
  assert.match(css,/#materialTile \.sd-material-slide\{[\s\S]*?opacity \.58s/);
  assert.match(css,/#materialTile::before\{/);
+ assert.match(css,/html\.theme-transitioning body \.nav-wrap \.nav/);
  assert.match(page,/const themeMeta=document\.querySelector\('meta\[name="theme-color"\]'\)/);
 });

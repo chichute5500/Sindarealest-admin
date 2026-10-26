@@ -39,6 +39,14 @@ html.theme-transitioning body :is(
   transition-timing-function:cubic-bezier(.22,.61,.36,1)!important;
   transition-delay:0s!important
 }
+/* Navigation has a separate, more specific 250ms transition in legacy CSS. */
+html.theme-transitioning body .nav-wrap .nav,
+html.theme-transitioning body .mobile-bottom-nav{
+  transition-property:background-color,border-color,box-shadow,color,opacity!important;
+  transition-duration:.46s!important;
+  transition-timing-function:cubic-bezier(.22,.61,.36,1)!important;
+  transition-delay:0s!important
+}
 html.theme-transitioning body #materialTile .material-photo{
   transition:opacity .46s cubic-bezier(.22,.61,.36,1)!important;
   transition-delay:0s!important

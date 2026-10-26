@@ -66,11 +66,15 @@ try{
       for(const direction of [true,false]){
         button.click();
         const now=snapshot();
-        await new Promise(resolve=>setTimeout(resolve,180));
-        const middle=snapshot();
-        await new Promise(resolve=>setTimeout(resolve,430));
+        const samples=[];
+        const started=performance.now();
+        while(performance.now()-started<660){
+          await new Promise(resolve=>setTimeout(resolve,50));
+          samples.push(snapshot());
+        }
+        await new Promise(resolve=>setTimeout(resolve,240));
         const stable=snapshot();
-        results.push({direction,now,middle,stable});
+        results.push({direction,now,samples,stable});
       }
       const first=layer.find(img=>img.classList.contains('is-visible'))?.src;
       await new Promise(resolve=>setTimeout(resolve,1600));
@@ -84,12 +88,12 @@ try{
     });
     for(const r of sync.results){
       const target=r.direction?1:0;
-      if(![r.now,r.middle,r.stable].every(s=>s.dark===r.direction))
+      if(![r.now,...r.samples,r.stable].every(s=>s.dark===r.direction))
         throw Error('Theme state changed twice: '+JSON.stringify(r));
-      if(!(r.middle.darkBg>0&&r.middle.darkBg<1&&r.middle.lightBg>0&&r.middle.lightBg<1))
-        throw Error('Theme does not crossfade gradually: '+JSON.stringify(r));
+      if(!r.samples.some(s=>s.darkBg>.05&&s.darkBg<.95&&s.lightBg>.05&&s.lightBg<.95))
+        throw Error('Theme does not crossfade progressively: '+JSON.stringify(r));
       if(Math.abs(r.stable.darkBg-target)>.02||Math.abs(r.stable.lightBg-(1-target))>.02)
-        throw Error('Theme did not settle after 610ms: '+JSON.stringify(r));
+        throw Error('Theme did not settle after 900ms: '+JSON.stringify(r));
       for(const key of ['bgTransition','navTransition','materialTransition']){
         const duration=parseFloat(r.now[key]);
         if(!(duration>=.4&&duration<=.5))
