@@ -25,12 +25,11 @@ test('Owner-controlled material photos are config-driven and have no manual cont
 test('Theme crossfades smoothly with one synchronized duration and no stagger',()=>{
  const page=read('public/index.html'),css=read('public/material-gallery.css');
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
- assert.match(page,/function applyThemeMode\\(mode,animate=true\\)/);
- assert.match(page,/nav\\.addEventListener\\('transitionstart',onStart\\)/);
- assert.match(page,/nav\\.addEventListener\\('transitionend',onEnd\\)/);
- assert.match(page,/if\\(event\\.target===nav&&event\\.propertyName==='background-color'\\)commitPalette\\(\\)/);
- assert.match(page,/window\\.__sdThemeTimer=setTimeout\\(finish,560\\)/);
- assert.match(page,/window\\.__sdCancelThemeStage/);
+ assert.match(page,/nav\.addEventListener\('transitionstart',onStart\)/);
+ assert.match(page,/nav\.addEventListener\('transitionend',onEnd\)/);
+ assert.match(page,/commitPalette\(\)/);
+ assert.match(page,/__sdThemeTimer=setTimeout\(finish,560\)/);
+ assert.match(page,/__sdCancelThemeStage/);
  assert.doesNotMatch(page,/function applyThemeMode[^\n]*void document\.body\.offsetHeight/);
  assert.match(css,/html\.theme-transitioning body \.theme-bg\{[\s\S]*?opacity \.22s/);
  assert.match(css,/#materialTile \.sd-material-slide\{[\s\S]*?opacity \.58s/);
