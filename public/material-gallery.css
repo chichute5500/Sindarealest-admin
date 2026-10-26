@@ -146,7 +146,7 @@ html.theme-transitioning,html.theme-transitioning body{
 /* All elements underlying the opaque sheet commit directly to the target.
    Switching hundreds of independent transitions is what caused flicker. */
 html.sd-theme-overlay-active,
-html.sd-theme-overlay-active body{transition:none!important}
+html.sd-theme-overlay-active body{transition:none!important;}
 html.sd-theme-overlay-active body .theme-bg,
 html.sd-theme-overlay-active body .nav-wrap .nav,
 html.sd-theme-overlay-active body .mobile-bottom-nav,
