@@ -476,7 +476,7 @@ for (const [label, amount] of [
   })));
   const payload = await response.json();
   assert.equal(response.status, 201);
-  assert.equal(payload.amount, 100000);
+  assert.equal(payload.amount, 95000, "full payment applies a 5% discount");
   assert.equal(payload.shippingBenefit, "free_shipping");
   assert.equal(payload.freeShippingEligible, true, "full payment request is eligible for freeship");
   assert.equal(payload.freeShippingApplied, false, "pending full payment is not yet an applied delivery benefit");
