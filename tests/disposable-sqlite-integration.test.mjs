@@ -22,6 +22,7 @@ const migrationNames = [
   '0004_admin_notifications.sql', '0005_address_warranty_verification.sql',
   '0006_remove_warranty_otp.sql', '0007_order_contact_details.sql',
   '0008_product_sku_verification.sql', '0009_fulfillment_and_manual_payments.sql',
+  '0010_product_image_colors.sql',
 ];
 for (const name of migrationNames)
   sql.exec(readFileSync(new URL('../migrations/' + name, import.meta.url), 'utf8'));
