@@ -129,3 +129,26 @@ for(const [key,label] of [['in_stock','Có sẵn'],['made_to_order','Hàng đặ
  assert.ok(!actual.includes('Tình trạng:'));
 }
 console.log('PASS: grouped category-first randomized catalog, stable pagination, four varied featured products and price styling.');
+
+// Owner-approved detail purchase layout, identical glass recipes for blue and orange.
+const detailStart=html.indexOf('<div class="detail-copy">');
+const detailFinish=html.indexOf('</div></div></div></div>',detailStart);
+assert.ok(detailStart>=0&&detailFinish>detailStart);
+const detail=html.slice(detailStart,detailFinish);
+assert.ok(detail.indexOf('id="detailPrice"')<detail.indexOf('id="detailVariants"'));
+assert.ok(detail.indexOf('id="detailVariants"')<detail.indexOf('id="detailAdd"'));
+assert.ok(detail.indexOf('id="detailAdd"')<detail.indexOf('id="detailBuyNow"'));
+assert.ok(detail.indexOf('id="detailBuyNow"')<detail.indexOf('id="detailDescription"'));
+assert.ok(detail.indexOf('id="detailDescription"')<detail.indexOf('class="promise-tags"'));
+assert.ok(detail.indexOf('class="promise-tags"')<detail.indexOf('id="detailZalo"'));
+assert.match(detail, /id="detailAdd"[^>]*>[\\s\\S]*?<svg/);
+assert.match(detail, /id="detailBuyNow"[^>]*>[\\s\\S]*?<svg/);
+assert.equal((detail.match(/class="pill-btn primary detail-purchase-button/g)||[]).length,2);
+assert.match(html,/\.detail-buy-now\{--sd-action-rgb:242,152,70;--sd-action-border-rgb:215,119,47\}/);
+assert.match(html,/--sd-action-rgb:126,177,215/);
+assert.match(html,/background:linear-gradient\(135deg,rgba\(255,255,255,\.65\),rgba\(var\(--sd-action-rgb\),\.30\)\)/);
+assert.ok(html.includes("$('#detailBuyNow').addEventListener('click'"));
+assert.ok(html.includes("if(!id||!addToCart(id))return;closeDetail(false,false);openCheckout()"));
+assert.ok(!detail.includes('id="detailZalo"')||detail.indexOf('id="detailZalo"')>detail.indexOf('id="detailBuyNow"'));
+assert.match(html,/border:1px solid rgba\(205,167,93,\.60\)/);
+assert.match(html,/background:linear-gradient\(135deg,rgba\(255,252,236,\.82\),rgba\(244,214,148,\.44\)\)/);

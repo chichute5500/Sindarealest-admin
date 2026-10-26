@@ -170,6 +170,36 @@ try{
   await page.locator('#detailClose').click({timeout:6500});
   await page.waitForFunction(()=>!document.querySelector('#productOverlay')?.classList.contains('open'),null,{timeout:6500});
   liveProof.detail={productId:liveProductId,opens:true,closes:true,watermark:detail.watermark};
+  // Buy Now must open the actual checkout form for this selected product,
+  // without submitting an order or issuing POST/PUT/DELETE to the Preview.
+  await page.locator('#catalogGrid [data-open-product]').first().click({timeout:8500});
+  await page.locator('#productOverlay.open').waitFor({state:'visible',timeout:7000});
+  const controls=await page.evaluate(()=>{
+   const buttons=[document.querySelector('#detailAdd'),document.querySelector('#detailBuyNow')];
+   const styles=buttons.map(b=>({background:getComputedStyle(b).backgroundImage,border:getComputedStyle(b).borderRadius,blur:getComputedStyle(b).backdropFilter,icon:!!b.querySelector('svg')}));
+   const status=document.querySelector('#detailFulfillment .fulfillment-badge');
+   return {styles,buyText:buttons[1].textContent?.trim(),glassStatus:getComputedStyle(status).backgroundImage,
+    orderOK:!!document.querySelector('.detail-aftercare #detailDescription')&&
+     !!document.querySelectorAll('.detail-aftercare .promise-tag').length&&
+     !!document.querySelector('.detail-aftercare #detailZalo')};
+  });
+  if(!controls.orderOK||controls.buyText!=='Đặt hàng ngay'||controls.styles.some(s=>!s.icon||!s.blur||s.blur==='none'||s.border!=='999px'))
+   throw Error('LIVE_BUY_NOW_CONTROLS_OR_AFTERCARE_WRONG');
+  if(!controls.styles[0].background.includes('126, 177, 215')||!controls.styles[1].background.includes('242, 152, 70'))
+   throw Error('LIVE_BLUE_ORANGE_GLASS_PALETTE_WRONG');
+  if(!controls.glassStatus.includes('244, 214, 148'))
+   throw Error('LIVE_FULFILLMENT_NOT_CHAMPAGNE');
+  await page.locator('#detailBuyNow').click({timeout:6500});
+  await page.locator('#checkoutDrawer.open').waitFor({state:'visible',timeout:7000});
+  const checkout=await page.evaluate(()=>({
+   modalClosed:!document.querySelector('#productOverlay').classList.contains('open'),
+   form:!!document.querySelector('#checkoutForm [name="fullName"]'),
+   quantity:Number(document.querySelector('#cartCount')?.textContent||0),
+   checkoutVisible:!document.querySelector('#checkoutDrawer').hasAttribute('inert')
+  }));
+  if(!checkout.modalClosed||!checkout.form||!checkout.checkoutVisible||checkout.quantity<1)
+   throw Error('LIVE_BUY_NOW_FAILED_TO_OPEN_CHECKOUT');
+  liveProof.buyNow={blueOrangeGlass:true,aftercareAtBottom:true,checkoutOpened:true,orderWrites:0};
   const media=liveRows.flatMap(x=>Array.isArray(x.images)?x.images:[]).find(x=>/^\/media\/[a-z0-9-]+\.webp$/i.test(String(x)));
   if(media){
    const img=await liveContext.request.get(alias+media,{headers:auth,timeout:25000});
