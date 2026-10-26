@@ -73,6 +73,11 @@ const report={sha:process.env.GITHUB_SHA,scope:'BROWSER_UI_TO_REAL_HANDLER_DISPO
 const browser=await chromium.launch({headless:true});
 try{
  for(const [index,spec] of configurations.entries()){
+  // Validate both real business types, independent of stock quantity:
+  // desktop = in stock; mobile = made to order (30% deposit).
+  const type=spec.mobile?'made_to_order':'in_stock';
+  const depositAmount=spec.mobile?45000:100000;
+  db.prepare('UPDATE products SET fulfillment_type=? WHERE id=?').run(type,productId);
   const ctx=await browser.newContext({
    viewport:{width:spec.width,height:spec.height},
    isMobile:spec.mobile,hasTouch:spec.mobile,colorScheme:spec.dark?'dark':'light',
@@ -152,8 +157,8 @@ try{
    await page.locator('#checkoutSubmit').click();
    await page.locator('#sdCheckoutPaymentStep').waitFor({state:'visible',timeout:15000});
    assert.equal(results.locallyQuotedOrders,1,'Quote must be computed locally by real server handler');
-   assert.equal(await page.locator('#sdCheckoutOptions [data-sd-payment-option]').count(),2,'In-stock checkout must offer exactly deposit and full transfer');
-   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'100.000đ');
+   assert.equal(await page.locator('#sdCheckoutOptions [data-sd-payment-option]').count(),2,'Both fulfillment types must offer deposit and full transfer');
+   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),depositAmount.toLocaleString('vi-VN')+'đ');
    await page.locator('[data-sd-payment-option="full"]').click();
    assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'150.000đ');
    await page.locator('[data-sd-payment-option="deposit"]').click();
@@ -176,7 +181,7 @@ try{
    assert.ok(view.orders.every(o=>o.items.length===1));
    const latest=view.orders.find(o=>o.phone==='000000030'+index);
    assert.equal(latest?.customer_payment_option,'deposit','Admin must show customer-selected deposit preference');
-   assert.equal(Number(latest?.customer_payment_amount),100000,'Admin must receive server-derived amount, not browser amount');
+   assert.equal(Number(latest?.customer_payment_amount),depositAmount,'Admin must receive server-derived amount, not browser amount');
    await page.screenshot({path:dir+'/'+spec.name+'.png',animations:'disabled'});
    results.pass=true;
   }catch(error){
