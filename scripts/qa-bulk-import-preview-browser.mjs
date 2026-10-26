@@ -90,9 +90,56 @@ try{
   assert.equal(mobileResponse?.status(),200);
   assert.equal(await mobile.locator("#preview").isVisible(),true);
   await mobile.screenshot({path:"artifacts/bulk-import-preview/screenshots/mobile-entry.png",fullPage:true});
+  const authCtx=await browser.newContext({viewport:{width:390,height:844},extraHTTPHeaders:ACCESS});
+  const authPage=await authCtx.newPage();
+  let signedIn=false,loginPosts=0,authReadCount=0;
+  const authPageErrors=[];
+  authPage.on("pageerror",error=>authPageErrors.push(error.message));
+  await authPage.route("**/api/admin/**",async route=>{
+    const req=route.request(),path=new URL(req.url()).pathname;
+    if(path==="/api/admin/products"&&req.method()==="GET"){
+      authReadCount++;
+      return route.fulfill({status:signedIn?200:401,contentType:"application/json",
+        body:JSON.stringify(signedIn?{products:[]}:{ok:false,error:"Phiên đăng nhập hết hạn hoặc chưa đăng nhập."})});
+    }
+    if(path==="/api/admin/login"&&req.method()==="POST"){
+      loginPosts++;
+      const body=JSON.parse(req.postData()||"{}");
+      assert.equal(body.password,"qa-password-123456789012");
+      signedIn=true;
+      return route.fulfill({status:200,contentType:"application/json",
+        headers:{"Set-Cookie":"sd_admin_session=qa_mock; Path=/api/admin; HttpOnly; Secure; SameSite=Strict"},
+        body:JSON.stringify({ok:true})});
+    }
+    throw Error("Unexpected auth test API path: "+path);
+  });
+  await authPage.goto(origin+"/admin/import.html",{waitUntil:"networkidle",timeout:40000});
+  await authPage.locator("#loginPanel").waitFor({state:"visible",timeout:15000});
+  assert.equal(await authPage.locator("#preview").isDisabled(),true,"Unauthorized user cannot compare or import");
+  await authPage.locator("#csv").setInputFiles(csvPath);
+  await authPage.locator("#folder").setInputFiles(selected);
+  assert.equal(await authPage.locator("#folder").evaluate(e=>e.files.length),2);
+  await authPage.locator("#previewPassword").fill("qa-password-123456789012");
+  await authPage.locator("#signIn").click();
+  await authPage.locator("#loginPanel").waitFor({state:"hidden",timeout:15000});
+  assert.equal(await authPage.locator("#preview").isEnabled(),true);
+  assert.equal(await authPage.locator("#folder").evaluate(e=>e.files.length),2,"Selected photos preserved across inline login");
+  assert.equal(loginPosts,1);
+  await authPage.locator("#preview").click();
+  await authPage.locator("#review").waitFor({state:"visible",timeout:12000});
+  assert.equal(await authPage.locator("#groups .item").count(),1);
+  await authPage.screenshot({path:"artifacts/bulk-import-preview/screenshots/mobile-inline-login.png",fullPage:true});
+  signedIn=false;
+  await authPage.locator("#preview").click();
+  await authPage.locator("#loginPanel").waitFor({state:"visible",timeout:15000});
+  assert.equal(await authPage.locator("#preview").isDisabled(),true,"Expired session re-locks import");
+  assert.equal(await authPage.locator("#folder").evaluate(e=>e.files.length),2,"Expired session does not clear selected photos");
+  assert.ok(authReadCount>=4,"GET product catalog checked login and expiration");
+  assert.deepEqual(authPageErrors,[],"No frontend exceptions");
+  await authCtx.close();
   await ctx.close();
   console.log(JSON.stringify({status:"PASS",sourceSha:process.env.GITHUB_SHA,previewOrigin:origin,
-    browser:"Chromium",desktop:true,mobile:true,matchedImages:2,draftCreatedOnlyInMock:true,
+    browser:"Chromium",desktop:true,mobile:true,inlinePreviewLogin:true,expiredSessionHandled:true,matchedImages:2,draftCreatedOnlyInMock:true,
     imagesUploadedOnlyInMock:uploads,d1Writes:0,r2Writes:0,productionWrites:0,leakedWrites,
     categoryAlias:"sneakers",cleanup:"local QA fixtures only"},null,2));
 }finally{
