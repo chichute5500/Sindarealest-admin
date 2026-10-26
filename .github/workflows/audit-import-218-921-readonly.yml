@@ -1,0 +1,44 @@
+name: Owner 218-921 Import Read-only Audit
+on:
+  push:
+    branches:
+      - audit/import-218-921-readonly-2026-10-26
+    paths:
+      - scripts/audit-import-218-921-readonly.mjs
+      - .github/workflows/audit-import-218-921-readonly.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Read-only guard
+        run: |
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/audit/import-218-921-readonly-2026-10-26"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install S3 client (HEAD only)
+        run: npm install --no-save --no-package-lock --no-audit --no-fund @aws-sdk/client-s3@3.914.0
+      - name: Audit isolated Preview D1 and R2 without writes
+        run: node scripts/audit-import-218-921-readonly.mjs
+      - name: Upload aggregate-only audit result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-import-readonly-audit-${{ github.sha }}
+          path: artifacts/import-audit/report.json
+          if-no-files-found: warn
+          retention-days: 14
