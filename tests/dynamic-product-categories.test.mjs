@@ -36,10 +36,10 @@ runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,"all","Stale selection resets when catalog changes");
 for(const c of ["sneakers","loafers","belts","tui-golf","tui-deo-cheo","tui-nu","cap-tab-laptop","clutch","mu","vi-nam","vi-cam-tay"])
  assert.ok(box.innerHTML.includes('data-category="'+c+'"'),"Missing category: "+c);
-assert.match(box.innerHTML,/Túi golf · 2/,"Category count accurate");
+assert.match(box.innerHTML,/Túi Golf · 2/,"Title-cased category count accurate");
 assert.equal((box.innerHTML.match(/class="filter-pill/g)||[]).length,13,"One all filter plus twelve distinct published groups");
 assert.ok(!box.innerHTML.includes("<img src=x"),"Untrusted category labels must be escaped");
-assert.ok(box.innerHTML.includes("&lt;img src=x onerror=alert(1)&gt;"));
+assert.ok(box.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"));
 ctx.selectedCategory="vi-cam-tay";
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
 assert.ok(box.innerHTML.includes('class="filter-pill tap-target active" data-category="vi-cam-tay" aria-pressed="true"'),"Wallet categories stay distinct");
@@ -102,11 +102,25 @@ getFiltered().map(p=>p.id)
 `,{...productCtx}, {timeout:1000});
 assert.equal(categoryResult.length,12);
 assert.ok(categoryResult.every(id=>id.startsWith('sn-')));
-assert.ok(html.includes('class="product-price-label">Giá bán</span>'),
- 'Product card prices need an explicit label without changing actual amounts');
-assert.ok(html.includes('class="product-price-amount"'));
-assert.ok(html.includes('html.dark .product-card .product-price{'),
- 'Price contrast must be explicit in dark mode');
-assert.ok(html.includes('.product-card .product-price-amount{font-size:clamp(12px,3.7vw,15px)}'),
- 'Mobile prices require responsive amount typography');
+assert.ok(html.includes('<span class="product-price">Giá: <strong class="product-price-amount">'),'Plain price text on cards');
+assert.ok(html.includes("$('#detailPrice').textContent=detailPrice?'Giá: '+detailPrice:'';"),'Plain price text in details');
+assert.ok(!html.includes('id="detailCategory"'),'Detail category removed');
+assert.ok(html.includes('class="detail-meta-row"'),'SKU/status on one row');
+assert.ok(!html.includes("detail?'Tình trạng: ':'"),'Status has no prefix');
+assert.ok(html.includes('#productOverlay .detail-copy #detailTitle{font-weight:700'),'Bold product detail title');
+assert.ok(html.includes('.product-card .product-title{font-weight:700}'),'Bold catalog product title');
+assert.ok(html.includes('::before{content:none;display:none}'),'No decorative price box');
+const nameBegin=html.indexOf('function displayProductName('),nameEnd=html.indexOf('\nfunction preferred(',nameBegin);
+assert.ok(nameBegin>0&&nameEnd>nameBegin);
+for(const [input,expected] of [['giày tây','Giày Tây'],['giày lười','Giày Lười'],['ví cầm tay','Ví Cầm Tay'],['mũ vip gù 6 đinh da cá sấu','Mũ Vip Gù 6 Đinh Da Cá Sấu']]){
+ const actual=runInNewContext(html.slice(nameBegin,nameEnd)+'\ndisplayProductName('+JSON.stringify(input)+')',{}, {timeout:1000});
+ assert.equal(actual,expected);
+}
+const statusBegin=html.indexOf('const fulfillmentLabels='),statusEnd=html.indexOf('\nfunction renderFilters(',statusBegin);
+assert.ok(statusBegin>0&&statusEnd>statusBegin);
+for(const [key,label] of [['in_stock','Có sẵn'],['made_to_order','Hàng đặt'],['unclassified','Cần xác nhận']]){
+ const actual=runInNewContext(html.slice(statusBegin,statusEnd)+'\nfulfillmentBadge({fulfillmentType:'+JSON.stringify(key)+'},true)',{escapeHtml},{timeout:1000});
+ assert.ok(actual.includes('>'+label+'</span>'));
+ assert.ok(!actual.includes('Tình trạng:'));
+}
 console.log('PASS: grouped category-first randomized catalog, stable pagination, four varied featured products and price styling.');

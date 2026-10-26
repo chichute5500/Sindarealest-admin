@@ -134,14 +134,37 @@ try{
    title:document.querySelector('#detailTitle')?.textContent?.trim(),
    url:location.pathname,
    interactive:!document.querySelector('#productOverlay')?.hasAttribute('inert'),
-   watermark:!!document.querySelector('.detail-image-stage > .sd-viewer-watermark')
+   watermark:!!document.querySelector('.detail-image-stage > .sd-viewer-watermark'),
+   hasCategory:!!document.querySelector('#detailCategory'),
+   sameRow:!!document.querySelector('#detailSku')?.closest('.detail-meta-row')&&!!document.querySelector('#detailFulfillment')?.closest('.detail-meta-row'),
+   skuX:document.querySelector('#detailSku')?.getBoundingClientRect().left,
+   statusX:document.querySelector('#detailFulfillment')?.getBoundingClientRect().left,
+   status:document.querySelector('#detailFulfillment')?.textContent?.trim(),
+   glass:getComputedStyle(document.querySelector('#detailFulfillment .fulfillment-badge')).backdropFilter,
+   titleWeight:Number(getComputedStyle(document.querySelector('#detailTitle')).fontWeight),
+   price:document.querySelector('#detailPrice')?.textContent?.trim(),
+   priceHidden:document.querySelector('#detailPrice')?.hidden,
+   priceBorder:getComputedStyle(document.querySelector('#detailPrice')).borderTopWidth,
+   priceBg:getComputedStyle(document.querySelector('#detailPrice')).backgroundColor
   }));
-  if(detail.title!==liveProduct.title||!detail.url.startsWith('/sanpham/')||!detail.interactive)
+  const expectedTitle=String(liveProduct.title||'').replace(/\p{L}[\p{L}\p{M}\p{N}]*/gu,w=>w.charAt(0).toLocaleUpperCase('vi')+w.slice(1));
+  if(detail.title!==expectedTitle||!detail.url.startsWith('/sanpham/')||!detail.interactive)
    throw Error('LIVE_PRODUCT_DETAIL_NOT_INTERACTIVE');
+  if(detail.hasCategory||!detail.sameRow||detail.skuX>=detail.statusX||detail.titleWeight<700||!detail.glass||detail.glass==='none'||detail.status.includes('Tình trạng:'))
+   throw Error('LIVE_DETAIL_METADATA_OR_TITLE_INCORRECT');
+  const type=liveProduct.fulfillmentType||liveProduct.fulfillment_type;
+  const labels={in_stock:'Có sẵn',made_to_order:'Hàng đặt',unclassified:'Cần xác nhận'};
+  if(detail.status!==(labels[type]||labels.unclassified))throw Error('LIVE_DETAIL_STATUS_NOT_FROM_REAL_DATA');
+  if(Number.isSafeInteger(liveProduct.price)&&liveProduct.price>=0&&liveProduct.sourcePriceConfirmed===true){
+   const expectedPrice='Giá: '+new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(liveProduct.price)+'₫';
+   if(detail.priceHidden||detail.price!==expectedPrice||detail.priceBorder!=='0px'||detail.priceBg!=='rgba(0, 0, 0, 0)')
+    throw Error('LIVE_DETAIL_PRICE_STILL_BOXED_OR_WRONG');
+  }else if(!detail.priceHidden)throw Error('LIVE_UNCONFIRMED_PRICE_VISIBLE');
   const image=Array.isArray(liveProduct.images)?String(liveProduct.images[0]||''):'';
   if(image.startsWith('/media/')&&image.endsWith('.webp')&&!detail.watermark)
    throw Error('LIVE_PRODUCT_DETAIL_WATERMARK_MISSING');
   await page.waitForTimeout(350);
+  await page.screenshot({path:path.join(destination,'real-product-detail-mobile-owner-layout.png'),fullPage:false,animations:'disabled'});
   await page.locator('#detailClose').click({timeout:6500});
   await page.waitForFunction(()=>!document.querySelector('#productOverlay')?.classList.contains('open'),null,{timeout:6500});
   liveProof.detail={productId:liveProductId,opens:true,closes:true,watermark:detail.watermark};
