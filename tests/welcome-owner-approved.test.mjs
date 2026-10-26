@@ -23,7 +23,7 @@ assert.ok(html.includes('    },360);\n  }\n  window.__sdDismissWelcome'),'Closin
 assert.match(html,/\.welcome-texture--dark\{[^\n]*filter:none\}/);
 assert.match(html,/\.welcome-texture--light\{[^\n]*filter:none\}/);
 assert.ok(html.includes('<section class="sd-code-hero wrap" id="home"'),'Owner-approved separate HERO must remain');
-assert.ok(html.includes('<link rel="stylesheet" href="/code-hero.css?v=20261026-1">'),'HERO stylesheet remains untouched');
+assert.ok(html.includes('<link rel="stylesheet" href="/code-hero.css?v=20261026-2">'),'Owner-requested HERO copy update keeps the separate versioned stylesheet');
 assert.ok(!html.includes('<picture class="hero-reference-art"'),'Never bring back bitmap HERO');
 console.log('PASS: Owner-approved Welcome from PR #113 isolated into fix branch; code-only HERO protected.');
 
