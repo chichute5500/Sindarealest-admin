@@ -158,9 +158,9 @@ try{
    await page.locator('#sdCheckoutPaymentStep').waitFor({state:'visible',timeout:15000});
    assert.equal(results.locallyQuotedOrders,1,'Quote must be computed locally by real server handler');
    assert.equal(await page.locator('#sdCheckoutOptions [data-sd-payment-option]').count(),2,'Both fulfillment types must offer deposit and full transfer');
-   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),depositAmount.toLocaleString('vi-VN')+'đ');
+   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),depositAmount.toLocaleString('vi-VN')+'₫');
    await page.locator('[data-sd-payment-option="full"]').click();
-   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'150.000đ');
+   assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'150.000₫');
    await page.locator('[data-sd-payment-option="deposit"]').click();
    await page.screenshot({path:dir+'/'+spec.name+'-payment-step.png',animations:'disabled'});
    await page.locator('#checkoutSubmit').click();
