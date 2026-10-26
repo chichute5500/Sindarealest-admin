@@ -126,7 +126,7 @@ html.js-enabled :is(.hero-copy,.section-head,.order-cta)[data-reveal].is-visible
   transform:none;
   transition:opacity .38s cubic-bezier(.22,.7,.25,1),transform .42s cubic-bezier(.22,.7,.25,1);
   transition-delay:min(var(--reveal-delay,0ms),90ms);
-
+}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}}
 @media(min-width:1500px){.hero{padding-top:48px;padding-bottom:40px}}
 @media(max-width:1050px){.wrap{width:min(100% - 36px,1390px)}.navlinks{gap:0}.navlink{padding:0 9px}.brand-name{font-size:17px}.hero{grid-template-columns:1fr;min-height:unset}.hero h1{font-size:clamp(38px,5vw,58px)}.promise{grid-template-columns:1fr;gap:15px}.promise-tags{grid-template-columns:repeat(4,minmax(0,1fr))}.mosaic{grid-template-rows:180px 145px}.contact-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
