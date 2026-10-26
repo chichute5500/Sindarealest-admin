@@ -1,0 +1,50 @@
+name: Theme Chromium Read-only Diagnostic (NO DEPLOY)
+on:
+  push:
+    branches:
+      - integration/storefront-locked-on-main-2026-10-26
+    paths:
+      - '.github/workflows/theme-chromium-readonly-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: theme-chromium-readonly-diagnostic
+  cancel-in-progress: true
+
+jobs:
+  theme-perf:
+    name: Read-only Chromium theme A/B diagnostic
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PREVIEW_URL: https://integration-storefront-locke.sindarealest-admin-preview.pages.dev/
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Checkout exactly this integration revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Cache isolated Chromium headless shell
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: chromium-headless-shell-${{ runner.os }}-playwright-1.56.1-v1
+      - name: Prepare Chromium without redundant system reinstall
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --only-shell chromium
+          node --input-type=module -e "import('playwright').then(async ({chromium})=>{const b=await chromium.launch({headless:true});await b.close()})" || {
+            npx playwright install-deps chromium
+            node --input-type=module -e "import('playwright').then(async ({chromium})=>{const b=await chromium.launch({headless:true});await b.close()})"
+          }
+      - name: Measure theme against current isolated Preview (GET only)
+        run: node scripts/qa-storefront-theme-material.mjs
