@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      PREVIEW_URL: https://integration-storefront-locked-on-main-20261026.sindarealest-admin-preview.pages.dev/
+      PREVIEW_URL: https://integration-storefront-locke.sindarealest-admin-preview.pages.dev/
       CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     steps:

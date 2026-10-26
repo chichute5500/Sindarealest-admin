@@ -5,7 +5,7 @@ import {buildCloudflareAccessHeaders} from './cloudflare-access-service-token.mj
 import {isApprovedPreviewExternalRead} from './preview-external-read-allowlist.mjs';
 
 const branch='integration/storefront-locked-on-main-2026-10-26';
-const alias='https://integration-storefront-locked-on-main-20261026.sindarealest-admin-preview.pages.dev';
+const alias='https://integration-storefront-locke.sindarealest-admin-preview.pages.dev';
 const sha=String(process.env.GITHUB_SHA||'');
 const preview=String(process.env.PREVIEW_URL||alias+'/');
 if(process.env.GITHUB_REPOSITORY!=='chichute5500/Sindarealest-admin'||process.env.GITHUB_REF!=='refs/heads/'+branch||!/^[0-9a-f]{40}$/i.test(sha)||preview!==alias+'/')throw Error('Wrong branch/SHA/alias: integration browser audit refused');
@@ -102,7 +102,7 @@ try{
      galleryPresent:!!document.querySelector('#sdFullscreenViewer'),
      catalogPresent:!!document.querySelector('#catalogGrid'),
      cartPresent:!!document.querySelector('#cartDrawer'),
-     protectedAdminLink:!!document.querySelector('a[href="/admin/"]')||!!document.querySelector('a[href*="/admin"]')||true
+     brandNavigationPresent:!!document.querySelector('.brand[href="#home"]')
     };
     return {checks,hero:{x:r.x,y:r.y,width:r.width,height:r.height},catalogCards:cards.length,fonts:getComputedStyle(title).fontFamily};
    },{width:spec.width,theme:spec.theme});
