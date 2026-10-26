@@ -192,14 +192,14 @@ try{
       const during=r.samples.slice(0,6);
       if(!during.some(s=>s.navColor!==r.now.navColor&&s.navColor!==r.stable.navColor))
         throw Error('Navigation must crossfade during the same early frames: '+JSON.stringify(r));
-      if(r.samples.slice(8).some(s=>s.navColor!==r.stable.navColor))
-        throw Error('Navigation still changing after 400-450ms: '+JSON.stringify(r));
+      if(r.samples.slice(6).some(s=>s.navColor!==r.stable.navColor))
+        throw Error('Navigation still changing after 300ms: '+JSON.stringify(r));
       if(Math.abs(r.stable.darkBg-target)>.02||Math.abs(r.stable.lightBg-(1-target))>.02)
         throw Error('Theme did not settle after 900ms: '+JSON.stringify(r));
       for(const key of ['bgTransition','navTransition','materialTransition']){
         const duration=parseFloat(r.now[key]);
-        if(!(duration>=.38&&duration<=.42))
-          throw Error('Staggered/instant theme timing '+key+': '+JSON.stringify(r.now));
+        if(!(duration>=.2&&duration<=.25))
+          throw Error('Theme should transition quickly, without heavy shadows: '+key+' '+JSON.stringify(r.now));
       }
     }
     if(sync.slides!==2||sync.photoCrossfadeMs!==580||!sync.slideshowChanged||!sync.noControls||!sync.noPhotoWash||!sync.readableCaption)

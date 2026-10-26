@@ -22,60 +22,43 @@ html body #materialTile.has-real-material-gallery .mosaic-content{
   color:#fff!important;
   text-shadow:0 1px 3px rgba(0,0,0,.94),0 1px 8px rgba(0,0,0,.72);
 }
-/* The nav must never fall back to its old 1.05-second CSS when the
-   temporary theme class is cleared. Preserve interactions and approved glass. */
+/* Fast theme response: avoid forced layout, full-screen filter and hundreds
+   of costly box-shadow/backdrop-filter transitions on catalog cards. */
+html body .theme-bg{
+  transition:opacity .22s ease-out!important;
+  transition-delay:0s!important;
+  will-change:opacity;
+}
 html body .nav-wrap .nav,
 html body .mobile-bottom-nav{
-  transition-property:background-color,border-color,box-shadow,color!important;
-  transition-duration:.4s!important;
-  transition-timing-function:cubic-bezier(.22,.61,.36,1)!important;
+  transition-property:background-color,border-color,color!important;
+  transition-duration:.22s!important;
+  transition-timing-function:ease-out!important;
   transition-delay:0s!important;
 }
-
-/* Fade the light/dark caption overlay, avoiding an instant gradient swap. */
-#materialTile::before{
-  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
-  background:linear-gradient(90deg,rgba(242,249,255,.78),rgba(242,249,255,.16));
-  opacity:0;transition:opacity .4s ease!important
-}
-#materialTile::after{
-  background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.16))!important;
-  opacity:1;transition:opacity .4s ease!important
-}
-html:not(.dark) #materialTile::before{opacity:1}
-html:not(.dark) #materialTile::after{opacity:0}
-
-/* All theme-dependent surfaces share one smooth 460ms window.
-   Avoid animating costly backdrop-filter / blur and respect owner colors. */
 html.theme-transitioning body .theme-bg{
-  transition:opacity .4s cubic-bezier(.22,.61,.36,1),filter .4s ease!important;
-  transition-delay:0s!important
+  transition:opacity .22s ease-out!important;
 }
-html.theme-transitioning body :is(
-  .nav,.mobile-nav,.glass,.glass-soft,.product-card,.promise,.promise-tag,
-  .mosaic-card,.mosaic-content,.custom-text,.footer,.contact-link,
-  .service-copy,.service-icon,.cart-drawer,.account-drawer,
-  .product-overlay-panel,.checkout-drawer,.pill-btn,.search-field
-){
-  transition-property:background-color,border-color,box-shadow,color,opacity!important;
-  transition-duration:.4s!important;
-  transition-timing-function:cubic-bezier(.22,.61,.36,1)!important;
-  transition-delay:0s!important
-}
-/* Navigation has a separate, more specific 250ms transition in legacy CSS. */
 html.theme-transitioning body .nav-wrap .nav,
 html.theme-transitioning body .mobile-bottom-nav{
-  transition-property:background-color,border-color,box-shadow,color,opacity!important;
-  transition-duration:.4s!important;
-  transition-timing-function:cubic-bezier(.22,.61,.36,1)!important;
-  transition-delay:0s!important
+  transition-property:background-color,border-color,color!important;
+  transition-duration:.22s!important;
+  transition-timing-function:ease-out!important;
+}
+/* All other surfaces switch immediately; no expensive paint-heavy shadow or
+   blur animation across the product catalog. */
+html.theme-transitioning body :is(
+  .glass,.glass-soft,.product-card,.promise,.promise-tag,
+  .mosaic-card,.custom-text,.footer,.contact-link,.search-field,
+  .cart-drawer,.account-drawer,.checkout-drawer
+){
+  transition:none!important;
 }
 html.theme-transitioning body #materialTile .material-photo{
-  transition:opacity .4s cubic-bezier(.22,.61,.36,1)!important;
-  transition-delay:0s!important
+  transition:opacity .22s ease-out!important;
 }
 html.theme-transitioning,html.theme-transitioning body{
-  transition:background-color .4s ease,color .4s ease!important
+  transition:background-color .22s ease-out,color .22s ease-out!important;
 }
 @media(prefers-reduced-motion:reduce){
   #materialTile .sd-material-slide,
