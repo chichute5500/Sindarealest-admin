@@ -9,7 +9,7 @@ export async function onRequestGet(context) {
     // avoids one D1 request per order when the admin screen loads up to 1,000.
     const result = await context.env.DB.prepare(
       "WITH recent_orders AS (" +
-      " SELECT o.id,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required," +
+      " SELECT o.id,o.customer_id AS customerId,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required," +
       " o.customer_note,o.payment_terms_confirmed_at,o.payment_terms_confirmed_by,o.payment_terms_note,o.created_at,o.updated_at,COALESCE(oc.full_name,c.full_name) AS full_name," +
       " COALESCE(oc.phone,c.phone) AS phone,COALESCE(oc.email,c.email) AS email," +
       " COALESCE(sa.full_address,c.address) AS address" +
