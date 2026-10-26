@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Nhập thư mục ảnh · SinDarealest Admin</title>
+<style>
+:root{font-family:Inter,system-ui,sans-serif;color:#262b33;background:#f4f6f8}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:24px 18px 80px}h1{font-size:clamp(22px,3vw,32px)}h2{font-size:18px}p{line-height:1.55}.muted{color:#596675}.panel{background:#fff;border:1px solid #dce2e9;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 6px 24px #192b400a}.warning{padding:13px;background:#fff6ed;border-left:4px solid #b67828;border-radius:8px}.error{color:#9d2020}.success{color:#13704b}label.filepicker{display:inline-grid;gap:6px;margin:9px 15px 9px 0;font-weight:600}label.filepicker input{display:block;max-width:100%;font-weight:400}button{border:1px solid #aebbc7;background:white;padding:11px 16px;border-radius:9px;cursor:pointer;font-weight:650}button.primary{background:#173b56;color:white;border-color:#173b56}button:disabled{opacity:.45;cursor:not-allowed}a{color:#175a91}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.stat{display:flex;gap:16px;flex-wrap:wrap}.stat b{font-size:21px}.progress{width:100%;height:14px;accent-color:#175b8d}.items{display:grid;gap:10px}.item{border:1px solid #dce2e9;border-radius:12px;padding:12px;display:grid;grid-template-columns:60px 1fr;gap:12px;align-items:start;background:white}.item.bad{background:#fff7f4;border-color:#efc7bb}.item.done{background:#f0faf5}.thumb{width:60px;height:60px;border-radius:8px;background:#edf0f2;object-fit:cover}.name{width:min(100%,540px);padding:9px;border-radius:7px;border:1px solid #c3ccd4;margin:7px 0}.metadata{font-size:12px;color:#596675;line-height:1.6;overflow-wrap:anywhere}.pick{display:flex;gap:8px;align-items:start}.notice{font-weight:650;overflow-wrap:anywhere}#status{white-space:pre-wrap}#groups{max-height:680px;overflow:auto;padding:2px}.busy{opacity:.75}@media(max-width:640px){main{padding:16px 10px}.panel{padding:14px}.item{grid-template-columns:48px 1fr;gap:9px}.thumb{width:48px;height:48px}}
+</style>
+</head>
+<body>
+<main>
+<p><a href="/admin/">← Quay lại Admin</a></p>
+<h1>Nhập ảnh sản phẩm theo thư mục</h1>
+<p class="muted">Dùng file <b>DANH_SACH_ANH.csv</b> và thư mục <b>KET_QUA_NHOM_MAU...</b> trên máy tính. Ảnh được phân nhóm theo danh mục và mã Mxxxx. Chỉ tạo <b>sản phẩm nháp chưa công khai</b>.</p>
+<div class="panel">
+<h2>1. Chọn dữ liệu trên máy tính</h2>
+<label class="filepicker">File CSV đã gửi trong chat
+<input id="csv" type="file" accept=".csv,text/csv"></label>
+<label class="filepicker">Thư mục kết quả chứa 15 danh mục
+<input id="folder" type="file" webkitdirectory directory multiple accept="image/jpeg,image/png,image/webp"></label>
+<div class="toolbar"><button id="preview" type="button" class="primary">Đối chiếu dữ liệu</button><span id="auth" class="muted">Đang kiểm tra quyền Admin…</span></div>
+</div>
+<div class="panel" id="review" hidden>
+<h2>2. Duyệt danh sách trước khi nhập</h2>
+<p id="totals" class="notice"></p>
+<p class="warning">Chỉ tạo bản nháp, <b>không xóa sản phẩm cũ</b>, không ghi giá/tồn kho khi CSV chưa có dữ liệu. Các mẫu thiếu ảnh, đường dẫn sai hoặc quá 30 ảnh sẽ bị chặn. Tên và màu chưa xác minh phải được kiểm tra lại trước khi công khai.</p>
+<div class="toolbar">
+<button id="selectAll" type="button">Chọn mẫu đủ điều kiện</button>
+<button id="clearAll" type="button">Bỏ chọn tất cả</button>
+<button id="import" type="button" class="primary" disabled>Tạo bản nháp đã chọn</button>
+<button id="stop" type="button" disabled>Dừng sau ảnh hiện tại</button>
+</div>
+<progress id="progress" class="progress" max="1" value="0"></progress>
+<p id="status" role="status" aria-live="polite" class="muted">Chưa bắt đầu.</p>
+<div id="groups" class="items"></div>
+</div>
+</main>
+<script type="module">
+import { parseCsv, buildImportPlan, MAX_IMAGES_PER_PRODUCT } from "./import-core.mjs";
+const $ = (id) => document.getElementById(id);
+let plan = null, stop = false, busy = false, checkpoint = null, checkpointKey = "", urls = [];
+const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function setStatus(text, error=false) { $("status").textContent=text; $("status").className=error?"error":"muted"; }
+async function request(url, init) {
+  const response = await fetch(url, {credentials:"same-origin",cache:"no-store",...init});
+  let data;try{data=await response.json()}catch{throw Error("API trả về dữ liệu không hợp lệ ("+response.status+")");}
+  if(!response.ok||data?.ok===false)throw Error(data?.error||"HTTP "+response.status);
+  return data;
+}
+async function catalog() {
+  const data = await request("/api/admin/products");
+  if(!Array.isArray(data.products))throw Error("Không đọc được danh sách sản phẩm từ D1.");
+  if(data.products.length>=2000)throw Error("Danh sách D1 đạt giới hạn API 2000. Cần xử lý phân trang trước khi nhập.");
+  return data.products;
+}
+async function fingerprint(csv,files) {
+  const summary = csv + "\n" + files.map(f=>f.webkitRelativePath+":"+f.size+":"+f.lastModified).sort().join("\n");
+  const hash = await crypto.subtle.digest("SHA-256",new TextEncoder().encode(summary));
+  return Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,"0")).join("");
+}
+function saveCheckpoint(){localStorage.setItem(checkpointKey,JSON.stringify(checkpoint));}
+function updateSelection(){ const available=plan.groups.filter(g=>g.status==="ready"&&g.selected&&!checkpoint.drafts[g.key]);
+  $("import").disabled=busy||!available.length; $("totals").textContent=
+  plan.groups.length+" mẫu / "+plan.rows+" dòng CSV / "+plan.matched+" ảnh khớp"+
+  "; "+plan.blocked+" mẫu cần xử lý; "+plan.missing+" ảnh thiếu; "+Object.keys(checkpoint.drafts).length+" bản nháp đã tạo"+
+  "; "+available.length+" mẫu đang chọn.";
+}
+function render(){
+  for(const url of urls)URL.revokeObjectURL(url);urls=[];
+  const holder=$("groups");holder.replaceChildren();
+  const frag=document.createDocumentFragment();
+  for(const g of plan.groups){
+    const done=Boolean(checkpoint.drafts[g.key]),blocked=g.status!=="ready";
+    const el=document.createElement("div");el.className="item"+(blocked?" bad":"")+(done?" done":"");
+    const img=document.createElement("img");img.className="thumb";img.alt="";img.loading="lazy";
+    if(g.images.length){const url=URL.createObjectURL(g.images[0].file);urls.push(url);img.src=url;}
+    const body=document.createElement("div");
+    const top=document.createElement("label");top.className="pick";
+    const select=document.createElement("input");select.type="checkbox";select.checked=g.selected&&!done;select.disabled=blocked||done||busy;
+    select.addEventListener("change",()=>{g.selected=select.checked;updateSelection();});
+    const name=document.createElement("strong");name.textContent=g.category+" / "+g.modelId+" ("+g.images.length+" ảnh)";
+    top.append(select,name);
+    const title=document.createElement("input");title.className="name";title.value=g.title;title.maxLength=180;title.setAttribute("aria-label","Tên nháp "+g.key);
+    title.disabled=blocked||done||busy;
+    title.addEventListener("input",()=>{g.title=title.value.trim();updateSelection();});
+    const info=document.createElement("div");info.className="metadata";
+    const colors=[...new Set(g.images.map(x=>x.color))].join(", ");
+    const problems = [];
+    if(g.missing.length)problems.push("Thiếu "+g.missing.length+" ảnh");
+    if(g.images.length>MAX_IMAGES_PER_PRODUCT)problems.push("Có "+g.images.length+" ảnh; tối đa 30 ảnh/sản phẩm");
+    if(g.warnings.length)problems.push(g.warnings[0]);
+    if(done)problems.push("Đã lưu bản nháp: "+checkpoint.drafts[g.key]);
+    info.textContent="Mã thư mục: "+g.modelFolder+" · Màu theo CSV: "+colors+
+      (problems.length?" · "+problems.join(" · "):" · Có thể nhập nháp");
+    body.append(top,title,info);el.append(img,body);frag.append(el);
+  }
+  holder.append(frag);updateSelection();
+}
+async function optimize(file){
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>20*1024*1024)throw Error("Ảnh sai định dạng hoặc vượt 20 MB: "+file.name);
+  const bitmap=await createImageBitmap(file);
+  let maxSide=1800,blob=null;
+  try{
+    for(let i=0;i<3;i++){
+      const scale=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.max(1,Math.round(bitmap.width*scale));
+      canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+      canvas.getContext("2d",{alpha:false}).drawImage(bitmap,0,0,canvas.width,canvas.height);
+      blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/webp",0.82));
+      if(blob?.type==="image/webp"&&blob.size>0&&blob.size<=5*1024*1024)break;
+      maxSide=Math.floor(maxSide*.72);
+    }
+  }finally{bitmap.close();}
+  if(!blob||blob.type!=="image/webp"||blob.size>5*1024*1024)throw Error("Không thể tối ưu ảnh WebP: "+file.name);
+  return blob;
+}
+async function upload(entry){
+  const cacheKey=entry.path+":"+entry.file.size+":"+entry.file.lastModified;
+  if(checkpoint.uploads[cacheKey])return checkpoint.uploads[cacheKey];
+  const derivative=await optimize(entry.file);
+  const form=new FormData();
+  form.set("file",derivative,"display.webp");
+  form.set("original",entry.file,entry.file.name);
+  const result=await request("/api/admin/upload",{method:"POST",body:form});
+  if(!/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(result.url||""))throw Error("API ảnh trả về URL không hợp lệ.");
+  checkpoint.uploads[cacheKey]=result.url;saveCheckpoint();
+  return result.url;
+}
+async function inspectDuplicate(group,images){
+  const list=await catalog();
+  // Lost-response recovery: only treat the draft as already present if it
+  // points to exactly the uploaded first image and same category.
+  return list.find(p=>p.categoryLabel===group.category&&
+    Array.isArray(p.images)&&p.images[0]===images[0]&&!p.published);
+}
+async function importGroup(group){
+  if(checkpoint.drafts[group.key])return;
+  if(group.status!=="ready"||group.images.length>MAX_IMAGES_PER_PRODUCT)throw Error("Mẫu bị chặn: "+group.key);
+  const title=group.title.trim();
+  if(!title)throw Error("Mẫu chưa có tên: "+group.key);
+  const images=[];
+  for(let i=0;i<group.images.length;i++){
+    if(stop)throw Error("Đã dừng theo yêu cầu.");
+    setStatus("Đang tải ảnh "+(i+1)+"/"+group.images.length+" · "+group.key);
+    images.push(await upload(group.images[i]));
+  }
+  const previous=await inspectDuplicate(group,images);
+  if(previous){checkpoint.drafts[group.key]=previous.id;saveCheckpoint();return;}
+  const payload={title,category:group.category,categoryLabel:group.category,
+    published:false,skuVerified:false,description:"",price:null,stock:null,
+    fulfillmentType:"unclassified",images};
+  const res=await request("/api/admin/products",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  if(!res.product?.id)throw Error("API tạo sản phẩm không trả lại mã sản phẩm. Hãy kiểm tra Admin trước khi chạy lại.");
+  checkpoint.drafts[group.key]=res.product.id;saveCheckpoint();
+}
+async function prepare(){
+  if(busy)return;
+  try{
+    const csvFile=$("csv").files?.[0], files=Array.from($("folder").files||[]);
+    if(!csvFile||!files.length)throw Error("Cần chọn cả CSV và thư mục kết quả chứa ảnh.");
+    if(csvFile.size>8*1024*1024)throw Error("CSV quá lớn (tối đa 8 MB).");
+    await catalog();
+    const csvText=await csvFile.text();
+    const rows=parseCsv(csvText);
+    const next=buildImportPlan(rows,files);
+    if(next.matched===0)throw Error("Không khớp ảnh nào. Hãy chọn đúng thư mục KET_QUA_NHOM_MAU và CSV đi cùng.");
+    checkpointKey="sd-folder-import-v1:"+await fingerprint(csvText,files);
+    try{checkpoint=JSON.parse(localStorage.getItem(checkpointKey)||"null")}catch{checkpoint=null;}
+    if(!checkpoint||typeof checkpoint!=="object")checkpoint={uploads:{},drafts:{}};
+    if(!checkpoint.uploads||typeof checkpoint.uploads!=="object")checkpoint.uploads={};
+    if(!checkpoint.drafts||typeof checkpoint.drafts!=="object")checkpoint.drafts={};
+    plan=next;$("review").hidden=false;$("progress").value=0;
+    setStatus("Dữ liệu đã đối chiếu cục bộ. Chưa tải ảnh và chưa tạo sản phẩm.");
+    render();
+  }catch(e){$("review").hidden=true;alert("Không thể đối chiếu: "+e.message);}
+}
+async function startImport(){
+  if(busy||!plan)return;
+  const selected=plan.groups.filter(g=>g.selected&&g.status==="ready"&&!checkpoint.drafts[g.key]);
+  if(!selected.length)return;
+  if(!confirm("Tạo "+selected.length+" sản phẩm nháp chưa công khai trên D1 và tải ảnh lên R2? Không xóa dữ liệu cũ."))return;
+  busy=true;stop=false;$("stop").disabled=false;$("preview").disabled=true;$("import").disabled=true;$("csv").disabled=true;$("folder").disabled=true;
+  let completed=0,errors=0;
+  try{
+    await catalog();
+    for(const g of selected){
+      if(stop)break;
+      try{await importGroup(g);completed++;}
+      catch(e){errors++;setStatus("Dừng vì lỗi ở "+g.key+": "+e.message,true);break;}
+      $("progress").value=completed/selected.length;
+      setStatus("Đã tạo "+completed+"/"+selected.length+" mẫu nháp. "+(errors?"Có lỗi.":""));
+    }
+    if(!errors)setStatus("Đã tạo "+completed+"/"+selected.length+" mẫu nháp."+(stop?" Dừng theo yêu cầu.":"")+" Danh mục cũ vẫn được giữ nguyên.");
+  }finally{
+    busy=false;$("stop").disabled=true;$("preview").disabled=false;$("csv").disabled=false;$("folder").disabled=false;
+    render();
+  }
+}
+$("preview").addEventListener("click",prepare);
+$("import").addEventListener("click",startImport);
+$("stop").addEventListener("click",()=>{stop=true;$("stop").disabled=true;});
+$("selectAll").addEventListener("click",()=>{if(!plan||busy)return;for(const g of plan.groups)g.selected=g.status==="ready";render();});
+$("clearAll").addEventListener("click",()=>{if(!plan||busy)return;for(const g of plan.groups)g.selected=false;render();});
+catalog().then(()=>{$("auth").textContent="Đã xác minh phiên Admin.";})
+  .catch(e=>{$("auth").textContent="Chưa đăng nhập hoặc D1 không sẵn sàng: "+e.message;});
+</script>
+</body></html>
