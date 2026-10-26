@@ -6,6 +6,7 @@ on:
     paths:
       - scripts/stage-imported-r2-to-production-2026-10-26.mjs
       - scripts/backup-production-d1-private-r2-2026-10-26.mjs
+      - scripts/stage-218-imported-products-production-d1.mjs
       - .github/workflows/stage-imported-r2-to-production-2026-10-26.yml
       - .github/workflows/validate-catalog-cutover-scripts.yml
 permissions:
@@ -25,4 +26,5 @@ jobs:
         run: |
           node --check scripts/backup-production-d1-private-r2-2026-10-26.mjs
           node --check scripts/stage-imported-r2-to-production-2026-10-26.mjs
+          node --check scripts/stage-218-imported-products-production-d1.mjs
           node --check scripts/inspect-r2-cutover-access-readonly.mjs
