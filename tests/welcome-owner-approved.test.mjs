@@ -31,3 +31,7 @@ console.log('PASS: Owner-approved Welcome from PR #113 isolated into fix branch;
 assert.match(html,/if\(!window\.__sdStorefrontReady\|\|document\.readyState==='loading'\)/);
 assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);\n    void document\.body\.offsetHeight;\n    s\.classList\.add\('is-leaving'\)/);
 assert.match(html,/init\(\)\.then\(finishStorefrontStartup,finishStorefrontStartup\)/);
+
+// During the approved 360ms exit, text must clear before the backdrop fades.
+assert.match(performance,/#welcomeSplash\.is-leaving \.welcome-content\{[\s\S]*?opacity:0!important;/);
+assert.match(performance,/#welcomeSplash\.is-leaving\{\n  transition:opacity \.20s ease \.10s,visibility 0s linear \.30s!important/);

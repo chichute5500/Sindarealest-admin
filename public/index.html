@@ -672,6 +672,17 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
   transform:none!important;transition:opacity .30s ease,visibility .30s ease!important;
 }
 #welcomeSplash.is-leaving{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+/* Two-phase approved 300ms exit: remove welcome text while its background is
+   still opaque, THEN reveal the pre-laid-out storefront. Never crossfade two
+   legible headline layers over each other (especially on mobile). */
+#welcomeSplash.is-leaving .welcome-content{
+  animation:none!important;
+  opacity:0!important;
+  transition:opacity .08s ease!important
+}
+#welcomeSplash.is-leaving{
+  transition:opacity .20s ease .10s,visibility 0s linear .30s!important
+}
 #welcomeSplash .welcome-content{
   min-width:0!important;max-width:100%!important;
   max-height:calc(100dvh - 24px)!important;
@@ -722,6 +733,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
   #welcomeSplash .welcome-content{animation:none!important}
   #welcomeSplash .welcome-loader i{animation:none!important}
   #welcomeSplash{transition-duration:.01ms!important}
+  #welcomeSplash.is-leaving,#welcomeSplash.is-leaving .welcome-content{transition:none!important}
 }
 </style>
 <script src="/material-gallery.js" defer></script>

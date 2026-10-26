@@ -65,11 +65,25 @@ async function verifyWelcomeExit(spec){
       ready:window.__sdStorefrontReady===true,
       bodyUnlocked:!document.body.classList.contains('welcome-active'),
       fullPage:document.body.scrollHeight>innerHeight,
-      heroPresent:!!document.querySelector('#home.sd-code-hero'),
-      splashOpacity:getComputedStyle(document.querySelector('#welcomeSplash')).opacity
+      heroPresent:!!document.querySelector('#home.sd-code-hero')
     }));
     if(!fade.ready||!fade.bodyUnlocked||!fade.fullPage||!fade.heroPresent)
       throw Error('Welcome exit began before storefront layout was stable: '+JSON.stringify(fade));
+    // Inspect an actual overlapping-paint frame: only the intro's blank
+    // backdrop may fade, never its headline/logo against the incoming HERO.
+    await page.waitForFunction(()=>{
+      const splash=document.querySelector('#welcomeSplash');
+      if(!splash)return false;
+      const opacity=Number(getComputedStyle(splash).opacity);
+      return opacity>.18&&opacity<.82;
+    },null,{timeout:1800});
+    const layers=await page.evaluate(()=>{
+      const splash=document.querySelector('#welcomeSplash');
+      return {splashOpacity:Number(getComputedStyle(splash).opacity),
+        textOpacity:Number(getComputedStyle(splash.querySelector('.welcome-content')).opacity)};
+    });
+    if(layers.textOpacity>.02)
+      throw Error('Welcome text ghosted over the storefront: '+JSON.stringify(layers));
     await page.screenshot({path:'artifacts/storefront-integration-preview/'+spec.label+'-welcome-exit.png',fullPage:false,animations:'allow'});
     await page.waitForFunction(()=>!document.querySelector('#welcomeSplash'),null,{timeout:5000});
     const final=await page.evaluate(()=>({
