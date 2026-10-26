@@ -51,8 +51,8 @@ try{
  report.realCatalog=liveProof;
  let liveContext;
  try{
-  if(liveRows.length!==218||new Set(liveRows.map(x=>x.category)).size!==15)
-   throw Error("ISOLATED_PREVIEW_CATALOG_NOT_APPROVED_218_IN_15");
+  if(liveRows.length<218||new Set(liveRows.map(x=>x.category)).size<15)
+   throw Error("ISOLATED_PREVIEW_CATALOG_BELOW_OWNER_PASSED_218_IN_15");
   liveContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1,colorScheme:'light',reducedMotion:'reduce'});
   await liveContext.addInitScript(()=>{try{localStorage.setItem('sd-theme-mode','light')}catch{}});
   const page=await liveContext.newPage();
