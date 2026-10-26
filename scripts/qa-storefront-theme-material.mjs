@@ -14,7 +14,82 @@ const auth=buildCloudflareAccessHeaders();
 const image=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/mXcAAAAASUVORK5CYII=','base64');
 const browser=await chromium.launch({headless:true});
 const matrix=[];
+const welcomeExitMatrix=[];
+async function verifyWelcomeExit(spec){
+  const context=await browser.newContext({
+    viewport:{width:spec.width,height:spec.height},
+    isMobile:spec.mobile,hasTouch:spec.mobile,deviceScaleFactor:1,
+    colorScheme:'light',reducedMotion:'no-preference'
+  });
+  await context.addInitScript(()=>{try{localStorage.setItem('sd-theme-mode','light')}catch{}});
+  let releaseProducts;
+  const productGate=new Promise(resolve=>{releaseProducts=resolve});
+  const page=await context.newPage();
+  const errors=[];
+  page.on('pageerror',err=>errors.push(err.message.slice(0,220)));
+  await page.route('**/*',async route=>{
+    const request=route.request();
+    let url;
+    try{url=new URL(request.url())}catch{await route.abort('blockedbyclient');return}
+    if(request.method()!=='GET'&&request.method()!=='HEAD'){
+      errors.push('Unexpected remote write '+request.method()+' '+url.pathname);
+      await route.abort('blockedbyclient');return;
+    }
+    if(url.origin===alias){
+      if(url.pathname==='/api/products'){
+        await productGate;await route.fulfill({status:200,contentType:'application/json',body:'[]'});return;
+      }
+      if(url.pathname==='/api/settings'){
+        await route.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":true}'});return;
+      }
+      await route.continue({headers:{...request.headers(),...auth}});return;
+    }
+    if(isApprovedPreviewExternalRead(request.url(),request.method())){await route.continue();return}
+    await route.abort('blockedbyclient');
+  });
+  try{
+    const response=await page.goto(alias+'/',{waitUntil:'domcontentloaded',timeout:45000});
+    if(response?.status()!==200)throw Error('Welcome Preview status '+response?.status());
+    await page.locator('#skipIntro').click({timeout:9000});
+    await page.waitForTimeout(120);
+    const blocked=await page.evaluate(()=>({
+      stillVisible:!!document.querySelector('#welcomeSplash')&&!document.querySelector('#welcomeSplash').classList.contains('is-leaving'),
+      bodyLocked:document.body.classList.contains('welcome-active'),
+      appReady:window.__sdStorefrontReady===true
+    }));
+    if(!blocked.stillVisible||!blocked.bodyLocked||blocked.appReady)
+      throw Error('Welcome exposed unready page: '+JSON.stringify(blocked));
+    releaseProducts();
+    await page.waitForFunction(()=>document.querySelector('#welcomeSplash')?.classList.contains('is-leaving'),null,{timeout:8500});
+    const fade=await page.evaluate(()=>({
+      ready:window.__sdStorefrontReady===true,
+      bodyUnlocked:!document.body.classList.contains('welcome-active'),
+      fullPage:document.body.scrollHeight>innerHeight,
+      heroPresent:!!document.querySelector('#home.sd-code-hero'),
+      splashOpacity:getComputedStyle(document.querySelector('#welcomeSplash')).opacity
+    }));
+    if(!fade.ready||!fade.bodyUnlocked||!fade.fullPage||!fade.heroPresent)
+      throw Error('Welcome exit began before storefront layout was stable: '+JSON.stringify(fade));
+    await page.screenshot({path:'artifacts/storefront-integration-preview/'+spec.label+'-welcome-exit.png',fullPage:false,animations:'allow'});
+    await page.waitForFunction(()=>!document.querySelector('#welcomeSplash'),null,{timeout:5000});
+    const final=await page.evaluate(()=>({
+      unlocked:!document.body.classList.contains('welcome-active'),
+      pageHeight:document.body.scrollHeight
+    }));
+    if(!final.unlocked||errors.length)throw Error('Welcome exit final state: '+JSON.stringify({final,errors}));
+    welcomeExitMatrix.push({label:spec.label,pass:true,waitedForProducts:true,
+      unlockedBeforeFade:true,completedWithoutHalfLayout:true});
+  }finally{
+    releaseProducts?.();
+    await context.close();
+  }
+}
 try{
+ await Promise.all([
+   verifyWelcomeExit({label:'pc-1440',width:1440,height:900,mobile:false}),
+   verifyWelcomeExit({label:'mobile-390',width:390,height:844,mobile:true})
+ ]);
+
  for(const spec of [{label:'pc-1440',width:1440,height:900,mobile:false},
                     {label:'mobile-390',width:390,height:844,mobile:true}]){
   const context=await browser.newContext({
@@ -121,4 +196,4 @@ try{
   }finally{await context.close()}
  }
 }finally{await browser.close()}
-console.log(JSON.stringify({sha,scope:'READ_ONLY_PREVIEW_WITH_SYNTHETIC_MATERIAL_PHOTOS',matrix,pass:matrix.length===2},null,2));
+console.log(JSON.stringify({sha,scope:'READ_ONLY_PREVIEW_WITH_SYNTHETIC_MATERIAL_PHOTOS',matrix,welcomeExitMatrix,pass:matrix.length===2&&welcomeExitMatrix.length===2},null,2));
