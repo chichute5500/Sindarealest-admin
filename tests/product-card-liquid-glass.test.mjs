@@ -12,8 +12,9 @@ assert.ok(productCard.includes("inset 0 1px 0 rgba(255,255,255,.28)"),
   "product cards should keep the layered specular highlight that gives the glass surface depth");
 assert.ok(html.includes(".contact-link,.product-card{backdrop-filter:blur(13px) saturate(135%)"),
   "mobile product cards should use the reduced blur appropriate for small screens");
-assert.ok(html.includes("html.theme-transitioning .product-card"),
-  "product card glass should participate in the existing light/dark transition");
+const themeFastCss = readFileSync(new URL("../public/material-gallery.css", import.meta.url), "utf8");
+assert.match(themeFastCss, /html\.theme-transitioning body :is\([\s\S]*?\.product-card[\s\S]*?\)\{\s*transition:none!important;/,
+  "Product glass colours must update without hundreds of expensive per-card shadow/blur animations");
 
 assert.match(html, /--page:#eaf3fb/, "Light mode must use the reference ice-blue palette.");
 assert.match(html, /--card-glass:rgba\(236,246,255,\.78\)/, "Light product cards must have a clearly visible frosted surface.");
