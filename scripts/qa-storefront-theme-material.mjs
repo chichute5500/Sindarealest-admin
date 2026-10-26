@@ -543,7 +543,8 @@ try{
         const dark=document.querySelector('.theme-bg--dark');
         const navLight='rgba(244,250,255,.94)',navDark='rgba(4,20,34,.94)';
         const out=[];
-        for(const desiredDark of [true,false,true,false]){
+        for(const useTransitionClass of [false,true])for(const desiredDark of [true,false,true,false]){
+          root.classList.remove('theme-transitioning');
           root.classList.toggle('dark',!desiredDark);
           nav.style.removeProperty('background-color');
           light.style.removeProperty('opacity');
@@ -558,6 +559,7 @@ try{
               ev.push({type:kind,element:name,at:Math.round(performance.now()-zero)});
               if(name==='nav'&&kind==='transitionstart'&&!didRestyle){
                 didRestyle=true;
+                if(useTransitionClass)root.classList.add('theme-transitioning');
                 root.classList.toggle('dark',desiredDark);
                 ev.push({type:'root-class-switched',at:Math.round(performance.now()-zero)});
               }
@@ -575,6 +577,7 @@ try{
           dark.style.setProperty('opacity',desiredDark?'1':'0','important');
           await new Promise(r=>setTimeout(r,610));
           listeners.forEach(fn=>fn());
+          root.classList.remove('theme-transitioning');
           // Read final real class-based computed color, then release inline
           // overrides. They match final CSS targets, so no reverse flash.
           const before={
@@ -590,7 +593,7 @@ try{
             light:getComputedStyle(light).opacity,
             dark:getComputedStyle(dark).opacity
           };
-          out.push({dark:desiredDark,events:ev,
+          out.push({dark:desiredDark,useTransitionClass,events:ev,
             start:ev.find(e=>e.element==='nav'&&e.type==='transitionstart')?.at,
             end:ev.find(e=>e.element==='nav'&&e.type==='transitionend')?.at,
             restyleAt:ev.find(e=>e.type==='root-class-switched')?.at,
