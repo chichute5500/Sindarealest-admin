@@ -55,6 +55,25 @@ const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp
 function setStatus(text, error=false) { $("status").textContent=text; $("status").className=error?"error":"muted"; }
 
 let authenticated = false;
+let lastImportActivity = Date.now(), lastSessionRefresh = 0, refreshingSession = false;
+// A long photo import counts as active work. Editing titles, prices and
+// colors also keeps the session alive; leaving the page idle does not.
+function recordImportActivity(){lastImportActivity=Date.now();}
+for(const eventName of ["input","pointerdown","keydown","touchstart","scroll"])
+  document.addEventListener(eventName,recordImportActivity,{passive:true});
+async function refreshActiveImportSession(){
+  const now=Date.now();
+  if(!authenticated||!plan||refreshingSession)return;
+  if(!busy && now-lastImportActivity>=9*60*1000)return;
+  if(now-lastSessionRefresh<3*60*1000)return;
+  refreshingSession=true;
+  lastSessionRefresh=now;
+  try{
+    const res=await fetch("/api/admin/session",{method:"GET",credentials:"same-origin",cache:"no-store"});
+    if(res.status===401)showAuth("Phiên đã hết hạn. Hãy đăng nhập tại đây; tên, giá, màu và các ảnh đã chọn vẫn được giữ.");
+  }catch{}finally{refreshingSession=false;}
+}
+setInterval(refreshActiveImportSession,60_000);
 function showAuth(message="Phiên đăng nhập chưa hợp lệ. Hãy đăng nhập vào Admin Preview để tiếp tục.") {
   authenticated=false;
   $("loginPanel").hidden=false;
@@ -67,6 +86,8 @@ function showAuth(message="Phiên đăng nhập chưa hợp lệ. Hãy đăng nh
 }
 function setAuthenticated(){
   authenticated=true;
+  lastSessionRefresh=Date.now();
+  lastImportActivity=lastSessionRefresh;
   $("loginPanel").hidden=true;
   $("authError").textContent="";
   $("preview").disabled=false;
