@@ -330,15 +330,31 @@ try{
         finish(){if(!probe||!probe.getStarted())throw Error('Theme click was not recorded');return probe.finish()}
       };
     });
+    // CDP counters localize lag to JS, style recalculation, layout or
+    // browser tasks without continuously forcing style in the paint loop.
+    const perfClient=await page.context().newCDPSession(page);
+    await perfClient.send('Performance.enable');
+    const perfSnapshot=async()=>Object.fromEntries(
+      (await perfClient.send('Performance.getMetrics')).metrics.map(m=>[m.name,m.value])
+    );
     const results=[];
     for(const direction of [true,false]){
       await page.evaluate(direction=>window.__sdThemeTiming.arm(direction),direction);
+      const perfBefore=await perfSnapshot();
       // Dispatch outside page.evaluate's long-lived Promise so the browser
       // can paint naturally after the interaction.
       await page.locator('#themeToggle').dispatchEvent('click');
       await page.waitForTimeout(850);
-      results.push(await page.evaluate(()=>window.__sdThemeTiming.finish()));
+      const perfAfter=await perfSnapshot();
+      const measured=await page.evaluate(()=>window.__sdThemeTiming.finish());
+      measured.chromeMetrics={};
+      for(const key of ['TaskDuration','ScriptDuration','RecalcStyleDuration','LayoutDuration','RecalcStyleCount','LayoutCount']){
+        const change=(perfAfter[key]??0)-(perfBefore[key]??0);
+        measured.chromeMetrics[key]=key.endsWith('Count')?Math.round(change):Math.round(change*1000);
+      }
+      results.push(measured);
     }
+    await perfClient.detach();
     const materialResult=await page.evaluate(async()=>{
       const layer=[...document.querySelectorAll('#materialGallery .sd-material-slide')];
       const first=layer.find(img=>img.classList.contains('is-visible'))?.src;
