@@ -1,3 +1,7 @@
+> **CHECKPOINT MỚI NHẤT SAU KHI OWNER BÁO LỖI WELCOME FIRST PAINT + THEME LAG (26/10/2026):** Xem trước [HANDOFF-LATEST-2026-10-26-WELCOME-THEME-MATERIAL.md](./HANDOFF-LATEST-2026-10-26-WELCOME-THEME-MATERIAL.md). **MÃ MỚI ĐÃ PASS `a4627e55da5420522ba5461145ec522dc826c625`**; [isolated Preview QA #40290073747](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40290073747) 3/3 SUCCESS, CI [#40290079433](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40290079433) PASS, Admin Preview [#40290079434](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40290079434) PASS. Welcome sửa lỗi font tiếng Việt *ở lúc MỞ trang*; Light/Dark đã tối ưu phản hồi ~220ms; mục Chất liệu cao cấp hiện 12 ảnh thật chuyển 1,5s/crossfade 580ms không phủ mờ. **Những SHA, thời lượng theme và nhận xét "không sửa UI" trong các đoạn cũ chỉ còn là LỊCH SỬ.** PR #118 vẫn OPEN/DRAFT, chưa merge/deploy; chờ nghiệm thu cảm nhận trên máy Owner và chỉ merge khi được cho phép rõ ràng.
+
+---
+
 # SINDAREALEST — BÀN GIAO TÍCH HỢP STOREFRONT + ADMIN
 **Ngày xác minh:** 26/10/2026 (Asia/Ho_Chi_Minh).  
 **Trạng thái:** Technical QA đã PASS ở phạm vi nêu dưới đây; **chưa Owner duyệt bản tích hợp / chưa merge PR #118 / chưa deploy Production.**
