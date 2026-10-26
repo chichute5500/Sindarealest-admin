@@ -85,22 +85,50 @@ html.theme-transitioning,html.theme-transitioning body{
 }
 
 
-/* Owner-requested dedicated 0.5–1s theme-change interstitial. Independent of
-   Light/Dark, existing satin wallpaper, Liquid Glass and approved components. */
+/* Owner-approved source-colour circular wipe, from words to page edges. */
 #sdThemeSwitchOverlay{
   position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;
-  box-sizing:border-box;padding:24px;text-align:center;
-  background:#091723;color:#f5f1e8;opacity:0;visibility:hidden;
-  pointer-events:none;
-  transition:opacity .16s ease-out,visibility 0s linear .16s;
+  box-sizing:border-box;padding:24px;text-align:center;isolation:isolate;
+  background:#061522;color:#f7f4ef;opacity:1;visibility:hidden;
+  clip-path:circle(0px at 50% 50%);pointer-events:none;transition:none;
+  contain:layout paint style;
 }
+#sdThemeSwitchOverlay[data-origin="light"]{
+  background:radial-gradient(ellipse at center,#fafdff 0%,#eaf3fb 48%,#dcebf7 100%);
+  color:#173449;
+}
+#sdThemeSwitchOverlay[data-origin="dark"]{
+  background:radial-gradient(ellipse at center,#10283b 0%,#061522 68%,#04101c 100%);
+  color:#f7f4ef;
+}
+#sdThemeSwitchOverlay.is-preparing,
+#sdThemeSwitchOverlay.is-visible,
+#sdThemeSwitchOverlay.is-covered,
+#sdThemeSwitchOverlay.is-dismissing{visibility:visible;pointer-events:auto}
 #sdThemeSwitchOverlay.is-visible{
-  opacity:1;visibility:visible;pointer-events:auto;transition:none;
+  clip-path:circle(150vmax at 50% 50%);
+  transition:clip-path .45s cubic-bezier(.22,.74,.20,1);
+}
+#sdThemeSwitchOverlay.is-covered{
+  clip-path:circle(150vmax at 50% 50%);transition:none;
+}
+#sdThemeSwitchOverlay.is-dismissing{
+  clip-path:circle(150vmax at 50% 50%);
+  opacity:0;pointer-events:none;transition:opacity .16s ease-in-out;
 }
 #sdThemeSwitchOverlay .sd-theme-switch-content{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:13px;max-width:min(88vw,460px);
+  gap:13px;max-width:min(88vw,460px);position:relative;
   font-family:"SD Sans",Arial,sans-serif;
+  opacity:0;transform:translateY(6px) scale(.97);
+  transition:opacity .3s ease-out,transform .35s cubic-bezier(.2,.7,.2,1);
+}
+#sdThemeSwitchOverlay.is-visible .sd-theme-switch-content,
+#sdThemeSwitchOverlay.is-covered .sd-theme-switch-content{
+  opacity:1;transform:translateY(0) scale(1);
+}
+#sdThemeSwitchOverlay.is-dismissing .sd-theme-switch-content{
+  opacity:0;transition:opacity .13s ease-in;
 }
 #sdThemeSwitchOverlay .sd-theme-switch-brand{
   font-family:"SD Serif",Georgia,serif;font-size:clamp(19px,4.5vw,28px);
@@ -116,12 +144,16 @@ html.theme-transitioning,html.theme-transitioning body{
 #sdThemeSwitchOverlay .sd-theme-switch-note{
   font-size:12px;letter-spacing:.04em;color:rgba(247,244,239,.67);
 }
-/* Prevent hidden underlay transitions from leaking out as the cover exits. */
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-brand{color:#906b3f}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-rule{
+  background:linear-gradient(90deg,transparent,#a67e4a,transparent);
+}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-message{color:#173449}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-note{color:#547083}
+/* Approved wallpaper/nav remain frozen through the final dissolve. */
 html.sd-theme-overlay-active body .theme-bg,
 html.sd-theme-overlay-active body .nav-wrap .nav,
-html.sd-theme-overlay-active body .mobile-bottom-nav{
-  transition:none!important;
-}
+html.sd-theme-overlay-active body .mobile-bottom-nav{transition:none!important}
 @media(prefers-reduced-motion:reduce){
-  #sdThemeSwitchOverlay{transition:none!important}
+  #sdThemeSwitchOverlay,#sdThemeSwitchOverlay .sd-theme-switch-content{transition:none!important}
 }

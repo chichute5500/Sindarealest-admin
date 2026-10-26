@@ -1124,11 +1124,8 @@ function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDra
 function iconBag(){return '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>'}
 function setThemeIcon(){const dark=document.documentElement.classList.contains('dark');$('#themeIcon').innerHTML=dark?'<path d="M20.2 15.4A8 8 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42-1.42m11.3-11.3 1.42-1.42"/>';const mode=document.documentElement.dataset.themeMode||'auto';$('#themeToggle').setAttribute('aria-label',mode==='auto'?'Đang theo giao diện thiết bị. Nhấn để đổi chế độ thủ công':dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối');$('#themeToggle').title=mode==='auto'?'Theo giao diện thiết bị':`Chế độ ${dark?'tối':'sáng'} (thủ công)`}
 function syncThemeMeta(){const dark=document.documentElement.classList.contains('dark');const meta=$('meta[name="theme-color"]');if(meta)meta.content=dark?'#061522':'#eaf3fb'}
-// Owner-selected 0.5–1 second theme-changing screen. The visual cover is
-// painted before touching the global palette, protecting approved components
-// from half-light/half-dark frames under expensive Chromium raster work.
-// This is a UX containment solution, not a claim that the old 80/300ms raw
-// navbar/backdrop benchmark is now met.
+// Owner-approved radial theme transition: outgoing Light/Dark colour expands
+// from the centred words, covers global palette work, then dissolves (~1s).
 function applyThemeMode(mode,animate=true){
   const root=document.documentElement;
   const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -1141,60 +1138,72 @@ function applyThemeMode(mode,animate=true){
   if(!animate||reduced||!overlay||(!hadPending&&targetDark===root.classList.contains('dark'))){
     root.classList.toggle('dark',targetDark);
     root.classList.remove('sd-theme-overlay-active','theme-transitioning');
-    overlay?.classList.remove('is-visible');
+    overlay?.classList.remove('is-preparing','is-visible','is-covered','is-dismissing');
     overlay?.setAttribute('aria-hidden','true');
-    window.__sdThemeTargetDark=null;
-    window.__sdCancelThemeStage=null;
-    syncThemeMeta();setThemeIcon();
-    return;
+    window.__sdThemeTargetDark=null;window.__sdCancelThemeStage=null;
+    syncThemeMeta();setThemeIcon();return;
   }
   const started=performance.now();
-  const durationMs=720;
-  let finished=false,committed=false,rafOne=0,rafTwo=0,rafThree=0,rafFour=0;
+  const durationMs=900,minimumCoveredAfterCommitMs=350;
+  let finished=false,committed=false,coverStarted=false;
+  let rafOne=0,rafTwo=0,rafThree=0,rafFour=0,rafFive=0,rafSix=0,coverFallback=0,exitTimer=0;
   window.__sdThemeTargetDark=targetDark;
-  overlay.classList.add('is-visible');
+  overlay.dataset.origin=root.classList.contains('dark')?'dark':'light';
+  overlay.classList.remove('is-visible','is-covered','is-dismissing');
+  overlay.classList.add('is-preparing');
   overlay.setAttribute('aria-hidden','false');
-  root.classList.add('sd-theme-overlay-active');
   const clearScheduled=()=>{
-    clearTimeout(window.__sdThemeTimer);
-    for(const id of [rafOne,rafTwo,rafThree,rafFour])if(id)cancelAnimationFrame(id);
+    clearTimeout(window.__sdThemeTimer);clearTimeout(coverFallback);clearTimeout(exitTimer);
+    for(const id of [rafOne,rafTwo,rafThree,rafFour,rafFive,rafSix])if(id)cancelAnimationFrame(id);
+    overlay.removeEventListener('transitionend',onCoverEnd);
   };
   const cleanup=()=>{
     clearScheduled();
-    overlay.classList.remove('is-visible');
+    overlay.classList.remove('is-preparing','is-visible','is-covered','is-dismissing');
     overlay.setAttribute('aria-hidden','true');
     root.classList.remove('sd-theme-overlay-active','theme-transitioning');
-    window.__sdThemeTargetDark=null;
-    window.__sdCancelThemeStage=null;
+    window.__sdThemeTargetDark=null;window.__sdCancelThemeStage=null;
   };
-  window.__sdCancelThemeStage=()=>{
-    if(finished)return;
-    finished=true;
-    cleanup();
-  };
+  window.__sdCancelThemeStage=()=>{if(finished)return;finished=true;cleanup()};
   const reveal=()=>{
     if(finished)return;
-    finished=true;
-    cleanup();
+    overlay.classList.add('is-dismissing');
+    overlay.classList.remove('is-visible');
+    overlay.setAttribute('aria-hidden','true');
+    exitTimer=setTimeout(()=>{if(finished)return;finished=true;cleanup()},180);
   };
   const commit=()=>{
     if(finished||committed)return;
     committed=true;
     root.classList.toggle('dark',targetDark);
     syncThemeMeta();setThemeIcon();
-    // Only reveal after the new palette has had a chance to render in the
-    // hidden-under-overlay page. Never expose a partially recoloured frame.
-    rafThree=requestAnimationFrame(()=>{
-      rafFour=requestAnimationFrame(()=>{
-        if(finished)return;
-        window.__sdThemeTimer=setTimeout(reveal,Math.max(0,durationMs-(performance.now()-started)));
-      });
-    });
+    rafFive=requestAnimationFrame(()=>{rafSix=requestAnimationFrame(()=>{
+      if(finished)return;
+      window.__sdThemeTimer=setTimeout(reveal,Math.max(
+        0,durationMs-(performance.now()-started),minimumCoveredAfterCommitMs
+      ));
+    })});
   };
-  // Double rAF guarantees that the covering screen receives a paint before
-  // the large html.dark cascade invalidation begins.
+  const coverComplete=()=>{
+    if(finished||coverStarted)return;
+    coverStarted=true;
+    clearTimeout(coverFallback);
+    overlay.removeEventListener('transitionend',onCoverEnd);
+    overlay.classList.add('is-covered');
+    root.classList.add('sd-theme-overlay-active');
+    rafThree=requestAnimationFrame(()=>{rafFour=requestAnimationFrame(commit)});
+  };
+  function onCoverEnd(event){
+    if(event.target===overlay&&event.propertyName==='clip-path')coverComplete();
+  }
+  overlay.addEventListener('transitionend',onCoverEnd);
+  // Double rAF paints the zero-radius origin before the compositor wipe.
   rafOne=requestAnimationFrame(()=>{
-    rafTwo=requestAnimationFrame(commit);
+    rafTwo=requestAnimationFrame(()=>{
+      if(finished)return;
+      overlay.classList.add('is-visible');
+      coverFallback=setTimeout(coverComplete,610);
+    });
   });
 }
 function toggleTheme(){
