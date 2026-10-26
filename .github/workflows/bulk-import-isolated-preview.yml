@@ -1,0 +1,186 @@
+name: Bulk Import isolated Preview QA (NO PRODUCTION)
+on:
+  push:
+    branches:
+      - feature/admin-bulk-folder-import-2026-10-26
+    paths:
+      - 'public/**'
+      - 'functions/**'
+      - 'tests/**'
+      - 'scripts/qa-bulk-import-preview-sha.mjs'
+      - 'scripts/qa-bulk-import-preview-browser.mjs'
+      - 'scripts/qa-bulk-import-remote-preview.mjs'
+      - 'scripts/qa-bulk-import-sequential-photo-preview.mjs'
+      - 'scripts/qa-bulk-import-preview-color-migration.mjs'
+      - 'migrations/0010_product_image_colors.sql'
+      - 'package.json'
+      - '.github/workflows/bulk-import-isolated-preview.yml'
+permissions:
+  contents: read
+concurrency:
+  group: bulk-import-recovery-2026-10-26
+  cancel-in-progress: true
+jobs:
+  deploy:
+    name: Prove separate D1/R2, test and deploy isolated Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH: sd-import-review-20261026
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Fail closed on any unexpected repository, branch or project
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feature/admin-bulk-folder-import-2026-10-26'
+          test "$CF_TARGET" = 'sindarealest-admin-preview'
+          test "$CF_BRANCH" = 'sd-import-review-20261026'
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Verify isolated Preview D1 and both R2 buckets are distinct from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl -fsSS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-preview.json"
+          curl -fsSS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest2" > "$RUNNER_TEMP/production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-preview.json" "$RUNNER_TEMP/production.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const a=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/admin-preview.json','utf8')).result;
+          const b=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/production.json','utf8')).result;
+          const id=v=>v?.id||v?.database_id||'';
+          const bucket=v=>v?.name||v?.bucket_name||'';
+          const av=a?.deployment_configs?.preview,bv=b?.deployment_configs?.production;
+          const d=id(av?.d1_databases?.DB),prod=id(bv?.d1_databases?.DB);
+          const x=bucket(av?.r2_buckets?.IMAGES),y=bucket(av?.r2_buckets?.ORIGINALS);
+          const px=bucket(bv?.r2_buckets?.IMAGES),py=bucket(bv?.r2_buckets?.ORIGINALS);
+          if(!d||!prod||d===prod||!x||!y||x===y||!px||!py||[x,y].some(v=>v===px||v===py))throw Error('D1/R2 isolation cannot be proven');
+          console.log('PASS: separate isolated Preview D1, public R2 and private-original R2; no Production writes');
+          NODE
+      - name: Install dependencies, validate and run full tests
+        run: |
+          npm install --no-fund
+          npm audit --audit-level=high
+          npm run check
+          npm test
+      - name: Apply only isolated Preview D1 color metadata column (no Production)
+        run: node scripts/qa-bulk-import-preview-color-migration.mjs
+      - name: Deploy only non-production branch on isolated Pages project
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "bulk photo import Preview $GITHUB_SHA"
+      - name: Read back exact deployed Preview SHA and branch
+        run: node scripts/qa-bulk-import-preview-sha.mjs
+
+  browser-qa:
+    name: Chromium desktop/mobile Preview UI + mocked uploads (no D1/R2 writes)
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Use preinstalled Google Chrome on Ubuntu runner
+        run: |
+          npm install --no-save --no-package-lock --no-fund --no-audit playwright@1.56.1
+          command -v google-chrome
+          google-chrome --version
+      - name: Exercise photo-folder chooser and draft contract without real writes
+        run: node scripts/qa-bulk-import-preview-browser.mjs
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-import-preview-browser-${{ github.sha }}
+          path: artifacts/bulk-import-preview/screenshots/
+          if-no-files-found: warn
+          retention-days: 14
+
+  real-photo-preview-qa:
+    name: Real Preview R2 original + D1 unpublished draft, then full fixture cleanup
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install S3 client for exact-run-key cleanup
+        run: npm install --no-save --no-package-lock --no-fund --no-audit @aws-sdk/client-s3@3.914.0
+      - name: Prove bindings/deployed SHA, run one real image upload and clean Preview-only D1/R2 fixture
+        run: node scripts/qa-bulk-import-remote-preview.mjs
+      - name: Publish bounded remote QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-import-remote-preview-${{ github.sha }}
+          path: artifacts/bulk-import-preview/remote/report.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  sequential-photo-qa:
+    name: Sequential 30-photo R2 Preview upload stress (WebP, PNG, JPEG; cleanup)
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install AWS R2 cleanup client
+        run: npm install --no-save --no-package-lock --no-fund --no-audit @aws-sdk/client-s3@3.914.0
+      - name: Exercise thirty real photo uploads to isolated Preview then verify cleanup
+        run: node scripts/qa-bulk-import-sequential-photo-preview.mjs
+      - name: Upload bounded non-sensitive stress test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-import-sequential-photo-preview-${{ github.sha }}
+          path: artifacts/bulk-import-preview/remote/sequential-30-photo-report.json
+          retention-days: 14
+          if-no-files-found: warn

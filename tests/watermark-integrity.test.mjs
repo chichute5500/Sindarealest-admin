@@ -68,9 +68,9 @@ assert.ok(admin.includes("body.append('original',file,file.name||'original')"));
 assert.ok(!/watermarkApplied|ctx\.drawImage\(markBitmap/.test(admin));
 
 const upload=readFileSync(new URL('../functions/api/admin/upload.js',import.meta.url),'utf8');
-assert.ok(upload.includes('context.env.ORIGINALS.put'));
+assert.ok(upload.includes('putR2WithBackoff(context.env.ORIGINALS') && upload.includes('await binding.put(key, bytes, options)'), 'Private original must be stored in R2, with bounded retries');
 assert.ok(upload.includes('context.env.ORIGINALS.delete'));
-assert.ok(upload.includes('context.env.IMAGES.put'));
+assert.ok(upload.includes('putR2WithBackoff(context.env.IMAGES') && upload.includes('await binding.put(key, bytes, options)'), 'Public derivative must be stored in R2, with bounded retries');
 assert.ok(upload.includes('private-originals/'));
 assert.ok(!upload.includes('watermarkApplied'));
 

@@ -1,4 +1,4 @@
-import { createSession, sessionCookie, verifySession } from "./_lib.js";
+import { createSession, sameSiteRequest, sessionCookie, verifySession } from "./_lib.js";
 import { canonicalProductPath, isVerifiedCommercialSku } from "./_storefront-route.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
@@ -11,7 +11,7 @@ function meta(html, name, content, property = false) {
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   if (url.pathname.startsWith('/api/admin/') && context.request.method !== 'OPTIONS') {
-    const hadValidSession = await verifySession(context.request, context.env);
+    const hadValidSession = sameSiteRequest(context.request) && await verifySession(context.request, context.env);
     const response = await context.next();
     // Never rotate a session on a response that already sets/clears a cookie.
     // In particular, logout must not be followed by a fresh valid session cookie.

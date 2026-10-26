@@ -313,10 +313,22 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     stock: publicView || row.stock === null || row.stock === undefined ? null : Number(row.stock),
     published: Number(row.published) === 1,
     images: parseImages(row.images_json),
+    imageColors: parseImageColors(row.image_colors_json, parseImages(row.images_json).length),
     sourcePriceConfirmed,
     sortOrder: Number(row.sort_order || 0),
     updatedAt: row.updated_at || null,
   };
+}
+
+/** Unverified/older records have no color labels. Indexes follow image URLs. */
+export function parseImageColors(raw, imageCount) {
+  let values=[];
+  try{values=Array.isArray(raw)?raw:JSON.parse(raw||"[]");}catch{}
+  if(!Array.isArray(values))values=[];
+  return Array.from({length:imageCount},(_,i)=>{
+    const v=typeof values[i]==="string"?values[i].normalize("NFC").trim():"";
+    return v.length>0&&v.length<=40&&!/[<>]/.test(v)?v:"Chưa rõ";
+  });
 }
 
 export function slugify(input) {
@@ -363,8 +375,23 @@ export function validateProduct(input, existing = null) {
   }
   const fulfillmentType = rawFulfillmentType;
   const images = input.images === undefined ? (existing?.images || []) : input.images;
-  if (!Array.isArray(images) || images.length > 30 || images.some((x) => typeof x !== "string" || x.length > 240 || (!/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) && !/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x)))) {
+  if (!Array.isArray(images) || images.length > 50 || images.some((x) => typeof x !== "string" || x.length > 240 || (!/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) && !/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x)))) {
     return { error: "Bộ ảnh không hợp lệ. Chỉ dùng ảnh WebP có sẵn trong images/ hoặc ảnh tải lên qua trang quản trị." };
+  }
+  // Per-photo colors are aligned to their R2/gallery URLs. Existing metadata
+  // follows URLs if an Admin later reorders images without editing colors.
+  const sourceColors = input.imageColors ?? input.image_colors;
+  if(sourceColors!==undefined && (!Array.isArray(sourceColors)||sourceColors.length!==images.length)){
+    return {error:"Số nhãn màu phải bằng số ảnh sản phẩm."};
+  }
+  const existingColorByUrl=new Map((existing?.images||[]).map((url,i)=>[url,(existing?.imageColors||[])[i]||"Chưa rõ"]));
+  const imageColors=[];
+  for(let i=0;i<images.length;i++){
+    const raw=sourceColors!==undefined?sourceColors[i]:(existingColorByUrl.get(images[i])||"Chưa rõ");
+    if(typeof raw!=="string")return {error:"Nhãn màu ảnh phải là văn bản."};
+    const color=raw.normalize("NFC").trim().replace(/\s+/g," ");
+    if(!color||color.length>40||/[<>]/.test(color))return {error:"Tên màu mỗi ảnh phải dài 1–40 ký tự hợp lệ."};
+    imageColors.push(color);
   }
   const id = existing?.id || crypto.randomUUID();
   const slug = existing?.slug || `${slugify(title).slice(0, 70)}-${id.slice(0, 8)}`;
@@ -382,7 +409,7 @@ export function validateProduct(input, existing = null) {
       stock: stock.value,
       fulfillmentType,
       published: input.published === false || input.published === 0 || input.published === "0" ? 0 : 1,
-      images,
+      images, imageColors,
       sourcePriceConfirmed: price.value !== null,
       sortOrder: existing?.sortOrder ?? Date.now(),
     },
@@ -391,8 +418,8 @@ export function validateProduct(input, existing = null) {
 
 export function productInsertStatement(db, p, ignore = false) {
   const verb = ignore ? "INSERT OR IGNORE" : "INSERT";
-  return db.prepare(`${verb} INTO products (id,slug,sku,sku_verified,title,category,category_label,description,price,stock,published,images_json,source_price_confirmed,sort_order,fulfillment_type,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'))`)
-    .bind(p.id, p.slug, p.sku, p.skuVerified ? 1 : 0, p.title, p.category, p.categoryLabel, p.description, p.price, p.stock, p.published, JSON.stringify(p.images), p.sourcePriceConfirmed ? 1 : 0, p.sortOrder, p.fulfillmentType);
+  return db.prepare(`${verb} INTO products (id,slug,sku,sku_verified,title,category,category_label,description,price,stock,published,images_json,image_colors_json,source_price_confirmed,sort_order,fulfillment_type,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'))`)
+    .bind(p.id, p.slug, p.sku, p.skuVerified ? 1 : 0, p.title, p.category, p.categoryLabel, p.description, p.price, p.stock, p.published, JSON.stringify(p.images), JSON.stringify(p.imageColors), p.sourcePriceConfirmed ? 1 : 0, p.sortOrder, p.fulfillmentType);
 }
 
 export function toAdminProduct(p) {
@@ -401,7 +428,7 @@ export function toAdminProduct(p) {
     category: p.category, categoryLabel: p.categoryLabel,
     fulfillmentType: normalizeFulfillmentType(p.fulfillmentType),
     description: p.description, price: p.price, stock: p.stock,
-    published: Boolean(p.published), images: p.images,
+    published: Boolean(p.published), images: p.images, imageColors: p.imageColors,
     sourcePriceConfirmed: Boolean(p.sourcePriceConfirmed), sortOrder: p.sortOrder,
   };
 }

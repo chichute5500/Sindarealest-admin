@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
 import { createSession } from "../functions/_lib.js";
 import { onRequestPost as uploadProductImage } from "../functions/api/admin/upload.js";
 
@@ -10,7 +11,7 @@ function bucket() {
   return {
     puts: [],
     deletes: [],
-    async put(key, bytes, options) { this.puts.push({ key, bytes: new Uint8Array(bytes), options }); },
+    async put(key, bytes, options) { this.puts.push({ key, bytes: bytes instanceof Blob ? new Uint8Array(await bytes.arrayBuffer()) : new Uint8Array(bytes), sourceWasBlob: bytes instanceof Blob, options }); },
     async delete(key) { this.deletes.push(key); },
   };
 }
@@ -42,6 +43,14 @@ const valid = await uploadProductImage({
 assert.equal(valid.status, 201, "a valid WebP derivative and original should upload");
 assert.equal(originals.puts.length, 1, "original should be stored privately");
 assert.equal(images.puts.length, 1, "optimized derivative should be stored in the public bucket");
+assert.equal(originals.puts[0].sourceWasBlob,true,"Originals are streamed to R2 from a File/Blob, without a full ArrayBuffer copy");
+assert.equal(images.puts[0].sourceWasBlob,true,"WebP files are streamed to R2 without a full ArrayBuffer copy");
+assert.deepEqual(originals.puts[0].bytes,webpBytes(),"Original bytes must remain unchanged");
+assert.deepEqual(images.puts[0].bytes,webpBytes(),"Optimized bytes must remain unchanged");
+const uploadSource=readFileSync(new URL("../functions/api/admin/upload.js",import.meta.url),"utf8");
+assert.doesNotMatch(uploadSource,/await\s+file\.arrayBuffer\(\)/,"Never materialize entire derivative bytes into Worker memory");
+assert.doesNotMatch(uploadSource,/await\s+original\.arrayBuffer\(\)/,"Never materialize entire original into Worker memory");
+
 assert.equal(originals.puts[0].options.customMetadata.visibility, "private-original");
 assert.equal(images.puts[0].options.customMetadata.visibility, "public-optimized-derivative");
 
@@ -54,6 +63,33 @@ assert.equal(mislabeled.status, 400, "original bytes must match the declared JPE
 assert.equal(badOriginals.puts.length, 0, "mislabeled originals must be rejected before storage");
 assert.equal(badImages.puts.length, 0, "rejecting the original must not leave a public derivative behind");
 
+// An existing browser tab cannot hot-reload JavaScript without losing file
+// inputs. Retry transient R2 outages *on the server* and return 201 normally.
+let firstOriginalAttempt=0, firstDerivativeAttempt=0;
+const flakyOriginals=bucket(), flakyDerivatives=bucket();
+const originalPut=flakyOriginals.put.bind(flakyOriginals);
+const derivativePut=flakyDerivatives.put.bind(flakyDerivatives);
+flakyOriginals.put=async(...args)=>{
+  firstOriginalAttempt++;
+  if(firstOriginalAttempt===1)throw new Error("temporary R2 originals outage");
+  return originalPut(...args);
+};
+flakyDerivatives.put=async(...args)=>{
+  firstDerivativeAttempt++;
+  if(firstDerivativeAttempt===1)throw new Error("temporary R2 images outage");
+  return derivativePut(...args);
+};
+const recovered=await uploadProductImage({
+  request:makeRequest(),
+  env:{DB:{},ADMIN_PASSWORD,SESSION_SECRET,ORIGINALS:flakyOriginals,IMAGES:flakyDerivatives}
+});
+assert.equal(recovered.status,201,"Server must recover transient R2 failures without browser refresh");
+assert.equal(firstOriginalAttempt,2,"Retry private original with same key");
+assert.equal(firstDerivativeAttempt,2,"Retry public derivative with same key");
+assert.equal(flakyOriginals.puts.length,1,"One original is finally stored");
+assert.equal(flakyDerivatives.puts.length,1,"One derivative is finally stored");
+assert.equal(flakyOriginals.deletes.length,0,"Recovery must not roll back a successful upload");
+
 const missingOriginals = bucket(), missingImages = bucket();
 const missingOriginal = await uploadProductImage({
   request: makeRequest({ includeOriginal: false }),
@@ -62,6 +98,36 @@ const missingOriginal = await uploadProductImage({
 assert.equal(missingOriginal.status, 400, "missing original file must be rejected instead of storing the optimized derivative as the original");
 assert.equal(missingOriginals.puts.length, 0, "missing original must not write to private storage");
 assert.equal(missingImages.puts.length, 0, "missing original must not write a public derivative");
+
+// Stream large multipart bodies with a byte cap, not a duplicate 26 MB buffer.
+// This prevents Pages memory-pressure 503 on bulk imports without exposing R2.
+const oversizedImages=bucket(),oversizedOriginals=bucket();
+let sentBytes=0;
+const body=new ReadableStream({
+  pull(controller){
+    if(sentBytes>=28*1024*1024){controller.close();return;}
+    const chunk=new Uint8Array(1024*1024);
+    sentBytes+=chunk.length;
+    controller.enqueue(chunk);
+  }
+});
+const overStreamRequest=new Request("https://shop.example/api/admin/upload",{
+  method:"POST",
+  headers:{
+    Cookie:"sd_admin_session="+session,Origin:"https://shop.example",
+    "Sec-Fetch-Site":"same-origin",
+    "Content-Type":"multipart/form-data; boundary=bulk-test"
+  },
+  body,duplex:"half"
+});
+const overStream=await uploadProductImage({
+  request:overStreamRequest,
+  env:{DB:{},ADMIN_PASSWORD,SESSION_SECRET,ORIGINALS:oversizedOriginals,IMAGES:oversizedImages}
+});
+assert.equal(overStream.status,413,"Unknown-length streaming >26 MB must be rejected before storage");
+assert.equal((await overStream.json()).ok,false,"Oversized upload returns JSON, not an HTML 503");
+assert.equal(oversizedOriginals.puts.length,0);
+assert.equal(oversizedImages.puts.length,0);
 
 // Preview lacking ORIGINALS must fail closed *before* the public derivative is put.
 const missingBindingImages = bucket();
@@ -81,6 +147,18 @@ const failedDerivative = await uploadProductImage({
   env: { DB: {}, ADMIN_PASSWORD, SESSION_SECRET, ORIGINALS: rolledBackOriginals, IMAGES: failedPublicImages },
 });
 assert.equal(failedDerivative.status, 503, "partial image upload cannot claim success");
+assert.match((await failedDerivative.clone().json()).error,/IMAGES/,"Error should identify the failed bucket binding");
+assert.equal(failedDerivative.headers.get("Retry-After"),"5","Temporary R2 errors include retry guidance");
+const brokenOriginals={async put(){throw new Error("R2 temporarily unavailable");}};
+const noDerivative=bucket();
+const failedOriginal=await uploadProductImage({
+  request:makeRequest(),
+  env:{DB:{},ADMIN_PASSWORD,SESSION_SECRET,ORIGINALS:brokenOriginals,IMAGES:noDerivative},
+});
+assert.equal(failedOriginal.status,503);
+assert.match((await failedOriginal.clone().json()).error,/ORIGINALS/,"Original bucket failure must be distinguishable");
+assert.equal(noDerivative.puts.length,0,"Do not write derivative if original upload failed");
+
 assert.equal(rolledBackOriginals.puts.length, 1, "private original was staged first");
 assert.deepEqual(rolledBackOriginals.deletes, [rolledBackOriginals.puts[0].key],
   "failed public derivative must delete exactly its own newly staged private original");

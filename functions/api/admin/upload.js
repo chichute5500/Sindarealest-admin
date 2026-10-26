@@ -1,4 +1,4 @@
-import { fail, json, readBodyBytesLimited, requireAdmin, storageOrFail } from "../../_lib.js";
+import { fail, json, requireAdmin, storageOrFail } from "../../_lib.js";
 
 const MAX_DERIVATIVE_BYTES = 5 * 1024 * 1024;
 const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024;
@@ -8,6 +8,26 @@ const ORIGINAL_TYPES = Object.freeze({
   "image/png": "png",
   "image/webp": "webp",
 });
+
+// Retries happen on the server so a browser tab opened before a Preview
+// deployment can continue importing without refreshing or losing edits.
+// Same key + bytes within this request: repeating a put is idempotent.
+async function putR2WithBackoff(binding, key, bytes, options, stage) {
+  let lastError;
+  for(let attempt=1;attempt<=3;attempt++) {
+    try {
+      await binding.put(key, bytes, options);
+      return;
+    } catch(error) {
+      lastError=error;
+      console.error("product-photo transient R2 write", {
+        stage, attempt, code:String(error?.name||"R2WriteError").slice(0,80)
+      });
+      if(attempt<3)await new Promise(resolve=>setTimeout(resolve,attempt===1?400:1100));
+    }
+  }
+  throw lastError;
+}
 
 function originalSignatureMatches(bytes, contentType) {
   if (contentType === "image/jpeg") {
@@ -35,23 +55,36 @@ export async function onRequestPost(context) {
     return fail("Kho ảnh gốc chưa được cấu hình. Hãy gắn R2 bucket riêng tư bằng binding ORIGINALS trước khi tải ảnh sản phẩm mới lên.", 503);
   }
 
-  const parsedMultipart = await readBodyBytesLimited(context.request, MAX_MULTIPART_BYTES);
-  if (parsedMultipart.error === "too_large") return fail("Biểu mẫu tải ảnh vượt giới hạn 26 MB.", 413);
-  if (parsedMultipart.error) return fail("Không đọc được tệp ảnh.");
-
-  let form;
+  // Large photo batches must not copy the whole 26 MB multipart body into a
+  // second buffer before parsing; that can exhaust a Pages Function's memory.
+  // Stream with a hard byte cap, then let the runtime parse form-data once.
+  const declared=Number(context.request.headers.get("Content-Length")||0);
+  if(Number.isFinite(declared)&&declared>MAX_MULTIPART_BYTES)
+    return fail("Biểu mẫu tải ảnh vượt giới hạn 26 MB.",413);
+  if(!context.request.body)return fail("Không đọc được tệp ảnh.");
+  let exceeded=false,consumed=0,form;
   try {
-    const headers = new Headers(context.request.headers);
+    const headers=new Headers(context.request.headers);
     headers.delete("Content-Length");
     headers.delete("Transfer-Encoding");
-    const boundedRequest = new Request(context.request.url, {
-      method: "POST",
-      headers,
-      body: parsedMultipart.bytes,
+    const limited=context.request.body.pipeThrough(new TransformStream({
+      transform(chunk,controller){
+        consumed+=chunk.byteLength;
+        if(consumed>MAX_MULTIPART_BYTES){
+          exceeded=true;
+          throw new Error("photo_multipart_too_large");
+        }
+        controller.enqueue(chunk);
+      }
+    }));
+    const boundedRequest=new Request(context.request.url,{
+      method:"POST",headers,body:limited,duplex:"half"
     });
-    form = await boundedRequest.formData();
-  } catch {
-    return fail("Không đọc được tệp ảnh.");
+    form=await boundedRequest.formData();
+  } catch(error) {
+    if(exceeded)return fail("Biểu mẫu tải ảnh vượt giới hạn 26 MB.",413);
+    console.error("product-photo form-data parsing failed",{code:String(error?.name||"InvalidMultipart").slice(0,80)});
+    return fail("Không đọc được tệp ảnh. Hãy kiểm tra định dạng JPEG/PNG/WebP và tải lại ảnh này.",400);
   }
   const file = form.get("file");
   const original = form.get("original");
@@ -66,32 +99,40 @@ export async function onRequestPost(context) {
   if (!originalType) return fail("Ảnh gốc cần là JPEG, PNG hoặc WebP.");
 
   try {
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const isWebp = bytes.length >= 12 &&
-      new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
-      new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP";
+    // Validate only the header. R2.put() supports Blob directly; forwarding
+    // the already-parsed File avoids another 25 MB worth of ArrayBuffer copies
+    // in a 128 MB Workers runtime during hundreds of consecutive uploads.
+    const webpHeader = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    const isWebp = originalSignatureMatches(webpHeader, "image/webp");
     if (!isWebp) return fail("Nội dung tệp hiển thị không phải ảnh WebP hợp lệ.");
 
-    const originalBytes = new Uint8Array(await original.arrayBuffer());
-    if (!originalSignatureMatches(originalBytes, original.type)) {
+    const originalHeader = new Uint8Array(await original.slice(0, 12).arrayBuffer());
+    if (!originalSignatureMatches(originalHeader, original.type)) {
       return fail("Nội dung ảnh gốc không khớp định dạng JPEG, PNG hoặc WebP đã khai báo.");
     }
     const id = crypto.randomUUID();
     const key = `${id}.webp`;
     const privateKey = `private-originals/${id}.${originalType}`;
 
-    await context.env.ORIGINALS.put(privateKey, originalBytes, {
-      httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
-      customMetadata: { visibility: "private-original" },
-    });
     try {
-      await context.env.IMAGES.put(key, bytes, {
+      await putR2WithBackoff(context.env.ORIGINALS, privateKey, original, {
+        httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
+        customMetadata: { visibility: "private-original" },
+      }, "original");
+    } catch (error) {
+      console.error("product-photo upload failure", { stage: "original", code: String(error?.name || "R2WriteError").slice(0, 80) });
+      return fail("Kho ảnh gốc ORIGINALS tạm thời không ghi được. Ảnh này chưa được xác nhận lưu; hãy thử tiếp tục sau.", 503, { "Retry-After": "5" });
+    }
+    try {
+      await putR2WithBackoff(context.env.IMAGES, key, file, {
         httpMetadata: { contentType: "image/webp", cacheControl: "public, max-age=31536000, immutable" },
         customMetadata: { visibility: "public-optimized-derivative", originalKey: privateKey },
-      });
+      }, "derivative");
     } catch (error) {
-      try { await context.env.ORIGINALS.delete(privateKey); } catch {}
-      throw error;
+      try { await context.env.ORIGINALS.delete(privateKey); }
+      catch (cleanupError) { console.error("product-photo rollback failed", {stage:"original-cleanup",code:String(cleanupError?.name||"R2DeleteError").slice(0,80)}); }
+      console.error("product-photo upload failure", { stage: "derivative", code: String(error?.name || "R2WriteError").slice(0, 80) });
+      return fail("Kho ảnh hiển thị IMAGES tạm thời không ghi được. Đã cố gắng dọn ảnh gốc của lượt tải lỗi; hãy thử tiếp tục sau.", 503, { "Retry-After": "5" });
     }
 
     return json({

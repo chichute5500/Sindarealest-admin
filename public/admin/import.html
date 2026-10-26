@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Nhập thư mục ảnh · SinDarealest Admin</title>
+<style>
+:root{font-family:Inter,system-ui,sans-serif;color:#262b33;background:#f4f6f8}*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:24px 18px 80px}h1{font-size:clamp(22px,3vw,32px)}h2{font-size:18px}p{line-height:1.55}.muted{color:#596675}.panel{background:#fff;border:1px solid #dce2e9;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 6px 24px #192b400a}.warning{padding:13px;background:#fff6ed;border-left:4px solid #b67828;border-radius:8px}.error{color:#9d2020}.success{color:#13704b}label.filepicker{display:inline-grid;gap:6px;margin:9px 15px 9px 0;font-weight:600}label.filepicker input{display:block;max-width:100%;font-weight:400}button{border:1px solid #aebbc7;background:white;padding:11px 16px;border-radius:9px;cursor:pointer;font-weight:650}button.primary{background:#173b56;color:white;border-color:#173b56}button:disabled{opacity:.45;cursor:not-allowed}a{color:#175a91}.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.stat{display:flex;gap:16px;flex-wrap:wrap}.stat b{font-size:21px}.progress{width:100%;height:14px;accent-color:#175b8d}.items{display:grid;gap:10px}.item{border:1px solid #dce2e9;border-radius:12px;padding:12px;display:grid;grid-template-columns:60px 1fr;gap:12px;align-items:start;background:white}.item.bad{background:#fff7f4;border-color:#efc7bb}.item.done{background:#f0faf5}.thumb{width:60px;height:60px;border-radius:8px;background:#edf0f2;object-fit:cover}.name{width:min(100%,540px);padding:9px;border-radius:7px;border:1px solid #c3ccd4;margin:7px 0}.metadata{font-size:12px;color:#596675;line-height:1.6;overflow-wrap:anywhere}.pick{display:flex;gap:8px;align-items:start}.notice{font-weight:650;overflow-wrap:anywhere}#status{white-space:pre-wrap}#groups{max-height:680px;overflow:auto;padding:2px}.model-fields{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin:7px 0}.field{display:grid;gap:5px;font-size:12px;font-weight:650}.price-input{font:inherit;padding:9px;border:1px solid #bfc9d4;border-radius:8px;width:185px;max-width:100%}.price-hint{font-size:12px;color:#8a5c12}.variant-list{border-top:1px solid #e5e8ed;margin-top:9px;padding-top:8px}.variant-list summary{cursor:pointer;font-weight:650;font-size:13px}.photo-color-row{display:grid;grid-template-columns:minmax(100px,1fr) 145px;gap:8px;padding:7px 0;border-bottom:1px solid #eef1f4;align-items:center}.photo-color-row input{width:100%;padding:8px;border:1px solid #bec7d1;border-radius:8px}.photo-color-row span{font-size:12px;overflow-wrap:anywhere}.sku-hint{font-size:12px;color:#425567;font-weight:650}.price-invalid{color:#b12626}.busy{opacity:.75}.auth-panel{border-color:#d8b37c;background:#fffaf3}.auth-panel p{margin:9px 0}.auth-panel input{padding:11px;border:1px solid #c4cbd3;border-radius:9px;max-width:100%;width:310px}.auth-panel button{margin-top:9px}.auth-panel a{font-weight:600}.auth-panel[hidden]{display:none!important}@media(max-width:640px){.photo-color-row{grid-template-columns:minmax(100px,1fr) 120px}main{padding:16px 10px}.panel{padding:14px}.item{grid-template-columns:48px 1fr;gap:9px}.thumb{width:48px;height:48px}}
+</style>
+</head>
+<body>
+<main>
+<p><a href="/admin/">← Quay lại Admin</a></p>
+<h1>Nhập ảnh sản phẩm theo thư mục</h1>
+<p class="muted">Dùng file <b>DANH_SACH_ANH.csv</b> và thư mục <b>KET_QUA_NHOM_MAU...</b> trên máy tính. Ảnh được phân nhóm theo thư mục Mxxxx (không phải SKU). SKU thực tế do hệ thống tự cấp dạng SD-... khi lưu. Chỉ tạo <b>sản phẩm nháp chưa công khai</b>.</p>
+<section class="panel auth-panel" id="loginPanel" aria-labelledby="loginTitle" hidden>
+<h2 id="loginTitle">Đăng nhập Admin Preview</h2>
+<p>Bạn đang sử dụng môi trường thử nghiệm. Cần đăng nhập bằng mật khẩu <strong>Admin Preview</strong> trước khi đối chiếu hoặc nhập ảnh. Mật khẩu Admin web chính có thể khác mật khẩu Preview.</p>
+<form id="loginImportForm">
+<label for="previewPassword">Mật khẩu Admin Preview</label>
+<div><input type="password" id="previewPassword" autocomplete="current-password" minlength="12" required placeholder="Nhập mật khẩu quản trị"></div>
+<button type="submit" class="primary" id="signIn">Đăng nhập để tiếp tục</button>
+</form>
+<p class="error" id="authError" role="alert" aria-live="polite"></p>
+<p class="muted">Bạn cũng có thể <a href="/admin/?view=products">mở trang đăng nhập Admin Preview</a> trên cùng địa chỉ website. Khi mở lại trang nhập ảnh, phiên đăng nhập phải còn hiệu lực.</p>
+</section>
+<div class="panel">
+<h2>1. Chọn dữ liệu trên máy tính</h2>
+<label class="filepicker">File CSV đã gửi trong chat
+<input id="csv" type="file" accept=".csv,text/csv"></label>
+<label class="filepicker">Thư mục kết quả chứa 15 danh mục
+<input id="folder" type="file" webkitdirectory directory multiple accept="image/jpeg,image/png,image/webp"></label>
+<div class="toolbar"><button id="preview" type="button" class="primary" disabled>Đối chiếu dữ liệu</button><span id="auth" class="muted">Đang kiểm tra quyền Admin…</span></div>
+</div>
+<div class="panel" id="review" hidden>
+<h2>2. Duyệt danh sách trước khi nhập</h2>
+<p id="totals" class="notice"></p>
+<p class="warning">Chỉ tạo bản nháp, <b>không xóa sản phẩm cũ</b>, giá được lưu khi bạn nhập trực tiếp; CSV không có cột giá bán chính thức. Màu từ CSV có thể sửa theo từng ảnh. Tồn kho để trống nếu chưa kiểm kê. Các mẫu thiếu ảnh, đường dẫn sai hoặc quá 50 ảnh sẽ bị chặn. Tên và màu chưa xác minh phải được kiểm tra lại trước khi công khai.</p>
+<div class="toolbar">
+<button id="selectAll" type="button">Chọn mẫu đủ điều kiện</button>
+<button id="clearAll" type="button">Bỏ chọn tất cả</button>
+<button id="import" type="button" class="primary" disabled>Tạo bản nháp đã chọn</button>
+<button id="stop" type="button" disabled>Dừng sau ảnh hiện tại</button>
+</div>
+<progress id="progress" class="progress" max="1" value="0"></progress>
+<p id="status" role="status" aria-live="polite" class="muted">Chưa bắt đầu.</p>
+<div id="groups" class="items"></div>
+</div>
+</main>
+<script type="module">
+import { parseCsv, buildImportPlan, MAX_IMAGES_PER_PRODUCT, categoryForImport, confirmedVndPrice, normalizeImageColor } from "./import-core.mjs";
+const $ = (id) => document.getElementById(id);
+let plan = null, stop = false, busy = false, checkpoint = null, checkpointKey = "", urls = [];
+const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function setStatus(text, error=false) { $("status").textContent=text; $("status").className=error?"error":"muted"; }
+
+let authenticated = false;
+let lastImportActivity = Date.now(), lastSessionRefresh = 0, refreshingSession = false;
+// A long photo import counts as active work. Editing titles, prices and
+// colors also keeps the session alive; leaving the page idle does not.
+function recordImportActivity(){lastImportActivity=Date.now();}
+for(const eventName of ["input","pointerdown","keydown","touchstart","scroll"])
+  document.addEventListener(eventName,recordImportActivity,{passive:true});
+async function refreshActiveImportSession(){
+  const now=Date.now();
+  if(!authenticated||!plan||refreshingSession)return;
+  if(!busy && now-lastImportActivity>=9*60*1000)return;
+  if(now-lastSessionRefresh<3*60*1000)return;
+  refreshingSession=true;
+  lastSessionRefresh=now;
+  try{
+    const res=await fetch("/api/admin/session",{method:"GET",credentials:"same-origin",cache:"no-store"});
+    if(res.status===401)showAuth("Phiên đã hết hạn. Hãy đăng nhập tại đây; tên, giá, màu và các ảnh đã chọn vẫn được giữ.");
+  }catch{}finally{refreshingSession=false;}
+}
+setInterval(refreshActiveImportSession,60_000);
+function showAuth(message="Phiên đăng nhập chưa hợp lệ. Hãy đăng nhập vào Admin Preview để tiếp tục.") {
+  authenticated=false;
+  $("loginPanel").hidden=false;
+  $("preview").disabled=true;
+  $("import").disabled=true;
+  $("auth").textContent="Chưa đăng nhập Admin Preview";
+  $("auth").className="error";
+  $("authError").textContent=message;
+  $("loginPanel").scrollIntoView({block:"start",behavior:"auto"});
+}
+function setAuthenticated(){
+  authenticated=true;
+  lastSessionRefresh=Date.now();
+  lastImportActivity=lastSessionRefresh;
+  $("loginPanel").hidden=true;
+  $("authError").textContent="";
+  $("preview").disabled=false;
+  $("auth").textContent="Đã đăng nhập Admin Preview";
+  $("auth").className="success";
+  if(plan) updateSelection();
+}
+async function submitLogin(event){
+  event.preventDefault();
+  const password=$("previewPassword").value;
+  if(!password)return;
+  const button=$("signIn");
+  button.disabled=true;$("authError").textContent="";
+  try{
+    const res=await fetch("/api/admin/login",{
+      method:"POST",credentials:"same-origin",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password})
+    });
+    let body=null;try{body=await res.json()}catch{}
+    if(!res.ok||body?.ok!==true)throw Error(body?.error||"Đăng nhập thất bại ("+res.status+").");
+    $("previewPassword").value="";
+    await catalog();
+    setAuthenticated();
+  }catch(e){
+    $("authError").textContent=e.message||"Không thể đăng nhập. Hãy kiểm tra mật khẩu Preview.";
+    $("previewPassword").focus();
+  }finally{button.disabled=false;}
+}
+$("loginImportForm").addEventListener("submit",submitLogin);
+
+async function request(url, init) {
+  const response = await fetch(url, {credentials:"same-origin",cache:"no-store",...init});
+  let data;try{data=await response.json()}catch{
+    const err=new Error("Máy chủ không trả về dữ liệu hợp lệ (HTTP "+response.status+").");
+    err.status=response.status;throw err;
+  }
+  if(response.status===401){
+    showAuth("Phiên đăng nhập hết hạn hoặc chưa đăng nhập. Hãy nhập mật khẩu Admin Preview để tiếp tục; file đã chọn vẫn được giữ.");
+    throw Error("Cần đăng nhập Admin Preview.");
+  }
+  if(!response.ok||data?.ok===false){
+    const err=new Error(data?.error||"HTTP "+response.status);
+    err.status=response.status;
+    const retryHeader=Number(response.headers.get("Retry-After"));
+    if(Number.isFinite(retryHeader)&&retryHeader>0)err.retryAfterMs=Math.min(10000,retryHeader*1000);
+    throw err;
+  }
+  return data;
+}
+async function catalog() {
+  const data = await request("/api/admin/products");
+  if(!Array.isArray(data.products))throw Error("Không đọc được danh sách sản phẩm từ D1.");
+  if(data.products.length>=2000)throw Error("Danh sách D1 đạt giới hạn API 2000. Cần xử lý phân trang trước khi nhập.");
+  return data.products;
+}
+async function fingerprint(csv,files) {
+  const summary = csv + "\n" + files.map(f=>f.webkitRelativePath+":"+f.size+":"+f.lastModified).sort().join("\n");
+  const hash = await crypto.subtle.digest("SHA-256",new TextEncoder().encode(summary));
+  return Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,"0")).join("");
+}
+function saveCheckpoint(){localStorage.setItem(checkpointKey,JSON.stringify(checkpoint));}
+function validPrice(group){
+  try{confirmedVndPrice(group.priceInput);return true;}catch{return false;}
+}
+function updateSelection(){
+  const available=plan.groups.filter(g=>g.status==="ready"&&g.selected&&!checkpoint.drafts[g.key]&&validPrice(g));
+  const invalid=plan.groups.filter(g=>g.status==="ready"&&g.selected&&!validPrice(g)).length;
+  $("import").disabled=busy||!authenticated||!available.length||invalid>0;
+  $("import").textContent=Object.keys(checkpoint.drafts).length?"Tiếp tục nhập "+available.length+" mẫu chưa tạo":"Tạo bản nháp đã chọn";
+  $("totals").textContent=
+    plan.groups.length+" mẫu / "+plan.rows+" dòng CSV / "+plan.matched+" ảnh khớp"+
+    "; "+plan.blocked+" mẫu cần xử lý; "+plan.missing+" ảnh thiếu; "+plan.unlisted+" ảnh ngoài CSV; "+plan.reviewRows+" ảnh có ghi chú"+
+    "; "+Object.keys(checkpoint.drafts).length+" bản nháp đã tạo"+
+    "; "+available.length+" mẫu đang chọn"+(invalid?"; "+invalid+" mẫu có giá không hợp lệ":"")+".";
+}
+function render(){
+  for(const url of urls)URL.revokeObjectURL(url);urls=[];
+  const holder=$("groups");holder.replaceChildren();
+  const frag=document.createDocumentFragment();
+  const sampleColors=["Chưa rõ","Đen","Nâu","Xanh","Xanh dương","Xám","Đỏ","Cam","Trắng"];
+  for(const g of plan.groups){
+    const saved=checkpoint.drafts[g.key],done=Boolean(saved),blocked=g.status!=="ready";
+    const el=document.createElement("div");el.className="item"+(blocked?" bad":"")+(done?" done":"");
+    const img=document.createElement("img");img.className="thumb";img.alt="";img.loading="lazy";
+    if(g.images.length){const url=URL.createObjectURL(g.images[0].file);urls.push(url);img.src=url;}
+    const body=document.createElement("div");
+    const top=document.createElement("label");top.className="pick";
+    const select=document.createElement("input");select.type="checkbox";select.checked=g.selected&&!done;select.disabled=blocked||done||busy;
+    select.addEventListener("change",()=>{g.selected=select.checked;updateSelection();});
+    const name=document.createElement("strong");
+    name.textContent=g.category+" / "+g.images.length+" ảnh";
+    top.append(select,name);
+    const sku=document.createElement("div");sku.className="sku-hint";
+    sku.textContent=done?"SKU đã cấp: "+(saved?.sku||"Kiểm tra trong Admin")+" (ID: "+(saved?.id||saved)+")":
+      "SKU: Hệ thống tự cấp SD-... khi tạo sản phẩm. Thư mục "+g.modelId+" chỉ dùng đối chiếu ảnh.";
+    const title=document.createElement("input");title.className="name";title.value=g.title;title.maxLength=180;title.setAttribute("aria-label","Tên sản phẩm "+g.key);
+    title.disabled=blocked||done||busy;
+    title.addEventListener("input",()=>{g.title=title.value.trim();checkpoint.titles[g.key]=g.title;saveCheckpoint();updateSelection();});
+    const fields=document.createElement("div");fields.className="model-fields";
+    const priceLabel=document.createElement("label");priceLabel.className="field";
+    priceLabel.textContent="Giá bán (VND) — nhập trực tiếp";
+    const price=document.createElement("input");price.className="price-input";price.type="number";price.min="0";price.max="2000000000";price.step="1";price.inputMode="numeric";
+    price.placeholder="Ví dụ 2200000";price.value=g.priceInput;price.disabled=blocked||done||busy;
+    price.setAttribute("aria-label","Giá bán bằng VND "+g.key);
+    price.addEventListener("input",()=>{g.priceInput=price.value;checkpoint.prices[g.key]=g.priceInput;saveCheckpoint();updateSelection();});
+    priceLabel.append(price);fields.append(priceLabel);
+    const priceHint=document.createElement("span");priceHint.className="price-hint";
+    priceHint.textContent=g.priceHint!==null?"Giá gợi ý từ tên thư mục: "+new Intl.NumberFormat("vi-VN").format(g.priceHint)+"đ — không tự áp dụng":"Tên thư mục không có gợi ý giá; để trống nếu chưa quyết định.";
+    fields.append(priceHint);
+    const colors=document.createElement("div");colors.className="metadata";
+    function updateColorsSummary(){
+      const counts=new Map();for(const entry of g.images)counts.set(entry.color,(counts.get(entry.color)||0)+1);
+      colors.textContent="Màu từ CSV (có thể sửa): "+[...counts].map(([color,n])=>color+" ("+n+" ảnh)").join(", ");
+    }
+    updateColorsSummary();
+    const details=document.createElement("details");details.className="variant-list";
+    const summary=document.createElement("summary");summary.textContent="Xem và chỉnh màu từng ảnh từ CSV ("+g.images.length+" ảnh)";
+    details.append(summary);
+    const datalist=document.createElement("datalist");const dlid="colors-"+g.key.replace(/[^a-z0-9]/gi,"-");
+    datalist.id=dlid;
+    for(const value of [...new Set([...sampleColors,...g.images.map(x=>x.csvColor)])]){
+      const option=document.createElement("option");option.value=value;datalist.append(option);
+    }
+    details.append(datalist);
+    for(const entry of g.images){
+      const line=document.createElement("label");line.className="photo-color-row";
+      const fileName=document.createElement("span");fileName.textContent=entry.file.name+" · CSV: "+entry.csvColor;
+      const input=document.createElement("input");input.type="text";input.maxLength=40;input.setAttribute("list",dlid);
+      input.value=entry.color;input.disabled=blocked||done||busy;
+      input.setAttribute("aria-label","Màu ảnh "+entry.file.name);
+      input.addEventListener("change",()=>{
+        try{entry.color=normalizeImageColor(input.value);input.value=entry.color;
+          checkpoint.colors[entry.path]=entry.color;saveCheckpoint();updateColorsSummary();updateSelection();
+        }catch(e){input.value=entry.color;setStatus(e.message,true);}
+      });
+      line.append(fileName,input);details.append(line);
+    }
+    const info=document.createElement("div");info.className="metadata";
+    const problems=[];
+    if(g.missing.length)problems.push("Thiếu "+g.missing.length+" ảnh");
+    if(g.images.length>MAX_IMAGES_PER_PRODUCT)problems.push("Có "+g.images.length+" ảnh; tối đa 50");
+    if(g.warnings.length)problems.push(g.warnings[0]);
+    const flagged=g.images.filter(x=>x.review.trim()).length;
+    if(flagged)problems.push(flagged+" ảnh có ghi chú kiểm duyệt CSV");
+    if(done)problems.push("Đã lưu nháp; sửa giá/màu tiếp trong Admin");
+    info.textContent="Thư mục nguồn: "+g.modelFolder+(problems.length?" · "+problems.join(" · "):"");
+    body.append(top,sku,title,fields,colors,details,info);el.append(img,body);frag.append(el);
+  }
+  holder.append(frag);updateSelection();
+}
+async function optimize(file){
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>20*1024*1024)throw Error("Ảnh sai định dạng hoặc vượt 20 MB: "+file.name);
+  const bitmap=await createImageBitmap(file);
+  let maxSide=1800,blob=null;
+  try{
+    for(let i=0;i<3;i++){
+      const scale=Math.min(1,maxSide/Math.max(bitmap.width,bitmap.height));
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.max(1,Math.round(bitmap.width*scale));
+      canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+      canvas.getContext("2d",{alpha:false}).drawImage(bitmap,0,0,canvas.width,canvas.height);
+      blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/webp",0.82));
+      if(blob?.type==="image/webp"&&blob.size>0&&blob.size<=5*1024*1024)break;
+      maxSide=Math.floor(maxSide*.72);
+    }
+  }finally{bitmap.close();}
+  if(!blob||blob.type!=="image/webp"||blob.size>5*1024*1024)throw Error("Không thể tối ưu ảnh WebP: "+file.name);
+  return blob;
+}
+async function upload(entry){
+  const cacheKey=entry.path+":"+entry.file.size+":"+entry.file.lastModified;
+  if(checkpoint.uploads[cacheKey])return checkpoint.uploads[cacheKey];
+  const derivative=await optimize(entry.file);
+  const form=new FormData();
+  form.set("file",derivative,"display.webp");
+  form.set("original",entry.file,entry.file.name);
+  // One transient outage should not abort a 200+ model import; never retry
+  // validation/authorization errors or product-creation calls.
+  for(let attempt=1;attempt<=3;attempt++){
+    try{
+      const result=await request("/api/admin/upload",{method:"POST",body:form});
+      if(!/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(result.url||""))throw Error("API ảnh trả về URL không hợp lệ.");
+      checkpoint.uploads[cacheKey]=result.url;
+      saveCheckpoint();
+      return result.url;
+    }catch(error){
+      const transient=[429,502,503,504].includes(error.status);
+      if(!transient||attempt===3)throw error;
+      const delay=error.retryAfterMs||[1500,4000][attempt-1];
+      setStatus("Kho ảnh báo lỗi tạm thời (HTTP "+error.status+"). Thử lại ảnh "+entry.file.name+" lần "+(attempt+1)+"/3 sau "+Math.ceil(delay/1000)+" giây. Các bản nháp đã tạo vẫn an toàn.");
+      await new Promise(resolve=>setTimeout(resolve,delay));
+      if(stop)throw Error("Đã tạm dừng. Bạn có thể nhấn tiếp tục; ảnh đã tải được lưu vào tiến độ.");
+    }
+  }
+}
+async function inspectDuplicate(group,images){
+  const list=await catalog();
+  // Lost-response recovery: only treat the draft as already present if it
+  // points to exactly the uploaded first image and same category.
+  return list.find(p=>p.categoryLabel===group.category&&
+    Array.isArray(p.images)&&p.images[0]===images[0]&&!p.published);
+}
+async function importGroup(group){
+  if(checkpoint.drafts[group.key])return;
+  if(group.status!=="ready"||group.images.length>MAX_IMAGES_PER_PRODUCT)throw Error("Mẫu bị chặn: "+group.key);
+  const title=group.title.trim();
+  if(!title)throw Error("Mẫu chưa có tên: "+group.key);
+  const images=[];
+  for(let i=0;i<group.images.length;i++){
+    if(stop)throw Error("Đã dừng theo yêu cầu.");
+    setStatus("Đang tải ảnh "+(i+1)+"/"+group.images.length+" · "+group.key);
+    images.push(await upload(group.images[i]));
+  }
+  const previous=await inspectDuplicate(group,images);
+  if(previous){checkpoint.drafts[group.key]={id:previous.id,sku:previous.sku};saveCheckpoint();return;}
+  const targetCategory=categoryForImport(group.category);
+  const confirmedPrice=confirmedVndPrice(group.priceInput);
+  const imageColors=group.images.map(entry=>normalizeImageColor(entry.color));
+  const payload={title,category:targetCategory.apiCategory,categoryLabel:targetCategory.categoryLabel,
+    published:false,skuVerified:false,description:"",price:confirmedPrice,stock:null,
+    fulfillmentType:"unclassified",images,imageColors};
+  const res=await request("/api/admin/products",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  if(!res.product?.id)throw Error("API tạo sản phẩm không trả lại mã sản phẩm. Hãy kiểm tra Admin trước khi chạy lại.");
+  checkpoint.drafts[group.key]={id:res.product.id,sku:res.product.sku};saveCheckpoint();
+}
+async function prepare(){
+  if(busy)return;
+  try{
+    const csvFile=$("csv").files?.[0], files=Array.from($("folder").files||[]);
+    if(!csvFile||!files.length)throw Error("Cần chọn cả CSV và thư mục kết quả chứa ảnh.");
+    if(csvFile.size>8*1024*1024)throw Error("CSV quá lớn (tối đa 8 MB).");
+    await catalog();
+    const csvText=await csvFile.text();
+    const rows=parseCsv(csvText);
+    const next=buildImportPlan(rows,files);
+    if(next.matched===0)throw Error("Không khớp ảnh nào. Hãy chọn đúng thư mục KET_QUA_NHOM_MAU và CSV đi cùng.");
+    checkpointKey="sd-folder-import-v1:"+await fingerprint(csvText,files);
+    try{checkpoint=JSON.parse(localStorage.getItem(checkpointKey)||"null")}catch{checkpoint=null;}
+    if(!checkpoint||typeof checkpoint!=="object")checkpoint={uploads:{},drafts:{}};
+    if(!checkpoint.uploads||typeof checkpoint.uploads!=="object")checkpoint.uploads={};
+    if(!checkpoint.drafts||typeof checkpoint.drafts!=="object")checkpoint.drafts={};
+    if(!checkpoint.prices||typeof checkpoint.prices!=="object")checkpoint.prices={};
+    if(!checkpoint.colors||typeof checkpoint.colors!=="object")checkpoint.colors={};
+    if(!checkpoint.titles||typeof checkpoint.titles!=="object")checkpoint.titles={};
+    for(const group of next.groups){
+      group.priceInput=String(checkpoint.prices[group.key]??"");
+      group.title=String(checkpoint.titles[group.key]??group.title).slice(0,180);
+      for(const entry of group.images){
+        if(Object.hasOwn(checkpoint.colors,entry.path)){
+          try{entry.color=normalizeImageColor(checkpoint.colors[entry.path]);}catch{}
+        }
+      }
+    }
+    plan=next;$("review").hidden=false;$("progress").value=0;
+    setStatus("Dữ liệu đã đối chiếu cục bộ. Chưa tải ảnh và chưa tạo sản phẩm.");
+    render();
+  }catch(e){if(!authenticated)return; $("review").hidden=true; $("authError").textContent=""; $("auth").textContent="Không thể đối chiếu: "+e.message; $("auth").className="error";}
+}
+async function startImport(){
+  if(busy||!plan||!authenticated)return;
+  const selected=plan.groups.filter(g=>g.selected&&g.status==="ready"&&!checkpoint.drafts[g.key]);
+  if(selected.some(g=>!validPrice(g))){setStatus("Có giá không hợp lệ. Chỉ nhập số nguyên VND.",true);return;}
+  if(!selected.length)return;
+  if(!confirm("Tạo "+selected.length+" sản phẩm nháp chưa công khai trên D1 và tải ảnh lên R2? Không xóa dữ liệu cũ."))return;
+  busy=true;stop=false;$("stop").disabled=false;$("preview").disabled=true;$("import").disabled=true;$("csv").disabled=true;$("folder").disabled=true;
+  let completed=0,errors=0;
+  try{
+    await catalog();
+    for(const g of selected){
+      if(stop)break;
+      try{await importGroup(g);completed++;}
+      catch(e){errors++;setStatus("Đã tạm dừng ở "+g.key+": "+e.message+"  Các bản nháp đã tạo và ảnh tải thành công đã được ghi nhận. Không chọn lại mẫu đã tạo. Khi kho ảnh hoạt động, nhấn Tiếp tục nhập để thử mẫu này.",true);break;}
+      $("progress").value=completed/selected.length;
+      setStatus("Đã tạo "+completed+"/"+selected.length+" mẫu nháp. "+(errors?"Có lỗi.":""));
+    }
+    if(!errors)setStatus("Đã tạo thêm "+completed+"/"+selected.length+" mẫu nháp."+(stop?" Dừng theo yêu cầu.":"")+" Tổng bản nháp trong đợt: "+Object.keys(checkpoint.drafts).length+". Danh mục cũ vẫn được giữ nguyên.");
+  }finally{
+    busy=false;$("stop").disabled=true;$("preview").disabled=false;$("csv").disabled=false;$("folder").disabled=false;
+    render();
+  }
+}
+$("preview").addEventListener("click",prepare);
+$("import").addEventListener("click",startImport);
+$("stop").addEventListener("click",()=>{stop=true;$("stop").disabled=true;});
+$("selectAll").addEventListener("click",()=>{if(!plan||busy)return;for(const g of plan.groups)g.selected=g.status==="ready";render();});
+$("clearAll").addEventListener("click",()=>{if(!plan||busy)return;for(const g of plan.groups)g.selected=false;render();});
+catalog().then(setAuthenticated)
+  .catch(e=>{ if(!authenticated && $("loginPanel").hidden) showAuth(e.message); });
+</script>
+</body></html>
