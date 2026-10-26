@@ -58,10 +58,17 @@ async function verifyWelcomeColdFonts(spec){
       return {
         ready:root.classList.contains('sd-welcome-font-ready'),
         visible:getComputedStyle(title).visibility,
+        serifLoaded:document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.'),
+        sansLoaded:document.fonts.check('400 12px "SD Sans"','Chất liệu cao cấp'),
         copied:title.textContent
       };
     });
-    if(first.ready||first.visible!=='hidden'||!first.copied.includes('Dấu ấn da cá sấu'))
+    // DOMContentLoaded may occur after both deliberately delayed fonts have
+    // completed. Correctly rendered, font-ready Welcome text is legal. The
+    // forbidden case remains visible fallback text while fonts are NOT ready.
+    if(!first.copied.includes('Dấu ấn da cá sấu')||
+       (first.ready&&(!first.serifLoaded||!first.sansLoaded))||
+       (!first.ready&&first.visible!=='hidden'))
       throw Error('Unstable Vietnamese glyphs appeared before fonts loaded: '+JSON.stringify({first,delayed}));
     await page.waitForFunction(()=>document.documentElement.classList.contains('sd-welcome-font-ready'),null,{timeout:4500});
     const after=await page.evaluate(()=>{
