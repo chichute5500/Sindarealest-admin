@@ -99,6 +99,17 @@ try{
   assert.equal(leakedWrites,0);
   assert.deepEqual(failures,[]);
   await page.screenshot({path:"artifacts/bulk-import-preview/screenshots/desktop-draft-confirmed.png",fullPage:true});
+  // Reload after an upload failure/session change must not duplicate earlier drafts:
+  // the same folder and CSV derive the identical browser-local checkpoint.
+  await page.reload({waitUntil:"networkidle",timeout:40000});
+  await page.locator("#csv").setInputFiles(csvPath);
+  await page.locator("#folder").setInputFiles(selected);
+  await page.locator("#preview").click();
+  await page.locator("#review").waitFor({state:"visible",timeout:12000});
+  assert.match(await page.locator("#totals").innerText(),/1 bản nháp đã tạo/);
+  assert.equal(await page.locator("#import").isDisabled(),true,"Already created draft cannot be reimported");
+  assert.match(await page.locator("#groups .sku-hint").innerText(),/SD-SN009/);
+  assert.equal(drafts.length,1,"Reload must not duplicate already confirmed draft");
   const mobile=await ctx.newPage();
   await mobile.setViewportSize({width:390,height:844});
   await mobile.route("**/api/admin/**",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({products:[]})}));
