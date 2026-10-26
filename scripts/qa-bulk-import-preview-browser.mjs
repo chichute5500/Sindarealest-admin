@@ -68,7 +68,7 @@ try{
   assert.equal(await page.locator("#groups .item").count(),1);
   assert.equal(await page.locator("#groups .item input[type=checkbox]").isChecked(),true);
   assert.match(await page.locator("#groups .sku-hint").innerText(),/SKU: Hệ thống tự cấp SD-/);
-  assert.match(await page.locator("#groups .photo-color-row").first().innerText(),/CSV: Đen/);
+  assert.match(await page.locator("#groups .photo-color-row").first().textContent(),/CSV: Đen/);
   assert.equal(await page.locator("#groups .price-input").inputValue(),"","Folder hint cannot silently become the selling price");
   await page.locator("#groups .price-input").fill("2200000");
   await page.locator("#groups details").first().evaluate(el=>{el.open=true;});
