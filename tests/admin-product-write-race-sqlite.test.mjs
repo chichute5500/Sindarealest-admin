@@ -12,7 +12,7 @@ const ADMIN_PASSWORD='test-only-admin-password-not-real';
 const session=await createSession(SESSION_SECRET);
 const db=new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
-for(const file of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql'])
+for(const file of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0010_product_image_colors.sql'])
   db.exec(readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8'));
 
 const id='qa-disposable-product';
