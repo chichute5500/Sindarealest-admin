@@ -372,6 +372,39 @@ try{
         for(const direction of [true,false])variants.push(await runThemeTrial(direction,experiment.label));
         await temporaryStyle.evaluate(node=>node.remove());
       }
+      // Exactly the same SVG images, decoded and drawn once into lossless PNG
+      // via browser Canvas. Only the diagnostic session uses the bitmaps.
+      // Retain the site's opacity fades, filter, placement and sizing.
+      const rasterized=await page.evaluate(async()=>{
+        const selectors=['.theme-bg--light','.theme-bg--dark'];
+        const results=[];
+        for(const selector of selectors){
+          const layer=document.querySelector(selector);
+          const current=getComputedStyle(layer).backgroundImage;
+          const match=current.match(/url\(["']?([^"')]+)["']?\)/);
+          if(!match)throw Error('Cannot find source SVG for '+selector+': '+current);
+          const img=new Image();
+          img.src=match[1];
+          await img.decode();
+          const canvas=document.createElement('canvas');
+          canvas.width=img.naturalWidth;
+          canvas.height=img.naturalHeight;
+          const ctx=canvas.getContext('2d',{willReadFrequently:false});
+          if(!ctx)throw Error('Canvas context unavailable');
+          ctx.drawImage(img,0,0);
+          const encoded=canvas.toDataURL('image/png');
+          if(!encoded.startsWith('data:image/png;base64,'))throw Error('Raster source invalid');
+          results.push({selector,encoded,width:canvas.width,height:canvas.height,
+            pngBytes:Math.floor(encoded.length*.75)});
+        }
+        return results;
+      });
+      console.log('THEME_SATIN_RASTER_METADATA '+JSON.stringify(rasterized.map(({selector,width,height,pngBytes})=>({selector,width,height,pngBytes}))));
+      const rasterOverride=await page.addStyleTag({content:rasterized
+        .map(({selector,encoded})=>'html body '+selector+'{background-image:url("'+encoded+'")!important}')
+        .join('\n')});
+      for(const direction of [true,false])variants.push(await runThemeTrial(direction,'test-only-lossless-png-background'));
+      await rasterOverride.evaluate(node=>node.remove());
       for(const direction of [true,false])variants.push(await runThemeTrial(direction,'baseline-warm'));
       const metric=r=>({
         variant:r.variant,dark:r.direction,

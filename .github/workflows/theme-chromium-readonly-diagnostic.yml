@@ -48,7 +48,7 @@ jobs:
           }
       - name: Measure independent empty-page Chromium compositor baseline
         run: node scripts/qa-theme-frame-scheduler-baseline.mjs
-      - name: Run compositor isolation trials with original strict gates (GET only)
+      - name: Compare rasterized satin artwork and Chrome frame trace (GET only)
         env:
           SD_THEME_DIAGNOSTIC_VARIANTS: '1'
           SD_THEME_TRACE: '1'
