@@ -50,3 +50,18 @@ Read-only audit and preflight only, on `audit/import-218-921-readonly-2026-10-26
 - A reversible atomic D1 visibility swap script `scripts/owner-atomic-218-catalog-swap.mjs` and a protected workflow `.github/workflows/owner-atomic-218-catalog-swap.yml` have been prepared, but the required explicit trigger `docs/import/RUN-OWNER-218-CATALOG-SWAP.trigger` intentionally does not exist. The script checks live Production HTML for dynamic filters before changing any D1 row, confirms private full backup + all 921 WebP objects, updates the 237 old and 218 new products atomically, verifies the public API has exactly 218 new and zero old, and rolls back automatically if post-validation fails. It does NOT delete historical product rows; this protects 6 order_item links to 5 old IDs until archived snapshots are ready.
 - Source syntax validation of the staged swap workflow **#40347387909 PASS**. Syntax PASS does not mean cutover PASS.
 - Next: merge/deploy the already-existing owner-approved integration / dynamic category code through its own review and QA process; re-run public frontend readiness check; only then add the explicit swap trigger and verify PC/mobile product cards, deep links and 15-category filters. Never overwrite or delete catalog rows while the production filter check is unresolved.
+
+## FINAL OWNER CUTOVER — VERIFIED PASS — 26 Oct 2026, 15:40 UTC
+
+- User explicitly authorized hiding all old products and publishing the imported replacements.
+- Production hotfix PR #121 (dynamic D1 category filters) merged into `main` at `31f395a0ac5bdbee94b398ad559414bce607dec0` and Production deployment Actions #40349734663 PASS. No merge of draft PR #118 or PR #119; theme/Welcome preserved.
+- Guarded catalog visibility swap **#40351175590 PASS**, `productionWrites=1`, `swapped=true`, `rolledBack=false`; 237 legacy records unpublished and retained for historical order references, 218 owner-imported records published. Zero product deletions and order-history writes.
+- Independent Production-only read audit **#40351570849 PASS**: D1 contains 455 records = 237 old **hidden**, 218 new **published**; `/api/products` lists 218 imported products, **zero** old public products. New 218 SKUs unique, 921 referenced WebP URLs, 15 categories, data identical to original Preview. Production dynamic category filter PASS. No issues reported.
+- The 921 optimized WebPs and 921 separately stored private original files had previously passed Production R2 readback. A private SQL backup from before the swap is retained in Production R2; do not delete it.
+- **68 of the 218 new records have no confirmed selling price.** This is *not* a data-integrity failure and must not be silently filled with fictional values. Commercial review of prices and image-color annotations can continue without undoing the catalog swap.
+- Final state is **DONE** for the requested old-for-new visibility cutover. Storefront PC/mobile visual browsing and per-image content semantics beyond metadata require separate owner QA, not implied by the aggregate API PASS.
+
+Evidence:
+- https://github.com/chichute5500/Sindarealest-admin/actions/runs/40349734663
+- https://github.com/chichute5500/Sindarealest-admin/actions/runs/40351175590
+- https://github.com/chichute5500/Sindarealest-admin/actions/runs/40351570849
