@@ -8,8 +8,8 @@ import { S3Client,PutObjectCommand,HeadObjectCommand,GetObjectCommand } from "@a
 import { setTimeout as sleep } from "node:timers/promises";
 const account=process.env.CLOUDFLARE_ACCOUNT_ID||"";
 const token=process.env.CLOUDFLARE_API_TOKEN||"";
-const access=process.env.R2_ACCESS_KEY_ID||"";
-const secret=process.env.R2_SECRET_ACCESS_KEY||"";
+const access=process.env.R2_PRODUCTION_ACCESS_KEY_ID||"";
+const secret=process.env.R2_PRODUCTION_SECRET_ACCESS_KEY||"";
 const output={operation:"PRODUCTION_D1_FULL_SQL_PRIVATE_BACKUP_ONLY",productionWritesToD1:0,productChanges:0,
   productionR2PrivateBackupWritten:false,backupVerified:false,success:false};
 const requireSafe=(x,msg)=>{if(!x)throw Error(msg)};
