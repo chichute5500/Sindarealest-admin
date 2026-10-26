@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { validateProduct } from "../functions/_lib.js";
 import { readFileSync } from "node:fs";
-import { parseCsv, buildImportPlan, normPath, MAX_IMAGES_PER_PRODUCT, categoryForImport } from "../public/admin/import-core.mjs";
+import { parseCsv, buildImportPlan, normPath, MAX_IMAGES_PER_PRODUCT, categoryForImport, folderPriceHint, confirmedVndPrice, normalizeImageColor } from "../public/admin/import-core.mjs";
 
 const csv = "\uFEFFẢnh gốc,Ảnh kết quả,Danh mục,Mẫu,Màu,Ghi chú\r\n" +
  '"A,1","Clutch\\M0023 - Clutch Nap\\Nâu\\anh (1).webp",Clutch,"Clutch, Nắp",Nâu,Cần xem lại\r\n' +
@@ -26,6 +26,15 @@ assert.equal(plan.groups[0].selected,true);
 assert.equal(plan.groups[0].title,"Clutch Nap");
 assert.equal(plan.matched,2);
 assert.equal(plan.missing,0);
+assert.equal(plan.groups[0].modelId,"M0023","M-folder code is metadata, not a commercial SKU");
+assert.equal(plan.groups[0].priceInput,"","No price is auto-assigned from folder name");
+assert.equal(folderPriceHint("M0023 - Clutch Mau Den 2200K"),2200000,"Folder K amounts are unconfirmed hints");
+assert.equal(confirmedVndPrice("2200000"),2200000);
+assert.equal(confirmedVndPrice(""),null,"Unset selling prices remain null");
+assert.throws(()=>confirmedVndPrice("2200K"),/số nguyên VND/);
+assert.throws(()=>confirmedVndPrice("-1"),/số nguyên VND/);
+assert.equal(normalizeImageColor("  Xanh dương  "),"Xanh dương");
+
 assert.equal(plan.unlisted,0,"Every source image is accounted for");
 assert.equal(plan.reviewRows,1,"CSV review markers remain visible");
 const unlisted=buildImportPlan(rows,[...files,{name:"not-in-CSV.webp",size:500,type:"image/webp",webkitRelativePath:"KET_QUA_NHOM_MAU/Clutch/M0023 - Clutch Nap/Đen/not-in-CSV.webp"}]);
@@ -62,13 +71,18 @@ assert.deepEqual(categoryForImport("Giày thể thao"),{apiCategory:"Sneaker",ca
 assert.deepEqual(categoryForImport("Ốp"),{apiCategory:"Ốp điện thoại",categoryLabel:"Ốp"});
 assert.deepEqual(categoryForImport("ví cầm tay"),{apiCategory:"ví cầm tay",categoryLabel:"ví cầm tay"});
 const sampleImages=Array.from({length:44},(_,i)=>"images/sample"+i+".webp");
-const accepted=validateProduct({title:"Một mẫu 44 ảnh",sku:"TEST-044",category:"Clutch",published:false,images:sampleImages});
+const colorValues=sampleImages.map((_,i)=>i<20?"Đen":i<35?"Nâu":"Xanh");
+const accepted=validateProduct({title:"Một mẫu 44 ảnh",sku:"SD-CL001",category:"Clutch",published:false,price:2200000,images:sampleImages,imageColors:colorValues});
 assert.equal(accepted.error,undefined,"Server must accept full 44 images within one model");
 assert.equal(accepted.value.images.length,44);
+assert.deepEqual(accepted.value.imageColors,colorValues);
+assert.equal(accepted.value.price,2200000,"Seller-confirmed price persisted");
 assert.equal(accepted.value.published,0,"Imported 44-image model remains unpublished");
 const rejected=validateProduct({title:"Quá số ảnh",sku:"TEST-051",category:"Clutch",published:false,
   images:[...sampleImages,...Array.from({length:7},(_,i)=>"images/extra"+i+".webp")]});
 assert.match(rejected.error,/Bộ ảnh không hợp lệ/,"Server blocks >50 images without dropping pictures");
+const invalidColors=validateProduct({title:"Màu không khớp",sku:"SD-CL003",category:"Clutch",published:false,images:sampleImages,imageColors:["Nâu"]});
+assert.match(invalidColors.error,/Số nhãn màu/);
 
 assert.throws(()=>parseCsv("a,b\n1"),/Thiếu cột/);
 assert.throws(()=>parseCsv("Ảnh kết quả,Danh mục,Mẫu\n\"unfinished"),/nháy chưa đóng/);
