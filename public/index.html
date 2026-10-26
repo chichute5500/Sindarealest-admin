@@ -1115,8 +1115,88 @@ function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDra
 function iconBag(){return '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>'}
 function setThemeIcon(){const dark=document.documentElement.classList.contains('dark');$('#themeIcon').innerHTML=dark?'<path d="M20.2 15.4A8 8 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42-1.42m11.3-11.3 1.42-1.42"/>';const mode=document.documentElement.dataset.themeMode||'auto';$('#themeToggle').setAttribute('aria-label',mode==='auto'?'Đang theo giao diện thiết bị. Nhấn để đổi chế độ thủ công':dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối');$('#themeToggle').title=mode==='auto'?'Theo giao diện thiết bị':`Chế độ ${dark?'tối':'sáng'} (thủ công)`}
 function syncThemeMeta(){const dark=document.documentElement.classList.contains('dark');const meta=$('meta[name="theme-color"]');if(meta)meta.content=dark?'#061522':'#eaf3fb'}
-function applyThemeMode(mode,animate=true){const root=document.documentElement;const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);const smooth=animate&&!reduced;root.classList.toggle('theme-transitioning',smooth);root.dataset.themeMode=mode;const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);root.classList.toggle('dark',mode==='dark'||(mode==='auto'&&systemDark));syncThemeMeta();setThemeIcon();clearTimeout(window.__sdThemeTimer);if(smooth)window.__sdThemeTimer=setTimeout(()=>root.classList.remove('theme-transitioning'),290)}
-function toggleTheme(){const root=document.documentElement;const dark=root.classList.contains('dark');const next=dark?'light':'dark';try{localStorage.setItem('sd-theme-mode',next)}catch(e){}applyThemeMode(next,true)}
+// Begin the three visible 220ms transitions without invalidating hundreds
+// of root-dependent catalog styles. Commit the full palette on the FIRST
+// observed nav transition frame, never at an arbitrary click-time delay.
+// This preserves the approved glass/SVG and lets the compositor lead.
+function applyThemeMode(mode,animate=true){
+  const root=document.documentElement;
+  const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const smooth=animate&&!reduced;
+  const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const targetDark=mode==='dark'||(mode==='auto'&&systemDark);
+  clearTimeout(window.__sdThemeTimer);
+  if(typeof window.__sdCancelThemeStage==='function')window.__sdCancelThemeStage();
+  const nav=$('.nav'),lightBg=$('.theme-bg--light'),darkBg=$('.theme-bg--dark');
+  const bottomNav=$('.mobile-bottom-nav');
+  root.dataset.themeMode=mode;
+  if(!smooth||!nav||!lightBg||!darkBg||targetDark===root.classList.contains('dark')){
+    root.classList.toggle('dark',targetDark);
+    root.classList.remove('theme-transitioning');
+    window.__sdThemeTargetDark=null;
+    syncThemeMeta();setThemeIcon();
+    return;
+  }
+  window.__sdThemeTargetDark=targetDark;
+  let committed=false,finished=false;
+  const releaseStyles=()=>{
+    nav.style.removeProperty('background-color');
+    lightBg.style.removeProperty('opacity');
+    darkBg.style.removeProperty('opacity');
+    bottomNav?.style.removeProperty('background-color');
+  };
+  const commitPalette=()=>{
+    if(committed)return;
+    committed=true;
+    root.classList.toggle('theme-transitioning',smooth);
+    root.classList.toggle('dark',targetDark);
+    syncThemeMeta();setThemeIcon();
+  };
+  const finish=()=>{
+    if(finished)return;
+    finished=true;
+    clearTimeout(window.__sdThemeTimer);
+    nav.removeEventListener('transitionstart',onStart);
+    nav.removeEventListener('transitionend',onEnd);
+    commitPalette();
+    releaseStyles();
+    root.classList.remove('theme-transitioning');
+    window.__sdThemeTargetDark=null;
+    window.__sdCancelThemeStage=null;
+  };
+  const onStart=event=>{
+    if(event.target===nav&&event.propertyName==='background-color')commitPalette();
+  };
+  const onEnd=event=>{
+    if(event.target===nav&&event.propertyName==='background-color')finish();
+  };
+  window.__sdCancelThemeStage=()=>{
+    if(finished)return;
+    finished=true;
+    clearTimeout(window.__sdThemeTimer);
+    nav.removeEventListener('transitionstart',onStart);
+    nav.removeEventListener('transitionend',onEnd);
+    releaseStyles();
+    root.classList.remove('theme-transitioning');
+    window.__sdCancelThemeStage=null;
+  };
+  nav.addEventListener('transitionstart',onStart);
+  nav.addEventListener('transitionend',onEnd);
+  nav.style.setProperty('background-color',targetDark?'rgba(4,20,34,.94)':'rgba(244,250,255,.94)','important');
+  lightBg.style.setProperty('opacity',targetDark?'0':'1','important');
+  darkBg.style.setProperty('opacity',targetDark?'1':'0','important');
+  if(bottomNav)bottomNav.style.setProperty('background-color',targetDark?'rgba(5,24,40,.995)':'rgba(244,250,255,.94)','important');
+  // Safety fallback if the element loses its transition events (e.g. hidden
+  // tab). Real devices complete via transitionend; never cut off a live fade.
+  window.__sdThemeTimer=setTimeout(finish,560);
+}
+function toggleTheme(){
+  const root=document.documentElement;
+  const dark=typeof window.__sdThemeTargetDark==='boolean'?window.__sdThemeTargetDark:root.classList.contains('dark');
+  const next=dark?'light':'dark';
+  try{localStorage.setItem('sd-theme-mode',next)}catch(e){}
+  applyThemeMode(next,true);
+}
 function setupSystemTheme(){const media=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');if(!media)return;const onChange=()=>{if((document.documentElement.dataset.themeMode||'auto')==='auto')applyThemeMode('auto',true)};if(media.addEventListener)media.addEventListener('change',onChange);else if(media.addListener)media.addListener(onChange)}
 function uniqueImages(list){return [...new Set(list.flatMap(p=>(p.images||[]).map(imgPath)).filter(Boolean))]}
 function visibleSku(p){return p&&p.skuVerified!==false?String(p.sku||'').trim():''}
