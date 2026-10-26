@@ -43,7 +43,7 @@ export async function onRequestGet({ request, env }) {
         shippingBenefit, freeShippingEligible, freeShipping,
         amount:null, transferReference:requestRow.transfer_reference,
         message:freeShipping ? "Đã xác minh thanh toán đủ. Đơn đủ điều kiện miễn phí giao hàng." :
-          (order.payment_status === "paid" ? "Admin đã xác minh đơn được thanh toán đủ." : "Yêu cầu thanh toán trước đã kết thúc; hãy chờ SinDarealest tạo đợt tiếp theo."),
+          (order.payment_status === "paid" ? "Shop đã xác minh đơn được thanh toán đủ." : "Yêu cầu thanh toán trước đã kết thúc; hãy chờ SinDarealest tạo đợt tiếp theo."),
         createdAt:requestRow.created_at
       },200,PRIVATE_PAYMENT_HEADERS);
     }
@@ -68,7 +68,7 @@ export async function onRequestGet({ request, env }) {
       transferReference:requestRow.transfer_reference,
       qrImageUrl:"/payment-qr/"+requestRow.qr_image_key, bankName:requestRow.bank_name,
       accountNumber:requestRow.account_number, accountName:requestRow.account_name,
-      instructions:"Nhập số tiền hiển thị ngoài QR trong ứng dụng ngân hàng; ghi đúng nội dung chuyển khoản. Mở/quét QR không xác nhận đã thanh toán. Freeship chỉ được áp dụng sau khi Admin xác minh đã nhận đủ toàn bộ số tiền.",
+      instructions:"Nhập số tiền hiển thị ngoài QR trong ứng dụng ngân hàng; ghi đúng nội dung chuyển khoản. QR không nhúng tiền và quét QR không đồng nghĩa đã thanh toán. Giảm 5% và freeship cho thanh toán đủ sau khi Shop xác minh đã nhận đủ tiền.",
       createdAt:requestRow.created_at
     },200,PRIVATE_PAYMENT_HEADERS);
   } catch { return fail("Không đọc được hướng dẫn thanh toán.",503); }
