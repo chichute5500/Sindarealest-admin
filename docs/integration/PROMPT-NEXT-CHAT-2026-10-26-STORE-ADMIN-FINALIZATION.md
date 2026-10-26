@@ -1,39 +1,38 @@
-# PROMPT CHAT MỚI — SINDAREALEST: HOÀN THÀNH TÍCH HỢP WEB (26/10/2026)
+# PROMPT BÀN GIAO CHAT MỚI — SINDAREALEST STOREFRONT + ADMIN
+**Ngày bàn giao 26/10/2026. Đây là dự án đang triển khai, KHÔNG tạo dự án mới.**
 
-> **MỚI NHẤT, 26/10/2026, CHECKPOINT REMOTE D1 E2E ĐÃ PASS:** Đã bổ sung `scripts/qa-storefront-remote-preview-order.mjs` và job độc lập `remote-order-qa` trong workflow tích hợp. SOURCE `9c5c09ebe972e57c2d564fec0ad79087c989f000`: [Actions #40279420747](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279420747) **SUCCESS 3/3 jobs**: 8/8 UI và 4/4 browser checkout disposable, D1/R2 Preview tách Production, và **1 đơn thật được ghi qua POST /api/orders lên D1 Preview**, Admin login/đọc đơn/xác nhận giá/terms, test token/CSRF/fail-closed/hủy, **cleanupVerified=true, productionWrites=0, realTransfers=0**; artifact remote E2E `12631321770`, screenshot `12632006392`, 22/22 assertions remote PASS. QR/ledger/freeship/refund chỉ thử real handlers **trên SQLite disposable**, không ghi nhận tiền không có thật trên remote Preview. **Workflow Admin isolated sai nhánh đã được sửa** (commit `cb9398b98f8ccdb1b3d0ca9dca8cc55473a9c5dd`): [run #40279463538](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279463538) SKIPPED theo intended-branch guard, CI [#40279463469](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279463469) và Admin Preview [#40279463480](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279463480) PASS. **Phần kỹ thuật thử nghiệm chính đã đóng. BƯỚC TIẾP: kiểm lại HEAD/main/PR #118 (DRAFT, no merge), trình Preview+ảnh để OWNER DUYỆT BẢN TÍCH HỢP MỘT LẦN; chỉ sau owner explicit authorization mới merge Production và kiểm tra SHA/API/rollback. Không làm lại gì đã OWNER PASS.** Đọc [báo cáo QA đã cập nhật](./QA-DISPOSABLE-CHECKOUT-RELEASE-GATE-2026-10-26.md) trước khi hành động. Nội dung cũ ghi "remote E2E chưa làm" là checkpoint lịch sử, không lặp lại.
+## NHIỆM VỤ
+Tiếp tục trực tiếp trên GitHub repository `chichute5500/Sindarealest-admin` bằng connector GitHub. Đừng hỏi lại lịch sử, đừng bắt người dùng dán tài liệu khác. Trước tiên đọc:
+1. **CHECKPOINT CHÍNH THỨC MỚI NHẤT:** [`docs/integration/HANDOFF-STORE-ADMIN-OWNER-ACCEPTANCE-2026-10-26.md`](./HANDOFF-STORE-ADMIN-OWNER-ACCEPTANCE-2026-10-26.md)
+2. [`docs/integration/QA-DISPOSABLE-CHECKOUT-RELEASE-GATE-2026-10-26.md`](./QA-DISPOSABLE-CHECKOUT-RELEASE-GATE-2026-10-26.md)
+3. [`docs/integration/STOREFRONT-MAIN-OWNER-PASS-STAGING-2026-10-26.md`](./STOREFRONT-MAIN-OWNER-PASS-STAGING-2026-10-26.md)
 
+**Nhánh làm việc:** `integration/storefront-locked-on-main-2026-10-26`; **PR #118** [mở tại đây](https://github.com/chichute5500/Sindarealest-admin/pull/118). Tại checkpoint kiểm tra trước các commit tài liệu bàn giao: PR **OPEN/DRAFT**, mergeable true, NOT MERGED, branch HEAD `a314a020cdabd96eb3154da0feb82e140670c696`, main `db40af63965678598b0ebd3f3fe63865849dcf2e`, ahead 26 / behind 0. **Đã có commit tài liệu mới hơn** nên PHẢI truy vấn HEAD hiện tại ngay, không xem SHA cũ là HEAD.
 
-> **CHECKPOINT QA BỔ SUNG 26/10/2026 — ƯU TIÊN HƠN THÔNG TIN CŨ BÊN DƯỚI.** SOURCE kiểm thử mới **`cfb9351424eea3d43a4fe2936a6f989be4dbe10a`** (HEAD có thể đã thêm commit tài liệu). Đã tạo E2E có thực thi đầy đủ Cloudflare Pages **route handlers** với một SQLite disposable áp dụng migration 0001–0009: Storefront tạo đơn, Admin xem/duyệt giá và terms, pending/active QR giả, payment request, ledger nhận tiền/hoàn tiền giả, paid/freeship/cancel, token/auth/CSRF/fail-closed; và Chromium **4/4 PC/Mobile sáng/tối** bấm UI trên Preview nhưng **POST chỉ gọi route handler ở địa chỉ cục bộ và DB disposable**. **0 remote writes, 0 real transfers**. Source CI PASS [#40277268196](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40277268196); Preview D1/R2 safety/deployed SHA, 8/8 browser UI + 4/4 browser checkout PASS [#40277262988](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40277262988); Admin Preview read-only PASS [#40277268193](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40277268193); screenshot artifact ID **12630847523**, expires 09/11/2026. **ĐỌC CHI TIẾT:** [QA-DISPOSABLE-CHECKOUT-RELEASE-GATE-2026-10-26.md](./QA-DISPOSABLE-CHECKOUT-RELEASE-GATE-2026-10-26.md). Workflow Admin isolated branch guard [#40277268183](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40277268183) FAIL do chạy sai nhánh, không gọi tất cả xanh. **CHƯA chứng minh remote Preview D1 POST hay ngân hàng thật; chưa OWNER nghiệm thu tổng thể; PR #118 DRAFT CHƯA MERGE; cấm deploy Production.** Không làm lại phần UI Owner PASS. Việc tiếp theo: xác minh branch/main/PR HEAD; nếu Owner yêu cầu Gate remote Preview D1 thì dùng D1/R2 test cách ly độc lập có chứng cứ, còn không trình Preview+ảnh để Owner nghiệm thu tích hợp và chỉ xin phép merge sau acceptance.
+## ĐÃ HOÀN THÀNH / BẰNG CHỨNG
+- **Nguồn code được triển khai và QA Preview thật:** `9c5c09ebe972e57c2d564fec0ad79087c989f000`; [GitHub Actions #40279420747](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279420747), **SUCCESS 3/3 jobs**.
+- **D1/R2 Preview tách Production + deploy đúng SHA: PASS.** Preview tích hợp: https://integration-storefront-locke.sindarealest-admin-preview.pages.dev/ .
+- **E2E remote D1 thật: 22/22 PASS**: 1 đơn giả qua `POST /api/orders` đến D1 Preview, Admin đăng nhập/nhìn thấy/xác nhận giá và điều khoản/hủy; test hash token/auth/CSRF, chặn QR trước xác nhận và không cho client sửa số tiền; **`cleanupVerified=true`, `productionWrites=0`, `realTransfers=0`**. [Artifact báo cáo #12631321770](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279420747/artifacts/12631321770).
+- **UI Chromium 8/8 PASS**, PC/Mobile sáng/tối; **checkout browser disposable 4/4 PASS** với HTML Preview thật + POST intercept vào SQLite cục bộ. [Ảnh, JSON artifact #12632006392](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279420747/artifacts/12632006392), hết hạn 09/11/2026.
+- **E2E backend thanh toán QR/ledger nhận tiền giả/hoàn tiền giả/freeship/cancel PASS** với route handlers trên **SQLite disposable**, migration đến 0009; **CHƯA làm remote Preview ledger/QR write, CHƯA chuyển tiền thật, CHƯA xác nhận bank thật**. Không nói vượt phạm vi.
+- **Workflow Admin isolated chạy sai branch đã được sửa thành SKIPPED đúng điều kiện** trên PR này, giữ nguyên guard SHA của nhánh Admin thật. [Run #40279918616](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279918616) SKIPPED. CI tại checkpoint `a314a020c` [#40279918700](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279918700) PASS; Admin Preview [#40279918598](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40279918598) PASS.
+- Các commit sau source QA trong checkpoint chỉ sửa workflow Admin branch guard và các file docs; **không sửa app/UI/backend/payment**.
+- **HERO, Welcome, Gallery, các ô dịch vụ, Liquid Glass, hiệu ứng bay CẢ ô sản phẩm vào giỏ, giao diện Admin đã Owner PASS và KHÓA. KHÔNG thiết kế/sửa lại.**
+- **main/Production chưa đổi; PR #118 vẫn DRAFT chưa merge.**
 
+## NHỮNG VIỆC CHƯA XONG — THỰC HIỆN THEO THỨ TỰ
+1. **Xác minh lại trạng thái thực tế:** `get_pr_info` PR118, main vs integration compare/diff/CI/latest branch HEAD, xem có mã app mới sau SHA PASS không. Chỉ báo PASS khi có logs. Không coi CI SKIPPED là FAIL; không coi remote D1 E2E chưa làm.
+2. **Đưa Owner nghiệm thu BẢN TÍCH HỢP CUỐI**: cung cấp link Preview và ảnh artifact, hướng dẫn nhìn PC/Mobile, sáng/tối, trang chủ, danh mục, cart, checkout và Admin. Chỉ so regression, không hỏi duyệt lại từng thành phần đã PASS. Báo rõ QA kỹ thuật xong và giới hạn payment test.
+3. **Nếu có lỗi thật Owner phát hiện:** sửa an toàn đúng phạm vi trên branch integration, chạy lại đủ QA, cập nhật PR và docs. Không tự sửa các module owner PASS khi chưa có lỗi có chứng cứ.
+4. **Chỉ sau khi có sự cho phép rõ ràng của Owner:** recheck CI/security/branch/Production binding, chuẩn bị rollback, rồi merge PR118/deploy Production trong quyền được cho phép và verify deployed commit/API/order/catalog. **Không tự merge, không deploy, không ghi Production, không thử chuyển tiền** chỉ vì người dùng bảo “tiếp tục”.
+5. Cập nhật hồ sơ bàn giao khi có sự kiện mới. Nếu Owner chưa cho phép merge, **dừng ở gate chờ Owner nghiệm thu**, trình rõ việc chờ quyết định; không báo “100% hoàn thành”.
 
-**Tiếp tục trực tiếp**, KHÔNG tạo dự án mới, KHÔNG hỏi người dùng lặp lịch sử. Repo GitHub `chichute5500/Sindarealest-admin`. Đầu tiên truy xuất tài liệu `docs/integration/STOREFRONT-MAIN-OWNER-PASS-STAGING-2026-10-26.md` trên branch `integration/storefront-locked-on-main-2026-10-26`, rồi xác minh SHA/PR/CI/Preview trực tiếp trên GitHub.
+## NGUYÊN TẮC BẮT BUỘC
+- Không chỉnh `main`, không force push, không merge/deploy Production nếu Owner chưa phê duyệt rõ ràng.
+- Không chạy bất kỳ test ghi nào trên Preview cũ `fix-liquid-glass-audit-2026.sindarealest2.pages.dev` vì rủi ro binding Production. Trước mọi QA ghi vào Preview phải đối chiếu chính xác DB và R2 khác Production.
+- Không ghi ledger chuyển tiền hoặc hoàn tiền giả lên remote DB dùng chung. QR/ledger/freeship/refund đã PASS trong môi trường disposable.
+- Không làm lại HERO/Welcome/Gallery/cart flight/Admin owner PASS. Không thay logo hoặc màu nhận diện trái mẫu.
+- Tận dụng song song các lượt **đọc** độc lập; các lượt cập nhật GitHub tuần tự, kiểm HEAD và file blob SHA trước mỗi ghi.
+- Báo cáo chính xác: **technical QA PASS không đồng nghĩa owner acceptance, merge hay Production PASS**.
 
-## Checkpoint đã kiểm chứng
-- Production Admin `main` ở `db40af63965678598b0ebd3f3fe63865849dcf2e` khi bàn giao. User đã triển khai Admin lên main. Nếu main thay đổi, lấy trạng thái mới trước khi sửa.
-- Branch tích hợp `integration/storefront-locked-on-main-2026-10-26`; **last full source QA SHA** `dd72ed1ec1d3854ef43d6d707259915c698e4b86`. HEAD có thể đã thêm commit tài liệu, hãy so diff, đừng đánh mất SHA PASS.
-- **PR #118**, OPEN/DRAFT/mergeable, **CHƯA MERGE**: https://github.com/chichute5500/Sindarealest-admin/pull/118.
-- **CI PASS**: Actions #40274309066 và #40274305508.
-- **Isolated Preview full pipeline PASS** Action #40274305506, cả hai jobs gồm SHA/binding isolation, deploy + Chromium 8/8 PC/Mobile sáng–tối PASS, GET API public PASS; screenshot artifact `storefront-main-integration-dd72ed1ec1d3854ef43d6d707259915c698e4b86`, id `12629383033`, exp 09/11/2026.
-- Live isolated Preview: https://integration-storefront-locke.sindarealest-admin-preview.pages.dev/ (Cloudflare rút gọn alias, không dùng URL dài).
-- Admin Preview Playwright PASS #40274308968. Một workflow riêng "Admin isolated Preview Playwright" #40274309155 FAIL ở branch guard vì đây không phải nhánh Admin isolated; điều tra đúng phạm vi, đừng báo tất cả đều xanh.
-- Nguồn Storefront owner PASS: `fix/liquid-glass-audit-2026-10-19` @ `4feacf7`. HERO code-only owner PASS, Welcome 12/12 PASS, Gallery, các ô dịch vụ, layout và **bay CẢ ô sản phẩm vào giỏ** đã được owner PASS. **KHÓA THIẾT KẾ — KHÔNG SỬA/RENDER/DỰNG LẠI PHẦN PASS**. Admin trên main đã hoàn tất, không thiết kế lại.
-- Không merge bừa PR #108 hay PR #113 cũ; PR #118 đã tích hợp chọn lọc trên main mới.
-
-## NHỮNG VIỆC CHƯA HOÀN THÀNH — LÀM NGAY, ĐA LUỒNG
-**L1 (Git/CI & security):** Kiểm tra branch/PR118/compare với main mới nhất, CI, drift/mergeable, Preview D1/R2 KHÔNG trùng Production; xử lý các gate CI còn lỗi đúng nguyên nhân, không bỏ bảo vệ.
-
-**L2 (E2E checkout + Admin + payment):** Đây là GATE QUAN TRỌNG. Audit Chromium trước **chặn mọi method ghi** và mock public catalog; 8/8 PASS **không** đồng nghĩa luồng mua hàng thật đã test. Dùng **chỉ D1/R2 Preview cách ly hoặc disposable local fixtures** để chạy giỏ → checkout → POST tạo đơn → snapshot/mã `orderAccessToken` → Admin nhận đơn → admin xác nhận giá → QR active/payment request → trạng thái nhận tiền/ledger/freeship/refund/cancel. Thử cả điều kiện fail-closed và CSRF, không chuyển tiền thật, không dùng dữ liệu Production. Báo PASS dựa trên request/response/DB evidence thực, thất bại thì sửa đúng phạm vi và chạy lại.
-
-**L3 (browser regression):** Đồng thời chạy Playwright trên Preview đúng SHA, PC/Mobile sáng/tối; kiểm tra các phần đã owner PASS chỉ để phát hiện regression tích hợp: Welcome first paint, HERO ngắn mobile, tiếng Việt, Gallery, sản phẩm, tương tác cart, checkout, accessibility, CSS không chồng. Chụp/snapshot đối chiếu. Tuyệt đối không chỉnh sửa thẩm mỹ phần PASS.
-
-**L4 (release/handoff):** Rà API đường dẫn `/sanpham/{category}/{verifiedSKU-or-id}`, sitemap, legacy redirect, public catalog, migrations D1 0009, các API mới, deployment bindings; chuẩn bị checklist QA + rollback; cập nhật docs/pr evidence. Làm song song với L1/L2/L3, không chờ khi không phụ thuộc.
-
-## Quy tắc an toàn và kết thúc
-1. Không chạy workflow test ghi trên Preview fix cũ `fix-liquid-glass-audit-2026.sindarealest2.pages.dev` vì có rủi ro binding Production; mọi ghi thử chỉ ở Preview cách ly đã verify DB/R2 khác Production.
-2. Chỉ sửa nhánh tích hợp, giữ `main` không đổi, không force-push, không sửa backend thanh toán Admin nếu không có bug có bằng chứng.
-3. Không nói dự án "100%" nếu chưa thực sự đóng E2E + nghiệm thu tích hợp + được owner cho phép merge + xác minh Production.
-4. Không hỏi lại phần người dùng đã PASS; chỉ xin quyết định của owner ở bước cuối cần xác nhận merge/deploy.
-5. Khi xong các gate: gửi link Preview + ảnh + logs + báo cáo từng PASS/FAIL, rồi xin quyền merge PR #118 sang `main`; nếu được cho phép thì mới merge và xác minh Production. Không tự triển khai.
-6. Làm việc đa luồng/Promise.all với nhiệm vụ độc lập, kiểm tra commit mới nhất trước khi ghi, không bịt lỗi bằng bỏ bài test. Báo cáo tiến triển đúng sự thật, tiếp tục xử lý ngay các việc còn khả thi. Không hứa tự làm sau khi chat kết thúc.
-
-**Ưu tiên số 1:** E2E đơn hàng và thanh toán trên isolated D1/R2. **Giữ nguyên HERO, Welcome, Gallery, cart flight, Admin và UI đã được PASS.**
+**Yêu cầu chat mới:** Đọc nguồn bàn giao, kiểm tra trực tiếp, báo cáo cho Owner trạng thái thật và đưa bản Preview tích hợp để Owner quyết định. Không bắt Owner dán lại lịch sử.
