@@ -83,7 +83,7 @@ try{
   await page.screenshot({path:"artifacts/bulk-import-preview/screenshots/desktop-review.png",fullPage:true});
   page.once("dialog",dialog=>dialog.accept());
   await page.locator("#import").click();
-  await page.waitForFunction(()=>document.querySelector("#status")?.textContent?.includes("Đã tạo 1/1 mẫu nháp"),null,{timeout:35000});
+  await page.waitForFunction(()=>document.querySelector("#status")?.textContent?.includes("Đã tạo thêm 1/1 mẫu nháp"),null,{timeout:35000});
   assert.equal(uploads,3,"One transient R2 503 is retried and two unique images succeed");
   assert.equal(drafts.length,1);
   assert.equal(drafts[0].published,false);
