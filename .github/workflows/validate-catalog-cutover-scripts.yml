@@ -1,0 +1,28 @@
+name: Validate catalog cutover scripts (no Cloudflare access)
+on:
+  push:
+    branches:
+      - audit/import-218-921-readonly-2026-10-26
+    paths:
+      - scripts/stage-imported-r2-to-production-2026-10-26.mjs
+      - scripts/backup-production-d1-private-r2-2026-10-26.mjs
+      - .github/workflows/stage-imported-r2-to-production-2026-10-26.yml
+      - .github/workflows/validate-catalog-cutover-scripts.yml
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Validate backup and staging JavaScript syntax, no secrets and no writes
+        run: |
+          node --check scripts/backup-production-d1-private-r2-2026-10-26.mjs
+          node --check scripts/stage-imported-r2-to-production-2026-10-26.mjs
+          node --check scripts/inspect-r2-cutover-access-readonly.mjs
