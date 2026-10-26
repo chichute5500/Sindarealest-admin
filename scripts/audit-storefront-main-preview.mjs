@@ -72,7 +72,9 @@ try{
   const splash=page.locator('#welcomeSplash');
   if(await splash.isVisible()){
    const skip=page.locator('#skipIntro');
-   if(await skip.isVisible())await skip.click({timeout:5000});
+   // Welcome may auto-close between visibility probing and clicking.
+   // The subsequent wait still requires it to become fully hidden.
+   if(await skip.isVisible())await skip.click({force:true,timeout:1500}).catch(()=>{});
   }
   await page.waitForFunction(()=>{
    const el=document.querySelector('#welcomeSplash');
