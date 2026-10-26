@@ -658,5 +658,110 @@
     "allowD1R2ReQA": false,
     "allowMerge": false,
     "allowProductionChanges": false
+  },
+  "latestReview20261026": {
+    "head": "7856cfce64c173bb505bc65ad0116393509488d8",
+    "branch": "feature/admin-isolated-handoff-2026-10-20",
+    "pr111": {
+      "state": "OPEN",
+      "merged": false
+    },
+    "ci": {
+      "passed": 4,
+      "total": 4,
+      "runs": [
+        {
+          "id": 40265235004,
+          "name": "Validate source and tests (pull_request)",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        },
+        {
+          "id": 40265231897,
+          "name": "Validate source and tests (push)",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        },
+        {
+          "id": 40265234942,
+          "name": "Admin Preview Playwright",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        },
+        {
+          "id": 40265234943,
+          "name": "Admin isolated Preview Playwright",
+          "result": "SUCCESS",
+          "headSha": "7856cfce64c173bb505bc65ad0116393509488d8"
+        }
+      ]
+    },
+    "deployedAdminAppSha": "f9c992a614193722d2510755a24fb46dac20c4eb",
+    "lockedPassPreserved": [
+      "OWNER_12_UI_AND_BELL",
+      "ADMIN_R2_LIFECYCLE",
+      "DISPOSABLE_D1_RESTORE",
+      "SECURITY_KEYBOARD_PERFORMANCE_SMOKE",
+      "PREVIOUS_BUSINESS_UI_CHECKS"
+    ],
+    "newReview": {
+      "security": {
+        "state": "STATIC_REVIEW_NO_SUBSTANTIATED_EXPLOIT_FOUND",
+        "pentestSignoff": false,
+        "edits": 0,
+        "smokeRerun": false,
+        "residual": "Bearer token is request query input; Referrer-Policy no-referrer present; edge/access log handling unverified."
+      },
+      "accessibility": {
+        "state": "OPEN_MANUAL_ASSISTIVE_TECH_SIGNOFF",
+        "sourceReview": true,
+        "axeRerun": false,
+        "focusAndDialogSupportObserved": true,
+        "fieldErrorAssociationNeedsManualReview": true
+      },
+      "performance": {
+        "state": "OPEN_NEEDS_ISOLATED_MEASUREMENT",
+        "findings": [
+          "Serial startup data-load waterfall",
+          "Loads bounded lists before all screens are opened"
+        ],
+        "provenRegression": false,
+        "benchmarkRun": false,
+        "stressRun": false,
+        "edits": 0
+      },
+      "finance": {
+        "state": "OPEN_OWNER_RECONCILIATION_REQUIRED",
+        "sourceGuardsReviewed": true,
+        "bankEvidenceAvailable": false,
+        "realTransactions": false
+      },
+      "adminStorefrontContract": {
+        "state": "READ_ONLY_SOURCE_DRIFT_CONFIRMED",
+        "storefrontPR": 108,
+        "missingOnStorefront": [
+          "orderAccessToken returned by order creation",
+          "/api/order-payment",
+          "/api/payment-settings",
+          "public QR route",
+          "migrations/0009_fulfillment_and_manual_payments.sql"
+        ],
+        "adminSourceHasCorrespondingContracts": true,
+        "integrationApproved": false
+      }
+    },
+    "deferredNotPassed": [
+      "STOREFRONT_PREVIEW_DB_SHARES_PRODUCTION",
+      "STOREFRONT_PREVIEW_ORIGINALS_PRODUCTION_BACKED"
+    ],
+    "prohibited": [
+      "merge",
+      "main changes",
+      "Storefront PR #108 changes",
+      "Production changes",
+      "Cloudflare binding/secret changes",
+      "Storefront Preview writes",
+      "repeat locked PASS tests"
+    ]
   }
 }
