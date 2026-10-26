@@ -162,6 +162,17 @@ try{
    await page.locator('[data-sd-payment-option="full"]').click();
    assert.equal(await page.locator('#sdCheckoutSelectedAmount').textContent(),'142.500₫');
    await page.locator('[data-sd-payment-option="deposit"]').click();
+   const qrGeometry=await page.locator('#sdCheckoutQrImage').evaluate(img=>{
+     const qr=img.getBoundingClientRect(),shell=img.closest('.sd-checkout-qr-art').getBoundingClientRect(),
+       bank=document.querySelector('#sdCheckoutQrWrap .sd-checkout-bank-lines').getBoundingClientRect();
+     return {width:qr.width,height:qr.height,shellWidth:shell.width,shellHeight:shell.height,bankTop:bank.top,qrBottom:qr.bottom};
+   });
+   assert.ok(qrGeometry.width>=220,'QR too small: '+JSON.stringify(qrGeometry));
+   assert.ok(Math.abs(qrGeometry.width-qrGeometry.height)<=2,'QR image must be 1:1');
+   assert.ok(Math.abs(qrGeometry.shellWidth-qrGeometry.shellHeight)<=2,'QR holder must be 1:1');
+   assert.ok(qrGeometry.bankTop>=qrGeometry.qrBottom-2,'Bank copy fields must be below full-size QR');
+   await page.locator('#sdCheckoutQrImage').scrollIntoViewIfNeeded();
+   await page.screenshot({path:dir+'/'+spec.name+'-qr-large.png',animations:'disabled'});
    await page.screenshot({path:dir+'/'+spec.name+'-payment-step.png',animations:'disabled'});
    await page.locator('#checkoutSubmit').click();
    await page.locator('#sdCheckoutReviewStep').waitFor({state:'visible',timeout:10000});
