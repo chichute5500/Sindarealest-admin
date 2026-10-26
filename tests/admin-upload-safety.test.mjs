@@ -81,6 +81,18 @@ const failedDerivative = await uploadProductImage({
   env: { DB: {}, ADMIN_PASSWORD, SESSION_SECRET, ORIGINALS: rolledBackOriginals, IMAGES: failedPublicImages },
 });
 assert.equal(failedDerivative.status, 503, "partial image upload cannot claim success");
+assert.match((await failedDerivative.clone().json()).error,/IMAGES/,"Error should identify the failed bucket binding");
+assert.equal(failedDerivative.headers.get("Retry-After"),"5","Temporary R2 errors include retry guidance");
+const brokenOriginals={async put(){throw new Error("R2 temporarily unavailable");}};
+const noDerivative=bucket();
+const failedOriginal=await uploadProductImage({
+  request:makeRequest(),
+  env:{DB:{},ADMIN_PASSWORD,SESSION_SECRET,ORIGINALS:brokenOriginals,IMAGES:noDerivative},
+});
+assert.equal(failedOriginal.status,503);
+assert.match((await failedOriginal.clone().json()).error,/ORIGINALS/,"Original bucket failure must be distinguishable");
+assert.equal(noDerivative.puts.length,0,"Do not write derivative if original upload failed");
+
 assert.equal(rolledBackOriginals.puts.length, 1, "private original was staged first");
 assert.deepEqual(rolledBackOriginals.deletes, [rolledBackOriginals.puts[0].key],
   "failed public derivative must delete exactly its own newly staged private original");
