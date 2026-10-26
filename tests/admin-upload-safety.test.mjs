@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
 import { createSession } from "../functions/_lib.js";
 import { onRequestPost as uploadProductImage } from "../functions/api/admin/upload.js";
 
@@ -10,7 +11,7 @@ function bucket() {
   return {
     puts: [],
     deletes: [],
-    async put(key, bytes, options) { this.puts.push({ key, bytes: new Uint8Array(bytes), options }); },
+    async put(key, bytes, options) { this.puts.push({ key, bytes: bytes instanceof Blob ? new Uint8Array(await bytes.arrayBuffer()) : new Uint8Array(bytes), sourceWasBlob: bytes instanceof Blob, options }); },
     async delete(key) { this.deletes.push(key); },
   };
 }
@@ -42,6 +43,14 @@ const valid = await uploadProductImage({
 assert.equal(valid.status, 201, "a valid WebP derivative and original should upload");
 assert.equal(originals.puts.length, 1, "original should be stored privately");
 assert.equal(images.puts.length, 1, "optimized derivative should be stored in the public bucket");
+assert.equal(originals.puts[0].sourceWasBlob,true,"Originals are streamed to R2 from a File/Blob, without a full ArrayBuffer copy");
+assert.equal(images.puts[0].sourceWasBlob,true,"WebP files are streamed to R2 without a full ArrayBuffer copy");
+assert.deepEqual(originals.puts[0].bytes,webpBytes(),"Original bytes must remain unchanged");
+assert.deepEqual(images.puts[0].bytes,webpBytes(),"Optimized bytes must remain unchanged");
+const uploadSource=readFileSync(new URL("../functions/api/admin/upload.js",import.meta.url),"utf8");
+assert.doesNotMatch(uploadSource,/await\s+file\.arrayBuffer\(\)/,"Never materialize entire derivative bytes into Worker memory");
+assert.doesNotMatch(uploadSource,/await\s+original\.arrayBuffer\(\)/,"Never materialize entire original into Worker memory");
+
 assert.equal(originals.puts[0].options.customMetadata.visibility, "private-original");
 assert.equal(images.puts[0].options.customMetadata.visibility, "public-optimized-derivative");
 
