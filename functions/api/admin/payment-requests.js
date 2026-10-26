@@ -1,5 +1,5 @@
 import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
-import { validPublicQrImageKey, summarizePaymentRows } from "../../_payments.js";
+import { validPublicQrImageKey, summarizePaymentRows, discountedCheckoutFullAmount } from "../../_payments.js";
 
 function referenceCode() {
   return "SD" + Date.now().toString(36).toUpperCase() + crypto.randomUUID().replaceAll("-","").slice(0,8).toUpperCase();
@@ -66,11 +66,11 @@ export async function onRequestPost(context) {
     let shippingBenefit = "standard_shipping";
     if (paymentOption === "deposit") {
       if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; hãy chọn thanh toán số dư sau khi Admin đối chiếu.", 409);
-      amount = fulfillmentType === "made_to_order" ? Math.ceil(total * 0.3) : 100000;
+      amount = fulfillmentType === "made_to_order" ? Math.ceil((total * 0.3)/100000)*100000 : 100000;
       if (!Number.isSafeInteger(amount) || amount <= 0 || amount > total) return fail("Khoản đặt cọc theo quy định lớn hơn tổng tiền đơn; cần tư vấn thủ công.", 409);
     } else if (paymentOption === "full") {
       if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; không tạo lại yêu cầu thanh toán đủ. Hãy chọn thanh toán số dư.", 409);
-      amount = total;
+      amount = discountedCheckoutFullAmount(total);
       shippingBenefit = "free_shipping";
     } else {
       if (summary.netReceivedAmount <= 0 || summary.remainingBalance === null || summary.remainingBalance <= 0) return fail("Thanh toán số dư chỉ được tạo sau khi đã xác minh khoản nhận và còn dư phải thu.", 409);
@@ -78,7 +78,12 @@ export async function onRequestPost(context) {
     }
 
     const id = crypto.randomUUID();
-    const reference = referenceCode();
+    const selectedAudit = await db.prepare(
+      "SELECT details_json FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1"
+    ).bind(orderId).first();
+    let selected={};try{selected=JSON.parse(selectedAudit?.details_json||'{}')}catch{}
+    const requestedReference=selected.selectedPaymentOption===paymentOption ? String(selected.transferReference||'') : '';
+    const reference=/^[0-9]{4}-[A-Z0-9-]{1,36}-[A-Z2-9]{4}$/.test(requestedReference)?requestedReference:referenceCode();
 
     // Re-check the validated order and financial snapshot in the same atomic write
     // that creates the QR request. An order price/terms edit or verified transaction
