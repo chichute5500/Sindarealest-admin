@@ -13,7 +13,7 @@ assert.ok(lib.includes("Object.hasOwn(aliases, categoryKey)"), "product category
 assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
 assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
 assert.ok(read("../functions/api/warranty-lookup.js").includes("warranty_lookup:") && !read("../functions/api/warranty-lookup.js").includes("warrantyCode: code"), "Lookup API must return only masked codes plus short-lived action tokens");
-assert.ok(read("../functions/_middleware.js").includes("isVerifiedCommercialSku(product)") && read("../functions/_middleware.js").includes("encodeURIComponent(productKey)"), "Product canonical URL must use a verified SKU or immutable ID");
+assert.ok(read("../functions/_storefront-route.js").includes("isVerifiedCommercialSku(row)") && read("../functions/_storefront-route.js").includes("encodeURIComponent(key)") && middleware.includes("canonicalProductPath(product)"), "Product canonical URL must use a verified SKU or immutable ID and category route");
 assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
 assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should expand from existing product data");
 assert.ok(admin.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");
