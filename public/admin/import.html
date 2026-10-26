@@ -37,7 +37,7 @@
 </div>
 </main>
 <script type="module">
-import { parseCsv, buildImportPlan, MAX_IMAGES_PER_PRODUCT } from "./import-core.mjs";
+import { parseCsv, buildImportPlan, MAX_IMAGES_PER_PRODUCT, categoryForImport } from "./import-core.mjs";
 const $ = (id) => document.getElementById(id);
 let plan = null, stop = false, busy = false, checkpoint = null, checkpointKey = "", urls = [];
 const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -148,7 +148,8 @@ async function importGroup(group){
   }
   const previous=await inspectDuplicate(group,images);
   if(previous){checkpoint.drafts[group.key]=previous.id;saveCheckpoint();return;}
-  const payload={title,category:group.category,categoryLabel:group.category,
+  const targetCategory=categoryForImport(group.category);
+  const payload={title,category:targetCategory.apiCategory,categoryLabel:targetCategory.categoryLabel,
     published:false,skuVerified:false,description:"",price:null,stock:null,
     fulfillmentType:"unclassified",images};
   const res=await request("/api/admin/products",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
