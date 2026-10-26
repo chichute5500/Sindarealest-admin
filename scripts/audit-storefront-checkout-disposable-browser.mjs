@@ -105,7 +105,7 @@ try{
    }
    if(req.method()==='GET'&&url.origin===alias&&url.pathname==='/payment-qr/'+qrKey){
     // A real PNG transfer fixture, never a real bank QR and never a remote write.
-    const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAOb+YwAAAABJRU5ErkJggg==','base64');
+    const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8//8/AwMDEwMDAwMDAwAkBgMB/DXemwAAAABJRU5ErkJggg==','base64');
     await route.fulfill({status:200,contentType:'image/png',body:png});return;
    }
    if(req.method()!=='GET'&&req.method()!=='HEAD'){
@@ -174,7 +174,7 @@ try{
    const view=await admin.json();
    assert.equal(view.orders.length,index+1);
    assert.ok(view.orders.every(o=>o.items.length===1));
-   const latest=view.orders.find(o=>o.order_number===last[last.length-1].n);
+   const latest=view.orders.find(o=>o.phone==='000000030'+index);
    assert.equal(latest?.customer_payment_option,'deposit','Admin must see customer's selected deposit preference');
    assert.equal(Number(latest?.customer_payment_amount),100000,'Admin must receive server-derived amount, not browser amount');
    await page.screenshot({path:dir+'/'+spec.name+'.png',animations:'disabled'});
