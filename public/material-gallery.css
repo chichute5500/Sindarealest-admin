@@ -85,50 +85,43 @@ html.theme-transitioning,html.theme-transitioning body{
 }
 
 
-/* Owner-approved source-colour circular wipe, from words to page edges. */
+/* Android WebView safe static sheet. Never animate full-viewport clip-path or
+   gradient masks in front of multiple backdrop-filter panels: expensive GPU
+   tiling can display partially repainted horizontal bands and heavy flashes. */
 #sdThemeSwitchOverlay{
   position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;
   box-sizing:border-box;padding:24px;text-align:center;isolation:isolate;
-  background:#061522;color:#f7f4ef;opacity:1;visibility:hidden;
-  clip-path:circle(0px at 50% 50%);pointer-events:none;transition:none;
-  /* A second paint-containment layer caused unstable Android GPU tiling. */
+  background-color:#061522;color:#f7f4ef;
+  opacity:0;visibility:hidden;pointer-events:none;transition:none;
 }
-#sdThemeSwitchOverlay[data-origin="light"]{
-  background:radial-gradient(ellipse at center,#fafdff 0%,#eaf3fb 48%,#dcebf7 100%);
-  color:#173449;
-}
-#sdThemeSwitchOverlay[data-origin="dark"]{
-  background:radial-gradient(ellipse at center,#10283b 0%,#061522 68%,#04101c 100%);
-  color:#f7f4ef;
-}
+#sdThemeSwitchOverlay[data-origin="light"]{background-color:#eaf3fb;color:#173449}
+#sdThemeSwitchOverlay[data-origin="dark"]{background-color:#061522;color:#f7f4ef}
 #sdThemeSwitchOverlay.is-preparing,
 #sdThemeSwitchOverlay.is-visible,
 #sdThemeSwitchOverlay.is-covered,
 #sdThemeSwitchOverlay.is-dismissing{visibility:visible;pointer-events:auto}
 #sdThemeSwitchOverlay.is-visible{
-  clip-path:circle(72vmax at 50% 50%);
-  transition:clip-path .45s cubic-bezier(.22,.74,.20,1);
+  opacity:1;transition:opacity .18s ease-in-out;
 }
 #sdThemeSwitchOverlay.is-covered{
-  clip-path:circle(72vmax at 50% 50%);transition:none;
+  opacity:1;transition:none;
 }
 #sdThemeSwitchOverlay.is-dismissing{
-  clip-path:circle(72vmax at 50% 50%);
-  opacity:0;pointer-events:none;transition:opacity .16s ease-in-out;
+  opacity:0;pointer-events:none;transition:opacity .28s ease-out;
 }
 #sdThemeSwitchOverlay .sd-theme-switch-content{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:13px;max-width:min(88vw,460px);position:relative;
   font-family:"SD Sans",Arial,sans-serif;
-  opacity:0;transform:translateY(6px) scale(.97);
-  transition:opacity .3s ease-out,transform .35s cubic-bezier(.2,.7,.2,1);
+  opacity:0;transform:translateY(5px);
+  transition:opacity .18s ease-out,transform .23s ease-out;
 }
 #sdThemeSwitchOverlay.is-visible .sd-theme-switch-content,
 #sdThemeSwitchOverlay.is-covered .sd-theme-switch-content{
-  opacity:1;transform:translateY(0) scale(1);
+  opacity:1;transform:translateY(0);
 }
 #sdThemeSwitchOverlay.is-dismissing .sd-theme-switch-content{
-  opacity:0;transition:opacity .13s ease-in;
+  opacity:0;transition:opacity .16s ease-in;
 }
 #sdThemeSwitchOverlay .sd-theme-switch-brand{
   font-family:"SD Serif",Georgia,serif;font-size:clamp(19px,4.5vw,28px);
@@ -150,13 +143,16 @@ html.theme-transitioning,html.theme-transitioning body{
 }
 #sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-message{color:#173449}
 #sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-note{color:#547083}
-/* Freeze both root and body colours while the circle is fully covering the
-   page. Otherwise 240ms body background colour transitions can expose a light
-   horizontal band under a dark account drawer on narrow mobile viewports. */
+/* All elements underlying the opaque sheet commit directly to the target.
+   Switching hundreds of independent transitions is what caused flicker. */
 html.sd-theme-overlay-active,
-html.sd-theme-overlay-active body{
-  transition:none!important;
-}
+html.sd-theme-overlay-active body{transition:none!important}
+html.sd-theme-overlay-active body .theme-bg,
+html.sd-theme-overlay-active body .nav-wrap .nav,
+html.sd-theme-overlay-active body .mobile-bottom-nav,
+html.sd-theme-overlay-active body .account-drawer,
+html.sd-theme-overlay-active body .cart-drawer,
+html.sd-theme-overlay-active body .checkout-drawer{transition:none!important}
 /* Approved wallpaper/nav remain frozen through the final dissolve. */
 html.sd-theme-overlay-active body .theme-bg,
 html.sd-theme-overlay-active body .nav-wrap .nav,

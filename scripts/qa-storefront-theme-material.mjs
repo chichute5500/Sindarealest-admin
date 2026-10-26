@@ -273,7 +273,7 @@ try{
         arm(direction){
           const baseline=snapshot();
           const result={direction,now:{...baseline,dark:direction},samples:[],frameTimes:[],
-            transitionEvents:[],longTasks:[],overlayEvents:[],radialEvents:[],overlayOrigin:null,paletteCommitAt:null,paletteCovered:false,firstOverlayFrameMs:null};
+            transitionEvents:[],longTasks:[],overlayEvents:[],coverEvents:[],overlayOrigin:null,paletteCommitAt:null,paletteCovered:false,firstOverlayFrameMs:null};
           const cleanup=[];
           const obs=typeof PerformanceObserver==='function'
             ?new PerformanceObserver(list=>result.longTasks.push(...list.getEntries().map(e=>({start:Math.round(e.startTime),duration:Math.round(e.duration)}))))
@@ -298,13 +298,13 @@ try{
           });
           overlayObserver.observe(overlay,{attributes:true,attributeFilter:['class']});
           cleanup.push(()=>overlayObserver.disconnect());
-          const onRadial=e=>{
-            if(e.target!==overlay||e.propertyName!=='clip-path')return;
-            result.radialEvents.push({type:e.type,relativeMs:Math.round(performance.now()-started)});
+          const onCover=e=>{
+            if(e.target!==overlay||e.propertyName!=='opacity')return;
+            result.coverEvents.push({type:e.type,relativeMs:Math.round(performance.now()-started)});
           };
-          overlay.addEventListener('transitionstart',onRadial);
-          overlay.addEventListener('transitionend',onRadial);
-          cleanup.push(()=>{overlay.removeEventListener('transitionstart',onRadial);overlay.removeEventListener('transitionend',onRadial)});
+          overlay.addEventListener('transitionstart',onCover);
+          overlay.addEventListener('transitionend',onCover);
+          cleanup.push(()=>{overlay.removeEventListener('transitionstart',onCover);overlay.removeEventListener('transitionend',onCover)});
           const paletteObserver=new MutationObserver(()=>{
             if(!started||!active||result.paletteCommitAt!==null)return;
             if(root.classList.contains('dark')===direction){
@@ -859,7 +859,7 @@ try{
           console.log('THEME_OVERLAY_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
             dark:r.direction,variant:'baseline',
             startMs:r.overlayEvents.find(e=>e.type==='show')?.relativeMs,
-             origin:r.overlayOrigin,radialEvents:r.radialEvents,
+             origin:r.overlayOrigin,coverEvents:r.coverEvents,
             endMs:r.overlayEvents.find(e=>e.type==='hide')?.relativeMs,
             firstFrameMs:r.firstOverlayFrameMs,paletteCommitMs:r.paletteCommitAt,
             paletteCovered:r.paletteCovered,overlayClean:r.overlayHidden&&r.stagingCleared,
@@ -892,7 +892,7 @@ try{
       if(![r.now,...r.samples,r.stable].every(s=>s.dark===r.direction))
         throw Error('Theme state changed twice: '+JSON.stringify(r));
       // New owner-authorized UX acceptance: a visible covering screen appears
-      // outwards from central text, palette commits while fully covered,
+      // with source-colour opacity fade, palette commits while fully covered,
       // and both themes settle before removing it. This replaces, not silently
       // weakens, the retired bare-navbar 80/300ms exposure benchmark.
       const shows=r.overlayEvents.filter(e=>e.type==='show');
@@ -904,12 +904,12 @@ try{
         throw Error('Theme screen not activated promptly: '+JSON.stringify(r));
       if(r.firstOverlayFrameMs===null||r.firstOverlayFrameMs>180)
         throw Error('Theme screen first frame delayed: '+JSON.stringify(r));
-      if(hide<770||hide>1190)
-         throw Error('Circular theme cover did not last approximately one second: '+JSON.stringify(r));
+      if(hide<500||hide>1280)
+         throw Error('Theme safe-cover reveal did not finish near one second: '+JSON.stringify(r));
        if(r.overlayOrigin!==(r.direction?'light':'dark'))
          throw Error('Cover source colour reversed: '+JSON.stringify(r));
-       if(!r.radialEvents.some(e=>e.type==='transitionstart')||!r.radialEvents.some(e=>e.type==='transitionend'))
-         throw Error('Clip-path did not spread outwards from centred text: '+JSON.stringify(r));
+       if(!r.coverEvents.some(e=>e.type==='transitionstart')||!r.coverEvents.some(e=>e.type==='transitionend'))
+         throw Error('Opaque sheet did not fade in safely: '+JSON.stringify(r));
        if(r.paletteCommitAt===null||r.paletteCommitAt>hide||!r.paletteCovered)
         throw Error('Theme palette exposed before cover was ready: '+JSON.stringify(r));
       if(!r.overlayHidden||!r.stagingCleared)
@@ -1011,7 +1011,7 @@ try{
       await page.locator('#accountClose').dispatchEvent('click');
       await page.waitForTimeout(320);
     }
-    matrix.push({label:spec.label,pass:true,accountThemeMatrix,switches:'Light > Dark > Light',strictCycles,ux:'~1s source-colour circular wipe',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
+    matrix.push({label:spec.label,pass:true,accountThemeMatrix,switches:'Light > Dark > Light',strictCycles,ux:'~1s Android-safe solid-sheet dissolve',rapidInterrupts:'4 taps PASS',photoFiles:sync.files,
       slides:sync.slides,autoplayMs:1500,zeroRemoteWrites:true});
   }finally{await context.close()}
  }
