@@ -355,12 +355,39 @@ try{
     };
     const results=[];
     for(const direction of [true,false])results.push(await runThemeTrial(direction,'baseline-cold'));
-    console.log('THEME_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
-      dark:r.direction,variant:'baseline',
-      startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
-      endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
-      chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
-    }))));
+    // Run experimental CSS only in the explicitly isolated read-only
+    // diagnostic workflow, never in release-gated Chromium matrices.
+    if(process.env.SD_THEME_DIAGNOSTIC_VARIANTS==='1'){
+      const experiments=[
+        {label:'prepromote-visual-compositor',css:
+          'html body .nav-wrap .nav{will-change:background-color;transform:translateZ(0)}html body .theme-bg{transform:translateZ(0);backface-visibility:hidden}'},
+        {label:'isolate-navigation-style',css:
+          'html body .nav-wrap{contain:style}html body .nav-wrap .nav{will-change:background-color}'},
+        {label:'disable-wallpaper-color-filter-only',css:
+          'html body .theme-bg--light,html body .theme-bg--dark{filter:none!important}'},
+      ];
+      const variants=[];
+      for(const experiment of experiments){
+        const temporaryStyle=await page.addStyleTag({content:experiment.css});
+        for(const direction of [true,false])variants.push(await runThemeTrial(direction,experiment.label));
+        await temporaryStyle.evaluate(node=>node.remove());
+      }
+      for(const direction of [true,false])variants.push(await runThemeTrial(direction,'baseline-warm'));
+      const metric=r=>({
+        variant:r.variant,dark:r.direction,
+        startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
+        endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
+        chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
+      });
+      console.log('THEME_COMPOSITOR_ABA_DIAGNOSTIC '+JSON.stringify([...results,...variants].map(metric)));
+    }else{
+          console.log('THEME_PERF_DIAGNOSTIC '+JSON.stringify(results.map(r=>({
+            dark:r.direction,variant:'baseline',
+            startMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionstart')?.relativeMs,
+            endMs:r.transitionEvents.find(e=>e.element==='nav'&&e.type==='transitionend')?.relativeMs,
+            chromeMetrics:r.chromeMetrics,longTasks:r.longTasks
+          }))));
+    }
     await perfClient.detach();
     const materialResult=await page.evaluate(async()=>{
       const layer=[...document.querySelectorAll('#materialGallery .sd-material-slide')];
