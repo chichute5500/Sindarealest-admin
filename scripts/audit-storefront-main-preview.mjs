@@ -85,7 +85,7 @@ try{
   const expected=new Map();
   for(const x of liveRows){const key=String(x.category||'');expected.set(key,(expected.get(key)||0)+1)}
   const shown=new Set(pills.filter(x=>x.key!=='all').map(x=>x.key));
-  if(pills.length!==16||shown.size!==15||[...expected.keys()].some(k=>!shown.has(k)))
+  if(pills.length!==expected.size+1||shown.size!==expected.size||[...expected.keys()].some(k=>!shown.has(k)))
    throw Error("LIVE_CATEGORY_FILTER_NOT_SYNCED");
   // Verify real Preview data restores four owner-approved featured tiles.
   const featuredIds=await page.locator('#featuredGrid [data-featured-card]').evaluateAll(nodes=>nodes.map(n=>n.dataset.product));
