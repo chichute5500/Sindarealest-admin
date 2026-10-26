@@ -9,6 +9,8 @@ on:
       - 'tests/**'
       - 'package.json'
       - 'scripts/audit-storefront-main-preview.mjs'
+      - 'scripts/audit-static-assets.mjs'
+      - 'scripts/audit-css-cascade.mjs'
       - 'scripts/qa-storefront-theme-material.mjs'
       - 'scripts/audit-storefront-checkout-disposable-browser.mjs'
       - 'scripts/qa-storefront-remote-preview-order.mjs'
