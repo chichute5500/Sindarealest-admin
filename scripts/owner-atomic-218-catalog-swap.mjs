@@ -112,21 +112,27 @@ async function main(){
   await Promise.all(Array.from({length:12},worker));
   guard(!failed&&report.mediaChecked===921,"PRODUCTION_IMAGES_INCOMPLETE");
  }finally{s3.destroy();}
- const allIds=existing.map(p=>p.id);
+ // Legacy production product IDs are not uniformly UUIDs. Require UUIDs
+ // only for the 218 newly imported IDs, which were created as crypto UUIDs.
+ // Never rewrite historical IDs referenced by order_items.
  const newIds=staged.map(p=>p.id);
- const oldIds=old.map(p=>p.id);
- // Cloudflare D1's API rejected the former 673-bind UPDATE. Keys are
- // validated UUIDs from the exact preflight cohort before SQL quoting.
- // This preserves the one-statement atomic flip without oversized bind arrays.
- const uuidList=(ids)=>{
-   guard(ids.every(x=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(x))),
-     "INVALID_UUID_IN_CATALOG_SWAP");
-   return ids.map(x=>"'"+x+"'").join(",");
- };
- const allList=uuidList(allIds),newList=uuidList(newIds),oldList=uuidList(oldIds);
- // UPDATE is one D1 SQL statement: old and new visibility switch atomically.
- const swapSql="UPDATE products SET published=CASE WHEN id IN ("+newList+") THEN 1 ELSE 0 END WHERE id IN ("+allList+")";
- const restoreSql="UPDATE products SET published=CASE WHEN id IN ("+oldList+") THEN 1 ELSE 0 END WHERE id IN ("+allList+")";
+ const newList=(()=>{
+   guard(newIds.length===218&&newIds.every(x=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(x))),
+     "INVALID_NEW_UUID_IN_CATALOG_SWAP");
+   return newIds.map(x=>"'"+x+"'").join(",");
+ })();
+ // The preflight has proven the entire table contains exactly the 237 old
+ // and 218 new IDs. Use ONE atomic SQL statement, with precondition counts.
+ // No oversized D1 bind arrays and no reliance on legacy ID format.
+ const swapSql="UPDATE products SET published=CASE WHEN id IN ("+newList+") THEN 1 ELSE 0 END " +
+   "WHERE (SELECT COUNT(*) FROM products)=455 " +
+   "AND (SELECT COUNT(*) FROM products WHERE published=1)=237 " +
+   "AND (SELECT COUNT(*) FROM products WHERE published=0)=218";
+ // Safe rollback only to original 237-old/218-new visibility (no deletion).
+ const restoreSql="UPDATE products SET published=CASE WHEN id IN ("+newList+") THEN 0 ELSE 1 END " +
+   "WHERE (SELECT COUNT(*) FROM products)=455 " +
+   "AND (SELECT COUNT(*) FROM products WHERE published=1)=218 " +
+   "AND (SELECT COUNT(*) FROM products WHERE published=0)=237";
  let updated=false;
  try{
   report.attempted=true;
