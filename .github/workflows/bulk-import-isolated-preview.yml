@@ -100,10 +100,11 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
-      - name: Install Chromium
+      - name: Use preinstalled Google Chrome on Ubuntu runner
         run: |
           npm install --no-save --no-package-lock --no-fund --no-audit playwright@1.56.1
-          npx playwright install --with-deps chromium
+          command -v google-chrome
+          google-chrome --version
       - name: Exercise photo-folder chooser and draft contract without real writes
         run: node scripts/qa-bulk-import-preview-browser.mjs
       - name: Upload screenshots
