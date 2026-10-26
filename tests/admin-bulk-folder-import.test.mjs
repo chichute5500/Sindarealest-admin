@@ -35,17 +35,22 @@ const duplicated=buildImportPlan([...rows,rows[0]],files);
 assert.equal(duplicated.duplicates,1);
 assert.equal(duplicated.groups[0].status,"blocked");
 
-const largeRows=Array.from({length:MAX_IMAGES_PER_PRODUCT+14},(_,i)=>({
-  "Ảnh kết quả":"Cặp-tab-laptop\\M0062 - Tui Hop 4000K\\Chưa rõ\\anh-"+i+".webp",
-  "Danh mục":"Cặp-tab-laptop","Mẫu":"Tui Hop 4000K",
-}));
-const largeFiles=largeRows.map((r,i)=>({
-  name:"anh-"+i+".webp", size:100, type:"image/webp",
-  webkitRelativePath:"KET_QUA_NHOM_MAU/"+r["Ảnh kết quả"].replace(/\\/g,"/")
-}));
-const over=buildImportPlan(largeRows,largeFiles);
-assert.equal(over.groups[0].images.length,44);
-assert.equal(over.groups[0].status,"blocked", "Do not silently drop 14 photos");
+function groupedPhotos(n){
+  const largeRows=Array.from({length:n},(_,i)=>({
+    "Ảnh kết quả":"Cặp-tab-laptop\\M0062 - Tui Hop 4000K\\Chưa rõ\\anh-"+i+".webp",
+    "Danh mục":"Cặp-tab-laptop","Mẫu":"Tui Hop 4000K",
+  }));
+  const largeFiles=largeRows.map((r,i)=>({
+    name:"anh-"+i+".webp", size:100, type:"image/webp",
+    webkitRelativePath:"KET_QUA_NHOM_MAU/"+r["Ảnh kết quả"].replace(/\\/g,"/")
+  }));
+  return buildImportPlan(largeRows,largeFiles);
+}
+const fortyFour=groupedPhotos(44);
+assert.equal(fortyFour.groups[0].images.length,44);
+assert.equal(fortyFour.groups[0].status,"ready", "All 44 photos must stay on one product");
+const over=groupedPhotos(MAX_IMAGES_PER_PRODUCT+1);
+assert.equal(over.groups[0].status,"blocked", "Never silently drop photos above ceiling");
 
 assert.throws(()=>parseCsv("a,b\n1"),/Thiếu cột/);
 assert.throws(()=>parseCsv("Ảnh kết quả,Danh mục,Mẫu\n\"unfinished"),/nháy chưa đóng/);
@@ -59,4 +64,4 @@ assert.match(importer,/\/api\/admin\/products/, "Existing authenticated product 
 assert.doesNotMatch(importer,/method\s*:\s*["']DELETE["']/i, "Importer must never erase live catalog");
 const admin=readFileSync(new URL("../public/admin/index.html",import.meta.url),"utf8");
 assert.match(admin,/href="\/admin\/import\.html"/);
-console.log("PASS: folder/CSV reconciliation, missing/duplicate/44-photo blocking, safe draft-only import entry.");
+console.log("PASS: folder/CSV reconciliation, missing/duplicate/51-photo blocking and 44-photo preservation, safe draft-only import entry.");
