@@ -8,6 +8,7 @@ on:
       - 'functions/**'
       - 'tests/**'
       - 'scripts/qa-bulk-import-preview-sha.mjs'
+      - 'scripts/qa-bulk-import-preview-browser.mjs'
       - 'package.json'
       - '.github/workflows/bulk-import-isolated-preview.yml'
 permissions:
@@ -77,3 +78,34 @@ jobs:
           npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "bulk photo import Preview $GITHUB_SHA"
       - name: Read back exact deployed Preview SHA and branch
         run: node scripts/qa-bulk-import-preview-sha.mjs
+
+  browser-qa:
+    name: Chromium desktop/mobile Preview UI + mocked uploads (no D1/R2 writes)
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save --no-package-lock --no-fund --no-audit playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Exercise photo-folder chooser and draft contract without real writes
+        run: node scripts/qa-bulk-import-preview-browser.mjs
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-import-preview-browser-${{ github.sha }}
+          path: artifacts/bulk-import-preview/screenshots/
+          if-no-files-found: warn
+          retention-days: 14
