@@ -10,6 +10,8 @@ on:
       - 'scripts/qa-bulk-import-preview-sha.mjs'
       - 'scripts/qa-bulk-import-preview-browser.mjs'
       - 'scripts/qa-bulk-import-remote-preview.mjs'
+      - 'scripts/qa-bulk-import-preview-color-migration.mjs'
+      - 'migrations/0010_product_image_colors.sql'
       - 'package.json'
       - '.github/workflows/bulk-import-isolated-preview.yml'
 permissions:
@@ -72,6 +74,8 @@ jobs:
           npm audit --audit-level=high
           npm run check
           npm test
+      - name: Apply only isolated Preview D1 color metadata column (no Production)
+        run: node scripts/qa-bulk-import-preview-color-migration.mjs
       - name: Deploy only non-production branch on isolated Pages project
         shell: bash
         run: |
