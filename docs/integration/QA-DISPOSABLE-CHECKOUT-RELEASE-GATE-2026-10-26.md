@@ -58,3 +58,10 @@
 - `scripts/audit-storefront-checkout-disposable-browser.mjs`: Chromium PC/Mobile sáng tối với live Preview UI và local-only POST.
 - `.github/workflows/integration-storefront-isolated-preview.yml`: chạy browser checkout sau gate isolation + audit 8/8; upload screenshot.
 - **Không chỉnh public/index.html, CSS, Admin UI, Production backend logic** trong các commit QA bổ sung.
+
+## 7. Bài test Chromium lần đầu FAIL — đã sửa đúng nguyên nhân, chạy lại PASS
+
+- **FAIL:** workflow [#40276901952](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40276901952), source `82fbb391...`. Cả bốn cấu hình chỉ timeout ở thao tác Playwright nhấn `#skipIntro`; log: nút tồn tại trong DOM nhưng Welcome **đã tự biến mất** theo thiết kế Owner PASS (có cấu hình pointer interception trong mobile). Không có đơn nào bị tạo hoặc remote write trong lượt lỗi.
+- **Nguyên nhân:** kịch bản QA giả định nút luôn còn hiển thị, trái với hành vi tự đóng hợp lệ của Welcome, không phải bằng chứng lỗi UI.
+- **Sửa:** chỉ tệp test `scripts/audit-storefront-checkout-disposable-browser.mjs`, bỏ giả định, cho phép Welcome tự đóng và đợi trạng thái hidden; commit `cfb9351424eea3d43a4fe2936a6f989be4dbe10a`. Không sửa `public/index.html`, CSS hay Admin.
+- **RETEST:** workflow [#40277262988](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40277262988), kết quả 4/4 Chromium checkout PASS + 8/8 GUI audit PASS, `remoteWrites=0`, screenshot/log artifact `12630847523`.
