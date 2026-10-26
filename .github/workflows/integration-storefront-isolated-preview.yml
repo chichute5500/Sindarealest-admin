@@ -14,6 +14,7 @@ on:
       - 'scripts/qa-storefront-remote-preview-order.mjs'
       - 'scripts/qa-storefront-integration-preview-sha.mjs'
       - '.github/workflows/integration-storefront-isolated-preview.yml'
+      - '.github/workflows/ci.yml'
   workflow_dispatch:
 
 permissions:

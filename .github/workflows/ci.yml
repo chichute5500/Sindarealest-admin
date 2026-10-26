@@ -2,6 +2,10 @@ name: Validate source and tests
 
 on:
   push:
+    # This integration PR is fully tested by pull_request CI and by its
+    # isolated Preview gate; avoid launching identical push CI concurrently.
+    branches-ignore:
+      - integration/storefront-locked-on-main-2026-10-26
   workflow_dispatch:
   pull_request:
     branches:
