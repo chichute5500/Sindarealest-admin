@@ -90,6 +90,36 @@ assert.equal(missingOriginal.status, 400, "missing original file must be rejecte
 assert.equal(missingOriginals.puts.length, 0, "missing original must not write to private storage");
 assert.equal(missingImages.puts.length, 0, "missing original must not write a public derivative");
 
+// Stream large multipart bodies with a byte cap, not a duplicate 26 MB buffer.
+// This prevents Pages memory-pressure 503 on bulk imports without exposing R2.
+const oversizedImages=bucket(),oversizedOriginals=bucket();
+let sentBytes=0;
+const body=new ReadableStream({
+  pull(controller){
+    if(sentBytes>=28*1024*1024){controller.close();return;}
+    const chunk=new Uint8Array(1024*1024);
+    sentBytes+=chunk.length;
+    controller.enqueue(chunk);
+  }
+});
+const overStreamRequest=new Request("https://shop.example/api/admin/upload",{
+  method:"POST",
+  headers:{
+    Cookie:"sd_admin_session="+session,Origin:"https://shop.example",
+    "Sec-Fetch-Site":"same-origin",
+    "Content-Type":"multipart/form-data; boundary=bulk-test"
+  },
+  body,duplex:"half"
+});
+const overStream=await uploadProductImage({
+  request:overStreamRequest,
+  env:{DB:{},ADMIN_PASSWORD,SESSION_SECRET,ORIGINALS:oversizedOriginals,IMAGES:oversizedImages}
+});
+assert.equal(overStream.status,413,"Unknown-length streaming >26 MB must be rejected before storage");
+assert.equal((await overStream.json()).ok,false,"Oversized upload returns JSON, not an HTML 503");
+assert.equal(oversizedOriginals.puts.length,0);
+assert.equal(oversizedImages.puts.length,0);
+
 // Preview lacking ORIGINALS must fail closed *before* the public derivative is put.
 const missingBindingImages = bucket();
 const missingBinding = await uploadProductImage({
