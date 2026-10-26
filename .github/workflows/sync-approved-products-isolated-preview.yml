@@ -1,0 +1,39 @@
+name: Approved 218 Product Catalog To ISOLATED Preview ONLY
+on:
+  push:
+    branches:
+      - integration/storefront-locked-on-main-2026-10-26
+    paths:
+      - 'scripts/sync-approved-products-isolated-preview.mjs'
+      - '.github/workflows/sync-approved-products-isolated-preview.yml'
+permissions:
+  contents: read
+concurrency:
+  group: approved-catalog-isolated-preview-20261026
+  cancel-in-progress: false
+jobs:
+  safely-verify:
+    name: Verify separate D1/R2 and approved 218-product cohort (NO Production changes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SD_CATALOG_SYNC_MODE: preflight
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Refuse unexpected branch, validate script, and inspect ONLY metadata/SELECT
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/integration/storefront-locked-on-main-2026-10-26"
+          test "$SD_CATALOG_SYNC_MODE" = "preflight"
+          node --check scripts/sync-approved-products-isolated-preview.mjs
+          node scripts/sync-approved-products-isolated-preview.mjs
