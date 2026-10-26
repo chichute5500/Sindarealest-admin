@@ -63,7 +63,7 @@ function saveCheckpoint(){localStorage.setItem(checkpointKey,JSON.stringify(chec
 function updateSelection(){ const available=plan.groups.filter(g=>g.status==="ready"&&g.selected&&!checkpoint.drafts[g.key]);
   $("import").disabled=busy||!available.length; $("totals").textContent=
   plan.groups.length+" mẫu / "+plan.rows+" dòng CSV / "+plan.matched+" ảnh khớp"+
-  "; "+plan.blocked+" mẫu cần xử lý; "+plan.missing+" ảnh thiếu; "+Object.keys(checkpoint.drafts).length+" bản nháp đã tạo"+
+  "; "+plan.blocked+" mẫu cần xử lý; "+plan.missing+" ảnh thiếu; "+plan.unlisted+" ảnh ngoài CSV; "+plan.reviewRows+" ảnh có ghi chú cần kiểm tra; "+Object.keys(checkpoint.drafts).length+" bản nháp đã tạo"+
   "; "+available.length+" mẫu đang chọn.";
 }
 function render(){
@@ -90,6 +90,8 @@ function render(){
     if(g.missing.length)problems.push("Thiếu "+g.missing.length+" ảnh");
     if(g.images.length>MAX_IMAGES_PER_PRODUCT)problems.push("Có "+g.images.length+" ảnh; tối đa 50 ảnh/sản phẩm");
     if(g.warnings.length)problems.push(g.warnings[0]);
+    const flagged=g.images.filter(x=>x.review.trim()).length;
+    if(flagged)problems.push(flagged+" ảnh có ghi chú kiểm duyệt trong CSV");
     if(done)problems.push("Đã lưu bản nháp: "+checkpoint.drafts[g.key]);
     info.textContent="Mã thư mục: "+g.modelFolder+" · Màu theo CSV: "+colors+
       (problems.length?" · "+problems.join(" · "):" · Có thể nhập nháp");
