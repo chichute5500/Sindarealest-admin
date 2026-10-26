@@ -120,7 +120,10 @@ try{
   try{
    const pageResponse=await page.goto(alias+'/',{waitUntil:'domcontentloaded',timeout:45000});
    assert.equal(pageResponse?.status(),200);
-   await page.locator('#skipIntro').click({timeout:15000});
+   // Welcome is owner-approved to self-dismiss; do not race a vanished skip button.
+   if(await page.locator('#welcomeSplash').isVisible())
+    await page.locator('#skipIntro').evaluate(button=>button.click());
+   await page.locator('#welcomeSplash').waitFor({state:'hidden',timeout:15000});
    await page.locator('#catalogGrid [data-add]').first().waitFor({state:'visible',timeout:15000});
    await page.locator('#catalogGrid [data-add]').first().click();
    const cartButton=spec.mobile?'#mobileCartNav':'#cartOpen';
@@ -132,7 +135,7 @@ try{
    await page.locator('#checkoutWard').selectOption({label:'Phường kiểm thử'});
    await page.locator('#checkoutStreet').fill('DIA CHI GIA — KHONG GIAO HANG');
    await page.locator('#checkoutSubmit').click();
-   await page.locator('#checkoutMessage').getByText(/Mã yêu cầu SD-/).waitFor({timeout:15000});
+   await page.locator('#checkoutMessage').filter({hasText:/Mã yêu cầu SD-/}).waitFor({timeout:15000});
    assert.equal(results.locallyCreatedOrders,1,'Actual browser POST must call local checkout handler exactly once');
    assert.equal(attemptedRemoteWrites,0,'Browser must not send writes to Preview');
    assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,index+1);
