@@ -28,3 +28,14 @@ Replace the old storefront product catalog with 218 newly imported products / 92
 
 ## Authorized activity completed
 Read-only audit and preflight only, on `audit/import-218-921-readonly-2026-10-26`. No Product URL fix resumed, no writes to import branch or production. Source evidence: [audit #40317900018](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40317900018), [preflight #40318333624](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40318333624).
+
+## Permissions and execution checkpoint — 2026-10-26 (later)
+
+- The full production D1 backup workflow was attempted in Actions #40319117446 but could not write to the intended private production R2 destination (Access Denied). **No backup was completed and no Production D1 row was changed.**
+- A separate non-mutating permission test in Actions #40319448517 definitively found the existing `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` credentials can access Preview IMAGES and ORIGINALS, but both Production IMAGES and ORIGINALS return **403**.
+- Do **not** reuse or overwrite the Preview keys. Create a separate Cloudflare R2 **Object Read & Write** token restricted to the two buckets bound to `sindarealest2` Production (`IMAGES` and `ORIGINALS`), and save its access keys as Actions secrets `R2_PRODUCTION_ACCESS_KEY_ID` and `R2_PRODUCTION_SECRET_ACCESS_KEY`. Never paste key material in chat, pull requests or code.
+- Full D1 backup script `scripts/backup-production-d1-private-r2-2026-10-26.mjs` now requires separate Production credentials and is designed to export and hash-verify the SQL entirely within a private R2 object; no public backup artifact.
+- Idempotent staging script `scripts/stage-imported-r2-to-production-2026-10-26.mjs` is prepared to copy and verify all 921 derivatives and 921 private originals, without touching either D1 or publishing products. It is deliberately **not triggered** until Production-scoped credentials exist. Its guarded workflow `.github/workflows/stage-imported-r2-to-production-2026-10-26.yml` only runs on the dedicated branch and an explicit trigger file.
+- The backup and staging scripts passed a Node syntax CI check in Actions #40320204787. This is not proof of transfer success.
+- Remaining major blockers: dedicated Production R2 rights, completed/verified private full D1 backup, production migration 0010, Product data import and atomic/rollback-safe replacement, dynamic category storefront readiness, live PC/mobile owner QA.
+- The user approved the overall old-for-new catalog replacement plan; never interpret that as a request to leak credentials, bypass permission checks, or delete existing order/customer/warranty history.
