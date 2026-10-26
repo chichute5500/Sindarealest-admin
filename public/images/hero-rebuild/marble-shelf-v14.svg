@@ -51,22 +51,6 @@
   <stop offset=".69" stop-color="#ad8049"/><stop offset="1" stop-color="#fff9de"/>
 </linearGradient>
 <filter id="sdGoldBloomV16"><feGaussianBlur stdDeviation="3"/></filter>
-<!-- V25: independent natural mineral fracture network from multiscale coherent noise.
-     Procedural surface only; cannot contain picture, product, CTA, font or screenshot. -->
-<filter id="sdSeamWebV25" x="-6%" y="-15%" width="112%" height="130%">
- <feTurbulence type="fractalNoise" baseFrequency=".009 .052" numOctaves="5" seed="47" stitchTiles="stitch" result="veinCloud"/>
- <feColorMatrix in="veinCloud" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 16 0 -8.15" result="goldAlpha"/>
- <feGaussianBlur in="goldAlpha" stdDeviation=".54" result="smoothAlpha"/>
- <feFlood flood-color="#d2ad77" flood-opacity=".95" result="gold"/>
- <feComposite in="gold" in2="smoothAlpha" operator="in"/>
-</filter>
-<filter id="sdSeamShadowV25" x="-6%" y="-15%" width="112%" height="130%">
- <feTurbulence type="fractalNoise" baseFrequency=".009 .052" numOctaves="5" seed="47" stitchTiles="stitch" result="veinCloud"/>
- <feColorMatrix in="veinCloud" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 16 0 -8.15"/>
- <feGaussianBlur stdDeviation="2.1"/>
- <feFlood flood-color="#6e8094" flood-opacity=".8" result="shadow"/>
- <feComposite in="shadow" in2="SourceGraphic" operator="in"/>
-</filter>
 </defs>
 <ellipse cx="809" cy="420" rx="754" ry="137" fill="url(#sdUnderShadow)"/>
 <g mask="url(#sdShelfFade)">
@@ -74,7 +58,6 @@
 <!-- Crisp branching mineral seams, faceted blue-gray crystal, and stochastic natural grain. -->
 <g clip-path="url(#sdMarbleFace)" pointer-events="none">
  <rect x="65" y="246" width="1475" height="244" filter="url(#sdStoneMineralV16)" opacity=".31"/>
- <rect x="65" y="246" width="1475" height="244" filter="url(#sdSeamWebV25)" opacity=".47"/>
  <path d="M82 284 C316 357 584 404 817 407 S1314 423 1526 330" stroke="#eff9ff" stroke-width="12" opacity=".35" fill="none"/>
  <path d="M95 321 C384 390 697 437 1049 419 S1337 404 1525 352" stroke="#416d8e" stroke-width="13" opacity=".14" fill="none"/>
  <g fill="none" stroke="#ffe1a2" stroke-width="3.1" opacity=".36" filter="url(#sdGoldBloomV16)"><path d="M165.0 283.0 L188.4 293.2 L211.1 304.9 L227.8 325.5 L252.8 334.4 L276.8 344.7 L302.8 346.7 L323.6 362.0 L347.0 373.0"/><path d="M201.5 301.0 L205.0 289.0 L198.3 278.3 L192.7 267.2 L196.7 255.5"/><path d="M286.8 343.2 L275.8 359.9 L259.2 370.9 L249.0 387.6 L241.2 405.6"/><path d="M312.9 356.1 L307.1 352.3 L306.0 345.5 L302.2 338.3 L308.5 333.2"/><path d="M300.0 295.0 L322.7 301.6 L342.5 314.6 L363.9 324.1 L384.5 335.3 L403.5 349.3 L421.9 364.0 L439.9 381.5 L465.0 383.0"/><path d="M376.1 335.6 L397.7 343.1 L416.8 355.6 L435.1 369.8 L457.5 375.7"/><path d="M335.7 314.1 L320.5 297.3 L298.5 292.1 L277.6 300.2 L255.5 296.3"/><path d="M378.4 336.8 L366.1 343.3 L352.2 341.7 L338.2 341.1 L326.6 349.1"/><path d="M558.0 320.0 L580.5 329.0 L598.9 344.8 L615.8 361.8 L634.9 376.2 L653.1 393.1 L676.9 399.7 L700.5 404.7 L724.0 410.0"/><path d="M588.7 336.7 L596.3 343.4 L598.5 353.4 L594.9 362.5 L588.2 369.8"/><path d="M617.0 352.0 L623.3 365.0 L636.1 371.9 L636.4 385.7 L637.6 399.4"/><path d="M625.5 356.6 L619.2 370.3 L606.2 377.9 L592.5 384.0 L584.5 396.8"/><path d="M754.0 328.0 L778.8 331.3 L801.5 342.0 L825.1 349.1 L848.8 356.5 L868.2 372.6 L892.0 381.1 L910.5 397.6 L930.0 413.0"/><path d="M881.3 389.5 L909.5 397.8 L930.9 417.8 L948.9 440.2 L971.8 457.6"/><path d="M890.8 394.1 L871.6 408.2 L853.3 423.5 L840.9 444.1 L823.8 461.0"/><path d="M830.8 365.1 L842.3 373.6 L854.8 380.5 L867.7 388.0 L874.5 401.3"/><path d="M1110.0 322.0 L1132.0 330.8 L1151.7 344.0 L1175.0 351.0 L1192.2 368.2 L1214.2 378.5 L1238.5 378.8 L1256.6 395.8 L1281.0 400.0"/><path d="M1187.1 357.2 L1191.6 362.7 L1192.8 369.9 L1199.7 372.3 L1206.8 370.9"/><path d="M1193.5 360.1 L1178.1 362.3 L1169.2 375.0 L1155.6 379.6 L1142.6 385.6"/><path d="M1158.7 344.2 L1156.3 355.6 L1146.1 361.2 L1139.5 369.5 L1131.4 376.3"/><path d="M1323.0 309.0 L1346.3 320.1 L1364.3 338.6 L1387.6 350.1 L1413.6 350.8 L1438.5 343.5 L1464.0 348.1 L1487.3 359.0 L1513.0 360.0"/><path d="M1460.3 345.9 L1446.9 343.5 L1434.2 348.2 L1421.8 352.7 L1408.7 354.3"/><path d="M1462.2 346.4 L1475.3 361.8 L1494.6 367.6 L1511.5 378.6 L1531.6 379.4"/><path d="M1471.2 348.8 L1468.2 345.3 L1467.4 340.8 L1465.8 335.1 L1471.3 332.9"/></g>
@@ -94,7 +77,6 @@
 
 <g clip-path="url(#sdMarbleDeck)" pointer-events="none">
  <rect x="70" y="25" width="1470" height="315" filter="url(#sdStoneMineralV16)" opacity=".13"/>
- <rect x="70" y="20" width="1470" height="326" filter="url(#sdSeamWebV25)" opacity=".31"/>
  <g fill="none" stroke="#ffecbc" stroke-width="4" opacity=".20" filter="url(#sdGoldBloomV16)"><path d="M183.0 214.0 L207.2 192.6 L238.1 183.1 L270.0 187.2 L301.3 180.0 L329.3 165.8 L359.7 158.2 L390.6 151.5 L422.0 156.0"/><path d="M378.9 166.5 L402.1 169.0 L423.7 177.9 L441.4 193.8 L464.2 200.4"/><path d="M266.8 193.7 L249.3 199.2 L236.2 212.0 L222.1 224.7 L203.3 225.8"/><path d="M450.0 189.0 L469.2 178.7 L490.4 173.4 L510.9 165.8 L532.7 164.1 L552.0 154.3 L572.5 147.4 L594.2 143.2 L612.0 130.0"/><path d="M522.6 162.6 L509.5 157.9 L497.1 151.9 L482.8 147.2 L469.5 154.3"/><path d="M584.6 140.0 L585.5 126.5 L589.7 113.7 L599.9 104.9 L611.9 98.7"/><path d="M933.0 177.0 L961.5 179.6 L989.9 183.7 L1016.1 170.2 L1045.6 170.4 L1068.9 154.0 L1094.7 142.2 L1123.5 138.5 L1148.0 123.0"/><path d="M1045.1 148.8 L1061.9 136.7 L1082.7 135.6 L1093.1 117.8 L1111.0 107.6"/><path d="M1050.4 147.5 L1061.9 137.3 L1077.2 136.6 L1091.2 133.1 L1105.2 129.5"/><path d="M1134.0 207.0 L1162.2 208.9 L1190.4 206.5 L1217.7 199.0 L1243.7 187.8 L1272.1 182.7 L1300.1 189.7 L1328.8 187.0 L1354.0 173.0"/><path d="M1290.7 182.8 L1282.9 203.3 L1264.6 215.6 L1253.1 233.1 L1239.9 249.5"/><path d="M1210.4 195.2 L1225.1 195.0 L1239.2 198.9 L1253.1 194.4 L1266.0 187.6"/></g>
  <g fill="none" stroke="url(#sdMicroGoldV16)" stroke-width="1.15" stroke-linejoin="round" stroke-linecap="round" opacity=".43"><path d="M183.0 214.0 L207.2 192.6 L238.1 183.1 L270.0 187.2 L301.3 180.0 L329.3 165.8 L359.7 158.2 L390.6 151.5 L422.0 156.0"/><path d="M378.9 166.5 L402.1 169.0 L423.7 177.9 L441.4 193.8 L464.2 200.4"/><path d="M266.8 193.7 L249.3 199.2 L236.2 212.0 L222.1 224.7 L203.3 225.8"/><path d="M450.0 189.0 L469.2 178.7 L490.4 173.4 L510.9 165.8 L532.7 164.1 L552.0 154.3 L572.5 147.4 L594.2 143.2 L612.0 130.0"/><path d="M522.6 162.6 L509.5 157.9 L497.1 151.9 L482.8 147.2 L469.5 154.3"/><path d="M584.6 140.0 L585.5 126.5 L589.7 113.7 L599.9 104.9 L611.9 98.7"/><path d="M933.0 177.0 L961.5 179.6 L989.9 183.7 L1016.1 170.2 L1045.6 170.4 L1068.9 154.0 L1094.7 142.2 L1123.5 138.5 L1148.0 123.0"/><path d="M1045.1 148.8 L1061.9 136.7 L1082.7 135.6 L1093.1 117.8 L1111.0 107.6"/><path d="M1050.4 147.5 L1061.9 137.3 L1077.2 136.6 L1091.2 133.1 L1105.2 129.5"/><path d="M1134.0 207.0 L1162.2 208.9 L1190.4 206.5 L1217.7 199.0 L1243.7 187.8 L1272.1 182.7 L1300.1 189.7 L1328.8 187.0 L1354.0 173.0"/><path d="M1290.7 182.8 L1282.9 203.3 L1264.6 215.6 L1253.1 233.1 L1239.9 249.5"/><path d="M1210.4 195.2 L1225.1 195.0 L1239.2 198.9 L1253.1 194.4 L1266.0 187.6"/></g>
 </g>
