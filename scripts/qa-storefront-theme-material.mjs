@@ -59,6 +59,7 @@ try{
         darkBg:Number(getComputedStyle(bgs[1]).opacity),
         lightBg:Number(getComputedStyle(bgs[0]).opacity),
         navTransition:getComputedStyle(document.querySelector('.nav')).transitionDuration,
+        navColor:getComputedStyle(document.querySelector('.nav')).backgroundColor,
         materialTransition:getComputedStyle(document.querySelector('.material-photo')).transitionDuration,
         bgTransition:getComputedStyle(bgs[0]).transitionDuration
       });
@@ -81,7 +82,14 @@ try{
       const second=layer.find(img=>img.classList.contains('is-visible'))?.src;
       await new Promise(resolve=>setTimeout(resolve,1600));
       const third=layer.find(img=>img.classList.contains('is-visible'))?.src;
+      const material=document.querySelector('#materialTile');
+      const washBefore=getComputedStyle(material,'::before');
+      const washAfter=getComputedStyle(material,'::after');
+      const caption=getComputedStyle(material.querySelector('.mosaic-content'));
       return {results,slides:layer.length,slideshowChanged:first!==second&&first===third,
+        noPhotoWash:parseFloat(washBefore.opacity)===0&&parseFloat(washAfter.opacity)===0&&
+          washBefore.backgroundImage==='none'&&washAfter.backgroundImage==='none',
+        readableCaption:caption.color==='rgb(255, 255, 255)'&&caption.textShadow!=='none',
         photoCrossfadeMs:Math.round(parseFloat(getComputedStyle(layer[0]).transitionDuration)*1000),
         noControls:!document.querySelector('#materialGallery button,#materialGallery [role=button],#materialGallery .slide-count'),
         files:[first,second,third].map(x=>x?.split('/').pop())};
@@ -92,15 +100,20 @@ try{
         throw Error('Theme state changed twice: '+JSON.stringify(r));
       if(!r.samples.some(s=>s.darkBg>.05&&s.darkBg<.95&&s.lightBg>.05&&s.lightBg<.95))
         throw Error('Theme does not crossfade progressively: '+JSON.stringify(r));
+      const during=r.samples.slice(0,6);
+      if(!during.some(s=>s.navColor!==r.now.navColor&&s.navColor!==r.stable.navColor))
+        throw Error('Navigation must crossfade during the same early frames: '+JSON.stringify(r));
+      if(r.samples.slice(8).some(s=>s.navColor!==r.stable.navColor))
+        throw Error('Navigation still changing after 400-450ms: '+JSON.stringify(r));
       if(Math.abs(r.stable.darkBg-target)>.02||Math.abs(r.stable.lightBg-(1-target))>.02)
         throw Error('Theme did not settle after 900ms: '+JSON.stringify(r));
       for(const key of ['bgTransition','navTransition','materialTransition']){
         const duration=parseFloat(r.now[key]);
-        if(!(duration>=.4&&duration<=.5))
+        if(!(duration>=.38&&duration<=.42))
           throw Error('Staggered/instant theme timing '+key+': '+JSON.stringify(r.now));
       }
     }
-    if(sync.slides!==2||sync.photoCrossfadeMs!==580||!sync.slideshowChanged||!sync.noControls)
+    if(sync.slides!==2||sync.photoCrossfadeMs!==580||!sync.slideshowChanged||!sync.noControls||!sync.noPhotoWash||!sync.readableCaption)
       throw Error('Material crossfade/autoplay failed: '+JSON.stringify(sync));
     if(errors.length)throw Error('Runtime/page errors: '+JSON.stringify(errors));
     matrix.push({label:spec.label,pass:true,switches:'Light > Dark > Light',photoFiles:sync.files,
