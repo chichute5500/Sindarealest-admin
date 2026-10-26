@@ -10,6 +10,7 @@ const access=process.env.R2_PRODUCTION_ACCESS_KEY_ID||"";
 const secret=process.env.R2_PRODUCTION_SECRET_ACCESS_KEY||"";
 const report={operation:"PRODUCTION_D1_STAGE_UNPUBLISHED_ONLY",expected:218,imagesExpected:921,
   rowsInserted:0,rowsAlreadyStaged:0,skusRemapped:0,imagesChecked:0,
+  privateBackupVerified:false,
   oldProductsChanged:0,productsPublished:0,ordersChanged:0,productionDeployments:0,
   schemaMigrationApplied:false,success:false};
 const ensure=(v,msg)=>{if(!v)throw Error(msg)};
@@ -82,6 +83,16 @@ async function main(){
    forcePathStyle:true,maxAttempts:2,credentials:{accessKeyId:access,secretAccessKey:secret}});
  let cursor=0,err=null;
  try{
+  // The full private SQL backup was exported and readback-hashed in
+  // GitHub Actions #40343065366; require it to still exist before D1 edits.
+  const backup=await s3.send(new HeadObjectCommand({
+    Bucket:buckets[3],
+    Key:"private-catalog-cutover-backups/2026-10-26/full-d1-43d2f19f-1c10-4e5e-ad7a-adce7cfe3241.sql"
+  }),{abortSignal:AbortSignal.timeout(18000)});
+  ensure(backup.ContentLength===201557&&
+    backup.Metadata?.sha256==="6cf5be71bc20c3c3dbf879c5608cc42259c48c59170cc49fcc349b4131b575ed",
+    "VERIFIED_PRIVATE_D1_BACKUP_MISSING");
+  report.privateBackupVerified=true;
   async function worker(){
    while(cursor<pictures.length&&!err){
     const k=media.exec(pictures[cursor++])?.[1];
