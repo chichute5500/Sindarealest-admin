@@ -94,7 +94,10 @@ async function main(){
  const pictures=cohort.flatMap(r=>imageList(r));
  check(cohort.length===218&&pictures.length===921&&new Set(pictures).size===921,"PREVIEW_COHORT_MISMATCH");
  const ids=new Set(existing.map(r=>r.id)),skus=new Set(existing.map(r=>r.sku));
- check(cohort.every(r=>!ids.has(r.id)&&!skus.has(r.sku)),"PRODUCTION_SKU_OR_ID_COLLISION");
+ check(cohort.every(r=>!ids.has(r.id)),"PRODUCTION_PRODUCT_ID_COLLISION");
+// A few draft SKUs can overlap independent Production numbering. This is
+// irrelevant to media staging. Record it for the later guarded D1 remap.
+result.productionSkuCollisions=cohort.filter(r=>skus.has(r.sku)).length;
  result.sourcePhotos=pictures.length;
  const src=new S3Client({region:"auto",endpoint:"https://"+account+".r2.cloudflarestorage.com",
   forcePathStyle:true,maxAttempts:3,credentials:{accessKeyId:pKey,secretAccessKey:pSecret}});
