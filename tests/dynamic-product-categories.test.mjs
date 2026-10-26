@@ -123,7 +123,7 @@ for(const [input,expected] of [['giày tây','Giày Tây'],['giày lười','Gi�
 }
 const statusBegin=html.indexOf('const fulfillmentLabels='),statusEnd=html.indexOf('\nfunction renderFilters(',statusBegin);
 assert.ok(statusBegin>0&&statusEnd>statusBegin);
-for(const [key,label] of [['in_stock','Có sẵn'],['made_to_order','Hàng đặt'],['unclassified','Cần xác nhận']]){
+for(const [key,label] of [['in_stock','Có sẵn'],['made_to_order','Hàng đặt riêng'],['unclassified','Cần xác nhận']]){
  const actual=runInNewContext(html.slice(statusBegin,statusEnd)+'\nfulfillmentBadge({fulfillmentType:'+JSON.stringify(key)+'},true)',{escapeHtml},{timeout:1000});
  assert.ok(actual.includes('>'+label+'</span>'));
  assert.ok(!actual.includes('Tình trạng:'));

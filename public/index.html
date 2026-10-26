@@ -1308,7 +1308,7 @@ function orderedSessionProducts(){
  return sessionProductOrder;
 }
 const fulfillmentLabels={in_stock:'Hàng có sẵn',made_to_order:'Hàng đặt riêng',unclassified:'Cần xác nhận'};
-const detailFulfillmentLabels={in_stock:'Có sẵn',made_to_order:'Hàng đặt',unclassified:'Cần xác nhận'};
+const detailFulfillmentLabels={in_stock:'Có sẵn',made_to_order:'Hàng đặt riêng',unclassified:'Cần xác nhận'};
 function productFulfillmentType(p){const raw=p?.fulfillmentType??p?.fulfillment_type;return raw==='in_stock'||raw==='made_to_order'||raw==='unclassified'?raw:'unclassified'}
 function fulfillmentBadge(p,detail=false){const type=productFulfillmentType(p),label=detail?detailFulfillmentLabels[type]:fulfillmentLabels[type];return '<span class="fulfillment-badge fulfillment-'+type+'" data-fulfillment-type="'+type+'">'+escapeHtml(label)+'</span>'}
 function renderFilters(){

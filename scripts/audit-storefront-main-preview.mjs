@@ -153,7 +153,7 @@ try{
   if(detail.hasCategory||!detail.sameRow||detail.skuX>=detail.statusX||detail.titleWeight<700||!detail.glass||detail.glass==='none'||detail.status.includes('Tình trạng:'))
    throw Error('LIVE_DETAIL_METADATA_OR_TITLE_INCORRECT');
   const type=liveProduct.fulfillmentType||liveProduct.fulfillment_type;
-  const labels={in_stock:'Có sẵn',made_to_order:'Hàng đặt',unclassified:'Cần xác nhận'};
+  const labels={in_stock:'Có sẵn',made_to_order:'Hàng đặt riêng',unclassified:'Cần xác nhận'};
   if(detail.status!==(labels[type]||labels.unclassified))throw Error('LIVE_DETAIL_STATUS_NOT_FROM_REAL_DATA');
   if(Number.isSafeInteger(liveProduct.price)&&liveProduct.price>=0&&liveProduct.sourcePriceConfirmed===true){
    const expectedPrice='Giá: '+new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(liveProduct.price)+'₫';
