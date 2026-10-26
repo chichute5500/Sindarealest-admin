@@ -383,12 +383,21 @@ try{
           const current=getComputedStyle(layer).backgroundImage;
           const match=current.match(/url\(["']?([^"')]+)["']?\)/);
           if(!match)throw Error('Cannot find source SVG for '+selector+': '+current);
+          const svgResponse=await fetch(match[1],{credentials:'same-origin'});
+          if(!svgResponse.ok)throw Error('Cannot read SVG original: '+svgResponse.status);
+          const svgMarkup=await svgResponse.text();
+          const svgDoc=new DOMParser().parseFromString(svgMarkup,'image/svg+xml');
+          const box=svgDoc.documentElement.getAttribute('viewBox')?.trim().split(/[ ,]+/).map(Number);
+          if(!box||box.length!==4||!box.every(Number.isFinite)||box[2]<=0||box[3]<=0)
+            throw Error('Original SVG has no valid viewBox');
           const img=new Image();
           img.src=match[1];
           await img.decode();
           const canvas=document.createElement('canvas');
-          canvas.width=img.naturalWidth;
-          canvas.height=img.naturalHeight;
+          // SVGs without width/height otherwise report just 216x150 natural
+          // pixels in Chromium, losing the fine Owner-approved satin folds.
+          canvas.width=box[2];
+          canvas.height=box[3];
           const ctx=canvas.getContext('2d',{willReadFrequently:false});
           if(!ctx)throw Error('Canvas context unavailable');
           ctx.drawImage(img,0,0);
