@@ -4,7 +4,7 @@ import { runInNewContext } from "node:vm";
 
 const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
 const start = html.indexOf("function renderFilters(){");
-const end = html.indexOf("\nfunction foldSearch(", start);
+const end = html.indexOf("\nlet selectedCategory=", start);
 assert.ok(start >= 0 && end > start, "Product-category filter implementation must exist");
 const filterSource = html.slice(start, end);
 const container = { innerHTML: "" };
