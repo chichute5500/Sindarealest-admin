@@ -46,5 +46,7 @@ jobs:
             npx playwright install-deps chromium
             node --input-type=module -e "import('playwright').then(async ({chromium})=>{const b=await chromium.launch({headless:true});await b.close()})"
           }
+      - name: Measure independent empty-page Chromium compositor baseline
+        run: node scripts/qa-theme-frame-scheduler-baseline.mjs
       - name: Measure theme against current isolated Preview (GET only)
         run: node scripts/qa-storefront-theme-material.mjs
