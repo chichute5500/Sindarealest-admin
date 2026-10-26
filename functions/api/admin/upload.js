@@ -9,6 +9,26 @@ const ORIGINAL_TYPES = Object.freeze({
   "image/webp": "webp",
 });
 
+// Retries happen on the server so a browser tab opened before a Preview
+// deployment can continue importing without refreshing or losing edits.
+// Same key + bytes within this request: repeating a put is idempotent.
+async function putR2WithBackoff(binding, key, bytes, options, stage) {
+  let lastError;
+  for(let attempt=1;attempt<=3;attempt++) {
+    try {
+      await binding.put(key, bytes, options);
+      return;
+    } catch(error) {
+      lastError=error;
+      console.error("product-photo transient R2 write", {
+        stage, attempt, code:String(error?.name||"R2WriteError").slice(0,80)
+      });
+      if(attempt<3)await new Promise(resolve=>setTimeout(resolve,attempt===1?400:1100));
+    }
+  }
+  throw lastError;
+}
+
 function originalSignatureMatches(bytes, contentType) {
   if (contentType === "image/jpeg") {
     return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
@@ -81,19 +101,19 @@ export async function onRequestPost(context) {
     const privateKey = `private-originals/${id}.${originalType}`;
 
     try {
-      await context.env.ORIGINALS.put(privateKey, originalBytes, {
+      await putR2WithBackoff(context.env.ORIGINALS, privateKey, originalBytes, {
         httpMetadata: { contentType: original.type, cacheControl: "private, no-store" },
         customMetadata: { visibility: "private-original" },
-      });
+      }, "original");
     } catch (error) {
       console.error("product-photo upload failure", { stage: "original", code: String(error?.name || "R2WriteError").slice(0, 80) });
       return fail("Kho ảnh gốc ORIGINALS tạm thời không ghi được. Ảnh này chưa được xác nhận lưu; hãy thử tiếp tục sau.", 503, { "Retry-After": "5" });
     }
     try {
-      await context.env.IMAGES.put(key, bytes, {
+      await putR2WithBackoff(context.env.IMAGES, key, bytes, {
         httpMetadata: { contentType: "image/webp", cacheControl: "public, max-age=31536000, immutable" },
         customMetadata: { visibility: "public-optimized-derivative", originalKey: privateKey },
-      });
+      }, "derivative");
     } catch (error) {
       try { await context.env.ORIGINALS.delete(privateKey); }
       catch (cleanupError) { console.error("product-photo rollback failed", {stage:"original-cleanup",code:String(cleanupError?.name||"R2DeleteError").slice(0,80)}); }
