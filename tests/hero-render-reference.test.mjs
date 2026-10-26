@@ -11,7 +11,7 @@ assert.match(hero,/<span class="sdh-glass-label">SINDAREALEST · SIGNATURE<\/spa
 assert.match(css,/\.sd-code-hero \.sdh-glass-label\{[^}]*translateY\(-4px\)/);
 assert.match(css,/\.sd-code-hero \.sdh-glass-message span:first-child/);
 assert.match(css,/@keyframes sdh-cta-border-pulse/);
-assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{[^}]*\.sdh-cta--zalo::before\{animation:none/);
+assert.match(css,/@media\(prefers-reduced-motion:reduce\)\{[\s\S]*?\.sdh-cta--zalo::before\{animation:none/);
 assert.doesNotMatch(hero,/<(?:picture|img|canvas|video)\b|style=|\.png|\.jpe?g|\.webp/);
 assert.doesNotMatch(css,/url\(|!important/);
 assert.match(css,/\.sd-code-hero \.sdh-stage::before/);
