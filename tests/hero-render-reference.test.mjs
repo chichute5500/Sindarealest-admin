@@ -26,4 +26,5 @@ assert.match(css,/backdrop-filter:blur\(14px\)/);
 assert.match(html,/<link rel="stylesheet" href="\/code-hero\.css\?v=20261026-2">/);
 assert.doesNotMatch(html,/<picture class="hero-reference-art"/);
 assert.doesNotMatch(html,/id="heroProductImage"/);
+assert.doesNotMatch(html,/HERO V2 — compact physical marble plinth|HERO REBUILD V8|HERO RENDER PARITY V7/,'Retired image-based HERO CSS must not return');
 console.log('PASS: code-only hero contract, copy, breakpoints and theme variants');
