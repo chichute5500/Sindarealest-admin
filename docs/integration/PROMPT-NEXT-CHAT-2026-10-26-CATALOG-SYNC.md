@@ -1,3 +1,7 @@
+> **CHECKPOINT MỚI NHẤT — OWNER PASS 27/10/2026:** Các commit/trạng thái "mới nhất" trong tài liệu cũ phía dưới là lịch sử. **ĐỌC TRƯỚC** [HANDOFF-LATEST-2026-10-27-OWNER-PASS-PRODUCT-DETAIL.md](./HANDOFF-LATEST-2026-10-27-OWNER-PASS-PRODUCT-DETAIL.md) và [PROMPT-NEXT-CHAT-2026-10-27-OWNER-PASS-PRODUCT-DETAIL.md](./PROMPT-NEXT-CHAT-2026-10-27-OWNER-PASS-PRODUCT-DETAIL.md). Source Owner PASS `5f991ff3339848efc036a30bcc1c7e66fd224cd0`; isolated Preview [Actions #40383014004](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40383014004), attempt 2 SUCCESS 3/3. PR #118 OPEN/DRAFT, chưa merge/Production. Không làm lại phần được PASS.
+
+---
+
 # PROMPT NEXT CHAT — SINDAREALEST (218 SẢN PHẨM / 15 LOẠI ĐÃ ĐỒNG BỘ PREVIEW)
 
 Tiếp tục trực tiếp dự án **SinDarealest** trên GitHub, **không bắt đầu dự án mới, không hỏi lại lịch sử, không làm lại việc đã PASS**.
