@@ -1,0 +1,59 @@
+name: Owner one-time convert existing products to Made To Order (Production D1)
+on:
+  push:
+    branches:
+      - feature/admin-inline-edit-photo-drag-preorder-2026-10-27
+    paths:
+      - '.github/workflows/owner-once-made-to-order-20261027.yml'
+
+permissions:
+  contents: read
+concurrency:
+  group: sindarealest-production-d1-owner-made-to-order-once-20261027
+  cancel-in-progress: false
+jobs:
+  owner-bulk:
+    name: Preflight, back up product types, convert once, verify (NO R2 or orders)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Refuse unapproved repo or any main deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-inline-edit-photo-drag-preorder-2026-10-27"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Verify migration script syntax and Owner-only scope
+        run: |
+          node --check scripts/owner-bulk-made-to-order-20261027.mjs
+          grep -q "WHERE fulfillment_type!='made_to_order'" scripts/owner-bulk-made-to-order-20261027.mjs
+          ! grep -Eq 'UPDATE order_items|UPDATE orders|DELETE FROM products' scripts/owner-bulk-made-to-order-20261027.mjs
+      - name: Preflight exact Production D1 binding and export product classification preimage (read-only)
+        env:
+          SD_OWNER_BULK_MODE: preflight
+        run: node scripts/owner-bulk-made-to-order-20261027.mjs
+      - name: Store short-lived private fulfillment rollback preimage BEFORE any mutation
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-product-fulfillment-original-types-20261027
+          path: artifacts/owner-fulfillment-20261027/product-fulfillment-preimage.json
+          if-no-files-found: error
+          retention-days: 1
+      - name: Apply once to existing products only, atomically guarded by one-time marker
+        env:
+          SD_OWNER_BULK_MODE: apply
+        run: node scripts/owner-bulk-made-to-order-20261027.mjs
+      - name: Verify no website deployment or order/R2 mutation occurred
+        run: echo "Owner one-time product fulfillment update completed; site deploy, orders, and R2 were not touched."
