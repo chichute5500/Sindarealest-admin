@@ -81,7 +81,7 @@ test('Dynamic homepage and category HTML get security headers even when Pages st
   const html=await r.text();
   assert.match(html,/<title>/);
  }
- assert.equal(count(middleware,'hardenStorefrontHtmlHeaders(headers)'),3,
+ assert.equal(count(middleware,'headers:hardenStorefrontHtmlHeaders(headers)'),3,
   'Every generated homepage/category/product HTML response must use shared header defense');
 });
 console.log('PASS: canonical Admin/Storefront brand tokens, single active Admin theme palette and static/API/dynamic HTML security.');
