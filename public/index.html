@@ -74,8 +74,8 @@ html.dark{color-scheme:only dark;--page:#061522;--ink:#edf7ff;--muted:#abc3d7;--
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:106px;background:var(--page);transition:background-color .24s ease,color .24s ease}body{margin:0;min-height:100vh;position:relative;isolation:isolate;overflow-x:hidden;background:var(--page);color:var(--ink);font-family:SD Sans,Arial,sans-serif;transition:background-color .24s ease,color .24s ease}
 .theme-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;background-position:center center;background-repeat:no-repeat;background-size:cover;transform:none;will-change:opacity;transition:opacity .24s ease,filter .24s ease}
 .theme-bg--dark{opacity:0;background-color:#061522;background-image:radial-gradient(ellipse at 18% 12%,rgba(106,174,219,.36) 0%,transparent 38%),radial-gradient(ellipse at 79% 39%,rgba(26,87,128,.42) 0%,transparent 42%),radial-gradient(ellipse at 39% 88%,rgba(57,117,157,.28) 0%,transparent 43%),linear-gradient(128deg,#04101d 0%,#0a2740 24%,#142d44 43%,#061725 60%,#12344d 78%,#04111e 100%);filter:hue-rotate(0deg) saturate(.82) brightness(.82) contrast(.92)}
-.theme-bg--light{opacity:1;background-color:#eaf3fb;background-image:radial-gradient(ellipse at 19% 16%,rgba(255,255,255,.96) 0%,rgba(255,255,255,.45) 16%,transparent 39%),radial-gradient(ellipse at 82% 9%,rgba(192,222,243,.62) 0%,transparent 39%),radial-gradient(ellipse at 41% 60%,rgba(255,255,255,.86) 0%,transparent 46%),radial-gradient(ellipse at 88% 87%,rgba(170,210,238,.46) 0%,transparent 32%),linear-gradient(132deg,#eaf4fc 0%,#dbeaf7 22%,#f9fcff 42%,#d6e9f7 58%,#e8f3fc 75%,#fbfdff 100%);filter:hue-rotate(25deg) saturate(.58) brightness(1.08)}
-html.dark .theme-bg--dark{opacity:1;filter:hue-rotate(0deg) saturate(.82) brightness(.82) contrast(.92)}html.dark .theme-bg--light{opacity:0}
+.theme-bg--light{opacity:1;background-color:#eaf3fb;background-image:radial-gradient(ellipse at 19% 16%,rgba(255,255,255,.96) 0%,rgba(255,255,255,.45) 16%,transparent 39%),radial-gradient(ellipse at 82% 9%,rgba(192,222,243,.62) 0%,transparent 39%),radial-gradient(ellipse at 41% 60%,rgba(255,255,255,.86) 0%,transparent 46%),radial-gradient(ellipse at 88% 87%,rgba(170,210,238,.46) 0%,transparent 32%),linear-gradient(132deg,#eaf4fc 0%,#dbeaf7 22%,#f9fcff 42%,#d6e9f7 58%,#e8f3fc 75%,#fbfdff 100%)}
+html.dark .theme-bg--dark{opacity:1}html.dark .theme-bg--light{opacity:0}
 /* Test-only brand watermark over the crocodile background; kept below page content. */
 .theme-watermark{position:fixed;inset:0;z-index:-1;pointer-events:none;display:grid;place-items:center;opacity:.15;transition:opacity .24s ease}
 .theme-watermark img{width:clamp(180px,29vw,400px);max-height:46vh;object-fit:contain;filter:drop-shadow(0 2px 12px rgba(0,0,0,.10))}
@@ -2783,7 +2783,7 @@ html.dark .theme-watermark{opacity:.045}
 }
 .theme-bg--light::after{background:linear-gradient(118deg,rgba(239,247,255,.78),rgba(226,240,251,.80) 52%,rgba(246,250,255,.76)),radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.38),transparent 38%)}
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.76),rgba(7,31,51,.72) 52%,rgba(3,17,30,.78)),radial-gradient(ellipse at 20% 15%,rgba(91,157,202,.15),transparent 40%),radial-gradient(ellipse at 82% 58%,rgba(37,100,148,.12),transparent 42%)}
-html.dark .theme-bg--dark{filter:hue-rotate(0deg) saturate(.72) brightness(.88) contrast(.84)}
+
 @media(max-width:760px){
 }
 @media(max-width:350px){
@@ -2808,13 +2808,13 @@ html.dark .theme-bg--dark{filter:hue-rotate(0deg) saturate(.72) brightness(.88) 
   linear-gradient(145deg,transparent 27%,rgba(119,174,211,.10) 42%,transparent 55%),
   linear-gradient(28deg,transparent 20%,rgba(66,127,168,.09) 42%,transparent 62%);
 }
-html.dark .theme-bg--dark{filter:hue-rotate(0deg) saturate(.68) brightness(.90) contrast(.80)}
+
 
 
 /* The background remains branded but must not compete with product imagery or text. */
 .theme-bg{inset:-8px}
-.theme-bg--light{filter:blur(.5px) hue-rotate(25deg) saturate(.60) brightness(1.03)}
-html.dark .theme-bg--dark{filter:blur(.8px) hue-rotate(0deg) saturate(.88) brightness(.78) contrast(.90)}
+
+
 
 
 /* Mobile-first bottom navigation matching the reference app using existing site destinations. */
@@ -2922,8 +2922,8 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
     linear-gradient(28deg,transparent 20%,rgba(94,159,201,.20) 42%,transparent 62%),
     linear-gradient(157deg,transparent 48%,rgba(188,222,245,.18) 53%,transparent 60%);
 }
-.theme-bg--light{filter:blur(1px) hue-rotate(25deg) saturate(.70) brightness(1.035) contrast(.95)}
-html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brightness(.86) contrast(.92)}
+
+
 @keyframes sdLiquidGlassDrift{
   0%{transform:translate3d(-.35%,-.2%,0) scale(1.025)}
   100%{transform:translate3d(.35%,.25%,0) scale(1.035)}
@@ -3084,8 +3084,8 @@ html.dark .detail-favorite-btn[aria-pressed="true"]{background:rgba(13,38,59,.58
   radial-gradient(ellipse at 82% 65%,rgba(40,114,163,.30),transparent 36%),
   linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72));
 }
-.theme-bg--light{filter:blur(1px) hue-rotate(0deg) saturate(.88) brightness(1.02) contrast(1.03)}
-html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brightness(.90) contrast(.92)}
+
+
 .welcome-texture--light{
  background-image:
   linear-gradient(145deg,transparent 15%,rgba(255,255,255,.84) 23%,rgba(255,255,255,.12) 29%,transparent 38%),
@@ -3110,9 +3110,9 @@ html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brig
 }
 
 /* Organic liquid-glass wave assets: irregular gathered satin folds replace uniform diagonal ribbons. */
-.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261022-3');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
+.theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261022-3');background-repeat:no-repeat;background-position:center;background-size:cover}
 .theme-bg--dark{background-color:#061522;background-image:url('images/liquid-glass-dark.svg?v=20261022-3');background-repeat:no-repeat;background-position:center;background-size:cover;filter:none}
-html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}
+html.dark .theme-bg--dark{opacity:1}
 .theme-bg--light::after{background:linear-gradient(118deg,rgba(225,241,255,.52),rgba(211,231,249,.46) 52%,rgba(237,247,255,.54))}
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.68),rgba(7,31,51,.63) 52%,rgba(3,17,30,.72))}
 .welcome-texture--light{background-image:url('images/liquid-glass-light.svg?v=20261022-3');filter:none}

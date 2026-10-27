@@ -8,6 +8,18 @@ function meta(html, name, content, property = false) {
   const tag = `<meta ${attr}="${name}" content="${escaped}">`;
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", `  ${tag}\n</head>`);
 }
+// Functions-generated HTML bypasses static _headers on some Cloudflare paths.
+// Apply the same minimally restrictive document-level controls on all real
+// storefront HTML responses, without blocking approved inline scripts, Zalo
+// links or image/media assets.
+function hardenStorefrontHtmlHeaders(headers) {
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("X-Permitted-Cross-Domain-Policies", "none");
+  headers.set("Content-Security-Policy", "frame-ancestors 'none'; object-src 'none'; base-uri 'self'");
+  return headers;
+}
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   if (url.pathname.startsWith('/api/admin/') && context.request.method !== 'OPTIONS') {
@@ -84,7 +96,7 @@ export async function onRequest(context) {
     headers.set("Content-Type","text/html; charset=utf-8");
     headers.set("Cache-Control","public, max-age=60, s-maxage=300");
     for (const key of ["Content-Length","Content-Encoding","ETag"]) headers.delete(key);
-    return new Response(html,{status:200,headers});
+    return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
   }
   const legacyMatch = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   const modernMatch = url.pathname.match(/^\/sanpham\/([a-z0-9][a-z0-9-]{0,99})\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
@@ -99,7 +111,14 @@ export async function onRequest(context) {
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
-    return new Response(html, { status: response.status, headers });
+    return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
+  }
+  // Match the catalog route contract: product-detail HTML is read-only.
+  // Never turn an unsupported POST/PATCH/DELETE into an internal GET.
+  if (context.request.method !== "GET" && context.request.method !== "HEAD") {
+    return new Response("Method not allowed", {
+      status: 405, headers: { "Allow": "GET, HEAD", "Cache-Control": "no-store" }
+    });
   }
   const slug = (modernMatch ? modernMatch[2] : legacyMatch[1]).toLowerCase();
   if (!context.env?.DB) return new Response("Dịch vụ dữ liệu chưa sẵn sàng.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
@@ -147,5 +166,5 @@ export async function onRequest(context) {
   const headers = new Headers(response.headers);
   headers.set("Content-Type", "text/html; charset=utf-8");
   headers.set("Cache-Control", "public, max-age=60, s-maxage=300"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
-  return new Response(html, { status: response.status, headers });
+  return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
 }

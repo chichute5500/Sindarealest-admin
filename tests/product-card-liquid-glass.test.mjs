@@ -49,8 +49,10 @@ assert.match(finalBackgroundCss, /\.theme-bg--dark::after\{background:linear-gra
 
 assert.ok(finalThemeCss.includes(".theme-bg--light{background-color:#eaf3fb;background-image:url('images/liquid-glass-light.svg?v=20261022-3')"),
   "Light theme must use the final cache-versioned pearl-glass SVG background.");
-assert.ok(finalThemeCss.includes("html.dark .theme-bg--dark{opacity:1;filter:blur(0px) saturate(.96) brightness(.98) contrast(1.02)}"),
-  "Dark theme must preserve the navy-sapphire SVG backdrop without the old color cast.");
+assert.ok(html.includes("html.dark .theme-bg--dark{filter:none!important}"),
+  "Dark theme must use the final Owner-approved navy-sapphire SVG with no obsolete filter casts.");
+assert.doesNotMatch(finalThemeCss,/html\.dark \.theme-bg--dark\{[^}]*filter:blur\(/,
+  "A pre-final blur filter shadowed by the approved final rule must not reappear.");
 
 
 assert.ok(finalThemeCss.includes("background-image:url('images/liquid-glass-light.svg?v=20261022-3')"),

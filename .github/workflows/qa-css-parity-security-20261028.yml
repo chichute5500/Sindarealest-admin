@@ -1,0 +1,104 @@
+name: Owner CSS/Admin-Storefront parity and security audit (isolated Preview)
+# Revalidate final dead CSS removal, source guard and OS-first Admin theme on live Chrome.
+on:
+  push:
+    branches: [audit/css-parity-security-2026-10-28]
+    paths:
+      - '.github/workflows/qa-css-parity-security-20261028.yml'
+      - 'public/index.html'
+      - 'public/admin/index.html'
+      - 'public/code-hero.css'
+      - 'public/material-gallery.css'
+      - 'public/_headers'
+      - 'functions/**'
+      - 'tests/e2e/owner-css-parity-security.spec.js'
+      - 'tests/owner-css-parity-security-audit.test.mjs'
+      - 'tests/storefront-integration-route.test.mjs'
+      - 'scripts/audit-css-cascade.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: sd-owner-css-parity-security-1028
+  cancel-in-progress: true
+jobs:
+  qa:
+    name: Enforce source QA and verify four browser presentation matrices in nonproduction Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH: owner-css-parity-1028
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Verify code provenance and never target Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/audit/css-parity-security-2026-10-28"
+          test "$CF_TARGET" = "sindarealest-admin-preview"
+          test "$CF_BRANCH" != "main"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Existing CI checks, DB safety and security suite
+        run: |
+          npm install --no-fund
+          npm run check
+          npm test
+      - name: Verify Preview D1/R2 isolated from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-preview.json"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest2" > "$RUNNER_TEMP/production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-preview.json" "$RUNNER_TEMP/production.json"
+      - name: Deploy only isolated nonproduction site for Owner review
+        run: |
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "Owner CSS/security parity review $GITHUB_SHA"
+      - name: Setup system Chrome QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 95s npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          if command -v google-chrome >/dev/null 2>&1; then
+            google-chrome --version
+            echo "SD_OWNER_QA_SYSTEM_CHROME=1" >> "$GITHUB_ENV"
+          else
+            timeout 110s npx playwright install chromium
+          fi
+      - name: Visual parity mobile/desktop light/dark and no overflow
+        shell: bash
+        env:
+          SD_AUDIT_BASE_URL: http://127.0.0.1:4173
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public > "$RUNNER_TEMP/owner-css-security-browser.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep .3
+          done
+          npx playwright test tests/e2e/owner-css-parity-security.spec.js --config=playwright.owner-gesture.config.js --reporter=list
+      - name: Upload screenshots and test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-css-parity-security-${{ github.sha }}
+          path: |
+            artifacts/owner-css-parity-security/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Report isolated preview URL
+        run: |
+          echo "Owner review: https://owner-css-parity-1028.sindarealest-admin-preview.pages.dev/"
+          echo "Source SHA: $GITHUB_SHA"

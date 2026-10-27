@@ -29,6 +29,17 @@ assert.equal(legacy.status,301);
 assert.equal(legacy.headers.get("Location"),"https://shop.example/sanpham/giaytay/internal-abc123");
 const wrong=await middleware(ctx(old,"/sanpham/vida/internal-abc123"));
 assert.equal(wrong.headers.get("Location"),"https://shop.example/sanpham/giaytay/internal-abc123");
+// Product-detail deep URLs must not turn state-changing verbs into 200 HTML.
+for (const method of ["POST","PUT","PATCH","DELETE"]) {
+  const denied=await middleware({
+    request:new Request("https://shop.example/sanpham/giaytay/internal-abc123",{method}),
+    env:{DB:{prepare(){throw Error("Unsupported verb queried D1");}}},
+    next:async()=>{throw Error("Unsupported verb fetched HTML");}
+  });
+  assert.equal(denied.status,405,method+" must fail closed");
+  assert.equal(denied.headers.get("Allow"),"GET, HEAD");
+  assert.equal(denied.headers.get("Cache-Control"),"no-store");
+}
 const correct=await middleware(ctx(old,"/sanpham/giaytay/internal-abc123"));
 assert.equal(correct.status,200);
 const seo=await correct.text();

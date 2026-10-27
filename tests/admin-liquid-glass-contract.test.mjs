@@ -26,8 +26,14 @@ has('border-color: CanvasText;', 'control boundaries in forced-colors mode');
 
 // System theme is the default until the administrator explicitly chooses light/dark.
 has("let adminThemeMode='auto';", 'system theme default');
-has("localStorage.getItem('sd-theme-mode')||'auto'", 'system theme fallback when no preference is saved');
+has("sessionStorage.getItem('sd-admin-theme-override-v2')||'auto'", 'system theme fallback when no tab-scoped override is saved');
 has("if(mode==='auto')applyAdminTheme('auto')", 'system theme change listener');
+
+has("sessionStorage.setItem('sd-admin-theme-override-v2',next)", 'Admin manual override scoped to current tab');
+has("sessionStorage.removeItem('sd-admin-theme-override-v2')", 'Admin restores OS preference on refresh/new entry');
+assert.doesNotMatch(adminHtml,/localStorage\.getItem\('sd-theme-mode'\)/,'Admin must not read stale legacy Storefront theme key');
+has('color-scheme:only light;', 'protect explicit light UI from browser forced darkening');
+has('color-scheme:only dark;', 'protect dark UI from browser forced lightening');
 
 // Preserve authentication markup and the core API integration contract.
 for (const id of ['loginView', 'loginForm', 'password', 'appView', 'adminThemeToggle', 'logout']) {
