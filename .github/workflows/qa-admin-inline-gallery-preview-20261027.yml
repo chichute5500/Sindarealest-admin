@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: owner-admin-inline-preview-20261027
+  group: owner-admin-inline-preview-swipe-updown-systemchrome-20261028
   cancel-in-progress: true
 jobs:
   preview:
