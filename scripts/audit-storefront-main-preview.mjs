@@ -309,6 +309,8 @@ try{
    // even on 360px mobile. No logo card/backdrop is allowed.
    const footer=page.locator('#siteFooter .footer-story-heading');
    await footer.scrollIntoViewIfNeeded();
+   await footer.evaluate(el=>el.scrollIntoView({behavior:'instant',block:'start'}));
+   await page.waitForTimeout(80);
    const footerProof=await footer.evaluate(el=>{
     const logoLink=el.querySelector('.footer-brand'),logo=logoLink?.querySelector('img'),
       heading=el.querySelector('#footer-story-title'),eyebrow=el.querySelector('.footer-story-eyebrow'),
@@ -335,7 +337,8 @@ try{
     };
    });
    result.footer=footerProof;
-   result.checks.footerLogoLeft=footerProof.logoRight+5<=footerProof.titleLeft&&footerProof.logoRight+5<=footerProof.eyebrowLeft;
+   result.checks.footerLogoLeft=footerProof.logoRight+5<=footerProof.eyebrowLeft&&
+     (spec.width<=760?footerProof.titleTop>footerProof.eyebrowBottom-1:footerProof.logoRight+5<=footerProof.titleLeft);
    result.checks.footerTextStacked=footerProof.eyebrowBottom<=footerProof.titleTop+1;
    result.checks.footerLogoLarger=footerProof.logoW>=90;
    result.checks.footerLogoNoCard=footerProof.logoBackdrop==='rgba(0, 0, 0, 0)'&&footerProof.logoBorder==='0px'&&footerProof.logoShadow==='none';
@@ -343,10 +346,10 @@ try{
    if(spec.width<=760){
     result.checks.footerVietnameseSingleLine=footerProof.titleWhiteSpace==='nowrap'&&
       footerProof.titleScrollWidth<=footerProof.titleClientWidth+1;
-    result.checks.footerEnglishSingleLine=footerProof.eyebrowWhiteSpace==='nowrap'&&
+    result.checks.footerEnglishLegible=footerProof.eyebrowFontSize>=12&&
       footerProof.eyebrowScrollWidth<=footerProof.eyebrowClientWidth+1;
-    result.checks.footerEnglishEnhanced=footerProof.eyebrowFontSize>=9;
-    result.checks.footerTitleBalanced=footerProof.titleFontSize>=11&&footerProof.titleFontSize<=15;
+    result.checks.footerTitleBalanced=footerProof.titleFontSize>=20&&footerProof.titleFontSize<=24;
+    result.checks.footerTitleFullWidth=footerProof.titleLeft<footerProof.eyebrowLeft-5;
    }
    if(!Object.values(result.checks).every(Boolean))throw Error('Footer alignment or another layout gate failed: '+JSON.stringify(footerProof));
    await footer.screenshot({path:path.join(destination,spec.label+'-footer-story.png'),animations:'disabled'});
