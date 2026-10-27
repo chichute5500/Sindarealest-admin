@@ -79,4 +79,59 @@ for(const cfg of [
   await page.screenshot({path:dir+'/checkout-'+cfg.label+'.png',animations:'disabled'});
   expect(errors).toEqual([]);
  });
+ test('Legacy cart requires a selection and preserves quantity '+cfg.label,async({page,context})=>{
+  await page.setViewportSize({width:cfg.w,height:cfg.h});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  await context.addInitScript(()=>{
+   localStorage.setItem('sd-cart',JSON.stringify({'qa-shoe':2,'qa-wallet':1}));
+  });
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+  await page.locator(cfg.w<=760?'#mobileCartNav':'#cartOpen').click();
+  await expect(page.locator('#cartList .cart-row')).toHaveCount(2);
+  await expect(page.locator('[data-cart-select="qa-shoe"]')).toBeVisible();
+  await page.locator('#cartCheckout').click();
+  await expect(page.locator('#productOverlay')).toHaveClass(/open/);
+  await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
+  await page.locator('#sdDetailOption').selectOption('42');
+  await page.locator('#detailAdd').click();
+  await page.locator('#detailClose').click();
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
+  expect(saved).toMatchObject({'qa-shoe::42':2,'qa-wallet':1});
+  expect(saved).not.toHaveProperty('qa-shoe');
+  await page.locator(cfg.w<=760?'#mobileCartNav':'#cartOpen').click();
+  await expect(page.locator('#cartList')).toContainText('Size 42');
+  await expect(page.locator('#cartList')).not.toContainText('Chọn size');
+  await page.locator('#cartCheckout').click();
+  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+  await expect(page.locator('#sdCheckoutItemSummary')).toContainText('Size 42');
+  expect(errors).toEqual([]);
+ });
+
+ test('Aggregate quantity ceiling applies across shoe sizes '+cfg.label,async({page,context})=>{
+  await page.setViewportSize({width:cfg.w,height:cfg.h});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  await context.addInitScript(()=>{
+   localStorage.setItem('sd-cart',JSON.stringify({'qa-shoe::42':49,'qa-shoe::43':1}));
+  });
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
+  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+  await page.locator('[data-open-product="qa-shoe"]').first().evaluate(el=>el.click());
+  await page.locator('#sdDetailOption').selectOption('43');
+  await page.locator('#detailAdd').click();
+  const afterAdd=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
+  expect(afterAdd).toMatchObject({'qa-shoe::42':49,'qa-shoe::43':1});
+  await page.locator('#detailClose').click();
+  await page.locator(cfg.w<=760?'#mobileCartNav':'#cartOpen').click();
+  const inc=page.locator('[data-qty="1"][data-id="qa-shoe::43"]');
+  await inc.click();
+  const afterIncrement=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
+  expect(afterIncrement).toMatchObject({'qa-shoe::42':49,'qa-shoe::43':1});
+ });
+
 }
