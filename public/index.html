@@ -1585,6 +1585,9 @@ function catalogCategoryFromLocation(){
 function syncCatalogFromLocation(){
  const value=catalogCategoryFromLocation();
  if(value===null)return false;
+ document.body.classList.remove('sd-not-found-route');
+ const notFoundView=document.querySelector('#notFoundPage');
+ if(notFoundView)notFoundView.hidden=true;
  selectedCategory=value;page=1;renderFilters();renderCatalog();
  setActiveNav('products');
  return true;
@@ -3783,9 +3786,15 @@ html.dark .detail-gallery-arrow:active,html.dark .sd-fullscreen-arrow:active{
 (() => {
   const rawPath = location.pathname;
   const path = rawPath.endsWith('/') ? rawPath.slice(0, -1) || '/' : rawPath;
-  const parts = path.split('/').filter(Boolean);
-  const productRoute = (path.startsWith('/sanpham/') && parts.length === 3) || (path.startsWith('/san-pham/') && parts.length === 2);
-  if (path !== '/' && path !== '/index.html' && !productRoute) document.body.classList.add('sd-not-found-route');
+  // Match the same public routes as Cloudflare middleware and init().
+  // A catalog/category link has one or two URL segments; a product detail has three.
+  // Previously two-segment categories such as /sanpham/mu were falsely marked 404
+  // before product data was loaded; the CSS then hid the real catalog permanently.
+  const catalogRoute = /^\/sanpham(?:\/[a-z0-9][a-z0-9-]{0,99})?$/i.test(path);
+  const productRoute = /^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path)
+    || /^\/san-pham\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path);
+  if (path !== '/' && path !== '/index.html' && !catalogRoute && !productRoute)
+    document.body.classList.add('sd-not-found-route');
 })();
 </script>
 <style id="sd-not-found-route-styles">
