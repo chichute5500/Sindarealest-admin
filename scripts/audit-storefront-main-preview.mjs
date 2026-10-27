@@ -339,15 +339,15 @@ try{
    result.footer=footerProof;
    result.checks.footerLogoLeft=footerProof.logoRight+5<=footerProof.eyebrowLeft&&footerProof.logoRight+5<=footerProof.titleLeft;
    result.checks.footerTextStacked=footerProof.eyebrowBottom<=footerProof.titleTop+1;
-   result.checks.footerLogoLarger=footerProof.logoW>=90;
+   result.checks.footerLogoLarger=footerProof.logoW>=(spec.width<=760?76:90);
    result.checks.footerLogoNoCard=footerProof.logoBackdrop==='rgba(0, 0, 0, 0)'&&footerProof.logoBorder==='0px'&&footerProof.logoShadow==='none';
    result.checks.footerNoOverflow=footerProof.footerOverflow<=2;
    if(spec.width<=760){
     result.checks.footerVietnameseSingleLine=footerProof.titleWhiteSpace==='nowrap'&&
       footerProof.titleScrollWidth<=footerProof.titleClientWidth+1;
-    result.checks.footerEnglishLegible=footerProof.eyebrowFontSize>=10&&
+    result.checks.footerEnglishLegible=footerProof.eyebrowFontSize>=11.5&&
       footerProof.eyebrowScrollWidth<=footerProof.eyebrowClientWidth+1;
-    result.checks.footerTitleBalanced=footerProof.titleFontSize>=12&&footerProof.titleFontSize<=15;
+    result.checks.footerTitleBalanced=footerProof.titleFontSize>=16&&footerProof.titleFontSize<=19;
     result.checks.footerBothLinesRight=footerProof.titleLeft>=footerProof.eyebrowLeft-1&&
       footerProof.titleLeft<=footerProof.eyebrowLeft+3;
     result.checks.footerTwoTextRows=footerProof.titleTop>=footerProof.eyebrowBottom-1;
