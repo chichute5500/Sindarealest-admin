@@ -1,0 +1,30 @@
+name: Audit official brand assets for favicon and sharing
+on:
+  push:
+    branches: [fix/official-brand-favicon-share-preview-2026-10-27]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  brand:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet Pillow
+      - name: Identify originals and inspect small previews
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          import io,base64
+          paths=[('LOGO','public/logo.png'),('EMBLEM','public/images/brand-emblem.png'),('OLD_OG','public/og-sindarealest.jpg')]
+          for key,path in paths:
+            im=Image.open(path)
+            print(f'ASSET {key} size={im.size} mode={im.mode} path={path}')
+            out=im.convert('RGBA')
+            out.thumbnail((280,180),Image.Resampling.LANCZOS)
+            bio=io.BytesIO();out.save(bio,format='PNG',optimize=True)
+            print('THUMB_'+key+'='+base64.b64encode(bio.getvalue()).decode('ascii'))
+          PY
