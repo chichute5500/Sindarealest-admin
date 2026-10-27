@@ -1129,7 +1129,8 @@ html.sd-catalog-route #products .filter-pill{
   document.addEventListener('focusin',keepFocusInside,true);
   if(skip)skip.focus({preventScroll:true});
   var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(dismiss,document.documentElement.classList.contains('sd-catalog-route')?0:(reduced?220:1450));
+  if(document.documentElement.classList.contains('sd-catalog-route'))window.setTimeout(dismiss,0);
+  else window.setTimeout(dismiss,reduced?220:1450);
   fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
     if(!c)return;
     if(c.welcomeEnabled===false)dismiss();
