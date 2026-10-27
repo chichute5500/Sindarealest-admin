@@ -35,7 +35,7 @@ for(const rule of [
 const source=html.slice(html.indexOf('function catalogCategoryFromLocation(){'),html.indexOf("let selectedCategory='all';"));
 assert.match(source,/setCatalogLandingMode\(true\)/);
 assert.match(source,/window\.scrollTo\(\{top:0,behavior:'instant'\}\)/);
-assert.ok(html.includes("document.documentElement.classList.contains('sd-catalog-route')?0:(reduced?220:1450)"),
+assert.ok(html.includes("if(document.documentElement.classList.contains('sd-catalog-route'))window.setTimeout(dismiss,0);"),
  'Deep category URL must bypass homepage Welcome delay');
 assert.match(html,/section\?\.closest\('main > section:not\(#products\)'\)/);
 assert.match(html,/else\{setCatalogLandingMode\(false\)/);
