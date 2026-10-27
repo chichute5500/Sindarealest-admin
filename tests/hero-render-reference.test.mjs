@@ -27,4 +27,9 @@ assert.match(html,/<link rel="stylesheet" href="\/code-hero\.css\?v=20261026-2">
 assert.doesNotMatch(html,/<picture class="hero-reference-art"/);
 assert.doesNotMatch(html,/id="heroProductImage"/);
 assert.doesNotMatch(html,/HERO V2 — compact physical marble plinth|HERO REBUILD V8|HERO RENDER PARITY V7/,'Retired image-based HERO CSS must not return');
+// The live Home section is code-only; legacy image-HERO selectors cannot match it.
+const inlineCss=[...html.matchAll(/<style\\b[^>]*>([\\s\\S]*?)<\\/style>/gi)].map(match=>match[1]).join('\\n');
+const nonStyleContent=html.replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,'');
+assert.doesNotMatch(nonStyleContent, /class="hero(?:\\s|"|-)|id="heroProductImage"/, 'Legacy image-HERO markup must remain absent');
+assert.doesNotMatch(inlineCss, /(?:^|})\\s*(?:\\.hero(?:-visual|-copy|-description|-actions)?|#home\\.hero(?:\\.wrap)?)\\s*\\{/m, 'Old standalone hero CSS must not come back');
 console.log('PASS: code-only hero contract, copy, breakpoints and theme variants');
