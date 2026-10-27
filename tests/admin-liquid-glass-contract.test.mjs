@@ -323,7 +323,7 @@ has('function renderGalleryItem(g,i)', 'shared gallery thumbnail renderer');
 has('class="image-cover-slot"', 'featured cover occupies its own responsive row');
 has('class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ"', 'thumbnail rail has an accessible Vietnamese group label');
 has('#imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.75/1;object-fit:contain;background:rgba(218,235,247,.40)}', 'cover image keeps its full composition visible on mobile');
-has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}', 'supporting thumbnails form a horizontally scrollable rail');
+has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:none;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}', 'supporting thumbnails form a horizontally scrollable rail');
 has('#imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-align:start}', 'thumbnail rail uses fixed mobile targets and snap points');
 
 
