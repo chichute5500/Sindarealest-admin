@@ -13,7 +13,7 @@
 - Original `(id, sku, fulfillment_type)` preimage was saved as short-lived private Actions artifact **before any write** (1-day retention). An idempotence marker is saved in D1 settings.
 - One-shot workflow and temporary mutation script were subsequently removed from feature branch: **DO NOT RE-RUN**. Individual Admin edits remain allowed; future products retain pre-existing default.
 
-## Feature code pending Owner review
+## Feature code — OWNER PASS (2026-10-28)
 - Branch `feature/admin-inline-edit-photo-drag-preorder-2026-10-27` based on last known Production `main` commit `c7b55e46c57e08e4da9f015b964be8fb68ff2c0b`.
 - `functions/api/admin/products/[id].js`: Admin-authenticated `PATCH` of one allowlisted field (fulfillmentType, category, price, images). Optimistic CAS based on original field prevents stale updates; audit only on effective successful update; 409 conflicts. Existing full PUT and delete unchanged.
 - `public/admin/index.html`: list card image opens Gallery tab; blank card opens Details; category, fulfillment and price remain individually editable. Whole-photo unified Pointer Events for Android and desktop, hold-to-enlarge then release-to-dismiss, drag-to-reorder with splice insert/shift, and one bottom drag-to-trash zone. The existing Gallery “Thêm ảnh” and Save pipeline remain, so existing WebP/private originals behavior is preserved. One Owner-approved CSS block retained.
@@ -21,7 +21,11 @@
 - `package.json` adds test command.
 - Isolated Admin Preview: https://owner-admin-quickedit-1027.sindarealest-admin-preview.pages.dev/admin/
 - Preview workflow: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40544105841 **SUCCESS**; verified isolated Preview D1 and R2 bindings.
-- Owner HAS NOT YET PASSed the inline Admin UI or image reorder; **do not merge these code changes to main before Owner approval.**
+- Owner explicitly **PASS**ed the final Admin inline-edit and gallery interactions on 2026-10-28; approved for controlled merge to `main` after CI.
+- Owner specifically verified the long gallery horizontal browse fix and the smooth swipe + long-hold vertical up/down repositioning.
+- Latest fully tested source SHA: `bd661bf16d459aaa1b9c1b7e28bfa94f5e82c8a2`; browser QA **3/3 PASS** with 28 photos and mobile up/down gestures: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40553730121.
+- Approved gestures: swipe to browse with inertia; touch-and-hold to enlarge; after hold drag up/down/left/right to insert, shifting images; one bottom trash; Save required to persist; Cancel discards.
+- No repeat of the one-time Production D1 conversion: it is already complete, and per-product fulfillment remains reversible.
 
 ## Acceptance checklist
 - Mobile 390 px: tap type chip, choose Hàng có sẵn; save only that product and field. Same for category and price. Tap cover: open Gallery editor without choosing a file. Tap blank card: open Details editor without hitting the pen.
