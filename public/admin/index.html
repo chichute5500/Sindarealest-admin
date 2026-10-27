@@ -1981,6 +1981,30 @@ function removeGalleryImage(index){
    No individual arrows, delete buttons, or grip handles. */
 const galleryGrid=$('#imageGrid');
 let galleryPointer=null,galleryPreview=null,galleryGhost=null;
+let gallerySwipeFrame=null;
+function cancelGallerySwipeInertia(){
+ if(gallerySwipeFrame!==null)cancelAnimationFrame(gallerySwipeFrame);
+ gallerySwipeFrame=null;
+}
+function continueGallerySwipeInertia(scroller,axis,velocity){
+ cancelGallerySwipeInertia();
+ if(!scroller||!scroller.isConnected||Math.abs(velocity)<.12)return;
+ let speed=Math.max(-2.8,Math.min(2.8,velocity))*16;
+ let last=performance.now();
+ const frame=now=>{
+  if(!scroller.isConnected){gallerySwipeFrame=null;return}
+  const elapsed=Math.max(1,Math.min(40,now-last)),prev=axis==='x'?scroller.scrollLeft:scroller.scrollTop;
+  const delta=speed*(elapsed/16);
+  if(axis==='x')scroller.scrollLeft=prev-delta;
+  else scroller.scrollTop=prev-delta;
+  const current=axis==='x'?scroller.scrollLeft:scroller.scrollTop;
+  speed*=Math.pow(.9,elapsed/16);
+  last=now;
+  if(Math.abs(speed)<.35||Math.abs(current-prev)<.1){gallerySwipeFrame=null;return}
+  gallerySwipeFrame=requestAnimationFrame(frame);
+ };
+ gallerySwipeFrame=requestAnimationFrame(frame);
+}
 function hideHeldGalleryPreview(){
  if(galleryPreview){galleryPreview.remove();galleryPreview=null;}
 }
@@ -2044,10 +2068,11 @@ galleryGrid.addEventListener('pointerdown',e=>{
  resetGalleryPointer();
  const index=Number(item.dataset.imageIndex);
  if(!Number.isInteger(index)||index<0||index>=gallery.length)return;
- const rail=item.closest('.image-rail');
+ cancelGallerySwipeInertia();
+ const rail=galleryGrid.querySelector('.image-rail');
  const drag={item,pointerId:e.pointerId,pointerType:e.pointerType,from:index,startX:e.clientX,startY:e.clientY,
-  moved:false,browsing:false,armed:false,target:null,timer:null,rail,
-  scrollStart:rail?.scrollLeft??0,lastX:e.clientX,lastTime:performance.now(),velocity:0};
+  moved:false,browsing:false,browseAxis:null,browseScroller:null,armed:false,target:null,timer:null,rail,
+  scrollStart:0,lastX:e.clientX,lastY:e.clientY,lastTime:performance.now(),velocity:0};
  galleryPointer=drag;
  try{item.setPointerCapture(e.pointerId)}catch{}
  drag.timer=setTimeout(()=>{
