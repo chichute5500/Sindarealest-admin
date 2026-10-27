@@ -1372,9 +1372,9 @@ let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, f
 const FAVORITES_STORAGE_KEY='sd-favorites';
 const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history';
 const LOCAL_ADDRESS_KEY='sd-shipping-address';
-const categoryLabels={all:'Tất cả',sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví da',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
-const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','wallets','sandals','watch-straps','phone-cases'];
-const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vida","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung"});function routeSlug(value){const key=String(value||'').trim().toLocaleLowerCase('en');if(Object.prototype.hasOwnProperty.call(productCategoryRouteSlugs,key))return productCategoryRouteSlugs[key];return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
+const categoryLabels={all:'Tất cả',sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví nam','vi-nam':'Ví nam','vi-cam-tay':'Ví cầm tay','cap-tab-laptop':'Cặp – Tab – Laptop',clutch:'Clutch',mu:'Mũ','tui-deo-cheo':'Túi đeo chéo','tui-golf':'Túi golf','tui-nu':'Túi nữ',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
+const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','wallets','vi-nam','vi-cam-tay','sandals','watch-straps','phone-cases','cap-tab-laptop','clutch','mu','tui-deo-cheo','tui-golf','tui-nu'];
+const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vinam","vi-nam":"vinam","vi-cam-tay":"vicamtay","cap-tab-laptop":"caplaptop","clutch":"clutch","mu":"mu","tui-deo-cheo":"tuideocheo","tui-golf":"tuigolf","tui-nu":"tuinu","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung"});function routeSlug(value){const key=String(value||'').trim().toLocaleLowerCase('en');if(Object.prototype.hasOwnProperty.call(productCategoryRouteSlugs,key))return productCategoryRouteSlugs[key];return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const imgPath=x=>String(x||'').replace(/^\.\//,'');
 function dismissToast(){const t=$('#toast');if(t)t.classList.remove('show','toast-detail-context');clearTimeout(toastTimer)}
@@ -1601,21 +1601,13 @@ function renderFilters(){
 function foldSearch(value){return String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function getFiltered(){
  const q=foldSearch(($('#catalogSearch').value||'').trim());
+ // Newly created products must appear at the top for ALL and category/search.
+ // Use the immutable D1 created_at timestamp, not Admin sort_order or update time.
  const matches=orderedSessionProducts().filter(p=>
   (selectedCategory==='all'||p.category===selectedCategory)&&
   (!q||foldSearch((p.title||'')+' '+visibleSku(p)+' '+(p.categoryLabel||'')+' '+(p.description||'')).includes(q)));
- if(selectedCategory!=='all'||q)return matches;
- // All products show the FULL sneakers group first, then successive category
- // groups. Only products INSIDE each category are randomized for this session.
- const groups=new Map();
- for(const p of matches){
-  const key=String(p.category||'');
-  if(!groups.has(key))groups.set(key,[]);
-  groups.get(key).push(p);
- }
- const keys=[...categoryOrder.filter(c=>c!=='all'&&groups.has(c)),
-  ...[...groups.keys()].filter(c=>!categoryOrder.includes(c))];
- return keys.flatMap(key=>groups.get(key));
+ const timestamp=p=>String(p.createdAt||p.created_at||'');
+ return matches.sort((a,b)=>timestamp(b).localeCompare(timestamp(a)));
 }
 function renderCatalog(){unbindReveal($('#catalogGrid'));filtered=getFiltered();const maxPage=Math.max(1,Math.ceil(filtered.length/perPage));page=Math.min(page,maxPage);const start=(page-1)*perPage;const items=filtered.slice(start,start+perPage);$('#catalogGrid').innerHTML=items.map((p,i)=>productCard(p,(p.categoryLabel||'SELECTED').toUpperCase(),i)).join('');$('#pageSummary').textContent=filtered.length?`Hiển thị ${start+1}–${Math.min(start+perPage,filtered.length)} trong ${filtered.length} sản phẩm`:'Không tìm thấy sản phẩm phù hợp.';const nums=[];let from=Math.max(1,page-2),to=Math.min(maxPage,page+2);if(from>1)nums.push(1,'…');for(let i=from;i<=to;i++)nums.push(i);if(to<maxPage)nums.push('…',maxPage);$('#pagination').innerHTML=filtered.length?`<button type="button" class="page-btn page-arrow tap-target" data-page="prev" ${page===1?'disabled':''} aria-label="Trang trước">${arrowIcon('left')}</button>${nums.map(n=>n==='…'?'<span class="page-summary">…</span>':`<button class="page-btn tap-target ${n===page?'active':''}" data-page="${n}" ${n===page?'aria-current="page"':''}>${n}</button>`).join('')}<button type="button" class="page-btn page-arrow tap-target" data-page="next" ${page===maxPage?'disabled':''} aria-label="Trang sau">${arrowIcon('right')}</button>`:'';bindReveal($('#catalogGrid'))}
 function scheduleDetailAutoplay(){clearTimeout(detailTimer);if(!currentProduct||detailImages.length<2||!$('#productOverlay').classList.contains('open')||$('#sdFullscreenViewer').classList.contains('open')||document.hidden)return;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;detailTimer=setTimeout(()=>changeDetailImage((detailIndex+1)%detailImages.length,false),2000)}
