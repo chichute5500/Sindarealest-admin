@@ -15,6 +15,10 @@ for(const cfg of tests){
  test('CSS identity and OS color scheme: '+cfg.label,async({page,context})=>{
   await page.setViewportSize({width:cfg.width,height:cfg.height});
   await page.emulateMedia({colorScheme:cfg.os,reducedMotion:'reduce'});
+  // Legacy stale localStorage must never force a surface to conflict with OS.
+  await context.addInitScript(()=>{
+   try{localStorage.setItem('sd-theme-mode',matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark')}catch{}
+  });
   const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
   await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:'[]'}));
   await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
@@ -72,6 +76,19 @@ for(const cfg of tests){
   expect(mode.logo).toBe(true);
   expect(mode.page).toBeLessThanOrEqual(cfg.width+1);
   await admin.screenshot({path:dir+'/admin-'+cfg.label+'.png',animations:'disabled'});
+  if(cfg.label==='mobile-dark'){
+   // A deliberate Admin LIGHT selection on a dark phone must remain entirely
+   // light; refreshing the document restores the device's preferred DARK.
+   await admin.locator('#adminThemeToggle').click();
+   await expect.poll(()=>admin.evaluate(()=>({
+     theme:document.documentElement.dataset.adminTheme,
+     scheme:getComputedStyle(document.documentElement).colorScheme,
+     background:getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
+   }))).toMatchObject({theme:'light',background:'#eaf3fb'});
+   expect((await admin.evaluate(()=>getComputedStyle(document.documentElement).colorScheme))).toContain('only');
+   await admin.reload({waitUntil:'domcontentloaded'});
+   await expect.poll(()=>admin.evaluate(()=>document.documentElement.dataset.adminTheme)).toBe('dark');
+  }
   expect(pageErrors).toEqual([]);
   expect(errors).toEqual([]);
   await admin.close();
