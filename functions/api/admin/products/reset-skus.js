@@ -26,7 +26,7 @@ export async function onRequestPost(context) {
   const db = context.env.DB;
   try {
     const query = await db.prepare(
-      "SELECT id, sku, sku_verified, title, category, category_label, sort_order FROM products ORDER BY sort_order ASC, title COLLATE NOCASE ASC, id ASC"
+      "SELECT id, sku, sku_verified, published, title, category, category_label, sort_order FROM products ORDER BY sort_order ASC, title COLLATE NOCASE ASC, id ASC"
     ).all();
     const allRows = query.results || [];
     const rows = allRows.filter((row) => Number(row.published) === 1 && Number(row.sku_verified) !== 1);
@@ -57,20 +57,14 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Build rules dynamically so future categories can also receive SKUs.
+    // Only the 15 owner-approved category prefixes may receive an official SKU.
     const categoryRules = Object.create(null);
     for (const row of categorized) {
       if (!Object.hasOwn(categoryRules, row.categoryKey)) {
         const prefix=officialSkuPrefix(row.categoryKey);
         if(!prefix)return fail(`Danh mục ${row.categoryKey} chưa có tiền tố SKU chính thức.`,400);
         const known={prefix,label:String(row.category_label||row.categoryKey)};
-        let hash = 0;
-        for (const char of row.categoryKey) hash = (hash * 31 + char.charCodeAt(0)) % 1296;
-        const compact = row.categoryKey.replace(/-/g, "").toUpperCase();
-        categoryRules[row.categoryKey] = known || {
-          prefix: "SD-" + (compact.slice(0, 5) || "MISC") + hash.toString(36).toUpperCase().padStart(2, "0"),
-          label: String(row.category_label || row.category || row.categoryKey),
-        };
+        categoryRules[row.categoryKey] = known;
       }
     }
     const counters = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
