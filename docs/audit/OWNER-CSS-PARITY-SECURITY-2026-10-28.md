@@ -28,7 +28,7 @@ Baseline: merged Owner-PASS Welcome/device theme main `7c6607e5115cdec9aceee28b0
 ## Source/browser QA evidence
 - Full `npm run check` and `npm test` on the branch; includes `tests/owner-css-parity-security-audit.test.mjs` in normal CI.
 - Chromium visual integration: [Actions 40559386212](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40559386212): **4/4 PASS** for **Admin + Storefront**, mobile 390 px and desktop 1366 px, device Light and Dark. Checks computed palette, brand artwork, color-scheme, no horizontal overflow or JS page exceptions. Artifact includes 8 real browser screenshots.
-- Most recent source-only change additionally removes 7 dead CSS declarations and adds a regression check; verify the exact branch head CI before Owner approval.
+- Final tested source SHA `f5728d040b14433d36f2da2868236da2b3b3231c` removes the 7 dead CSS declarations and includes explicit regression guards. Source and browser CI have now both passed. Later commits only update audit/handoff documents; check new HEAD CI as an extra gate.
 - Isolated Owner Preview: https://owner-css-parity-1028.sindarealest-admin-preview.pages.dev/
 - Existing security suite remains in CI: login/session tests, Admin auth surface tests, upload/JSON limits, SQL concurrency, return of private data, production binding guards.
 
@@ -38,4 +38,8 @@ Baseline: merged Owner-PASS Welcome/device theme main `7c6607e5115cdec9aceee28b0
 - Runtime third-party Cloudflare configuration and a live adversarial penetration test are beyond the scope of static source/isolated browser QA; don't equate passing test suites with an absolute absence of security issues.
 
 ## Status
-- **Audit changes are isolated and awaiting Owner PASS.** PR must remain Draft; do not merge without approval.
+- **Audit changes are isolated and awaiting Owner PASS** as **Draft PR #136**; do not merge without approval.
+- Final isolated Preview + 4/4 Chromium browser tests: [run #40560364276](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40560364276) **SUCCESS**.
+- PR CI for verified code: [run #40560417021](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40560417021) **SUCCESS**.
+- Next-chat documents: `docs/audit/HANDOFF-LATEST-2026-10-28-CSS-PARITY-SECURITY.md` and `docs/audit/PROMPT-NEXT-CHAT-2026-10-28-CSS-PARITY-SECURITY.md`.
+- Main Production code stays `7c6607e5115cdec9aceee28b00bff4d7d0c4fc30` unless a later independently verified main change occurs.
