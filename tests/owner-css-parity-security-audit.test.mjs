@@ -51,6 +51,12 @@ test('Owner-approved final dark background filter has no stale competing declara
  assert.ok(!web.includes('transition:background-color 1.15s'));
 });
 
+test('Owner-approved light background has no ineffective historical filter layers',()=>{
+ const rules=[...web.matchAll(/\\.theme-bg--light\\{([^}]+)\\}/g)];
+ const filters=rules.flatMap(item=>[...item[1].matchAll(/(?:^|;)\\s*filter\\s*:\\s*([^;]+)/g)].map(match=>match[1].trim()));
+ assert.deepEqual(filters,['none!important'],'Light background must retain only its final effective filter:none!important');
+});
+
 test('Cloudflare static HTML sends safe framing/object/base controls without blocking the existing app',()=>{
  for(const value of [
   "Content-Security-Policy: frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
