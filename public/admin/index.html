@@ -1414,7 +1414,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 #main .product-table tbody tr[data-product-row]{cursor:pointer}
 #main .product-table tbody tr[data-product-row]:focus-visible{outline:2px solid #5a9dcc;outline-offset:-2px}
 #main .product-table tbody tr[data-product-row]:hover{background:rgba(125,186,226,.055)}
-#imageGrid .imageitem{position:relative;touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#imageGrid .imageitem{position:relative;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #imageGrid .imageitem:active{cursor:grabbing}
 #imageGrid .imageitem img{pointer-events:none;-webkit-user-drag:none;-webkit-user-select:none;user-select:none}
 #imageGrid .imageitem.is-pointer-dragging{opacity:.65;outline:3px solid #4289be;outline-offset:-3px}
@@ -2079,7 +2079,7 @@ galleryGrid.addEventListener('pointermove',e=>{
     drag.browsing=true;
     drag.rail.scrollLeft=drag.scrollStart-dx;
    }
-   // Vertical motions retain native page scrolling via touch-action:pan-y.
+   // Vertical scrolling is handled manually until long-press activates dragging.
    return;
   }
   drag.moved=true;
