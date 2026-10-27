@@ -27,14 +27,15 @@ const mobileReferenceEnd = html.indexOf("@media(max-width:360px){", mobileRefere
 assert.ok(mobileReferenceStart >= 0 && mobileReferenceEnd > mobileReferenceStart,
   "The mobile reference-fit block must remain a single identifiable design section.");
 const mobileReferenceCss = html.slice(mobileReferenceStart, mobileReferenceEnd);
-assert.match(mobileReferenceCss, /\.hero-visual\{height:clamp\(170px,48vw,205px\);min-height:0;aspect-ratio:\.9\/1;border-radius:22px\}/,
-  "The mobile Hero must avoid the too-tall crop that cuts off real product imagery.");
-assert.match(mobileReferenceCss, /\.hero-visual img\{object-fit:contain;padding:4%;box-sizing:border-box\}/,
-  "Mobile Hero must show the full real catalog image instead of cropping the product.");
+const codeHeroCss = readFileSync(new URL("../public/code-hero.css", import.meta.url), "utf8");
+assert.match(codeHeroCss, /height:clamp\(236px,66vw,270px\)/,
+  "The live mobile code-only Hero must retain its owner-approved compact height.");
+assert.match(codeHeroCss, /\.sd-code-hero \.sdh-visual\{height:100%\}/,
+  "Mobile Hero must keep its CSS-only visual composition without loading a product photo.");
 assert.match(mobileReferenceCss, /\.service-strip \.service-copy\{min-height:52px;padding:4px 2px\}/,
   "The six reference benefit tiles must stay compact on mobile.");
-assert.match(html, /\.hero-visual\{height:clamp\(155px,46vw,175px\);min-height:0;aspect-ratio:\.9\/1\}/,
-  "Narrow phones must keep the Hero image frame compact without restoring the oversized crop.");
+assert.match(codeHeroCss, /@media\(max-width:370px\)\{\.sd-code-hero\{/,
+  "Narrow-phone Hero must preserve its dedicated code-only layout.");
 const finalBackgroundStart = html.lastIndexOf(".theme-bg--light::after{");
 const finalBackgroundCss = html.slice(finalBackgroundStart, finalBackgroundStart + 6000);
 const finalThemeCss = html.slice(html.lastIndexOf("/* Organic liquid-glass wave assets"));
@@ -128,16 +129,10 @@ assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  backgrou
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
 assert.ok(html.includes('html.dark .sd-fullscreen-viewer{color:#edf7ff;background:rgba(3,18,32,.84)}'),
   "The dark fullscreen viewer must stay navy glass rather than reuse the light palette.");
-const mobileHeroReferenceMatch = html.slice(html.lastIndexOf("/* Mobile Hero — owner reference, single authoritative layout."));
-assert.ok(html.includes('/* Hero uses the original owner-supplied RGBA PNG; preserve all product pixels and let the storefront ice-blue surface show through its alpha. */')
-  && html.includes('filter:drop-shadow(0 12px 16px rgba(0,0,0,.18))!important')
-  && mobileHeroReferenceMatch.includes('grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;')
-  && mobileHeroReferenceMatch.includes('height:clamp(216px,57vw,230px)!important;')
-  && mobileHeroReferenceMatch.includes('grid-template-rows:1fr!important;')
-  && mobileHeroReferenceMatch.includes('top:-42px!important;left:-30px!important;')
-  && mobileHeroReferenceMatch.includes('object-fit:contain!important;object-position:center center!important;')
-  && mobileHeroReferenceMatch.includes('opacity:1!important;mix-blend-mode:normal!important;'),
-  "Hero reference layout must not expand transparent PNG padding or stack the shoes below the copy.");
+assert.ok(html.includes('<section class="sd-code-hero wrap" id="home"'),
+  "Only the owner-approved code Hero is active.");
+assert.doesNotMatch(codeHeroCss, /url\(|!important/,
+  "CSS-only Hero must not load legacy hero photos or force overlapping !important rules.");
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
