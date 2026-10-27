@@ -27,4 +27,10 @@ assert.match(html,/<link rel="stylesheet" href="\/code-hero\.css\?v=20261026-2">
 assert.doesNotMatch(html,/<picture class="hero-reference-art"/);
 assert.doesNotMatch(html,/id="heroProductImage"/);
 assert.doesNotMatch(html,/HERO V2 — compact physical marble plinth|HERO REBUILD V8|HERO RENDER PARITY V7/,'Retired image-based HERO CSS must not return');
+// Retired image-HERO selectors are not used by the live code-only Hero.
+assert.equal(html.includes('id="heroProductImage"'), false);
+assert.equal(html.includes('class="hero"'), false);
+assert.equal(html.includes('.hero-visual{'), false);
+assert.equal(html.includes('.hero-copy{'), false);
+assert.equal(html.includes('#home.hero.wrap{'), false);
 console.log('PASS: code-only hero contract, copy, breakpoints and theme variants');

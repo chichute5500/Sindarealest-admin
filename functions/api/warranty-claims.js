@@ -1,4 +1,5 @@
 import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
+import { isWarrantyCode } from "../_warranty-policy.js";
 const clean=(v,max=1600)=>String(v??"").trim().slice(0,max);
 export async function onRequestPost({request,env}){
  if(request.headers.get("Origin")){try{if(new URL(request.headers.get("Origin")).origin!==new URL(request.url).origin)return fail("Yêu cầu không hợp lệ.",403)}catch{return fail("Yêu cầu không hợp lệ.",403)}}
@@ -16,7 +17,7 @@ export async function onRequestPost({request,env}){
    warrantyCode=clean(tokenData?.warrantyCode,100).toUpperCase();tokenWarrantyId=clean(tokenData?.warrantyId,100);
   }catch{return fail("Không thể xác minh phiên tra cứu bảo hành.",503)}
  }
- if(!/^SDW-[A-Z0-9]{24}$/.test(warrantyCode)||!["defect","seam","material","other"].includes(issueType)||description.length<8)return fail("Mã bảo hành, loại vấn đề hoặc mô tả chưa hợp lệ.");
+ if(!isWarrantyCode(warrantyCode)||!["defect","seam","material","other"].includes(issueType)||description.length<8)return fail("Mã bảo hành, loại vấn đề hoặc mô tả chưa hợp lệ.");
  if(contactPhone&&!/^[+0-9() .-]{9,24}$/.test(contactPhone))return fail("Số điện thoại liên hệ chưa hợp lệ.");
  const issueLabels={defect:"Lỗi sản phẩm",seam:"Đường may / hoàn thiện",material:"Chất liệu",other:"Vấn đề khác"};
  const message="Loại vấn đề: "+issueLabels[issueType]+"\n"+(contactPhone?"Số liên hệ: "+contactPhone+"\n":"")+"Mô tả: "+description;

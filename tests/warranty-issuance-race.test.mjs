@@ -6,7 +6,7 @@ const SECRET = "warranty-issue-race-test-secret-long-enough";
 const PASSWORD = "test-admin-password-long-enough";
 const session = await createSession(SECRET);
 
-function makeDB(inserted, { orderStatusAtBatch = "completed" } = {}) {
+function makeDB(inserted, { orderStatusAtBatch = "completed", collideFirstCode = false } = {}) {
   const calls = { batchCount: 0, statements: [] };
   return {
     calls,
@@ -24,6 +24,9 @@ function makeDB(inserted, { orderStatusAtBatch = "completed" } = {}) {
     },
     async batch(statements) {
       calls.batchCount++;
+      if (collideFirstCode && calls.batchCount === 1) {
+        throw new Error('D1_ERROR: UNIQUE constraint failed: warranties.warranty_code');
+      }
       calls.statements = statements.map((statement) => ({ sql: statement.sql, values: statement.values }));
       // Simulate the order changing after the preflight SELECT but before the atomic D1 INSERT.
       const checksCompletedOrderAtInsert = /AND EXISTS \(SELECT 1 FROM orders WHERE id=\? AND status='completed'\)/.test(calls.statements[0].sql);
@@ -71,6 +74,7 @@ assert.equal((await post(stringMonths, { durationMonths: "12" })).status, 201,
 const successDB = makeDB(true);
 const success = await post(successDB);
 assert.equal(success.status, 201, "first warranty issue should succeed");
+assert.match((await success.json()).warrantyCode,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
 assert.equal(successDB.calls.batchCount, 1, "warranty insert and audit record must be one atomic batch");
 assert.match(successDB.calls.statements[0].sql, /INSERT INTO warranties[\s\S]*SELECT[\s\S]*WHERE NOT EXISTS \(SELECT 1 FROM warranties WHERE order_item_id=\?\)/,
   "the insert itself must atomically check for an existing warranty for this order item");
@@ -78,6 +82,12 @@ assert.match(successDB.calls.statements[0].sql, /AND EXISTS \(SELECT 1 FROM orde
   "the atomic warranty insert must recheck that the order is still completed after the preflight read");
 assert.match(successDB.calls.statements[1].sql, /INSERT INTO audit_logs[\s\S]*WHERE EXISTS \(SELECT 1 FROM warranties WHERE id=\?\)/,
   "audit event must only be inserted if this request actually created the warranty");
+
+const collisionDB=makeDB(true,{collideFirstCode:true});
+const recovered=await post(collisionDB);
+assert.equal(recovered.status,201,'manual issue regenerates after a D1 code collision');
+assert.equal(collisionDB.calls.batchCount,2,'collision requires a second atomic batch');
+assert.match((await recovered.json()).warrantyCode,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
 
 const duplicateDB = makeDB(false);
 const duplicate = await post(duplicateDB);

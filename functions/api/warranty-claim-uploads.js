@@ -2,7 +2,7 @@ import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_MULTIPART_BYTES = MAX_IMAGE_BYTES + 1024 * 1024;
-const WARRANTY_CODE_PATTERN = /^SDW-[A-Z0-9]{24}$/;
+import { isWarrantyCode } from "../_warranty-policy.js";
 
 
 export async function onRequestPost({ request, env }) {
@@ -75,7 +75,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   const file = form.get("file");
-  if (!WARRANTY_CODE_PATTERN.test(warrantyCode)) {
+  if (!isWarrantyCode(warrantyCode)) {
     return fail("Mã bảo hành hoặc phiên tra cứu không hợp lệ.");
   }
   if (!file || typeof file.arrayBuffer !== "function" || file.size <= 0 ||

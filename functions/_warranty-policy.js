@@ -20,3 +20,24 @@ export function addWarrantyCalendarMonths(startsAt, months) {
   date.setUTCDate(Math.min(day, last));
   return date.toISOString().slice(0, 10);
 }
+
+/**
+ * Public display code, not an authentication secret.
+ * Crockford-style 32-symbol alphabet avoids 0/O and 1/I ambiguity:
+ * 32^4 = 1,048,576 possible codes. Existing 24-character codes remain valid.
+ */
+const WARRANTY_CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+export function generateShortWarrantyCode() {
+  const random = crypto.getRandomValues(new Uint8Array(4));
+  return "SDW-" + Array.from(random, byte => WARRANTY_CODE_ALPHABET[byte & 31]).join("");
+}
+
+export function isWarrantyCode(value) {
+  return /^SDW-(?:[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}|[A-Z0-9]{24})$/i.test(String(value || ""));
+}
+
+export function isWarrantyCodeCollisionError(error) {
+  const message = String(error?.message || error || "");
+  return /(?:UNIQUE constraint failed|SQLITE_CONSTRAINT_UNIQUE|UNIQUE violation).*warranties\.warranty_code/i.test(message);
+}

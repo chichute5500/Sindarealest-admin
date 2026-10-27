@@ -1,4 +1,5 @@
 import { dbOrFail, fail, getCurrentDateInVietnam, isWarrantyEligibleOnDate, json, parseImages, rateLimitPublicRequest, readJsonBodyLimited, warrantyStatusOnDate } from "../_lib.js";
+import { isWarrantyCode } from "../_warranty-policy.js";
 
 const clean = (value, max = 120) => String(value ?? "").trim().slice(0, max);
 const normalizePhone = value => {
@@ -32,7 +33,7 @@ function shapeWarranty(row, today, claimToken) {
   const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
   return {
     claimToken,
-    maskedWarrantyCode: code ? "••••" + code.slice(-4) : "••••",
+    maskedWarrantyCode: code ? "••••" + code.slice(-4).slice(code.length<=8 ? 2 : 0) : "••••",
     title: String(row.title || "Sản phẩm"),
     sku: Number(row.skuVerified) === 1 ? String(row.sku || "") : "",
     size: String(row.size || ""),
@@ -72,7 +73,7 @@ export async function onRequestPost({ request, env }) {
   if (!raw) return fail("Nhập mã bảo hành hoặc số điện thoại dùng khi mua hàng.");
   const today = getCurrentDateInVietnam();
   try {
-    const isCode = /^SDW-[A-Z0-9]{24}$/i.test(raw);
+    const isCode = isWarrantyCode(raw);
     let rows = [];
     if (isCode) {
       const row = await env.DB.prepare(selectSql + " WHERE upper(w.warranty_code)=? LIMIT 1").bind(raw.toUpperCase()).first();
