@@ -52,5 +52,6 @@ assert.match(glass,/#sdCheckoutQrImage\{[^}]*object-fit:contain/,"Do not crop or
 assert.doesNotMatch(glass,/\.sd-checkout-qr-main\{grid-template-columns:/,"Never put QR back into narrow side-by-side grid");
 assert.match(html,/sd-checkout-qr-warning/);
 assert.match(admin,/AS customer_payment_option/);
-assert.match(adminUi,/Khách chọn:/);
+assert.match(adminUi,/QR khách đã nhận/,"Admin shows checkout QR selection as pending bank reconciliation");
+assert.match(adminUi,/orderQrReceptionMarkup/,"Admin uses server-saved QR intent instead of marking payment as received");
 console.log("PASS: owner-approved Liquid Glass checkout steps; server-authoritative deposits; QR fail-closed; Admin choice recorded without marking paid.");
