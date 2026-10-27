@@ -1956,10 +1956,68 @@ $('#imageGrid').addEventListener('click',e=>{
 });
 function addImageFiles(files){for(const file of [...files||[]]){if(!file.type.startsWith('image/'))continue;if(gallery.length>=30){toast('Mỗi sản phẩm tối đa 30 ảnh.');break}if(file.size>20*1024*1024){toast(`Bỏ qua ${file.name}: ảnh gốc vượt 20 MB.`);continue}gallery.push({url:URL.createObjectURL(file),file,temporary:true})}renderGallery()}
 $('#imageInput').addEventListener('change',e=>{addImageFiles(e.target.files);e.target.value=''});
+function moveGalleryImage(from,to){
+ if(!Number.isInteger(from)||!Number.isInteger(to)||from===to||
+    from<0||to<0||from>=gallery.length||to>=gallery.length)return false;
+ const [moved]=gallery.splice(from,1);
+ gallery.splice(to,0,moved);renderGallery();
+ const status=$('#galleryStatus');
+ if(status)status.textContent='Đã chuyển ảnh '+(from+1)+' đến vị trí '+(to+1)+(to===0?' (ảnh đại diện)':'')+'. Nhấn Lưu để cập nhật sản phẩm.';
+ return true;
+}
 $('#imageGrid').addEventListener('dragstart',e=>{const item=e.target.closest('[data-image-index]');if(!item)return;item.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/x-sd-image-index',item.dataset.imageIndex)});
 $('#imageGrid').addEventListener('dragend',e=>e.target.closest('[data-image-index]')?.classList.remove('dragging'));
 $('#imageGrid').addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/x-sd-image-index'))e.preventDefault()});
-$('#imageGrid').addEventListener('drop',e=>{const target=e.target.closest('[data-image-index]');if(!target||!e.dataTransfer.types.includes('text/x-sd-image-index'))return;e.preventDefault();const from=Number(e.dataTransfer.getData('text/x-sd-image-index')),to=Number(target.dataset.imageIndex);if(Number.isInteger(from)&&Number.isInteger(to)&&from>=0&&from<gallery.length&&to>=0&&to<gallery.length&&from!==to){const [item]=gallery.splice(from,1);gallery.splice(to,0,item);renderGallery()}});
+$('#imageGrid').addEventListener('drop',e=>{const target=e.target.closest('[data-image-index]');if(!target||!e.dataTransfer.types.includes('text/x-sd-image-index'))return;e.preventDefault();const from=Number(e.dataTransfer.getData('text/x-sd-image-index')),to=Number(target.dataset.imageIndex);if(Number.isInteger(from)&&Number.isInteger(to)&&from>=0&&from<gallery.length&&to>=0&&to<gallery.length&&from!==to){moveGalleryImage(from,to)}});
+// Browser-native drag works on desktop. Android/iOS need Pointer Events:
+// hold the grip on a thumbnail, drag to a slot, release to INSERT at that
+// position (other images shift; swapping would lose the requested order).
+const galleryGrid=$('#imageGrid');
+let imageTouchDrag=null;
+function clearImageTouchDrag(){
+ if(!imageTouchDrag)return;
+ clearTimeout(imageTouchDrag.timer);
+ galleryGrid.querySelectorAll('.is-pointer-dragging,.is-drop-target').forEach(el=>{
+  el.classList.remove('is-pointer-dragging','is-drop-target');
+ });
+ imageTouchDrag=null;
+}
+galleryGrid.addEventListener('pointerdown',event=>{
+ if(event.pointerType==='mouse'||busy||!event.isPrimary)return;
+ const grip=event.target.closest('[data-image-drag-handle]');
+ const item=grip?.closest('[data-image-index]');
+ if(!item)return;
+ clearImageTouchDrag();
+ const drag={pointerId:event.pointerId,from:Number(item.dataset.imageIndex),to:null,
+  x:event.clientX,y:event.clientY,armed:false,handle:grip,timer:null};
+ imageTouchDrag=drag;
+ try{grip.setPointerCapture(event.pointerId)}catch{}
+ drag.timer=setTimeout(()=>{
+  if(imageTouchDrag!==drag)return;
+  drag.armed=true;item.classList.add('is-pointer-dragging');
+  $('#galleryStatus').textContent='Đang kéo ảnh '+(drag.from+1)+'. Thả vào ảnh muốn chèn trước.';
+ },180);
+});
+galleryGrid.addEventListener('pointermove',event=>{
+ const drag=imageTouchDrag;if(!drag||drag.pointerId!==event.pointerId)return;
+ if(!drag.armed){
+  if(Math.hypot(event.clientX-drag.x,event.clientY-drag.y)>18)clearImageTouchDrag();
+  return;
+ }
+ event.preventDefault();
+ const pointed=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-image-index]');
+ const current=pointed&&galleryGrid.contains(pointed)?Number(pointed.dataset.imageIndex):null;
+ drag.to=Number.isInteger(current)?current:null;
+ galleryGrid.querySelectorAll('.is-drop-target').forEach(el=>el.classList.remove('is-drop-target'));
+ if(drag.to!==null)pointed.classList.add('is-drop-target');
+});
+galleryGrid.addEventListener('pointerup',event=>{
+ const drag=imageTouchDrag;if(!drag||drag.pointerId!==event.pointerId)return;
+ const from=drag.from,to=drag.to,armed=drag.armed;
+ clearImageTouchDrag();
+ if(armed&&to!==null)moveGalleryImage(from,to);
+});
+galleryGrid.addEventListener('pointercancel',clearImageTouchDrag);
 const imageDropZone=$('#imageDropZone');['dragenter','dragover'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(e.dataTransfer?.types?.includes('Files')){e.preventDefault();imageDropZone.classList.add('is-dragover')}}));['dragleave','drop'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(type==='drop'&&e.dataTransfer?.files?.length){e.preventDefault();addImageFiles(e.dataTransfer.files)}imageDropZone.classList.remove('is-dragover')}));
 async function optimizeUpload(file){if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Ảnh gốc cần là JPEG, PNG hoặc WebP.');if(file.size>20*1024*1024)throw Error('Ảnh gốc vượt giới hạn 20 MB.');let bitmap;try{bitmap=await createImageBitmap(file)}catch{throw Error(`Không đọc được ảnh ${file.name}.`)}const scale=Math.min(1,1800/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));const ctx=canvas.getContext('2d',{alpha:false});ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.88));if(!blob||blob.size>5*1024*1024)throw Error(`Ảnh ${file.name} vượt giới hạn 5 MB sau tối ưu.`);const body=new FormData();body.append('file',blob,'product.webp');body.append('original',file,file.name||'original');return (await api('/api/admin/upload',{method:'POST',body})).url}
 $('#productForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;const b=$('#saveProduct');b.disabled=true;b.textContent='Đang lưu…';b.setAttribute('aria-label','Đang lưu sản phẩm');err($('#saveError'),'');try{syncProductIdentityValidity();const invalidInput=$('#productForm').querySelector(':invalid');if(invalidInput){const panel=invalidInput.closest('[data-product-panel]');if(panel)setProductEditorTab(panel.dataset.productPanel);invalidInput.focus();const fieldLabel=document.querySelector(`label[for="${invalidInput.id}"]`)?.textContent?.trim()||'trường này';throw Error(({pTitle:'Vui lòng nhập tên sản phẩm.',pCategory:'Vui lòng chọn hoặc nhập danh mục.'})[invalidInput.id]||`Vui lòng kiểm tra trường “${fieldLabel}”.`)}const id=$('#pId').value;for(const g of gallery){if(g.file){g.url=await optimizeUpload(g.file);g.file=null;g.temporary=false}}const payload={title:$('#pTitle').value.trim(),category:$('#pCategory').value.trim(),categoryLabel:$('#pCategory').value.trim(),sku:$('#pSku').value.trim(),skuVerified:$('#pSkuVerified').checked,description:$('#pDescription').value,price:$('#pPrice').value===''?null:Number($('#pPrice').value),stock:$('#pStock').value===''?null:Number($('#pStock').value),fulfillmentType:$('#pFulfillmentType').value,published:$('#pPublished').checked,images:gallery.map(g=>g.url)};const result=await api(id?`/api/admin/products/${encodeURIComponent(id)}`:'/api/admin/products',{method:id?'PUT':'POST',body:JSON.stringify(payload)});await loadData();closeEditor(true);render();toast(result.message||'Đã lưu sản phẩm.')}catch(ex){err($('#saveError'),ex.message)}finally{busy=false;b.disabled=false;b.textContent='Lưu';b.setAttribute('aria-label','Lưu sản phẩm')}});
