@@ -70,28 +70,17 @@ for(const marker of ['data-inline-photo=','data-inline-edit="fulfillmentType"','
 }
 assert.equal(admin.split('</style>').length-1,1,'Keep one approved Admin CSS block');
 
-const reorderStart=admin.indexOf('function moveGalleryImage(from,to){');
-const reorderEnd=admin.indexOf("$('#imageGrid').addEventListener('dragstart'",reorderStart);
-assert.ok(reorderStart>=0&&reorderEnd>reorderStart,'Gallery reorder helper must be defined once');
-const reorderCode=admin.slice(reorderStart,reorderEnd);
-const {runInNewContext}=await import('node:vm');
-let renderCalls=0;
-const state={gallery:['ảnh 1','ảnh 2','ảnh 3','ảnh 4'],renderGallery:()=>{renderCalls++},$:()=>({textContent:''})};
-const verify=runInNewContext(reorderCode+'\nmoveGalleryImage(2,0);gallery',state);
-assert.deepEqual(Array.from(verify),['ảnh 3','ảnh 1','ảnh 2','ảnh 4'],
- 'Moving a later photo to cover must INSERT and shift former cover/other photos right');
-assert.equal(renderCalls,1,'One reorder updates gallery view once');
-
 
 const reorderStart=admin.indexOf('function moveGalleryImage(from,to){');
 const reorderEnd=admin.indexOf("$('#imageGrid').addEventListener('dragstart'",reorderStart);
 assert.ok(reorderStart>=0&&reorderEnd>reorderStart,'Gallery reorder helper must be defined once');
 const reorderCode=admin.slice(reorderStart,reorderEnd);
 const {runInNewContext}=await import('node:vm');
-const state={gallery:['ảnh 1','ảnh 2','ảnh 3','ảnh 4'],calls:0,renderGallery(){this.calls++},$(){return {textContent:''}}};
-// Method call through VM-owned context rather than relying on the platform drag behavior.
-const verify=runInNewContext(reorderCode+'\nmoveGalleryImage(2,0);gallery',state);
-assert.deepEqual(Array.from(verify),['ảnh 3','ảnh 1','ảnh 2','ảnh 4'],
- 'Moving a later photo to cover must INSERT and shift former cover/other photos right');
+let reorderRenderCalls=0;
+const reorderContext={gallery:['ảnh 1','ảnh 2','ảnh 3','ảnh 4'],renderGallery:()=>{reorderRenderCalls++},$:()=>({textContent:''})};
+const reordered=runInNewContext(reorderCode+'\nmoveGalleryImage(2,0);gallery',reorderContext);
+assert.deepEqual(Array.from(reordered),['ảnh 3','ảnh 1','ảnh 2','ảnh 4'],
+ 'Moving a later photo to cover inserts and shifts former cover/other photos right');
+assert.equal(reorderRenderCalls,1,'One reorder updates gallery once');
 
 console.log('PASS: authenticated atomic quick-edit for fulfillment/category/price/cover, CAS, audit, revert, touch reorder wiring, owner CSS.');
