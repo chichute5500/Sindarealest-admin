@@ -138,4 +138,30 @@ for(const cfg of [
   expect(afterIncrement).toMatchObject({'qa-shoe::42':49,'qa-shoe::43':1});
  });
 
+ test('Changed category preserves cart but requires a compatible choice '+cfg.label,async({page,context})=>{
+  await page.setViewportSize({width:cfg.w,height:cfg.h});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  await context.addInitScript(()=>{
+   localStorage.setItem('sd-cart',JSON.stringify({'qa-shoe::42':3}));
+  });
+  const moved=items.map(p=>p.id==='qa-shoe'?{...p,category:'belts',categoryLabel:'Thắt lưng'}:p);
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(moved)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
+  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+  await page.locator(cfg.w<=760?'#mobileCartNav':'#cartOpen').click();
+  await expect(page.locator('#cartList .cart-row')).toHaveCount(1);
+  await expect(page.locator('[data-cart-select="qa-shoe"]')).toContainText('bản dây');
+  let persisted=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
+  expect(persisted).toMatchObject({'qa-shoe':3});
+  expect(persisted).not.toHaveProperty('qa-shoe::42');
+  await page.locator('#cartCheckout').click();
+  await expect(page.locator('#productOverlay')).toHaveClass(/open/);
+  await page.locator('#sdDetailOption').selectOption('3.5');
+  await page.locator('#detailAdd').click();
+  persisted=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
+  expect(persisted).toMatchObject({'qa-shoe::3.5':3});
+  expect(persisted).not.toHaveProperty('qa-shoe');
+ });
+
 }
