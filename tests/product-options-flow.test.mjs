@@ -34,7 +34,7 @@ const DB={
    async first(){return db.prepare(sql).get(...values)||null},
    async all(){return {results:db.prepare(sql).all(...values)}},
    async run(){const result=db.prepare(sql).run(...values);return {success:true,meta:{changes:Number(result.changes)}}},
-   execute(){if(/^\\s*(?:SELECT|WITH|PRAGMA)\\b/i.test(sql))return {results:db.prepare(sql).all(...values)};return {meta:{changes:Number(db.prepare(sql).run(...values).changes)}}}
+   execute(){if(['SELECT','WITH','PRAGMA'].includes(sql.trim().split(' ')[0].toUpperCase()))return {results:db.prepare(sql).all(...values)};return {meta:{changes:Number(db.prepare(sql).run(...values).changes)}}}
   }
  },
  async batch(statements){
@@ -75,19 +75,19 @@ try {
  assert.deepEqual(db.prepare('SELECT size FROM order_item_details ORDER BY size').all().map(x=>x.size),['42','43']);
  const cookie=await createSession(env.SESSION_SECRET);
  const admin=await adminOrders({env,request:new Request('https://qa.invalid/api/admin/orders',{headers:{Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin',Cookie:'sd_admin_session='+cookie}})});
- assert.equal(admin.status,200,await admin.text());
+ if(admin.status!==200)throw Error('Admin read failed: '+admin.status+' '+await admin.text());
  const payload=await admin.json();
  assert.deepEqual(payload.orders[0].items.map(x=>x.title),saved.map(x=>x.title),'Admin receives the exact selected size / belt width / phone model');
  assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
 
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const adminHtml=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
- assert.match(html,/function renderProductOptions\\(p\\)/);
- assert.match(html,/function sdCheckoutItems\\(\\)\\{return cartEntries\\(\\)/);
- assert.match(html,/const items=sdCheckoutItems\\(\\);if\\(!items.length\\)/);
- assert.match(html,/selectedDetailOption\\(currentProduct\\)/);
+ assert.ok(html.includes('function renderProductOptions(p)'));
+ assert.ok(html.includes('function sdCheckoutItems(){return cartEntries()'));
+ assert.ok(html.includes('const items=sdCheckoutItems();if(!items.length)'));
+ assert.ok(html.includes('selectedDetailOption(currentProduct)'));
  assert.match(html,/data-cart-select/);
- assert.match(html,/#productOverlay \\.detail-variants:not\\(\\[hidden\\]\\)/);
- assert.match(adminHtml,/esc\\(item.title\\|\\|'Sản phẩm'\\)/);
+ assert.ok(html.includes('#productOverlay .detail-variants:not([hidden])'));
+ assert.ok(adminHtml.includes("esc(item.title||'Sản phẩm')"));
  console.log('PASS: category-specific selections, server validation, multi-size cart contract, real SQLite order snapshots, shoe warranty sizes, Admin parity, no Production writes.');
 } finally {db.close()}
