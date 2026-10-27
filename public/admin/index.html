@@ -2084,29 +2084,37 @@ galleryGrid.addEventListener('pointerdown',e=>{
 galleryGrid.addEventListener('pointermove',e=>{
  const drag=galleryPointer;if(!drag||drag.pointerId!==e.pointerId)return;
  const dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;
- // A swipe before the hold timer expires browses the long photo rail.
- // Only a stationary hold enables photo reordering and drag-to-trash.
  if(drag.browsing){
-  if(drag.rail){
-   drag.rail.scrollLeft=drag.scrollStart-dx;
+  const scroller=drag.browseScroller,axis=drag.browseAxis;
+  if(scroller){
+   const coord=axis==='x'?e.clientX:e.clientY;
+   const delta=axis==='x'?dx:dy;
+   if(axis==='x')scroller.scrollLeft=drag.scrollStart-delta;
+   else scroller.scrollTop=drag.scrollStart-delta;
    const now=performance.now(),elapsed=Math.max(1,now-drag.lastTime);
-   drag.velocity=(e.clientX-drag.lastX)/elapsed;
-   drag.lastX=e.clientX;drag.lastTime=now;
+   const previous=axis==='x'?drag.lastX:drag.lastY;
+   const instantaneous=(coord-previous)/elapsed;
+   drag.velocity=drag.velocity*.35+instantaneous*.65;
+   drag.lastX=e.clientX;drag.lastY=e.clientY;drag.lastTime=now;
   }
   if(e.cancelable)e.preventDefault();
   return;
  }
  if(!drag.moved){
-  if(Math.hypot(dx,dy)<11)return;
+  if(Math.hypot(dx,dy)<9)return;
   if(drag.pointerType!=='mouse'&&!drag.armed){
    clearTimeout(drag.timer);
-   if(drag.rail&&Math.abs(dx)>=Math.abs(dy)){
-    drag.browsing=true;
-    drag.rail.scrollLeft=drag.scrollStart-dx;
-   }
-   // Vertical scrolling is handled manually until long-press activates dragging.
+   drag.browsing=true;
+   drag.browseAxis=drag.rail&&Math.abs(dx)>=Math.abs(dy)?'x':'y';
+   drag.browseScroller=drag.browseAxis==='x'?drag.rail:$('#backdrop .editorcontent');
+   const scroller=drag.browseScroller;
+   drag.scrollStart=scroller?(drag.browseAxis==='x'?scroller.scrollLeft:scroller.scrollTop):0;
+   drag.lastX=e.clientX;drag.lastY=e.clientY;drag.lastTime=performance.now();
+   // The gesture remains browsing-only until release, even if direction changes.
+   if(e.cancelable)e.preventDefault();
    return;
   }
+  // Once held, movement in ANY direction starts dragging, including vertical.
   drag.moved=true;
   clearTimeout(drag.timer);hideHeldGalleryPreview();
   drag.item.classList.add('is-pointer-dragging');
@@ -2141,10 +2149,11 @@ galleryGrid.addEventListener('pointermove',e=>{
 galleryGrid.addEventListener('pointerup',e=>{
  const drag=galleryPointer;if(!drag||drag.pointerId!==e.pointerId)return;
  const moved=drag.moved,from=drag.from,target=galleryPointerTarget(e.clientX,e.clientY)||drag.target;
- const browsing=drag.browsing,rail=drag.rail,velocity=drag.velocity;
+ const browsing=drag.browsing,scroller=drag.browseScroller,axis=drag.browseAxis;
+ const velocity=drag.velocity;
  resetGalleryPointer();
  if(browsing){
-  if(rail&&Math.abs(velocity)>0.15)rail.scrollBy({left:-Math.max(-240,Math.min(240,velocity*160)),behavior:'smooth'});
+  continueGallerySwipeInertia(scroller,axis,velocity);
   return;
  }
  if(!moved||!target)return;
