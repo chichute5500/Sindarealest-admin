@@ -4,7 +4,7 @@
  * Production write only from the exact one-off Owner branch Actions workflow.
  */
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
-import {createHash} from 'node:crypto';
+import {createHash,randomUUID} from 'node:crypto';
 
 const EXPECTED_REPO='chichute5500/Sindarealest-admin';
 const EXPECTED_REF='refs/heads/feature/admin-inline-edit-photo-drag-preorder-2026-10-27';
@@ -76,6 +76,6 @@ guard(Number(counts.total)===beforeCount&&Number(counts.placed)===beforeCount,'P
 await query('INSERT INTO settings(key,value,updated_at) VALUES (?, ?, datetime(\'now\'))',[MARKER,JSON.stringify({count:beforeCount,changed:changeCount,fingerprint})]);
 try{
  await query("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'admin', 'product_bulk_fulfillment', 'products', 'all', ?)",
- [crypto.randomUUID(),JSON.stringify({count:beforeCount,changed:changeCount,target:'made_to_order',ownerApproved:true})]);
+ [randomUUID(),JSON.stringify({count:beforeCount,changed:changeCount,target:'made_to_order',ownerApproved:true})]);
 }catch{console.warn('Audit summary insertion not verified; marker and product verification are still authoritative.')}
 console.log('OWNER BULK PASS: '+beforeCount+'/'+beforeCount+' existing products are made_to_order. Changed '+changeCount+'. Future individual edits and new-product defaults remain unchanged. Order records and R2 untouched.');
