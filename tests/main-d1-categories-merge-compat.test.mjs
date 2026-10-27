@@ -39,7 +39,7 @@ for(const c of ["sneakers","tui-golf","clutch","vi-nam","vi-cam-tay","mu"])asser
 assert.ok(container.innerHTML.includes("Túi Golf · 2"),"Existing D1 category counts preserved with Owner-approved capitalization");
 assert.equal((container.innerHTML.match(/class="filter-pill/g)||[]).length,8,"Every distinct imported category plus All stays visible");
 assert.ok(!container.innerHTML.includes("<img src=x"),"Untrusted D1 labels cannot inject markup");
-assert.ok(container.innerHTML.includes("&lt;img src=x onerror=alert(1)&gt;"),"Escaped untrusted category labels remain readable");
+assert.ok(container.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"),"Escaped untrusted category labels remain readable, regardless of owner-approved title case");
 ctx.selectedCategory="tui-golf";render();
 assert.ok(container.innerHTML.includes('data-category="tui-golf" aria-pressed="true"'),"Dynamic D1 category remains selectable");
 ctx.products=[{category:"imported-after-merge",categoryLabel:"Danh mục tương lai"}];render();
