@@ -45,3 +45,15 @@
 ## Prompt tiếp nối nếu chat bị dài
 
 > Tiếp tục trực tiếp repository `chichute5500/Sindarealest-admin`, branch `feat/product-options-shoes-belts-phone-2026-10-28`, PR #137 OPEN/DRAFT. Đọc toàn bộ `docs/features/PRODUCT-OPTIONS-OWNER-REVIEW-2026-10-28.md`. Chủ shop đã yêu cầu size giày 38–44, thắt lưng bản 3.5/4.0 cm, ốp điện thoại ghi dòng máy; đồng bộ storefront/admin PC/mobile. Tính năng đã triển khai và SQLite/Chrome QA cũ GREEN. Source QA mở rộng mốc `23bbb25` cần xác minh CI run 40576608412 / 40576608410, sửa nếu đỏ. QA Chrome vòng cuối **20/20 GREEN**, source CI xanh, Preview branch đã deploy; báo cáo nghiệm thu và xin Owner PASS; không merge main/Production khi chưa được phép. Không làm lại các phần Owner PASS trước đó. Không thay đổi Production D1/R2.
+
+## Điều chỉnh giao diện lựa chọn theo yêu cầu Owner (2026-10-28)
+
+- Thay select/dropdown cho **mọi lựa chọn cố định** bằng ô bấm riêng: giày 38–44 có **7 nút số nhỏ**, thắt lưng 3.5/4.0 cm có **2 nút**, hiển thị 3,5 và 4,0; nhãn bên trên ghi đơn vị cm.
+- Các nút vừa nội dung số, `flex-wrap` tự xuống hàng trên màn nhỏ, không kéo rộng kín hàng. Nút chọn dùng màu xanh `--gold` của giao diện đã Owner PASS, trạng thái `aria-pressed`, điều hướng phím mũi tên, Home/End và focus-visible.
+- Ốp điện thoại có tên máy nhập tự do, không thể biến thành danh sách hữu hạn: giữ ô nhập chữ nhưng thu gọn tối đa 280px, bo tròn đồng tông.
+- Không đổi hợp đồng API, giá, QR, Admin, bản ghi size đã lưu hoặc logic giỏ. Hidden canonical value truyền lại lựa chọn như trước.
+- Mã nguồn chức năng được kiểm tra: `69fb405a8dc7860c32630b0730e5f72822cd00ac`.
+- [Chrome QA chọn ô và hậu kiểm toàn luồng](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40578106356): **SUCCESS, 20/20**, gồm chip 7 nút, bề ngang nút dưới 60px, mobile overflow, keyboard navigation, đồng bộ giỏ/checkout/Admin trên PC/mobile sáng/tối; bước binding safety, Preview deploy **SUCCESS**.
+- [Source checks](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40578106322): **SUCCESS**; [Admin Preview regression](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40578117361): **SUCCESS**.
+- Preview đã cập nhật thành công: https://product-options-1028.sindarealest-admin-preview.pages.dev/
+- **Chờ Owner PASS mới merge.** Không chạm `main`, Production D1 hoặc R2.
