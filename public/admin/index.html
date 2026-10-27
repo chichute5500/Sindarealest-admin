@@ -1920,30 +1920,24 @@ function setProductEditorTab(name,moveFocus=false){const tabs=$$('#productEditor
  if(/^(?:blob:|data:image\/|https?:\/\/)/i.test(src))return src;
  return src.startsWith('/')?src:'/'+src;
 }
-function renderGalleryItem(g,i){return `<div class="imageitem ${i===0?'imageitem-cover':''}" role="group" aria-label="${i===0?'Ảnh đại diện sản phẩm':'Ảnh sản phẩm '+(i+1)}" draggable="true" data-image-index="${i}">${i===0?'<span class="covertag">ẢNH ĐẠI DIỆN</span>':''}<img src="${esc(galleryImageSrc(g.url))}" alt="${i===0?'Ảnh đại diện sản phẩm':'Ảnh sản phẩm '+(i+1)}"><span class="image-drag-handle" data-image-drag-handle title="Giữ và kéo để đổi vị trí ảnh">⠿</span><div class="imagebuttons"><button type="button" data-gallery="up" data-index="${i}" aria-label="Chuyển ảnh ${i+1} lên" ${i===0?"disabled":""}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg></button><button type="button" data-gallery="down" data-index="${i}" aria-label="Chuyển ảnh ${i+1} xuống" ${i===gallery.length-1?"disabled":""}><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></button><button type="button" data-gallery="remove" data-index="${i}" aria-label="Xóa ảnh ${i+1}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg></button></div></div>`}
-function renderGallery(){const grid=$('#imageGrid');if(!gallery.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;border:1px dashed var(--line);border-radius:12px">Chưa có ảnh. Chọn ảnh từ điện thoại để tạo bộ ảnh cùng SKU.</div>';return}const cover=renderGalleryItem(gallery[0],0),thumbnails=gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('');grid.innerHTML=`<div class="image-cover-slot">${cover}</div>${thumbnails?'<div class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ, vuốt ngang để xem thêm">'+thumbnails+'</div>':''}`}
+function renderGalleryItem(g,i){
+ return '<div class="imageitem '+(i===0?'imageitem-cover':'')+'" role="group" tabindex="0" aria-label="Ảnh '+(i+1)+' trên '+gallery.length+'. Giữ để phóng to, kéo để đổi vị trí, phím Delete để gỡ ảnh." data-image-index="'+i+'">'+
+  (i===0?'<span class="covertag">ẢNH ĐẠI DIỆN</span>':'')+
+  '<img draggable="false" src="'+esc(galleryImageSrc(g.url))+'" alt="'+(i===0?'Ảnh đại diện sản phẩm':'Ảnh sản phẩm '+(i+1))+'"></div>';
+}
+function renderGallery(){
+ const grid=$('#imageGrid'),trash=$('#galleryTrash');
+ trash?.classList.toggle('is-empty',gallery.length===0);
+ if(!gallery.length){
+  grid.innerHTML='<div class="empty" style="grid-column:1/-1;border:1px dashed var(--line);border-radius:12px">Chưa có ảnh. Nhấn “Thêm ảnh” để tạo bộ ảnh cùng SKU.</div>';
+  return;
+ }
+ const cover=renderGalleryItem(gallery[0],0);
+ const thumbnails=gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('');
+ grid.innerHTML='<div class="image-cover-slot">'+cover+'</div>'+
+  (thumbnails?'<div class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ">'+thumbnails+'</div>':'');
+}
 $('#chooseImages').addEventListener('click',()=>$('#imageInput').click());
-$('#imageGrid').addEventListener('click',e=>{
- const b=e.target.closest('[data-gallery]');if(!b)return;
- const action=b.dataset.gallery,from=Number(b.dataset.index),status=$('#galleryStatus');
- let focusIndex=from,focusAction='remove';
- if(action==='up'&&from>0){
-  [gallery[from-1],gallery[from]]=[gallery[from],gallery[from-1]];
-  focusIndex=from-1;focusAction=focusIndex===0?'down':'up';
-  status.textContent=focusIndex===0?'Đã chuyển ảnh lên vị trí ảnh đại diện.':`Đã chuyển ảnh lên vị trí ${focusIndex+1}.`;
- }else if(action==='down'&&from<gallery.length-1){
-  [gallery[from+1],gallery[from]]=[gallery[from],gallery[from+1]];
-  focusIndex=from+1;focusAction='up';
-  status.textContent=from===0?'Đã chuyển ảnh đại diện xuống vị trí 2.':`Đã chuyển ảnh xuống vị trí ${focusIndex+1}.`;
- }else if(action==='remove'){
-  if(gallery[from]?.temporary)URL.revokeObjectURL(gallery[from].url);
-  gallery.splice(from,1);focusIndex=Math.min(from,gallery.length-1);focusAction='remove';
-  status.textContent=`Đã xóa ảnh ${from+1}. Còn ${gallery.length} ảnh.`;
- }else{return}
- renderGallery();
- const target=gallery.length?$('#imageGrid').querySelector(`[data-gallery="${focusAction}"][data-index="${focusIndex}"]`):null;
- if(target&&!target.disabled)target.focus();else $('#chooseImages')?.focus();
-});
 function addImageFiles(files){for(const file of [...files||[]]){if(!file.type.startsWith('image/'))continue;if(gallery.length>=30){toast('Mỗi sản phẩm tối đa 30 ảnh.');break}if(file.size>20*1024*1024){toast(`Bỏ qua ${file.name}: ảnh gốc vượt 20 MB.`);continue}gallery.push({url:URL.createObjectURL(file),file,temporary:true})}renderGallery()}
 $('#imageInput').addEventListener('change',e=>{addImageFiles(e.target.files);e.target.value=''});
 function moveGalleryImage(from,to){
