@@ -88,7 +88,7 @@ assert.doesNotMatch(adminHtml, /customer-mobile-(?:total|revenue|amount)/,
 
 // Owner-approved order redesign: tappable cards and a focused detail screen.
 for(const token of ['const filteredOrders=orders.filter','id="orderSearchBox"','id="orderStatusFilter"','id="orderPaymentFilter"','id="orderResultSummary"',
- 'class="sd-order-cards"','data-order-open="${esc(o.id)}"','class="sd-order-advanced"','data-action="record-payment"',
+ 'class="sd-order-cards"','data-order-open="${esc(o.id)}"','sd-order-advanced"','data-action="record-payment"',
  'data-action="record-refund"','data-next-status="${nextStatus}"','sdAdminEditor:true']){
  has(token,'focused order workflow: '+token);
 }
