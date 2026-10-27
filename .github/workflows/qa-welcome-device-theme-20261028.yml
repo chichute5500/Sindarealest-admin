@@ -1,0 +1,94 @@
+name: Owner Welcome once and device-first storefront theme (isolated Preview)
+# Owner regression re-run after Chrome computed color-scheme normalization in browser tests.
+on:
+  push:
+    branches: [fix/welcome-once-device-theme-2026-10-28]
+    paths:
+      - '.github/workflows/qa-welcome-device-theme-20261028.yml'
+permissions:
+  contents: read
+concurrency:
+  group: sd-owner-welcome-device-theme-1028
+  cancel-in-progress: true
+jobs:
+  qa:
+    name: Validate source and deploy isolated Theme QA Preview (no Production)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH: welcome-device-theme-1028
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Validate target and source immutable SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/fix/welcome-once-device-theme-2026-10-28"
+          test "$CF_TARGET" = "sindarealest-admin-preview"
+          test "$CF_BRANCH" != "main"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Run full source and regression checks
+        run: |
+          npm install --no-fund
+          npm run check
+          npm test
+      - name: Verify separate D1/R2, forbid Production binding in Preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-preview.json"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest2" > "$RUNNER_TEMP/production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-preview.json" "$RUNNER_TEMP/production.json"
+      - name: Deploy only isolated preview project and branch
+        run: |
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "Welcome once and device-first theme QA $GITHUB_SHA"
+      - name: Prepare Chrome browser regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 95s npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          if command -v google-chrome >/dev/null 2>&1; then
+            google-chrome --version
+            echo "SD_OWNER_QA_SYSTEM_CHROME=1" >> "$GITHUB_ENV"
+          else
+            timeout 110s npx playwright install chromium
+          fi
+      - name: Verify Welcome Home/Catalog/reload and OS-vs-manual theme on mobile/desktop
+        shell: bash
+        env:
+          SD_STOREFRONT_TEST_URL: http://127.0.0.1:4173/
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public > "$RUNNER_TEMP/owner-storefront-test.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep .3
+          done
+          npx playwright test tests/e2e/storefront-welcome-device-theme-20261028.spec.js --config=playwright.owner-gesture.config.js --reporter=list
+      - name: Attach screenshot/test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: welcome-theme-qa-${{ github.sha }}
+          path: |
+            artifacts/welcome-device-theme-20261028/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Confirm nonproduction Owner URL
+        run: |
+          echo "Preview only: https://welcome-device-theme-1028.sindarealest-admin-preview.pages.dev/"
+          echo "Source SHA: $GITHUB_SHA"

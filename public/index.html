@@ -6,6 +6,7 @@
 <meta name="google-site-verification" content="6GC_01bvUrkBiD79vdoKU9wJ3A5PGNdqibCT_FkgG7o">
 <base href="/">
 <meta name="theme-color" content="#061522">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20261027">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=20261027">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=20261027">
@@ -31,7 +32,36 @@
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
 <title>SinDarealest — Premium Crocodile Leather Fashion</title>
-<script>(()=>{const root=document.documentElement;root.classList.add('js-enabled');root.classList.toggle('sd-catalog-route',/^\/sanpham(?:\/[a-z0-9][a-z0-9-]{0,99})?\/?$/i.test(location.pathname));let mode='auto';try{const saved=localStorage.getItem('sd-theme-mode');if(saved==='dark'||saved==='light')mode=saved}catch(e){}const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);root.dataset.themeMode=mode;if(mode==='dark'||(mode==='auto'&&systemDark))root.classList.add('dark');const themeMeta=document.querySelector('meta[name="theme-color"]');if(themeMeta)themeMeta.content=root.classList.contains('dark')?'#061522':'#eaf3fb'})();</script>
+<script>(()=>{const root=document.documentElement;
+ root.classList.add('js-enabled');
+ root.classList.toggle('sd-catalog-route',/^\/sanpham(?:\/[a-z0-9][a-z0-9-]{0,99})?\/?$/i.test(location.pathname));
+ const navigation=typeof performance!=='undefined'&&performance.getEntriesByType?.('navigation')?.[0]?.type||'navigate';
+ let sameSiteEntry=false;
+ try{sameSiteEntry=Boolean(document.referrer&&new URL(document.referrer).origin===location.origin)}catch(e){}
+ // Only full page loads from another store page may bypass Welcome. Refresh
+ // (navigation=reload), fresh external entry and new tab entry still show it.
+ try{
+  const seen=sessionStorage.getItem('sd-welcome-seen-in-tab')==='1';
+  if(navigation!=='reload'&&sameSiteEntry&&seen)root.classList.add('sd-welcome-nav-bypass');
+  sessionStorage.setItem('sd-welcome-seen-in-tab','1');
+ }catch(e){}
+ // OS preference owns each new entry/reload. Manual website choice is scoped
+ // to this tab's same-origin navigation, never a stale localStorage override.
+ let mode='auto';
+ try{
+  if(navigation==='reload'||!sameSiteEntry&&navigation!=='back_forward')
+   sessionStorage.removeItem('sd-storefront-theme-override-v2');
+  else{
+   const saved=sessionStorage.getItem('sd-storefront-theme-override-v2');
+   if(saved==='dark'||saved==='light')mode=saved;
+  }
+ }catch(e){}
+ const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+ root.dataset.themeMode=mode;
+ root.classList.toggle('dark',mode==='dark'||(mode==='auto'&&systemDark));
+ const themeMeta=document.querySelector('meta[name="theme-color"]');
+ if(themeMeta)themeMeta.content=root.classList.contains('dark')?'#061522':'#eaf3fb';
+})();</script>
 <style>
 /* Avoid Android's blue tap flash without disabling text selection or keyboard focus. */
 button,a,[role="button"],img,svg{ -webkit-tap-highlight-color: transparent; }
@@ -39,8 +69,8 @@ button,a,[role="button"],img,svg{ -webkit-tap-highlight-color: transparent; }
 @font-face{font-family:SD Sans;src:url('fonts/NotoSans-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
 @font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
 @font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
-:root{color-scheme:light;--page:#eaf3fb;--ink:#142a3c;--muted:#5b7488;--gold:#5c91b9;--gold-hi:#b9dcf6;--line:rgba(235,247,255,.88);--nav-bg:rgba(244,250,255,.50);--nav-glass-hover:rgba(255,255,255,.36);--glass:rgba(245,250,255,.66);--card-glass:rgba(236,246,255,.78);--shadow:0 18px 44px rgba(41,84,119,.15);--card-ink:#142a3c;--soft-line:rgba(74,116,147,.18);--panel:rgba(238,247,255,.70);--panel-strong:rgba(248,252,255,.86);--benefit-tile-glass:linear-gradient(145deg,rgba(255,255,255,.88) 0%,rgba(236,246,255,.82) 48%,rgba(216,234,249,.74) 100%);--benefit-tile-border:rgba(255,255,255,.80);--benefit-tile-shadow:0 8px 21px rgba(37,72,98,.12),inset 0 1px 0 rgba(255,255,255,.84),inset 0 -1px 0 rgba(68,112,144,.07),inset 0 0 0 1px rgba(255,255,255,.14);--benefit-tile-hover-shadow:0 12px 27px rgba(37,72,98,.16),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(68,112,144,.06),inset 0 0 0 1px rgba(255,255,255,.20);--body-overlay:rgba(232,244,255,.035);--nav-ink:#142a3c;--nav-muted:rgba(20,42,60,.78);--lightness:1}
-html.dark{color-scheme:dark;--page:#061522;--ink:#edf7ff;--muted:#abc3d7;--gold:#9bcdf3;--gold-hi:#d9f0ff;--line:rgba(176,215,243,.36);--nav-bg:rgba(7,24,41,.64);--nav-glass-hover:rgba(164,211,244,.20);--glass:rgba(13,35,56,.78);--card-glass:rgba(8,27,46,.86);--shadow:0 18px 44px rgba(0,7,18,.46);--card-ink:#edf7ff;--soft-line:rgba(176,213,239,.24);--panel:rgba(8,27,46,.78);--panel-strong:rgba(10,32,53,.90);--benefit-tile-glass:linear-gradient(145deg,rgba(36,66,91,.96) 0%,rgba(24,49,72,.94) 48%,rgba(12,31,50,.92) 100%);--benefit-tile-border:rgba(204,231,250,.44);--benefit-tile-shadow:0 10px 24px rgba(0,6,16,.30),inset 0 1px 0 rgba(232,246,255,.42),inset 0 -1px 0 rgba(0,8,19,.20),inset 0 0 0 1px rgba(184,219,244,.10);--benefit-tile-hover-shadow:0 13px 28px rgba(0,6,16,.36),inset 0 1px 0 rgba(243,250,255,.56),inset 0 -1px 0 rgba(0,8,19,.18),inset 0 0 0 1px rgba(198,228,248,.14);--body-overlay:rgba(0,7,18,.26);--nav-ink:#edf7ff;--nav-muted:rgba(237,247,255,.80);--lightness:.92}
+:root{color-scheme:only light;--page:#eaf3fb;--ink:#142a3c;--muted:#5b7488;--gold:#5c91b9;--gold-hi:#b9dcf6;--line:rgba(235,247,255,.88);--nav-bg:rgba(244,250,255,.50);--nav-glass-hover:rgba(255,255,255,.36);--glass:rgba(245,250,255,.66);--card-glass:rgba(236,246,255,.78);--shadow:0 18px 44px rgba(41,84,119,.15);--card-ink:#142a3c;--soft-line:rgba(74,116,147,.18);--panel:rgba(238,247,255,.70);--panel-strong:rgba(248,252,255,.86);--benefit-tile-glass:linear-gradient(145deg,rgba(255,255,255,.88) 0%,rgba(236,246,255,.82) 48%,rgba(216,234,249,.74) 100%);--benefit-tile-border:rgba(255,255,255,.80);--benefit-tile-shadow:0 8px 21px rgba(37,72,98,.12),inset 0 1px 0 rgba(255,255,255,.84),inset 0 -1px 0 rgba(68,112,144,.07),inset 0 0 0 1px rgba(255,255,255,.14);--benefit-tile-hover-shadow:0 12px 27px rgba(37,72,98,.16),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(68,112,144,.06),inset 0 0 0 1px rgba(255,255,255,.20);--body-overlay:rgba(232,244,255,.035);--nav-ink:#142a3c;--nav-muted:rgba(20,42,60,.78);--lightness:1}
+html.dark{color-scheme:only dark;--page:#061522;--ink:#edf7ff;--muted:#abc3d7;--gold:#9bcdf3;--gold-hi:#d9f0ff;--line:rgba(176,215,243,.36);--nav-bg:rgba(7,24,41,.64);--nav-glass-hover:rgba(164,211,244,.20);--glass:rgba(13,35,56,.78);--card-glass:rgba(8,27,46,.86);--shadow:0 18px 44px rgba(0,7,18,.46);--card-ink:#edf7ff;--soft-line:rgba(176,213,239,.24);--panel:rgba(8,27,46,.78);--panel-strong:rgba(10,32,53,.90);--benefit-tile-glass:linear-gradient(145deg,rgba(36,66,91,.96) 0%,rgba(24,49,72,.94) 48%,rgba(12,31,50,.92) 100%);--benefit-tile-border:rgba(204,231,250,.44);--benefit-tile-shadow:0 10px 24px rgba(0,6,16,.30),inset 0 1px 0 rgba(232,246,255,.42),inset 0 -1px 0 rgba(0,8,19,.20),inset 0 0 0 1px rgba(184,219,244,.10);--benefit-tile-hover-shadow:0 13px 28px rgba(0,6,16,.36),inset 0 1px 0 rgba(243,250,255,.56),inset 0 -1px 0 rgba(0,8,19,.18),inset 0 0 0 1px rgba(198,228,248,.14);--body-overlay:rgba(0,7,18,.26);--nav-ink:#edf7ff;--nav-muted:rgba(237,247,255,.80);--lightness:.92}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:106px;background:var(--page);transition:background-color .24s ease,color .24s ease}body{margin:0;min-height:100vh;position:relative;isolation:isolate;overflow-x:hidden;background:var(--page);color:var(--ink);font-family:SD Sans,Arial,sans-serif;transition:background-color .24s ease,color .24s ease}
 .theme-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;background-position:center center;background-repeat:no-repeat;background-size:cover;transform:none;will-change:opacity;transition:opacity .24s ease,filter .24s ease}
 .theme-bg--dark{opacity:0;background-color:#061522;background-image:radial-gradient(ellipse at 18% 12%,rgba(106,174,219,.36) 0%,transparent 38%),radial-gradient(ellipse at 79% 39%,rgba(26,87,128,.42) 0%,transparent 42%),radial-gradient(ellipse at 39% 88%,rgba(57,117,157,.28) 0%,transparent 43%),linear-gradient(128deg,#04101d 0%,#0a2740 24%,#142d44 43%,#061725 60%,#12344d 78%,#04111e 100%);filter:hue-rotate(0deg) saturate(.82) brightness(.82) contrast(.92)}
@@ -616,6 +646,8 @@ html{transition:background-color .25s ease,color .25s ease}
 
 <!-- sd-welcome-first-paint-guard-2026-10-22 -->
 <style id="sdWelcomeFirstPaintGuard">
+/* In-app navigation must never re-display Welcome; hide before first paint. */
+html.sd-welcome-nav-bypass #welcomeSplash{display:none!important}
 /* Parsed in <head>: the initial body flag must gate storefront chrome before first paint; :has() remains a secondary safeguard. */
 .welcome-splash{z-index:2147483000!important}
 body.welcome-active .welcome-splash{z-index:2147483000!important}
@@ -1025,6 +1057,11 @@ html.sd-catalog-route #products .filter-pill{
 (function(){
   var s=document.getElementById('welcomeSplash');
   if(!s)return;
+  if(document.documentElement.classList.contains('sd-welcome-nav-bypass')){
+    document.body.classList.remove('welcome-active');
+    s.setAttribute('aria-hidden','true');s.remove();
+    return;
+  }
   var closed=false;
   var skip=document.getElementById('skipIntro');
   // Warm the exact Vietnamese font faces before revealing any welcome copy.
@@ -1535,7 +1572,7 @@ function toggleTheme(){
   const root=document.documentElement;
   const dark=typeof window.__sdThemeTargetDark==='boolean'?window.__sdThemeTargetDark:root.classList.contains('dark');
   const next=dark?'light':'dark';
-  try{localStorage.setItem('sd-theme-mode',next)}catch(e){}
+  try{sessionStorage.setItem('sd-storefront-theme-override-v2',next)}catch(e){}
   applyThemeMode(next,true);
 }
 function setupSystemTheme(){const media=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');if(!media)return;const onChange=()=>{if((document.documentElement.dataset.themeMode||'auto')==='auto')applyThemeMode('auto',true)};if(media.addEventListener)media.addEventListener('change',onChange);else if(media.addListener)media.addListener(onChange)}
@@ -1620,16 +1657,23 @@ function catalogCategoryFromLocation(){
  const found=products.find(p=>routeSlug(p.category)===slug);
  return found?found.category:null;
 }
-// Links to home-only sections must not strand customers on a hidden anchor.
+// Return from catalog to Welcome-free home with SPA History navigation.
+// Do not reload the HTML document: its Welcome lifecycle belongs to page load.
 if(typeof document!=='undefined'&&typeof document.addEventListener==='function')document.addEventListener('click',event=>{
  if(!document.documentElement.classList.contains('sd-catalog-route'))return;
- const link=event.target.closest?.('a[href^="#"]');
- if(!link)return;
- const hash=link.getAttribute('href'),section=hash?.length>1?document.getElementById(hash.slice(1)):null;
- if(section?.closest('main > section:not(#products)')){
-  event.preventDefault();
-  location.assign('/'+hash);
- }
+ const link=event.target.closest?.('a[href^="#"],a[href="/"]');
+ if(!link||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+ const raw=link.getAttribute('href'),hash=raw==='/'?'#home':raw;
+ const section=hash?.length>1?document.getElementById(hash.slice(1)):null;
+ if(!section?.closest('main > section:not(#products)'))return;
+ event.preventDefault();
+ const destination='/'+hash;
+ if(location.pathname+location.hash!==destination)
+  history.pushState({sdStorefrontHome:true},'',destination);
+ setCatalogLandingMode(false);
+ setActiveNav(section.id==='home'?'home':section.id);
+ setMobileMenu(false);
+ requestAnimationFrame(()=>section.scrollIntoView({behavior:'instant',block:'start'}));
 },true);
 function setCatalogLandingMode(active){
  if(typeof document!=='undefined')document.documentElement?.classList.toggle('sd-catalog-route',Boolean(active));
