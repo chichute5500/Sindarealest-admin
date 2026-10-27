@@ -72,92 +72,80 @@ function fixture(total, {existingWarranty=false, secondItem=false,simulateCodeCo
 
 for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
  const f=fixture(total,{secondItem:true});
- const result=await f.patch('confirmed');
- assert.equal(result.status,200,'confirm must succeed');
- const payload=await result.json();
- assert.equal(payload.warrantiesIssued,2,'one warranty per order line');
- const issued=f.list();
+ assert.equal((await f.patch('confirmed')).status,200,'confirmation succeeds without warranty');
+ assert.equal(f.list().length,0,'never activate warranty on confirmed');
+ assert.equal(f.audits('warranty_issued').length,0);
+ assert.equal((await f.patch('processing')).status,200);
+ assert.equal(f.list().length,0,'no warranty while being made');
+ assert.equal((await f.patch('shipped')).status,200);
+ assert.equal(f.list().length,0,'no warranty on shipping');
+ const finished=await f.patch('completed');
+ assert.equal(finished.status,200,'completion succeeds');
+ assert.equal((await finished.json()).warrantiesIssued,2,'completion activates one per item');
+ const issued=f.list(),today=getCurrentDateInVietnam();
  assert.equal(issued.length,2);
- assert.equal(issued[0].duration_months,months);
- assert.equal(issued[1].duration_months,months);
- const today=getCurrentDateInVietnam();
  for(const w of issued){
-  assert.equal(w.starts_at,today,'activation starts on Vietnam confirmation date');
-  assert.equal(w.ends_at,addWarrantyCalendarMonths(today,months));
-  assert.equal(w.status,'active');
-  assert.match(w.warranty_code,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
-  assert.equal(isWarrantyCode(w.warranty_code),true);
+   assert.equal(w.duration_months,months);
+   assert.equal(w.starts_at,today,'warranty begins at completion date Vietnam');
+   assert.equal(w.ends_at,addWarrantyCalendarMonths(today,months));
+   assert.equal(w.status,'active');
+   assert.match(w.warranty_code,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+   assert.equal(isWarrantyCode(w.warranty_code),true);
  }
  assert.equal(f.audits('warranty_issued').length,2);
- const retry=await f.patch('confirmed');
- assert.equal(retry.status,200);
- assert.equal((await retry.json()).warrantiesIssued,0,'repeat confirmed status must not duplicate');
- assert.equal(f.list().length,2,'no duplicate warranty after retries');
- assert.equal(f.audits('warranty_issued').length,2);
- assert.equal((await f.patch('processing')).status,200);
- assert.equal(f.list().length,2,'other status changes never reset warranty');
+ const retry=await f.patch('completed');
+ assert.equal(retry.status,200,'same-state update supported');
+ assert.equal((await retry.json()).warrantiesIssued,0,'never issue again');
+ assert.equal(f.list().length,2,'no duplicates');
  assert.equal((await f.patch('cancelled')).status,200);
- assert.ok(f.list().every(w=>w.status==='void'),'cancellation voids active warranties atomically');
- assert.equal(f.audits('warranties_voided_on_cancellation').length,1);
+ assert.ok(f.list().every(w=>w.status==='void'),'cancellation voids active warranties');
  f.sql.close();
 }
-
-// Transactional retry of a short-code collision must never confirm a partial order.
 {
  const f=fixture(2_100_000,{secondItem:true,simulateCodeCollision:true});
- const confirmed=await f.patch('confirmed');
- assert.equal(confirmed.status,200,'code collision should regenerate, not fail the order');
- assert.equal(f.batchCount(),2,'one collision rolls back before retry');
- assert.equal((await confirmed.json()).warrantiesIssued,2);
- assert.equal(f.list().length,2);
- assert.notEqual(f.list()[0].warranty_code,f.list()[1].warranty_code);
- assert.equal(f.audits('order_updated').length,1,'no double confirmation audit');
- assert.equal(f.audits('warranty_issued').length,2,'one audit per newly issued warranty');
+ for(const status of ['confirmed','processing','shipped'])assert.equal((await f.patch(status)).status,200);
+ const finished=await f.patch('completed');
+ assert.equal(finished.status,200,'code collision retries completion transaction');
+ assert.equal(f.batchCount(),5,'initial stages + one rolled-back collision + successful completion');
+ assert.equal((await finished.json()).warrantiesIssued,2);
+ assert.equal(new Set(f.list().map(w=>w.warranty_code)).size,2);
+ assert.equal(f.audits('warranty_issued').length,2);
+ assert.equal(f.audits('order_updated').filter(a=>JSON.parse(a.details_json).status==='completed').length,1);
  f.sql.close();
 }
-
-// Respect an existing, possibly longer, manually issued warranty.
 {
  const f=fixture(2_000_000,{existingWarranty:true,secondItem:true});
- const confirmation=await f.patch('confirmed');
- assert.equal(confirmation.status,200);
- assert.equal((await confirmation.json()).warrantiesIssued,1,'issue only missing item');
- assert.equal(f.list().length,2);
- assert.equal(f.list()[0].duration_months,24,'never overwrite old warranty');
+ for(const s of ['confirmed','processing','shipped'])assert.equal((await f.patch(s)).status,200);
+ const done=await f.patch('completed');
+ assert.equal(done.status,200);
+ assert.equal((await done.json()).warrantiesIssued,1,'only new line gets warranty');
  assert.equal(f.list()[0].warranty_code,'SDW-LEGACY001');
- assert.equal(f.audits('warranty_issued').length,1,'audit only newly issued item');
+ assert.equal(f.list()[0].duration_months,24);
+ assert.equal(f.list().length,2);
  f.sql.close();
 }
-
-// Failed optimistic status claim must not leave orphaned warranties or audit events.
 {
- const f=fixture(1_900_000,{secondItem:true});
- f.setBeforeBatch(db=>db.prepare("UPDATE orders SET status='processing' WHERE id='order'").run());
- const conflict=await f.patch('confirmed');
- assert.equal(conflict.status,409);
- assert.equal(f.list().length,0);
+ const f=fixture(1_900_000);
+ for(const s of ['confirmed','processing','shipped'])assert.equal((await f.patch(s)).status,200);
+ f.setBeforeBatch(db=>db.prepare("UPDATE orders SET status='cancelled' WHERE id='order'").run());
+ assert.equal((await f.patch('completed')).status,409,'cancelled concurrently before completion');
+ assert.equal(f.list().length,0,'no warranty on stale completion');
  assert.equal(f.audits('warranty_issued').length,0);
- assert.equal(f.state().status,'processing');
  f.sql.close();
 }
-
-// Price must never be rewritten after a warranty is active even without a bank transaction.
 {
  const f=fixture(2_100_000);
- assert.equal((await f.patch('confirmed')).status,200);
- const reprice=await f.patch('confirmed',{prices:[{itemId:'item-a',unitPrice:1_500_000}]});
- assert.equal(reprice.status,409,'confirmed financial entitlement must be immutable');
+ for(const s of ['confirmed','processing','shipped','completed'])assert.equal((await f.patch(s)).status,200);
+ const change=await f.patch('completed',{prices:[{itemId:'item-a',unitPrice:1_500_000}]});
+ assert.equal(change.status,409,'price stays immutable after issuance');
  assert.equal(f.state().total,2_100_000);
  assert.equal(f.list().length,1);
  f.sql.close();
 }
-
-// Concurrent cancellation must fail before issuing coverage.
 {
  const f=fixture(2_100_000);
- f.setBeforeBatch(db=>db.prepare("UPDATE orders SET status='cancelled' WHERE id='order'").run());
- assert.equal((await f.patch('confirmed')).status,409);
+ assert.equal((await f.patch('cancelled')).status,200);
  assert.equal(f.list().length,0);
  f.sql.close();
 }
-console.log('PASS: Vietnam calendar, 2m boundary, atomic per-item warranty activation, duplicate protection, cancel void, immutable prices.');
+console.log('PASS: no early warranty, activation only at completion, 6/12 months, COD-safe atomic batch, retry, cancellation.');

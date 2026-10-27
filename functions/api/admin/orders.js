@@ -276,12 +276,12 @@ export async function onRequestPatch(context) {
       ).bind(orderAuditId,id,auditDetails));
     }
 
-    // First confirmation issues one warranty per order line in the SAME D1
+    // Completing an order issues one warranty per order line in the SAME D1
     // batch as the optimistic order status update and audit. Every insert is
     // gated by the unique order-update audit ID from this transaction. If an
     // order-status, item-price, or payment guard rejects the update, NO
     // warranty can be created and the entire operation remains atomic.
-    const activateWarranty = existing.status === "pending_confirmation" && status === "confirmed";
+    const activateWarranty = existing.status === "shipped" && status === "completed";
     const issueAuditIds = [];
     const warrantyPlans = [];
     const usedWarrantyCodes = new Set();
@@ -307,12 +307,12 @@ export async function onRequestPatch(context) {
           "SELECT ?,oi.order_id,oi.id,?,?,?,?,?,'active' FROM order_items oi WHERE oi.id=? AND oi.order_id=? " +
           "AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=oi.id) " +
           "AND EXISTS (SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=oi.order_id AND action='order_updated') " +
-          "AND EXISTS (SELECT 1 FROM orders o WHERE o.id=oi.order_id AND o.status='confirmed' AND o.total=?)"
+          "AND EXISTS (SELECT 1 FROM orders o WHERE o.id=oi.order_id AND o.status='completed' AND o.total=?)"
         ).bind(warrantyId,code,policy.policyName,policy.durationMonths,startsAt,endsAt,item.id,id,orderAuditId,subtotal);
         const buildAudit = code => context.env.DB.prepare(
           "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
           "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)"
-        ).bind(warrantyAuditId,warrantyId,JSON.stringify({ orderId:id, orderItemId:item.id, warrantyCode:code, source:"automatic_order_confirmation", policyName:policy.policyName, months:policy.durationMonths, startsAt, endsAt }),warrantyId);
+        ).bind(warrantyAuditId,warrantyId,JSON.stringify({ orderId:id, orderItemId:item.id, warrantyCode:code, source:"automatic_order_completion", policyName:policy.policyName, months:policy.durationMonths, startsAt, endsAt }),warrantyId);
         plan.rebuild = code => { statements[insertIndex] = buildInsert(code); statements[insertIndex+1] = buildAudit(code); };
         warrantyPlans.push(plan);
         plan.rebuild(warrantyCode);
@@ -385,7 +385,7 @@ export async function onRequestPatch(context) {
     await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (termsConfirmed ? " · Đã xác nhận điều kiện" : ""), url: "/admin/" });
     return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, warrantiesIssued,
       codCollectedAmount:codCollection?.amount || 0, message: activateWarranty
-      ? (warrantiesIssued ? "Đã xác nhận đơn và tự kích hoạt " + warrantiesIssued + " bảo hành." : "Đã xác nhận đơn; sản phẩm đã có bảo hành nên không cấp trùng.")
+      ? (warrantiesIssued ? "Đã hoàn tất đơn và tự kích hoạt " + warrantiesIssued + " bảo hành." : "Đã hoàn tất đơn; sản phẩm đã có bảo hành nên không cấp trùng.")
       : allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
   } catch { return fail("Không thể cập nhật đơn hàng.", 503); }
 }
