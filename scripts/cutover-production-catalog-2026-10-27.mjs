@@ -40,7 +40,9 @@ must(db?.uuid===database&&db?.name==='sindarealest-db','PRODUCTION_D1_IDENTITY_F
 const pages=await api('/pages/projects/'+project);
 must(pages?.name===project&&identity(pages?.deployment_configs?.production?.d1_databases?.DB)===database,
  'PRODUCTION_PAGES_D1_BINDING_MISMATCH');
-// The marker MUST be checked before reading or changing future catalog drafts.
+// Resume safely from partial success. Cloudflare D1 may report an affected-row
+// count that differs from verified table state after a successful DELETE.
+// Never repeat a destructive operation without checking real rows first.
 const status=await query('SELECT value FROM settings WHERE key=? LIMIT 1',[marker]);
 if(status.rows.length) {
  console.log('CATALOG_CUTOVER=ALREADY_COMPLETED; no D1 mutations attempted');
@@ -48,35 +50,51 @@ if(status.rows.length) {
  const before=await query('SELECT id,sku,sku_verified,category,category_label,published,created_at,sort_order FROM products LIMIT 3001');
  const plan=planCatalogCutover(before.rows);
  must(plan.published.length>=200&&plan.published.length<=400,'PRODUCTION_PUBLISHED_COHORT_UNEXPECTED');
- must(plan.hidden.length>=200&&plan.hidden.length<=1000,'PRODUCTION_HIDDEN_COHORT_UNEXPECTED');
+ // A resumed cutover may already have removed every hidden product.
+ must(plan.hidden.length===0||(plan.hidden.length>=200&&plan.hidden.length<=1000),
+   'PRODUCTION_HIDDEN_COHORT_UNEXPECTED');
+ const liveExpected=new Map(plan.planned.map(x=>[x.id,x.sku]));
+ const liveIsOfficial=plan.published.every(row=>Number(row.sku_verified)===1 &&
+  String(row.sku||'')===liveExpected.get(row.id));
  const check=await query('SELECT COUNT(*) AS total, SUM(CASE WHEN published=1 THEN 1 ELSE 0 END) AS live, SUM(CASE WHEN published=0 THEN 1 ELSE 0 END) AS hidden FROM products');
  must(check.rows.length===1&&Number(check.rows[0].total)===before.rows.length&&
-  Number(check.rows[0].live)===plan.published.length&&Number(check.rows[0].hidden)===plan.hidden.length,
+  Number(check.rows[0].live)===plan.published.length&&Number(check.rows[0].hidden||0)===plan.hidden.length,
   'CATALOG_CHANGED_DURING_PREFLIGHT');
- console.log('CATALOG_CUTOVER_PREFLIGHT=PASS live='+plan.published.length+' hidden='+plan.hidden.length+' categories=15');
- // Two-phase renaming: reserve every SKU (including hidden legacy values)
- // before allocating the approved 15-category IDs. Hidden rows are NOT deleted
- // until all live rows are verified in their final states.
- const temp=await query("UPDATE products SET sku='MIG-'||upper(hex(randomblob(16))),sku_verified=0 WHERE published IN(0,1)");
- must(temp.changes===before.rows.length,'TEMP_SKU_UPDATE_COUNT_MISMATCH');
- const mapping=JSON.stringify(plan.planned);
- const final=await query("UPDATE products SET sku=(SELECT json_extract(value,'$.sku') FROM json_each(?) WHERE json_extract(value,'$.id')=products.id), sku_verified=1 WHERE published=1",[mapping]);
- must(final.changes===plan.published.length,'OFFICIAL_SKU_UPDATE_COUNT_MISMATCH');
+ console.log('CATALOG_CUTOVER_PREFLIGHT=PASS live='+plan.published.length+
+  ' hidden='+plan.hidden.length+' categories=15 official='+liveIsOfficial);
+ if(!liveIsOfficial) {
+  // Two-phase assignment for UNIQUE SKU index. Idempotent at the row level
+  // even when recovering from a prior temporary-SKU phase.
+  must(plan.hidden.length>=200,'REFUSE_TO_RENUMBER_AFTER_HIDDEN_PURGE');
+  const temp=await query("UPDATE products SET sku='MIG-'||upper(hex(randomblob(16))),sku_verified=0 WHERE published IN(0,1)");
+  must(temp.changes===before.rows.length,'TEMP_SKU_UPDATE_COUNT_MISMATCH');
+  const mapping=JSON.stringify(plan.planned);
+  const final=await query("UPDATE products SET sku=(SELECT json_extract(value,'$.sku') FROM json_each(?) WHERE json_extract(value,'$.id')=products.id), sku_verified=1 WHERE published=1",[mapping]);
+  must(final.changes===plan.published.length,'OFFICIAL_SKU_UPDATE_COUNT_MISMATCH');
+ }
+ // Full row-level verification is stronger than the D1 metadata count.
  const verified=await query('SELECT id,sku,sku_verified,published,category FROM products LIMIT 3001');
- const expected=new Map(plan.planned.map(x=>[x.id,x.sku]));
- must(verified.rows.length===before.rows.length&&verified.rows.filter(x=>Number(x.published)===1).length===plan.published.length&&
+ must(verified.rows.length===before.rows.length &&
+   verified.rows.filter(x=>Number(x.published)===1).length===plan.published.length &&
    verified.rows.filter(x=>Number(x.published)===1).every(x=>
-     Number(x.sku_verified)===1&&expected.get(x.id)===x.sku),'CATALOG_OFFICIAL_POSTCHECK_FAILED');
- // Historical orders and warranties are snapshots, intentionally untouched.
- // R2 files are NOT deleted. Deletion only occurs AFTER SKU verification.
- const removed=await query('DELETE FROM products WHERE published=0');
- must(removed.changes===plan.hidden.length,'HIDDEN_DELETE_COUNT_MISMATCH');
+     Number(x.sku_verified)===1&&liveExpected.get(x.id)===x.sku),
+   'CATALOG_OFFICIAL_POSTCHECK_FAILED');
+ if(plan.hidden.length>0) {
+  const removed=await query('DELETE FROM products WHERE published=0');
+  // Log raw mutation metadata but verify the outcome independently:
+  // a successful D1 DELETE can return an unexpected meta.changes value.
+  console.log('CATALOG_HIDDEN_DELETE_REPORTED='+removed.changes+
+    ' preflight_hidden='+plan.hidden.length);
+ }
  const after=await query('SELECT id,sku,sku_verified,published,category FROM products LIMIT 3001');
- must(after.rows.length===plan.published.length&&after.rows.every(x=>Number(x.published)===1&&
-  Number(x.sku_verified)===1&&expected.get(x.id)===x.sku),'CATALOG_POSTCHECK_FAILED');
- await query("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now'))",[marker,JSON.stringify({
-  date:'2026-10-27',removed:plan.hidden.length,verified:plan.published.length,categories:15
- })]);
- console.log('CATALOG_CUTOVER=PASS removed_hidden='+plan.hidden.length+' official_skus='+plan.published.length+
-  ' legacy_id_links=preserved');
+ must(after.rows.length===plan.published.length && after.rows.every(x=>
+  Number(x.published)===1&&Number(x.sku_verified)===1&&liveExpected.get(x.id)===x.sku),
+  'CATALOG_POSTCHECK_FAILED');
+ // If the marker insert fails, the next run revalidates the real D1 state
+ // rather than assuming that no deletion occurred.
+ await query("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now'))",
+  [marker,JSON.stringify({date:'2026-10-27',removed:plan.hidden.length,
+   verified:plan.published.length,categories:15,resumed:liveIsOfficial})]);
+ console.log('CATALOG_CUTOVER=PASS removed_hidden='+plan.hidden.length+
+  ' official_skus='+plan.published.length+' legacy_id_links=preserved');
 }

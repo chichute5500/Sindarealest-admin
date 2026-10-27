@@ -36,6 +36,11 @@ const cutover=readFileSync(new URL('../scripts/cutover-production-catalog-2026-1
 assert.match(deploy,/One-time owner-approved Production catalog cleanup/);
 assert.match(cutover,/DELETE FROM products WHERE published=0/);
 assert.match(cutover,/CATALOG_CUTOVER=ALREADY_COMPLETED/);
+assert.match(cutover,/const liveIsOfficial=/,'Recognize an already-assigned official SKU cohort');
+assert.match(cutover,/plan.hidden.length===0/,'Support recovering when hidden rows were already purged');
+assert.match(cutover,/CATALOG_HIDDEN_DELETE_REPORTED=/,'Report DELETE metadata without mistaking it for row proof');
+assert.match(cutover,/CATALOG_POSTCHECK_FAILED/,'Verify every surviving row after possible deletion');
+assert.ok(cutover.indexOf("const after=await query(")<cutover.indexOf('INSERT INTO settings(key,value,updated_at)'),'Never set the one-time completion marker before D1 verification');
 assert.match(cutover,/PRODUCTION_PAGES_D1_BINDING_MISMATCH/);
 assert.doesNotMatch(cutover,/DELETE FROM orders|DELETE FROM warranties|r2\/buckets/);
 console.log('PASS: 15 official category codes; guarded single-use D1 cutover plan; no draft re-deletion.');
