@@ -51,6 +51,13 @@ for(const cfg of tests){
   const cartOpen=page.locator(cfg.width<=760?'#mobileCartNav':'#cartOpen');
   await cartOpen.click();
   await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+  // Do not mistake an added .open class for a visible drawer: on low-powered
+  // mobile devices the slide-in transform can still be offscreen for a frame.
+  // This also makes the screenshots comparable across runs.
+  await expect.poll(()=>page.locator('#cartDrawer').evaluate(el=>{
+    const rect=el.getBoundingClientRect(),vw=window.innerWidth;
+    return rect.width>0&&rect.left>=-1&&rect.right<=vw+1&&Math.abs(rect.right-vw)<=1;
+  }),{timeout:8000}).toBe(true);
   const cart=await page.locator('#cartDrawer').evaluate(el=>({
     width:el.getBoundingClientRect().width,scrollWidth:el.scrollWidth,
     scheme:getComputedStyle(document.documentElement).colorScheme
