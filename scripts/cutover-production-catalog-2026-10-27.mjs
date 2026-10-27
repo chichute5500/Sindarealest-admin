@@ -54,18 +54,24 @@ if(status.rows.length) {
   Number(check.rows[0].live)===plan.published.length&&Number(check.rows[0].hidden)===plan.hidden.length,
   'CATALOG_CHANGED_DURING_PREFLIGHT');
  console.log('CATALOG_CUTOVER_PREFLIGHT=PASS live='+plan.published.length+' hidden='+plan.hidden.length+' categories=15');
- // Historical orders reference product IDs as snapshots (not as D1 FK), and remain intact.
- const removed=await query('DELETE FROM products WHERE published=0');
- must(removed.changes===plan.hidden.length,'HIDDEN_DELETE_COUNT_MISMATCH');
- // Two-phase renaming prevents UNIQUE constraint collisions when official codes
- // are reordered. Temporary codes never leave D1 after the successful second phase.
- const temp=await query("UPDATE products SET sku='MIG-'||upper(hex(randomblob(16))),sku_verified=0 WHERE published=1");
- must(temp.changes===plan.published.length,'TEMP_SKU_UPDATE_COUNT_MISMATCH');
+ // Two-phase renaming: reserve every SKU (including hidden legacy values)
+ // before allocating the approved 15-category IDs. Hidden rows are NOT deleted
+ // until all live rows are verified in their final states.
+ const temp=await query("UPDATE products SET sku='MIG-'||upper(hex(randomblob(16))),sku_verified=0 WHERE published IN(0,1)");
+ must(temp.changes===before.rows.length,'TEMP_SKU_UPDATE_COUNT_MISMATCH');
  const mapping=JSON.stringify(plan.planned);
  const final=await query("UPDATE products SET sku=(SELECT json_extract(value,'$.sku') FROM json_each(?) WHERE json_extract(value,'$.id')=products.id), sku_verified=1 WHERE published=1",[mapping]);
  must(final.changes===plan.published.length,'OFFICIAL_SKU_UPDATE_COUNT_MISMATCH');
- const after=await query('SELECT id,sku,sku_verified,published,category FROM products LIMIT 3001');
+ const verified=await query('SELECT id,sku,sku_verified,published,category FROM products LIMIT 3001');
  const expected=new Map(plan.planned.map(x=>[x.id,x.sku]));
+ must(verified.rows.length===before.rows.length&&verified.rows.filter(x=>Number(x.published)===1).length===plan.published.length&&
+   verified.rows.filter(x=>Number(x.published)===1).every(x=>
+     Number(x.sku_verified)===1&&expected.get(x.id)===x.sku),'CATALOG_OFFICIAL_POSTCHECK_FAILED');
+ // Historical orders and warranties are snapshots, intentionally untouched.
+ // R2 files are NOT deleted. Deletion only occurs AFTER SKU verification.
+ const removed=await query('DELETE FROM products WHERE published=0');
+ must(removed.changes===plan.hidden.length,'HIDDEN_DELETE_COUNT_MISMATCH');
+ const after=await query('SELECT id,sku,sku_verified,published,category FROM products LIMIT 3001');
  must(after.rows.length===plan.published.length&&after.rows.every(x=>Number(x.published)===1&&
   Number(x.sku_verified)===1&&expected.get(x.id)===x.sku),'CATALOG_POSTCHECK_FAILED');
  await query("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now'))",[marker,JSON.stringify({
