@@ -299,7 +299,7 @@ has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab sta
 has("for(const panel of $$('.editor-tab-panel'))panel.hidden=panel.dataset.productPanel!==name", 'all editor tab panels are iterated without throwing when the editor opens');
 has("const editorContent=$('#backdrop .editorcontent');if(editorContent)editorContent.scrollTop=0", 'switching editor tabs resets the shared scroll position so the selected panel starts at its heading');
 has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
-has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
+has("function openEditor(p,initialTab='details'){setProductEditorTab('details');", 'product editor defaults to details, while allowing image tap to open gallery');
 has('<form id="productForm" novalidate>', 'custom product validation can reveal invalid controls hidden in another tab');
 has('function syncProductIdentityValidity()', 'product editor rejects whitespace-only identity fields');
 has("title.setCustomValidity(title.value.trim()?'':'Vui lòng nhập tên sản phẩm.')", 'title validation is based on trimmed content');
@@ -321,7 +321,7 @@ assert.match(baselineSpec, /await page\.locator\('#productTabGallery'\)\.click\(
 // Mobile gallery layout must give the primary cover priority without hiding controls or losing narrow-screen support.
 has('function renderGalleryItem(g,i)', 'shared gallery thumbnail renderer');
 has('class="image-cover-slot"', 'featured cover occupies its own responsive row');
-has('class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ, vuốt ngang để xem thêm"', 'thumbnail rail has an accessible Vietnamese group label');
+has('class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ"', 'thumbnail rail has an accessible Vietnamese group label');
 has('#imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.75/1;object-fit:contain;background:rgba(218,235,247,.40)}', 'cover image keeps its full composition visible on mobile');
 has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}', 'supporting thumbnails form a horizontally scrollable rail');
 has('#imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-align:start}', 'thumbnail rail uses fixed mobile targets and snap points');
