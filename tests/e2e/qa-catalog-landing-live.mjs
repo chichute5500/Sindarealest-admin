@@ -26,7 +26,10 @@ qaModes: for (const mode of [
   {name:'mobile',viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2}
 ]){
  for (const theme of ['light','dark']){
-  const ctx=await browser.newContext({...mode,locale:'vi-VN'});
+  const id=process.env.CF_ACCESS_CLIENT_ID||'';
+  const secret=process.env.CF_ACCESS_CLIENT_SECRET||'';
+  assert.ok(id&&secret,'Cloudflare Access service credentials required for protected branch previews');
+  const ctx=await browser.newContext({...mode,locale:'vi-VN',extraHTTPHeaders:{'CF-Access-Client-Id':id,'CF-Access-Client-Secret':secret}});
   await ctx.addInitScript(theme=>{try{localStorage.setItem('sd-theme-mode',theme)}catch{}},theme);
   await ctx.route('**/*',route=>['GET','HEAD'].includes(route.request().method())?route.continue():route.abort());
   for(const test of cases){
