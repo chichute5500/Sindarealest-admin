@@ -71,9 +71,10 @@ export async function onRequest(context) {
     html = meta(html, "og:url", url.origin + canonicalPath, true);
     // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
     // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
-    html = meta(html, "og:image", url.origin + "/og-sindarealest.jpg", true);
-    html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest.jpg", true);
-    html = meta(html, "twitter:image", url.origin + "/og-sindarealest.jpg");
+    html = meta(html, "og:image", url.origin + "/og-sindarealest-20261027.jpg", true);
+    html = meta(html, "og:image:alt", "SinDarealest — " + categoryName, true);
+    html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest-20261027.jpg", true);
+    html = meta(html, "twitter:image", url.origin + "/og-sindarealest-20261027.jpg");
     html = meta(html, "twitter:card", "summary_large_image");
     const canonicalTag = '<link rel="canonical" href="' + escapeHtml(url.origin + canonicalPath) + '">';
     html = /<link\s+rel=["']canonical["']/i.test(html)
@@ -92,9 +93,9 @@ export async function onRequest(context) {
     if (!response.ok || !["/", "/index.html"].includes(url.pathname) || !(response.headers.get("content-type") || "").includes("text/html")) return response;
     let html = await response.text();
     html = meta(html, "og:url", `${url.origin}/`, true);
-    html = meta(html, "og:image", `${url.origin}/og-sindarealest.jpg`, true);
-    html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest.jpg`, true);
-    html = meta(html, "twitter:image", `${url.origin}/og-sindarealest.jpg`);
+    html = meta(html, "og:image", `${url.origin}/og-sindarealest-20261027.jpg`, true);
+    html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest-20261027.jpg`, true);
+    html = meta(html, "twitter:image", `${url.origin}/og-sindarealest-20261027.jpg`);
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
@@ -112,7 +113,7 @@ export async function onRequest(context) {
   let images = [];
   try { images = JSON.parse(product.images_json || "[]"); } catch {}
   const candidateImage = Array.isArray(images) && typeof images[0] === "string" ? images[0] : "";
-  const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest.jpg";
+  const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest-20261027.jpg";
   const canonical = `${url.origin}${canonicalPath}`;
   const title = `${product.title} | SinDarealest`;
   const descriptionBase = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim();
