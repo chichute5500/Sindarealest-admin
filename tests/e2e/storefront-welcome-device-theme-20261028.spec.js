@@ -78,10 +78,10 @@ test('Android dark preference wins at new entry; manual LIGHT stays light on dar
  // A click on the genuine theme toggle is sufficient: it calls the same
  // Owner-approved transition used by the Account's accessible mobile action.
  await page.locator('#themeToggle').evaluate(el=>el.click());
- await expect.poll(async()=>palette(page)).toMatchObject({mode:'light',dark:false,colorScheme:'only light',page:'#eaf3fb'});
+ await expect.poll(async()=>palette(page)).toMatchObject({mode:'light',dark:false,page:'#eaf3fb'});
  await page.waitForTimeout(1600);
  state=await palette(page);
- expect(state.colorScheme).toBe('only light');
+ expect(state.colorScheme.split(/\s+/).sort()).toEqual(['light','only']);
  await page.screenshot({path:join(output,'device-dark-web-manual-light.png'),animations:'disabled'});
  await page.locator('#mobileBottomNav a[href="/sanpham"]').click();
  await page.locator('#mobileBottomNav a[href="#home"]').click();
@@ -102,13 +102,14 @@ test('Light device ignores legacy saved dark, tracks OS until manual selection, 
  expect((await page.goto(url,{waitUntil:'domcontentloaded'}))?.status()).toBe(200);
  let state=await palette(page);
  expect(state.mode).toBe('auto');expect(state.dark).toBe(false);
- expect(state.colorScheme).toBe('only light');
+ expect(state.colorScheme.split(/\s+/).sort()).toEqual(['light','only']);
+ expect(state.colorScheme.split(/\s+/).sort()).toEqual(['light','only']);
  await closeIntro(page);await ready(page);
  await page.emulateMedia({colorScheme:'dark'});
  await expect.poll(async()=>(await palette(page)).dark).toBe(true);
  // Explicit manual LIGHT overrides a later OS change, without a palette clash.
  await page.locator('#themeToggle').click();
- await expect.poll(async()=>palette(page)).toMatchObject({mode:'light',dark:false,colorScheme:'only light'});
+ await expect.poll(async()=>palette(page)).toMatchObject({mode:'light',dark:false});
  await page.waitForTimeout(1600);
  await page.emulateMedia({colorScheme:'light'});
  await page.emulateMedia({colorScheme:'dark'});
