@@ -40,6 +40,17 @@ test('Admin and Storefront share the approved light-blue identity without forcin
  assert.match(admin,/src="\/images\/brand-emblem\.png"|src="\/logo\.png"/,'Admin brand artwork still present');
 });
 
+test('Owner-approved final dark background filter has no stale competing declarations',()=>{
+ const matches=[...web.matchAll(/html\\.dark \\.theme-bg--dark\\{([^}]+)\\}/g)];
+ const filters=matches.filter(item=>/(?:^|;)\\s*filter\\s*:/.test(item[1])).map(item=>item[1].trim());
+ assert.deepEqual(filters,['filter:none!important'],'All former dark background filters must remain removed');
+ // The Welcome palette switch uses the approved old-to-new glass transition;
+ // never recreate earlier large-area or conflicting theme animation cascades.
+ assert.ok(web.includes("root.classList.toggle('dark',targetDark)"));
+ assert.ok(web.includes("sd-theme-repaint-isolated"));
+ assert.ok(!web.includes('transition:background-color 1.15s'));
+});
+
 test('Cloudflare static HTML sends safe framing/object/base controls without blocking the existing app',()=>{
  for(const value of [
   "Content-Security-Policy: frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
