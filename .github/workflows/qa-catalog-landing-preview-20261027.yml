@@ -1,0 +1,79 @@
+name: Catalog direct landing Owner Preview (NO PRODUCTION)
+# Owner visual QA, bounded fail-fast timeouts; never main or D1/R2.
+on:
+  push:
+    branches:
+      - fix/catalog-direct-landing-view-2026-10-27
+    paths:
+      - '.github/workflows/qa-catalog-landing-preview-20261027.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-direct-landing-20261027
+  cancel-in-progress: true
+
+jobs:
+  owner-preview:
+    name: Validate source, deploy branch Preview, verify real catalog PC/mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest2
+      CF_BRANCH_ALIAS: catalog-landing-owner-review-20261027
+    steps:
+      - name: Refuse main / Production changes
+        run: |
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/fix/catalog-direct-landing-view-2026-10-27"
+          test "$CF_TARGET" = "sindarealest2"
+          test "$CF_BRANCH_ALIAS" != "main"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Run source integrity, full regression tests before Preview
+        run: |
+          npm install --no-fund
+          npm run check
+          npm test
+      - name: Verify Pages Production branch remains main (metadata only)
+        run: |
+          curl -fsS --max-time 30 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_TARGET}" > "$RUNNER_TEMP/project.json"
+          jq -e '.success==true and .result.production_branch=="main"' "$RUNNER_TEMP/project.json"
+          echo "PASS: Production branch stays main; only non-main Preview will be deployed."
+      - name: Publish Pages Preview only - no Production/D1/R2 mutation
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH_ALIAS" --commit-hash "$GITHUB_SHA" --commit-message "owner preview: catalog deep links list first" 2>&1 | tee "$RUNNER_TEMP/preview-deploy.txt"
+          QA_URL="$(sed -nE 's@.*(https://[a-zA-Z0-9-]+\.sindarealest2\.pages\.dev).*@\1@p' "$RUNNER_TEMP/preview-deploy.txt" | tail -1)"
+          test -n "$QA_URL"
+          test "$QA_URL" != "https://sindarealest2.pages.dev"
+          echo "QA_URL=$QA_URL" >> "$GITHUB_ENV"
+          echo "Deployed Preview: $QA_URL"
+      - name: Prepare isolated Playwright Chromium
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Validate exact category page, chips, cards, dark/light, home navigation
+        env:
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: node tests/e2e/qa-catalog-landing-live.mjs
+      - name: Upload PC/mobile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-preview-catalog-landing-${{ github.sha }}
+          path: artifacts/qa-catalog-landing/
+          if-no-files-found: warn
+          retention-days: 14

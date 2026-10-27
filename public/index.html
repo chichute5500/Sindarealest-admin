@@ -31,7 +31,7 @@
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
 <title>SinDarealest — Premium Crocodile Leather Fashion</title>
-<script>(()=>{const root=document.documentElement;root.classList.add('js-enabled');let mode='auto';try{const saved=localStorage.getItem('sd-theme-mode');if(saved==='dark'||saved==='light')mode=saved}catch(e){}const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);root.dataset.themeMode=mode;if(mode==='dark'||(mode==='auto'&&systemDark))root.classList.add('dark');const themeMeta=document.querySelector('meta[name="theme-color"]');if(themeMeta)themeMeta.content=root.classList.contains('dark')?'#061522':'#eaf3fb'})();</script>
+<script>(()=>{const root=document.documentElement;root.classList.add('js-enabled');root.classList.toggle('sd-catalog-route',/^\/sanpham(?:\/[a-z0-9][a-z0-9-]{0,99})?\/?$/i.test(location.pathname));let mode='auto';try{const saved=localStorage.getItem('sd-theme-mode');if(saved==='dark'||saved==='light')mode=saved}catch(e){}const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);root.dataset.themeMode=mode;if(mode==='dark'||(mode==='auto'&&systemDark))root.classList.add('dark');const themeMeta=document.querySelector('meta[name="theme-color"]');if(themeMeta)themeMeta.content=root.classList.contains('dark')?'#061522':'#eaf3fb'})();</script>
 <style>
 /* Avoid Android's blue tap flash without disabling text selection or keyboard focus. */
 button,a,[role="button"],img,svg{ -webkit-tap-highlight-color: transparent; }
@@ -965,6 +965,43 @@ html.dark .sd-vip-word{
  }
 }
 </style>
+
+<style id="sd-catalog-direct-landing-20261027">
+/* Catalog deep links must open AS CATALOG pages, not as the home page with
+   the catalog several sections below. Only the exact 1/2-segment listing
+   routes opt in; HOME and product SKU/detail URLs keep their approved layout. */
+html.sd-catalog-route main > section:not(#products){display:none!important}
+html.sd-catalog-route #products{
+  padding-top:clamp(22px,3vw,42px);
+  min-height:calc(100svh - 95px);
+}
+html.sd-catalog-route #welcomeSplash{display:none!important}
+html.sd-catalog-route:has(body.welcome-active){overflow-y:auto!important;scroll-behavior:auto!important}
+html.sd-catalog-route body.welcome-active{
+  height:auto!important;min-height:100svh!important;
+  overflow-y:auto!important;overscroll-behavior:auto!important
+}
+html.sd-catalog-route #products .section-note{display:none!important}
+/* The active category remains discoverable but never pushes product cards
+   below several rows of category chips on mobile. */
+html.sd-catalog-route #products .filter-pills{
+  display:flex!important;flex-wrap:nowrap!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  align-content:normal!important;
+  scrollbar-width:thin;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:8px;
+}
+html.sd-catalog-route #products .filter-pill{
+  flex:0 0 auto!important;width:max-content;white-space:nowrap
+}
+@media(max-width:760px){
+  html.sd-catalog-route #products{padding-top:18px;padding-bottom:108px}
+  html.sd-catalog-route #products .section-head{margin-bottom:10px}
+  html.sd-catalog-route #products .catalog-tools{margin-bottom:13px}
+}
+</style>
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -1092,7 +1129,8 @@ html.dark .sd-vip-word{
   document.addEventListener('focusin',keepFocusInside,true);
   if(skip)skip.focus({preventScroll:true});
   var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(dismiss,reduced?220:1450);
+  if(document.documentElement.classList.contains('sd-catalog-route'))window.setTimeout(dismiss,0);
+  else window.setTimeout(dismiss,reduced?220:1450);
   fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
     if(!c)return;
     if(c.welcomeEnabled===false)dismiss();
@@ -1582,9 +1620,24 @@ function catalogCategoryFromLocation(){
  const found=products.find(p=>routeSlug(p.category)===slug);
  return found?found.category:null;
 }
+// Links to home-only sections must not strand customers on a hidden anchor.
+if(typeof document!=='undefined'&&typeof document.addEventListener==='function')document.addEventListener('click',event=>{
+ if(!document.documentElement.classList.contains('sd-catalog-route'))return;
+ const link=event.target.closest?.('a[href^="#"]');
+ if(!link)return;
+ const hash=link.getAttribute('href'),section=hash?.length>1?document.getElementById(hash.slice(1)):null;
+ if(section?.closest('main > section:not(#products)')){
+  event.preventDefault();
+  location.assign('/'+hash);
+ }
+},true);
+function setCatalogLandingMode(active){
+ if(typeof document!=='undefined')document.documentElement?.classList.toggle('sd-catalog-route',Boolean(active));
+}
 function syncCatalogFromLocation(){
  const value=catalogCategoryFromLocation();
  if(value===null)return false;
+ setCatalogLandingMode(true);
  document.body.classList.remove('sd-not-found-route');
  const notFoundView=document.querySelector('#notFoundPage');
  if(notFoundView)notFoundView.hidden=true;
@@ -1596,9 +1649,10 @@ function navigateCatalog(category='all'){
  const key=category==='all'?'all':String(category||'all');
  const path=key==='all'?'/sanpham':'/sanpham/'+routeSlug(key);
  if(location.pathname!==path||location.hash)history.pushState({sdCatalog:true},'',path);
+ setCatalogLandingMode(true);
  selectedCategory=key;page=1;renderFilters();renderCatalog();
  setActiveNav('products');
- $('#products')?.scrollIntoView({behavior:'smooth',block:'start'});
+ if(typeof window!=='undefined')window.scrollTo({top:0,behavior:'instant'});
 }
 let selectedCategory='all';
 // Fisher-Yates shuffle once per loaded catalog: no reshuffle while paging,
@@ -1640,6 +1694,14 @@ function renderFilters(){
     ? 'Tất cả sản phẩm'
     : displayProductName(labels[selectedCategory]||categoryLabels[selectedCategory]||selectedCategory);
   $('#categoryFilters').innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target '+(selectedCategory===c?'active':'')+'" data-category="'+escapeHtml(c)+'" aria-pressed="'+(selectedCategory===c)+'">'+escapeHtml(c==='all'?categoryLabels.all:displayProductName(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
+  // Center the chosen chip in its own horizontal row without scrolling the page.
+  if(typeof document!=='undefined'&&document.documentElement?.classList.contains('sd-catalog-route')){
+    const strip=$('#categoryFilters'),chip=strip?.querySelector('.filter-pill.active');
+    if(strip&&chip){
+      const area=strip.getBoundingClientRect(),item=chip.getBoundingClientRect();
+      strip.scrollLeft+=item.left-area.left-(area.width-item.width)/2;
+    }
+  }
 }
 function foldSearch(value){return String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function getFiltered(){
@@ -2461,14 +2523,14 @@ $('#sdFullscreenFrame').addEventListener('pointerup',e=>{const dx=e.clientX-full
 $('#sdFullscreenStage').addEventListener('click',e=>{if(e.target===$('#sdFullscreenStage'))closeFullscreenImage()});
 document.addEventListener('keydown',e=>{if(!$('#sdFullscreenViewer').classList.contains('open'))return;if(e.key==='Escape'){e.preventDefault();e.stopPropagation();requestStorefrontModalClose('gallery',closeFullscreenImage)}else if(e.key==='ArrowLeft'){e.preventDefault();e.stopPropagation();changeDetailImage(detailIndex-1,true,'right')}else if(e.key==='ArrowRight'){e.preventDefault();e.stopPropagation();changeDetailImage(detailIndex+1,true,'left')}},true);
 window.addEventListener('resize',sizeFullscreenFrame);
-$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy;if(!id||!addToCart(id))return;closeDetail(false,false);openCheckout()});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});window.addEventListener('popstate',event=>{const currentModal=activeStorefrontModal(),targetModal=storefrontModalHistoryType(event.state);if(currentModal||targetModal){const intentionalCheckoutBack=currentModal==='checkout'&&targetModal==='cart';if(targetModal&&targetModal!==currentModal&&(targetModal==='cart'||targetModal==='account')&&!intentionalCheckoutBack){if(currentModal)closeStorefrontModal(currentModal,false);history.back();return}if(currentModal&&currentModal!==targetModal)closeStorefrontModal(currentModal,targetModal!=='cart');if(targetModal&&targetModal!==currentModal)openStorefrontModal(targetModal);if(intentionalCheckoutBack)setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0);return}const m=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);if(m){openDetail(decodeURIComponent(m[1]),true)}else{if($('#productOverlay').classList.contains('open'))closeDetail(true);if(location.hash==='#products')history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation())requestAnimationFrame(()=>$('#products')?.scrollIntoView({behavior:'auto',block:'start'}))}});
+$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy;if(!id||!addToCart(id))return;closeDetail(false,false);openCheckout()});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});window.addEventListener('popstate',event=>{const currentModal=activeStorefrontModal(),targetModal=storefrontModalHistoryType(event.state);if(currentModal||targetModal){const intentionalCheckoutBack=currentModal==='checkout'&&targetModal==='cart';if(targetModal&&targetModal!==currentModal&&(targetModal==='cart'||targetModal==='account')&&!intentionalCheckoutBack){if(currentModal)closeStorefrontModal(currentModal,false);history.back();return}if(currentModal&&currentModal!==targetModal)closeStorefrontModal(currentModal,targetModal!=='cart');if(targetModal&&targetModal!==currentModal)openStorefrontModal(targetModal);if(intentionalCheckoutBack)setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0);return}const m=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);if(m){openDetail(decodeURIComponent(m[1]),true)}else{if($('#productOverlay').classList.contains('open'))closeDetail(true);if(location.hash==='#products')history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation())window.scrollTo({top:0,behavior:'instant'});else{setCatalogLandingMode(false);if(location.pathname==='/'||location.pathname==='/index.html')window.scrollTo({top:0,behavior:'instant'})}}});
  $('#featuredAutoplayToggle')?.addEventListener('click',()=>setFeaturedAutoplayPaused(!featuredAutoplayPaused));$('#searchJump').addEventListener('click',()=>{navigateCatalog('all');setTimeout(()=>$('#catalogSearch').focus({preventScroll:true}),450)});$('#contactJump').addEventListener('click',()=>document.querySelector('#contact').scrollIntoView({behavior:'smooth'}));$('#menuToggle').addEventListener('click',()=>setMobileMenu(!$('#mobileNav').classList.contains('open')));$('#mobileNavBackdrop').addEventListener('click',()=>{setMobileMenu(false);$('#menuToggle').focus({preventScroll:true})});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#mobileNav').classList.contains('open')){setMobileMenu(false);$('#menuToggle').focus({preventScroll:true})}});
  $('#desktopLinks').addEventListener('click',navClick);$('#mobileNav').addEventListener('click',navClick);$('#catalogSearch').addEventListener('input',()=>{page=1;renderCatalog()});$('#catalogSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.currentTarget.blur()}});$('#categoryFilters').addEventListener('click',e=>{const b=e.target.closest('[data-category]');if(!b)return;navigateCatalog(b.dataset.category)});$('#pagination').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;const max=Math.max(1,Math.ceil(filtered.length/perPage));if(b.dataset.page==='prev')page=Math.max(1,page-1);else if(b.dataset.page==='next')page=Math.min(max,page+1);else page=Number(b.dataset.page)||1;renderCatalog();$('#products').scrollIntoView({behavior:'smooth',block:'start'})});
  document.body.addEventListener('click',e=>{const catalogLink=e.target.closest('a[href="/sanpham"]');if(catalogLink){e.preventDefault();navigateCatalog('all');return}const featureStep=e.target.closest('[data-feature-step]');if(featureStep){e.preventDefault();e.stopPropagation();changeFeaturedImage(featureStep.closest('[data-featured-card]'),Number(featureStep.dataset.featureStep));return}const add=e.target.closest('[data-add]');if(add){if(add.id==='detailAdd')return;e.preventDefault();e.stopPropagation();addToCartFromControl(add.dataset.add,add);return}const op=e.target.closest('[data-open-product]');if(op){openDetail(op.dataset.openProduct);return}const thumb=e.target.closest('[data-thumb]');if(thumb&&currentProduct){changeDetailImage(Number(thumb.dataset.thumb),true);return}const qty=e.target.closest('[data-qty]');if(qty){const id=qty.dataset.id;cart[id]=Number(cart[id]||0)+Number(qty.dataset.qty);if(cart[id]<=0)delete cart[id];saveCart();return}const rem=e.target.closest('[data-remove]');if(rem){delete cart[rem.dataset.remove];saveCart();showToast('Đã xóa sản phẩm khỏi giỏ chọn.')}});
  document.addEventListener('keydown',e=>{const op=e.target.closest&&e.target.closest('[data-open-product]');if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#productOverlay').classList.contains('open')){closeDetail()}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowRight'){changeDetailImage(detailIndex+1,true)}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowLeft'){changeDetailImage(detailIndex-1,true)}});
 }
 async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year').textContent=new Date().getFullYear();loadCart();loadFavorites();loadOrderHistory();loadLocalShippingAddress();bindEvents();try{const res=await fetch('/api/products',{cache:'no-store'});if(!res.ok)throw new Error('API sản phẩm trả về HTTP '+res.status);const payload=await res.json();products=Array.isArray(payload)?payload:(payload.products||payload.data||[]);if(!Array.isArray(products))throw new Error('Dữ liệu sản phẩm không hợp lệ');products=products.map(p=>({...p,images:(p.images||[]).map(imgPath)}));normalizeCart();normalizeFavorites();}catch(err){$('#catalogGrid').innerHTML='<p class="section-note">Không thể tải danh mục từ /api/products. Hãy kiểm tra Cloudflare Pages Functions, binding D1 tên DB và các tệp SQL trong migrations/. Website không dùng danh mục tĩnh cũ khi API gặp lỗi.</p>';return}
- renderFeatured();renderFilters();renderCatalog();renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){requestAnimationFrame(()=>$('#products')?.scrollIntoView({behavior:'auto',block:'start'}))}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
+ renderFeatured();renderFilters();renderCatalog();renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
 }
 const finishStorefrontStartup=()=>{window.__sdStorefrontReady=true;window.dispatchEvent(new Event('sd-storefront-ready'))};
 init().then(finishStorefrontStartup,finishStorefrontStartup);
