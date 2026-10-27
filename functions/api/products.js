@@ -9,8 +9,8 @@ export async function onRequestGet({ request, env }) {
     const requestedType = new URL(request?.url || "https://shop.example/api/products").searchParams.get("fulfillmentType");
     if (requestedType !== null && !FULFILLMENT_TYPES.includes(requestedType)) return fail("Bộ lọc loại hàng không hợp lệ.", 400);
     const query = requestedType
-      ? env.DB.prepare("SELECT * FROM products WHERE published = 1 AND fulfillment_type = ? ORDER BY sort_order ASC, sku ASC LIMIT 2000").bind(requestedType)
-      : env.DB.prepare("SELECT * FROM products WHERE published = 1 ORDER BY sort_order ASC, sku ASC LIMIT 2000");
+      ? env.DB.prepare("SELECT * FROM products WHERE published = 1 AND fulfillment_type = ? ORDER BY created_at DESC, id DESC LIMIT 2000").bind(requestedType)
+      : env.DB.prepare("SELECT * FROM products WHERE published = 1 ORDER BY created_at DESC, id DESC LIMIT 2000");
     const result = await query.all();
     return json((result.results || []).map((row) => {
       // Public product URLs, JSON-LD and catalog must follow the same explicit
