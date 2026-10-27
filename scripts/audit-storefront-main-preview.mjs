@@ -305,6 +305,36 @@ try{
    await page.locator('#detailClose').click({timeout:4500});
    await page.waitForFunction(()=>!document.querySelector('#productOverlay')?.classList.contains('open'),null,{timeout:4500});
    result.checks.detailCloses=true;
+   // Owner's footer headline must remain next to the logo on the same row,
+   // even on 360px mobile. No logo card/backdrop is allowed.
+   const footer=page.locator('#siteFooter .footer-story-heading');
+   await footer.scrollIntoViewIfNeeded();
+   const footerProof=await footer.evaluate(el=>{
+    const logoLink=el.querySelector('.footer-brand'),logo=logoLink?.querySelector('img'),
+      heading=el.querySelector('#footer-story-title'),eyebrow=el.querySelector('.footer-story-eyebrow'),
+      lr=logo?.getBoundingClientRect(),hr=heading?.getBoundingClientRect(),
+      er=eyebrow?.getBoundingClientRect(),fr=el.getBoundingClientRect();
+    const style=logoLink?getComputedStyle(logoLink):null;
+    const image=logo?getComputedStyle(logo):null;
+    return {
+      title:heading?.textContent?.trim(),eyebrow:eyebrow?.textContent?.trim(),
+      logoW:lr?.width,logoH:lr?.height,logoRight:lr?.right,
+      titleLeft:hr?.left,titleTop:hr?.top,titleBottom:hr?.bottom,
+      eyebrowLeft:er?.left,eyebrowBottom:er?.bottom,
+      rowWidth:fr?.width,
+      logoBackdrop:style?.backgroundColor,logoBorder:style?.borderTopWidth,
+      logoShadow:style?.boxShadow,imageBackdrop:image?.backgroundColor,
+      footerOverflow:document.documentElement.scrollWidth-innerWidth
+    };
+   });
+   result.footer=footerProof;
+   result.checks.footerLogoLeft=footerProof.logoRight+5<=footerProof.titleLeft&&footerProof.logoRight+5<=footerProof.eyebrowLeft;
+   result.checks.footerTextStacked=footerProof.eyebrowBottom<=footerProof.titleTop+1;
+   result.checks.footerLogoLarger=footerProof.logoW>=90;
+   result.checks.footerLogoNoCard=footerProof.logoBackdrop==='rgba(0, 0, 0, 0)'&&footerProof.logoBorder==='0px'&&footerProof.logoShadow==='none';
+   result.checks.footerNoOverflow=footerProof.footerOverflow<=2;
+   if(!Object.values(result.checks).every(Boolean))throw Error('Footer alignment or another layout gate failed: '+JSON.stringify(footerProof));
+   await footer.screenshot({path:path.join(destination,spec.label+'-footer-story.png'),animations:'disabled'});
    result.pass=Object.values(result.checks).every(Boolean)&&result.errors.length===0;
   }catch(err){result.pass=false;result.errors.push({type:'capture',message:String(err).slice(0,340)})}
   report.matrix.push(result);
