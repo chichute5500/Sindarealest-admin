@@ -44,6 +44,12 @@ const unknown=await middleware(fakeContext('/sanpham/khong-ton-tai'));
 assert.equal(unknown.status,404);
 assert.equal(unknown.headers.get('X-Robots-Tag'),'noindex, nofollow');
 const front=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+const verificationTag='<meta name="google-site-verification" content="6GC_01bvUrkBiD79vdoKU9wJ3A5PGNdqibCT_FkgG7o">';
+assert.ok(front.includes(verificationTag),'Google Search Console URL-prefix verification meta tag must remain on storefront');
+assert.equal(front.split('name="google-site-verification"').length-1,1,'Verification tag must appear exactly once');
+assert.ok(front.indexOf(verificationTag)>front.indexOf('<head>')&&front.indexOf(verificationTag)<front.indexOf('</head>'),
+  'Google verification tag must be inside head for Googlebot');
+
 assert.ok(front.includes('href="/sanpham"'));
 assert.ok(!front.includes('href="#products"'));
 assert.match(front,/function navigateCatalog\(/);
