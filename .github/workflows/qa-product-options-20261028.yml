@@ -6,6 +6,7 @@ on:
       - '.github/workflows/qa-product-options-20261028.yml'
       - 'public/index.html'
       - 'functions/api/orders.js'
+      - 'functions/api/checkout-quote.js'
       - 'functions/_product-options.js'
       - 'tests/product-options-flow.test.mjs'
       - 'tests/e2e/product-options-mobile-desktop.spec.js'
