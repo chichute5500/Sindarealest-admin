@@ -2116,7 +2116,12 @@ galleryGrid.addEventListener('pointermove',e=>{
 galleryGrid.addEventListener('pointerup',e=>{
  const drag=galleryPointer;if(!drag||drag.pointerId!==e.pointerId)return;
  const moved=drag.moved,from=drag.from,target=galleryPointerTarget(e.clientX,e.clientY)||drag.target;
+ const browsing=drag.browsing,rail=drag.rail,velocity=drag.velocity;
  resetGalleryPointer();
+ if(browsing){
+  if(rail&&Math.abs(velocity)>0.15)rail.scrollBy({left:-Math.max(-240,Math.min(240,velocity*160)),behavior:'smooth'});
+  return;
+ }
  if(!moved||!target)return;
  if(target.type==='trash')removeGalleryImage(from);
  else if(target.type==='slot')moveGalleryImage(from,target.index);
