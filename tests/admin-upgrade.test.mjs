@@ -32,10 +32,10 @@ assert.ok(admin.includes("data-image-index") && admin.includes("text/x-sd-image-
 assert.ok(admin.includes("Liquid Glass admin skin"), "Admin should use the matching Liquid Glass visual system");
 assert.ok(admin.includes('<svg viewBox="0 0 24 24" aria-hidden="true">'), "Admin navigation should use consistent line icons");
 assert.ok(middleware.includes("lower(id)=?"), "Product URLs should support immutable IDs");
-assert.ok(products.includes("makeCategoryPrefix(normalized)"), "New categories should receive automatic SKU prefixes without a hardcoded category list");
+assert.ok(products.includes("officialSkuPrefix(body?.category") && products.includes("body.skuVerified=true;"), "New products must automatically receive an official SKU from one of 15 approved prefixes");
 assert.ok(ai.includes("OPENAI_API_KEY"), "AI key must be read server-side");
 const resetSkus = read("../functions/api/admin/products/reset-skus.js");
-assert.ok(resetSkus.includes("categoryRules[row.categoryKey]"), "SKU reset should support future categories dynamically");
+assert.ok(resetSkus.includes("officialSkuPrefix(row.categoryKey)") && resetSkus.includes("sku_verified = 1"), "SKU reset must only allocate approved, verified SKU prefixes");
 assert.ok(push.includes("requireAdmin"), "Push subscriptions must require admin authentication");
 console.log("PASS: admin upgrade static regression checks.");
 
