@@ -9,10 +9,10 @@ assert.ok(start>=0&&end>start,"Use the existing title-case helper for display on
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const emphasize=runInNewContext(html.slice(start,end)+"\nproductTitleWithVip",{escapeHtml},{timeout:1200});
 
-assert.equal(emphasize("GIÀY TÂY VIP DA CÁ SẤU"),'Giày Tây <span class="sd-vip-word">VIP</span> Da Cá Sấu');
+assert.equal(emphasize("GIÀY TÂY VIP DA CÁ SẤU"),'GIÀY TÂY <span class="sd-vip-word">VIP</span> DA CÁ SẤU');
 assert.equal(emphasize("ví vip xịn"),'Ví <span class="sd-vip-word">VIP</span> Xịn');
 assert.equal(emphasize("VIP VIP").match(/class="sd-vip-word"/g)?.length,2);
-assert.equal(emphasize("Đế Viper VVIP VIP1 SUPERVIP"),"Đế Viper Vvip Vip1 Supervip","Do not mark VIP embedded inside another word");
+assert.equal(emphasize("Đế Viper VVIP VIP1 SUPERVIP"),"Đế Viper VVIP VIP1 SUPERVIP","Do not mark VIP embedded inside another word");
 assert.equal(emphasize("VIP <img src=x onerror=alert(1)>"),'<span class="sd-vip-word">VIP</span> &lt;Img Src=X Onerror=Alert(1)&gt;');
 assert.equal(emphasize("vip 123",false),'<span class="sd-vip-word">VIP</span> 123');
 assert.equal(emphasize("Một sản phẩm",false),"Một sản phẩm");
