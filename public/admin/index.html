@@ -1535,7 +1535,7 @@ function orderStatusLabel(value){return ({pending_confirmation:'Chờ xác nhậ
 function orderPaymentStatusLabel(value,order){return value==='paid'?'Đã thanh toán (đã xác minh)':value==='pending'?'Đã nhận một phần':value==='refunded'?'Đã hoàn tiền':order&&(order.customer_payment_option==='deposit'||order.customer_payment_option==='full')?'Chờ đối soát QR (chưa xác minh)':'Chưa hoàn tất thanh toán'}
 function orderDetailMarkup(order){
  const items=Array.isArray(order.items)?order.items:[],id=esc(order.id);
- const received=Number(order.received_amount||0),refunded=Number(order.refunded_amount||0),net=received-refunded,maxRefundAmount=Math.max(0,net);
+ const received=Number(order.received_amount||0),refunded=Number(order.refunded_amount||0),net=received-refunded,netReceived=net,maxRefundAmount=Number.isSafeInteger(netReceived)&&netReceived>0?netReceived:0;
  const priceConfirmed=Number(order.price_confirmation_required)===0&&Boolean(order.payment_terms_confirmed_at)&&Number.isSafeInteger(Number(order.total));
  const selected=['deposit','full'].includes(order.customer_payment_option);
  const expected=Number(order.customer_payment_amount),remainder=Number(order.customer_payment_remaining_amount);
@@ -1590,7 +1590,7 @@ function orderDetailMarkup(order){
    ${order.pending_payment_request_id?`<button class="btn small" type="button" data-action="cancel-payment-request" data-id="${id}" data-request-id="${esc(order.pending_payment_request_id)}">Hủy hồ sơ QR chờ</button>`:''}
   </div>
   <details class="sd-order-subdetails"><summary>Hoàn tiền đã chuyển</summary><div class="order-detail-refund-entry" data-refund-entry="${id}">
-   <p class="tiny muted">Chỉ ghi nhận giao dịch hoàn đã thực sự chuyển và đối chiếu sao kê.</p>
+   <p class="tiny muted">Chỉ ghi sổ sau khi thực sự chuyển tiền hoàn và đối chiếu sao kê; thao tác này không thực hiện chuyển tiền.</p>
    <label class="tiny">Số tiền đã hoàn<input class="control" type="number" min="1" max="${maxRefundAmount}" step="1" data-refund-amount ${maxRefundAmount>0?'':'disabled'}></label>
    <label class="tiny">Mã giao dịch hoàn<input class="control" maxlength="80" data-refund-reference></label>
    <label class="tiny">Ghi chú<input class="control" maxlength="500" data-refund-note></label>
