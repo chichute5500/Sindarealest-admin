@@ -1949,60 +1949,137 @@ function moveGalleryImage(from,to){
  if(status)status.textContent='Đã chuyển ảnh '+(from+1)+' đến vị trí '+(to+1)+(to===0?' (ảnh đại diện)':'')+'. Nhấn Lưu để cập nhật sản phẩm.';
  return true;
 }
-$('#imageGrid').addEventListener('dragstart',e=>{const item=e.target.closest('[data-image-index]');if(!item)return;item.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/x-sd-image-index',item.dataset.imageIndex)});
-$('#imageGrid').addEventListener('dragend',e=>e.target.closest('[data-image-index]')?.classList.remove('dragging'));
-$('#imageGrid').addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('text/x-sd-image-index'))e.preventDefault()});
-$('#imageGrid').addEventListener('drop',e=>{const target=e.target.closest('[data-image-index]');if(!target||!e.dataTransfer.types.includes('text/x-sd-image-index'))return;e.preventDefault();const from=Number(e.dataTransfer.getData('text/x-sd-image-index')),to=Number(target.dataset.imageIndex);if(Number.isInteger(from)&&Number.isInteger(to)&&from>=0&&from<gallery.length&&to>=0&&to<gallery.length&&from!==to){moveGalleryImage(from,to)}});
-// Browser-native drag works on desktop. Android/iOS need Pointer Events:
-// hold the grip on a thumbnail, drag to a slot, release to INSERT at that
-// position (other images shift; swapping would lose the requested order).
+
+function removeGalleryImage(index){
+ if(!Number.isInteger(index)||index<0||index>=gallery.length)return false;
+ const [removed]=gallery.splice(index,1);
+ if(removed.temporary)URL.revokeObjectURL(removed.url);
+ renderGallery();
+ $('#galleryStatus').textContent='Đã gỡ ảnh '+(index+1)+' khỏi bộ ảnh. Nhấn Lưu để xác nhận; Hủy để giữ ảnh cũ.';
+ return true;
+}
+/* The entire photograph is the drag surface. A stationary long hold opens
+   a large view (only for as long as it is held); moving the pointer inserts
+   the photo into the target slot, or removes it when dropped on the bin.
+   No individual arrows, delete buttons, or grip handles. */
 const galleryGrid=$('#imageGrid');
-let imageTouchDrag=null;
-function clearImageTouchDrag(){
- if(!imageTouchDrag)return;
- clearTimeout(imageTouchDrag.timer);
+let galleryPointer=null,galleryPreview=null,galleryGhost=null;
+function hideHeldGalleryPreview(){
+ if(galleryPreview){galleryPreview.remove();galleryPreview=null;}
+}
+function showHeldGalleryPreview(index){
+ const photo=gallery[index];
+ if(!photo)return;
+ hideHeldGalleryPreview();
+ const overlay=document.createElement('div');
+ overlay.className='gallery-held-preview';
+ overlay.setAttribute('aria-hidden','true');
+ const img=document.createElement('img');
+ img.src=galleryImageSrc(photo.url);
+ img.alt='';
+ img.draggable=false;
+ overlay.appendChild(img);document.body.appendChild(overlay);galleryPreview=overlay;
+}
+function hideGalleryGhost(){
+ if(galleryGhost){galleryGhost.remove();galleryGhost=null;}
+}
+function showGalleryGhost(index,x,y){
+ hideGalleryGhost();
+ const img=document.createElement('img');
+ img.src=galleryImageSrc(gallery[index]?.url);img.alt='';img.draggable=false;
+ const ghost=document.createElement('div');
+ ghost.className='gallery-drag-ghost';
+ ghost.setAttribute('aria-hidden','true');ghost.appendChild(img);
+ document.body.appendChild(ghost);galleryGhost=ghost;moveGalleryGhost(x,y);
+}
+function moveGalleryGhost(x,y){
+ if(!galleryGhost)return;
+ galleryGhost.style.left=Math.min(x+12,innerWidth-82)+'px';
+ galleryGhost.style.top=Math.max(4,Math.min(y-79,innerHeight-82))+'px';
+}
+function galleryPointerTarget(x,y){
+ const hovered=document.elementFromPoint(x,y);
+ const trash=$('#galleryTrash');
+ if(trash&&hovered&&(hovered===trash||trash.contains(hovered)))return {type:'trash'};
+ const item=hovered?.closest?.('#imageGrid [data-image-index]');
+ return item?{type:'slot',index:Number(item.dataset.imageIndex)}:null;
+}
+function resetGalleryPointer(){
+ const drag=galleryPointer;
+ if(drag){
+  clearTimeout(drag.timer);
+  try{if(drag.item?.hasPointerCapture?.(drag.pointerId))drag.item.releasePointerCapture(drag.pointerId)}catch{}
+ }
+ galleryPointer=null;
  galleryGrid.querySelectorAll('.is-pointer-dragging,.is-drop-target').forEach(el=>{
   el.classList.remove('is-pointer-dragging','is-drop-target');
  });
- imageTouchDrag=null;
+ $('#galleryTrash')?.classList.remove('is-drop-target');
+ hideHeldGalleryPreview();hideGalleryGhost();
 }
-galleryGrid.addEventListener('pointerdown',event=>{
- if(event.pointerType==='mouse'||busy||!event.isPrimary)return;
- const grip=event.target.closest('[data-image-drag-handle]');
- const item=grip?.closest('[data-image-index]');
+galleryGrid.addEventListener('contextmenu',e=>{
+ if(e.target.closest('[data-image-index]'))e.preventDefault();
+});
+galleryGrid.addEventListener('pointerdown',e=>{
+ if(busy||!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0))return;
+ const item=e.target.closest('[data-image-index]');
  if(!item)return;
- clearImageTouchDrag();
- const drag={pointerId:event.pointerId,from:Number(item.dataset.imageIndex),to:null,
-  x:event.clientX,y:event.clientY,armed:false,handle:grip,timer:null};
- imageTouchDrag=drag;
- try{grip.setPointerCapture(event.pointerId)}catch{}
+ resetGalleryPointer();
+ const index=Number(item.dataset.imageIndex);
+ if(!Number.isInteger(index)||index<0||index>=gallery.length)return;
+ const drag={item,pointerId:e.pointerId,from:index,startX:e.clientX,startY:e.clientY,
+  moved:false,target:null,timer:null};
+ galleryPointer=drag;
+ try{item.setPointerCapture(e.pointerId)}catch{}
  drag.timer=setTimeout(()=>{
-  if(imageTouchDrag!==drag)return;
-  drag.armed=true;item.classList.add('is-pointer-dragging');
-  $('#galleryStatus').textContent='Đang kéo ảnh '+(drag.from+1)+'. Thả vào ảnh muốn chèn trước.';
- },180);
+  if(galleryPointer!==drag||drag.moved)return;
+  showHeldGalleryPreview(index);
+ },320);
 });
-galleryGrid.addEventListener('pointermove',event=>{
- const drag=imageTouchDrag;if(!drag||drag.pointerId!==event.pointerId)return;
- if(!drag.armed){
-  if(Math.hypot(event.clientX-drag.x,event.clientY-drag.y)>18)clearImageTouchDrag();
-  return;
+galleryGrid.addEventListener('pointermove',e=>{
+ const drag=galleryPointer;if(!drag||drag.pointerId!==e.pointerId)return;
+ if(!drag.moved){
+  if(Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<11)return;
+  drag.moved=true;
+  clearTimeout(drag.timer);hideHeldGalleryPreview();
+  drag.item.classList.add('is-pointer-dragging');
+  showGalleryGhost(drag.from,e.clientX,e.clientY);
  }
- event.preventDefault();
- const pointed=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-image-index]');
- const current=pointed&&galleryGrid.contains(pointed)?Number(pointed.dataset.imageIndex):null;
- drag.to=Number.isInteger(current)?current:null;
+ e.preventDefault();
+ moveGalleryGhost(e.clientX,e.clientY);
+ drag.target=galleryPointerTarget(e.clientX,e.clientY);
  galleryGrid.querySelectorAll('.is-drop-target').forEach(el=>el.classList.remove('is-drop-target'));
- if(drag.to!==null)pointed.classList.add('is-drop-target');
+ $('#galleryTrash')?.classList.remove('is-drop-target');
+ if(drag.target?.type==='trash')$('#galleryTrash')?.classList.add('is-drop-target');
+ if(drag.target?.type==='slot')
+  galleryGrid.querySelector('[data-image-index="'+drag.target.index+'"]')?.classList.add('is-drop-target');
 });
-galleryGrid.addEventListener('pointerup',event=>{
- const drag=imageTouchDrag;if(!drag||drag.pointerId!==event.pointerId)return;
- const from=drag.from,to=drag.to,armed=drag.armed;
- clearImageTouchDrag();
- if(armed&&to!==null)moveGalleryImage(from,to);
+galleryGrid.addEventListener('pointerup',e=>{
+ const drag=galleryPointer;if(!drag||drag.pointerId!==e.pointerId)return;
+ const moved=drag.moved,from=drag.from,target=galleryPointerTarget(e.clientX,e.clientY)||drag.target;
+ resetGalleryPointer();
+ if(!moved||!target)return;
+ if(target.type==='trash')removeGalleryImage(from);
+ else if(target.type==='slot')moveGalleryImage(from,target.index);
 });
-galleryGrid.addEventListener('pointercancel',clearImageTouchDrag);
-const imageDropZone=$('#imageDropZone');['dragenter','dragover'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(e.dataTransfer?.types?.includes('Files')){e.preventDefault();imageDropZone.classList.add('is-dragover')}}));['dragleave','drop'].forEach(type=>imageDropZone.addEventListener(type,e=>{if(type==='drop'&&e.dataTransfer?.files?.length){e.preventDefault();addImageFiles(e.dataTransfer.files)}imageDropZone.classList.remove('is-dragover')}));
+galleryGrid.addEventListener('pointercancel',resetGalleryPointer);
+galleryGrid.addEventListener('lostpointercapture',e=>{
+ if(galleryPointer&&galleryPointer.pointerId===e.pointerId)resetGalleryPointer();
+});
+galleryGrid.addEventListener('keydown',e=>{
+ const item=e.target.closest('[data-image-index]');
+ if(!item||e.target!==item)return;
+ const from=Number(item.dataset.imageIndex);
+ let to=null;
+ if(e.key==='ArrowLeft'||e.key==='ArrowUp')to=Math.max(0,from-1);
+ else if(e.key==='ArrowRight'||e.key==='ArrowDown')to=Math.min(gallery.length-1,from+1);
+ else if(e.key==='Home')to=0;
+ else if(e.key==='End')to=gallery.length-1;
+ else if(e.key==='Delete'||e.key==='Backspace'){
+  e.preventDefault();if(removeGalleryImage(from))galleryGrid.querySelector('[data-image-index="'+Math.min(from,gallery.length-1)+'"]')?.focus();return;
+ }else return;
+ e.preventDefault();if(moveGalleryImage(from,to))galleryGrid.querySelector('[data-image-index="'+to+'"]')?.focus();
+});
 async function optimizeUpload(file){if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Ảnh gốc cần là JPEG, PNG hoặc WebP.');if(file.size>20*1024*1024)throw Error('Ảnh gốc vượt giới hạn 20 MB.');let bitmap;try{bitmap=await createImageBitmap(file)}catch{throw Error(`Không đọc được ảnh ${file.name}.`)}const scale=Math.min(1,1800/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));const ctx=canvas.getContext('2d',{alpha:false});ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.88));if(!blob||blob.size>5*1024*1024)throw Error(`Ảnh ${file.name} vượt giới hạn 5 MB sau tối ưu.`);const body=new FormData();body.append('file',blob,'product.webp');body.append('original',file,file.name||'original');return (await api('/api/admin/upload',{method:'POST',body})).url}
 $('#productForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;const b=$('#saveProduct');b.disabled=true;b.textContent='Đang lưu…';b.setAttribute('aria-label','Đang lưu sản phẩm');err($('#saveError'),'');try{syncProductIdentityValidity();const invalidInput=$('#productForm').querySelector(':invalid');if(invalidInput){const panel=invalidInput.closest('[data-product-panel]');if(panel)setProductEditorTab(panel.dataset.productPanel);invalidInput.focus();const fieldLabel=document.querySelector(`label[for="${invalidInput.id}"]`)?.textContent?.trim()||'trường này';throw Error(({pTitle:'Vui lòng nhập tên sản phẩm.',pCategory:'Vui lòng chọn hoặc nhập danh mục.'})[invalidInput.id]||`Vui lòng kiểm tra trường “${fieldLabel}”.`)}const id=$('#pId').value;for(const g of gallery){if(g.file){g.url=await optimizeUpload(g.file);g.file=null;g.temporary=false}}const payload={title:$('#pTitle').value.trim(),category:$('#pCategory').value.trim(),categoryLabel:$('#pCategory').value.trim(),sku:$('#pSku').value.trim(),skuVerified:$('#pSkuVerified').checked,description:$('#pDescription').value,price:$('#pPrice').value===''?null:Number($('#pPrice').value),stock:$('#pStock').value===''?null:Number($('#pStock').value),fulfillmentType:$('#pFulfillmentType').value,published:$('#pPublished').checked,images:gallery.map(g=>g.url)};const result=await api(id?`/api/admin/products/${encodeURIComponent(id)}`:'/api/admin/products',{method:id?'PUT':'POST',body:JSON.stringify(payload)});await loadData();closeEditor(true);render();toast(result.message||'Đã lưu sản phẩm.')}catch(ex){err($('#saveError'),ex.message)}finally{busy=false;b.disabled=false;b.textContent='Lưu';b.setAttribute('aria-label','Lưu sản phẩm')}});
 $('#deleteProduct').addEventListener('click',async()=>{if(!editing)return;if(!confirm(`Bạn chắc chắn muốn xóa “${editing.title}” (SKU ${editing.sku})? Thao tác này không thể hoàn tác nếu chưa có bản sao lưu.`))return;busy=true;$('#deleteProduct').disabled=true;try{const r=await api(`/api/admin/products/${encodeURIComponent(editing.id)}`,{method:'DELETE'});await loadData();closeEditor(true);render();toast(r.message)}catch(e){err($('#saveError'),e.message)}finally{busy=false;$('#deleteProduct').disabled=false}});
