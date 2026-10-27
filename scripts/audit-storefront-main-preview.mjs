@@ -337,8 +337,7 @@ try{
     };
    });
    result.footer=footerProof;
-   result.checks.footerLogoLeft=footerProof.logoRight+5<=footerProof.eyebrowLeft&&
-     (spec.width<=760?footerProof.titleTop>footerProof.eyebrowBottom-1:footerProof.logoRight+5<=footerProof.titleLeft);
+   result.checks.footerLogoLeft=footerProof.logoRight+5<=footerProof.eyebrowLeft&&footerProof.logoRight+5<=footerProof.titleLeft;
    result.checks.footerTextStacked=footerProof.eyebrowBottom<=footerProof.titleTop+1;
    result.checks.footerLogoLarger=footerProof.logoW>=90;
    result.checks.footerLogoNoCard=footerProof.logoBackdrop==='rgba(0, 0, 0, 0)'&&footerProof.logoBorder==='0px'&&footerProof.logoShadow==='none';
@@ -346,10 +345,12 @@ try{
    if(spec.width<=760){
     result.checks.footerVietnameseSingleLine=footerProof.titleWhiteSpace==='nowrap'&&
       footerProof.titleScrollWidth<=footerProof.titleClientWidth+1;
-    result.checks.footerEnglishLegible=footerProof.eyebrowFontSize>=12&&
+    result.checks.footerEnglishLegible=footerProof.eyebrowFontSize>=10&&
       footerProof.eyebrowScrollWidth<=footerProof.eyebrowClientWidth+1;
-    result.checks.footerTitleBalanced=footerProof.titleFontSize>=20&&footerProof.titleFontSize<=24;
-    result.checks.footerTitleFullWidth=footerProof.titleLeft<footerProof.eyebrowLeft-5;
+    result.checks.footerTitleBalanced=footerProof.titleFontSize>=12&&footerProof.titleFontSize<=15;
+    result.checks.footerBothLinesRight=footerProof.titleLeft>=footerProof.eyebrowLeft-1&&
+      footerProof.titleLeft<=footerProof.eyebrowLeft+3;
+    result.checks.footerTwoTextRows=footerProof.titleTop>=footerProof.eyebrowBottom-1;
    }
    if(!Object.values(result.checks).every(Boolean))throw Error('Footer alignment or another layout gate failed: '+JSON.stringify(footerProof));
    await footer.screenshot({path:path.join(destination,spec.label+'-footer-story.png'),animations:'disabled'});
