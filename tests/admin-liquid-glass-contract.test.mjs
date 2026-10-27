@@ -232,14 +232,12 @@ assert.match(adminHtml, /async function showOrderCustomerProfile\(searchTerm\)/,
 assert.match(baselineSpec, /await expect\(page\.locator\('\.order-detail-page'\)\)\.toBeVisible\(\);/,
   'Order-detail capture should wait for the dedicated page to render');
 
-// The reorder/remove gallery controls use SVG artwork, not Unicode text glyphs, while
-// retaining record-specific accessible names and remaining legible in both themes.
-for (const action of ['up', 'down', 'remove']) {
-  assert.match(adminHtml, new RegExp('data-gallery="' + action + '"[^>]*><svg[^>]*aria-hidden="true"'),
-    'Gallery action ' + action + ' should render an aria-hidden inline SVG icon');
-}
-assert.doesNotMatch(adminHtml, /data-gallery="(?:up|down|remove)"[^>]*>(?:←|→|×)<\/button>/,
-  'Gallery controls must not fall back to Unicode arrow/delete glyphs');
+// Owner replaced per-image buttons with whole-image gestures and one small
+// accessible SVG trash drop target beneath the gallery. Keep them absent.
+assert.match(adminHtml, /id="galleryTrash"[^>]*>[\\s\\S]*?<svg[^>]*aria-hidden="true"/,
+  'Bottom-only photo trash zone must contain decorative line-art SVG');
+assert.doesNotMatch(adminHtml, /data-gallery="(?:up|down|remove)"|data-image-drag-handle/,
+  'Gallery must not show old arrows, per-image bins or drag grips');
 
 assert.match(adminHtml, /<option value="all">Tất cả<\/option>/, 'Mobile category filter should use a short all-categories label');
 assert.match(adminHtml, /placeholder="Ví dụ: Bảo hành đường may"/, 'Warranty-policy placeholder should fit small phone widths');
