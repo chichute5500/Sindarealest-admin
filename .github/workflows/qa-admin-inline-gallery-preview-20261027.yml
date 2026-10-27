@@ -60,7 +60,7 @@ jobs:
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
           npx playwright install --with-deps chromium
-      - name: Test gestures against actual Admin source with isolated mock products (PC + mobile)
+      - name: Test gestures on PC/mobile and swipe through 28 product photos without reordering
         shell: bash
         env:
           LOCAL_ADMIN_URL: http://127.0.0.1:4173/admin/
@@ -71,7 +71,7 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/admin/ >/dev/null; then break; fi
             sleep .3
           done
-          npx playwright test tests/e2e/admin-photo-gesture-owner.spec.js --reporter=list
+          npx playwright test tests/e2e/admin-photo-gesture-owner.spec.js tests/e2e/admin-long-gallery-swipe.spec.js --reporter=list
       - name: Upload Owner gesture visual evidence
         if: always()
         uses: actions/upload-artifact@v4
