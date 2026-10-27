@@ -2815,7 +2815,6 @@ html.dark .theme-bg--dark{filter:blur(1.5px) hue-rotate(0deg) saturate(.86) brig
 
 /* QA correction: the two-column hero must stay inside the viewport after enlarging the reference proportions. */
 @media(max-width:760px){
-  #home.hero.wrap{width:calc(100vw - 26px)!important;max-width:calc(100vw - 26px);margin-left:auto;margin-right:auto;box-sizing:border-box}
   .service-strip>.service{min-height:0;height:auto}
   #order .order-cta--compact #orderDetailsToggle{min-height:50px}
 }
@@ -3051,18 +3050,7 @@ html.dark .theme-bg--dark{filter:none!important}
 .section-title{letter-spacing:-.035em}
 .text-link,.pill-btn{border-color:rgba(145,190,222,.46);box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 4px 14px rgba(49,91,123,.06)}
 html.dark .text-link,html.dark .pill-btn{border-color:rgba(151,197,229,.36);box-shadow:inset 0 1px 0 rgba(235,246,255,.10),0 4px 14px rgba(0,0,0,.12)}
-/* Home hero: a single editorial image composition, not two visibly separate boxed columns. */
-#home.hero.wrap{
-  position:relative;
-  isolation:isolate;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.62);
-  border-radius:28px;
-  background:var(--sd-reference-surface);
-  box-shadow:var(--sd-reference-shadow);
-}
 @media(min-width:761px){
-  #home.hero.wrap{min-height:340px}
 }
 /* Product cards share the soft, bright/deep-blue glass surface from the reference boards. */
 .product-card,.catalog-card{
@@ -3223,16 +3211,6 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   .nav-wrap .nav .brand-name{font-size:14px;line-height:1.08}
   .nav-wrap .nav .brand-tagline{font-size:7px;line-height:1.08;margin-top:2px}
   .nav-actions .icon-btn{width:34px;height:34px;min-width:34px}
-  #home.hero.wrap{
-    width:calc(100vw - 26px)!important;
-    max-width:calc(100vw - 26px);
-    min-height:clamp(250px,68vw,292px);
-    height:auto;
-    margin:12px auto 14px;
-    padding:0;
-    display:block;
-    border-radius:25px;
-  }
   .service-strip{
     width:calc(100vw - 26px);
     margin:0 auto;
@@ -3357,14 +3335,6 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
 
 /* Historical QA section retained for surrounding layout rules; protected hero image rules are neutralized below. */
 @media(max-width:760px){
-  #home.hero.wrap{
-    margin:10px auto 6px;
-    border:0!important;
-    border-radius:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    overflow:hidden;
-  }
   .service-strip>.service{min-height:78px;height:auto}
   .service-strip .service-copy{min-height:66px;gap:7px}
   .service-icon{width:27px;height:27px}
@@ -3443,7 +3413,6 @@ html.dark .sd-fullscreen-share{
   .welcome-loader{margin-top:7px!important}
   .welcome-skip{min-height:36px!important;padding:8px 14px!important}
 }
-#home.hero:has(#heroProductImage[hidden]){grid-template-columns:minmax(0,1fr)!important}
 #heroProductImage[hidden]{display:none!important}
 
 
@@ -3469,51 +3438,15 @@ html.dark .sd-fullscreen-share{
   -webkit-backdrop-filter:blur(24px) saturate(145%);
   backdrop-filter:blur(24px) saturate(145%);
 }
-
-
-/* No substitute hero product when SD-GL052 is absent: collapse the empty image frame. */
-#home.hero:has(#heroProductImage[hidden]){
-  min-height:0!important;
-  height:auto!important;
-  grid-template-columns:minmax(0,1fr)!important;
-  align-items:center!important;
-  padding:clamp(28px,5vw,64px) clamp(20px,4vw,56px)!important;
-  margin-top:clamp(14px,3vw,28px)!important;
-  margin-bottom:clamp(12px,2vw,22px)!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
-}
 @media(max-width:760px){
-  #home.hero:has(#heroProductImage[hidden]){
-    padding:24px 12px 20px!important;
-    margin-top:8px!important;
-    margin-bottom:8px!important;
-  }
 }
-
-
-/* Suppress the empty hero pseudo-card only when the required verified SKU is absent. */
-#home.hero:has(#heroProductImage[hidden])::before,
-#home.hero:has(#heroProductImage[hidden])::after{content:none!important;display:none!important;background:none!important;box-shadow:none!important;border:0!important}
-#home.hero:has(#heroProductImage[hidden]){display:block!important;min-height:0!important;height:auto!important;border:0!important;outline:0!important;border-radius:0!important;background:transparent!important;background-image:none!important;box-shadow:none!important}
 
 
 
 /* Desktop fallback hero: keep the headline, description and CTA in a deliberate editorial stack when the exact SKU is absent. */
 @media(min-width:761px){
-  #home.hero:has(#heroProductImage[hidden]){
-    display:flex!important;
-    align-items:center!important;
-    justify-content:flex-start!important;
-    min-height:clamp(260px,24vw,340px)!important;
-    padding:clamp(32px,4vw,58px) clamp(32px,5.2vw,78px)!important;
-    margin:18px auto 12px!important;
-  }
 }
 @media(min-width:761px) and (max-width:1000px){
-  #home.hero:has(#heroProductImage[hidden]){min-height:245px!important;padding:30px 34px!important}
 }
 
 /* Explicitly size mobile drawers so the persistent bottom navigation stays visible. */
@@ -3663,21 +3596,6 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
     overflow-y:auto!important;
   }
   .cart-drawer:has(.cart-row) .cart-bottom{margin-top:auto}
-}
-
-
-/* Theme-only transitions are centralized in material-gallery.css; old global shadow/blur selectors removed. */
-
-/* Historical satin layout correction; the protected hero image may not be veiled or faded. */
-#home.hero.wrap{
-  background:rgba(246,251,255,.20)!important;
-  border-color:rgba(255,255,255,.46)!important;
-  box-shadow:0 12px 34px rgba(38,82,116,.06),inset 0 1px 0 rgba(255,255,255,.28)!important;
-}
-html.dark #home.hero.wrap{
-  background:rgba(7,27,45,.22)!important;
-  border-color:rgba(155,198,229,.28)!important;
-  box-shadow:0 14px 36px rgba(0,5,15,.14),inset 0 1px 0 rgba(219,241,255,.07)!important;
 }
 @media(max-width:760px){
 }
@@ -3866,7 +3784,6 @@ html.dark .not-found-card{background:rgba(7,27,43,.62);border-color:rgba(92,145,
 /* Bring product-detail trust icons into the same navy 24x24 thin-stroke system. */
 .promise-tag i{color:var(--ink)}
 .promise-tag i svg{display:block;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-#home.hero:after{content:none!important;display:none!important;background:none!important}
 @media(min-width:761px){}
 @media(min-width:761px) and (max-width:1000px){
 }
@@ -4345,13 +4262,9 @@ html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html
 @media(max-width:1000px){}
 @media(max-width:760px){}
 
-
-#home.hero:after{content:none!important;display:none!important;background:none!important}
-
 /* Tablet Hero pedestal stays under the shoes without extending beyond the right edge. */
 @media(min-width:761px) and (max-width:1000px){
 }
-#home.hero:after{content:none!important;display:none!important;background:none!important}
 
 @media(min-width:761px) and (max-width:1000px){}
 
@@ -4364,21 +4277,8 @@ html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html
    The 1200x1600 source PNG has ~83% alpha: never scale its blank canvas to the layout.
    Reference composition: text on left, shoe silhouettes at upper right, marble below. */
 @media(max-width:760px){
-  #home.hero.wrap{
-    display:grid!important;position:relative!important;
-    grid-template-columns:minmax(0,58fr) minmax(0,42fr)!important;
-    grid-template-rows:1fr!important;
-    width:calc(100% - 24px)!important;max-width:calc(100% - 24px)!important;
-    box-sizing:border-box!important;
-    height:clamp(216px,57vw,230px)!important;
-    min-height:0!important;
-    margin:9px auto 8px!important;padding:12px 14px 8px!important;
-    align-items:start!important;column-gap:0!important;row-gap:0!important;
-    overflow:hidden!important;
-  }
 }
 @media(max-width:390px){
-  #home.hero.wrap{padding:11px 12px 8px!important}
 }
 @media(max-width:375px){
 }
@@ -4389,27 +4289,8 @@ html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html
    curved mineral shelf, two localized shoe contact shadows, and the original
    source PNG used by the owner-accepted mobile layout. No edits below 761px. */
 @media(min-width:761px){
-  #home.hero.wrap{
-    display:grid!important;
-    grid-template-columns:minmax(0,.93fr) minmax(0,1.07fr)!important;
-    grid-template-rows:1fr!important;
-    align-items:center!important;
-    gap:clamp(14px,2vw,32px)!important;
-    width:calc(100% - 56px)!important;max-width:1440px!important;
-    min-height:0!important;height:clamp(405px,32vw,460px)!important;
-    margin:12px auto 20px!important;
-    padding:28px clamp(26px,3.8vw,56px)!important;
-    box-sizing:border-box!important;overflow:hidden!important;
-  }
 }
 @media(min-width:761px) and (max-width:1000px){
-  #home.hero.wrap{
-    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;
-    gap:12px!important;
-    width:calc(100% - 30px)!important;
-    height:clamp(455px,60vw,550px)!important;
-    padding:22px 25px!important;
-  }
 }
 
 
@@ -4430,12 +4311,6 @@ html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html
   .nav-wrap .nav-actions .menu-btn{display:grid!important}
   .mobile-nav.open{display:grid!important}
   .mobile-nav .navlink{font-size:16px!important;min-height:46px!important}
-  #home.hero.wrap{
-    width:calc(100% - 30px)!important;
-    height:clamp(460px,54vw,535px)!important;
-    grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr)!important;
-    gap:12px!important;padding:25px!important;
-  }
   .featured-grid,.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}
   .product-card .product-info,.catalog-card .product-info{padding:16px 18px 44px!important}
   .product-card .product-title,.catalog-card .product-title{font-size:20px!important}
