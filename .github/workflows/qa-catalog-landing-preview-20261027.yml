@@ -1,5 +1,5 @@
 name: Catalog direct landing Owner Preview (NO PRODUCTION)
-# Owner visual QA against the latest isolated fix SHA; never main or D1/R2.
+# Owner visual QA, bounded fail-fast timeouts; never main or D1/R2.
 on:
   push:
     branches:
