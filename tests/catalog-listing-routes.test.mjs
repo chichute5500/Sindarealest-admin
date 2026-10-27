@@ -38,8 +38,8 @@ const actualContext=()=>({
  next:async()=>new Response(actualInitialHtml,{headers:{'Content-Type':'text/html'}})
 });
 const sneakerHTML=await (await middleware(actualContext())).text();
-assert.match(sneakerHTML,/Giày thể thao \\(Sneaker\\) \\| SinDarealest/);
-assert.match(sneakerHTML,/id="catalogHeading">Giày thể thao \\(Sneaker\\)<\\/h2>/);
+assert.ok(sneakerHTML.includes('Giày thể thao (Sneaker) | SinDarealest'));
+assert.ok(sneakerHTML.includes('id="catalogHeading">Giày thể thao (Sneaker)</h2>'));
 const unknown=await middleware(fakeContext('/sanpham/khong-ton-tai'));
 assert.equal(unknown.status,404);
 assert.equal(unknown.headers.get('X-Robots-Tag'),'noindex, nofollow');
@@ -81,7 +81,7 @@ assert.deepEqual(state.history.calls,['/sanpham/giaytay']);
 // Search matches both a URL slug and the category key, even when the product
 // title/description contain no English keyword.
 const searchStart=front.indexOf('function getFiltered(){');
-const searchEnd=front.indexOf('\\nfunction renderCatalog(){',searchStart);
+const searchEnd=front.indexOf('\nfunction renderCatalog(){',searchStart);
 const source=front.slice(searchStart,searchEnd);
 const cases=[
  ['sneaker','sneakers',true],['giaytay','dress-shoes',true],
