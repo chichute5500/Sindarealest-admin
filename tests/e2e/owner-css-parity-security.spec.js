@@ -30,7 +30,9 @@ for(const cfg of tests){
    return {dark:root.classList.contains('dark'),mode:root.dataset.themeMode,
     scheme:style.colorScheme,background:style.getPropertyValue('--page').trim(),
     ink:style.getPropertyValue('--ink').trim(),accent:style.getPropertyValue('--gold').trim(),
-    logo:!!document.querySelector('.brand-symbol'),page:document.body.scrollWidth};
+    logo:!!document.querySelector('.brand-symbol'),page:document.body.scrollWidth,
+    lightBgFilter:getComputedStyle(document.querySelector('.theme-bg--light')).filter,
+    darkBgFilter:getComputedStyle(document.querySelector('.theme-bg--dark')).filter};
   });
   expect(web.dark).toBe(cfg.os==='dark');
   expect(web.background).toBe(cfg.os==='dark'?'#061522':'#eaf3fb');
@@ -40,6 +42,8 @@ for(const cfg of tests){
   expect(web.scheme).toContain('only');
   expect(web.logo).toBe(true);
   expect(web.page).toBeLessThanOrEqual(cfg.width+1);
+  expect(web.lightBgFilter).toBe('none');
+  expect(web.darkBgFilter).toBe('none');
   await page.screenshot({path:dir+'/store-'+cfg.label+'.png',animations:'disabled'});
   // Verify the previously approved Liquid Glass cart surface, not just Home.
   // Opening/closing must preserve responsive bounds and visible content in
