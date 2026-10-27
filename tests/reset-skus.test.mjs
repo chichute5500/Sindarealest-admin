@@ -8,11 +8,11 @@ const categories = [
   ['sneakers', 'Sneaker', 62, 'SD-SN'],
   ['loafers', 'Giày lười', 52, 'SD-GL'],
   ['dress-shoes', 'Giày tây', 22, 'SD-GT'],
-  ['wallets', 'Ví da', 28, 'SD-VD'],
+  ['wallets', 'Ví da', 28, 'SD-VN'],
   ['belts', 'Thắt lưng', 22, 'SD-TL'],
   ['sandals', 'Dép', 22, 'SD-DD'],
   ['watch-straps', 'Dây đồng hồ', 21, 'SD-DH'],
-  ['phone-cases', 'Ốp điện thoại', 6, 'SD-ODT'],
+  ['phone-cases', 'Ốp điện thoại', 6, 'SD-OP'],
 ];
 
 function makeRows({ unsupported = false } = {}) {
@@ -31,7 +31,7 @@ function makeRows({ unsupported = false } = {}) {
         price: index * 100,
         stock: index % 7,
         images_json: JSON.stringify([`images/image-${index}.webp`]),
-        published: index % 2,
+        published: 1,
         slug: `product-${index}`,
         description: `Description ${index}`,
       });
@@ -85,7 +85,7 @@ function createMockDb(rows, { failAudit = false } = {}) {
           for (const row of draft) {
             if (!ids.includes(row.id)) continue;
             const pair = pairs.find(([id]) => id === row.id);
-            if (pair) { row.sku = pair[1]; row.sku_verified = 0; }
+            if (pair) { row.sku = pair[1]; row.sku_verified = 1; }
           }
           assert.equal(
             new Set(draft.map((row) => row.sku)).size,
@@ -149,7 +149,7 @@ for (const row of rows) {
   counters[row.category]++;
   const expectedSku = prefixByCategory[row.category] + String(counters[row.category]).padStart(3, '0');
   assert.equal(row.sku, expectedSku, `Mã nội bộ không đúng thứ tự tại ${row.title}`);
-  assert.equal(row.sku_verified, 0, `Mã reset phải được đánh dấu chưa xác minh tại ${row.title}`);
+  assert.equal(row.sku_verified, 1, `Mã cấp lại phải chính thức tại ${row.title}`);
 }
 for (let i = 0; i < rows.length; i++) {
   for (const field of ['id', 'title', 'category', 'category_label', 'sort_order', 'price', 'stock', 'images_json', 'published', 'slug', 'description']) {
@@ -174,23 +174,17 @@ assert.equal(mock.stats().auditStatement.params[1] && JSON.parse(mock.stats().au
   assert.equal(mixedRows[0].sku, verifiedSnapshot.sku, 'Reset must preserve the commercial SKU');
   assert.equal(mixedRows[0].sku_verified, verifiedSnapshot.sku_verified, 'Reset must preserve the verification flag');
   assert.equal(mixedRows[1].sku, 'SD-SN002', 'Internal code allocation must skip a verified SKU collision');
-  assert.equal(mixedRows[1].sku_verified, 0);
+  assert.equal(mixedRows[1].sku_verified, 1);
   assert.equal(new Set(mixedRows.map((row) => row.sku)).size, mixedRows.length, 'verified and internal SKU values must remain unique');
   assert.equal(JSON.parse(dbMock.stats().auditStatement.params[1]).count, 234, 'audit log counts only internal codes changed');
 }
 
 {
-  const rowsWithNewCategory = makeRows({ unsupported: true });
-  const dbMock = createMockDb(rowsWithNewCategory);
-  const result = await resetSkus(await makeContext(dbMock.db, { confirm: true }));
-  const data = await result.json();
-  assert.equal(result.status, 200, 'Danh mục mới phải được hỗ trợ tự động');
-  assert.equal(data.ok, true);
-  assert.equal(dbMock.stats().batchCalls, 1, 'Danh mục mới phải được reset trong một batch');
-  const newCategoryRow = rowsWithNewCategory[4];
-  assert.match(newCategoryRow.sku, /^SD-UNKNON/);
-  assert.equal(newCategoryRow.category, 'unknown-category');
-  assert.equal(newCategoryRow.category_label, 'Danh mục lạ');
+  const rowsWithNewCategory=makeRows({unsupported:true});
+  const dbMock=createMockDb(rowsWithNewCategory);
+  const result=await resetSkus(await makeContext(dbMock.db,{confirm:true}));
+  assert.equal(result.status,400,'Unknown category cannot receive an unapproved official prefix');
+  assert.equal(dbMock.stats().batchCalls,0);
 }
 
 {
@@ -237,8 +231,8 @@ assert.equal(mock.stats().auditStatement.params[1] && JSON.parse(mock.stats().au
   const prototypeRows = [{ ...makeRows()[0], category: 'constructor', category_label: 'Constructor' }];
   const dbMock = createMockDb(prototypeRows);
   const result = await resetSkus(await makeContext(dbMock.db, { confirm: true }));
-  assert.equal(result.status, 200, 'prototype-named custom categories must not break SKU reset');
-  assert.match(prototypeRows[0].sku, /^SD-CONST[A-Z0-9]{2}001$/);
+  assert.equal(result.status, 400, 'Unapproved prototype-named category must not get a SKU');
+  assert.equal(dbMock.stats().batchCalls,0);
 }
 
 console.log('PASS: reset SKU — 235 sản phẩm, SKU duy nhất, giữ nguyên trường khác, phân quyền, xác nhận, danh mục mới, prototype-safe categories và rollback giả lập.');

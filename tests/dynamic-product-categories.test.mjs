@@ -54,14 +54,15 @@ assert.equal(ctx.selectedCategory,"all","Stale filter selection resets");
 assert.match(box.innerHTML,/data-category="new-2027"/,"Future categories need no code change");
 assert.ok(!box.innerHTML.includes("tui-golf"),"Stale categories must be removed");
 
-// A fixed randomized session must show ALL sneakers first, then the next
-// category, without repetitions or reordering on pagination/filter changes.
+// Newest published products must lead the full catalog, regardless of category,
+// without changing their relative order while paging or filtering.
 const sampleCatalog=[
  ...Array.from({length:12},(_,i)=>({id:'sn-'+i,category:'sneakers',title:'Giày thể thao '+i})),
  ...Array.from({length:4},(_,i)=>({id:'lo-'+i,category:'loafers',title:'Giày lười '+i})),
  {id:'vi-1',category:'vi-nam',title:'Ví nam'},
  {id:'mu-1',category:'mu',title:'Mũ'}
 ];
+sampleCatalog.forEach((p,i)=>{p.createdAt=new Date(Date.UTC(2026,9,1+i)).toISOString()});
 const shuffleStart=html.indexOf("let selectedCategory='all';");
 const shuffleEnd=html.indexOf("\nconst fulfillmentLabels=",shuffleStart);
 const filterStart=html.indexOf("function getFiltered(){");
@@ -88,10 +89,8 @@ renderFeatured();
 `,productCtx,{timeout:1000});
 assert.equal(result.first.join('|'),result.second.join('|'),'Paging and rerendering must keep order stable within session');
 assert.equal(result.first.length,sampleCatalog.length);
-assert.ok(result.first.slice(0,12).every(id=>id.startsWith('sn-')),
- 'All products must exhaust all 12 sneakers BEFORE the next category');
-assert.ok(result.first.slice(12,16).every(id=>id.startsWith('lo-')),
- 'Subsequent category must appear as a contiguous group');
+assert.equal(result.first[0],'mu-1','Newest item from any category must lead All');
+assert.equal(result.first[1],'vi-1','Second-newest item must appear second');
 assert.notEqual(result.randomized.join('|'),sampleCatalog.map(p=>p.id).join('|'),
  'Shuffle must genuinely randomize order rather than retain raw D1 order');
 assert.equal((featuredBox.innerHTML.match(/data-featured-card/g)||[]).length,4,
@@ -128,7 +127,7 @@ for(const [key,label] of [['in_stock','Có sẵn'],['made_to_order','Hàng đặ
  assert.ok(actual.includes('>'+label+'</span>'));
  assert.ok(!actual.includes('Tình trạng:'));
 }
-console.log('PASS: grouped category-first randomized catalog, stable pagination, four varied featured products and price styling.');
+console.log('PASS: newest-first catalog, stable pagination, four varied featured products and price styling.');
 
 // Owner-approved detail purchase layout, identical glass recipes for blue and orange.
 const detailStart=html.indexOf('<div class="detail-copy">');

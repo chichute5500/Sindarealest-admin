@@ -1,45 +1,13 @@
-import { fail, genericDbError, json, readJsonBodyLimited, requireAdmin, slugify } from "../../../_lib.js";
+import { fail, genericDbError, json, readJsonBodyLimited, requireAdmin } from "../../../_lib.js";
+import { officialSkuPrefix, normalizeCatalogCategory } from "../../../_catalog-sku.js";
 
-const CATEGORY_RULES = {
-  sneakers: { prefix: "SD-SN", label: "Sneaker" },
-  loafers: { prefix: "SD-GL", label: "Giày lười" },
-  "dress-shoes": { prefix: "SD-GT", label: "Giày tây" },
-  belts: { prefix: "SD-TL", label: "Thắt lưng" },
-  wallets: { prefix: "SD-VD", label: "Ví da" },
-  sandals: { prefix: "SD-DD", label: "Dép" },
-  "watch-straps": { prefix: "SD-DH", label: "Dây đồng hồ" },
-  "phone-cases": { prefix: "SD-ODT", label: "Ốp điện thoại" },
-};
-
-const CATEGORY_ALIASES = {
-  sneaker: "sneakers",
-  sneakers: "sneakers",
-  "giay-luoi": "loafers",
-  loafers: "loafers",
-  "giay-tay": "dress-shoes",
-  "dress-shoes": "dress-shoes",
-  "that-lung": "belts",
-  belts: "belts",
-  "vi-da": "wallets",
-  wallets: "wallets",
-  dep: "sandals",
-  sandals: "sandals",
-  "day-dong-ho": "watch-straps",
-  "watch-straps": "watch-straps",
-  "op-dien-thoai": "phone-cases",
-  "phone-cases": "phone-cases",
-};
-
-function resolveCategory(value) {
-  const key = slugify(String(value ?? "").trim());
-  return (Object.hasOwn(CATEGORY_ALIASES, key) ? CATEGORY_ALIASES[key] : key) || null;
-}
+function resolveCategory(value) { return normalizeCatalogCategory(value); }
 
 function buildCaseUpdate(db, rows, skuById) {
   const pairs = rows.map((row) => [row.id, skuById.get(row.id)]);
   const cases = pairs.map(() => "WHEN ? THEN ?").join(" ");
   const ids = pairs.map(() => "?").join(",");
-  const sql = `UPDATE products SET sku = CASE id ${cases} ELSE sku END, sku_verified = 0 WHERE id IN (${ids})`;
+  const sql = `UPDATE products SET sku = CASE id ${cases} ELSE sku END, sku_verified = 1 WHERE id IN (${ids})`;
   const params = [...pairs.flat(), ...pairs.map(([id]) => id)];
   if (params.length > 100) throw new Error("Quá nhiều sản phẩm trong một lô cập nhật SKU.");
   return db.prepare(sql).bind(...params);
@@ -58,12 +26,12 @@ export async function onRequestPost(context) {
   const db = context.env.DB;
   try {
     const query = await db.prepare(
-      "SELECT id, sku, sku_verified, title, category, category_label, sort_order FROM products ORDER BY sort_order ASC, title COLLATE NOCASE ASC, id ASC"
+      "SELECT id, sku, sku_verified, published, title, category, category_label, sort_order FROM products ORDER BY sort_order ASC, title COLLATE NOCASE ASC, id ASC"
     ).all();
     const allRows = query.results || [];
-    const rows = allRows.filter((row) => Number(row.sku_verified) !== 1);
+    const rows = allRows.filter((row) => Number(row.published) === 1 && Number(row.sku_verified) !== 1);
     if (!rows.length) {
-      return json({ ok: true, count: 0, categories: {}, message: "Không có mã nội bộ cần tạo lại; SKU thương mại đã xác nhận được giữ nguyên." });
+      return json({ ok: true, count: 0, categories: {}, message: "Không có SKU cần cấp mới; SKU chính thức đã xác nhận được giữ nguyên." });
     }
 
     // Validate every category before creating any mutation statement.
@@ -84,30 +52,29 @@ export async function onRequestPost(context) {
         .map((p) => `“${p.title}” (danh mục: ${p.category})`).join("; ");
       const extra = unsupported.length > 8 ? `; và ${unsupported.length - 8} sản phẩm khác` : "";
       return fail(
-        `Chưa thể đặt lại SKU vì có ${unsupported.length} sản phẩm thuộc danh mục chưa hỗ trợ: ${sample}${extra}. Hãy sửa danh mục của các sản phẩm này rồi thử lại.`,
+        `Chưa thể cấp SKU vì có ${unsupported.length} sản phẩm thuộc danh mục chưa hỗ trợ: ${sample}${extra}. Hãy sửa danh mục của các sản phẩm này rồi thử lại.`,
         400
       );
     }
 
-    // Build rules dynamically so future categories can also receive SKUs.
+    // Only the 15 owner-approved category prefixes may receive an official SKU.
     const categoryRules = Object.create(null);
     for (const row of categorized) {
       if (!Object.hasOwn(categoryRules, row.categoryKey)) {
-        const known = Object.hasOwn(CATEGORY_RULES, row.categoryKey) ? CATEGORY_RULES[row.categoryKey] : null;
-        let hash = 0;
-        for (const char of row.categoryKey) hash = (hash * 31 + char.charCodeAt(0)) % 1296;
-        const compact = row.categoryKey.replace(/-/g, "").toUpperCase();
-        categoryRules[row.categoryKey] = known || {
-          prefix: "SD-" + (compact.slice(0, 5) || "MISC") + hash.toString(36).toUpperCase().padStart(2, "0"),
-          label: String(row.category_label || row.category || row.categoryKey),
-        };
+        const prefix=officialSkuPrefix(row.categoryKey);
+        if(!prefix)return fail(`Danh mục ${row.categoryKey} chưa có tiền tố SKU chính thức.`,400);
+        const known={prefix,label:String(row.category_label||row.categoryKey)};
+        categoryRules[row.categoryKey] = known;
       }
     }
     const counters = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
     const finalSkuById = new Map();
     const categoryCounts = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
+    const targetIds = new Set(rows.map((row) => row.id));
+    // Reserve EVERY SKU outside the target set, including hidden drafts,
+    // otherwise the reset can collide with an existing unverified record.
     const verifiedSkuValues = new Set(allRows
-      .filter((row) => Number(row.sku_verified) === 1)
+      .filter((row) => !targetIds.has(row.id))
       .map((row) => String(row.sku || "").trim().toUpperCase())
       .filter(Boolean));
     const assignedInternalSkuValues = new Set();
@@ -163,7 +130,7 @@ export async function onRequestPost(context) {
       categories: Object.fromEntries(
         Object.entries(categoryCounts).map(([key, count]) => [categoryRules[key].label, count])
       ),
-      message: `Đã tạo lại mã nội bộ cho ${rows.length} sản phẩm chưa xác minh. SKU thương mại đã xác nhận được giữ nguyên.`,
+      message: `Đã cấp SKU chính thức cho ${rows.length} sản phẩm chưa xác minh. SKU thương mại đã xác nhận được giữ nguyên.`,
     });
   } catch (error) {
     return genericDbError(error);

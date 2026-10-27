@@ -7,7 +7,7 @@ export async function onRequestGet({ request, env }) {
   if (!env?.DB) return new Response("Sitemap temporarily unavailable", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   try {
     const url = new URL(request.url), origin = url.origin;
-    const rows = await env.DB.prepare("SELECT * FROM products WHERE published=1 ORDER BY sort_order,sku LIMIT 2000").all();
+    const rows = await env.DB.prepare("SELECT * FROM products WHERE published=1 ORDER BY created_at DESC,id DESC LIMIT 2000").all();
     const escapeXml = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&apos;");
     const urls = [`<url><loc>${origin}/</loc></url>`, ...(rows.results || []).map((p) => {
       let lastmod = "";

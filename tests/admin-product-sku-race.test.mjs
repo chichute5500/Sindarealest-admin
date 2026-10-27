@@ -65,7 +65,7 @@ const response = await createProduct({
 assert.equal(response.status, 201, "SKU conflict caused by a concurrent admin request should retry safely");
 const payload = await response.json();
 assert.equal(payload.product.sku, "SD-SN002");
-assert.equal(payload.product.skuVerified, false, "auto-generated SKU must be marked as an internal identifier");
+assert.equal(payload.product.skuVerified, true, "auto-generated SKU must be official immediately");
 assert.deepEqual(skuState, ["SD-SN001", "SD-SN002"], "no duplicate SKU should be committed");
 assert.equal(batchCalls, 2, "only the colliding SKU insertion should be retried");
 console.log("PASS: concurrent product creation retries automatic SKU allocation after a unique conflict.");

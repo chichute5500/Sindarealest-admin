@@ -315,6 +315,7 @@ export function fromRow(row, { publicView = false, showPrices = false } = {}) {
     images: parseImages(row.images_json),
     sourcePriceConfirmed,
     sortOrder: Number(row.sort_order || 0),
+    createdAt: row.created_at || null,
     updatedAt: row.updated_at || null,
   };
 }
