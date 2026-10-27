@@ -77,6 +77,8 @@ export async function onRequestPatch(context) {
   const id = String(body?.id || ""), status = String(body?.status || "");
   const statuses = ["pending_confirmation","confirmed","processing","shipped","completed","cancelled"];
   if (body?.paymentStatus !== undefined) return fail("Không được tự đặt trạng thái thanh toán. Chỉ giao dịch đã được Admin đối chiếu thực tế mới thay đổi trạng thái.",409);
+  if (body?.codCollected !== undefined && body.codCollected !== true) return fail("Xác nhận thu số dư phải là giá trị true.",400);
+  if (body.codCollected === true && status !== "completed") return fail("Chỉ ghi nhận thu số dư COD khi hoàn tất đơn.",409);
   if (!id || !statuses.includes(status)) return fail("Trạng thái đơn hàng không hợp lệ.");
   if (body?.prices !== undefined && (!Array.isArray(body.prices) || body.prices.length > 50)) return fail("Danh sách giá cần xác nhận không hợp lệ.");
   try {
@@ -119,6 +121,43 @@ export async function onRequestPatch(context) {
     if (note.length > 1000) return fail("Ghi chú điều kiện thanh toán tối đa 1.000 ký tự.");
     const termsConfirmed = body.termsConfirmed === true;
     const confirmationAt = termsConfirmed ? new Date().toISOString() : null;
+
+    // COD is a separate, explicitly acknowledged payment source. It is never
+    // presented as a bank-verified QR receipt. Ordinary completed PATCH cannot
+    // bypass the explicit collection acknowledgement for deposit orders.
+    let codCollection = null;
+    if (status === "completed") {
+      const checkout = await context.env.DB.prepare(
+        "SELECT json_extract(details_json,'$.selectedPaymentOption') AS payment_option," +
+        "json_extract(details_json,'$.selectedPaymentAmount') AS expected_deposit " +
+        "FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1"
+      ).bind(id).first();
+      if (checkout?.payment_option === "deposit") {
+        const money = await context.env.DB.prepare(
+          "SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) AS net_received " +
+          "FROM order_payment_transactions WHERE order_id=?"
+        ).bind(id).first();
+        const paid = Number(money?.net_received);
+        const target = Number(checkout.expected_deposit);
+        if (!Number.isSafeInteger(paid) || !Number.isSafeInteger(target) || target <= 0 ||
+            !Number.isSafeInteger(subtotal) || subtotal <= 0 || paid < target || paid > subtotal)
+          return fail("Chưa đối soát đủ tiền cọc hoặc dữ liệu thanh toán không hợp lệ; chưa thể hoàn tất đơn.",409);
+        if (paid < subtotal) {
+          if (body.codCollected !== true) return fail("Hoàn tất đơn cần xác nhận Shop đã thu đủ số dư lúc giao hàng.",409);
+          if (existing.status !== "shipped") return fail("Chỉ ghi nhận số dư COD khi đơn đã gửi hàng và được hoàn tất.",409);
+          const pending = await context.env.DB.prepare(
+            "SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' LIMIT 1"
+          ).bind(id).first();
+          if (pending) return fail("Còn hồ sơ thanh toán QR đang chờ. Hãy đối soát hoặc hủy hồ sơ trước khi hoàn tất.",409);
+          codCollection = { amount: subtotal-paid, paidBefore: paid, expectedDeposit: target,
+            transactionId:crypto.randomUUID(), reference:"COD-"+id.toUpperCase() };
+        }
+      } else if (body.codCollected === true) {
+        return fail("Chỉ tự ghi nhận COD với đơn đã chọn đặt cọc QR.",409);
+      }
+    } else if (body.codCollected === true) {
+      return fail("Xác nhận thu số dư chỉ áp dụng khi hoàn tất đơn.",409);
+    }
 
     // Keep payment amounts and verified ledger history tied to the confirmed order total.
     // The API/UI submits existing values during ordinary saves, so only real price changes
@@ -177,7 +216,12 @@ export async function onRequestPatch(context) {
       "payment_terms_confirmed_by=CASE WHEN ?=1 THEN 'admin' WHEN ?=1 THEN '' ELSE payment_terms_confirmed_by END," +
       "payment_terms_note=CASE WHEN ?=1 THEN ? ELSE payment_terms_note END,updated_at=datetime('now') WHERE id=? AND status=?" +
       (priceChanged ? priceGuardSql : "") + unchangedItemGuardSql +
-      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'");
+      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'") +
+      (codCollection
+        ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" +
+          " AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)=?" +
+          " AND EXISTS (SELECT 1 FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' AND json_extract(details_json,'$.selectedPaymentOption')='deposit')"
+        : "");
     const orderUpdateValues = [
       status,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
       priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id,existing.status
@@ -187,6 +231,7 @@ export async function onRequestPatch(context) {
     // Non-cancelled UPDATE uses a literal status guard with no extra SQL bind.
     // Binding one more ID here previously made every ordinary order save fail (503).
     if (status === "cancelled") orderUpdateValues.push(id);
+    if (codCollection) orderUpdateValues.push(id,id,codCollection.paidBefore,id);
     statements.push(context.env.DB.prepare(orderUpdateSql).bind(...orderUpdateValues));
     statements.push(...priceStatements);
 
@@ -264,15 +309,45 @@ export async function onRequestPatch(context) {
         "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
       ).bind(crypto.randomUUID(),id,JSON.stringify({ reason:"order_cancelled", source:"automatic_warranty_policy" }),id));
     }
+    // Same transaction as the completed status: append COD only after the
+    // successful order audit, then update ledger-derived payment status.
+    // A deterministic unique reference and the optimistic net-receipt guard
+    // prohibit duplicate collection even with repeat submissions/races.
+    if (codCollection) {
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) " +
+        "SELECT ?,?,NULL,'received',?,?,?,'admin_cod_completion' WHERE EXISTS " +
+        "(SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=? AND action='order_updated') " +
+        "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status='completed' AND total=?) " +
+        "AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)=?"
+      ).bind(codCollection.transactionId,id,codCollection.amount,codCollection.reference,
+        "Shop xác nhận đã thu số dư khi giao hàng. Không phải chuyển khoản ngân hàng.",
+        orderAuditId,id,id,subtotal,id,codCollection.paidBefore));
+      statements.push(context.env.DB.prepare(
+        "UPDATE orders SET payment_status='paid',updated_at=datetime('now') WHERE id=? AND status='completed' " +
+        "AND EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?) " +
+        "AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)=total"
+      ).bind(id,codCollection.transactionId,id));
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?,'admin','payment_cod_collected_on_completion','order',?,? " +
+        "WHERE EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)"
+      ).bind(crypto.randomUUID(),id,JSON.stringify({
+        source:"cod_on_completion", amount:codCollection.amount, paidBefore:codCollection.paidBefore,
+        transactionId:codCollection.transactionId, reference:codCollection.reference,
+        acknowledgement:"admin_confirmed_cash_collected_on_delivery"
+      }),codCollection.transactionId));
+    }
     const batchResults = await context.env.DB.batch(statements);
     if (Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
       if (status === "cancelled") return fail("Không thể hủy đơn vì yêu cầu QR đang chờ hoặc đơn vừa thay đổi. Hãy hủy yêu cầu QR trước rồi tải lại đơn.",409);
       if (priceChanged) return fail("Giá không thể thay đổi vì đơn/trạng thái/giá dòng hàng đã thay đổi đồng thời, hoặc đã phát sinh thanh toán. Không ghi đè dữ liệu; hãy tải lại đơn và đối soát trước.",409);
-      return fail("Đơn hàng vừa thay đổi hoặc đã hủy. Hãy tải lại đơn trước khi cập nhật trạng thái.",409);
+      return fail("Đơn hàng vừa thay đổi, số dư thanh toán đã thay đổi hoặc đã hủy. Hãy tải lại đơn trước khi cập nhật trạng thái.",409);
     }
     const warrantiesIssued = issueAuditIds.filter(index => Number(batchResults?.[index]?.meta?.changes || 0) > 0).length;
     await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (termsConfirmed ? " · Đã xác nhận điều kiện" : ""), url: "/admin/" });
-    return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, warrantiesIssued, message: activateWarranty
+    return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, warrantiesIssued,
+      codCollectedAmount:codCollection?.amount || 0, message: activateWarranty
       ? (warrantiesIssued ? "Đã xác nhận đơn và tự kích hoạt " + warrantiesIssued + " bảo hành." : "Đã xác nhận đơn; sản phẩm đã có bảo hành nên không cấp trùng.")
       : allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
   } catch { return fail("Không thể cập nhật đơn hàng.", 503); }
