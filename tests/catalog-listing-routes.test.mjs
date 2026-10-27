@@ -95,7 +95,7 @@ for(const [term,category,shouldMatch] of cases) {
    }],$:(x)=>x==='#catalogSearch'?{value:term}:null,
    foldSearch:v=>String(v||'').toLowerCase(),visibleSku:()=>'',routeSlug:productCategoryRouteSlug
  };
- const matched=runInNewContext(source+'\\ngetFiltered().map(p=>p.id)',context);
+  const matched=runInNewContext(source+"\ngetFiltered().map(p=>p.id)",context);
  assert.equal(matched.length,shouldMatch?1:0,term);
 }
 const DB={prepare(){return {async all(){return {results:[
