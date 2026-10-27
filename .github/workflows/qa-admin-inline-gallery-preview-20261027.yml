@@ -1,5 +1,5 @@
 name: Owner Admin inline edit and touch gallery Preview (ISOLATED)
-# Owner revision QA: source contract migrated from legacy buttons to photo gestures; browser screenshots on desktop/mobile.
+# Owner QA: 28-image swipe inertia and long-hold vertical UP/DOWN reorder on real Chromium touch emulation; desktop/mobile legacy gestures unchanged.
 on:
   push:
     branches:
