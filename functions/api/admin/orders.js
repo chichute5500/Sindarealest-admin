@@ -85,6 +85,7 @@ export async function onRequestPatch(context) {
     const existing = await context.env.DB.prepare("SELECT id,status FROM orders WHERE id=?").bind(id).first();
     if (!existing) return fail("Không tìm thấy đơn hàng.", 404);
     if (existing.status === "cancelled" && status !== "cancelled") return fail("Đơn đã hủy không thể mở lại hoặc tiếp tục xử lý.", 409);
+    if (body.codCollected === true && existing.status !== "shipped") return fail("Chỉ được xác nhận thu số dư COD một lần từ trạng thái Đã gửi hàng.",409);
     // A cancelled order cannot accept a verified receipt while its QR request remains pending.
     // Require explicit QR cancellation before cancelling the order, then recheck at UPDATE time below.
     if (status === "cancelled") {
