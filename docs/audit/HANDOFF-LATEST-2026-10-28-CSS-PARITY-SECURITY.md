@@ -64,3 +64,11 @@
 - CI #40560417021: https://github.com/chichute5500/Sindarealest-admin/actions/runs/40560417021
 
 **BÀN GIAO:** Dự án đang ở trạng thái kiểm toán sâu có bằng chứng QA tốt nhưng **chưa Owner PASS phần kiểm toán**; tiếp tục trực tiếp trên nhánh audit, tuyệt đối không tự xem mọi CSS chồng chéo hoặc bảo mật là “100% đã xử lý”.
+
+## Phụ lục audit tiếp nối — 2026-10-28 (bổ sung trong chat này)
+- Follow-up source SHA `05c35a655f4e07771d94fc8cd9bd248087b9bc33`; [source CI #40567425583 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40567425583). [Isolated Preview + Chrome #40567425595](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40567425595) **đang chạy** ở lần ghi nhận này, phải xác minh kết quả cuối cùng.
+- Đã sửa lỗi thực sự: phương thức POST/PUT/PATCH/DELETE trên deep route chi tiết sản phẩm từ nay nhận 405, `Allow: GET, HEAD`, không còn bị biến thành GET/truy vấn D1. Có regression test.
+- Bỏ thêm đúng 5 khai báo `filter` cũ nền **sáng** Storefront bị `filter:none!important` cuối cùng phủ; không thay đổi hình nền/opacity/hiệu ứng. Có source assertion và đo computed-style trong Chrome.
+- Mở rộng workflow QA: chạy khi file chức năng/CSS/test liên quan thay đổi; bổ sung bốn ảnh trạng thái giỏ hàng desktop/mobile sáng/tối, kiểm tra không tràn ngang.
+- Một lượt test trung gian đã thất bại do **escape regex sai trong chính test mới**; đã sửa trong SHA `05c35a655f4e07771d94fc8cd9bd248087b9bc33`, source CI cuối cùng SUCCESS. Không che giấu test đỏ của SHA trung gian.
+- Không chỉnh phần Owner đã PASS; **PR #136 vẫn Draft**, **main Production vẫn ở baseline đã bàn giao**, tuyệt đối không ghi D1/R2 Production. Những CSS trùng selector có điều kiện chưa được tự ý xóa; kiểm thử luồng category/detail/checkout/warranty với dữ liệu thực chưa đủ để khẳng định 100%.
