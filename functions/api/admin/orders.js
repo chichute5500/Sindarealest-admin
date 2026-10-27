@@ -1,4 +1,5 @@
-import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { fail, getCurrentDateInVietnam, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { addWarrantyCalendarMonths, shopWarrantyPolicy } from "../../_warranty-policy.js";
 import { sendAdminPush } from "../../_notifications.js";
 
 export async function onRequestGet(context) {
@@ -125,17 +126,20 @@ export async function onRequestPatch(context) {
     if (priceChanged) {
       const financialState = await context.env.DB.prepare(
         "SELECT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?) AS has_transactions, " +
-        "EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') AS has_pending_request"
-      ).bind(id,id).first();
+        "EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') AS has_pending_request, " +
+        "EXISTS (SELECT 1 FROM warranties WHERE order_id=?) AS has_warranties"
+      ).bind(id,id,id).first();
       if (Number(financialState?.has_transactions) > 0) return fail("Không thể sửa giá khi đơn đã có giao dịch được xác minh. Cần đối soát lịch sử thanh toán trước khi thay đổi giá.",409);
       if (Number(financialState?.has_pending_request) > 0) return fail("Không thể sửa giá khi đơn còn yêu cầu QR đang chờ. Hãy hủy yêu cầu QR trước khi thay đổi giá.",409);
+      if (Number(financialState?.has_warranties) > 0) return fail("Không thể sửa giá sau khi đã cấp bảo hành. Hãy xử lý ngoại lệ theo quy trình Shop.",409);
     }
 
     const statements = [];
     const priceStatements = [];
     const priceGuardSql =
       " AND NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?)" +
-      " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
+      " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" +
+      " AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_id=?)";
     const terminalStatusGuardSql = " AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled')";
     const cancellationRequestGuardSql =
       " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
@@ -156,7 +160,7 @@ export async function onRequestPatch(context) {
         itemGuardSql + " AND changes()=1";
       const values = [update.unitPrice,update.lineTotal,update.itemId,id];
       if (priceChanged) {
-        values.push(id,id);
+        values.push(id,id,id);
         if (status !== "cancelled") values.push(id);
       } else if (status === "cancelled") values.push(id);
       priceStatements.push(context.env.DB.prepare(sql).bind(...values));
@@ -178,7 +182,7 @@ export async function onRequestPatch(context) {
       status,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
       priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id,existing.status
     ];
-    if (priceChanged) orderUpdateValues.push(id,id);
+    if (priceChanged) orderUpdateValues.push(id,id,id);
     orderUpdateValues.push(...unchangedItemGuardBindings);
     // Non-cancelled UPDATE uses a literal status guard with no extra SQL bind.
     // Binding one more ID here previously made every ordinary order save fail (503).
@@ -190,6 +194,7 @@ export async function onRequestPatch(context) {
       status, pricesUpdated: priceUpdates.length, priceChanged, priceConfirmed: allPriced,
       paymentTermsConfirmed: termsConfirmed, paymentTermsNoteLength: note.length
     });
+    const orderAuditId = crypto.randomUUID();
     if (priceChanged) {
       // Re-check the same invariant inside the atomic batch: if financial activity
       // appeared after the preflight SELECT, all guarded item/order/audit writes are no-ops.
@@ -198,18 +203,66 @@ export async function onRequestPatch(context) {
         "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
         "WHERE NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?) " +
         "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') " +
+        "AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_id=?) " +
         "AND changes()=1"
-      ).bind(crypto.randomUUID(),id,auditDetails,id,id));
+      ).bind(orderAuditId,id,auditDetails,id,id,id));
     } else if (status === "cancelled") {
       statements.push(context.env.DB.prepare(
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
         "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
         "WHERE changes()=1 AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
-      ).bind(crypto.randomUUID(),id,auditDetails,id));
+      ).bind(orderAuditId,id,auditDetails,id));
     } else {
       statements.push(context.env.DB.prepare(
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'order_updated', 'order', ?, ? WHERE changes()=1"
-      ).bind(crypto.randomUUID(),id,auditDetails));
+      ).bind(orderAuditId,id,auditDetails));
+    }
+
+    // First confirmation issues one warranty per order line in the SAME D1
+    // batch as the optimistic order status update and audit. Every insert is
+    // gated by the unique order-update audit ID from this transaction. If an
+    // order-status, item-price, or payment guard rejects the update, NO
+    // warranty can be created and the entire operation remains atomic.
+    const activateWarranty = existing.status === "pending_confirmation" && status === "confirmed";
+    const issueAuditIds = [];
+    if (activateWarranty) {
+      const policy = shopWarrantyPolicy(subtotal);
+      const startsAt = getCurrentDateInVietnam();
+      const endsAt = addWarrantyCalendarMonths(startsAt, policy.durationMonths);
+      for (const item of items) {
+        const warrantyId = crypto.randomUUID();
+        const warrantyCode = "SDW-" + crypto.randomUUID().replaceAll("-", "").slice(0, 24).toUpperCase();
+        const warrantyAuditId = crypto.randomUUID();
+        const insertIndex = statements.length;
+        statements.push(context.env.DB.prepare(
+          "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
+          "SELECT ?,oi.order_id,oi.id,?,?,?,?,?,'active' FROM order_items oi WHERE oi.id=? AND oi.order_id=? " +
+          "AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=oi.id) " +
+          "AND EXISTS (SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=oi.order_id AND action='order_updated') " +
+          "AND EXISTS (SELECT 1 FROM orders o WHERE o.id=oi.order_id AND o.status='confirmed' AND o.total=?)"
+        ).bind(warrantyId,warrantyCode,policy.policyName,policy.durationMonths,startsAt,endsAt,item.id,id,orderAuditId,subtotal));
+        statements.push(context.env.DB.prepare(
+          "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+          "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)"
+        ).bind(warrantyAuditId,warrantyId,JSON.stringify({ orderId:id, orderItemId:item.id, warrantyCode, source:"automatic_order_confirmation", policyName:policy.policyName, months:policy.durationMonths, startsAt, endsAt }),warrantyId));
+        issueAuditIds.push(insertIndex);
+      }
+    }
+
+    // Cancelling a formerly confirmed order must not leave active warranty
+    // coverage behind. This is atomic with order cancellation, and leaves
+    // previously voided or manually managed warranty records intact.
+    if (status === "cancelled" && existing.status !== "cancelled") {
+      statements.push(context.env.DB.prepare(
+        "UPDATE warranties SET status='void' WHERE order_id=? AND status='active' " +
+        "AND EXISTS (SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=? AND action='order_updated') " +
+        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
+      ).bind(id,orderAuditId,id,id));
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'warranties_voided_on_cancellation', 'order', ?, ? WHERE changes()>0 " +
+        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
+      ).bind(crypto.randomUUID(),id,JSON.stringify({ reason:"order_cancelled", source:"automatic_warranty_policy" }),id));
     }
     const batchResults = await context.env.DB.batch(statements);
     if (Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
@@ -217,7 +270,10 @@ export async function onRequestPatch(context) {
       if (priceChanged) return fail("Giá không thể thay đổi vì đơn/trạng thái/giá dòng hàng đã thay đổi đồng thời, hoặc đã phát sinh thanh toán. Không ghi đè dữ liệu; hãy tải lại đơn và đối soát trước.",409);
       return fail("Đơn hàng vừa thay đổi hoặc đã hủy. Hãy tải lại đơn trước khi cập nhật trạng thái.",409);
     }
+    const warrantiesIssued = issueAuditIds.filter(index => Number(batchResults?.[index]?.meta?.changes || 0) > 0).length;
     await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (termsConfirmed ? " · Đã xác nhận điều kiện" : ""), url: "/admin/" });
-    return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, message: allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
+    return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, warrantiesIssued, message: activateWarranty
+      ? (warrantiesIssued ? "Đã xác nhận đơn và tự kích hoạt " + warrantiesIssued + " bảo hành." : "Đã xác nhận đơn; sản phẩm đã có bảo hành nên không cấp trùng.")
+      : allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
   } catch { return fail("Không thể cập nhật đơn hàng.", 503); }
 }
