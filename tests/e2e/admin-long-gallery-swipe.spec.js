@@ -80,7 +80,49 @@ test('28 photos: mobile swipe browses to last image without reordering or saving
  expect(p.images).toEqual(photos);
  expect(saves).toBe(0);
  await page.screenshot({path:join('artifacts/admin-owner-photo-gesture','28-photos-mobile-end.png'),animations:'disabled'});
+
+ // Reproduce a real finger LONG HOLD followed by vertical movement.
+ // Touch-action must not cancel the pointer when moving up or down.
+ const coords=async(index)=>{
+  const item=page.locator('#imageGrid [data-image-index="'+index+'"]');
+  await item.scrollIntoViewIfNeeded();
+  const b=await item.boundingBox();
+  expect(b).toBeTruthy();
+  return {x:b.x+b.width/2,y:b.y+b.height/2};
+ };
+ await rail.evaluate(x=>x.scrollLeft=0);
+ await page.waitForTimeout(100);
+ const railPhoto=await coords(1);
+ const cover=await coords(0);
+ async function longHoldMove(from,to){
+  await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[from]});
+  await page.waitForTimeout(410);
+  await expect(page.locator('.gallery-held-preview')).toBeVisible();
+  for(let n=1;n<=15;n++){
+   const point={x:from.x+(to.x-from.x)*n/15,y:from.y+(to.y-from.y)*n/15};
+   await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[point]});
+  }
+  await expect(page.locator('.gallery-drag-ghost')).toBeVisible();
+  await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await expect(page.locator('.gallery-held-preview')).toHaveCount(0);
+ }
+ await longHoldMove(railPhoto,cover);
+ let reordered=await page.locator('#imageGrid .imageitem img')
+  .evaluateAll(imgs=>imgs.map(i=>new URL(i.src).pathname));
+ expect(reordered.slice(0,4),'Hold then drag UP must move #2 into cover slot')
+  .toEqual([photos[1],photos[0],photos[2],photos[3]]);
+ await rail.evaluate(x=>x.scrollLeft=0);
+ const newCover=await coords(0);
+ const third=await coords(2);
+ await longHoldMove(newCover,third);
+ reordered=await page.locator('#imageGrid .imageitem img')
+  .evaluateAll(imgs=>imgs.map(i=>new URL(i.src).pathname));
+ expect(reordered.slice(0,4),'Hold then drag DOWN must move cover into third slot')
+  .toEqual([photos[0],photos[2],photos[1],photos[3]]);
+ expect(saves,'Vertical reorder must stay local until user taps Save').toBe(0);
+ await page.screenshot({path:join('artifacts/admin-owner-photo-gesture','28-photos-long-hold-vertical-mobile.png'),animations:'disabled'});
+
  await touch.detach();
  expect(errors).toEqual([]);
- console.log('PASS: 28-photo mobile rail reaches the last photo by normal swipes; no reorder, trash, upload, or save.');
+ console.log('PASS: 28-photo mobile swipe to end; hold then vertical UP and DOWN reorder; no save.');
 });
