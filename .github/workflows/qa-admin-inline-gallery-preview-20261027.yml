@@ -55,6 +55,32 @@ jobs:
       - name: Deploy only isolated Pages branch Preview, never production
         run: |
           npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_PREVIEW_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "Owner inline editor + touch image reorder $GITHUB_SHA"
+      - name: Prepare local read-only Chromium gesture tests
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Test gestures against actual Admin source with isolated mock products (PC + mobile)
+        shell: bash
+        env:
+          LOCAL_ADMIN_URL: http://127.0.0.1:4173/admin/
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public > "$RUNNER_TEMP/owner-admin-server.log" 2>&1 &
+          for i in $(seq 1 25); do
+            if curl -fsS http://127.0.0.1:4173/admin/ >/dev/null; then break; fi
+            sleep .3
+          done
+          npx playwright test tests/e2e/admin-photo-gesture-owner.spec.js --reporter=list
+      - name: Upload Owner gesture visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-admin-photo-gestures-${{ github.sha }}
+          path: |
+            artifacts/admin-owner-photo-gesture/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Report exact Preview URL
         run: |
           echo "Owner review: https://owner-admin-quickedit-1027.sindarealest-admin-preview.pages.dev/admin/"
