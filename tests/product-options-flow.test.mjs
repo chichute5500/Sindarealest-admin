@@ -12,6 +12,12 @@ for(const category of ['sneakers','loafers','dress-shoes']) {
  for(let size=38;size<=44;size++)assert.equal(normalizeProductOption(category,String(size)),String(size));
  for(const invalid of ['', '37', '45', '40.5'])assert.equal(normalizeProductOption(category,invalid),null);
 }
+for(const category of ['giay-boot','Giày Boot','boots','oxfords','shoe-custom']) {
+ assert.equal(productOptionKind(category),'shoe','New shoe categories must require selection: '+category);
+ assert.equal(normalizeProductOption(category,'44'),'44');
+ assert.equal(normalizeProductOption(category,''),null);
+}
+assert.equal(productOptionKind('sandals'),'','Dép must not silently become size-only shoes');
 assert.equal(normalizeProductOption('belts','3.5'),'3.5');
 assert.equal(normalizeProductOption('belts','4.0'),'4.0');
 assert.equal(normalizeProductOption('belts','3.0'),null);
