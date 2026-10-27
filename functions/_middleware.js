@@ -113,6 +113,13 @@ export async function onRequest(context) {
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
     return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
   }
+  // Match the catalog route contract: product-detail HTML is read-only.
+  // Never turn an unsupported POST/PATCH/DELETE into an internal GET.
+  if (context.request.method !== "GET" && context.request.method !== "HEAD") {
+    return new Response("Method not allowed", {
+      status: 405, headers: { "Allow": "GET, HEAD", "Cache-Control": "no-store" }
+    });
+  }
   const slug = (modernMatch ? modernMatch[2] : legacyMatch[1]).toLowerCase();
   if (!context.env?.DB) return new Response("Dịch vụ dữ liệu chưa sẵn sàng.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   let product;
