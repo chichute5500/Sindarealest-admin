@@ -41,6 +41,22 @@ for(const cfg of tests){
   expect(web.logo).toBe(true);
   expect(web.page).toBeLessThanOrEqual(cfg.width+1);
   await page.screenshot({path:dir+'/store-'+cfg.label+'.png',animations:'disabled'});
+  // Verify the previously approved Liquid Glass cart surface, not just Home.
+  // Opening/closing must preserve responsive bounds and visible content in
+  // both device color schemes without modifying any checkout/payment data.
+  const cartOpen=page.locator(cfg.width<=760?'#mobileCartNav':'#cartOpen');
+  await cartOpen.click();
+  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+  const cart=await page.locator('#cartDrawer').evaluate(el=>({
+    width:el.getBoundingClientRect().width,scrollWidth:el.scrollWidth,
+    scheme:getComputedStyle(document.documentElement).colorScheme
+  }));
+  expect(cart.width).toBeLessThanOrEqual(cfg.width+1);
+  expect(cart.scrollWidth).toBeLessThanOrEqual(Math.ceil(cart.width)+1);
+  expect(cart.scheme).toContain(cfg.os);
+  await page.screenshot({path:dir+'/store-cart-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#cartClose').click();
+  await expect(page.locator('#cartDrawer')).not.toHaveClass(/open/);
   // Separate browser tab starts with the same device preference, not a stale
   // legacy sd-theme-mode override left by the public Storefront.
   const admin=await context.newPage();
