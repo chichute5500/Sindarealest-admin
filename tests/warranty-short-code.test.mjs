@@ -28,7 +28,9 @@ const record={
 const stored=new Map();
 const DB={
  prepare(sql){
-  return {sql,bind(...params){
+  return {sql,
+   async run(){ return {meta:{changes:1}}; },
+   bind(...params){
    return {
     sql,params,
     async first(){
