@@ -51,7 +51,7 @@ assert.ok(finalThemeCss.includes(".theme-bg--light{background-color:#eaf3fb;back
   "Light theme must use the final cache-versioned pearl-glass SVG background.");
 assert.ok(html.includes("html.dark .theme-bg--dark{filter:none!important}"),
   "Dark theme must use the final Owner-approved navy-sapphire SVG with no obsolete filter casts.");
-assert.doesNotMatch(finalThemeCss,/html\\.dark \\.theme-bg--dark\\{[^}]*filter:blur\\(/,
+assert.doesNotMatch(finalThemeCss,/html\.dark \.theme-bg--dark\{[^}]*filter:blur\(/,
   "A pre-final blur filter shadowed by the approved final rule must not reappear.");
 
 
