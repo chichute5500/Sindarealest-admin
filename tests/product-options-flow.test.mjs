@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { normalizeProductOption, productOptionKind, productOptionLabel } from '../functions/_product-options.js';
 import { createSession } from '../functions/_lib.js';
 import { onRequestPost as createOrder } from '../functions/api/orders.js';
+import { onRequestPost as quoteCheckout } from '../functions/api/checkout-quote.js';
 import { onRequestGet as adminOrders } from '../functions/api/admin/orders.js';
 
 for(const category of ['sneakers','loafers','dress-shoes']) {
@@ -53,6 +54,7 @@ const env={DB,ADMIN_PASSWORD:'FAKE_QA_PASSWORD_NOT_REAL',SESSION_SECRET:'QA-NONP
 const body={fullName:'KHACH HANG GIA LAP',phone:'0000000808',address:'Địa chỉ QA giả lập, không giao hàng',items:[]};
 const endpoint='https://qa.invalid/api/orders';
 const invoke=async items=>createOrder({env,request:new Request(endpoint,{method:'POST',headers:{Origin:'https://qa.invalid','Content-Type':'application/json','CF-Connecting-IP':'203.0.113.88'},body:JSON.stringify({...body,items})})});
+const quote=async items=>quoteCheckout({env,request:new Request('https://qa.invalid/api/checkout-quote',{method:'POST',headers:{Origin:'https://qa.invalid','Content-Type':'application/json'},body:JSON.stringify({items,phone:body.phone})})});
 const item=(i,quantity=1,option='')=>({id:'opt-'+i,quantity,option});
 try {
  for(const invalid of [[item(0,1,'37')],[item(0)],[item(3,1,'4.5')],[item(4)],[item(5,1,'42')]]) {
@@ -60,6 +62,10 @@ try {
   assert.equal(result.status,400,'Invalid/missing option must fail before D1 order creation: '+await result.text());
   db.exec('DELETE FROM public_rate_limits');
  }
+ assert.equal((await quote([item(0)])).status,400,'Payment quote must reject missing shoe size');
+ assert.equal((await quote([item(3,1,'4.5')])).status,400,'Payment quote must reject invalid belt width');
+ assert.equal((await quote([item(4)])).status,400,'Payment quote must reject missing phone model');
+ assert.equal((await quote([item(0,1,'42'),item(0,1,'43'),item(3,1,'4.0'),item(4,1,'Samsung Galaxy S25')])).status,200,'Payment quote accepts valid size-specific items');
  const overLimit=await invoke([item(0,40,'42'),item(0,11,'43')]);
  assert.equal(overLimit.status,400,'The 50-piece limit applies to a product across all its sizes');
  db.exec('DELETE FROM public_rate_limits');
