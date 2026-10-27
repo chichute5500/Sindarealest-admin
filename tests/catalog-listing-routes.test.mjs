@@ -28,6 +28,18 @@ for(const [path,canonical] of [['/sanpham/','/sanpham'],['/sanpham/GIAYTAY','/sa
  assert.equal(response.status,301,path);
  assert.equal(response.headers.get('location'),'https://shop.example'+canonical,path);
 }
+// Category names and headings must be visible even before JS fetches products.
+const actualInitialHtml=html.replace(
+  '<title>Trang chủ</title>',
+  '<title>Trang chủ</title>'
+).replace('</body>','<h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2></body>');
+const actualContext=()=>({
+ ...fakeContext('/sanpham/sneaker'),
+ next:async()=>new Response(actualInitialHtml,{headers:{'Content-Type':'text/html'}})
+});
+const sneakerHTML=await (await middleware(actualContext())).text();
+assert.match(sneakerHTML,/Giày thể thao \\(Sneaker\\) \\| SinDarealest/);
+assert.match(sneakerHTML,/id="catalogHeading">Giày thể thao \\(Sneaker\\)<\\/h2>/);
 const unknown=await middleware(fakeContext('/sanpham/khong-ton-tai'));
 assert.equal(unknown.status,404);
 assert.equal(unknown.headers.get('X-Robots-Tag'),'noindex, nofollow');
@@ -43,6 +55,9 @@ const helperStart=front.indexOf('function catalogCategoryFromLocation(){');
 const helperEnd=front.indexOf("let selectedCategory='all';",helperStart);
 const functions=front.slice(helperStart,helperEnd);
 assert.ok(helperStart>0&&helperEnd>helperStart);
+assert.ok(front.includes("id=\"catalogHeading\""),'Category heading must be visible on screen');
+assert.ok(front.includes("routeSlug(p.category)+' '+(p.description||'')"),'Search index must include route category slugs');
+assert.ok(front.includes("$('#searchJump').addEventListener('click',()=>{navigateCatalog('all')"),'Header search must route to the all-products search');
 const sample=[
  {category:'dress-shoes'},
  {category:'vi-cam-tay'},
@@ -63,6 +78,26 @@ state.location.pathname='/sanpham';ret=runInNewContext(functions+"\ncatalogCateg
 assert.equal(ret,'all');
 runInNewContext(functions+"\nnavigateCatalog('dress-shoes')",state);
 assert.deepEqual(state.history.calls,['/sanpham/giaytay']);
+// Search matches both a URL slug and the category key, even when the product
+// title/description contain no English keyword.
+const searchStart=front.indexOf('function getFiltered(){');
+const searchEnd=front.indexOf('\\nfunction renderCatalog(){',searchStart);
+const source=front.slice(searchStart,searchEnd);
+const cases=[
+ ['sneaker','sneakers',true],['giaytay','dress-shoes',true],
+ ['tuideocheo','tui-deo-cheo',true],['khong-ton-tai','sneakers',false]
+];
+for(const [term,category,shouldMatch] of cases) {
+ const context={
+   selectedCategory:'all',orderedSessionProducts:()=>[{
+      id:'sample-1',category,title:'Sản phẩm cá sấu',description:'Đẹp',categoryLabel:'Phụ kiện',
+      createdAt:'2026-10-27 01:00:00'
+   }],$:(x)=>x==='#catalogSearch'?{value:term}:null,
+   foldSearch:v=>String(v||'').toLowerCase(),visibleSku:()=>'',routeSlug:productCategoryRouteSlug
+ };
+ const matched=runInNewContext(source+'\\ngetFiltered().map(p=>p.id)',context);
+ assert.equal(matched.length,shouldMatch?1:0,term);
+}
 const DB={prepare(){return {async all(){return {results:[
  {id:'1',category:'dress-shoes',sku:'SD-GT001',sku_verified:1,published:1},
  {id:'2',category:'vi-cam-tay',sku:'SD-VD001',sku_verified:1,published:1}
