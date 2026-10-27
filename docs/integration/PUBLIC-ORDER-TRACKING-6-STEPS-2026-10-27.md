@@ -1,26 +1,13 @@
-# SINDAREALEST — Six-step public tracking and warranty activation on completion
+# Six-step order lookup + completed-only warranty — technical checkpoint 27/10/2026
 
-Date: 2026-10-27. Branch: `feat/warranty-short-code-2026-10-27`. PR #122 remains DRAFT for Owner acceptance.
+**OWNER PASS / NO PENDING CODE WORK:** code SHA 89657feb0b5bba186ff50b672a3af72687463741 on feat/warranty-short-code-2026-10-27; PR #122 OPEN/DRAFT. Isolated Preview https://order-six-review-1027.sindarealest-admin-preview.pages.dev/ deployed by successful workflow #40451693014 and same SHA, plus successful CI #40451693023 / #40451697405, Admin smoke #40451697430. main f50ec34910bbfc431b01d6603d7973f2b0e426f1 unchanged; no Production deployment.
 
-## Customer-facing six stages
+**Public lookup:** immediately below Đặt hàng an tâm and before Sản phẩm nổi bật; visible outside collapsed order-guide panel. Six stages: (1) Đã gửi đơn, always done at order created_at; (2) Xác nhận đơn at confirmed audit; (3) Đã nhận cọc (full-pay: Đã nhận thanh toán) after verified ledger threshold, excluding auto COD; (4) Đang làm sản phẩm, current during processing, done at shipment; (5) Đã gửi hàng, done at shipped audit; (6) Hoàn thành at completed audit. Dates only when step is done. Uses same-origin POST /api/order-tracking; server returns status and sanitized/masked order numbers only; phone lookup caps at 10 recent orders, 5 requests per 15 minutes per IP. No PII or financial information.
 
-1. **Đã gửi đơn** — created_at, automatically complete as soon as the customer places an order
-2. **Xác nhận đơn** — order update audit event `confirmed`
-3. **Đã nhận cọc** (or Đã nhận thanh toán for full-pay orders) — first bank ledger receipt crossing the checkout requested amount, excluding COD auto-collection
-4. **Đang làm sản phẩm** — current during processing; only considered finished with the shipping milestone
-5. **Đã gửi hàng** — shipped event
-6. **Hoàn thành** — completed event
+**Just-passed compact UI:** delete the texts “Nhập mã đơn hoặc số điện thoại đã đặt để xem 6 bước xử lý của Shop.” and “Chỉ hiển thị tiến trình đơn, không công khai thông tin cá nhân hoặc thanh toán. Liên hệ Shop nếu cần hỗ trợ.” and their unused styles. Keep compact PC/mobile gap and padding; selectors are scoped .sd-track and sdTrackForm/Results. These texts MUST NOT return.
 
-Dates display only on fully recorded stages. Customer sees only progress and a code (masked to last 4 for phone lookups), not customer name, addresses, amounts, transfer references, SKUs or admin actions. Public lookup is capped at 5 attempts / 15 min / IP and requests must be same-origin. The tracking API requires Cloudflare D1.
+**Warranty:** new issuance only on first noncompleted -> completed status, not confirmation. Atomic transaction alongside COD where relevant, starts Vietnam completion day. One SDW-XXXX per order item; retry unique collisions; legacy SDW-24 still accepted; 6 months for total under VND 2,000,000, else 12 months. No migration/backfill of already-issued warranties or historical financial data. Admin five-step progress remains separate from public six-step tracking.
 
-## Warranty activation correction
+**Code:** public/index.html, public/admin/index.html, functions/api/order-tracking.js, functions/api/admin/orders.js, functions/_warranty-policy.js, tests/order-tracking-public.test.mjs, tests/warranty-auto-confirmation.test.mjs.
 
-All **new** automatic warranties are issued on `shipped → completed`, in the same atomic order transition (with COD balance recognition where applicable), not on `pending_confirmation → confirmed`. Start date is the local Vietnam date when Shop completes. Terms remain 6 months under VND 2M and 12 months from VND 2M, with collision-resilient `SDW-XXXX` codes. Completed items with pre-existing warranty records are never overwritten or reissued. Existing previously issued warranties are intentionally not batch-mutated in production by this feature; any historical correction must be separately authorized.
-
-Admin progress confirmation copy now says prices and conditions, and completion copy says warranty activation. The Admin remains five steps, as Owner approved; only public tracking has six.
-
-## Delivery scope and QA
-
-The public tracking card is below the **Đặt hàng an tâm** section, outside its collapsible details. New scoped `sd-track` CSS lives in the existing Storefront style, with a responsive input and six-stage timeline. `tests/order-tracking-public.test.mjs` simulates the production schema in disposable SQLite and checks stage dates, phone/masked code search, privacy, rate limit and validation. The automatic warranty regression suite now checks no issuance before completion, atomic per-item issue at completion and anti-duplicate retries.
-
-No changes to production or main without Owner PASS and an explicit merge request.
+**Operational:** do not merge PR #122 until explicit Owner instruction; do not treat old PR #118 handoff as current. Read HANDOFF-LATEST-2026-10-27-OWNER-PASS-ORDER-TRACKING-WARRANTY.md and PROMPT-NEXT-CHAT-2026-10-27-ORDER-TRACKING-WARRANTY.md.
