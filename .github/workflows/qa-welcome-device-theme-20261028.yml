@@ -1,5 +1,5 @@
 name: Owner Welcome once and device-first storefront theme (isolated Preview)
-# Owner regression re-run after browser-safe bootstrap VM compatibility fix.
+# Owner regression re-run after Chrome computed color-scheme normalization in browser tests.
 on:
   push:
     branches: [fix/welcome-once-device-theme-2026-10-28]
