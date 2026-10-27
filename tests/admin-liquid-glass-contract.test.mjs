@@ -114,9 +114,9 @@ assert.match(adminHtml, /main\.querySelectorAll\('\[data-action=save-order-detai
 has('data-claim-status="${esc(c.id)}" aria-label="Trạng thái yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim status');
 has('data-claim-note="${esc(c.id)}" aria-label="Ghi chú quản trị cho yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty admin note');
 has('data-action="save-claim" data-id="${esc(c.id)}" aria-label="Lưu yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim save action');
-has('aria-label="Chuyển ảnh ${i+1} lên"', 'gallery reorder-up accessible name');
-has('aria-label="Chuyển ảnh ${i+1} xuống"', 'gallery reorder-down accessible name');
-has('aria-label="Xóa ảnh ${i+1}"', 'gallery remove accessible name');
+has('Ảnh ${i+1} trên ${gallery.length}. Giữ để phóng to, kéo để đổi vị trí, phím Delete để gỡ ảnh.', 'whole-image gallery keyboard and screenreader instructions');
+has('id="galleryTrash" class="gallery-trash" role="region" aria-label="Thả ảnh vào đây để xóa khỏi bộ ảnh"', 'single accessible gallery drop-to-trash zone');
+has("galleryGrid.addEventListener('keydown'", 'keyboard image reorder/remove fallback');
 has('id="pPublished" type="checkbox" aria-label="Hiển thị sản phẩm"', 'published toggle accessible name');
 has('id="showPrices" type="checkbox" aria-label="Hiển thị giá trên website"', 'public price toggle accessible name');
 has('id="welcomeEnabled" type="checkbox" aria-label="Bật lớp phủ chào mừng"', 'welcome overlay toggle accessible name');
