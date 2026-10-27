@@ -844,6 +844,73 @@ html.dark .sd-vip-word{
   text-shadow:0 0 8px rgba(255,69,87,.18);
 }
 </style>
+
+<style id="sd-footer-story-heading-2026-10-27">
+/* Footer story only: preserve official logo asset and the accepted Liquid Glass theme. */
+#siteFooter .footer-story-heading{
+ display:grid;
+ grid-template-columns:clamp(100px,10vw,136px) minmax(0,1fr);
+ align-items:center;
+ gap:clamp(14px,2vw,24px);
+ margin:0 0 19px;
+ min-width:0;
+}
+#siteFooter .footer-story-heading .footer-brand{
+ display:flex;
+ width:100%;
+ max-width:136px;
+ height:auto;
+ margin:0;
+ padding:0;
+ border:0;
+ border-radius:0;
+ background:transparent;
+ box-shadow:none;
+ backdrop-filter:none;
+ -webkit-backdrop-filter:none;
+ align-items:center;
+ justify-content:flex-start;
+ align-self:center;
+}
+#siteFooter .footer-story-heading .footer-brand img{
+ display:block;
+ width:100%;
+ height:auto;
+ max-width:136px;
+ object-fit:contain;
+ border:0;
+ border-radius:0;
+ background:transparent;
+ box-shadow:none;
+}
+#siteFooter .footer-story-heading-copy{min-width:0}
+#siteFooter .footer-story-heading-copy .footer-story-eyebrow{
+ margin:0 0 8px;
+ line-height:1.55;
+}
+#siteFooter .footer-story-heading-copy #footer-story-title{
+ margin:0;
+ line-height:1.2;
+ overflow-wrap:normal;
+}
+@media(max-width:760px){
+ #siteFooter .footer-story-heading{
+  grid-template-columns:clamp(91px,26vw,116px) minmax(0,1fr);
+  gap:clamp(11px,3.2vw,16px);
+  margin-bottom:18px;
+ }
+ #siteFooter .footer-story-heading .footer-brand img{max-width:116px}
+ #siteFooter .footer-story-heading-copy .footer-story-eyebrow{
+  font-size:clamp(7px,1.85vw,9px);
+  letter-spacing:.13em;
+  margin-bottom:6px;
+ }
+ #siteFooter .footer-story-heading-copy #footer-story-title{
+  font-size:clamp(18px,5.3vw,24px);
+  line-height:1.18;
+ }
+}
+</style>
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -1091,9 +1158,13 @@ html.dark .sd-vip-word{
  <div class="wrap">
   <div class="footer-main">
    <section class="footer-story" id="about" aria-labelledby="footer-story-title">
-    <a href="#home" class="footer-brand" aria-label="SinDarealest — Trang chủ"><img src="logo.png" alt="Logo chính thức SinDarealest"></a>
-    <div class="footer-story-eyebrow">Premium Crocodile Leather Fashion</div>
-    <h2 id="footer-story-title">Giá trị nằm trong từng chi tiết.</h2>
+    <div class="footer-story-heading">
+     <a href="#home" class="footer-brand" aria-label="SinDarealest — Trang chủ"><img src="logo.png" alt="Logo chính thức SinDarealest"></a>
+     <div class="footer-story-heading-copy">
+      <div class="footer-story-eyebrow">Premium Crocodile Leather Fashion</div>
+      <h2 id="footer-story-title">Giá trị nằm trong từng chi tiết.</h2>
+     </div>
+    </div>
     <p>SinDarealest trân trọng vẻ đẹp tự nhiên của da cá sấu và giá trị của đôi tay người thợ. Từ lựa chọn chất liệu đến từng đường cắt, đường may và công đoạn hoàn thiện, mỗi chi tiết đều được chăm chút với sự kiên nhẫn và tỉ mỉ.</p>
     <p>Chúng tôi tin rằng sự sang trọng đích thực không nằm ở sự phô trương, mà ở chất liệu, kỹ nghệ thủ công và dấu ấn riêng bền vững theo thời gian.</p>
     <a class="footer-story-link" href="#products">Khám phá bộ sưu tập <span>→</span></a>
