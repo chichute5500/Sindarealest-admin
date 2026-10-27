@@ -1620,7 +1620,7 @@ function catalogCategoryFromLocation(){
  return found?found.category:null;
 }
 // Links to home-only sections must not strand customers on a hidden anchor.
-document.addEventListener('click',event=>{
+if(typeof document!=='undefined'&&typeof document.addEventListener==='function')document.addEventListener('click',event=>{
  if(!document.documentElement.classList.contains('sd-catalog-route'))return;
  const link=event.target.closest?.('a[href^="#"]');
  if(!link)return;
