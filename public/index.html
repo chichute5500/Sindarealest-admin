@@ -417,14 +417,12 @@ html{transition:background-color .25s ease,color .25s ease}
 
 /* SD_TRACK_6: scoped storefront status cards */
 .sd-track{padding-top:0!important}
-.sd-track-panel{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:14px 22px;align-items:center;padding:clamp(15px,2.8vw,26px);border:1px solid var(--line);border-radius:21px}
-.sd-track-intro h2{font:400 clamp(23px,2.4vw,32px)/1.2 SD Serif,Georgia,serif;margin:7px 0 9px;color:var(--ink)}
-.sd-track-intro p{font-size:11px;line-height:1.7;color:var(--muted);margin:0}
+.sd-track-panel{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:8px 17px;align-items:center;padding:clamp(12px,2vw,19px);border:1px solid var(--line);border-radius:19px}
+.sd-track-intro h2{font:400 clamp(23px,2.4vw,32px)/1.2 SD Serif,Georgia,serif;margin:5px 0 0;color:var(--ink)}
 .sd-track-form{display:grid;gap:8px;min-width:0}.sd-track-form label{font-size:11px;font-weight:700;color:var(--ink)}
 .sd-track-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px}
 .sd-track-controls input{min-width:0;width:100%;min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--glass);color:var(--ink);padding:11px 12px;font:12px/1.5 SD Sans,Arial,sans-serif}
 .sd-track-controls button{min-height:44px;white-space:nowrap}
-.sd-track-privacy{grid-column:1/-1;font-size:10px;color:var(--muted);line-height:1.6;margin:0}
 .sd-track-results{grid-column:1/-1;display:grid;gap:12px}.sd-track-results[hidden]{display:none!important}
 .sd-track-order{border:1px solid var(--line);border-radius:15px;background:var(--glass);padding:14px}
 .sd-track-order-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.sd-track-order-head strong{font-size:13px;color:var(--ink);overflow-wrap:anywhere}.sd-track-order-head span{font-size:10px;color:var(--muted)}
@@ -436,7 +434,7 @@ html{transition:background-color .25s ease,color .25s ease}
 .sd-track-step.is-current{border:1px solid var(--gold);background:rgba(173,129,56,.09)}.sd-track-step.is-current .sd-track-number{background:var(--gold);border-color:var(--gold);color:#fff}
 .sd-track-step-copy{display:grid;gap:4px;min-width:0}.sd-track-step-copy b{font-size:12px;color:var(--ink)}.sd-track-step-copy time{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .sd-track-step-state{font-size:10px;color:var(--muted);font-weight:700;white-space:nowrap}
-@media(max-width:760px){.sd-track-panel{grid-template-columns:1fr;padding:15px}.sd-track-privacy,.sd-track-results{grid-column:1}}
+@media(max-width:760px){.sd-track-panel{grid-template-columns:1fr;padding:12px;gap:9px}.sd-track-results{grid-column:1}}
 @media(max-width:390px){.sd-track-controls{grid-template-columns:1fr}.sd-track-controls button{width:100%}.sd-track-step{grid-template-columns:30px minmax(0,1fr) auto;gap:7px}.sd-track-step-state{font-size:9px}}
 </style>
 
@@ -1180,10 +1178,9 @@ html.dark .sd-vip-word{
 
   <section class="sd-track section wrap" id="orderTracking" aria-labelledby="sdTrackTitle">
    <div class="sd-track-panel glass-soft">
-    <div class="sd-track-intro"><div class="eyebrow">Order progress · Theo dõi đơn hàng</div><h2 id="sdTrackTitle">Tra cứu đơn hàng</h2><p>Nhập mã đơn hoặc số điện thoại đã đặt để xem 6 bước xử lý của Shop.</p></div>
+    <div class="sd-track-intro"><div class="eyebrow">Order progress · Theo dõi đơn hàng</div><h2 id="sdTrackTitle">Tra cứu đơn hàng</h2></div>
     <form id="sdTrackForm" class="sd-track-form"><label for="sdTrackInput">Mã đơn hàng hoặc số điện thoại</label><div class="sd-track-controls"><input id="sdTrackInput" required maxlength="64" autocomplete="off" placeholder="Mã đơn hàng hoặc 09xxxxxxxx"><button id="sdTrackSubmit" type="submit" class="pill-btn primary tap-target">Tra cứu đơn</button></div><p id="sdTrackMessage" class="checkout-message" role="status" aria-live="polite"></p></form>
     <div id="sdTrackResults" class="sd-track-results" hidden aria-live="polite"></div>
-    <p class="sd-track-privacy">Chỉ hiển thị tiến trình đơn, không công khai thông tin cá nhân hoặc thanh toán. Liên hệ Shop nếu cần hỗ trợ.</p>
    </div>
   </section>
   <section class="section wrap" id="featured">
