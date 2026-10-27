@@ -355,7 +355,7 @@ has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:a
 
 has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:52px;width:52px}}', 'thumbnail rail remains touchable on narrow phones');
 has(':root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
-has('aria-label="Chuyển ảnh ${i+1} lên"', 'accessible gallery reorder controls remain present');
+has('role="group" tabindex="0" aria-label="Ảnh ', 'whole-photo keyboard-focusable gallery entries remain accessible');
 has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('')", 'all supporting images are rendered inside the mobile thumbnail rail');
 
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
