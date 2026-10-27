@@ -1,4 +1,4 @@
-import { canonicalProductPath } from "./_storefront-route.js";
+import { canonicalProductPath, catalogListingPath } from "./_storefront-route.js";
 export async function onRequestGet({ request, env }) {
   const requestUrl = new URL(request.url);
   const previewHost = requestUrl.hostname.toLowerCase().endsWith(".sindarealest2.pages.dev")
@@ -9,7 +9,8 @@ export async function onRequestGet({ request, env }) {
     const url = new URL(request.url), origin = url.origin;
     const rows = await env.DB.prepare("SELECT * FROM products WHERE published=1 ORDER BY created_at DESC,id DESC LIMIT 2000").all();
     const escapeXml = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&apos;");
-    const urls = [`<url><loc>${origin}/</loc></url>`, ...(rows.results || []).map((p) => {
+    const categoryPaths = [...new Set((rows.results || []).map(p => catalogListingPath(p.category)))].sort();
+    const urls = [`<url><loc>${origin}/</loc></url>`, `<url><loc>${origin}/sanpham</loc></url>`, ...categoryPaths.map(path => `<url><loc>${escapeXml(origin + path)}</loc></url>`), ...(rows.results || []).map((p) => {
       let lastmod = "";
       if (p.updated_at !== null && p.updated_at !== undefined && String(p.updated_at).trim()) {
         const raw = String(p.updated_at).trim();

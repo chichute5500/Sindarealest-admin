@@ -7,6 +7,12 @@ export function productCategoryRouteSlug(value) {
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "").slice(0, 100) || "san-pham";
 }
+export function catalogListingPath(category) {
+  return "/sanpham" + (category ? "/" + productCategoryRouteSlug(category) : "");
+}
+export function isKnownCatalogCategoryRoute(segment) {
+  return Object.values(PRODUCT_CATEGORY_ROUTE_SLUGS).includes(String(segment || "").toLowerCase());
+}
 export function isVerifiedCommercialSku(row) {
   // Missing sku_verified column (migration 0008 not run) always means unverified.
   return Boolean(row && Number(row.sku_verified ?? row.skuVerified) === 1
