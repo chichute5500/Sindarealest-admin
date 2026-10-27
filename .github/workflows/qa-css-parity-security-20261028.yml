@@ -5,6 +5,16 @@ on:
     branches: [audit/css-parity-security-2026-10-28]
     paths:
       - '.github/workflows/qa-css-parity-security-20261028.yml'
+      - 'public/index.html'
+      - 'public/admin/index.html'
+      - 'public/code-hero.css'
+      - 'public/material-gallery.css'
+      - 'public/_headers'
+      - 'functions/**'
+      - 'tests/e2e/owner-css-parity-security.spec.js'
+      - 'tests/owner-css-parity-security-audit.test.mjs'
+      - 'tests/storefront-integration-route.test.mjs'
+      - 'scripts/audit-css-cascade.mjs'
 permissions:
   contents: read
 concurrency:
