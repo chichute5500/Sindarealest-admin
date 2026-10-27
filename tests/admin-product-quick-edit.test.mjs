@@ -75,6 +75,19 @@ const reorderEnd=admin.indexOf("$('#imageGrid').addEventListener('dragstart'",re
 assert.ok(reorderStart>=0&&reorderEnd>reorderStart,'Gallery reorder helper must be defined once');
 const reorderCode=admin.slice(reorderStart,reorderEnd);
 const {runInNewContext}=await import('node:vm');
+let renderCalls=0;
+const state={gallery:['ảnh 1','ảnh 2','ảnh 3','ảnh 4'],renderGallery:()=>{renderCalls++},$:()=>({textContent:''})};
+const verify=runInNewContext(reorderCode+'\nmoveGalleryImage(2,0);gallery',state);
+assert.deepEqual(Array.from(verify),['ảnh 3','ảnh 1','ảnh 2','ảnh 4'],
+ 'Moving a later photo to cover must INSERT and shift former cover/other photos right');
+assert.equal(renderCalls,1,'One reorder updates gallery view once');
+
+
+const reorderStart=admin.indexOf('function moveGalleryImage(from,to){');
+const reorderEnd=admin.indexOf("$('#imageGrid').addEventListener('dragstart'",reorderStart);
+assert.ok(reorderStart>=0&&reorderEnd>reorderStart,'Gallery reorder helper must be defined once');
+const reorderCode=admin.slice(reorderStart,reorderEnd);
+const {runInNewContext}=await import('node:vm');
 const state={gallery:['ảnh 1','ảnh 2','ảnh 3','ảnh 4'],calls:0,renderGallery(){this.calls++},$(){return {textContent:''}}};
 // Method call through VM-owned context rather than relying on the platform drag behavior.
 const verify=runInNewContext(reorderCode+'\nmoveGalleryImage(2,0);gallery',state);
