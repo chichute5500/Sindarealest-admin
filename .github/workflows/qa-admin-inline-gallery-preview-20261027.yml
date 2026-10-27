@@ -1,4 +1,5 @@
 name: Owner Admin inline edit and touch gallery Preview (ISOLATED)
+# Revalidate image-only drag, long-hold zoom, one bottom trash and blank card navigation after Owner revision.
 on:
   push:
     branches:
