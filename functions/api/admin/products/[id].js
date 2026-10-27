@@ -39,12 +39,12 @@ export async function onRequestPatch(context) {
   const input = parsed.value;
   if (parsed.error || !input || typeof input !== "object" || Array.isArray(input)) return fail("Thao tác chỉnh nhanh không hợp lệ.");
   const { field, value, expectedValue } = input;
-  if (!["category", "price", "images"].includes(field) || !Object.hasOwn(input, "expectedValue")) return fail("Trường chỉnh nhanh không hợp lệ.");
+  if (!["category", "price", "images", "fulfillmentType"].includes(field) || !Object.hasOwn(input, "expectedValue")) return fail("Trường chỉnh nhanh không hợp lệ.");
   try {
     const row = await context.env.DB.prepare("SELECT * FROM products WHERE id=? LIMIT 1").bind(id).first();
     if (!row) return fail("Không tìm thấy sản phẩm.", 404);
     const existing = fromRow(row);
-    const before = field === "category"
+    const before = field === "fulfillmentType" ? existing.fulfillmentType : field === "category"
       ? { category: existing.category, categoryLabel: existing.categoryLabel }
       : field === "images" ? existing.images : existing.price;
     if (JSON.stringify(before) !== JSON.stringify(expectedValue))
@@ -67,6 +67,8 @@ export async function onRequestPatch(context) {
       checkInput.categoryLabel = value.categoryLabel;
     } else if (field === "price") {
       checkInput.price = value;
+    } else if (field === "fulfillmentType") {
+      checkInput.fulfillmentType = value;
     } else {
       checkInput.images = value;
     }
@@ -76,6 +78,9 @@ export async function onRequestPatch(context) {
     if (field === "category") {
       updates = context.env.DB.prepare("UPDATE products SET category=?, category_label=?, updated_at=datetime('now') WHERE id=? AND category=? AND category_label=?")
         .bind(after.category, after.categoryLabel, id, row.category, row.category_label);
+    } else if (field === "fulfillmentType") {
+      updates = context.env.DB.prepare("UPDATE products SET fulfillment_type=?, updated_at=datetime(\'now\') WHERE id=? AND fulfillment_type=?")
+        .bind(after.fulfillmentType, id, row.fulfillment_type);
     } else if (field === "price") {
       updates = context.env.DB.prepare("UPDATE products SET price=?, source_price_confirmed=?, updated_at=datetime('now') WHERE id=? AND price IS ?")
         .bind(after.price, after.sourcePriceConfirmed ? 1 : 0, id, row.price);
