@@ -7,6 +7,13 @@ import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import { onRequestPost as lookup, onRequestGet, publicOrderProgress } from "../functions/api/order-tracking.js";
 
+const storefront=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
+const orderSection=storefront.indexOf('id="order"');
+const trackingCard=storefront.indexOf('id="orderTracking"');
+const featuredSection=storefront.indexOf('id="featured"');
+assert.ok(orderSection>=0&&orderSection<trackingCard&&trackingCard<featuredSection,"Public tracking belongs below Đặt hàng an tâm and above Featured");
+for(const marker of ['id="sdTrackForm"','id="sdTrackResults"',"$('#sdTrackForm').addEventListener","function sdTrackRender(","function sdTrackDate(","/* SD_TRACK_6:"])
+ assert.ok(storefront.includes(marker),"Missing mobile/desktop public tracking UI: "+marker);
 const schema=[
  "0001_schema.sql","0003_storefront_operations.sql","0004_admin_notifications.sql",
  "0005_address_warranty_verification.sql","0006_remove_warranty_otp.sql",

@@ -113,6 +113,17 @@ for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
  assert.equal(f.audits('order_updated').filter(a=>JSON.parse(a.details_json).status==='completed').length,1);
  f.sql.close();
 }
+// Admin exception path may finish in one action; even then coverage starts
+// only when status is actually completed, never at confirmation.
+{
+ const f=fixture(2_500_000);
+ const finished=await f.patch('completed');
+ assert.equal(finished.status,200);
+ assert.equal((await finished.json()).warrantiesIssued,1);
+ assert.equal(f.list()[0].starts_at,getCurrentDateInVietnam());
+ assert.equal(f.audits('warranty_issued').length,1);
+ f.sql.close();
+}
 {
  const f=fixture(2_000_000,{existingWarranty:true,secondItem:true});
  for(const s of ['confirmed','processing','shipped'])assert.equal((await f.patch(s)).status,200);
