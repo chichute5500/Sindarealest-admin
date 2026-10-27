@@ -58,7 +58,7 @@ assert.match(adminOrders, /body\?\.paymentStatus !== undefined/, "Admin order PA
 assert.doesNotMatch(adminOrders, /SET status=\?,payment_status=COALESCE/, "order PATCH must never set payment status from a client field");
 const paymentRequestApi = read("../functions/api/admin/payment-requests.js");
 assert.match(paymentRequestApi, /Object\.hasOwn\(body, "amount"\)/, "client-supplied amount must be rejected");
-assert.match(paymentRequestApi, /Math\.ceil\(total \* 0\.3\)/, "made-to-order deposit must be server-derived as 30 percent");
+assert.match(paymentRequestApi, /Math\.ceil\(\(total \* 0\.3\)\/100000\)\*100000/, "made-to-order deposit must round up to a 100k VND increment");
 assert.match(paymentRequestApi, /: 100000;/, "in-stock deposit must be fixed at 100,000 VND");
 assert.match(paymentRequestApi, /fulfillmentTypes\.size !== 1/, "mixed fulfillment order must fail closed");
 assert.match(paymentRequestApi, /fulfillmentType === "unclassified"/, "unclassified items must require manual consultation");

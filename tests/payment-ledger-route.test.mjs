@@ -318,7 +318,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   })));
   assert.equal(response.status, 201, "confirmed order can create deposit request with active QR config");
   const payload = await response.json();
-  assert.equal(payload.amount, 30000, "made-to-order deposit is server-derived as 30% of the confirmed total");
+  assert.equal(payload.amount, 100000, "made-to-order deposit is rounded up to the next 100,000 by the server");
   assert.equal(payload.shippingBenefit, "standard_shipping");
   assert.equal(payload.freeShippingApplied, false);
   assert.match(payload.transferReference, /^SD[A-Z0-9]+$/);
@@ -476,7 +476,7 @@ for (const [label, amount] of [
   })));
   const payload = await response.json();
   assert.equal(response.status, 201);
-  assert.equal(payload.amount, 100000);
+  assert.equal(payload.amount, 95000, "full payment applies a 5% discount");
   assert.equal(payload.shippingBenefit, "free_shipping");
   assert.equal(payload.freeShippingEligible, true, "full payment request is eligible for freeship");
   assert.equal(payload.freeShippingApplied, false, "pending full payment is not yet an applied delivery benefit");

@@ -28,6 +28,10 @@ concurrency:
 jobs:
   preview:
     name: Test isolated Admin Preview (read-only)
+    # A PR touching main may trigger this workflow, but only the dedicated Admin
+    # feature branch has the matching deployed SHA and credentials. Keep all
+    # provenance guards for that branch; skip unrelated integration PRs.
+    if: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'chichute5500/Sindarealest-admin' && github.event.pull_request.head.ref == 'feature/admin-isolated-handoff-2026-10-20') || (github.event_name != 'pull_request' && github.ref == 'refs/heads/feature/admin-isolated-handoff-2026-10-20') }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:

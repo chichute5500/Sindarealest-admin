@@ -1,0 +1,181 @@
+/* Owner-requested smooth 580ms crossfade in the material tile only. */
+#materialTile .sd-material-gallery{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+#materialTile .sd-material-slide{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  object-fit:cover;opacity:0;filter:none;transform:none;
+  transition:opacity .58s cubic-bezier(.42,0,.58,1)!important
+}
+#materialTile .sd-material-slide.is-visible{opacity:1}
+#materialTile.has-real-material-gallery .material-photo{opacity:0!important;visibility:hidden!important}
+#materialTile.has-real-material-gallery .mosaic-content{z-index:1}
+
+/* Keep photo pixels clear: do not cover a real hide with a full-tile light or
+   dark wash. The old pseudo-overlays stay available for fallback art only. */
+html body #materialTile.has-real-material-gallery::before,
+html body #materialTile.has-real-material-gallery::after{
+  background:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  transition:none!important;
+}
+html body #materialTile.has-real-material-gallery .mosaic-content{
+  color:#fff!important;
+  text-shadow:0 1px 3px rgba(0,0,0,.94),0 1px 8px rgba(0,0,0,.72);
+}
+/* The original Light/Dark fallback caption washes remain only for legacy
+   placeholder material art; real leather photos are explicitly kept unwashed. */
+#materialTile::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(242,249,255,.78),rgba(242,249,255,.16));
+  opacity:0;transition:opacity .22s ease-out!important;
+}
+#materialTile::after{
+  background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.16))!important;
+  opacity:1;transition:opacity .22s ease-out!important;
+}
+html:not(.dark) #materialTile::before{opacity:1}
+html:not(.dark) #materialTile::after{opacity:0}
+
+/* Fast theme response: restore the approved 220ms visual blend for strict A/B QA,
+   keep the unchanged 80ms start / 300ms finish / 220±25ms duration gate.
+   Avoid forced layout, full-screen filter and hundreds
+   of costly box-shadow/backdrop-filter transitions on catalog cards. */
+html body .theme-bg{
+  transition:opacity .22s ease-out!important;
+  transition-delay:0s!important;
+  will-change:opacity;
+}
+html body .nav-wrap .nav,
+html body .mobile-bottom-nav{
+  transition-property:background-color,border-color,color!important;
+  transition-duration:.22s!important;
+  transition-timing-function:ease-out!important;
+  transition-delay:0s!important;
+}
+html.theme-transitioning body .theme-bg{
+  transition:opacity .22s ease-out!important;
+}
+html.theme-transitioning body .nav-wrap .nav,
+html.theme-transitioning body .mobile-bottom-nav{
+  transition-property:background-color,border-color,color!important;
+  transition-duration:.22s!important;
+  transition-timing-function:ease-out!important;
+}
+/* All other surfaces switch immediately; no expensive paint-heavy shadow or
+   blur animation across the product catalog. */
+html.theme-transitioning body :is(
+  .glass,.glass-soft,.product-card,.promise,.promise-tag,
+  .mosaic-card,.custom-text,.footer,.contact-link,.search-field,
+  .cart-drawer,.account-drawer,.checkout-drawer
+){
+  transition:none!important;
+}
+html.theme-transitioning body #materialTile .material-photo{
+  transition:opacity .22s ease-out!important;
+}
+/* No full-viewport background/text repaint on every animation frame.
+   The fixed theme-bg layers and navbar perform the approved 220ms fade;
+   html/body palette changes immediately, preserving the existing appearance. */
+html.theme-transitioning,html.theme-transitioning body{
+  transition:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  #materialTile .sd-material-slide,
+  #materialTile::before,#materialTile::after{transition:none!important}
+}
+
+
+/* Android WebView safe static sheet. Never animate full-viewport clip-path or
+   gradient masks in front of multiple backdrop-filter panels: expensive GPU
+   tiling can display partially repainted horizontal bands and heavy flashes. */
+#sdThemeSwitchOverlay{
+  position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;
+  box-sizing:border-box;padding:24px;text-align:center;isolation:isolate;
+  background-color:#061522;color:#f7f4ef;
+  opacity:0;visibility:hidden;pointer-events:none;transition:none;
+}
+#sdThemeSwitchOverlay[data-origin="light"]{background-color:#eaf3fb;color:#173449}
+#sdThemeSwitchOverlay[data-origin="dark"]{background-color:#061522;color:#f7f4ef}
+#sdThemeSwitchOverlay.is-preparing,
+#sdThemeSwitchOverlay.is-visible,
+#sdThemeSwitchOverlay.is-covered,
+#sdThemeSwitchOverlay.is-dismissing{visibility:visible;pointer-events:auto}
+#sdThemeSwitchOverlay.is-visible{
+  opacity:1;transition:opacity .18s ease-in-out;
+}
+#sdThemeSwitchOverlay.is-covered{
+  opacity:1;transition:none;
+}
+#sdThemeSwitchOverlay.is-dismissing{
+  opacity:0;pointer-events:none;transition:opacity .28s ease-out;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-content{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:13px;max-width:min(88vw,460px);position:relative;
+  font-family:"SD Sans",Arial,sans-serif;
+  opacity:0;transform:translateY(5px);
+  transition:opacity .18s ease-out,transform .23s ease-out;
+}
+#sdThemeSwitchOverlay.is-visible .sd-theme-switch-content,
+#sdThemeSwitchOverlay.is-covered .sd-theme-switch-content{
+  opacity:1;transform:translateY(0);
+}
+#sdThemeSwitchOverlay.is-dismissing .sd-theme-switch-content{
+  opacity:0;transition:opacity .16s ease-in;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-brand{
+  font-family:"SD Serif",Georgia,serif;font-size:clamp(19px,4.5vw,28px);
+  letter-spacing:.17em;font-weight:500;color:#d7b67d;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-rule{
+  width:72px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#d9b77b,transparent);
+}
+#sdThemeSwitchOverlay .sd-theme-switch-message{
+  font-size:clamp(14px,3.8vw,17px);letter-spacing:.07em;font-weight:600;color:#f7f4ef;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-note{
+  font-size:12px;letter-spacing:.04em;color:rgba(247,244,239,.67);
+}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-brand{color:#906b3f}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-rule{
+  background:linear-gradient(90deg,transparent,#a67e4a,transparent);
+}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-message{color:#173449}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-note{color:#547083}
+/* All elements underlying the opaque sheet commit directly to the target.
+   Switching hundreds of independent transitions is what caused flicker. */
+html.sd-theme-overlay-active,
+html.sd-theme-overlay-active body{transition:none!important;}
+html.sd-theme-overlay-active body .theme-bg,
+html.sd-theme-overlay-active body .nav-wrap .nav,
+html.sd-theme-overlay-active body .mobile-bottom-nav,
+html.sd-theme-overlay-active body .account-drawer,
+html.sd-theme-overlay-active body .cart-drawer,
+html.sd-theme-overlay-active body .checkout-drawer{transition:none!important}
+/* Approved wallpaper/nav remain frozen through the final dissolve. */
+html.sd-theme-overlay-active body .theme-bg,
+html.sd-theme-overlay-active body .nav-wrap .nav,
+html.sd-theme-overlay-active body .mobile-bottom-nav{transition:none!important}
+@media(prefers-reduced-motion:reduce){
+  #sdThemeSwitchOverlay,#sdThemeSwitchOverlay .sd-theme-switch-content{transition:none!important}
+}
+
+/* Mobile theme-switch raster isolation. Applied ONLY behind the fully opaque
+   transition screen and removed before revealing the approved Liquid Glass. */
+@media(max-width:760px){
+  html.sd-theme-repaint-isolated body :is(
+    .glass,.glass-soft,.nav,.mobile-bottom-nav,.product-card,.account-drawer,
+    .cart-drawer,.checkout-drawer,.sdh-glass-card,.search-field,.mosaic-card,
+    .contact-link,.order-step,.service-strip,.service-copy,.footer,.custom-text,
+    .custom-image,.detail-modal,.detail-image-stage,.sd-fullscreen-viewer,
+    .promise-tag,.product-overlay-panel,.cart-row,.nav-wrap
+  ){
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  html.sd-theme-repaint-isolated body .theme-bg{filter:none!important}
+  html.sd-theme-overlay-active body .sd-code-hero .sdh-cta--zalo::before{
+    animation-play-state:paused!important;
+  }
+}

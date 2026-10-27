@@ -1,4 +1,5 @@
-import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { fail, getCurrentDateInVietnam, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
+import { addWarrantyCalendarMonths, shopWarrantyPolicy } from "../../_warranty-policy.js";
 import { sendAdminPush } from "../../_notifications.js";
 
 export async function onRequestGet(context) {
@@ -11,6 +12,23 @@ export async function onRequestGet(context) {
       "WITH recent_orders AS (" +
       " SELECT o.id,o.customer_id AS customerId,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required," +
       " o.customer_note,o.payment_terms_confirmed_at,o.payment_terms_confirmed_by,o.payment_terms_note,o.created_at,o.updated_at,COALESCE(oc.full_name,c.full_name) AS full_name," +
+      " (SELECT json_extract(details_json,'$.selectedPaymentOption') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_option," +
+      " (SELECT json_extract(details_json,'$.selectedPaymentAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_amount," +
+      " (SELECT json_extract(details_json,'$.selectedRemainingAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_remaining_amount," +
+      " (SELECT json_extract(details_json,'$.selectedDiscountAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_discount_amount," +
+      " (SELECT json_extract(details_json,'$.transferReference') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_transfer_reference," +
+      // Original, audit-backed milestone dates. Never fabricate a date from
+      // order.updated_at (which changes during unrelated admin edits).
+      " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='confirmed') AS timeline_confirmed_at," +
+      " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='processing') AS timeline_processing_at," +
+      " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='shipped') AS timeline_shipped_at," +
+      " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='completed') AS timeline_completed_at," +
+      // Date of the *first receipt that reached the customer's requested
+      // deposit/full amount*; never count the automatically collected COD.
+      " (SELECT MIN(pt.verified_at) FROM order_payment_transactions pt WHERE pt.order_id=o.id AND pt.direction='received' AND pt.actor<>'admin_cod_completion'" +
+      " AND (SELECT COALESCE(SUM(tx.amount),0) FROM order_payment_transactions tx WHERE tx.order_id=o.id AND tx.direction='received' AND tx.actor<>'admin_cod_completion'" +
+      " AND (tx.verified_at < pt.verified_at OR (tx.verified_at=pt.verified_at AND tx.rowid<=pt.rowid))) >=" +
+      " COALESCE((SELECT json_extract(a.details_json,'$.selectedPaymentAmount') FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_created' ORDER BY a.created_at DESC LIMIT 1),o.total)) AS timeline_payment_at," +
       " COALESCE(oc.phone,c.phone) AS phone,COALESCE(oc.email,c.email) AS email," +
       " COALESCE(sa.full_address,c.address) AS address" +
       " ,(SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=o.id) AS received_amount" +
@@ -71,12 +89,15 @@ export async function onRequestPatch(context) {
   const id = String(body?.id || ""), status = String(body?.status || "");
   const statuses = ["pending_confirmation","confirmed","processing","shipped","completed","cancelled"];
   if (body?.paymentStatus !== undefined) return fail("Không được tự đặt trạng thái thanh toán. Chỉ giao dịch đã được Admin đối chiếu thực tế mới thay đổi trạng thái.",409);
+  if (body?.codCollected !== undefined && body.codCollected !== true) return fail("Xác nhận thu số dư phải là giá trị true.",400);
+  if (body.codCollected === true && status !== "completed") return fail("Chỉ ghi nhận thu số dư COD khi hoàn tất đơn.",409);
   if (!id || !statuses.includes(status)) return fail("Trạng thái đơn hàng không hợp lệ.");
   if (body?.prices !== undefined && (!Array.isArray(body.prices) || body.prices.length > 50)) return fail("Danh sách giá cần xác nhận không hợp lệ.");
   try {
     const existing = await context.env.DB.prepare("SELECT id,status FROM orders WHERE id=?").bind(id).first();
     if (!existing) return fail("Không tìm thấy đơn hàng.", 404);
     if (existing.status === "cancelled" && status !== "cancelled") return fail("Đơn đã hủy không thể mở lại hoặc tiếp tục xử lý.", 409);
+    if (body.codCollected === true && existing.status !== "shipped") return fail("Chỉ được xác nhận thu số dư COD một lần từ trạng thái Đã gửi hàng.",409);
     // A cancelled order cannot accept a verified receipt while its QR request remains pending.
     // Require explicit QR cancellation before cancelling the order, then recheck at UPDATE time below.
     if (status === "cancelled") {
@@ -114,23 +135,63 @@ export async function onRequestPatch(context) {
     const termsConfirmed = body.termsConfirmed === true;
     const confirmationAt = termsConfirmed ? new Date().toISOString() : null;
 
+    // COD is a separate, explicitly acknowledged payment source. It is never
+    // presented as a bank-verified QR receipt. Ordinary completed PATCH cannot
+    // bypass the explicit collection acknowledgement for deposit orders.
+    let codCollection = null;
+    if (status === "completed") {
+      const checkout = await context.env.DB.prepare(
+        "SELECT json_extract(details_json,'$.selectedPaymentOption') AS payment_option," +
+        "json_extract(details_json,'$.selectedPaymentAmount') AS expected_deposit " +
+        "FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1"
+      ).bind(id).first();
+      if (checkout?.payment_option === "deposit") {
+        const money = await context.env.DB.prepare(
+          "SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) AS net_received " +
+          "FROM order_payment_transactions WHERE order_id=?"
+        ).bind(id).first();
+        const paid = Number(money?.net_received);
+        const target = Number(checkout.expected_deposit);
+        if (!Number.isSafeInteger(paid) || !Number.isSafeInteger(target) || target <= 0 ||
+            !Number.isSafeInteger(subtotal) || subtotal <= 0 || paid < target || paid > subtotal)
+          return fail("Chưa đối soát đủ tiền cọc hoặc dữ liệu thanh toán không hợp lệ; chưa thể hoàn tất đơn.",409);
+        if (paid < subtotal) {
+          if (body.codCollected !== true) return fail("Hoàn tất đơn cần xác nhận Shop đã thu đủ số dư lúc giao hàng.",409);
+          if (existing.status !== "shipped") return fail("Chỉ ghi nhận số dư COD khi đơn đã gửi hàng và được hoàn tất.",409);
+          const pending = await context.env.DB.prepare(
+            "SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' LIMIT 1"
+          ).bind(id).first();
+          if (pending) return fail("Còn hồ sơ thanh toán QR đang chờ. Hãy đối soát hoặc hủy hồ sơ trước khi hoàn tất.",409);
+          codCollection = { amount: subtotal-paid, paidBefore: paid, expectedDeposit: target,
+            transactionId:crypto.randomUUID(), reference:"COD-"+id.toUpperCase() };
+        }
+      } else if (body.codCollected === true) {
+        return fail("Chỉ tự ghi nhận COD với đơn đã chọn đặt cọc QR.",409);
+      }
+    } else if (body.codCollected === true) {
+      return fail("Xác nhận thu số dư chỉ áp dụng khi hoàn tất đơn.",409);
+    }
+
     // Keep payment amounts and verified ledger history tied to the confirmed order total.
     // The API/UI submits existing values during ordinary saves, so only real price changes
     // must be blocked when a QR request is pending or a verified transaction already exists.
     if (priceChanged) {
       const financialState = await context.env.DB.prepare(
         "SELECT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?) AS has_transactions, " +
-        "EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') AS has_pending_request"
-      ).bind(id,id).first();
+        "EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') AS has_pending_request, " +
+        "EXISTS (SELECT 1 FROM warranties WHERE order_id=?) AS has_warranties"
+      ).bind(id,id,id).first();
       if (Number(financialState?.has_transactions) > 0) return fail("Không thể sửa giá khi đơn đã có giao dịch được xác minh. Cần đối soát lịch sử thanh toán trước khi thay đổi giá.",409);
       if (Number(financialState?.has_pending_request) > 0) return fail("Không thể sửa giá khi đơn còn yêu cầu QR đang chờ. Hãy hủy yêu cầu QR trước khi thay đổi giá.",409);
+      if (Number(financialState?.has_warranties) > 0) return fail("Không thể sửa giá sau khi đã cấp bảo hành. Hãy xử lý ngoại lệ theo quy trình Shop.",409);
     }
 
     const statements = [];
     const priceStatements = [];
     const priceGuardSql =
       " AND NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?)" +
-      " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
+      " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" +
+      " AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_id=?)";
     const terminalStatusGuardSql = " AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled')";
     const cancellationRequestGuardSql =
       " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')";
@@ -151,7 +212,7 @@ export async function onRequestPatch(context) {
         itemGuardSql + " AND changes()=1";
       const values = [update.unitPrice,update.lineTotal,update.itemId,id];
       if (priceChanged) {
-        values.push(id,id);
+        values.push(id,id,id);
         if (status !== "cancelled") values.push(id);
       } else if (status === "cancelled") values.push(id);
       priceStatements.push(context.env.DB.prepare(sql).bind(...values));
@@ -168,16 +229,22 @@ export async function onRequestPatch(context) {
       "payment_terms_confirmed_by=CASE WHEN ?=1 THEN 'admin' WHEN ?=1 THEN '' ELSE payment_terms_confirmed_by END," +
       "payment_terms_note=CASE WHEN ?=1 THEN ? ELSE payment_terms_note END,updated_at=datetime('now') WHERE id=? AND status=?" +
       (priceChanged ? priceGuardSql : "") + unchangedItemGuardSql +
-      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'");
+      (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'") +
+      (codCollection
+        ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" +
+          " AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)=?" +
+          " AND EXISTS (SELECT 1 FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' AND json_extract(details_json,'$.selectedPaymentOption')='deposit')"
+        : "");
     const orderUpdateValues = [
       status,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
       priceChanged?1:0,termsConfirmed?1:0,priceChanged?1:0,termsConfirmed?1:0,note,id,existing.status
     ];
-    if (priceChanged) orderUpdateValues.push(id,id);
+    if (priceChanged) orderUpdateValues.push(id,id,id);
     orderUpdateValues.push(...unchangedItemGuardBindings);
     // Non-cancelled UPDATE uses a literal status guard with no extra SQL bind.
     // Binding one more ID here previously made every ordinary order save fail (503).
     if (status === "cancelled") orderUpdateValues.push(id);
+    if (codCollection) orderUpdateValues.push(id,id,codCollection.paidBefore,id);
     statements.push(context.env.DB.prepare(orderUpdateSql).bind(...orderUpdateValues));
     statements.push(...priceStatements);
 
@@ -185,6 +252,7 @@ export async function onRequestPatch(context) {
       status, pricesUpdated: priceUpdates.length, priceChanged, priceConfirmed: allPriced,
       paymentTermsConfirmed: termsConfirmed, paymentTermsNoteLength: note.length
     });
+    const orderAuditId = crypto.randomUUID();
     if (priceChanged) {
       // Re-check the same invariant inside the atomic batch: if financial activity
       // appeared after the preflight SELECT, all guarded item/order/audit writes are no-ops.
@@ -193,26 +261,107 @@ export async function onRequestPatch(context) {
         "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
         "WHERE NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE order_id=?) " +
         "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending') " +
+        "AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_id=?) " +
         "AND changes()=1"
-      ).bind(crypto.randomUUID(),id,auditDetails,id,id));
+      ).bind(orderAuditId,id,auditDetails,id,id,id));
     } else if (status === "cancelled") {
       statements.push(context.env.DB.prepare(
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
         "SELECT ?, 'admin', 'order_updated', 'order', ?, ? " +
         "WHERE changes()=1 AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
-      ).bind(crypto.randomUUID(),id,auditDetails,id));
+      ).bind(orderAuditId,id,auditDetails,id));
     } else {
       statements.push(context.env.DB.prepare(
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'order_updated', 'order', ?, ? WHERE changes()=1"
-      ).bind(crypto.randomUUID(),id,auditDetails));
+      ).bind(orderAuditId,id,auditDetails));
+    }
+
+    // First confirmation issues one warranty per order line in the SAME D1
+    // batch as the optimistic order status update and audit. Every insert is
+    // gated by the unique order-update audit ID from this transaction. If an
+    // order-status, item-price, or payment guard rejects the update, NO
+    // warranty can be created and the entire operation remains atomic.
+    const activateWarranty = existing.status === "pending_confirmation" && status === "confirmed";
+    const issueAuditIds = [];
+    if (activateWarranty) {
+      const policy = shopWarrantyPolicy(subtotal);
+      const startsAt = getCurrentDateInVietnam();
+      const endsAt = addWarrantyCalendarMonths(startsAt, policy.durationMonths);
+      for (const item of items) {
+        const warrantyId = crypto.randomUUID();
+        const warrantyCode = "SDW-" + crypto.randomUUID().replaceAll("-", "").slice(0, 24).toUpperCase();
+        const warrantyAuditId = crypto.randomUUID();
+        const insertIndex = statements.length;
+        statements.push(context.env.DB.prepare(
+          "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
+          "SELECT ?,oi.order_id,oi.id,?,?,?,?,?,'active' FROM order_items oi WHERE oi.id=? AND oi.order_id=? " +
+          "AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=oi.id) " +
+          "AND EXISTS (SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=oi.order_id AND action='order_updated') " +
+          "AND EXISTS (SELECT 1 FROM orders o WHERE o.id=oi.order_id AND o.status='confirmed' AND o.total=?)"
+        ).bind(warrantyId,warrantyCode,policy.policyName,policy.durationMonths,startsAt,endsAt,item.id,id,orderAuditId,subtotal));
+        statements.push(context.env.DB.prepare(
+          "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+          "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)"
+        ).bind(warrantyAuditId,warrantyId,JSON.stringify({ orderId:id, orderItemId:item.id, warrantyCode, source:"automatic_order_confirmation", policyName:policy.policyName, months:policy.durationMonths, startsAt, endsAt }),warrantyId));
+        issueAuditIds.push(insertIndex);
+      }
+    }
+
+    // Cancelling a formerly confirmed order must not leave active warranty
+    // coverage behind. This is atomic with order cancellation, and leaves
+    // previously voided or manually managed warranty records intact.
+    if (status === "cancelled" && existing.status !== "cancelled") {
+      statements.push(context.env.DB.prepare(
+        "UPDATE warranties SET status='void' WHERE order_id=? AND status='active' " +
+        "AND EXISTS (SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=? AND action='order_updated') " +
+        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
+      ).bind(id,orderAuditId,id,id));
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?, 'admin', 'warranties_voided_on_cancellation', 'order', ?, ? WHERE changes()>0 " +
+        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
+      ).bind(crypto.randomUUID(),id,JSON.stringify({ reason:"order_cancelled", source:"automatic_warranty_policy" }),id));
+    }
+    // Same transaction as the completed status: append COD only after the
+    // successful order audit, then update ledger-derived payment status.
+    // A deterministic unique reference and the optimistic net-receipt guard
+    // prohibit duplicate collection even with repeat submissions/races.
+    if (codCollection) {
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) " +
+        "SELECT ?,?,NULL,'received',?,?,?,'admin_cod_completion' WHERE EXISTS " +
+        "(SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=? AND action='order_updated') " +
+        "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status='completed' AND total=?) " +
+        "AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)=?"
+      ).bind(codCollection.transactionId,id,codCollection.amount,codCollection.reference,
+        "Shop xác nhận đã thu số dư khi giao hàng. Không phải chuyển khoản ngân hàng.",
+        orderAuditId,id,id,subtotal,id,codCollection.paidBefore));
+      statements.push(context.env.DB.prepare(
+        "UPDATE orders SET payment_status='paid',updated_at=datetime('now') WHERE id=? AND status='completed' " +
+        "AND EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?) " +
+        "AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=?)=total"
+      ).bind(id,codCollection.transactionId,id));
+      statements.push(context.env.DB.prepare(
+        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+        "SELECT ?,'admin','payment_cod_collected_on_completion','order',?,? " +
+        "WHERE EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)"
+      ).bind(crypto.randomUUID(),id,JSON.stringify({
+        source:"cod_on_completion", amount:codCollection.amount, paidBefore:codCollection.paidBefore,
+        transactionId:codCollection.transactionId, reference:codCollection.reference,
+        acknowledgement:"admin_confirmed_cash_collected_on_delivery"
+      }),codCollection.transactionId));
     }
     const batchResults = await context.env.DB.batch(statements);
     if (Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
       if (status === "cancelled") return fail("Không thể hủy đơn vì yêu cầu QR đang chờ hoặc đơn vừa thay đổi. Hãy hủy yêu cầu QR trước rồi tải lại đơn.",409);
       if (priceChanged) return fail("Giá không thể thay đổi vì đơn/trạng thái/giá dòng hàng đã thay đổi đồng thời, hoặc đã phát sinh thanh toán. Không ghi đè dữ liệu; hãy tải lại đơn và đối soát trước.",409);
-      return fail("Đơn hàng vừa thay đổi hoặc đã hủy. Hãy tải lại đơn trước khi cập nhật trạng thái.",409);
+      return fail("Đơn hàng vừa thay đổi, số dư thanh toán đã thay đổi hoặc đã hủy. Hãy tải lại đơn trước khi cập nhật trạng thái.",409);
     }
+    const warrantiesIssued = issueAuditIds.filter(index => Number(batchResults?.[index]?.meta?.changes || 0) > 0).length;
     await sendAdminPush(context.env, { title: "Đơn hàng được cập nhật", body: "Trạng thái: " + status + (termsConfirmed ? " · Đã xác nhận điều kiện" : ""), url: "/admin/" });
-    return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, message: allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
+    return json({ ok: true, priceConfirmationRequired: !allPriced, total: subtotal, warrantiesIssued,
+      codCollectedAmount:codCollection?.amount || 0, message: activateWarranty
+      ? (warrantiesIssued ? "Đã xác nhận đơn và tự kích hoạt " + warrantiesIssued + " bảo hành." : "Đã xác nhận đơn; sản phẩm đã có bảo hành nên không cấp trùng.")
+      : allPriced ? "Đã cập nhật đơn hàng và xác nhận tổng tiền." : "Đã cập nhật trạng thái. Đơn vẫn chờ xác nhận giá." });
   } catch { return fail("Không thể cập nhật đơn hàng.", 503); }
 }

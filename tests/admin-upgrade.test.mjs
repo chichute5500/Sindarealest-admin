@@ -13,7 +13,7 @@ assert.ok(lib.includes("Object.hasOwn(aliases, categoryKey)"), "product category
 assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
 assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
 assert.ok(read("../functions/api/warranty-lookup.js").includes("warranty_lookup:") && !read("../functions/api/warranty-lookup.js").includes("warrantyCode: code"), "Lookup API must return only masked codes plus short-lived action tokens");
-assert.ok(read("../functions/_middleware.js").includes("isVerifiedCommercialSku(product)") && read("../functions/_middleware.js").includes("encodeURIComponent(productKey)"), "Product canonical URL must use a verified SKU or immutable ID");
+assert.ok(read("../functions/_storefront-route.js").includes("isVerifiedCommercialSku(row)") && read("../functions/_storefront-route.js").includes("encodeURIComponent(key)") && middleware.includes("canonicalProductPath(product)"), "Product canonical URL must use a verified SKU or immutable ID and category route");
 assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
 assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should expand from existing product data");
 assert.ok(admin.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");
@@ -95,7 +95,8 @@ assert.ok(admin.includes("function orderDetailMarkup(order)"), "Order detail pan
 assert.ok(admin.includes("function orderDetailPage()"), "Order detail must render as its own Admin screen");
 assert.ok(admin.includes("view==='order-detail'?orderDetailPage()"), "The Admin view router must render the dedicated order detail screen");
 assert.ok(admin.includes("selectedOrderId=new URLSearchParams(location.search).get('orderId')||''"), "Order detail deep links must restore the selected existing order");
-assert.ok(admin.includes('data-action="order-detail-to-row"'), "Order detail must provide a real route back to the matching order's management controls");
+assert.ok(admin.includes('data-action="back-to-orders"'), "Order detail must return to the order list with browser history semantics");
+assert.ok(admin.includes('sd-order-advanced"'), "Specialist order controls must be available only in the advanced disclosure");
 assert.ok(!admin.includes('<div id="orderDetailBackdrop"'), "Order detail must not regress to a modal overlay");
 console.log("PASS: dedicated Order detail screen, deep-link state and return-to-actions contracts.");
 

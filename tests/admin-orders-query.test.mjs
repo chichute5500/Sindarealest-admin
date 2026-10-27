@@ -57,4 +57,9 @@ assert.equal(payload.orders[0].items[0].unitPrice, null, "unconfirmed prices mus
 assert.equal(payload.orders[0].items[1].lineTotal, 5000000, "confirmed line totals must be preserved");
 assert.deepEqual(payload.orders[1].items, [], "orders with no item rows should still be returned with an empty list");
 assert.ok(!Object.hasOwn(payload.orders[0], "itemId"), "join implementation fields must not leak into the order response");
-console.log("Admin orders single-query regression tests passed.");
+for(const column of ["timeline_confirmed_at","timeline_processing_at","timeline_shipped_at","timeline_completed_at","timeline_payment_at"]) {
+ assert.ok(calls[0].includes(column),"Timeline query must expose real "+column);
+}
+assert.ok(calls[0].includes("tx.rowid<=pt.rowid"),"Deposit milestone must be based on crossing the verified transfer threshold");
+assert.ok(calls[0].includes("admin_cod_completion"),"COD collection must not rewrite initial deposit date");
+console.log("Admin orders single-query and authentic milestone date regression tests passed.");
