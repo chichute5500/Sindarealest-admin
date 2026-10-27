@@ -6,7 +6,7 @@ import {PRODUCT_CATEGORY_ROUTE_SLUGS,productCategoryRouteSlug} from '../function
 
 const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
 const match=html.match(/<script id="sd-not-found-route-init">([\s\S]*?)<\/script>/);
-assert.ok(match,'The page's initial 404 guard must exist');
+assert.ok(match,"The page's initial 404 guard must exist");
 const guard=match[1];
 // The browser runs this synchronous guard before data fetch, so it must
 // recognize direct category/listing/deep links; unit testing server HTML alone
