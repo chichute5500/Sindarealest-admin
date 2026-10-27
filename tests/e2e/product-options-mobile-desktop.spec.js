@@ -42,6 +42,23 @@ for(const cfg of [
   await expect(page.locator('[data-option-value="43"]')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#sdDetailOption')).toHaveValue('42');
   await expect(page.locator('#detailVariants .sd-product-option-choices')).toHaveCSS('flex-wrap','wrap');
+  const chipMetrics=await page.locator('#detailVariants .sd-product-option-chip').evaluateAll(nodes=>nodes.map(x=>({
+   w:x.getBoundingClientRect().width,h:x.getBoundingClientRect().height,
+   text:x.textContent,viewWidth:window.innerWidth,
+   outerRight:x.getBoundingClientRect().right
+  })));
+  expect(chipMetrics).toHaveLength(7);
+  for(const metric of chipMetrics){
+   expect(metric.w).toBeLessThanOrEqual(60);
+   expect(metric.h).toBeGreaterThanOrEqual(36);
+   expect(metric.outerRight).toBeLessThanOrEqual(metric.viewWidth+1);
+   expect(metric.text).toMatch(/^(38|39|40|41|42|43|44)$/);
+  }
+  await page.locator('[data-option-value="42"]').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#sdDetailOption')).toHaveValue('43');
+  await page.keyboard.press('ArrowLeft');
+  await expect(page.locator('#sdDetailOption')).toHaveValue('42');
   await page.screenshot({path:dir+'/shoe-'+cfg.label+'.png',animations:'disabled'});
   await page.locator('#detailAdd').click();
   await close();
