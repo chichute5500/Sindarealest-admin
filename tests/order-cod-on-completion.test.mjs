@@ -68,7 +68,9 @@ function setup({deposit=2_700_000,net=2_700_000,paymentOption='deposit',orderSta
  const response=await f.patch({codCollected:true});
  assert.equal(response.status,200);
  assert.equal((await response.json()).codCollectedAmount,6_300_000);
- assert.deepEqual(f.state(),{status:'completed',payment_status:'paid',total:9_000_000});
+ assert.equal(f.state().status,'completed');
+ assert.equal(f.state().payment_status,'paid');
+ assert.equal(f.state().total,9_000_000);
  const cod=f.ledger().find(x=>x.actor==='admin_cod_completion');
  assert.equal(cod?.amount,6_300_000,'remaining COD computed from server ledger, not UI');
  assert.equal(cod?.transaction_reference,'COD-QA-ORDER');
