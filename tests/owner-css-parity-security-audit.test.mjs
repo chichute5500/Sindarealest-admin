@@ -41,8 +41,8 @@ test('Admin and Storefront share the approved light-blue identity without forcin
 });
 
 test('Owner-approved final dark background filter has no stale competing declarations',()=>{
- const matches=[...web.matchAll(/html\\.dark \\.theme-bg--dark\\{([^}]+)\\}/g)];
- const filters=matches.filter(item=>/(?:^|;)\\s*filter\\s*:/.test(item[1])).map(item=>item[1].trim());
+ const matches=[...web.matchAll(/html\.dark \.theme-bg--dark\{([^}]+)\}/g)];
+ const filters=matches.filter(item=>/(?:^|;)\s*filter\s*:/.test(item[1])).map(item=>item[1].trim());
  assert.deepEqual(filters,['filter:none!important'],'All former dark background filters must remain removed');
  // The Welcome palette switch uses the approved old-to-new glass transition;
  // never recreate earlier large-area or conflicting theme animation cascades.
