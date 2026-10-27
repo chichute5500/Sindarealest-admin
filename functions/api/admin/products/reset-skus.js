@@ -70,8 +70,11 @@ export async function onRequestPost(context) {
     const counters = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
     const finalSkuById = new Map();
     const categoryCounts = Object.fromEntries(Object.keys(categoryRules).map((key) => [key, 0]));
+    const targetIds = new Set(rows.map((row) => row.id));
+    // Reserve EVERY SKU outside the target set, including hidden drafts,
+    // otherwise the reset can collide with an existing unverified record.
     const verifiedSkuValues = new Set(allRows
-      .filter((row) => Number(row.sku_verified) === 1)
+      .filter((row) => !targetIds.has(row.id))
       .map((row) => String(row.sku || "").trim().toUpperCase())
       .filter(Boolean));
     const assignedInternalSkuValues = new Set();
