@@ -66,7 +66,7 @@ for (const [id, label] of [
   has(`id="${id}"`, label);
 }
 has('aria-label="Xác nhận SKU thương mại chính thức"', 'clear accessible label for SKU verification');
-has('Mã tự sinh chỉ là mã nội bộ; chỉ bật khi mã chính thức đã được xác nhận.', 'warning that internal/generated SKU is not an official verified SKU');
+has('Sản phẩm mới sẽ tự cấp SKU chính thức theo danh mục sau khi lưu, không cần xác minh thủ công.', 'new products receive an approved verified SKU automatically');
 has('AI chỉ đề xuất nội dung; hãy kiểm tra và chỉnh sửa trước khi lưu.', 'human review before saving AI-suggested copy');
 has('class="sku-entry-row"', 'SKU and verification controls share a responsive row');
 has('class="product-description-heading"', 'description label and AI action share a heading row');
