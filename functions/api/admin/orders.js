@@ -1,5 +1,5 @@
 import { fail, getCurrentDateInVietnam, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
-import { addWarrantyCalendarMonths, shopWarrantyPolicy } from "../../_warranty-policy.js";
+import { addWarrantyCalendarMonths, generateShortWarrantyCode, isWarrantyCodeCollisionError, shopWarrantyPolicy } from "../../_warranty-policy.js";
 import { sendAdminPush } from "../../_notifications.js";
 
 export async function onRequestGet(context) {
@@ -283,26 +283,39 @@ export async function onRequestPatch(context) {
     // warranty can be created and the entire operation remains atomic.
     const activateWarranty = existing.status === "pending_confirmation" && status === "confirmed";
     const issueAuditIds = [];
+    const warrantyPlans = [];
+    const usedWarrantyCodes = new Set();
+    const nextWarrantyCode = () => {
+      for (let trial=0;trial<96;trial++) {
+        const code = generateShortWarrantyCode();
+        if (!usedWarrantyCodes.has(code)) { usedWarrantyCodes.add(code); return code; }
+      }
+      throw new Error("Không thể tạo mã bảo hành khác nhau trong cùng đơn.");
+    };
     if (activateWarranty) {
       const policy = shopWarrantyPolicy(subtotal);
       const startsAt = getCurrentDateInVietnam();
       const endsAt = addWarrantyCalendarMonths(startsAt, policy.durationMonths);
       for (const item of items) {
         const warrantyId = crypto.randomUUID();
-        const warrantyCode = "SDW-" + crypto.randomUUID().replaceAll("-", "").slice(0, 24).toUpperCase();
+        const warrantyCode = nextWarrantyCode();
         const warrantyAuditId = crypto.randomUUID();
         const insertIndex = statements.length;
-        statements.push(context.env.DB.prepare(
+        const plan = {insertIndex,warrantyId,warrantyAuditId,itemId:item.id,policy,startsAt,endsAt,warrantyCode};
+        const buildInsert = code => context.env.DB.prepare(
           "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
           "SELECT ?,oi.order_id,oi.id,?,?,?,?,?,'active' FROM order_items oi WHERE oi.id=? AND oi.order_id=? " +
           "AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=oi.id) " +
           "AND EXISTS (SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=oi.order_id AND action='order_updated') " +
           "AND EXISTS (SELECT 1 FROM orders o WHERE o.id=oi.order_id AND o.status='confirmed' AND o.total=?)"
-        ).bind(warrantyId,warrantyCode,policy.policyName,policy.durationMonths,startsAt,endsAt,item.id,id,orderAuditId,subtotal));
-        statements.push(context.env.DB.prepare(
+        ).bind(warrantyId,code,policy.policyName,policy.durationMonths,startsAt,endsAt,item.id,id,orderAuditId,subtotal);
+        const buildAudit = code => context.env.DB.prepare(
           "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
           "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)"
-        ).bind(warrantyAuditId,warrantyId,JSON.stringify({ orderId:id, orderItemId:item.id, warrantyCode, source:"automatic_order_confirmation", policyName:policy.policyName, months:policy.durationMonths, startsAt, endsAt }),warrantyId));
+        ).bind(warrantyAuditId,warrantyId,JSON.stringify({ orderId:id, orderItemId:item.id, warrantyCode:code, source:"automatic_order_confirmation", policyName:policy.policyName, months:policy.durationMonths, startsAt, endsAt }),warrantyId);
+        plan.rebuild = code => { statements[insertIndex] = buildInsert(code); statements[insertIndex+1] = buildAudit(code); };
+        warrantyPlans.push(plan);
+        plan.rebuild(warrantyCode);
         issueAuditIds.push(insertIndex);
       }
     }
@@ -351,7 +364,18 @@ export async function onRequestPatch(context) {
         acknowledgement:"admin_confirmed_cash_collected_on_delivery"
       }),codCollection.transactionId));
     }
-    const batchResults = await context.env.DB.batch(statements);
+    // D1.batch is transactional: if a concurrent order already allocated a
+    // four-character code, its UNIQUE failure rolls back the WHOLE batch.
+    // Rebuild all proposed code/audit pairs and retry, not the order alone.
+    let batchResults;
+    for (let attempt=0;attempt<8;attempt++) {
+      try { batchResults = await context.env.DB.batch(statements); break; }
+      catch (error) {
+        if (!activateWarranty || !isWarrantyCodeCollisionError(error) || attempt===7) throw error;
+        usedWarrantyCodes.clear();
+        for (const plan of warrantyPlans) plan.rebuild(nextWarrantyCode());
+      }
+    }
     if (Number(batchResults?.[orderUpdateIndex]?.meta?.changes || 0) === 0) {
       if (status === "cancelled") return fail("Không thể hủy đơn vì yêu cầu QR đang chờ hoặc đơn vừa thay đổi. Hãy hủy yêu cầu QR trước rồi tải lại đơn.",409);
       if (priceChanged) return fail("Giá không thể thay đổi vì đơn/trạng thái/giá dòng hàng đã thay đổi đồng thời, hoặc đã phát sinh thanh toán. Không ghi đè dữ liệu; hãy tải lại đơn và đối soát trước.",409);

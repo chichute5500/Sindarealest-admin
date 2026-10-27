@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import { createSession, getCurrentDateInVietnam } from '../functions/_lib.js';
-import { shopWarrantyPolicy, addWarrantyCalendarMonths } from '../functions/_warranty-policy.js';
+import { shopWarrantyPolicy, addWarrantyCalendarMonths, isWarrantyCode } from '../functions/_warranty-policy.js';
 import { onRequestPatch as patchOrder } from '../functions/api/admin/orders.js';
 
 assert.deepEqual(shopWarrantyPolicy(1_999_999).durationMonths,6);
@@ -27,7 +27,7 @@ const schema=[
  '0007_order_contact_details.sql','0008_product_sku_verification.sql',
  '0009_fulfillment_and_manual_payments.sql',
 ].map(file=>readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8')).join('\n');
-function fixture(total, {existingWarranty=false, secondItem=false}={}){
+function fixture(total, {existingWarranty=false, secondItem=false,simulateCodeCollision=false}={}){
  const sql=new DatabaseSync(':memory:');
  sql.exec('PRAGMA foreign_keys=ON;'+schema);
  sql.prepare('INSERT INTO customers(id,full_name,phone) VALUES(?,?,?)').run('cust','QA TEST','0000000000');
@@ -37,7 +37,7 @@ function fixture(total, {existingWarranty=false, secondItem=false}={}){
  if(secondItem)sql.prepare('INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)')
    .run('item-b','order','product-b','QA-B','Sản phẩm QA B',1,total-Math.floor(total/2),total-Math.floor(total/2));
  if(existingWarranty)sql.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) VALUES('legacy','order','item-a','SDW-LEGACY001','Bảo hành cũ',24,'2026-01-01','2028-01-01','active')").run();
- let beforeBatch=null;
+ let beforeBatch=null,collisionPending=simulateCodeCollision,batchCount=0;
  const DB={
   prepare(statement){
    let values=[];
@@ -48,7 +48,12 @@ function fixture(total, {existingWarranty=false, secondItem=false}={}){
     execute(){return sql.prepare(statement).run(...values)}};
   },
   async batch(statements){
+   batchCount++;
    if(beforeBatch){const fn=beforeBatch;beforeBatch=null;fn(sql)}
+   if(collisionPending&&statements.some(s=>s.sql.includes('INSERT INTO warranties'))){
+     collisionPending=false;
+     throw new Error('D1_ERROR: UNIQUE constraint failed: warranties.warranty_code');
+   }
    sql.exec('BEGIN IMMEDIATE');
    try{const rows=statements.map(s=>{const r=s.execute();return {success:true,meta:{changes:r.changes}}});sql.exec('COMMIT');return rows}
    catch(e){sql.exec('ROLLBACK');throw e}
@@ -62,7 +67,7 @@ function fixture(total, {existingWarranty=false, secondItem=false}={}){
  const list=()=>sql.prepare('SELECT * FROM warranties ORDER BY order_item_id').all();
  const state=()=>sql.prepare("SELECT status,total FROM orders WHERE id='order'").get();
  const audits=action=>sql.prepare('SELECT * FROM audit_logs WHERE action=?').all(action);
- return {sql,patch,list,state,audits,setBeforeBatch:fn=>{beforeBatch=fn}};
+ return {sql,patch,list,state,audits,batchCount:()=>batchCount,setBeforeBatch:fn=>{beforeBatch=fn}};
 }
 
 for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
@@ -80,7 +85,8 @@ for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
   assert.equal(w.starts_at,today,'activation starts on Vietnam confirmation date');
   assert.equal(w.ends_at,addWarrantyCalendarMonths(today,months));
   assert.equal(w.status,'active');
-  assert.match(w.warranty_code,/^SDW-[A-F0-9]{24}$/);
+  assert.match(w.warranty_code,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+  assert.equal(isWarrantyCode(w.warranty_code),true);
  }
  assert.equal(f.audits('warranty_issued').length,2);
  const retry=await f.patch('confirmed');
@@ -93,6 +99,20 @@ for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
  assert.equal((await f.patch('cancelled')).status,200);
  assert.ok(f.list().every(w=>w.status==='void'),'cancellation voids active warranties atomically');
  assert.equal(f.audits('warranties_voided_on_cancellation').length,1);
+ f.sql.close();
+}
+
+// Transactional retry of a short-code collision must never confirm a partial order.
+{
+ const f=fixture(2_100_000,{secondItem:true,simulateCodeCollision:true});
+ const confirmed=await f.patch('confirmed');
+ assert.equal(confirmed.status,200,'code collision should regenerate, not fail the order');
+ assert.equal(f.batchCount(),2,'one collision rolls back before retry');
+ assert.equal((await confirmed.json()).warrantiesIssued,2);
+ assert.equal(f.list().length,2);
+ assert.notEqual(f.list()[0].warranty_code,f.list()[1].warranty_code);
+ assert.equal(f.audits('order_updated').length,1,'no double confirmation audit');
+ assert.equal(f.audits('warranty_issued').length,2,'one audit per newly issued warranty');
  f.sql.close();
 }
 
