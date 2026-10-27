@@ -281,7 +281,7 @@ export async function onRequestPatch(context) {
     // gated by the unique order-update audit ID from this transaction. If an
     // order-status, item-price, or payment guard rejects the update, NO
     // warranty can be created and the entire operation remains atomic.
-    const activateWarranty = existing.status === "shipped" && status === "completed";
+    const activateWarranty = existing.status !== "completed" && existing.status !== "cancelled" && status === "completed";
     const issueAuditIds = [];
     const warrantyPlans = [];
     const usedWarrantyCodes = new Set();
