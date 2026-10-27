@@ -60,6 +60,9 @@ try {
   assert.equal(result.status,400,'Invalid/missing option must fail before D1 order creation: '+await result.text());
   db.exec('DELETE FROM public_rate_limits');
  }
+ const overLimit=await invoke([item(0,40,'42'),item(0,11,'43')]);
+ assert.equal(overLimit.status,400,'The 50-piece limit applies to a product across all its sizes');
+ db.exec('DELETE FROM public_rate_limits');
  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,0);
  const response=await invoke([item(0,1,'42'),item(0,2,'43'),item(0,1,'42'),item(3,1,'3.5'),item(4,1,'iPhone 16 Pro Max'),item(5,1,'')]);
  assert.equal(response.status,201,await response.text());
