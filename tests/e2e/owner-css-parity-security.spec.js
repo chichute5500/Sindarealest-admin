@@ -56,7 +56,9 @@ for(const cfg of tests){
   // This also makes the screenshots comparable across runs.
   await expect.poll(()=>page.locator('#cartDrawer').evaluate(el=>{
     const rect=el.getBoundingClientRect(),vw=window.innerWidth;
-    return rect.width>0&&rect.left>=-1&&rect.right<=vw+1&&Math.abs(rect.right-vw)<=1;
+    // The approved mobile Liquid Glass drawer has a small inset and radius;
+    // never require it to touch the rightmost pixel.
+    return rect.width>0&&rect.left>=-1&&rect.right<=vw+1&&rect.right>=vw-24;
   }),{timeout:8000}).toBe(true);
   const cart=await page.locator('#cartDrawer').evaluate(el=>({
     width:el.getBoundingClientRect().width,scrollWidth:el.scrollWidth,
