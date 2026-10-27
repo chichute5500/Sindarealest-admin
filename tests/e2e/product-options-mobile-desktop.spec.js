@@ -72,7 +72,9 @@ for(const cfg of [
   expect(dimensions.cart).toBeLessThanOrEqual(Math.ceil(dimensions.cartWidth)+1);
   await page.locator('#cartCheckout').click();
   await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
-  const summary=await page.locator('#sdCheckoutItemSummary').innerText();
+  await expect(page.locator('#sdCheckoutItemSummary .sd-checkout-item')).toHaveCount(4);
+  await expect(page.locator('#sdCheckoutShippingStep')).toBeVisible();
+  const summary=await page.locator('#sdCheckoutItemSummary').textContent();
   for(const value of ['Size 42','Size 43','Bản dây 4.0 cm','iPhone 16 Pro Max'])expect(summary).toContain(value);
   await page.screenshot({path:dir+'/checkout-'+cfg.label+'.png',animations:'disabled'});
   expect(errors).toEqual([]);
