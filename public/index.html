@@ -1572,7 +1572,7 @@ function toggleTheme(){
   const root=document.documentElement;
   const dark=typeof window.__sdThemeTargetDark==='boolean'?window.__sdThemeTargetDark:root.classList.contains('dark');
   const next=dark?'light':'dark';
-  try{localStorage.setItem('sd-theme-mode',next)}catch(e){}
+  try{sessionStorage.setItem('sd-storefront-theme-override-v2',next)}catch(e){}
   applyThemeMode(next,true);
 }
 function setupSystemTheme(){const media=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)');if(!media)return;const onChange=()=>{if((document.documentElement.dataset.themeMode||'auto')==='auto')applyThemeMode('auto',true)};if(media.addEventListener)media.addEventListener('change',onChange);else if(media.addListener)media.addListener(onChange)}
@@ -1657,16 +1657,23 @@ function catalogCategoryFromLocation(){
  const found=products.find(p=>routeSlug(p.category)===slug);
  return found?found.category:null;
 }
-// Links to home-only sections must not strand customers on a hidden anchor.
+// Return from catalog to Welcome-free home with SPA History navigation.
+// Do not reload the HTML document: its Welcome lifecycle belongs to page load.
 if(typeof document!=='undefined'&&typeof document.addEventListener==='function')document.addEventListener('click',event=>{
  if(!document.documentElement.classList.contains('sd-catalog-route'))return;
- const link=event.target.closest?.('a[href^="#"]');
- if(!link)return;
- const hash=link.getAttribute('href'),section=hash?.length>1?document.getElementById(hash.slice(1)):null;
- if(section?.closest('main > section:not(#products)')){
-  event.preventDefault();
-  location.assign('/'+hash);
- }
+ const link=event.target.closest?.('a[href^="#"],a[href="/"]');
+ if(!link||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+ const raw=link.getAttribute('href'),hash=raw==='/'?'#home':raw;
+ const section=hash?.length>1?document.getElementById(hash.slice(1)):null;
+ if(!section?.closest('main > section:not(#products)'))return;
+ event.preventDefault();
+ const destination='/'+hash;
+ if(location.pathname+location.hash!==destination)
+  history.pushState({sdStorefrontHome:true},'',destination);
+ setCatalogLandingMode(false);
+ setActiveNav(section.id==='home'?'home':section.id);
+ setMobileMenu(false);
+ requestAnimationFrame(()=>section.scrollIntoView({behavior:'instant',block:'start'}));
 },true);
 function setCatalogLandingMode(active){
  if(typeof document!=='undefined')document.documentElement?.classList.toggle('sd-catalog-route',Boolean(active));
