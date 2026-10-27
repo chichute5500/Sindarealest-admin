@@ -2023,11 +2023,11 @@ function galleryPointerTarget(x,y){
 }
 function resetGalleryPointer(){
  const drag=galleryPointer;
+ galleryPointer=null;
  if(drag){
   clearTimeout(drag.timer);
   try{if(drag.item?.hasPointerCapture?.(drag.pointerId))drag.item.releasePointerCapture(drag.pointerId)}catch{}
  }
- galleryPointer=null;
  galleryGrid.querySelectorAll('.is-pointer-dragging,.is-drop-target').forEach(el=>{
   el.classList.remove('is-pointer-dragging','is-drop-target');
  });
@@ -2064,6 +2064,13 @@ galleryGrid.addEventListener('pointermove',e=>{
  }
  e.preventDefault();
  moveGalleryGhost(e.clientX,e.clientY);
+ // Allow a held image to reach the trash below the thumbnail rail on short phones.
+ const scrollArea=$('#backdrop .editorcontent');
+ if(scrollArea){
+  const area=scrollArea.getBoundingClientRect();
+  if(e.clientY>area.bottom-52)scrollArea.scrollTop+=18;
+  else if(e.clientY<area.top+52)scrollArea.scrollTop-=18;
+ }
  drag.target=galleryPointerTarget(e.clientX,e.clientY);
  galleryGrid.querySelectorAll('.is-drop-target').forEach(el=>el.classList.remove('is-drop-target'));
  $('#galleryTrash')?.classList.remove('is-drop-target');
