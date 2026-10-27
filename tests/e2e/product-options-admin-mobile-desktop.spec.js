@@ -62,6 +62,8 @@ for(const cfg of [
   await page.locator('#pCategory').fill('Giày lười');
   await expect(page.locator('#pOptionHint')).toContainText('38–44');
   await page.screenshot({path:dir+'/admin-size-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#pCategory').fill('Giày boot');
+  await expect(page.locator('#pOptionHint')).toContainText('38–44');
   await page.locator('#pCategory').fill('Thắt lưng');
   await expect(page.locator('#pOptionHint')).toContainText('3,5 cm hoặc 4,0 cm');
   await page.locator('#pCategory').fill('Ốp điện thoại');
