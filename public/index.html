@@ -1695,7 +1695,7 @@ function renderFilters(){
     : displayProductName(labels[selectedCategory]||categoryLabels[selectedCategory]||selectedCategory);
   $('#categoryFilters').innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target '+(selectedCategory===c?'active':'')+'" data-category="'+escapeHtml(c)+'" aria-pressed="'+(selectedCategory===c)+'">'+escapeHtml(c==='all'?categoryLabels.all:displayProductName(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
   // Center the chosen chip in its own horizontal row without scrolling the page.
-  if(document.documentElement?.classList.contains('sd-catalog-route')){
+  if(typeof document!=='undefined'&&document.documentElement?.classList.contains('sd-catalog-route')){
     const strip=$('#categoryFilters'),chip=strip?.querySelector('.filter-pill.active');
     if(strip&&chip){
       const area=strip.getBoundingClientRect(),item=chip.getBoundingClientRect();
