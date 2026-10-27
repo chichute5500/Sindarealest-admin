@@ -1386,6 +1386,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 #main .sd-order-step-copy{display:grid;gap:4px;min-width:0}
 #main .sd-order-step-copy b{font-size:12px;line-height:1.3}
 #main .sd-order-step-copy small{font-size:11px;line-height:1.4;color:var(--muted);overflow-wrap:anywhere}
+#main .sd-order-step-date{font-size:11px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
 #main .sd-order-step-state{white-space:nowrap;font-size:10px;color:var(--muted);font-weight:750}
 #main .sd-order-step.is-current{border:1px solid var(--gold);background:rgba(173,129,56,.11)}
 #main .sd-order-step.is-current .sd-order-step-number{background:var(--gold);color:#fff;border-color:var(--gold)}
@@ -1552,6 +1553,14 @@ function orderQrReceptionMarkup(order,compact=true){
 function orderFulfillmentLabel(value){return value==='in_stock'?'Hàng có sẵn':value==='made_to_order'?'Hàng đặt riêng':'Chưa phân loại'}
 function orderStatusLabel(value){return ({pending_confirmation:'Chờ xác nhận',confirmed:'Đã xác nhận',processing:'Đang xử lý',shipped:'Đã gửi hàng',completed:'Hoàn tất',cancelled:'Đã hủy'})[value]||String(value||'Chưa rõ')}
 function orderPaymentStatusLabel(value,order){return value==='paid'?'Đã thanh toán (đã xác minh)':value==='pending'?'Đã nhận một phần':value==='refunded'?'Đã hoàn tiền':order&&(order.customer_payment_option==='deposit'||order.customer_payment_option==='full')?'Chờ đối soát QR (chưa xác minh)':'Chưa hoàn tất thanh toán'}
+function sdOrderStepDate(value){
+ if(typeof value!=='string'||!value.trim())return '';
+ const normalized=value.trim();
+ // Cloudflare D1 stores audit/ledger times as UTC SQL timestamps.
+ const iso=/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)?normalized.replace(' ','T')+'Z':normalized;
+ const time=new Date(iso);
+ return Number.isFinite(time.getTime())?new Intl.DateTimeFormat('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',day:'2-digit',month:'2-digit',year:'numeric'}).format(time):'';
+}
 function orderDetailMarkup(order){
  const items=Array.isArray(order.items)?order.items:[],id=esc(order.id);
  const received=Number(order.received_amount||0),refunded=Number(order.refunded_amount||0),net=received-refunded,netReceived=net,maxRefundAmount=Number.isSafeInteger(netReceived)&&netReceived>0?netReceived:0;
@@ -1559,18 +1568,23 @@ function orderDetailMarkup(order){
  const selected=['deposit','full'].includes(order.customer_payment_option);
  const expected=Number(order.customer_payment_amount),remainder=Number(order.customer_payment_remaining_amount);
  const nextStatus=({pending_confirmation:'confirmed',confirmed:'processing',processing:'shipped',shipped:'completed'})[order.status]||'';
- const nextLabel=({confirmed:'Xác nhận đơn',processing:'Bắt đầu xử lý',shipped:'Đánh dấu đã gửi hàng',completed:'Hoàn tất đơn'})[nextStatus]||'';
+ const nextLabel=({confirmed:'Xác nhận đơn',processing:'Bắt đầu làm hàng',shipped:'Xác nhận đã gửi hàng',completed:'Hoàn tất đơn'})[nextStatus]||'';
  const requiredDeposit=selected&&Number.isSafeInteger(expected)&&expected>0?expected:0;
  const requiresReceipt=selected&&order.payment_status!=='paid'&&net<requiredDeposit;
  const canNext=priceConfirmed&&!requiresReceipt&&order.status!=='cancelled';
  const balance=Math.max(0,Number(order.total||0)-net);
  const collectCod=order.customer_payment_option==='deposit'&&order.status==='shipped'&&balance>0&&net>=requiredDeposit;
  const finalAction=collectCod?'Hoàn tất & xác nhận thu '+money(balance):nextLabel;
+ const orderActive=order.status!=='cancelled';
+ const hasProcessed=['processing','shipped','completed'].includes(order.status);
+ const hasShipped=['shipped','completed'].includes(order.status);
+ const depositDone=selected&&requiredDeposit>0&&!requiresReceipt&&net>=requiredDeposit;
  const orderSteps=[
-  {title:'Xác nhận đơn',done:order.status!=='pending_confirmation',active:order.status==='pending_confirmation',hint:'Chốt giá và kích hoạt bảo hành'},
-  {title:order.customer_payment_option==='deposit'?'Đối soát tiền cọc':'Đối soát thanh toán',done:!requiresReceipt,active:order.status!=='pending_confirmation'&&requiresReceipt,hint:requiresReceipt?'Chờ tiền thực nhận':'Đã nhận '+money(net)},
-  {title:'Chuẩn bị & gửi hàng',done:['shipped','completed'].includes(order.status),active:['confirmed','processing'].includes(order.status)&&!requiresReceipt,hint:order.status==='shipped'?'Đã gửi hàng':'Xử lý và giao hàng'},
-  {title:order.customer_payment_option==='deposit'?'Thu số dư & hoàn tất':'Hoàn tất đơn hàng',done:order.status==='completed',active:order.status==='shipped'&&!requiresReceipt,hint:order.customer_payment_option==='deposit'&&balance>0?'Sẽ ghi nhận thu '+money(balance)+' khi hoàn tất':'Kết thúc đơn'}
+  {title:'Xác nhận đơn',done:orderActive&&order.status!=='pending_confirmation',active:orderActive&&order.status==='pending_confirmation',hint:'Chốt giá và kích hoạt bảo hành',date:order.timeline_confirmed_at},
+  {title:order.customer_payment_option==='deposit'?'Đối soát tiền cọc':'Đối soát thanh toán',done:depositDone,active:orderActive&&!depositDone,hint:depositDone?'Đã nhận '+money(net):'Đối chiếu khoản tiền khách chuyển',date:order.timeline_payment_at},
+  {title:'Làm hàng',done:hasProcessed,active:orderActive&&order.status==='confirmed'&&depositDone,hint:hasProcessed?'Đã bắt đầu làm hàng':'Chuẩn bị và tiến hành làm hàng',date:order.timeline_processing_at},
+  {title:'Gửi hàng',done:hasShipped,active:orderActive&&order.status==='processing'&&depositDone,hint:hasShipped?'Đã bàn giao cho đơn vị vận chuyển':'Gửi hàng đến khách',date:order.timeline_shipped_at},
+  {title:order.customer_payment_option==='deposit'?'Thu số dư & hoàn tất':'Hoàn tất đơn hàng',done:order.status==='completed',active:orderActive&&order.status==='shipped'&&depositDone,hint:order.customer_payment_option==='deposit'&&balance>0?'Sẽ ghi nhận thu '+money(balance)+' khi hoàn tất':'Kết thúc đơn',date:order.timeline_completed_at}
  ];
  const statusValues=[['pending_confirmation','Chờ xác nhận'],['confirmed','Đã xác nhận'],['processing','Đang xử lý'],['shipped','Đã gửi hàng'],['completed','Hoàn tất'],['cancelled','Đã hủy']];
  return `
@@ -1602,7 +1616,7 @@ function orderDetailMarkup(order){
   </details>`:''}
  </div></section>
  <section class="panel sd-order-next"><div class="panelhead"><h3>Tiến trình xử lý đơn</h3><span class="tiny muted">${order.status==='completed'?'Đã hoàn tất':order.status==='cancelled'?'Đã hủy':'Bước hiện tại nổi bật'}</span></div><div class="panelbody">
-  <ol class="sd-order-step-list">${orderSteps.map((step,index)=>`<li class="sd-order-step ${step.done?'is-done':step.active?'is-current':'is-upcoming'}"><span class="sd-order-step-number" aria-hidden="true">${step.done?'✓':index+1}</span><div class="sd-order-step-copy"><b>${esc(step.title)}</b><small>${esc(step.hint)}</small></div><span class="sd-order-step-state">${step.done?'Xong':step.active?'Đang làm':'Sắp tới'}</span></li>`).join('')}</ol>
+  <ol class="sd-order-step-list">${orderSteps.map((step,index)=>`<li class="sd-order-step ${step.done?'is-done':step.active?'is-current':'is-upcoming'}"><span class="sd-order-step-number" aria-hidden="true">${step.done?'✓':index+1}</span><div class="sd-order-step-copy"><b>${esc(step.title)}</b><small>${esc(step.hint)}</small>${step.done&&sdOrderStepDate(step.date)?`<time class="sd-order-step-date" datetime="${esc(String(step.date).slice(0,10))}">${esc(sdOrderStepDate(step.date))}</time>`:''}</div><span class="sd-order-step-state">${step.done?'Xong':step.active?'Đang làm':'Sắp tới'}</span></li>`).join('')}</ol>
   ${order.status==='cancelled'?'<p class="sd-order-next-note">Đơn đã hủy, không có bước tiếp theo.</p>':order.status==='completed'?'<p class="sd-order-next-note">✓ Đã hoàn tất đơn và lưu lịch sử thanh toán.</p>':!priceConfirmed?'<div class="sd-order-next-note">Cần xác nhận giá và điều kiện trước khi tiếp tục.</div><button class="btn" type="button" data-action="open-order-advanced">Mở xác nhận giá & điều kiện</button>':requiresReceipt?'<div class="sd-order-next-note">Đang chờ Shop đối chiếu '+(order.customer_payment_option==='deposit'?'tiền cọc':'chuyển khoản')+'. Mở phần Thanh toán phía trên để ghi nhận.</div>':collectCod?'<div class="sd-order-next-note">Đã đối soát cọc '+esc(money(net))+'. Khi hoàn tất, Shop xác nhận đã thực sự thu '+esc(money(balance))+' lúc giao hàng, không phải chuyển khoản ngân hàng.</div>':nextStatus?'<div class="sd-order-next-note">Đã đủ điều kiện để chuyển sang bước tiếp theo.</div>':''}
   ${nextStatus?`<button class="btn primary sd-order-next-button" type="button" data-action="save-order-detail-status" data-id="${id}" data-next-status="${nextStatus}" ${collectCod?'data-cod-collected="true" data-cod-amount="'+balance+'"':''} ${canNext?'':'disabled'}>${esc(finalAction)}</button>`:''}
  </div></section>
