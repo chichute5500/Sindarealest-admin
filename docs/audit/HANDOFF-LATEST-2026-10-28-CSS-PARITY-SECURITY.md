@@ -66,7 +66,7 @@
 **BÀN GIAO:** Dự án đang ở trạng thái kiểm toán sâu có bằng chứng QA tốt nhưng **chưa Owner PASS phần kiểm toán**; tiếp tục trực tiếp trên nhánh audit, tuyệt đối không tự xem mọi CSS chồng chéo hoặc bảo mật là “100% đã xử lý”.
 
 ## Phụ lục audit tiếp nối — 2026-10-28 (bổ sung trong chat này)
-- Follow-up source SHA `05c35a655f4e07771d94fc8cd9bd248087b9bc33`; [source CI #40567425583 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40567425583). [Isolated Preview + Chrome #40567425595](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40567425595) **đang chạy** ở lần ghi nhận này, phải xác minh kết quả cuối cùng.
+- Follow-up source SHA `05c35a655f4e07771d94fc8cd9bd248087b9bc33`; [source CI #40567425583 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40567425583). [Isolated Preview + Chrome #40567425595](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40567425595) **SUCCESS 4/4 Chrome** (Admin/Storefront × Light/Dark × 390px/1366px), đã kiểm tra CSS computed backgrounds và cart; artifact bao gồm 12 screenshot, xác minh Preview D1/R2 tách Production.
 - Đã sửa lỗi thực sự: phương thức POST/PUT/PATCH/DELETE trên deep route chi tiết sản phẩm từ nay nhận 405, `Allow: GET, HEAD`, không còn bị biến thành GET/truy vấn D1. Có regression test.
 - Bỏ thêm đúng 5 khai báo `filter` cũ nền **sáng** Storefront bị `filter:none!important` cuối cùng phủ; không thay đổi hình nền/opacity/hiệu ứng. Có source assertion và đo computed-style trong Chrome.
 - Mở rộng workflow QA: chạy khi file chức năng/CSS/test liên quan thay đổi; bổ sung bốn ảnh trạng thái giỏ hàng desktop/mobile sáng/tối, kiểm tra không tràn ngang.
