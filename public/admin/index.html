@@ -2064,6 +2064,16 @@ galleryGrid.addEventListener('pointermove',e=>{
  }
  e.preventDefault();
  moveGalleryGhost(e.clientX,e.clientY);
+ // When the gallery contains many thumbnails, drag near either rail edge to
+ // reveal off-screen photo slots without lifting the finger.
+ const rail=galleryGrid.querySelector('.image-rail');
+ if(rail){
+  const bounds=rail.getBoundingClientRect();
+  if(e.clientY>=bounds.top-15&&e.clientY<=bounds.bottom+15){
+   if(e.clientX>bounds.right-32)rail.scrollLeft+=15;
+   else if(e.clientX<bounds.left+32)rail.scrollLeft-=15;
+  }
+ }
  // Allow a held image to reach the trash below the thumbnail rail on short phones.
  const scrollArea=$('#backdrop .editorcontent');
  if(scrollArea){
