@@ -1,5 +1,5 @@
 import { createSession, sessionCookie, verifySession } from "./_lib.js";
-import { canonicalProductPath, isVerifiedCommercialSku } from "./_storefront-route.js";
+import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
   const attr = property ? "property" : "name";
@@ -20,6 +20,49 @@ export async function onRequest(context) {
     const headers = new Headers(response.headers);
     headers.append('Set-Cookie', sessionCookie(token));
     return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  }
+  // Canonical catalog routes are real server-rendered entry points to the same
+  // Storefront app. Never route them through product detail SQL or a blank 404.
+  const catalogMatch = url.pathname.match(/^\/sanpham(?:\/([a-z0-9][a-z0-9-]{0,99}))?\/?$/i);
+  if (catalogMatch) {
+    if (context.request.method !== "GET" && context.request.method !== "HEAD")
+      return new Response("Method not allowed", { status: 405 });
+    let categorySlug = (catalogMatch[1] || "").toLowerCase();
+    const legacyCategories = { vida: "vinam", "giay-tay": "giaytay", "giay-luoi": "giayluoi" };
+    categorySlug = legacyCategories[categorySlug] || categorySlug;
+    const canonicalPath = categorySlug ? "/sanpham/" + categorySlug : "/sanpham";
+    if (url.pathname !== canonicalPath) return Response.redirect(new URL(canonicalPath + url.search, url.origin), 301);
+    if (categorySlug && !isKnownCatalogCategoryRoute(categorySlug)) {
+      if (!context.env?.DB) return new Response("Danh mục chưa sẵn sàng.", {status:503});
+      try {
+        const rows = await context.env.DB.prepare("SELECT DISTINCT category FROM products WHERE published=1").all();
+        if (!(rows.results || []).some(row => productCategoryRouteSlug(row.category) === categorySlug))
+          return new Response("Không tìm thấy danh mục.", {status:404,headers:{"X-Robots-Tag":"noindex, nofollow"}});
+      } catch { return new Response("Không thể tải danh mục.", {status:503}); }
+    }
+    const response = await context.next(new Request(new URL("/index.html",url.origin), {
+      method:context.request.method,headers:context.request.headers
+    }));
+    if (!response.ok || !(response.headers.get("content-type") || "").includes("text/html")) return response;
+    let html = await response.text();
+    const catalogTitle = categorySlug ? "Danh mục " + categorySlug + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest";
+    const catalogDescription = categorySlug
+      ? "Khám phá sản phẩm thuộc danh mục " + categorySlug + " tại SinDarealest."
+      : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.";
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(catalogTitle) + "</title>");
+    html = meta(html, "description", catalogDescription);
+    html = meta(html, "og:title", catalogTitle, true);
+    html = meta(html, "og:description", catalogDescription, true);
+    html = meta(html, "og:url", url.origin + canonicalPath, true);
+    const canonicalTag = '<link rel="canonical" href="' + escapeHtml(url.origin + canonicalPath) + '">';
+    html = /<link\s+rel=["']canonical["']/i.test(html)
+      ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
+      : html.replace("</head>", "  " + canonicalTag + "\n</head>");
+    const headers = new Headers(response.headers);
+    headers.set("Content-Type","text/html; charset=utf-8");
+    headers.set("Cache-Control","public, max-age=60, s-maxage=300");
+    for (const key of ["Content-Length","Content-Encoding","ETag"]) headers.delete(key);
+    return new Response(html,{status:200,headers});
   }
   const legacyMatch = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   const modernMatch = url.pathname.match(/^\/sanpham\/([a-z0-9][a-z0-9-]{0,99})\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
