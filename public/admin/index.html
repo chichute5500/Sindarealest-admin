@@ -652,10 +652,6 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   #imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}
   #imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-align:start}
   #imageGrid .image-rail .imageitem img{aspect-ratio:1;object-fit:cover}
-  #imageGrid .image-rail .imagebuttons{gap:2px;padding:3px 0;justify-content:flex-start}
-  #imageGrid .image-rail .imagebuttons button{width:18px;height:18px;border-radius:6px}
-  #imageGrid .image-rail .imagebuttons button svg{width:10px;height:10px}
-  #imageGrid .imagebuttons{gap:3px}
 }
 @media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:52px;width:52px}}
 :root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}
@@ -1413,10 +1409,31 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 .product-quick-editor button{min-height:31px;padding:5px 9px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;font-size:11px;cursor:pointer}
 .product-quick-editor .product-quick-save{background:#e3f1fb;border-color:#8bbfe1;color:#17415d;font-weight:750}
 .product-quick-editor .product-quick-save:disabled{opacity:.5}
-#imageGrid .imageitem{position:relative}
-#imageGrid .image-drag-handle{position:absolute;z-index:3;right:7px;top:6px;display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(255,255,255,.8);border-radius:9px;background:rgba(235,247,255,.89);color:#264b67;font-size:18px;font-weight:700;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
-#imageGrid .imageitem.is-pointer-dragging{outline:3px solid #4289be;outline-offset:-3px;opacity:.65}
+
+/* Whole-photo gesture replaces all per-photo edit/drag/delete controls. */
+#main .product-table tbody tr[data-product-row]{cursor:pointer}
+#main .product-table tbody tr[data-product-row]:focus-visible{outline:2px solid #5a9dcc;outline-offset:-2px}
+#main .product-table tbody tr[data-product-row]:hover{background:rgba(125,186,226,.055)}
+#imageGrid .imageitem{position:relative;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#imageGrid .imageitem:active{cursor:grabbing}
+#imageGrid .imageitem img{pointer-events:none;-webkit-user-drag:none;-webkit-user-select:none;user-select:none}
+#imageGrid .imageitem.is-pointer-dragging{opacity:.65;outline:3px solid #4289be;outline-offset:-3px}
 #imageGrid .imageitem.is-drop-target{box-shadow:0 0 0 3px #4e99d0,inset 0 0 0 3px #e8f8ff}
+.gallery-add-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.gallery-add-row>.tiny{flex:1;min-width:120px}
+.gallery-add-row .btn{white-space:nowrap}
+.gallery-trash-row{display:flex;justify-content:center;align-items:center;padding:11px 0 3px}
+.gallery-trash{display:flex;align-items:center;justify-content:center;width:54px;height:50px;border:1px dashed rgba(124,143,160,.45);border-radius:15px;color:#7e8994;background:rgba(218,236,247,.38);transition:background .14s,border-color .14s,transform .14s}
+.gallery-trash.is-empty{opacity:.38}
+.gallery-trash.is-drop-target{color:#a83737;border:2px solid #d44c52;background:rgba(242,76,85,.16);transform:scale(1.12)}
+:root[data-admin-theme="dark"] .gallery-trash{background:rgba(30,55,74,.66);color:#bfd0df}
+.gallery-held-preview{position:fixed;inset:0;z-index:9999;display:flex;justify-content:center;align-items:center;padding:20px;background:rgba(7,17,28,.83);pointer-events:none;animation:sd-gallery-hold-show .13s ease-out}
+.gallery-held-preview img{display:block;max-width:min(94vw,1100px);max-height:90dvh;width:auto;height:auto;object-fit:contain;border-radius:12px;box-shadow:0 15px 45px rgba(0,0,0,.38)}
+.gallery-drag-ghost{position:fixed;z-index:10000;width:72px;height:72px;padding:3px;border-radius:11px;box-shadow:0 10px 25px rgba(0,0,0,.24);background:rgba(232,244,253,.95);pointer-events:none;transform:rotate(-4deg)}
+.gallery-drag-ghost img{display:block;width:100%;height:100%;object-fit:cover;border-radius:8px}
+@keyframes sd-gallery-hold-show{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.gallery-held-preview{animation:none}.gallery-trash{transition:none}}
+@media(max-width:680px){#main .product-table tbody tr[data-product-row]:active{background:rgba(125,186,226,.09)}}
 @media(max-width:680px){
  #main .product-table .product-quick-editor{max-width:100%;gap:3px;padding:4px}
  #main .product-table .product-quick-editor select,#main .product-table .product-quick-editor input{font-size:12px;max-width:158px}
