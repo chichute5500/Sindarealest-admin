@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { onRequest as middleware } from "../functions/_middleware.js";
+const pub=(name)=>readFileSync(new URL("../public/"+name,import.meta.url));
+const html=pub("index.html").toString("utf8");
+assert.equal(pub("logo.png").subarray(0,8).toString("hex"),"89504e470d0a1a0a");
+assert.equal(pub("images/brand-emblem.png").subarray(0,8).toString("hex"),"89504e470d0a1a0a");
+assert.equal(pub("og-sindarealest.jpg").subarray(0,2).toString("hex"),"ffd8");
+for(const [n,size] of [["favicon-16x16.png",16],["favicon-32x32.png",32],["favicon-48x48.png",48],["apple-touch-icon.png",180],["android-chrome-192x192.png",192],["android-chrome-512x512.png",512]]){
+ const b=pub(n);assert.equal(b.subarray(0,8).toString("hex"),"89504e470d0a1a0a",n);
+ assert.equal(b.readUInt32BE(16),size,n);assert.equal(b.readUInt32BE(20),size,n);
+}
+assert.equal(pub("favicon.ico").readUInt16LE(2),1);
+assert.equal(JSON.parse(pub("site.webmanifest")).short_name,"SinDarealest");
+assert.match(html,/<link rel="icon" type="image\/x-icon" href="\/favicon\.ico/);
+assert.match(html,/<meta property="og:image" content="https:\/\/sindarealest2\.pages\.dev\/og-sindarealest\.jpg"/);
+assert.ok(html.includes('name="google-site-verification"'));
+const site="https://sindarealest2.pages.dev";
+const doc='<html><head><title>Home</title><meta property="og:image" content="/og-sindarealest.jpg"><meta name="twitter:image" content="/og-sindarealest.jpg"></head><body>Body</body></html>';
+const context=(path,row)=>({request:new Request(site+path),env:{DB:{prepare(){return {bind(){return {first:async()=>row}}}}}},next:async()=>new Response(doc,{headers:{"Content-Type":"text/html"}})});
+const home=await (await middleware(context("/",null))).text();
+assert.ok(home.includes('property="og:image" content="'+site+'/og-sindarealest.jpg"'));
+const category=await (await middleware(context("/sanpham/sneaker",null))).text();
+assert.ok(category.includes('property="og:image" content="'+site+'/og-sindarealest.jpg"'));
+assert.ok(category.includes('name="twitter:image" content="'+site+'/og-sindarealest.jpg"'));
+const item={id:"shoe-1",slug:"shoe-1",sku:"SD-SN001",sku_verified:1,published:1,title:"Sneaker",category:"sneakers",images_json:'["/media/12345678-1234-1234-1234-123456789012.webp"]'};
+const detail=await middleware(context("/sanpham/sneaker/SD-SN001",item));
+assert.equal(detail.status,200);
+const content=await detail.text();
+assert.ok(content.includes('property="og:image:type" content="image/webp"'));
+console.log("PASS: authentic SinDarealest logo, favicon/manifest assets and absolute social sharing previews.");

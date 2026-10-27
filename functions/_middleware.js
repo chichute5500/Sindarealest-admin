@@ -69,6 +69,12 @@ export async function onRequest(context) {
     html = meta(html, "og:title", catalogTitle, true);
     html = meta(html, "og:description", catalogDescription, true);
     html = meta(html, "og:url", url.origin + canonicalPath, true);
+    // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
+    // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
+    html = meta(html, "og:image", url.origin + "/og-sindarealest.jpg", true);
+    html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest.jpg", true);
+    html = meta(html, "twitter:image", url.origin + "/og-sindarealest.jpg");
+    html = meta(html, "twitter:card", "summary_large_image");
     const canonicalTag = '<link rel="canonical" href="' + escapeHtml(url.origin + canonicalPath) + '">';
     html = /<link\s+rel=["']canonical["']/i.test(html)
       ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
@@ -87,6 +93,7 @@ export async function onRequest(context) {
     let html = await response.text();
     html = meta(html, "og:url", `${url.origin}/`, true);
     html = meta(html, "og:image", `${url.origin}/og-sindarealest.jpg`, true);
+    html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest.jpg`, true);
     html = meta(html, "twitter:image", `${url.origin}/og-sindarealest.jpg`);
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
@@ -121,6 +128,12 @@ export async function onRequest(context) {
   html = meta(html, "og:description", description, true);
   html = meta(html, "og:url", canonical, true);
   html = meta(html, "og:image", new URL(imagePath, url.origin).href, true);
+  html = meta(html, "og:image:secure_url", new URL(imagePath, url.origin).href, true);
+  html = meta(html, "og:image:type", imagePath.toLowerCase().endsWith(".webp") ? "image/webp" : "image/jpeg", true);
+  if (imagePath.toLowerCase().endsWith(".webp")) {
+    // The product's original WebP dimensions are not the homepage OG dimensions.
+    html = html.replace(/<meta\\s+property=["']og:image:(?:width|height)["'][^>]*>\\s*/gi, "");
+  }
   html = meta(html, "og:image:alt", product.title, true);
   html = meta(html, "twitter:card", "summary_large_image");
   html = meta(html, "twitter:title", title);
