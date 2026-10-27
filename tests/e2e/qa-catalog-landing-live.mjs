@@ -21,7 +21,7 @@ function mark(record){
  if(!record.pass)failures++;
 }
 try{
-for (const mode of [
+qaModes: for (const mode of [
   {name:'desktop',viewport:{width:1440,height:900},isMobile:false,hasTouch:false},
   {name:'mobile',viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2}
 ]){
@@ -35,8 +35,8 @@ for (const mode of [
    page.on('response',r=>{if(new URL(r.url()).pathname==='/api/products')apiStatus=r.status()});
    try{
     const response=await page.goto(site+test.path,{waitUntil:'domcontentloaded',timeout:50000});
-    await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:30000});
-    await page.waitForFunction(()=>!document.querySelector('#welcomeSplash'),null,{timeout:12000});
+    await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:9000});
+    await page.waitForFunction(()=>!document.querySelector('#welcomeSplash'),null,{timeout:7000});
     await page.locator('#catalogHeading').waitFor({state:'visible',timeout:12000});
     await page.locator('#catalogGrid .product-card').first().waitFor({state:'visible',timeout:12000});
     await page.waitForTimeout(200);
@@ -87,6 +87,7 @@ for (const mode of [
     mark({device:mode.name,theme,route:test.path,pass:false,error:String(e).slice(0,650),pageErrors,apiStatus});
     try{await page.screenshot({path:join(output,'FAIL-'+mode.name+'-'+theme+test.path.replaceAll('/','_')+'.png')})}catch{}
    }finally{await page.close()}
+   if(failures>=2){console.log('Fast fail: stop after two browser errors; inspect Preview configuration.');break qaModes;}
   }
   await ctx.close();
  }
