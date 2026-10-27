@@ -9,7 +9,8 @@ const items=[
  {id:'qa-shoe',sku:'QA-SHOE-001',title:'Giày lười kiểm thử',category:'loafers',categoryLabel:'Giày lười'},
  {id:'qa-belt',sku:'QA-BELT-001',title:'Thắt lưng kiểm thử',category:'belts',categoryLabel:'Thắt lưng'},
  {id:'qa-phone',sku:'QA-PHONE-001',title:'Ốp điện thoại kiểm thử',category:'phone-cases',categoryLabel:'Ốp điện thoại'},
- {id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví không size',category:'wallets',categoryLabel:'Ví nam'}
+ {id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví không size',category:'wallets',categoryLabel:'Ví nam'},
+ {id:'qa-boot',sku:'QA-BOOT-001',title:'Giày boot kiểm thử',category:'giay-boot',categoryLabel:'Giày boot'}
 ].map(p=>({...p,slug:p.id,skuVerified:true,images:['images/brand-emblem.png'],description:'Mock data, no real purchases',price:100000,sourcePriceConfirmed:true,fulfillmentType:'made_to_order',published:true}));
 for(const cfg of [
  {label:'mobile-light',w:390,h:844,scheme:'light'},
@@ -57,6 +58,9 @@ for(const cfg of [
   await page.locator('#sdDetailOption').fill('iPhone 16 Pro Max');
   await page.screenshot({path:dir+'/phone-'+cfg.label+'.png',animations:'disabled'});
   await page.locator('#detailAdd').click();
+  await close();
+  await open('qa-boot');
+  await expect(page.locator('#sdDetailOption option')).toHaveCount(8);
   await close();
   await open('qa-wallet');
   await expect(page.locator('#detailVariants')).toBeHidden();
