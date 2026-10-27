@@ -28,6 +28,77 @@ export async function onRequestPut(context) {
   } catch (error) { return genericDbError(error); }
 }
 
+// Single-field quick edits on Admin cards. Unlike PUT, this never replaces
+// other fields that another editor may have modified since the list was loaded.
+export async function onRequestPatch(context) {
+  const auth = await requireAdmin(context);
+  if (auth.response) return auth.response;
+  const id = String(context.params.id || "");
+  const parsed = await readJsonBodyLimited(context.request, 32 * 1024);
+  if (parsed.error === "too_large") return fail("Thao tác vượt giới hạn dữ liệu.", 413);
+  const input = parsed.value;
+  if (parsed.error || !input || typeof input !== "object" || Array.isArray(input)) return fail("Thao tác chỉnh nhanh không hợp lệ.");
+  const { field, value, expectedValue } = input;
+  if (!["category", "price", "images", "fulfillmentType"].includes(field) || !Object.hasOwn(input, "expectedValue")) return fail("Trường chỉnh nhanh không hợp lệ.");
+  try {
+    const row = await context.env.DB.prepare("SELECT * FROM products WHERE id=? LIMIT 1").bind(id).first();
+    if (!row) return fail("Không tìm thấy sản phẩm.", 404);
+    const existing = fromRow(row);
+    const before = field === "fulfillmentType" ? existing.fulfillmentType : field === "category"
+      ? { category: existing.category, categoryLabel: existing.categoryLabel }
+      : field === "images" ? existing.images : existing.price;
+    if (JSON.stringify(before) !== JSON.stringify(expectedValue))
+      return fail("Sản phẩm đã được chỉnh sửa từ thiết bị khác. Hãy tải lại rồi thử lại.", 409);
+
+    let updates;
+    let checkInput = {
+      title: existing.title, sku: existing.sku, skuVerified: existing.skuVerified,
+      category: existing.category, categoryLabel: existing.categoryLabel,
+      description: existing.description, price: existing.price, stock: existing.stock,
+      published: existing.published, images: existing.images,
+      fulfillmentType: existing.fulfillmentType
+    };
+    if (field === "category") {
+      if (!value || typeof value !== "object" || Array.isArray(value) ||
+          typeof value.category !== "string" || !/^[a-z0-9-]{1,80}$/.test(value.category) ||
+          typeof value.categoryLabel !== "string" || !value.categoryLabel.trim() ||
+          value.categoryLabel.length > 80) return fail("Danh mục không hợp lệ.", 400);
+      checkInput.category = value.category;
+      checkInput.categoryLabel = value.categoryLabel;
+    } else if (field === "price") {
+      checkInput.price = value;
+    } else if (field === "fulfillmentType") {
+      checkInput.fulfillmentType = value;
+    } else {
+      checkInput.images = value;
+    }
+    const checked = validateProduct(checkInput, existing);
+    if (checked.error) return fail(checked.error, 400);
+    const after = checked.value;
+    if (field === "category") {
+      updates = context.env.DB.prepare("UPDATE products SET category=?, category_label=?, updated_at=datetime('now') WHERE id=? AND category=? AND category_label=?")
+        .bind(after.category, after.categoryLabel, id, row.category, row.category_label);
+    } else if (field === "fulfillmentType") {
+      updates = context.env.DB.prepare("UPDATE products SET fulfillment_type=?, updated_at=datetime(\'now\') WHERE id=? AND fulfillment_type=?")
+        .bind(after.fulfillmentType, id, row.fulfillment_type);
+    } else if (field === "price") {
+      updates = context.env.DB.prepare("UPDATE products SET price=?, source_price_confirmed=?, updated_at=datetime('now') WHERE id=? AND price IS ?")
+        .bind(after.price, after.sourcePriceConfirmed ? 1 : 0, id, row.price);
+    } else {
+      updates = context.env.DB.prepare("UPDATE products SET images_json=?, updated_at=datetime('now') WHERE id=? AND images_json=?")
+        .bind(JSON.stringify(after.images), id, row.images_json);
+    }
+    const results = await context.env.DB.batch([
+      updates,
+      context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'product_inline_updated', 'product', ?, ? WHERE changes()=1")
+        .bind(crypto.randomUUID(), id, JSON.stringify({ sku: existing.sku, field }))
+    ]);
+    if (Number(results?.[0]?.meta?.changes) !== 1)
+      return fail("Dữ liệu đã thay đổi trong lúc chỉnh sửa. Hãy tải lại danh sách.", 409);
+    return json({ ok:true, message:"Đã cập nhật sản phẩm.", field, product:toAdminProduct(after) });
+  } catch(error) { return genericDbError(error); }
+}
+
 export async function onRequestDelete(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;

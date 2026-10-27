@@ -114,9 +114,9 @@ assert.match(adminHtml, /main\.querySelectorAll\('\[data-action=save-order-detai
 has('data-claim-status="${esc(c.id)}" aria-label="Trạng thái yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim status');
 has('data-claim-note="${esc(c.id)}" aria-label="Ghi chú quản trị cho yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty admin note');
 has('data-action="save-claim" data-id="${esc(c.id)}" aria-label="Lưu yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim save action');
-has('aria-label="Chuyển ảnh ${i+1} lên"', 'gallery reorder-up accessible name');
-has('aria-label="Chuyển ảnh ${i+1} xuống"', 'gallery reorder-down accessible name');
-has('aria-label="Xóa ảnh ${i+1}"', 'gallery remove accessible name');
+has('Giữ để phóng to, kéo để đổi vị trí, phím Delete để gỡ ảnh.', 'whole-image gallery keyboard and screenreader instructions');
+has('id="galleryTrash" class="gallery-trash" role="region" aria-label="Thả ảnh vào đây để xóa khỏi bộ ảnh"', 'single accessible gallery drop-to-trash zone');
+has("galleryGrid.addEventListener('keydown'", 'keyboard image reorder/remove fallback');
 has('id="pPublished" type="checkbox" aria-label="Hiển thị sản phẩm"', 'published toggle accessible name');
 has('id="showPrices" type="checkbox" aria-label="Hiển thị giá trên website"', 'public price toggle accessible name');
 has('id="welcomeEnabled" type="checkbox" aria-label="Bật lớp phủ chào mừng"', 'welcome overlay toggle accessible name');
@@ -232,14 +232,12 @@ assert.match(adminHtml, /async function showOrderCustomerProfile\(searchTerm\)/,
 assert.match(baselineSpec, /await expect\(page\.locator\('\.order-detail-page'\)\)\.toBeVisible\(\);/,
   'Order-detail capture should wait for the dedicated page to render');
 
-// The reorder/remove gallery controls use SVG artwork, not Unicode text glyphs, while
-// retaining record-specific accessible names and remaining legible in both themes.
-for (const action of ['up', 'down', 'remove']) {
-  assert.match(adminHtml, new RegExp('data-gallery="' + action + '"[^>]*><svg[^>]*aria-hidden="true"'),
-    'Gallery action ' + action + ' should render an aria-hidden inline SVG icon');
-}
-assert.doesNotMatch(adminHtml, /data-gallery="(?:up|down|remove)"[^>]*>(?:←|→|×)<\/button>/,
-  'Gallery controls must not fall back to Unicode arrow/delete glyphs');
+// Owner replaced per-image buttons with whole-image gestures and one small
+// accessible SVG trash drop target beneath the gallery. Keep them absent.
+assert.match(adminHtml, /id="galleryTrash"[^>]*>[\\s\\S]*?<svg[^>]*aria-hidden="true"/,
+  'Bottom-only photo trash zone must contain decorative line-art SVG');
+assert.doesNotMatch(adminHtml, /data-gallery="(?:up|down|remove)"|data-image-drag-handle/,
+  'Gallery must not show old arrows, per-image bins or drag grips');
 
 assert.match(adminHtml, /<option value="all">Tất cả<\/option>/, 'Mobile category filter should use a short all-categories label');
 assert.match(adminHtml, /placeholder="Ví dụ: Bảo hành đường may"/, 'Warranty-policy placeholder should fit small phone widths');
@@ -301,7 +299,7 @@ has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab sta
 has("for(const panel of $$('.editor-tab-panel'))panel.hidden=panel.dataset.productPanel!==name", 'all editor tab panels are iterated without throwing when the editor opens');
 has("const editorContent=$('#backdrop .editorcontent');if(editorContent)editorContent.scrollTop=0", 'switching editor tabs resets the shared scroll position so the selected panel starts at its heading');
 has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End tab keyboard navigation');
-has("function openEditor(p){setProductEditorTab('details');", 'product editor resets to the details tab when opened');
+has("function openEditor(p,initialTab='details'){setProductEditorTab('details');", 'product editor defaults to details, while allowing image tap to open gallery');
 has('<form id="productForm" novalidate>', 'custom product validation can reveal invalid controls hidden in another tab');
 has('function syncProductIdentityValidity()', 'product editor rejects whitespace-only identity fields');
 has("title.setCustomValidity(title.value.trim()?'':'Vui lòng nhập tên sản phẩm.')", 'title validation is based on trimmed content');
@@ -323,9 +321,9 @@ assert.match(baselineSpec, /await page\.locator\('#productTabGallery'\)\.click\(
 // Mobile gallery layout must give the primary cover priority without hiding controls or losing narrow-screen support.
 has('function renderGalleryItem(g,i)', 'shared gallery thumbnail renderer');
 has('class="image-cover-slot"', 'featured cover occupies its own responsive row');
-has('class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ, vuốt ngang để xem thêm"', 'thumbnail rail has an accessible Vietnamese group label');
+has('class="image-rail" role="group" aria-label="Dải ảnh thu nhỏ"', 'thumbnail rail has an accessible Vietnamese group label');
 has('#imageGrid .image-cover-slot .imageitem img{aspect-ratio:1.75/1;object-fit:contain;background:rgba(218,235,247,.40)}', 'cover image keeps its full composition visible on mobile');
-has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}', 'supporting thumbnails form a horizontally scrollable rail');
+has('#imageGrid .image-rail{display:flex;grid-column:1/-1;max-width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:none;scrollbar-width:thin;padding-bottom:3px;-webkit-overflow-scrolling:touch}', 'supporting thumbnails form a horizontally scrollable rail');
 has('#imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-align:start}', 'thumbnail rail uses fixed mobile targets and snap points');
 
 
@@ -357,7 +355,7 @@ has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:a
 
 has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:52px;width:52px}}', 'thumbnail rail remains touchable on narrow phones');
 has(':root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
-has('aria-label="Chuyển ảnh ${i+1} lên"', 'accessible gallery reorder controls remain present');
+has('role="group" tabindex="0" aria-label="Ảnh ', 'whole-photo keyboard-focusable gallery entries remain accessible');
 has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('')", 'all supporting images are rendered inside the mobile thumbnail rail');
 
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');

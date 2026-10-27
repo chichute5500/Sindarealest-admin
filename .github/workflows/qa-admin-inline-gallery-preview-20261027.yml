@@ -1,0 +1,96 @@
+name: Owner Admin inline edit and touch gallery Preview (ISOLATED)
+# Owner QA: 28-image swipe inertia and long-hold vertical UP/DOWN reorder on real Chromium touch emulation; desktop/mobile legacy gestures unchanged.
+on:
+  push:
+    branches:
+      - feature/admin-inline-edit-photo-drag-preorder-2026-10-27
+    paths:
+      - '.github/workflows/qa-admin-inline-gallery-preview-20261027.yml'
+permissions:
+  contents: read
+concurrency:
+  group: owner-admin-inline-preview-swipe-updown-systemchrome-20261028
+  cancel-in-progress: true
+jobs:
+  preview:
+    name: Validate current SHA and deploy isolated nonproduction Admin Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_PREVIEW_BRANCH: owner-admin-quickedit-1027
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Require exact feature branch, no Production mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feature/admin-inline-edit-photo-drag-preorder-2026-10-27"
+          test "$CF_TARGET" = "sindarealest-admin-preview"
+          test "$CF_PREVIEW_BRANCH" != "main"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Validate all source and unit/integration tests
+        run: |
+          npm install --no-fund
+          npm run check
+          npm test
+      - name: Verify isolated Admin Preview is bound to a different D1/R2 from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-preview.json"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest2" > "$RUNNER_TEMP/production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-preview.json" "$RUNNER_TEMP/production.json"
+      - name: Deploy only isolated Pages branch Preview, never production
+        run: |
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_PREVIEW_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "Owner inline editor + touch image reorder $GITHUB_SHA"
+      - name: Prepare browser gesture tests with existing Chrome on GitHub runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 95s npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          if command -v google-chrome >/dev/null 2>&1; then
+            google-chrome --version
+            echo "SD_OWNER_QA_SYSTEM_CHROME=1" >> "$GITHUB_ENV"
+          else
+            echo "System Chrome missing; install Chromium browser only (bounded)."
+            timeout 110s npx playwright install chromium
+          fi
+      - name: Test gestures on PC/mobile and swipe through 28 product photos without reordering
+        shell: bash
+        env:
+          LOCAL_ADMIN_URL: http://127.0.0.1:4173/admin/
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public > "$RUNNER_TEMP/owner-admin-server.log" 2>&1 &
+          for i in $(seq 1 25); do
+            if curl -fsS http://127.0.0.1:4173/admin/ >/dev/null; then break; fi
+            sleep .3
+          done
+          npx playwright test tests/e2e/admin-photo-gesture-owner.spec.js tests/e2e/admin-long-gallery-swipe.spec.js --config=playwright.owner-gesture.config.js --reporter=list
+      - name: Upload Owner gesture visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owner-admin-photo-gestures-${{ github.sha }}
+          path: |
+            artifacts/admin-owner-photo-gesture/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Report exact Preview URL
+        run: |
+          echo "Owner review: https://owner-admin-quickedit-1027.sindarealest-admin-preview.pages.dev/admin/"
+          echo "Source SHA: $GITHUB_SHA"

@@ -28,7 +28,7 @@ assert.ok(admin.includes('id="notificationPanel"'), "Notification center missing
 assert.ok(lib.includes("const SESSION_SECONDS = 10 * 60"), "Session should expire after ten minutes without a renewed request");
 assert.ok(middleware.includes("sessionCookie(token)"), "Valid admin API activity should renew session cookie");
 assert.ok(products.includes("SELECT sku FROM products"), "SKU generation should use server-side database data");
-assert.ok(admin.includes("data-image-index") && admin.includes("text/x-sd-image-index"), "Admin gallery should support drag-and-drop reordering");
+assert.ok(admin.includes("data-image-index") && admin.includes("galleryGrid.addEventListener(\'pointerdown\'") && admin.includes("moveGalleryImage(from,target.index)"), "Admin gallery should support whole-photo drag-and-drop reordering without handles");
 assert.ok(admin.includes("Liquid Glass admin skin"), "Admin should use the matching Liquid Glass visual system");
 assert.ok(admin.includes('<svg viewBox="0 0 24 24" aria-hidden="true">'), "Admin navigation should use consistent line icons");
 assert.ok(middleware.includes("lower(id)=?"), "Product URLs should support immutable IDs");
