@@ -9,6 +9,8 @@ on:
       - 'functions/_product-options.js'
       - 'tests/product-options-flow.test.mjs'
       - 'tests/e2e/product-options-mobile-desktop.spec.js'
+      - 'tests/e2e/product-options-admin-mobile-desktop.spec.js'
+      - 'public/admin/index.html'
       - 'package.json'
 permissions:
   contents: read
@@ -56,7 +58,7 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep .3
           done
-          npx playwright test tests/e2e/product-options-mobile-desktop.spec.js --config=playwright.owner-gesture.config.js --reporter=list
+          npx playwright test tests/e2e/product-options-mobile-desktop.spec.js tests/e2e/product-options-admin-mobile-desktop.spec.js --config=playwright.owner-gesture.config.js --reporter=list
       - name: Verify nonproduction Cloudflare D1/R2 project isolation
         shell: bash
         env:
