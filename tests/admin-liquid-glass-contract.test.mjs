@@ -86,23 +86,15 @@ assert.match(adminHtml, /customer-mobile-extra[\\s\\S]*?c\\.email\\|\\|'Chưa cu
 assert.doesNotMatch(adminHtml, /customer-mobile-(?:total|revenue|amount)/,
   'Customer cards must not invent order totals/revenue that the endpoint does not return');
 
-// Orders stay summary-first and use local search/status/payment filters on already-loaded orders.
-has('const filteredOrders=orders.filter', 'orders filters operate only on the currently loaded orders array');
-has('id="orderSearchBox"', 'orders list exposes a labeled search field');
-has('id="orderStatusFilter"', 'orders list exposes an order-status filter');
-has('id="orderPaymentFilter"', 'orders list exposes a payment-status filter');
-has('id="orderResultSummary"', 'orders result count is announced accessibly');
-has('class="order-mobile-summary"', 'mobile order cards expose a compact summary using existing order fields');
-has('#main .order-table tbody tr td:nth-child(-n+6){display:none!important}', 'mobile order card hides secondary table cells until editing is opened');
-has('<details class="order-management-details"><summary class="order-management-summary">Quản lý giá, trạng thái & thanh toán</summary>', 'per-order management disclosure starts compact and opens on demand');
-has('<label class="tiny muted order-price-entry">Giá/đơn vị (VNĐ)<input class="control"', 'one per-item price control is kept in the product cell to avoid duplicate API values');
-has('#main .order-table .order-price-entry{display:none}', 'mobile price entry stays hidden while order tools are collapsed');
-has('#main .order-table tbody tr:has(.order-management-details[open]) .order-price-entry{display:grid;gap:4px;width:100%;margin-top:8px}', 'expanding mobile order tools reveals the existing single price entry');
-has("const orderToolsMedia=window.matchMedia('(max-width:680px)');const syncOrderToolsDisclosure=()=>main.querySelectorAll('.order-management-details').forEach(details=>{details.open=false})", 'order management starts collapsed on every viewport');
-has('#main .order-table .order-management-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(92,145,185,.08);color:var(--ink);font-size:11px;font-weight:750;cursor:pointer}', 'touch-friendly order-management disclosure summary');
-has('#main .order-table .order-management-details:not([open])>.order-management-content{display:none!important}', 'closed order disclosures explicitly hide management content');
-has('@media(min-width:681px){\n#main .order-table .order-management-details{min-width:210px}\n#main .order-table .order-management-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(92,145,185,.08);color:var(--ink);font-size:10px;font-weight:750;cursor:pointer}\n#main .order-table .order-management-summary::-webkit-details-marker{display:none}\n#main .order-table .order-management-summary::marker{content:"";display:none}\n#main .order-table .order-management-summary::after{content:"+";flex:0 0 auto;font-size:17px;line-height:1}\n#main .order-table .order-management-details[open]>.order-management-summary::after{content:"−"}\n#main .order-table .order-management-content{padding-top:10px}\n}', 'desktop order controls use the same compact liquid-glass disclosure style');
-
+// Owner-approved order redesign: tappable cards and a focused detail screen.
+for(const token of ['const filteredOrders=orders.filter','id="orderSearchBox"','id="orderStatusFilter"','id="orderPaymentFilter"','id="orderResultSummary"',
+ 'class="sd-order-cards"','data-order-open="${esc(o.id)}"','class="sd-order-advanced"','data-action="record-payment"',
+ 'data-action="record-refund"','data-next-status="${nextStatus}"','sdAdminEditor:true']){
+ has(token,'focused order workflow: '+token);
+}
+has('#main .sd-order-cards{display:grid','card layout and responsive styles');
+has("card.addEventListener('keydown'",'keyboard support for whole order cards');
+has("if(!$('#backdrop').classList.contains('hidden'))",'history Back checks editor first');
 // The product editor remains a modal; Order detail is a standalone screen with an Escape-to-list route.
 has('function activateAdminModal(backdrop,initialFocusSelector)', 'modal initial focus setup');
 has('function deactivateAdminModal(backdrop)', 'modal aria-hidden and focus restoration');
@@ -112,17 +104,13 @@ has("if(e.key==='Escape'&&view==='order-detail'){e.preventDefault();closeOrderDe
 has("if(e.key==='Escape'){e.preventDefault();closeEditor();return}", 'Escape closes the currently open product editor modal');
 
 // Accessible names for repeated controls must identify the affected record, not just say "Save".
-has('data-order-status="${esc(o.id)}" aria-label="Trạng thái đơn hàng ${esc(o.order_number)}"', 'accessible per-order status select');
 has('Đã thanh toán (đã xác minh)', 'payment status must be presented as a ledger-derived, read-only label');
 has('data-action="record-payment"', 'admin must have an explicit manual verification action for real bank receipts');
 assert.doesNotMatch(adminHtml, /data-payment-status=/, 'payment status must not be directly editable in the order UI');
 
-assert.match(adminHtml, /data-order-detail-status=\"\$\{esc\(order\.id\)\}\"/, 'Order detail must expose the order-status control bound to the selected order in the approved Screen 7 reference');
 assert.match(adminHtml, /data-action=\"save-order-detail-status\"/, 'Order detail must provide a direct update action instead of requiring navigation back to the orders list');
 assert.match(adminHtml, /main\.querySelectorAll\('\[data-action=save-order-detail-status\]'\)/, 'The dedicated order-detail update action must be wired to the existing Admin orders PATCH API');
-assert.match(adminHtml, /order-detail-status-grid/, 'Order detail status and read-only payment state must be grouped in a compact responsive section');
 
-has('data-action="save-order" data-id="${esc(o.id)}" aria-label="Lưu đơn hàng ${esc(o.order_number)}"', 'accessible per-order save action');
 has('data-claim-status="${esc(c.id)}" aria-label="Trạng thái yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim status');
 has('data-claim-note="${esc(c.id)}" aria-label="Ghi chú quản trị cho yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty admin note');
 has('data-action="save-claim" data-id="${esc(c.id)}" aria-label="Lưu yêu cầu bảo hành ${esc(c.id)}"', 'accessible warranty claim save action');
@@ -224,11 +212,10 @@ assert.match(baselineSpec, /fixtureImages: 6/,
 // Guard the visual-capture harness against flaky scrolling of hidden desktop-only table rows.
 assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
   'Visual capture should pass viewport/theme context into screen-specific setup');
-assert.match(adminHtml, /mobilecards/,
-  'Responsive order tables should provide the mobile-card layout checked by the visual matrix');
+assert.match(adminHtml, /sd-order-cards/,
+  'Responsive order cards work at desktop and mobile widths');
 assert.match(baselineSpec, /captureView\('order-detail', 'orders'/,
   'The visual matrix should exercise Order detail as a dedicated route from the Orders screen');
-assert.match(adminHtml, /\.order-detail-customer-card\{display:grid;grid-template-columns:42px minmax\(0,1fr\) auto/, 'Order detail should render a compact customer identity/contact card with a distinct action');
 assert.match(adminHtml, /\.activity-log-cards\{display:none\}/, 'Activity log should keep an explicit desktop/table and mobile/card presentation split');
 assert.match(adminHtml, /id="activityAdvancedToggle"/, 'Screen 12 should expose expandable advanced search controls rather than pushing the event list below mobile navigation');
 assert.match(adminHtml, /activity-log-push-settings/, 'Screen 12 should show a notification-permission settings card with a real action');
@@ -242,8 +229,6 @@ assert.match(adminHtml, /id="activityDateFrom"/, 'Activity log should provide da
 assert.match(baselineSpec, /Mobile activity cards should stay within the viewport/, 'Screen 12 mobile event cards should be checked for horizontal overflow');
 assert.match(adminHtml, /data-action="view-order-customer"/, 'The order-detail customer card should expose a read-only view-profile action rather than an unsupported edit control');
 assert.match(adminHtml, /async function showOrderCustomerProfile\(searchTerm\)/, 'The customer shortcut should route to the customer list with a searchable contact key');
-assert.match(baselineSpec, /const detailsButton = orderRow\.locator\('\[data-action="view-order-details"\]:visible'\)\.first\(\);\s*await expect\(orderRow\)\.toBeVisible\(\);\s*await detailsButton\.click\(\);/,
-  'Order-detail capture should open the selected UI-only order from its visible row');
 assert.match(baselineSpec, /await expect\(page\.locator\('\.order-detail-page'\)\)\.toBeVisible\(\);/,
   'Order-detail capture should wait for the dedicated page to render');
 
@@ -334,7 +319,6 @@ assert.match(baselineSpec, /await page\.keyboard\.press\('ArrowRight'\);[\s\S]*p
 assert.match(baselineSpec, /await page\.locator\('#productTabGallery'\)\.click\(\);[\s\S]*setInputFiles\(/,
   'Synthetic image fixture should switch to the visible gallery tab before interacting');
 
-has('aria-label="Ghi chú điều kiện đơn hàng ${esc(o.order_number)}"', 'accessible order payment terms note');
  
 // Mobile gallery layout must give the primary cover priority without hiding controls or losing narrow-screen support.
 has('function renderGalleryItem(g,i)', 'shared gallery thumbnail renderer');

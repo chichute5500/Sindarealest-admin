@@ -677,7 +677,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         const orderId = await page.locator('.order-detail-page').getAttribute('data-order-detail-id');
         await page.locator('[data-action="back-to-orders"]:visible').first().click();
         await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
-        await expect(page.locator('[data-order-row="' + orderId + '"] [data-action="view-order-details"]:visible').first()).toBeFocused();
+        await expect(page.locator('[data-order-row="' + orderId + '"]')).toBeVisible();
       }
     }
   };
@@ -1865,224 +1865,53 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     }
 
     await captureView('orders', 'orders', async variant => {
-      const row = page.locator('[data-order-row="UI-ONLY-ORDER"]');
-      const management = row.locator('details.order-management-details');
-      const summary = management.locator('summary.order-management-summary');
-      const unitPrice = row.locator('[data-order-item-price]');
-      await expect(row).toBeVisible();
-      const orderSearch = page.locator('#orderSearchBox');
-      const orderRows = page.locator('[data-order-row]');
-      await expect(orderSearch, 'Orders list provides a labeled local search field').toBeVisible();
-      await expect(page.locator('#orderStatusFilter')).toBeVisible();
-      await expect(page.locator('#orderPaymentFilter')).toBeVisible();
-      await expect(orderRows).toHaveCount(3);
-      if (variant.viewport.width <= 680) {
-        const mobileSummary = row.locator('.order-mobile-summary');
-        await expect(mobileSummary, 'Mobile order list uses a compact summary without invented thumbnail data').toBeVisible();
-        await expect(mobileSummary).toContainText('Khách thử nghiệm giao diện');
-        await expect(mobileSummary).toContainText('Sản phẩm thử nghiệm giao diện');
-      }
+      const row=page.locator('[data-order-row="UI-ONLY-ORDER"]'),cards=page.locator('[data-order-open]');
+      await expect(row).toBeVisible();await expect(cards).toHaveCount(3);
+      for(const selector of ['#orderSearchBox','#orderStatusFilter','#orderPaymentFilter'])await expect(page.locator(selector)).toBeVisible();
       await expect(page.locator('#orderResultSummary')).toHaveText('Hiển thị 3 / 3 đơn hàng');
-      await orderSearch.fill('Khách UI Fixture 2');
-      await expect(orderRows).toHaveCount(1);
-      await expect(page.locator('[data-order-row="UI-ONLY-ORDER-2"]')).toBeVisible();
-      await orderSearch.fill('khong-co-don-hang-nay');
-      await expect(orderRows).toHaveCount(0);
-      await expect(page.locator('#orderEmptyStateFiltered')).toContainText('Không tìm thấy đơn hàng phù hợp');
+      await expect(page.locator('.order-management-details')).toHaveCount(0);
+      await page.locator('#orderSearchBox').fill('Khách UI Fixture 2');await expect(cards).toHaveCount(1);
+      await page.locator('#orderSearchBox').fill('khong-co-don-hang-nay');await expect(cards).toHaveCount(0);
       await page.locator('#clearOrderFilters').click();
-      await expect(orderRows).toHaveCount(3);
-      await page.locator('#orderStatusFilter').selectOption('completed');
-      await expect(orderRows).toHaveCount(1);
-      await expect(page.locator('[data-order-row="UI-ONLY-ORDER-3"]')).toBeVisible();
+      await page.locator('#orderStatusFilter').selectOption('completed');await expect(cards).toHaveCount(1);
       await page.locator('#orderStatusFilter').selectOption('all');
-      await expect(orderRows).toHaveCount(3);
-      await page.locator('#orderPaymentFilter').selectOption('paid');
-      await expect(orderRows).toHaveCount(1);
-      await expect(page.locator('[data-order-row="UI-ONLY-ORDER-3"]')).toBeVisible();
-      await page.locator('#clearOrderFilters').click();
-      await expect(orderRows).toHaveCount(3);
-      await expect(page.locator('#orderResultSummary')).toHaveText('Hiển thị 3 / 3 đơn hàng');
-      await expect(row).toContainText('Chờ xác nhận giá');
-      await expect(row).toContainText('Chưa hoàn tất thanh toán');
-      await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
-      await expect(row.locator('[data-action="record-payment"]')).toBeDisabled();
-
-      if (variant.viewport.width <= 680) {
-        await expect(summary, 'Mobile order operations use a visible disclosure summary').toBeVisible();
-        await expect(management, 'Mobile order tools start collapsed to preserve the order-list summary').not.toHaveAttribute('open', '');
-        await expect(management.locator('.order-management-content'), 'Closed mobile disclosure hides the management control panel').toBeHidden();
-        await expect(unitPrice, 'Per-item price entry is hidden on mobile until the order tools are expanded').toBeHidden();
-        const compactOrderCardHeight = await row.evaluate(el => el.getBoundingClientRect().height);
-        expect(compactOrderCardHeight, 'Collapsed mobile order card should keep the first-screen summary compact').toBeLessThan(560);
-        await summary.click();
-        await expect(management).toHaveAttribute('open', '');
-        await expect(management.locator('.order-management-content'), 'Opening mobile disclosure reveals management controls').toBeVisible();
-        await expect(unitPrice).toBeVisible();
-        await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
-        await expect(row.locator('[data-action="record-payment"]')).toBeDisabled();
-        await summary.click();
-        await expect(unitPrice).toBeHidden();
-      } else {
-        await expect(summary, 'Desktop order management keeps a compact visible disclosure control').toBeVisible();
-        await expect(management, 'Desktop order management starts collapsed to avoid an oversized table row').not.toHaveAttribute('open', '');
-        await expect(management.locator('.order-management-content'), 'Closed desktop disclosure hides the management control panel').toBeHidden();
-        await expect(unitPrice, 'The existing single price input stays visible in the desktop product cell').toBeVisible();
-        const compactDesktopOrderCardHeight = await row.evaluate(el => el.getBoundingClientRect().height);
-        expect(compactDesktopOrderCardHeight, 'Collapsed desktop order row should not inherit the full payment form height').toBeLessThan(250);
-        await summary.click();
-        await expect(management).toHaveAttribute('open', '');
-        await expect(management.locator('.order-management-content'), 'Opening desktop disclosure reveals management controls').toBeVisible();
-        await expect(row.locator('[data-action="save-order"]')).toBeVisible();
-        await expect(row.locator('[data-action="create-payment-request"]')).toBeDisabled();
-        await summary.click();
-        await expect(management).not.toHaveAttribute('open', '');
-      }
-      // Locator assertions can scroll the page and nested table horizontally; return to the reference's initial list position before taking screenshots.
-      await page.evaluate(() => {
-        window.scrollTo(0, 0);
-        document.scrollingElement?.scrollTo(0, 0);
-        document.querySelectorAll('#main .tablewrap').forEach(wrapper => { wrapper.scrollLeft = 0; });
-      });
+      await page.locator('#orderPaymentFilter').selectOption('paid');await expect(cards).toHaveCount(1);
+      await page.locator('#clearOrderFilters').click();await expect(cards).toHaveCount(3);
+      const dims=await row.evaluate(el=>({w:el.getBoundingClientRect().width,h:el.getBoundingClientRect().height,v:innerWidth}));
+      expect(dims.w).toBeLessThanOrEqual(dims.v);expect(dims.h).toBeLessThan(300);
+      await page.evaluate(()=>window.scrollTo(0,0));
     }, true);
     await captureView('order-detail', 'orders', async variant => {
-      const orderRow = page.locator('[data-order-row="UI-ONLY-ORDER"]');
-      const detailsButton = orderRow.locator('[data-action="view-order-details"]:visible').first();
-      await expect(orderRow).toBeVisible();
-      await detailsButton.click();
-      await expect(page.locator('#main .pagehead h2')).toHaveText('Chi tiết đơn hàng');
-      await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id', 'UI-ONLY-ORDER');
-      await expect(page.locator('#orderDetailBackdrop')).toHaveCount(0);
-      const refundEntry = page.locator('#orderDetailContent [data-refund-entry="UI-ONLY-ORDER"]');
-      await expect(refundEntry, 'Screen 7 includes a refund ledger form inside the collapsed payment disclosure').toHaveCount(1);
-      await expect(refundEntry.locator('[data-action="record-refund"]'),
-        'Orders with no verified receipts must not enable refund recording').toBeDisabled();
-      await expect(refundEntry.locator('[data-refund-amount]')).toBeDisabled();
-      const orderTimeline = page.locator('#orderDetailContent .order-detail-timeline');
-      await expect(orderTimeline, 'reference Screen 7 includes a timeline in the order detail view').toBeVisible();
-      await expect(orderTimeline).toContainText('Timeline');
-      await expect(orderTimeline).toContainText('Đặt hàng');
-      await expect(orderTimeline).toContainText('Cập nhật gần nhất');
-      const orderPanelHeadings = await page.locator('#orderDetailContent').evaluate(root =>
-        Array.from(root.children).map(child => child.querySelector('.panelhead h3')?.textContent?.trim() || '')
-      );
-      const productPanelIndex = orderPanelHeadings.findIndex(label => label.startsWith('Sản phẩm trong đơn'));
-      const timelinePanelIndex = orderPanelHeadings.indexOf('Timeline');
-      expect(timelinePanelIndex, 'reference Screen 7 places Timeline after the product list')
-        .toBeGreaterThan(productPanelIndex);
-      if (page.viewportSize()?.width === 390) {
-        const timelineGeometry = await orderTimeline.evaluate(element => {
-          const rect = element.getBoundingClientRect();
-          const actions = document.querySelector('.order-detail-page-actions')?.getBoundingClientRect();
-          return { top: rect.top, bottom: rect.bottom, actionTop: actions?.top ?? window.innerHeight,
-            visibleAboveActions: rect.top >= 0 && rect.bottom <= (actions?.top ?? window.innerHeight) - 8 };
-        });
-        expect(timelineGeometry.visibleAboveActions,
-          'Screen 7 timeline should be visible above the fixed action row at 390×844 without scrolling: ' +
-          JSON.stringify(timelineGeometry)).toBe(true);
-      }
-      await expect(page.locator('#orderDetailContent')).toContainText('Khách thử nghiệm giao diện');
-      await expect(page.locator('#orderDetailContent')).toContainText('Sản phẩm thử nghiệm giao diện');
-      const orderDetailViewportWidth = page.viewportSize()?.width ?? 0;
-      const customerCardColumns = await page.locator('#orderDetailContent .order-detail-customer-card').evaluate(element =>
-        getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
-      );
-      const expectedDetailColumns = orderDetailViewportWidth >= 360 ? 2 : 1;
-      const itemDetails = page.locator('#orderDetailContent .order-detail-item-details').first();
-      await itemDetails.locator('summary').click();
-      await expect(itemDetails).toHaveAttribute('open', '');
-      const itemMetaGridColumns = await itemDetails.locator('.order-detail-item-grid').evaluate(element =>
-        getComputedStyle(element).gridTemplateColumns.trim().split(/\s+/).length
-      );
-      expect(customerCardColumns, `Customer identity card should keep avatar, contact details, and action in separate columns at ${orderDetailViewportWidth}px`).toBe(3);
-      expect(itemMetaGridColumns, `Order item details should use ${expectedDetailColumns} column(s) at ${orderDetailViewportWidth}px`).toBe(expectedDetailColumns);
-      if (orderDetailViewportWidth === 390) {
-        await page.evaluate(() => window.scrollTo(0, 0));
-        const actionGeometry = await page.locator('.order-detail-page-actions .btn.primary').evaluate(element => {
-          const rect = element.getBoundingClientRect();
-          return { top: rect.top, bottom: rect.bottom, viewportHeight: window.innerHeight,
-            visibleWithoutScrolling: rect.top >= 0 && rect.bottom <= window.innerHeight };
-        });
-        expect(actionGeometry.visibleWithoutScrolling,
-          'Screen 7 primary order action should remain visible in the 390×844 reference viewport without scrolling: ' +
-          JSON.stringify(actionGeometry)).toBe(true);
-      }
-      if (orderDetailViewportWidth <= 359) {
-        const actionWidths = await page.locator('.order-detail-page-actions').evaluate(container => {
-          const primary = container.querySelector('.btn.primary')?.getBoundingClientRect();
-          const secondary = container.querySelector('[data-action="order-detail-to-row"]')?.getBoundingClientRect();
-          return { primary: primary?.width ?? 0, secondary: secondary?.width ?? 0, viewport: window.innerWidth };
-        });
-        expect(actionWidths.primary,
-          'At 320px, Screen 7 primary action must not collapse into a narrow vertical button: ' +
-          JSON.stringify(actionWidths)).toBeGreaterThanOrEqual(88);
-        expect(actionWidths.secondary,
-          'At 320px, Screen 7 secondary action must remain wide enough to read and tap: ' +
-          JSON.stringify(actionWidths)).toBeGreaterThanOrEqual(120);
-      }
-      if (orderDetailViewportWidth <= 820) {
-        await expect(page.locator('.mobiletabs')).toBeVisible();
-      } else {
-        await expect(page.locator('.mobiletabs')).toBeHidden();
-      }
-      const detailUrl = new URL(page.url());
-      expect(detailUrl.searchParams.get('view'), 'Opening a detail screen should create a direct route').toBe('order-detail');
-      expect(detailUrl.searchParams.get('orderId'), 'Detail route should identify only the selected existing order').toBe('UI-ONLY-ORDER');
-
-      await page.keyboard.press('Escape');
-      await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
-      await expect(detailsButton).toBeFocused();
-
-      await detailsButton.click();
-      await expect(page.locator('.order-detail-page')).toBeVisible();
-      await page.locator('[data-action="order-detail-to-row"]').click();
-      await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
-      await expect(orderRow.locator('[data-action="save-order"]')).toBeFocused();
-
-      await detailsButton.click();
-      await expect(page.locator('.order-detail-page')).toBeVisible();
-
-      const customerCard = page.locator('.order-detail-customer-card');
-      await expect(customerCard).toBeVisible();
-      await expect(customerCard.locator('.order-detail-customer-avatar')).toHaveText('KD');
-      await expect(customerCard.locator('.order-detail-customer-avatar')).toHaveAttribute('aria-hidden', 'true');
-      await expect(customerCard.locator('.order-detail-customer-name')).toHaveText('Khách thử nghiệm giao diện');
-      const customerProfileButton = customerCard.locator('[data-action="view-order-customer"]');
-      await expect(customerProfileButton).toBeVisible();
-      await customerProfileButton.click();
-      await expect(page.locator('#main .pagehead h2')).toHaveText('Danh sách khách hàng');
-      await expect(page.locator('#customerSearch')).toHaveValue('Khách thử nghiệm giao diện');
-      await expect(page.locator('#customerSearch')).toBeFocused();
-      await expect(page.locator('.customer-table tbody tr')).toHaveCount(1);
-      await expect(page.locator('.customer-table tbody')).toContainText('Khách thử nghiệm giao diện');
-      // Reset the shortcut query so it cannot leak into the next independent screen capture.
-      await page.locator('#customerSearch').fill('');
-      await expect(page.locator('.customer-table tbody tr')).toHaveCount(2);
-      await page.locator('[data-view="orders"]:visible').first().click();
-      await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
-      await page.locator('[data-order-row="UI-ONLY-ORDER"] [data-action="view-order-details"]:visible').first().click();
-      await expect(page.locator('.order-detail-page')).toBeVisible();
+      const orderRow=page.locator('[data-order-row="UI-ONLY-ORDER"]');
+      await expect(orderRow).toBeVisible();await orderRow.click();
+      await expect(page.locator('#main .pagehead h2')).toHaveText('Xử lý đơn hàng');
+      await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id','UI-ONLY-ORDER');
+      for(const selector of ['.sd-order-overview','.sd-order-items','.sd-order-payment'])await expect(page.locator(selector)).toBeVisible();
+      await expect(page.locator('#sdOrderAdvanced')).not.toHaveAttribute('open','');
+      await expect(page.locator('[data-action="record-refund"]')).toBeDisabled();
+      const detailUrl=new URL(page.url());expect(detailUrl.searchParams.get('view')).toBe('order-detail');
+      expect(detailUrl.searchParams.get('orderId')).toBe('UI-ONLY-ORDER');
+      await page.goBack();await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
+      await orderRow.focus();await page.keyboard.press('Enter');await expect(page.locator('.order-detail-page')).toBeVisible();
     }, true);
-    // Positive eligibility path uses an explicit UI-only paid order; the test never confirms or submits a refund.
-    await page.setViewportSize({ width: 390, height: 844 });
+    // Paid fixture must still refuse an over-limit refund without a server write.
+    await page.setViewportSize({width:390,height:844});
     await page.locator('[data-view="orders"]:visible').first().click();
-    await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
-    const paidFixtureRow = page.locator('[data-order-row="UI-ONLY-ORDER-3"]');
-    await expect(paidFixtureRow).toBeVisible();
-    await paidFixtureRow.locator('[data-action="view-order-details"]:visible').first().click();
-    await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id', 'UI-ONLY-ORDER-3');
-    const paidPaymentDetails = page.locator('#orderDetailContent .order-detail-extra').first();
-    await paidPaymentDetails.locator('summary').click();
-    const paidRefundEntry = page.locator('#orderDetailContent [data-refund-entry="UI-ONLY-ORDER-3"]');
-    const paidRefundButton = paidRefundEntry.locator('[data-action="record-refund"]');
-    await expect(paidRefundButton, 'Verified positive net receipts enable the refund ledger form').toBeEnabled();
-    await expect(paidRefundEntry.locator('[data-refund-amount]')).toHaveAttribute('max', '7800000');
-    await expect(paidRefundEntry).toContainText('không thực hiện chuyển tiền');
-    const writesBeforeInvalidRefund = attemptedWrites.length;
+    const paidFixtureRow=page.locator('[data-order-row="UI-ONLY-ORDER-3"]');
+    await expect(paidFixtureRow).toBeVisible();await paidFixtureRow.click();
+    await expect(page.locator('.order-detail-page')).toHaveAttribute('data-order-detail-id','UI-ONLY-ORDER-3');
+    await page.locator('#sdOrderAdvanced > summary').click();
+    await page.locator('.sd-order-subdetails').first().locator('summary').click();
+    const paidRefundEntry=page.locator('#orderDetailContent [data-refund-entry="UI-ONLY-ORDER-3"]');
+    const refundButton=paidRefundEntry.locator('[data-action="record-refund"]');
+    await expect(refundButton).toBeEnabled();
+    await expect(paidRefundEntry.locator('[data-refund-amount]')).toHaveAttribute('max','7800000');
+    const writesBeforeInvalidRefund=attemptedWrites.length;
     await paidRefundEntry.locator('[data-refund-amount]').fill('7800001');
     await paidRefundEntry.locator('[data-refund-reference]').fill('REFUND-UI-001');
-    await paidRefundButton.click();
+    await refundButton.click();
     await expect(page.locator('#toast')).toContainText('không vượt số tiền thực nhận thuần còn lại');
-    expect(attemptedWrites.length, 'An over-limit refund must be rejected locally without attempting an API write').toBe(writesBeforeInvalidRefund);
+    expect(attemptedWrites.length).toBe(writesBeforeInvalidRefund);
     await page.locator('[data-action="back-to-orders"]:visible').first().click();
     await expect(page.locator('#main .pagehead h2')).toHaveText('Đơn hàng');
     await captureView('customers', 'customers', async variant => {
@@ -2912,7 +2741,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await navigateTo('orders');
         await page.setViewportSize(viewport);
         await chooseTheme(theme);
-        await page.locator('[data-order-row="UI-ONLY-ORDER"] [data-action="view-order-details"]:visible').first().click();
+        await page.locator('[data-order-row="UI-ONLY-ORDER"]').click();
         await expect(page.locator('.order-detail-page')).toBeVisible();
         await page.waitForTimeout(50);
         await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
