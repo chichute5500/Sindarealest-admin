@@ -1,4 +1,5 @@
 name: Owner CSS/Admin-Storefront parity and security audit (isolated Preview)
+# Revalidate final dead CSS removal, source guard and OS-first Admin theme on live Chrome.
 on:
   push:
     branches: [audit/css-parity-security-2026-10-28]
