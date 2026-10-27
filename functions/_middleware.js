@@ -45,11 +45,26 @@ export async function onRequest(context) {
     }));
     if (!response.ok || !(response.headers.get("content-type") || "").includes("text/html")) return response;
     let html = await response.text();
-    const catalogTitle = categorySlug ? "Danh mục " + categorySlug + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest";
+    const catalogLabels = {
+      sneaker: "Giày thể thao (Sneaker)", giayluoi: "Giày lười", giaytay: "Giày tây",
+      thatlung: "Thắt lưng", vinam: "Ví nam", vicamtay: "Ví cầm tay",
+      caplaptop: "Cặp – Tab – Laptop", clutch: "Clutch", mu: "Mũ",
+      tuideocheo: "Túi đeo chéo", tuigolf: "Túi golf", tuinu: "Túi nữ",
+      dep: "Dép", daydongho: "Dây đồng hồ", oplung: "Ốp điện thoại"
+    };
+    const categoryName = Object.hasOwn(catalogLabels,categorySlug)
+      ? catalogLabels[categorySlug] : categorySlug;
+    const catalogTitle = categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest";
     const catalogDescription = categorySlug
-      ? "Khám phá sản phẩm thuộc danh mục " + categorySlug + " tại SinDarealest."
+      ? "Khám phá sản phẩm " + categoryName + " tại SinDarealest. Xem thiết kế và mã SKU chính thức."
       : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.";
     html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(catalogTitle) + "</title>");
+    // Give direct-link visitors and crawlers the correct category heading in
+    // the initial HTML, before /api/products completes on a slow connection.
+    if(categorySlug) html = html.replace(
+      '<h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2>',
+      '<h2 class="section-title" id="catalogHeading">' + escapeHtml(categoryName) + '</h2>'
+    );
     html = meta(html, "description", catalogDescription);
     html = meta(html, "og:title", catalogTitle, true);
     html = meta(html, "og:description", catalogDescription, true);
