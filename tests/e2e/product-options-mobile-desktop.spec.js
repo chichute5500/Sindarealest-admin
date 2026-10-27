@@ -1,0 +1,80 @@
+import {test,expect} from '@playwright/test';
+import {mkdirSync} from 'node:fs';
+
+const base=process.env.SD_OPTIONS_BASE_URL||'http://127.0.0.1:4173';
+const dir='artifacts/product-options';
+mkdirSync(dir,{recursive:true});
+test.use({serviceWorkers:'block'});
+const items=[
+ {id:'qa-shoe',sku:'QA-SHOE-001',title:'Giày lười kiểm thử',category:'loafers',categoryLabel:'Giày lười'},
+ {id:'qa-belt',sku:'QA-BELT-001',title:'Thắt lưng kiểm thử',category:'belts',categoryLabel:'Thắt lưng'},
+ {id:'qa-phone',sku:'QA-PHONE-001',title:'Ốp điện thoại kiểm thử',category:'phone-cases',categoryLabel:'Ốp điện thoại'},
+ {id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví không size',category:'wallets',categoryLabel:'Ví nam'}
+].map(p=>({...p,slug:p.id,skuVerified:true,images:['images/brand-emblem.png'],description:'Mock data, no real purchases',price:100000,sourcePriceConfirmed:true,fulfillmentType:'made_to_order',published:true}));
+for(const cfg of [
+ {label:'mobile-light',w:390,h:844,scheme:'light'},
+ {label:'mobile-dark',w:390,h:844,scheme:'dark'},
+ {label:'desktop-light',w:1366,h:900,scheme:'light'},
+ {label:'desktop-dark',w:1366,h:900,scheme:'dark'}
+]){
+ test('Catalog options and cart responsive '+cfg.label,async({page})=>{
+  await page.setViewportSize({width:cfg.w,height:cfg.h});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+  const open=async id=>{
+   await page.locator('[data-open-product="'+id+'"]').first().evaluate(el=>el.click());
+   await expect(page.locator('#productOverlay')).toHaveClass(/open/);
+  };
+  const close=async()=>{await page.locator('#detailClose').click();await expect(page.locator('#productOverlay')).not.toHaveClass(/open/)};
+  await open('qa-shoe');
+  await expect(page.locator('#detailVariants')).toBeVisible();
+  await expect(page.locator('#sdDetailOption')).toHaveCount(1);
+  await expect(page.locator('#sdDetailOption option')).toHaveCount(8);
+  await page.locator('#detailAdd').click();
+  await expect(page.locator('#sdDetailOptionMessage')).toContainText('Vui lòng chọn');
+  await page.locator('#sdDetailOption').selectOption('42');
+  await page.screenshot({path:dir+'/shoe-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#detailAdd').click();
+  await close();
+  await open('qa-shoe');
+  await page.locator('#sdDetailOption').selectOption('43');
+  await page.locator('#detailAdd').click();
+  await close();
+  await open('qa-belt');
+  await expect(page.locator('#sdDetailOption option')).toHaveCount(3);
+  await page.locator('#sdDetailOption').selectOption('4.0');
+  await page.screenshot({path:dir+'/belt-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#detailAdd').click();
+  await close();
+  await open('qa-phone');
+  await expect(page.locator('#sdDetailOption')).toHaveAttribute('maxlength','80');
+  await page.locator('#detailAdd').click();
+  await expect(page.locator('#sdDetailOptionMessage')).toContainText('Vui lòng nhập');
+  await page.locator('#sdDetailOption').fill('iPhone 16 Pro Max');
+  await page.screenshot({path:dir+'/phone-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#detailAdd').click();
+  await close();
+  await open('qa-wallet');
+  await expect(page.locator('#detailVariants')).toBeHidden();
+  await close();
+  await page.locator(cfg.w<=760?'#mobileCartNav':'#cartOpen').click();
+  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+  await expect(page.locator('#cartList .cart-row')).toHaveCount(4);
+  const list=await page.locator('#cartList').innerText();
+  for(const value of ['Size 42','Size 43','Bản dây 4.0 cm','iPhone 16 Pro Max'])expect(list).toContain(value);
+  await page.screenshot({path:dir+'/cart-'+cfg.label+'.png',animations:'disabled'});
+  const dimensions=await page.evaluate(()=>({body:document.body.scrollWidth,cart:document.querySelector('#cartDrawer').scrollWidth,cartWidth:document.querySelector('#cartDrawer').getBoundingClientRect().width}));
+  expect(dimensions.body).toBeLessThanOrEqual(cfg.w+1);
+  expect(dimensions.cart).toBeLessThanOrEqual(Math.ceil(dimensions.cartWidth)+1);
+  await page.locator('#cartCheckout').click();
+  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+  const summary=await page.locator('#sdCheckoutItemSummary').innerText();
+  for(const value of ['Size 42','Size 43','Bản dây 4.0 cm','iPhone 16 Pro Max'])expect(summary).toContain(value);
+  await page.screenshot({path:dir+'/checkout-'+cfg.label+'.png',animations:'disabled'});
+  expect(errors).toEqual([]);
+ });
+}
