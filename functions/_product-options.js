@@ -4,7 +4,10 @@ export const SHOE_CATEGORIES = Object.freeze(["sneakers", "loafers", "dress-shoe
 
 export function productOptionKind(category) {
   const key = String(category ?? "").trim().toLowerCase();
-  if (SHOE_CATEGORIES.includes(key)) return "shoe";
+  // New Admin-created shoe categories also need sizes without another deploy.
+  // Normalize Vietnamese names/slugs; do not classify sandals/dép as shoes.
+  const slug = key.replace(/đ/gu, "d").normalize("NFD").replace(/[\u0300-\u036f]/gu, "").replace(/[\s_]+/gu, "-");
+  if (SHOE_CATEGORIES.includes(key) || /^(?:giay|shoe|shoes|boot|boots)(?:-|$)/u.test(slug) || ["oxford", "oxfords", "derby", "derbies"].includes(slug)) return "shoe";
   if (key === "belts") return "belt";
   if (key === "phone-cases") return "phone";
   return "";
