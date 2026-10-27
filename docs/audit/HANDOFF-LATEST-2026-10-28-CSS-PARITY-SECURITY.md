@@ -72,3 +72,9 @@
 - Mở rộng workflow QA: chạy khi file chức năng/CSS/test liên quan thay đổi; bổ sung bốn ảnh trạng thái giỏ hàng desktop/mobile sáng/tối, kiểm tra không tràn ngang.
 - Một lượt test trung gian đã thất bại do **escape regex sai trong chính test mới**; đã sửa trong SHA `05c35a655f4e07771d94fc8cd9bd248087b9bc33`, source CI cuối cùng SUCCESS. Không che giấu test đỏ của SHA trung gian.
 - Không chỉnh phần Owner đã PASS; **PR #136 vẫn Draft**, **main Production vẫn ở baseline đã bàn giao**, tuyệt đối không ghi D1/R2 Production. Những CSS trùng selector có điều kiện chưa được tự ý xóa; kiểm thử luồng category/detail/checkout/warranty với dữ liệu thực chưa đủ để khẳng định 100%.
+
+## Nghiệm thu hình ảnh cuối — 2026-10-28 (strict drawer visibility)
+- Code/script-tested HEAD: `fd925d81ae4be560f101f6fda2da02716efded0d` (app behavior source unchanged since `05c35a655f4e07771d94fc8cd9bd248087b9bc33`). Full source CI [#40568866665 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40568866665); final isolated Chrome QA [#40568866642 SUCCESS](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40568866642): **4/4**, 12 PNG artifact, mobile light/dark cart images personally opened and verified.
+- Đã bổ sung kiểm tra geometry: không chỉ xác nhận `.open`, mà chờ drawer thật sự nằm trong viewport trước khi chụp. Mobile drawer có viền inset đã PASS nên cho phép khoảng hở tối đa 24px; không thay đổi giao diện. Trung gian run #40568389672 đỏ do assertion quá chặt, đã sửa và run cuối xanh.
+- Đối chiếu 8 ảnh cũ/mới: 7 ảnh gần như giống hệt, ảnh mobile sáng khác cục bộ ở dòng placeholder nhập mã đơn, không phát hiện lệch tông hoặc bố cục đáng kể trong mẫu so sánh.
+- Mọi phần đã Owner PASS giữ nguyên; PR #136 còn DRAFT, main chưa merge, D1/R2 Production tuyệt đối không ghi. Chưa xác minh đầy đủ mọi luồng thực bằng dữ liệu real; không chứng nhận 100% tuyệt đối.
