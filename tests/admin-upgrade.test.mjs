@@ -95,7 +95,8 @@ assert.ok(admin.includes("function orderDetailMarkup(order)"), "Order detail pan
 assert.ok(admin.includes("function orderDetailPage()"), "Order detail must render as its own Admin screen");
 assert.ok(admin.includes("view==='order-detail'?orderDetailPage()"), "The Admin view router must render the dedicated order detail screen");
 assert.ok(admin.includes("selectedOrderId=new URLSearchParams(location.search).get('orderId')||''"), "Order detail deep links must restore the selected existing order");
-assert.ok(admin.includes('data-action="order-detail-to-row"'), "Order detail must provide a real route back to the matching order's management controls");
+assert.ok(admin.includes('data-action="back-to-orders"'), "Order detail must return to the order list with browser history semantics");
+assert.ok(admin.includes('class="sd-order-advanced"'), "Specialist order controls must be available only in the advanced disclosure");
 assert.ok(!admin.includes('<div id="orderDetailBackdrop"'), "Order detail must not regress to a modal overlay");
 console.log("PASS: dedicated Order detail screen, deep-link state and return-to-actions contracts.");
 
