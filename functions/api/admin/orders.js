@@ -13,6 +13,9 @@ export async function onRequestGet(context) {
       " o.customer_note,o.payment_terms_confirmed_at,o.payment_terms_confirmed_by,o.payment_terms_note,o.created_at,o.updated_at,COALESCE(oc.full_name,c.full_name) AS full_name," +
       " (SELECT json_extract(details_json,'$.selectedPaymentOption') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_option," +
       " (SELECT json_extract(details_json,'$.selectedPaymentAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_amount," +
+      " (SELECT json_extract(details_json,'$.selectedRemainingAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_remaining_amount," +
+      " (SELECT json_extract(details_json,'$.selectedDiscountAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_discount_amount," +
+      " (SELECT json_extract(details_json,'$.transferReference') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_transfer_reference," +
       " COALESCE(oc.phone,c.phone) AS phone,COALESCE(oc.email,c.email) AS email," +
       " COALESCE(sa.full_address,c.address) AS address" +
       " ,(SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=o.id) AS received_amount" +
