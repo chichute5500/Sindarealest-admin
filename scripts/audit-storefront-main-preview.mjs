@@ -321,6 +321,13 @@ try{
       logoW:lr?.width,logoH:lr?.height,logoRight:lr?.right,
       titleLeft:hr?.left,titleTop:hr?.top,titleBottom:hr?.bottom,
       eyebrowLeft:er?.left,eyebrowBottom:er?.bottom,
+      titleHeight:hr?.height,eyebrowHeight:er?.height,
+      titleFontSize:heading?parseFloat(getComputedStyle(heading).fontSize):0,
+      eyebrowFontSize:eyebrow?parseFloat(getComputedStyle(eyebrow).fontSize):0,
+      titleScrollWidth:heading?.scrollWidth,titleClientWidth:heading?.clientWidth,
+      eyebrowScrollWidth:eyebrow?.scrollWidth,eyebrowClientWidth:eyebrow?.clientWidth,
+      titleWhiteSpace:heading?getComputedStyle(heading).whiteSpace:'',
+      eyebrowWhiteSpace:eyebrow?getComputedStyle(eyebrow).whiteSpace:'',
       rowWidth:fr?.width,
       logoBackdrop:style?.backgroundColor,logoBorder:style?.borderTopWidth,
       logoShadow:style?.boxShadow,imageBackdrop:image?.backgroundColor,
@@ -333,6 +340,14 @@ try{
    result.checks.footerLogoLarger=footerProof.logoW>=90;
    result.checks.footerLogoNoCard=footerProof.logoBackdrop==='rgba(0, 0, 0, 0)'&&footerProof.logoBorder==='0px'&&footerProof.logoShadow==='none';
    result.checks.footerNoOverflow=footerProof.footerOverflow<=2;
+   if(spec.width<=760){
+    result.checks.footerVietnameseSingleLine=footerProof.titleWhiteSpace==='nowrap'&&
+      footerProof.titleScrollWidth<=footerProof.titleClientWidth+1;
+    result.checks.footerEnglishSingleLine=footerProof.eyebrowWhiteSpace==='nowrap'&&
+      footerProof.eyebrowScrollWidth<=footerProof.eyebrowClientWidth+1;
+    result.checks.footerEnglishEnhanced=footerProof.eyebrowFontSize>=9;
+    result.checks.footerTitleBalanced=footerProof.titleFontSize>=11&&footerProof.titleFontSize<=15;
+   }
    if(!Object.values(result.checks).every(Boolean))throw Error('Footer alignment or another layout gate failed: '+JSON.stringify(footerProof));
    await footer.screenshot({path:path.join(destination,spec.label+'-footer-story.png'),animations:'disabled'});
    result.pass=Object.values(result.checks).every(Boolean)&&result.errors.length===0;
