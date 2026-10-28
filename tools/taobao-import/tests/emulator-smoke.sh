@@ -31,40 +31,19 @@ adb shell am start -W -a android.intent.action.SEND -t text/plain \
   --es android.intent.extra.TEXT 'https://taobao.com.evil.example/item/1' \
   -n "$PKG/.MainActivity" >/dev/null
 await_ui 'không thuộc tên miền' /tmp/taobao-rejected-screen.xml
-# Exercise Android ACTION_SEND image with an actual MediaStore content:// URI.
-# This proves ContentResolver access and scoped image persistence, not Taobao login.
-printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAALUlEQVR4nGOclmLDQEvARFPTRy0YtWDUglELRi0YtWDUglELRi0YtWDUAioCAD2+AXadpnZ5AAAAAElFTkSuQmCC' | base64 -d > /tmp/sd-share-source.png
-inserted="$(adb shell content insert \
-  --uri content://media/external/images/media \
-  --bind _display_name:s:sd-import-qa.png \
-  --bind mime_type:s:image/png \
-  --bind relative_path:s:Pictures/SinDarealest-QA 2>&1)"
-echo "MediaStore QA insert result: $inserted"
-media_uri="$(printf '%s' "$inserted" | sed -n 's/.*\(content:\/\/media\/[^[:space:]]*\).*/\1/p' | tr -d '\r' | head -1)"
-if [ -z "$media_uri" ]; then
-  query="$(adb shell content query --uri content://media/external/images/media \
-    --projection _id:_display_name 2>&1 || true)"
-  # Avoid passing shell-escaped SQL into adb content --where: some emulators
-  # strip the string quotes and reject filenames containing '-' as SQL tokens.
-  media_id="$(printf '%s' "$query" | grep -F 'sd-import-qa.png' \
-    | sed -n 's/.*_id=\([0-9][0-9]*\).*/\1/p' | head -1 || true)"
-  echo "MediaStore QA query matched source: $([ -n "$media_id" ] && echo yes || echo no)"
-  if [ -n "$media_id" ]; then media_uri="content://media/external/images/media/$media_id"; fi
+# Cross-package image share via separate, emulator-only QA app.
+# Unlike adb shell content insert, the QA sender owns its MediaStore content URI,
+# grants scoped read permission, and sends Android ACTION_SEND to the import app.
+HELPER_APK="${2:-qa-helper/qa-sender-debug.apk}"
+test -s "$HELPER_APK" || { echo 'FAIL: isolated QA sender APK unavailable' >&2; exit 1; }
+adb install -r "$HELPER_APK"
+adb logcat -c
+adb shell am start -W -n 'com.sindarealest.taobaoimport.qasender/.ShareImageActivity' >/tmp/taobao-shared-image.txt
+await_ui 'Đã lưu 1 ảnh' /tmp/taobao-image-share-screen.xml
+if adb logcat -d -t 2500 | grep -q 'Cross-package image delivery failed'; then
+  echo 'FAIL: QA sender failed to grant Android image content URI' >&2; exit 1
 fi
-test -n "$media_uri" || { echo "FAIL: synthetic MediaStore URI unavailable" >&2; exit 1; }
-adb shell content write --uri "$media_uri" < /tmp/sd-share-source.png
-adb shell am start -W -a android.intent.action.SEND -t image/png \
-  --eu android.intent.extra.STREAM "$media_uri" --grant-read-uri-permission \
-  -n "$PKG/.MainActivity" >/tmp/taobao-shared-image.txt
-image_saved=0
-for attempt in $(seq 1 15); do
-  adb shell uiautomator dump /sdcard/window.xml >/dev/null
-  adb shell cat /sdcard/window.xml > /tmp/taobao-image-share-screen.xml
-  if grep -q 'Đã lưu 1 ảnh' /tmp/taobao-image-share-screen.xml; then image_saved=1;break;fi
-  sleep 1
-done
-test "$image_saved" = '1' || { echo "FAIL: Android shared image not persisted into MediaStore" >&2; exit 1; }
-echo 'PASS: Android image share via content URI was saved in scoped MediaStore.'
+echo 'PASS: Android separate-app content URI saved through scoped MediaStore.'
 adb shell cmd uimode night yes >/dev/null
 adb shell am start -W -n "$PKG/.MainActivity" >/dev/null
 await_ui 'SinDarealest' /tmp/taobao-dark-screen.xml

@@ -30,7 +30,7 @@ jobs:
           gradle-version: '8.13'
       - name: Compile, lint, run JVM unit tests
         working-directory: tools/taobao-import/android
-        run: gradle --no-daemon --stacktrace :app:assembleDebug :app:lintDebug
+        run: gradle --no-daemon --stacktrace :app:assembleDebug :app:lintDebug :qa-sender:assembleDebug
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -43,6 +43,13 @@ jobs:
         with:
           name: taobao-import-android-debug-qa
           path: tools/taobao-import/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 3
+
+      - name: Store separate emulator-only cross-package share sender
+        uses: actions/upload-artifact@v4
+        with:
+          name: taobao-import-emulator-image-sender
+          path: tools/taobao-import/android/qa-sender/build/outputs/apk/debug/qa-sender-debug.apk
           retention-days: 3
 
   emulator:
@@ -58,6 +65,10 @@ jobs:
         with:
           name: taobao-import-android-debug-qa
           path: qa-apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: taobao-import-emulator-image-sender
+          path: qa-helper
       - name: Enable hardware-assisted emulator
         shell: bash
         run: |
@@ -70,7 +81,7 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_7
-          script: bash tools/taobao-import/tests/emulator-smoke.sh qa-apk/app-debug.apk
+          script: bash tools/taobao-import/tests/emulator-smoke.sh qa-apk/app-debug.apk qa-helper/qa-sender-debug.apk
       - name: Attach emulator screenshot (QA only)
         if: always()
         uses: actions/upload-artifact@v4
