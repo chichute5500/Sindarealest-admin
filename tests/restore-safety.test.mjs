@@ -38,12 +38,24 @@ function request(backup, extraHeaders = {}) {
       Origin: "https://shop.example",
       "Sec-Fetch-Site": "same-origin",
       "Content-Type": "application/json",
+      "X-SD-Restore-Password": ADMIN_PASSWORD,
       ...extraHeaders,
     },
     body: JSON.stringify(backup),
   });
 }
 const env = { ADMIN_PASSWORD, SESSION_SECRET };
+
+for (const missingOrWrong of ["", "wrong-password"]) {
+  const db = makeDB();
+  const response = await restoreBackup({
+    request: request({ format:"sindarealest-backup-v1",products:[product()],settings:{showPrices:true} },
+      { "X-SD-Restore-Password": missingOrWrong }),
+    env:{ ...env,DB:db },
+  });
+  assert.equal(response.status,403,'restore requires fresh correct owner password');
+  assert.equal(db.batchCalls,0,'failed reauthentication cannot write D1');
+}
 
 {
   const db = makeDB();
