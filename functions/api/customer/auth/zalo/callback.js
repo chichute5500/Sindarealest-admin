@@ -1,4 +1,4 @@
-import { ZALO_APP_ID,customerOrigin,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error,zaloAppSecretProof } from "../../../../_customer-auth.js";
+import { ZALO_APP_ID,customerOrigin,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error } from "../../../../_customer-auth.js";
 export async function onRequestGet({request,env}) {
   const origin=customerOrigin(request);
   if(!origin||!configured(env,"zalo"))return error("Đăng nhập Zalo chưa sẵn sàng.",503);
@@ -25,11 +25,11 @@ export async function onRequestGet({request,env}) {
     if(!tokenResponse.ok)return fail("token_rejected");
     const token=await tokenResponse.json();
     if(typeof token.access_token!=="string"||!token.access_token)return fail("token_invalid");
-    // The Zalo App enables App Secret Proof for access-token API calls.
-    // The secret stays on the server and is never sent to the client.
+    // Social API /me needs the access_token header and fields query.
+    // App Secret verification is already applied to the OAuth V4 token exchange.
+    // Do not send appsecret_proof here: it is not part of the documented Social /me request.
     const profileUrl=new URL("https://graph.zalo.me/v2.0/me");
     profileUrl.searchParams.set("fields","id,name");
-    profileUrl.searchParams.set("appsecret_proof",await zaloAppSecretProof(token.access_token,env.ZALO_APP_SECRET));
     phase="profile_network";
     const profileResponse=await fetch(profileUrl.toString(),{
       headers:{"access_token":token.access_token},
@@ -37,9 +37,17 @@ export async function onRequestGet({request,env}) {
     });
     if(!profileResponse.ok)return fail("profile_rejected");
     const profile=await profileResponse.json();
-    if(!/^[0-9]{1,50}$/.test(String(profile.id||"")))return fail("profile_invalid");
+    // Zalo can return a JSON error with HTTP 200; never accept one as an identity.
+    if(!profile || typeof profile!=="object" ||
+       (Object.hasOwn(profile,"error") && profile.error!==0))
+      return fail("profile_api_error");
+    // Zalo's documentation defines id as an opaque UserId, not necessarily decimal.
+    // Bound the provider subject to the schema and reject missing/unsafe identity values.
+    const subject=typeof profile.id==="string"?profile.id:
+      (typeof profile.id==="number" && Number.isSafeInteger(profile.id)?String(profile.id):"");
+    if(!/^[A-Za-z0-9:_-]{1,255}$/.test(subject))return fail("profile_invalid");
     let session;
-    try {session=await beginSession(env,"zalo",String(profile.id),profile.name);}
+    try {session=await beginSession(env,"zalo",subject,profile.name);}
     catch {return fail("session_store");}
     return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
   }catch{return fail(phase); }
