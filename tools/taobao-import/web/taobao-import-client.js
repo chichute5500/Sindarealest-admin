@@ -71,13 +71,19 @@ async function photoClear() {
   return new Promise(resolve=>{try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').clear();tx.oncomplete=()=>resolve();tx.onerror=()=>resolve();tx.onabort=()=>resolve();}catch{resolve();}});
 }
 function fields() {return {title:$('title').value,category:$('category').value,price:$('price').value,fulfillment:$('fulfillment').value,description:$('description').value};}
-function persistMeta() {localSet({version:2,importId,completed,creationAttempted,fields:fields(),order:items.map(x=>x.key),source:$('sourceLink').hidden?'':$('sourceLink').href});}
+function persistMeta() {localSet({version:2,importId,completed,creationAttempted,fields:fields(),order:items.map(x=>x.key),source:$('taobaoLink').value.trim(),rightsConfirmed:$('photoRights').checked});}
 function applySource(source) {
-  if(source&&source.length<=2200&&allowedSource(source)){$('sourceLink').href=source;$('sourceLink').hidden=false;$('noSource').hidden=true;}
+  if(source&&source.length<=2200&&allowedSource(source)){
+    $('sourceLink').href=source;$('sourceLink').hidden=false;$('noSource').hidden=true;
+    $('taobaoLink').value=source;
+  }
 }
 function lockFields() {
   for(const id of ['title','category','price','fulfillment','description'])$(id).disabled=busy||creationAttempted||completed;
   $('picker').disabled=busy||creationAttempted||completed;
+  $('taobaoLink').disabled=busy||creationAttempted||completed;
+  $('autoPhotos').disabled=busy||creationAttempted||completed;
+  $('photoRights').disabled=busy||creationAttempted||completed;
   $('submit').disabled=busy||completed;
   $('submit').textContent=creationAttempted&&!completed?'Kiểm tra / hoàn tất bản nháp':'Tải ảnh & tạo bản nháp';
   $('newDraft').hidden=!completed;
@@ -95,6 +101,7 @@ async function restore() {
     }
     if(items.length || creationAttempted || completed)status(completed?'Đã khôi phục bản nháp đã tạo.':'Đã khôi phục phiên nhập đang dở và những ảnh đã lưu trên thiết bị.','good');
     applySource(meta.source);
+    $('photoRights').checked=Boolean(meta.rightsConfirmed);
   } else await photoClear();
   if(source)applySource(source);
   persistMeta();render();lockFields();
@@ -126,9 +133,10 @@ function render() {
   }
   $('count').textContent=`Đã chọn ${items.length}/30 ảnh`;
 }
-$('picker').addEventListener('change',async e=>{
-  const errors=[];
-  for(const file of Array.from(e.target.files||[])){
+async function addImages(files,showErrors=true){
+
+  const errors=[],before=items.length;
+  for(const file of Array.from(files||[])){
     if(items.length>=30){errors.push('Chỉ chọn tối đa 30 ảnh.');break;}
     if(!validType.has(file.type)||!file.size||file.size>MAX_ORIGINAL){errors.push(file.name+': chỉ nhận JPEG/PNG/WebP 1–20 MB.');continue;}
     if(items.some(x=>x.name===file.name&&x.file.size===file.size&&x.file.lastModified===file.lastModified)){errors.push(file.name+': ảnh có thể bị trùng.');continue;}
@@ -139,7 +147,70 @@ $('picker').addEventListener('change',async e=>{
     if(!ok){errors.push(file.name+': không lưu được ảnh trên thiết bị. Vui lòng kiểm tra dung lượng hoặc quyền lưu trữ.');continue;}
     items.push({key,file,name:file.name,preview:URL.createObjectURL(file),uploaded:null,sha256});
   }
-  e.target.value='';persistMeta();render();if(errors.length)status(errors.join('\n'),'bad');
+  persistMeta();render();if(errors.length && showErrors)status(errors.join('\n'),'bad');
+  return {added:items.length-before,errors};
+}
+$('picker').addEventListener('change',async e=>{
+  await addImages(Array.from(e.target.files||[]));
+  e.target.value='';
+});
+
+const autoMessage=(message,bad=false)=>{
+  const el=$('autoStatus');el.textContent=message;el.className='status '+(bad?'bad':'');
+};
+$('taobaoLink').addEventListener('input',()=>{
+  const link=$('taobaoLink').value.trim();
+  if(allowedSource(link)){
+    $('sourceLink').href=link;$('sourceLink').hidden=false;$('noSource').hidden=true;
+  }else{
+    $('sourceLink').hidden=true;$('noSource').hidden=!link;
+  }
+  persistMeta();
+});
+$('photoRights').addEventListener('change',persistMeta);
+$('autoPhotos').addEventListener('click',async()=>{
+  if(busy||creationAttempted||completed)return;
+  const link=$('taobaoLink').value.trim();
+  if(!allowedSource(link)){autoMessage('Vui lòng dán URL Taobao/Tmall đầy đủ có https:// và id sản phẩm.',true);return;}
+  if(!$('photoRights').checked){autoMessage('Cần xác nhận quyền sử dụng ảnh trước khi lấy.',true);return;}
+  busy=true;lockFields();
+  let added=0,failed=0;
+  try{
+    autoMessage('Đang lấy danh sách ảnh qua API Taobao chính thức…');
+    const result=await request('/api/admin/taobao-photos',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({link,permissionConfirmed:true})
+    });
+    if(!Array.isArray(result.images)||result.images.length===0)throw Error('API không trả về ảnh sản phẩm.');
+    // Do not auto-fill product title: official titles may not reflect SinDarealest naming.
+    for(let i=0;i<Math.min(result.images.length,30-items.length);i++){
+      const entry=result.images[i];
+      if(!entry||typeof entry.ticket!=='string'){failed++;continue;}
+      autoMessage('Đang tải ảnh '+(i+1)+'/'+result.images.length+'…');
+      try{
+        const res=await fetch('/api/admin/taobao-photo?ticket='+encodeURIComponent(entry.ticket),{
+          credentials:'same-origin',cache:'no-store'
+        });
+        if(!res.ok){failed++;continue;}
+        const type=(res.headers.get('Content-Type')||'').split(';')[0];
+        if(!validType.has(type)){failed++;continue;}
+        const blob=await res.blob();
+        if(!blob.size||blob.size>MAX_ORIGINAL){failed++;continue;}
+        const ext=type==='image/jpeg'?'jpg':type==='image/png'?'png':'webp';
+        const name='Taobao-'+result.itemId+'-'+(i+1)+'.'+ext;
+        const record=await addImages([new File([blob],name,{type})],false);
+        added+=record.added;
+        failed+=record.errors.length;
+      }catch{failed++;}
+    }
+    autoMessage(added
+      ?'Đã tự tải '+added+' ảnh. '+(failed?'Bỏ qua '+failed+' ảnh lỗi/trùng. ':'')+'Kiểm tra ảnh bên dưới rồi tạo bản nháp.'
+      :'Không tải được ảnh nào. API có thể thiếu quyền tải hình hoặc ảnh nguồn đã chặn truy xuất.',!added);
+  }catch(ex){
+    autoMessage('Chưa lấy được ảnh: '+ex.message,true);
+  }finally{
+    busy=false;lockFields();persistMeta();render();
+  }
 });
 async function toWebp(file){
   let bitmap;

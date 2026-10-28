@@ -21,7 +21,7 @@ input[type=file]{width:100%;color:var(--ink);font-size:13px}input[type=file]::fi
 .status{font-size:13px;line-height:1.5;border-radius:11px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);margin-top:12px;white-space:pre-wrap}.status.bad{color:var(--danger);border-color:var(--danger)}.status.good{color:var(--good)}
 #photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.photo{border:1px solid var(--border);border-radius:13px;background:var(--panel);overflow:hidden}.photo img{width:100%;height:145px;object-fit:contain;background:#e6edf2}.photo .bar{display:flex;align-items:center;gap:4px;padding:7px}.photo .bar span{flex:1;font-size:11px;color:var(--sub);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.photo .bar .btn{padding:6px}.photo .uploaded{display:block;font-size:10px;color:var(--good);padding:0 8px 7px}
 .progress{height:7px;overflow:hidden;border-radius:8px;background:var(--border);margin:11px 0 4px}.progress span{display:block;height:100%;background:var(--primary);width:0;transition:width .2s ease}
-a{color:var(--dark)}#sourceLink{overflow-wrap:anywhere} [hidden]{display:none!important}
+a{color:var(--dark)}#sourceLink{overflow-wrap:anywhere}.confirm-rights{display:flex;align-items:center;gap:10px;margin:15px 0 6px;font-weight:500;line-height:1.4}.confirm-rights input{width:21px;height:21px;flex-shrink:0;accent-color:var(--primary)}#taobaoLink{margin-bottom:9px}#autoPhotos{flex:1} [hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -33,8 +33,16 @@ a{color:var(--dark)}#sourceLink{overflow-wrap:anywhere} [hidden]{display:none!im
 <div id="loginMsg" class="status" role="status" hidden></div>
 </section>
 <div id="work" hidden>
-<section class="panel"><h2>1. Nguồn sản phẩm</h2><p>Ảnh cần được tải về điện thoại bằng chức năng hợp lệ của trình duyệt hoặc từ nhà cung cấp đã cho phép sử dụng.</p><a id="sourceLink" target="_blank" rel="noopener noreferrer" hidden>Mở link Taobao vừa chia sẻ</a><p class="muted" id="noSource">Chưa nhận được link. Bạn vẫn có thể chọn ảnh đã lưu trên điện thoại.</p></section>
-<section class="panel"><h2>2. Chọn và sắp xếp ảnh</h2><label for="picker">Ảnh gốc JPEG, PNG, WebP · tối đa 20 MB/ảnh · 30 ảnh/sản phẩm</label><input id="picker" type="file" accept="image/jpeg,image/png,image/webp" multiple><p class="muted">Ảnh đầu tiên là ảnh đại diện. Bấm ↑ ↓ để sắp xếp, ✕ để loại khỏi danh sách.</p><div id="photos" aria-live="polite"></div><p id="count" class="muted">Chưa chọn ảnh.</p></section>
+<section class="panel" id="taobaoSourcePanel"><h2>1. Dán link Taobao và lấy ảnh</h2>
+<label for="taobaoLink">Liên kết sản phẩm Taobao / Tmall</label>
+<input id="taobaoLink" type="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder="https://item.taobao.com/item.htm?id=..." maxlength="2200">
+<div class="actions"><button class="btn primary" id="autoPhotos" type="button">Tự lấy ảnh từ link</button><a id="sourceLink" class="btn" target="_blank" rel="noopener noreferrer" hidden>Mở sản phẩm</a></div>
+<label class="confirm-rights"><input id="photoRights" type="checkbox"> Tôi xác nhận có quyền sử dụng ảnh của sản phẩm này.</label>
+<p class="muted">Tự lấy ảnh sử dụng API Taobao chính thức khi tài khoản ứng dụng đã được cấp quyền. Đăng nhập Chrome riêng lẻ không cấp quyền API. Link rút gọn cần mở ra URL sản phẩm chứa <code>id=</code>.</p>
+<div id="autoStatus" class="status" aria-live="polite">Dán link và bấm “Tự lấy ảnh từ link”. Hệ thống sẽ báo rõ nếu API chưa được kết nối.</div>
+<p class="muted" id="noSource">Chưa có link sản phẩm.</p>
+</section>
+<section class="panel"><h2>2. Ảnh đã lấy được / chọn ảnh bổ sung</h2><label for="picker">Nếu API không cho truy xuất, chọn ảnh được phép sử dụng từ điện thoại · tối đa 20 MB/ảnh · 30 ảnh/sản phẩm</label><input id="picker" type="file" accept="image/jpeg,image/png,image/webp" multiple><p class="muted">Ảnh đầu tiên là ảnh đại diện. Bấm ↑ ↓ để sắp xếp, ✕ để loại khỏi danh sách.</p><div id="photos" aria-live="polite"></div><p id="count" class="muted">Chưa chọn ảnh.</p></section>
 <section class="panel"><h2>3. Thông tin sản phẩm</h2>
 <form id="createForm">
 <label for="title">Tên sản phẩm *</label><input id="title" maxlength="180" placeholder="Ví dụ: Giày lười da cá sấu màu đen" required>
@@ -50,7 +58,7 @@ a{color:var(--dark)}#sourceLink{overflow-wrap:anywhere} [hidden]{display:none!im
 <div id="status" class="status" role="status" aria-live="polite" hidden></div>
 </form></section>
 </div>
-<footer><p class="muted">Công cụ chỉ gửi ảnh bạn chủ động chọn lên hệ thống của chính SinDarealest. Không đọc cookie hay mật khẩu Taobao.</p></footer>
+<footer><p class="muted">Ảnh tự động chỉ được lấy qua API Taobao chính thức đã cấp quyền. Không đọc mật khẩu, cookie hay phiên đăng nhập Taobao.</p></footer>
 </main>
 <script>
 'use strict';
@@ -126,13 +134,19 @@ async function photoClear() {
   return new Promise(resolve=>{try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').clear();tx.oncomplete=()=>resolve();tx.onerror=()=>resolve();tx.onabort=()=>resolve();}catch{resolve();}});
 }
 function fields() {return {title:$('title').value,category:$('category').value,price:$('price').value,fulfillment:$('fulfillment').value,description:$('description').value};}
-function persistMeta() {localSet({version:2,importId,completed,creationAttempted,fields:fields(),order:items.map(x=>x.key),source:$('sourceLink').hidden?'':$('sourceLink').href});}
+function persistMeta() {localSet({version:2,importId,completed,creationAttempted,fields:fields(),order:items.map(x=>x.key),source:$('taobaoLink').value.trim(),rightsConfirmed:$('photoRights').checked});}
 function applySource(source) {
-  if(source&&source.length<=2200&&allowedSource(source)){$('sourceLink').href=source;$('sourceLink').hidden=false;$('noSource').hidden=true;}
+  if(source&&source.length<=2200&&allowedSource(source)){
+    $('sourceLink').href=source;$('sourceLink').hidden=false;$('noSource').hidden=true;
+    $('taobaoLink').value=source;
+  }
 }
 function lockFields() {
   for(const id of ['title','category','price','fulfillment','description'])$(id).disabled=busy||creationAttempted||completed;
   $('picker').disabled=busy||creationAttempted||completed;
+  $('taobaoLink').disabled=busy||creationAttempted||completed;
+  $('autoPhotos').disabled=busy||creationAttempted||completed;
+  $('photoRights').disabled=busy||creationAttempted||completed;
   $('submit').disabled=busy||completed;
   $('submit').textContent=creationAttempted&&!completed?'Kiểm tra / hoàn tất bản nháp':'Tải ảnh & tạo bản nháp';
   $('newDraft').hidden=!completed;
@@ -150,6 +164,7 @@ async function restore() {
     }
     if(items.length || creationAttempted || completed)status(completed?'Đã khôi phục bản nháp đã tạo.':'Đã khôi phục phiên nhập đang dở và những ảnh đã lưu trên thiết bị.','good');
     applySource(meta.source);
+    $('photoRights').checked=Boolean(meta.rightsConfirmed);
   } else await photoClear();
   if(source)applySource(source);
   persistMeta();render();lockFields();
@@ -181,9 +196,10 @@ function render() {
   }
   $('count').textContent=`Đã chọn ${items.length}/30 ảnh`;
 }
-$('picker').addEventListener('change',async e=>{
-  const errors=[];
-  for(const file of Array.from(e.target.files||[])){
+async function addImages(files,showErrors=true){
+
+  const errors=[],before=items.length;
+  for(const file of Array.from(files||[])){
     if(items.length>=30){errors.push('Chỉ chọn tối đa 30 ảnh.');break;}
     if(!validType.has(file.type)||!file.size||file.size>MAX_ORIGINAL){errors.push(file.name+': chỉ nhận JPEG/PNG/WebP 1–20 MB.');continue;}
     if(items.some(x=>x.name===file.name&&x.file.size===file.size&&x.file.lastModified===file.lastModified)){errors.push(file.name+': ảnh có thể bị trùng.');continue;}
@@ -194,7 +210,70 @@ $('picker').addEventListener('change',async e=>{
     if(!ok){errors.push(file.name+': không lưu được ảnh trên thiết bị. Vui lòng kiểm tra dung lượng hoặc quyền lưu trữ.');continue;}
     items.push({key,file,name:file.name,preview:URL.createObjectURL(file),uploaded:null,sha256});
   }
-  e.target.value='';persistMeta();render();if(errors.length)status(errors.join('\n'),'bad');
+  persistMeta();render();if(errors.length && showErrors)status(errors.join('\n'),'bad');
+  return {added:items.length-before,errors};
+}
+$('picker').addEventListener('change',async e=>{
+  await addImages(Array.from(e.target.files||[]));
+  e.target.value='';
+});
+
+const autoMessage=(message,bad=false)=>{
+  const el=$('autoStatus');el.textContent=message;el.className='status '+(bad?'bad':'');
+};
+$('taobaoLink').addEventListener('input',()=>{
+  const link=$('taobaoLink').value.trim();
+  if(allowedSource(link)){
+    $('sourceLink').href=link;$('sourceLink').hidden=false;$('noSource').hidden=true;
+  }else{
+    $('sourceLink').hidden=true;$('noSource').hidden=!link;
+  }
+  persistMeta();
+});
+$('photoRights').addEventListener('change',persistMeta);
+$('autoPhotos').addEventListener('click',async()=>{
+  if(busy||creationAttempted||completed)return;
+  const link=$('taobaoLink').value.trim();
+  if(!allowedSource(link)){autoMessage('Vui lòng dán URL Taobao/Tmall đầy đủ có https:// và id sản phẩm.',true);return;}
+  if(!$('photoRights').checked){autoMessage('Cần xác nhận quyền sử dụng ảnh trước khi lấy.',true);return;}
+  busy=true;lockFields();
+  let added=0,failed=0;
+  try{
+    autoMessage('Đang lấy danh sách ảnh qua API Taobao chính thức…');
+    const result=await request('/api/admin/taobao-photos',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({link,permissionConfirmed:true})
+    });
+    if(!Array.isArray(result.images)||result.images.length===0)throw Error('API không trả về ảnh sản phẩm.');
+    // Do not auto-fill product title: official titles may not reflect SinDarealest naming.
+    for(let i=0;i<Math.min(result.images.length,30-items.length);i++){
+      const entry=result.images[i];
+      if(!entry||typeof entry.ticket!=='string'){failed++;continue;}
+      autoMessage('Đang tải ảnh '+(i+1)+'/'+result.images.length+'…');
+      try{
+        const res=await fetch('/api/admin/taobao-photo?ticket='+encodeURIComponent(entry.ticket),{
+          credentials:'same-origin',cache:'no-store'
+        });
+        if(!res.ok){failed++;continue;}
+        const type=(res.headers.get('Content-Type')||'').split(';')[0];
+        if(!validType.has(type)){failed++;continue;}
+        const blob=await res.blob();
+        if(!blob.size||blob.size>MAX_ORIGINAL){failed++;continue;}
+        const ext=type==='image/jpeg'?'jpg':type==='image/png'?'png':'webp';
+        const name='Taobao-'+result.itemId+'-'+(i+1)+'.'+ext;
+        const record=await addImages([new File([blob],name,{type})],false);
+        added+=record.added;
+        failed+=record.errors.length;
+      }catch{failed++;}
+    }
+    autoMessage(added
+      ?'Đã tự tải '+added+' ảnh. '+(failed?'Bỏ qua '+failed+' ảnh lỗi/trùng. ':'')+'Kiểm tra ảnh bên dưới rồi tạo bản nháp.'
+      :'Không tải được ảnh nào. API có thể thiếu quyền tải hình hoặc ảnh nguồn đã chặn truy xuất.',!added);
+  }catch(ex){
+    autoMessage('Chưa lấy được ảnh: '+ex.message,true);
+  }finally{
+    busy=false;lockFields();persistMeta();render();
+  }
 });
 async function toWebp(file){
   let bitmap;
@@ -272,7 +351,6 @@ $('newDraft').addEventListener('click',async()=>{
 window.addEventListener('pagehide',()=>{if(!busy)persistMeta();for(const item of items)URL.revokeObjectURL(item.preview);});
 window.addEventListener('pageshow',event=>{if(event.persisted){for(const item of items)item.preview=URL.createObjectURL(item.file);render();}});
 (async()=>{await restore();await checkSession();})();
-
 </script>
 </body>
 </html>
