@@ -35,7 +35,9 @@ export async function onRequestGet({request,env}) {
     if(!profileResponse.ok)return fail("profile_rejected");
     const profile=await profileResponse.json();
     if(!/^[0-9]{1,50}$/.test(String(profile.id||"")))return fail("profile_invalid");
-    const session=await beginSession(env,"zalo",String(profile.id),profile.name);
+    let session;
+    try {session=await beginSession(env,"zalo",String(profile.id),profile.name);}
+    catch {return fail("session_store");}
     return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
   }catch{return fail("callback_error");}
 }
