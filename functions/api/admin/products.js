@@ -1,4 +1,4 @@
-import { fail, fromRow, genericDbError, json, productInsertStatement, readJsonBodyLimited, requireAdmin, toAdminProduct, validateProduct } from "../../_lib.js";
+import { fail, fromRow, genericDbError, json, productInsertStatement, readJsonBodyLimited, requireAdmin, toAdminProduct, validateProduct, slugify } from "../../_lib.js";
 import { officialSkuPrefix, nextSkuForPrefix, defaultSneakerTitle } from "../../_catalog-sku.js";
 
 export async function onRequestGet(context) {
@@ -54,8 +54,11 @@ export async function onRequestPost(context) {
       try {
         const rows=await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(prefix+"%").all();
         const nextSku=nextSkuForPrefix(rows.results,prefix);
+        const nextTitle=defaultSneakerTitle(nextSku);
         p={ ...p,sku:nextSku,skuVerified:true,
-          ...(useDefaultSneakerTitle?{title:defaultSneakerTitle(nextSku)}:{}) };
+          ...(useDefaultSneakerTitle?{
+            title:nextTitle,slug:`${slugify(nextTitle).slice(0,70)}-${p.id.slice(0,8)}`
+          }:{}) };
       } catch {
         return fail("Không thể đọc lại SKU sau xung đột. Vui lòng thử lại.", 503);
       }
