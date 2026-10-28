@@ -99,6 +99,7 @@ jobs:
       - name: Build signed APK and run Android lint
         working-directory: tools/taobao-import/android
         env:
+          SD_TAOBAO_RELEASE_VERSION_CODE: ${{ github.run_number }}
           SD_TAOBAO_RELEASE_STORE_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_STORE_PASSWORD }}
           SD_TAOBAO_RELEASE_KEY_ALIAS: ${{ secrets.SD_TAOBAO_ANDROID_KEY_ALIAS }}
           SD_TAOBAO_RELEASE_KEY_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_KEY_PASSWORD }}
@@ -110,6 +111,7 @@ jobs:
           apk='tools/taobao-import/android/app/build/outputs/apk/release/app-release.apk'
           test -s "$apk"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk" | grep -q "package: name='com.sindarealest.taobaoimport'"
           sha256sum "$apk"
       - name: Retain candidate only for emulator verification
         uses: actions/upload-artifact@v4
