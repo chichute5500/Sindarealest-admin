@@ -126,7 +126,7 @@ jobs:
           # Its current 12-screen coverage is replaced by admin-current-screens-readonly;
           # preserve the legacy login / reduced-motion checks without restoring rejected UI.
           SD_OPTIONS_BASE_URL=http://127.0.0.1:4173 LOCAL_ADMIN_URL=http://127.0.0.1:4173/admin/ \
-            npx playwright test tests/e2e/product-options-admin-mobile-desktop.spec.js tests/e2e/admin-search-live-input-race.spec.js tests/e2e/admin-current-screens-readonly.spec.js tests/e2e/admin-static-baseline.spec.js --grep-invert 'captures read-only Admin module UI states using explicit local fixtures' --config=playwright.owner-gesture.config.js --workers=2 --reporter=list
+            npx playwright test tests/e2e/product-options-admin-mobile-desktop.spec.js tests/e2e/admin-search-live-input-race.spec.js tests/e2e/admin-current-screens-readonly.spec.js tests/e2e/admin-restore-password-ui.spec.js tests/e2e/admin-static-baseline.spec.js --grep-invert 'captures read-only Admin module UI states using explicit local fixtures' --config=playwright.owner-gesture.config.js --workers=2 --reporter=list
       - uses: actions/upload-artifact@v4
         if: always()
         with:
