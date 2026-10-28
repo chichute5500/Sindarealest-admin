@@ -32,6 +32,8 @@
 <link rel="preload" href="/fonts/NotoSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
+<link rel="stylesheet" href="/customer-auth.css">
+<script type="module" src="/customer-auth-ui.js"></script>
 <title>SinDarealest — Premium Crocodile Leather Fashion</title>
 <script>(()=>{const root=document.documentElement;
  root.classList.add('js-enabled');
@@ -1342,12 +1344,34 @@ html.sd-catalog-route #products .filter-pill{
   <div class="account-panel-content">
     <div id="accountMenuView" class="account-menu-view">
       <div class="account-guest glass"><span class="account-avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.7-4.1 3.4-6.2 8-6.2s7.3 2.1 8 6.2"/></svg></span><div><strong>Chào mừng bạn</strong><small>Khám phá và kết nối cùng SinDarealest</small></div></div>
+      <section id="sdCustomerAuth" class="glass" aria-label="Đăng nhập tài khoản khách hàng">
+      <div data-auth-options>
+        <p class="sd-auth-heading">Đăng nhập tài khoản</p>
+        <p class="sd-auth-caption">Theo dõi tài khoản SinDarealest. Bạn vẫn có thể đặt hàng không cần đăng nhập.</p>
+        <button type="button" class="sd-auth-provider sd-auth-zalo tap-target" data-auth-zalo>Tiếp tục với Zalo</button>
+        <button type="button" class="sd-auth-provider tap-target" data-auth-google>Tiếp tục với Google</button>
+        <form class="sd-auth-email-fields" data-mode="login" autocomplete="on">
+          <label data-auth-name-row hidden>Họ và tên<input name="customer_name" autocomplete="name" maxlength="100"></label>
+          <label>Địa chỉ Email<input name="customer_email" type="email" autocomplete="email" required maxlength="254"></label>
+          <label>Mật khẩu<input name="customer_password" type="password" autocomplete="current-password" required minlength="12" maxlength="256"></label>
+          <button type="submit" class="sd-auth-submit tap-target" data-auth-submit>Đăng nhập bằng Email</button>
+        </form>
+        <button type="button" class="sd-auth-text-button tap-target" data-auth-toggle>Chưa có tài khoản? Đăng ký</button>
+        <p class="sd-auth-caption">Email chưa được xác minh tự động; chưa hỗ trợ khôi phục mật khẩu. Không dùng email để nhận quyền xem đơn cũ.</p>
+      </div>
+      <div data-auth-signed hidden>
+        <p class="sd-auth-heading">Xin chào, <span data-auth-user></span></p>
+        <p class="sd-auth-caption">Đã đăng nhập qua <span data-auth-provider></span></p>
+        <button type="button" class="sd-auth-provider tap-target" data-auth-logout>Đăng xuất</button>
+      </div>
+      <p class="sd-auth-message" data-auth-message role="status" aria-live="polite"></p>
+    </section>
       <button type="button" class="account-action tap-target" id="accountAddressAction" aria-controls="accountAddressView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="address" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><strong>Địa chỉ giao hàng</strong><small id="accountAddressSummary">Chưa lưu địa chỉ trên thiết bị này</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <button type="button" class="account-action tap-target" id="accountOrdersAction" aria-controls="accountOrdersView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="orders" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3.5h12v17l-3-1.8-3 1.8-3-1.8-3 1.8v-17Z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span><span><strong>Đơn hàng của tôi</strong><small><span id="accountOrderCount">0</span> yêu cầu đã gửi trên thiết bị này</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <button type="button" class="account-action tap-target" id="accountFavoritesAction" aria-controls="accountFavoritesView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="favorites" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.6 8.8c0 4.4-8.6 10.1-8.6 10.1S3.4 13.2 3.4 8.8A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.6 2.6Z"/></svg></span><span><strong>Sản phẩm yêu thích</strong><small><span id="accountFavoriteCount">0</span> sản phẩm đã lưu trên thiết bị này</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <button type="button" class="account-action tap-target" id="accountThemeAction"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="theme" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2.5 12h2m15 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span><strong>Chế độ hiển thị</strong><small>Chuyển giữa giao diện sáng và tối</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <a class="account-action tap-target" href="#contact" id="accountContactAction"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="contact" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 2 1-4A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 10h7M8.5 13.5h4"/></svg></span><span><strong>Liên hệ hỗ trợ</strong><small>Zalo, Messenger và các kênh liên hệ</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></a>
-      <p class="account-note">Phiên bản hiện tại chưa có đăng nhập khách hàng. Địa chỉ, yêu thích và tóm tắt yêu cầu đặt hàng chỉ lưu trên thiết bị này; cửa hàng nhận yêu cầu qua máy chủ khi bạn gửi đặt hàng. Lịch sử chưa đồng bộ giữa các thiết bị.</p>
+      <p class="account-note">Địa chỉ, sản phẩm yêu thích và lịch sử yêu cầu hiện vẫn chỉ lưu trên thiết bị này. Đăng nhập không tự động liên kết đơn hàng cũ; Shop sẽ bổ sung xác minh sở hữu đơn hàng trước khi đồng bộ giữa các thiết bị.</p>
     </div>
     <div id="accountFavoritesView" class="account-favorites-view" hidden>
       <div class="favorites-view-heading"><button type="button" class="favorites-back tap-target" id="accountFavoritesBack">← Tài khoản</button><span id="accountFavoritesTotal">0 sản phẩm</span></div>
