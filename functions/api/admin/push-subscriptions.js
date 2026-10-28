@@ -35,8 +35,8 @@ export async function onRequestDelete(context) {
 // NOT an authentication factor. Password-authenticated owner access is required.
 export async function onRequestPut(context) {
   const {request,env}=context;
-  if(request.headers.get("X-SD-Android-App")!=="2")return fail("Yêu cầu ứng dụng không hợp lệ.",403);
   const auth=await requireAdmin(context);if(auth.response)return auth.response;
+  if(request.headers.get("X-SD-Android-App")!=="2")return fail("Yêu cầu ứng dụng không hợp lệ.",403);
   const parsed=await readJsonBodyLimited(request,4*1024);
   if(parsed.error)return fail(parsed.error==="too_large"?"Vượt kích thước đăng ký.":"Thông tin thiết bị không hợp lệ.",parsed.error==="too_large"?413:400);
   const body=parsed.value;
