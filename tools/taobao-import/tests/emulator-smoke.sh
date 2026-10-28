@@ -4,25 +4,33 @@ set -euo pipefail
 APK="${1:-qa-apk/app-debug.apk}"
 PKG='com.sindarealest.taobaoimport'
 test -s "$APK"
+await_ui() {
+  local needle="$1" output="$2"
+  for attempt in $(seq 1 12); do
+    adb shell uiautomator dump /sdcard/window.xml >/dev/null 2>&1 || true
+    adb shell cat /sdcard/window.xml > "$output" 2>/dev/null || true
+    if grep -Fq "$needle" "$output"; then return 0; fi
+    sleep 2
+  done
+  echo "FAIL: Android UI did not show expected text: $needle" >&2
+  adb shell screencap -p /sdcard/taobao-import-emulator.png || true
+  adb pull /sdcard/taobao-import-emulator.png ./taobao-import-emulator.png >/dev/null 2>&1 || true
+  grep -o 'text="[^"]*"' "$output" | head -20 >&2 || true
+  return 1
+}
 adb install -r "$APK"
 adb shell am start -W -n "$PKG/.MainActivity" | tee /tmp/taobao-first-launch.txt
 grep -Eq 'Status: ok|Activity: com.sindarealest.taobaoimport/.MainActivity' /tmp/taobao-first-launch.txt
-adb shell uiautomator dump /sdcard/window.xml >/dev/null
-adb shell cat /sdcard/window.xml > /tmp/taobao-first-screen.xml
-grep -q 'SinDarealest' /tmp/taobao-first-screen.xml
-grep -q 'Mở Taobao' /tmp/taobao-first-screen.xml
+await_ui 'SinDarealest' /tmp/taobao-first-screen.xml
+await_ui 'Mở Taobao' /tmp/taobao-first-screen.xml
 adb shell am start -W -a android.intent.action.SEND -t text/plain \
   --es android.intent.extra.TEXT 'https://item.taobao.com/item.htm?id=12345678' \
   -n "$PKG/.MainActivity" | tee /tmp/taobao-shared-link.txt
-adb shell uiautomator dump /sdcard/window.xml >/dev/null
-adb shell cat /sdcard/window.xml > /tmp/taobao-shared-screen.xml
-grep -q '12345678' /tmp/taobao-shared-screen.xml
+await_ui '12345678' /tmp/taobao-shared-screen.xml
 adb shell am start -W -a android.intent.action.SEND -t text/plain \
   --es android.intent.extra.TEXT 'https://taobao.com.evil.example/item/1' \
   -n "$PKG/.MainActivity" >/dev/null
-adb shell uiautomator dump /sdcard/window.xml >/dev/null
-adb shell cat /sdcard/window.xml > /tmp/taobao-rejected-screen.xml
-grep -q 'không thuộc tên miền' /tmp/taobao-rejected-screen.xml
+await_ui 'không thuộc tên miền' /tmp/taobao-rejected-screen.xml
 # Exercise Android ACTION_SEND image with an actual MediaStore content:// URI.
 # This proves ContentResolver access and scoped image persistence, not Taobao login.
 printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAALUlEQVR4nGOclmLDQEvARFPTRy0YtWDUglELRi0YtWDUglELRi0YtWDUAioCAD2+AXadpnZ5AAAAAElFTkSuQmCC' | base64 -d > /tmp/sd-share-source.png
@@ -49,9 +57,7 @@ test "$image_saved" = '1' || { echo "FAIL: Android shared image not persisted in
 echo 'PASS: Android image share via content URI was saved in scoped MediaStore.'
 adb shell cmd uimode night yes >/dev/null
 adb shell am start -W -n "$PKG/.MainActivity" >/dev/null
-adb shell uiautomator dump /sdcard/window.xml >/dev/null
-adb shell cat /sdcard/window.xml > /tmp/taobao-dark-screen.xml
-grep -q 'SinDarealest' /tmp/taobao-dark-screen.xml
+await_ui 'SinDarealest' /tmp/taobao-dark-screen.xml
 adb shell screencap -p /sdcard/taobao-import-emulator.png
 adb pull /sdcard/taobao-import-emulator.png ./taobao-import-emulator.png >/dev/null
 adb shell cmd uimode night no >/dev/null
