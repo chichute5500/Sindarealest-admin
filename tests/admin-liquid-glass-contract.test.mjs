@@ -297,6 +297,10 @@ assert.ok(adminHtml.indexOf('id="pPrice"') < adminHtml.indexOf('id="productPanel
 assert.ok(!adminHtml.includes('id="pStock"'), 'stock entry removed');
 assert.ok(adminHtml.indexOf('id="pFulfillmentToggle"') < adminHtml.indexOf('id="productPanelGallery"'), 'order type must appear alongside category in Basic Info');
 has('class="field span2 product-category-duo"', 'category and order type belong to one side-by-side row');
+has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;', 'grid editor content must not stretch the tabs to fill spare height');
+has('grid-template-columns:repeat(2,minmax(0,1fr));height:52px;min-height:52px;max-height:52px;align-self:start;', 'two equal tabs stay a fixed height on desktop');
+has(' #productEditorTabs{position:sticky;top:0;height:48px;min-height:48px;max-height:48px;', 'mobile tabs stay 48px high on both panels');
+has('#productPanelDetails .product-category-duo .product-category-input-row #pCategory,#productPanelDetails .product-fulfillment-toggle{height:48px;min-height:48px;max-height:48px;box-sizing:border-box}', 'category and order-type controls share identical 48px sizing');
 has('#productPanelDetails .product-category-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))', 'two equal-width fields stay alongside each other even on narrow screens');
 has("field.value=field.value==='in_stock'?'made_to_order':'in_stock'", 'one tap alternates made-to-order and ready stock');
 has("!$('#pFulfillmentToggle').contains(event.target))setProductCategoryGridOpen(false)", 'outside-click dismissal must not steal the first pointer tap on the type toggle while the category grid is open');
