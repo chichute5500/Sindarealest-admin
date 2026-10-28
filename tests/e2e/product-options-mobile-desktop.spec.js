@@ -69,6 +69,32 @@ for(const cfg of [
   if(cfg.scheme==='light')expect(surfaces.idle.background).not.toBe(surfaces.heart.background);
   // In dark theme the translucent base tint may match the heart exactly.
   expect(surfaces.idle.shadow).not.toBe('none');
+  // Prevent a regression back to flat, smoky discs: both idle and selected
+  // lenses must retain layered refractive gradients, inner rim and specular arc.
+  for(const surface of [surfaces.idle,surfaces.selected]){
+   expect((surface.backgroundImage.match(/radial-gradient/g)||[]).length).toBeGreaterThanOrEqual(2);
+  }
+  const lensDetails=await page.evaluate(()=>{
+   return ['41','42'].map(value=>{
+    const node=document.querySelector('[data-option-value="'+value+'"]');
+    const inner=getComputedStyle(node,'::before');
+    const arc=getComputedStyle(node,'::after');
+    return {
+     innerContent:inner.content,innerBorder:inner.borderTopWidth,
+     arcContent:arc.content,arcBorder:arc.borderTopWidth,
+     arcPointerEvents:arc.pointerEvents,arcRadius:arc.borderRadius
+    };
+   });
+  });
+  for(const lens of lensDetails){
+   expect(lens.innerContent).not.toBe('none');
+   expect(lens.innerBorder).toBe('1px');
+   expect(lens.arcContent).not.toBe('none');
+   expect(lens.arcBorder).toBe('2px');
+   expect(lens.arcPointerEvents).toBe('none');
+   expect(lens.arcRadius).toBe('50%');
+  }
+
   expect(surfaces.selected.backgroundImage).toContain('linear-gradient');
   expect(surfaces.selected.border).not.toBe(surfaces.idle.border);
   expect(surfaces.selected.background).not.toBe(surfaces.idle.background);
