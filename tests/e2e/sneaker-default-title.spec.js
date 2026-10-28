@@ -105,6 +105,36 @@ for(const cfg of [
   await expect(typeButton).toContainText('Hàng đặt làm');
   await expect(typeValue).toHaveValue('made_to_order');
   await expect(typeButton).toHaveAttribute('aria-pressed','false');
+  // Owner screenshot regression: CSS grid must NOT stretch the editor's tab
+  // row to fill empty screen height (both on Basic Info and on Gallery).
+  const tabMeasure=async()=>page.locator('#productEditorTabs').evaluate(el=>{
+   const outer=el.getBoundingClientRect(),children=[...el.querySelectorAll('.editor-tab')].map(b=>b.getBoundingClientRect());
+   return {height:outer.height,childHeights:children.map(x=>x.height),top:outer.top,
+    contentAlign:getComputedStyle(el.parentElement).alignContent};
+  });
+  const basics=await tabMeasure();
+  expect(basics.height).toBeGreaterThanOrEqual(42);
+  expect(basics.height).toBeLessThanOrEqual(56);
+  expect(Math.abs(basics.childHeights[0]-basics.childHeights[1])).toBeLessThan(2);
+  const controls=await page.locator('.product-category-duo').evaluate(el=>{
+   const l=el.querySelector('#pCategory').getBoundingClientRect(),r=el.querySelector('#pFulfillmentToggle').getBoundingClientRect();
+   return {leftHeight:l.height,rightHeight:r.height,topDiff:Math.abs(l.top-r.top)};
+  });
+  expect(Math.abs(controls.leftHeight-controls.rightHeight)).toBeLessThan(2);
+  expect(controls.leftHeight).toBeGreaterThanOrEqual(44);
+  expect(controls.leftHeight).toBeLessThanOrEqual(52);
+  expect(controls.topDiff).toBeLessThan(3);
+  await page.screenshot({path:dir+'/balanced-basics-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#productTabGallery').click();
+  await expect(page.locator('#productPanelGallery')).toBeVisible();
+  const galleryTabs=await tabMeasure();
+  expect(galleryTabs.height).toBeLessThanOrEqual(56);
+  expect(Math.abs(galleryTabs.height-basics.height)).toBeLessThan(2);
+  await page.screenshot({path:dir+'/balanced-gallery-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#productTabDetails').click();
+  await expect(page.locator('#productPanelDetails')).toBeVisible();
+  const backTabs=await tabMeasure();
+  expect(Math.abs(backTabs.height-basics.height)).toBeLessThan(2);
   const sideBySide=await page.locator('.product-category-duo').evaluate(el=>{
    const [left,right]=[el.querySelector('.product-category-cell'),el.querySelector('.product-fulfillment-cell')].map(node=>node.getBoundingClientRect());
    return {leftWidth:left.width,rightWidth:right.width,xDiff:right.x-left.x,yDiff:Math.abs(left.y-right.y)};
