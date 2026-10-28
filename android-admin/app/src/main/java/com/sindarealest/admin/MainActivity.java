@@ -3,6 +3,15 @@ package com.sindarealest.admin;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.pm.PackageManager;
+import android.Manifest;
+import android.content.SharedPreferences;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
+import java.util.UUID;
 import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -60,6 +69,22 @@ public final class MainActivity extends Activity {
     private static final String ADMIN_URL = "https://sindarealest2.pages.dev/admin/";
     private static final String ALLOWED_HOST = "sindarealest2.pages.dev";
     private static final int FILE_REQUEST = 201;
+    private static final int NOTIFY_PERMISSION_REQUEST = 231;
+    private static final String NATIVE_PREFS = "sd_android_owner";
+    private static final String FCM_CHANNEL = "sindarealest_owner_events";
+    private boolean firebaseReady = false;
+    private String fcmToken = "";
+    private String deviceId = "";
+    private boolean webReady = false;
+    private long lastEnrollmentAttempt = 0;
+    private boolean foreground = false;
+    private final Runnable registrationHeartbeat = new Runnable() {
+        @Override public void run() {
+            if (!foreground || isFinishing() || isDestroyed()) return;
+            registerAndroidSession();
+            main.postDelayed(this, 30000);
+        }
+    };
     private static final int MAX_EXPORT_BASE64_CHARS = 25 * 1024 * 1024;
     private static final String BLOB_EXPORT_HOOK = "(function(){\n  if (window.__sdAdminExportHookInstalled || !window.SDAdminExport) return;\n  window.__sdAdminExportHookInstalled = true;\n  async function transmit(link){\n    try {\n      const response = await fetch(link.href);\n      if (!response.ok) throw new Error('Download failed');\n      const blob = await response.blob();\n      if (blob.size > 18 * 1024 * 1024) { alert('Tệp xuất quá lớn. Hãy mở Admin trong Chrome để tải.'); return; }\n      const reader = new FileReader();\n      reader.onload = function(){\n        const b64 = String(reader.result || '').split(',')[1] || '';\n        window.SDAdminExport.postMessage(JSON.stringify({\n          name: link.download || 'sindarealest-export',\n          mime: blob.type || 'application/octet-stream',\n          base64: b64\n        }));\n      };\n      reader.readAsDataURL(blob);\n    } catch(err) { alert('Không thể lưu tệp trong ứng dụng. Hãy mở Admin bằng Chrome để tải.'); }\n  }\n  // Keep non-download links and upload object URLs unchanged.\n  document.addEventListener('click', function(e){\n    const a = e.target && e.target.closest ? e.target.closest('a[download]') : null;\n    if (!a || !String(a.href).startsWith('blob:')) return;\n    e.preventDefault();\n    transmit(a);\n  }, true);\n})();";
     private WebView web;
@@ -86,12 +111,16 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
         getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        initAndroidNotifications();
         root = new FrameLayout(this);
         web = new WebView(this);
         root.addView(web, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
         WebView.setWebContentsDebuggingEnabled(false);
         WebSettings settings = web.getSettings();
+        // Client-side marker only: server auth is validated separately.
+        // Prevent the 10-minute browser inactivity timer within the APK.
+        settings.setUserAgentString(settings.getUserAgentString() + " SinDarealestAdminAndroid/2");
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
@@ -130,6 +159,8 @@ public final class MainActivity extends Activity {
             @Override public void onPageFinished(WebView view, String url) {
                 if (trusted(Uri.parse(url)) && !loadFailed) {
                     hideOffline();
+                    webReady = true;
+                    registerAndroidSession();
                     if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER))
                         view.evaluateJavascript(BLOB_EXPORT_HOOK, null);
                 }
@@ -214,6 +245,69 @@ public final class MainActivity extends Activity {
         } else {
             web.loadUrl(ADMIN_URL);
         }
+    }
+
+    /** Register a revocable 30-day device grant only after a successful Owner login.
+     * The fetch runs in the same-origin WebView so HttpOnly cookies stay private. */
+    private void registerAndroidSession() {
+        if (!webReady || web == null || !foreground || !trusted(Uri.parse(web.getUrl()))) return;
+        if (System.currentTimeMillis() - lastEnrollmentAttempt < 25000) return;
+        lastEnrollmentAttempt = System.currentTimeMillis();
+        String token = fcmToken;
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("deviceId", deviceId);
+            payload.put("fcmToken", token);
+        } catch (Exception ignored) { return; }
+        final String script = "(function(){fetch('/api/admin/android-device',{"
+            + "method:'POST',credentials:'same-origin',cache:'no-store',"
+            + "headers:{'Content-Type':'application/json','X-SD-Android-App':'2'},"
+            + "body:" + JSONObject.quote(payload.toString())
+            + "}).then(function(r){return r.json().then(function(d){return !!r.ok&&!!d.ok;});})"
+            + ".catch(function(){return false;});})();";
+        web.evaluateJavascript(script, result -> {
+            // The server owns authentication. Do not persist a password/token in JS.
+            // A 401 here simply means the Owner hasn't signed in yet.
+        });
+    }
+
+    private void initAndroidNotifications() {
+        SharedPreferences prefs=getSharedPreferences(NATIVE_PREFS,MODE_PRIVATE);
+        deviceId=prefs.getString("deviceId","");
+        if(!deviceId.matches("[a-f0-9-]{36}")) {
+            deviceId=UUID.randomUUID().toString();
+            prefs.edit().putString("deviceId",deviceId).apply();
+        }
+        fcmToken=prefs.getString("fcmToken","");
+        NotificationManager manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        if(manager!=null && Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            NotificationChannel channel=new NotificationChannel(FCM_CHANNEL,"Đơn hàng và hoạt động Admin",NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Đơn hàng mới, thanh toán, bảo hành và hoạt động quản trị");
+            manager.createNotificationChannel(channel);
+        }
+        // Native client config is public Firebase configuration, NEVER a service account.
+        final String appId=getString(R.string.sd_firebase_app_id);
+        final String sender=getString(R.string.sd_firebase_sender_id);
+        final String project=getString(R.string.sd_firebase_project_id);
+        final String apiKey=getString(R.string.sd_firebase_api_key);
+        if(!appId.isEmpty() && !sender.isEmpty() && !project.isEmpty() && !apiKey.isEmpty()){
+            try {
+                FirebaseOptions options=new FirebaseOptions.Builder().setApplicationId(appId)
+                    .setGcmSenderId(sender).setProjectId(project).setApiKey(apiKey).build();
+                if(FirebaseApp.getApps(this).isEmpty())FirebaseApp.initializeApp(this,options);
+                firebaseReady=!FirebaseApp.getApps(this).isEmpty();
+                if(firebaseReady) FirebaseMessaging.getInstance().getToken().addOnSuccessListener(token->{
+                    if(token!=null && !token.isEmpty()){
+                        fcmToken=token;
+                        prefs.edit().putString("fcmToken",token).apply();
+                        lastEnrollmentAttempt=0;
+                        registerAndroidSession();
+                    }
+                });
+            }catch(Exception ignored){firebaseReady=false;}
+        }
+        if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},NOTIFY_PERMISSION_REQUEST);
     }
 
     private void installPrivateExportBridge() {
@@ -358,15 +452,22 @@ public final class MainActivity extends Activity {
         super.onSaveInstanceState(out);
     }
     @Override protected void onPause() {
+        foreground = false;
+        main.removeCallbacks(registrationHeartbeat);
         CookieManager.getInstance().flush();
         web.onPause();
         super.onPause();
     }
     @Override protected void onResume() {
         super.onResume();
+        foreground = true;
         web.onResume();
+        main.removeCallbacks(registrationHeartbeat);
+        main.post(registrationHeartbeat);
     }
     @Override protected void onDestroy() {
+        foreground = false;
+        main.removeCallbacks(registrationHeartbeat);
         cancelPendingFile();
         if (web != null) {
             root.removeView(web);
