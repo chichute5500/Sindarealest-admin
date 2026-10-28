@@ -37,8 +37,9 @@ a{color:var(--dark)}#sourceLink{overflow-wrap:anywhere}.confirm-rights{display:f
 <label for="taobaoLink">Liên kết sản phẩm Taobao / Tmall</label>
 <textarea id="taobaoLink" rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Dán toàn bộ nội dung chia sẻ Taobao, ví dụ 【淘宝】... https://e.tb.cn/h....?tk=..." maxlength="3000"></textarea>
 <div class="actions"><button class="btn primary" id="autoPhotos" type="button">Tự lấy ảnh từ link</button><a id="sourceLink" class="btn" target="_blank" rel="noopener noreferrer" hidden>Mở sản phẩm</a></div>
+<div id="apiReadiness" class="status" role="status" aria-live="polite">Đang kiểm tra kết nối API Taobao…</div>
 <label class="confirm-rights"><input id="photoRights" type="checkbox"> Tôi xác nhận có quyền sử dụng ảnh của sản phẩm này.</label>
-<p class="muted">Tự lấy ảnh sử dụng API Taobao chính thức khi tài khoản ứng dụng đã được cấp quyền. Đăng nhập Chrome riêng lẻ không cấp quyền API. Nhận cả link rút gọn <code>e.tb.cn</code> và nguyên đoạn tiếng Trung; một số link vẫn cần Taobao cho phép giải mã.</p>
+<p class="muted">Tính năng tự tải ảnh cần AppKey/AppSecret Taobao Open Platform được cấu hình cho máy chủ SinDarealest. Đăng nhập Taobao bằng Chrome không cấp các khóa này. Khi chưa kết nối API, bạn vẫn có thể bấm “Mở sản phẩm” để lấy ảnh hợp lệ rồi chọn ảnh từ điện thoại ở bước 2.</p>
 <div id="autoStatus" class="status" aria-live="polite">Dán link và bấm “Tự lấy ảnh từ link”. Hệ thống sẽ báo rõ nếu API chưa được kết nối.</div>
 <p class="muted" id="noSource">Chưa có link sản phẩm.</p>
 </section>
@@ -156,7 +157,7 @@ function lockFields() {
   for(const id of ['title','category','price','fulfillment','description'])$(id).disabled=busy||creationAttempted||completed;
   $('picker').disabled=busy||creationAttempted||completed;
   $('taobaoLink').disabled=busy||creationAttempted||completed;
-  $('autoPhotos').disabled=busy||creationAttempted||completed;
+  $('autoPhotos').disabled=busy||creationAttempted||completed||apiConfigured===false;
   $('photoRights').disabled=busy||creationAttempted||completed;
   $('submit').disabled=busy||completed;
   $('submit').textContent=creationAttempted&&!completed?'Kiểm tra / hoàn tất bản nháp':'Tải ảnh & tạo bản nháp';
@@ -180,9 +181,36 @@ async function restore() {
   if(source)applySource(source);
   persistMeta();render();lockFields();
 }
+let apiConfigured = null;
+async function checkTaobaoCapability() {
+  const box=$('apiReadiness'),button=$('autoPhotos');
+  try {
+    const result=await request('/api/admin/taobao-photos',{method:'GET'});
+    apiConfigured=Boolean(result.configured);
+    if(!apiConfigured){
+      box.textContent='Chưa thể tự tải ảnh: máy chủ chưa có AppKey/AppSecret Taobao Open Platform. Đây là thiếu cấu hình, không phải lỗi link sản phẩm.';
+      box.className='status bad';
+      button.textContent='Chưa kết nối API Taobao';
+      button.disabled=true;
+    }else{
+      box.textContent='Đã cấu hình ứng dụng Taobao Open Platform. Có thể thử lấy ảnh; kết quả vẫn phụ thuộc quyền API và sản phẩm.';
+      box.className='status good';
+      button.textContent='Tự lấy ảnh từ link';
+      button.disabled=busy||creationAttempted||completed;
+    }
+  }catch{
+    apiConfigured=null;
+    box.textContent='Không kiểm tra được cấu hình API Taobao. Khi bấm lấy ảnh, hệ thống sẽ báo lỗi cụ thể nếu không kết nối được.';
+    box.className='status';
+    button.textContent='Tự lấy ảnh từ link';
+    button.disabled=busy||creationAttempted||completed;
+  }
+}
 async function checkSession() {
-  try{await request('/api/admin/session');$('work').hidden=false;$('loginPanel').hidden=true;}
-  catch{$('work').hidden=true;$('loginPanel').hidden=false;}
+  try{
+    await request('/api/admin/session');$('work').hidden=false;$('loginPanel').hidden=true;
+    await checkTaobaoCapability();
+  }catch{$('work').hidden=true;$('loginPanel').hidden=false;}
 }
 $('loginForm').addEventListener('submit',async e=>{
   e.preventDefault();const btn=e.submitter;btn.disabled=true;
@@ -243,7 +271,7 @@ $('taobaoLink').addEventListener('input',()=>{
 });
 $('photoRights').addEventListener('change',persistMeta);
 $('autoPhotos').addEventListener('click',async()=>{
-  if(busy||creationAttempted||completed)return;
+  if(busy||creationAttempted||completed||apiConfigured===false)return;
   const link=$('taobaoLink').value.trim();
   if(!allowedSource(link)){autoMessage('Dán link sản phẩm Taobao hoặc toàn bộ nội dung chia sẻ từ ứng dụng, kể cả tiếng Trung.',true);return;}
   if(!$('photoRights').checked){autoMessage('Cần xác nhận quyền sử dụng ảnh trước khi lấy.',true);return;}

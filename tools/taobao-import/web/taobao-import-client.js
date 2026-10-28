@@ -93,7 +93,7 @@ function lockFields() {
   for(const id of ['title','category','price','fulfillment','description'])$(id).disabled=busy||creationAttempted||completed;
   $('picker').disabled=busy||creationAttempted||completed;
   $('taobaoLink').disabled=busy||creationAttempted||completed;
-  $('autoPhotos').disabled=busy||creationAttempted||completed;
+  $('autoPhotos').disabled=busy||creationAttempted||completed||apiConfigured===false;
   $('photoRights').disabled=busy||creationAttempted||completed;
   $('submit').disabled=busy||completed;
   $('submit').textContent=creationAttempted&&!completed?'Kiểm tra / hoàn tất bản nháp':'Tải ảnh & tạo bản nháp';
@@ -117,9 +117,36 @@ async function restore() {
   if(source)applySource(source);
   persistMeta();render();lockFields();
 }
+let apiConfigured = null;
+async function checkTaobaoCapability() {
+  const box=$('apiReadiness'),button=$('autoPhotos');
+  try {
+    const result=await request('/api/admin/taobao-photos',{method:'GET'});
+    apiConfigured=Boolean(result.configured);
+    if(!apiConfigured){
+      box.textContent='Chưa thể tự tải ảnh: máy chủ chưa có AppKey/AppSecret Taobao Open Platform. Đây là thiếu cấu hình, không phải lỗi link sản phẩm.';
+      box.className='status bad';
+      button.textContent='Chưa kết nối API Taobao';
+      button.disabled=true;
+    }else{
+      box.textContent='Đã cấu hình ứng dụng Taobao Open Platform. Có thể thử lấy ảnh; kết quả vẫn phụ thuộc quyền API và sản phẩm.';
+      box.className='status good';
+      button.textContent='Tự lấy ảnh từ link';
+      button.disabled=busy||creationAttempted||completed;
+    }
+  }catch{
+    apiConfigured=null;
+    box.textContent='Không kiểm tra được cấu hình API Taobao. Khi bấm lấy ảnh, hệ thống sẽ báo lỗi cụ thể nếu không kết nối được.';
+    box.className='status';
+    button.textContent='Tự lấy ảnh từ link';
+    button.disabled=busy||creationAttempted||completed;
+  }
+}
 async function checkSession() {
-  try{await request('/api/admin/session');$('work').hidden=false;$('loginPanel').hidden=true;}
-  catch{$('work').hidden=true;$('loginPanel').hidden=false;}
+  try{
+    await request('/api/admin/session');$('work').hidden=false;$('loginPanel').hidden=true;
+    await checkTaobaoCapability();
+  }catch{$('work').hidden=true;$('loginPanel').hidden=false;}
 }
 $('loginForm').addEventListener('submit',async e=>{
   e.preventDefault();const btn=e.submitter;btn.disabled=true;
@@ -180,7 +207,7 @@ $('taobaoLink').addEventListener('input',()=>{
 });
 $('photoRights').addEventListener('change',persistMeta);
 $('autoPhotos').addEventListener('click',async()=>{
-  if(busy||creationAttempted||completed)return;
+  if(busy||creationAttempted||completed||apiConfigured===false)return;
   const link=$('taobaoLink').value.trim();
   if(!allowedSource(link)){autoMessage('Dán link sản phẩm Taobao hoặc toàn bộ nội dung chia sẻ từ ứng dụng, kể cả tiếng Trung.',true);return;}
   if(!$('photoRights').checked){autoMessage('Cần xác nhận quyền sử dụng ảnh trước khi lấy.',true);return;}
