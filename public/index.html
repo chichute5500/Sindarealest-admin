@@ -4408,7 +4408,7 @@ html.dark{
 /* Same translucent pearl/ice material and rim light across icon-only controls. */
 .icon-btn,.nav-wrap .icon-btn,.mini-add,.page-btn.page-arrow,
 .slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,
-.sd-fullscreen-close,.sd-fullscreen-arrow,.detail-favorite-btn,#productOverlay .sd-product-option-chip{
+.sd-fullscreen-close,.sd-fullscreen-arrow,.detail-favorite-btn{
  background:
   radial-gradient(125% 115% at 12% 0%,rgba(255,255,255,.90) 0%,rgba(255,255,255,.42) 27%,rgba(255,255,255,0) 65%),
   linear-gradient(145deg,rgba(255,255,255,.57) 0%,rgba(226,242,253,.38) 46%,rgba(151,194,223,.24) 100%) !important;
@@ -4422,7 +4422,7 @@ html.dark{
 html.dark .icon-btn,html.dark .nav-wrap .icon-btn,html.dark .mini-add,html.dark .page-btn.page-arrow,
 html.dark .slide-controls button,html.dark .featured-arrow,
 html.dark .detail-zoom-btn,html.dark .detail-gallery-arrow,
-html.dark .sd-fullscreen-close,html.dark .sd-fullscreen-arrow,html.dark .detail-favorite-btn,html.dark #productOverlay .sd-product-option-chip{
+html.dark .sd-fullscreen-close,html.dark .sd-fullscreen-arrow,html.dark .detail-favorite-btn{
  background:
   radial-gradient(125% 115% at 12% 0%,rgba(214,241,255,.28) 0%,rgba(157,206,238,.13) 28%,rgba(255,255,255,0) 66%),
   linear-gradient(145deg,rgba(27,62,88,.78) 0%,rgba(12,39,61,.68) 48%,rgba(5,24,41,.76) 100%) !important;
@@ -4432,7 +4432,7 @@ html.dark .sd-fullscreen-close,html.dark .sd-fullscreen-arrow,html.dark .detail-
 }
 .icon-btn:hover,.nav-wrap .icon-btn:hover,.mini-add:hover,.page-btn.page-arrow:hover:not(:disabled),
 .slide-controls button:hover,.featured-arrow:hover,.detail-zoom-btn:hover,
-.detail-gallery-arrow:hover,.sd-fullscreen-close:hover,.sd-fullscreen-arrow:hover,.detail-favorite-btn:hover,#productOverlay .sd-product-option-chip:hover{
+.detail-gallery-arrow:hover,.sd-fullscreen-close:hover,.sd-fullscreen-arrow:hover,.detail-favorite-btn:hover{
  background:
   radial-gradient(125% 115% at 14% 0%,rgba(255,255,255,.98) 0%,rgba(255,255,255,.54) 26%,rgba(255,255,255,0) 67%),
   linear-gradient(145deg,rgba(250,253,255,.74) 0%,rgba(223,241,253,.52) 46%,rgba(136,190,225,.32) 100%) !important;
@@ -4442,7 +4442,7 @@ html.dark .sd-fullscreen-close,html.dark .sd-fullscreen-arrow,html.dark .detail-
 html.dark .icon-btn:hover,html.dark .nav-wrap .icon-btn:hover,html.dark .mini-add:hover,html.dark .page-btn.page-arrow:hover:not(:disabled),
 html.dark .slide-controls button:hover,html.dark .featured-arrow:hover,
 html.dark .detail-zoom-btn:hover,html.dark .detail-gallery-arrow:hover,
-html.dark .sd-fullscreen-close:hover,html.dark .sd-fullscreen-arrow:hover,html.dark .detail-favorite-btn:hover,html.dark #productOverlay .sd-product-option-chip:hover{
+html.dark .sd-fullscreen-close:hover,html.dark .sd-fullscreen-arrow:hover,html.dark .detail-favorite-btn:hover{
  background:
   radial-gradient(125% 115% at 14% 0%,rgba(230,247,255,.42) 0%,rgba(157,206,238,.20) 29%,rgba(255,255,255,0) 67%),
   linear-gradient(145deg,rgba(35,77,106,.86) 0%,rgba(14,46,71,.80) 48%,rgba(7,29,48,.86) 100%) !important;
@@ -4451,7 +4451,7 @@ html.dark .sd-fullscreen-close:hover,html.dark .sd-fullscreen-arrow:hover,html.d
 }
 .icon-btn:active,.nav-wrap .icon-btn:active,.mini-add:active,.page-btn.page-arrow:active:not(:disabled),
 .slide-controls button:active,.featured-arrow:active,.detail-zoom-btn:active,
-.detail-gallery-arrow:active,.sd-fullscreen-close:active,.sd-fullscreen-arrow:active,.detail-favorite-btn:active,#productOverlay .sd-product-option-chip:active{
+.detail-gallery-arrow:active,.sd-fullscreen-close:active,.sd-fullscreen-arrow:active,.detail-favorite-btn:active{
  background:
   linear-gradient(155deg,rgba(197,225,245,.44) 0%,rgba(229,243,253,.32) 52%,rgba(130,180,212,.27) 100%) !important;
  border-color:rgba(201,230,249,.92) !important;
@@ -4460,7 +4460,7 @@ html.dark .sd-fullscreen-close:hover,html.dark .sd-fullscreen-arrow:hover,html.d
 html.dark .icon-btn:active,html.dark .nav-wrap .icon-btn:active,html.dark .mini-add:active,html.dark .page-btn.page-arrow:active:not(:disabled),
 html.dark .slide-controls button:active,html.dark .featured-arrow:active,
 html.dark .detail-zoom-btn:active,html.dark .detail-gallery-arrow:active,
-html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html.dark .detail-favorite-btn:active,html.dark #productOverlay .sd-product-option-chip:active{
+html.dark .sd-fullscreen-close:active,html.dark .sd-fullscreen-arrow:active,html.dark .detail-favorite-btn:active{
  background:
   linear-gradient(155deg,rgba(78,131,169,.42) 0%,rgba(28,67,96,.54) 52%,rgba(8,30,49,.74) 100%) !important;
  border-color:rgba(190,224,246,.62) !important;
@@ -4619,9 +4619,17 @@ html.dark #productOverlay .detail-actions .detail-purchase-button{
 #productOverlay .sd-product-option-chip{
  -webkit-appearance:none;appearance:none;display:inline-flex;align-items:center;justify-content:center;
  flex:0 0 40px;width:40px;min-width:40px;max-width:40px;height:40px;min-height:40px;max-height:40px;
- aspect-ratio:1;padding:0;margin:0;border-radius:50%;
+ aspect-ratio:1;padding:0;margin:0;border:1px solid rgba(255,255,255,.72);border-radius:50%;
+ background:rgba(255,255,255,.42);color:#142a3c;
+ backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);
+ box-shadow:0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80);
  font:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer;isolation:isolate;
  transition:transform .14s cubic-bezier(.2,.7,.2,1),background .14s cubic-bezier(.2,.7,.2,1),border-color .14s cubic-bezier(.2,.7,.2,1),box-shadow .14s cubic-bezier(.2,.7,.2,1)
+}
+/* The heart uses ID-specific !important colors; mirror its computed surface exactly. */
+html.dark #productOverlay .sd-product-option-chip{
+ color:#eaf3fb;background:rgba(13,38,59,.58);border-color:rgba(234,243,251,.28);
+ box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(234,243,251,.17)
 }
 #productOverlay .sd-product-option-chip:active{transform:scale(.94)}
 #productOverlay .sd-product-option-chip.is-selected{
