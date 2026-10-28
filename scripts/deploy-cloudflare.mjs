@@ -98,6 +98,12 @@ async function main() {
   } catch {
     throw new Error('Migration 0009_fulfillment_and_manual_payments.sql chưa sẵn sàng trên D1. Deploy bị chặn; script chỉ đọc schema và không tự chạy hoặc sửa migration/D1.');
   }
+  // Verify Owner-applied Android device table on Production before deploying.
+  try {
+    runWrangler(['d1','execute',databaseName,'--remote','--command','SELECT token_hash, device_id, fcm_token, expires_at FROM android_admin_devices LIMIT 0;'],{quiet:true});
+  } catch {
+    throw new Error('Migration 0010_admin_android_devices.sql thiếu trên Production D1; dừng deploy để bảo vệ dữ liệu.');
+  }
   if (!ci) {
     const confirm = await ask(`Gõ chính xác DEPLOY ${project} ${branch} để triển khai`);
     if (confirm !== `DEPLOY ${project} ${branch}`) throw new Error('Xác nhận không khớp; đã hủy deploy.');

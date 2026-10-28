@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "672743599644",
+    "project_id": "sindarealest-969e5",
+    "storage_bucket": "sindarealest-969e5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672743599644:android:178729c34c289b2b25f9d9",
+        "android_client_info": {
+          "package_name": "com.sindarealest.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAloz3nQ0YmTe3qtrphNEWgJ7RIN21uZ10"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

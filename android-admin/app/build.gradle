@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.application'
+}
+// Standard Firebase client configuration from Owner's Android registration.
+// These client identifiers are public; service-account credentials are NEVER included.
+
+def firebaseFile = file('google-services.json')
+if (!firebaseFile.isFile()) throw new GradleException('Missing Android Firebase client config')
+def firebase = new groovy.json.JsonSlurper().parse(firebaseFile)
+def nativeClient = firebase.client?.find { it.client_info?.android_client_info?.package_name == 'com.sindarealest.admin' }
+def firebaseAppId = nativeClient?.client_info?.mobilesdk_app_id
+def firebaseSender = firebase.project_info?.project_number
+def firebaseProject = firebase.project_info?.project_id
+def firebaseApiKey = nativeClient?.api_key?.getAt(0)?.current_key
+if (![firebaseAppId, firebaseSender, firebaseProject, firebaseApiKey].every { it instanceof String && !it.isBlank() })
+    throw new GradleException('Firebase Android configuration is incomplete or has wrong package')
+
+android {
+    namespace 'com.sindarealest.admin'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.sindarealest.admin'
+        minSdk 29
+        targetSdk 34
+        versionCode 2
+        versionName '1.1.0'
+        // Client configuration comes from the Android app's google-services.json.
+        resValue 'string', 'sd_firebase_app_id', firebaseAppId
+        resValue 'string', 'sd_firebase_sender_id', firebaseSender
+        resValue 'string', 'sd_firebase_project_id', firebaseProject
+        resValue 'string', 'sd_firebase_api_key', firebaseApiKey
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ''
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+}
+dependencies {
+    implementation 'androidx.core:core:1.15.0'
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'com.google.firebase:firebase-messaging:26.0.1'
+}
