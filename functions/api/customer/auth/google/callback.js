@@ -1,8 +1,9 @@
-import { ORIGIN,callback,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error } from "../../../../_customer-auth.js";
+import { customerOrigin,callback,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error } from "../../../../_customer-auth.js";
 export async function onRequestGet({request,env}) {
-  if(new URL(request.url).origin!==ORIGIN||!configured(env,"google"))return error("Đăng nhập Google chưa sẵn sàng.",503);
+  const origin=customerOrigin(request);
+  if(!origin||!configured(env,"google"))return error("Đăng nhập Google chưa sẵn sàng.",503);
   const url=new URL(request.url);
-  const fail=()=>redirect(ORIGIN+"/?customer_auth=failed",[clearFlow()]);
+  const fail=()=>redirect(origin+"/?customer_auth=failed",[clearFlow()]);
   if(url.searchParams.has("error")||!url.searchParams.has("code"))return fail();
   const code=url.searchParams.get("code")||"";
   if(code.length>2048)return fail();
@@ -11,7 +12,7 @@ export async function onRequestGet({request,env}) {
     if(!verifier)return fail();
     const body=new URLSearchParams({
       code,client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,
-      redirect_uri:callback("google"),grant_type:"authorization_code",code_verifier:verifier
+      redirect_uri:callback("google",origin),grant_type:"authorization_code",code_verifier:verifier
     });
     const tokenResponse=await fetch("https://oauth2.googleapis.com/token",{
       method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
@@ -28,6 +29,6 @@ export async function onRequestGet({request,env}) {
     const profile=await profileResponse.json();
     if(!profile.sub||profile.email_verified!==true)return fail();
     const session=await beginSession(env,"google",String(profile.sub),profile.name,profile.email);
-    return redirect(ORIGIN+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
+    return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
   }catch{return fail();}
 }
