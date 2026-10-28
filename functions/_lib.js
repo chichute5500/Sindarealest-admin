@@ -1,6 +1,8 @@
 const encoder = new TextEncoder();
 const SESSION_COOKIE = "sd_admin_session";
 const SESSION_SECONDS = 10 * 60;
+const ANDROID_COOKIE = "sd_admin_android";
+const ANDROID_DEVICE_DAYS = 30;
 
 export const FULFILLMENT_TYPES = Object.freeze(["in_stock", "made_to_order", "unclassified"]);
 export function normalizeFulfillmentType(value) {
@@ -182,7 +184,7 @@ export async function createSession(secret) {
   return `${payload}.${signature}`;
 }
 
-export async function verifySession(request, env) {
+export async function verifyShortSession(request, env) {
   if (!hasSecuritySecrets(env)) return false;
   const token = cookieValue(request, SESSION_COOKIE);
   const parts = token.split(".");
@@ -197,6 +199,38 @@ export async function verifySession(request, env) {
   } catch {
     return false;
   }
+}
+
+/** Android-only long-lived device grant. Kept in D1, revocable on logout.
+ * No session is created without an already authenticated owner session. */
+export function readAndroidSessionToken(request) {
+  const token = cookieValue(request, ANDROID_COOKIE);
+  return /^[A-Za-z0-9_-]{43}$/.test(token) ? token : "";
+}
+export function makeAndroidSessionToken() {
+  return b64url(crypto.getRandomValues(new Uint8Array(32)));
+}
+export async function hashAndroidSessionToken(token) {
+  return b64url(new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(token))));
+}
+export function androidSessionCookie(token) {
+  return `${ANDROID_COOKIE}=${token}; Path=/api/admin; HttpOnly; Secure; SameSite=Strict; Max-Age=${ANDROID_DEVICE_DAYS * 86400}`;
+}
+export function clearAndroidSessionCookie() {
+  return `${ANDROID_COOKIE}=; Path=/api/admin; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
+}
+export async function verifyAndroidSession(request, env) {
+  if (!hasSecuritySecrets(env) || !env?.DB) return false;
+  const token = readAndroidSessionToken(request);
+  if (!token) return false;
+  try {
+    const hash = await hashAndroidSessionToken(token);
+    const row = await env.DB.prepare("SELECT device_id FROM android_admin_devices WHERE token_hash=? AND expires_at>datetime('now') LIMIT 1").bind(hash).first();
+    return Boolean(row?.device_id);
+  } catch { return false; } // Missing migration must never grant access.
+}
+export async function verifySession(request, env) {
+  return await verifyShortSession(request, env) || await verifyAndroidSession(request, env);
 }
 
 export function sessionCookie(value) {

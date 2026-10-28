@@ -61,8 +61,58 @@ async function sendOne(endpoint,keys,payload,env) {
   const body=await encryptPayload({keys},payload), token=await vapidToken(endpoint,env);
   return fetch(endpoint,{method:"POST",redirect:"manual",signal:AbortSignal.timeout(3000),headers:{"Authorization":"vapid t="+token+", k="+env.VAPID_PUBLIC_KEY,"Content-Encoding":"aes128gcm","Content-Type":"application/octet-stream","TTL":"60","Urgency":"high"},body});
 }
-export async function sendAdminPush(env,payload) {
-  if(!env?.DB||!env.VAPID_PUBLIC_KEY||!env.VAPID_PRIVATE_KEY)return;
+// FCM HTTP v1 sender for native Android notifications. Service-account JSON belongs
+// ONLY in Cloudflare's encrypted FCM_SERVICE_ACCOUNT_JSON secret, never the APK.
+async function fcmAccessToken(serviceAccount) {
+  const now = Math.floor(Date.now() / 1000);
+  const b64 = v => b64url(enc.encode(JSON.stringify(v)));
+  const unsigned = b64({alg:"RS256",typ:"JWT"}) + "." + b64({
+    iss:serviceAccount.client_email, sub:serviceAccount.client_email,
+    aud:"https://oauth2.googleapis.com/token",
+    scope:"https://www.googleapis.com/auth/firebase.messaging", iat:now, exp:now+900,
+  });
+  const pem=String(serviceAccount.private_key||"").replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g,"");
+  const binary=atob(pem),keyBytes=Uint8Array.from(binary,ch=>ch.charCodeAt(0));
+  const key=await crypto.subtle.importKey("pkcs8",keyBytes,{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},false,["sign"]);
+  const sig=new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5",key,enc.encode(unsigned)));
+  const jwt=unsigned+"."+b64url(sig);
+  const response=await fetch("https://oauth2.googleapis.com/token",{
+    method:"POST",signal:AbortSignal.timeout(5000),
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion:jwt}),
+  });
+  if(!response.ok)throw Error("FCM OAuth exchange failed");
+  const reply=await response.json();
+  if(typeof reply.access_token!=="string")throw Error("FCM OAuth token missing");
+  return reply.access_token;
+}
+async function sendNativePush(env,payload){
+  if(!env?.FCM_SERVICE_ACCOUNT_JSON||!env.DB)return;
+  const result=await env.DB.prepare("SELECT token_hash,fcm_token FROM android_admin_devices WHERE expires_at>datetime('now') AND fcm_token<>'' ORDER BY updated_at DESC LIMIT 20").all();
+  const rows=result.results||[];
+  if(!rows.length)return;
+  const account=JSON.parse(env.FCM_SERVICE_ACCOUNT_JSON);
+  const project=String(account.project_id||"");
+  if(!/^[a-z0-9][a-z0-9-]{4,80}$/.test(project)||!account.client_email||!account.private_key)return;
+  const access=await fcmAccessToken(account);
+  const data={title:String(payload.title||"SinDarealest").slice(0,100),body:String(payload.body||"Có hoạt động mới.").slice(0,200),url:"/admin/"};
+  await Promise.allSettled(rows.map(async row=>{
+    try{
+      const response=await fetch("https://fcm.googleapis.com/v1/projects/"+encodeURIComponent(project)+"/messages:send",{
+        method:"POST",signal:AbortSignal.timeout(5000),
+        headers:{"Authorization":"Bearer "+access,"Content-Type":"application/json"},
+        body:JSON.stringify({message:{token:row.fcm_token,data,android:{priority:"HIGH",ttl:"3600s"}}}),
+      });
+      if(response.status===404||response.status===400){
+        const error=await response.json().catch(()=>({}));
+        const invalid=(error?.error?.details||[]).some(d=>d?.errorCode==="UNREGISTERED");
+        if(invalid)await env.DB.prepare("UPDATE android_admin_devices SET fcm_token='' WHERE token_hash=?").bind(row.token_hash).run();
+      }
+    }catch{}
+  }));
+}
+async function sendBrowserPush(env,payload){
+  if(!env?.VAPID_PUBLIC_KEY||!env?.VAPID_PRIVATE_KEY)return;
   let result;try{result=await env.DB.prepare("SELECT endpoint,keys_json FROM admin_push_subscriptions ORDER BY updated_at DESC LIMIT 50").all()}catch{return}
   await Promise.allSettled((result.results||[]).slice(0,50).map(async row=>{
     try {
@@ -70,4 +120,8 @@ export async function sendAdminPush(env,payload) {
       if(response.status===404||response.status===410)await env.DB.prepare("DELETE FROM admin_push_subscriptions WHERE endpoint=?").bind(row.endpoint).run();
     } catch {}
   }));
+}
+export async function sendAdminPush(env,payload) {
+  if(!env?.DB)return;
+  await Promise.allSettled([sendBrowserPush(env,payload),sendNativePush(env,payload)]);
 }
