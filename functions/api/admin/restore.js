@@ -1,4 +1,4 @@
-import { fail, getSetting, json, productInsertStatement, readJsonBodyLimited, requireAdmin, validateProduct } from "../../_lib.js";
+import { constantTimeTextEqual, fail, getSetting, json, productInsertStatement, readJsonBodyLimited, requireAdmin, validateProduct } from "../../_lib.js";
 import { validateWatermarkSettingUpdates } from "../../_lib/watermark-settings.js";
 
 const str = (v, max, required = false) => typeof v === "string" && v.length <= max && (!required || v.trim().length > 0);
@@ -164,6 +164,12 @@ function validateOperations(operations) {
 export async function onRequestPost(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
+  // Long-lived Android device authorization or a browser session alone cannot
+  // authorize the destructive replacement of orders, payments and warranties.
+  // Never store this confirmation in D1, logs, client storage or an export.
+  const reauth = context.request.headers.get("X-SD-Restore-Password") || "";
+  if (!reauth || reauth.length > 1024 || !constantTimeTextEqual(reauth, context.env.ADMIN_PASSWORD))
+    return fail("Cần xác thực lại mật khẩu quản trị để khôi phục dữ liệu.", 403);
   const parsed = await readJsonBodyLimited(context.request, MAX_BACKUP_BYTES);
   if (parsed.error === "too_large") return fail("Tệp sao lưu vượt giới hạn 20 MB. Hãy tạo bản sao lưu nhỏ hơn.", 413);
   if (parsed.error || !parsed.value || typeof parsed.value !== "object" || Array.isArray(parsed.value)) {
