@@ -12,8 +12,10 @@ function walk(dir) {
   });
 }
 const files=walk(adminDir);
-assert.equal(files.length,23,'Unexpected Admin API surface: review every new/removed route before release');
+assert.equal(files.length,25,'Unexpected Admin API surface: review every new/removed route before release');
 assert.ok(files.some(file=>file.endsWith('/import-draft.js')),'Taobao import-draft Admin route must be included in auth audit');
+for (const route of ['taobao-photos.js','taobao-photo.js'])
+  assert.ok(files.some(file=>file.endsWith('/'+route)),route+': new Taobao route must be included in Admin auth audit');
 for(const file of files) {
   const source=readFileSync(file,'utf8');
   const path=relative(root,file).split(sep).join('/');
@@ -33,4 +35,4 @@ assert.match(core,/sameSiteRequest\s*\(request\)/,'all Admin operations must rej
 assert.match(core,/SameSite=Strict/,'Admin authentication cookie must be same-site only');
 assert.match(core,/HttpOnly/,'Admin authentication cookie must not be readable by JS');
 assert.match(core,/Secure/,'Admin authentication cookie must be HTTPS-only');
-console.log('PASS: 23 Admin API route modules declare expected session/CSRF authorization guards; login and logout remain same-site only.');
+console.log('PASS: 25 Admin API route modules declare expected session/CSRF authorization guards; login and logout remain same-site only.');
