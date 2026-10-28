@@ -75,6 +75,25 @@ for(const cfg of [
   expect(initialStyle.opacity).toBe('1');
   expect(initialStyle.color).toBe(cfg.theme==='dark'?'rgb(175, 197, 213)':'rgb(112, 135, 153)');
   await page.screenshot({path:dir+'/initial-hint-'+cfg.label+'.png',animations:'disabled'});
+  // Owner regression: a browser datalist is not a usable category table on Android.
+  // Tapping the chevron must reveal all 15 real, selectable category cells.
+  await page.locator('#productCategoryToggle').click();
+  const grid=page.locator('#productCategoryGrid');
+  await expect(grid).toBeVisible();
+  await expect(grid.locator('[data-category-pick]')).toHaveCount(15);
+  await expect(page.locator('#productCategoryToggle')).toHaveAttribute('aria-expanded','true');
+  await page.screenshot({path:dir+'/category-table-'+cfg.label+'.png',animations:'disabled'});
+  await grid.locator('[data-category-pick="loafers"]').click();
+  await expect(category).toHaveValue('Giày Lười');
+  await expect(title).toHaveAttribute('placeholder','Giày Lười VIP Da Cá Sấu Mẫu #001');
+  await expect(grid).toBeHidden();
+  await expect(page.locator('#productCategoryToggle')).toHaveAttribute('aria-expanded','false');
+  await category.click();
+  await expect(grid).toBeVisible();
+  await expect(grid.locator('[data-category-pick="loafers"]')).toHaveAttribute('aria-pressed','true');
+  await grid.locator('[data-category-pick="sneakers"]').click();
+  await expect(category).toHaveValue('Giày Thể Thao');
+  await expect(title).toHaveAttribute('placeholder','Giày Thể Thao VIP Da Cá Sấu Mẫu #025');
   for(const [chosen,label,ordinal] of categories){
    await category.fill(chosen);
    await expect(title).toHaveValue('');
