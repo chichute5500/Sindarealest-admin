@@ -20,7 +20,7 @@ export async function onRequestGet({request,env}) {
     phase="token_network";
     const tokenResponse=await fetch("https://oauth.zaloapp.com/v4/access_token",{
       method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded","secret_key":env.ZALO_APP_SECRET},
-      body,redirect:"error",signal:AbortSignal.timeout(10000)
+      body,redirect:"manual",signal:AbortSignal.timeout(10000)
     });
     if(!tokenResponse.ok)return fail("token_rejected");
     const token=await tokenResponse.json();
@@ -33,7 +33,7 @@ export async function onRequestGet({request,env}) {
     phase="profile_network";
     const profileResponse=await fetch(profileUrl.toString(),{
       headers:{"access_token":token.access_token},
-      redirect:"error",signal:AbortSignal.timeout(10000)
+      redirect:"manual",signal:AbortSignal.timeout(10000)
     });
     if(!profileResponse.ok)return fail("profile_rejected");
     const profile=await profileResponse.json();
