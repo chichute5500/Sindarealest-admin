@@ -56,6 +56,9 @@ jobs:
           npm install --no-audit --no-fund
           npm run check
           npm test
+      - name: Syntax-check optional Vietnam shared-hosting PHP relay
+        if: steps.creds.outputs.ready == 'true'
+        run: php -l relay/zalo-php/zalo-me.php
       - name: Read-only Cloudflare Preview binding and Production-isolation guard
         if: steps.creds.outputs.ready == 'true'
         run: node scripts/verify-customer-auth-preview.mjs
