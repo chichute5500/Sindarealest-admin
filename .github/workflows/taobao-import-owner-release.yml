@@ -65,6 +65,7 @@ jobs:
           npm test
           node tools/taobao-import/tests/import-draft.test.mjs
           node tests/taobao-import-local-d1-r2.test.mjs
+          node tests/taobao-official-import.test.mjs
       - name: Check real Chrome persistence and image import before release signing
         shell: bash
         run: |
