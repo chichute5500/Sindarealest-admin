@@ -30,7 +30,9 @@ if(root){
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
     };
     if(authReturn==="success")notify("Đã xác thực. Đang kiểm tra phiên đăng nhập…","success");
-    else notify("Đăng nhập chưa thành công. "+(reasonMessages[reason]||reasonMessages.unknown),"error");
+    else notify("Đăng nhập chưa thành công. "+(/^profile_api_error_-?\d{1,5}$/.test(reason) ?
+      "Zalo báo mã lỗi API "+reason.slice("profile_api_error_".length)+". Vui lòng gửi mã lỗi này để kiểm tra." :
+      (reasonMessages[reason]||reasonMessages.unknown)),"error");
     params.delete("customer_auth");params.delete("auth_reason");
     const rest=window.location.pathname+(params.size?"?"+params:"")+window.location.hash;
     history.replaceState(history.state,"",rest);
