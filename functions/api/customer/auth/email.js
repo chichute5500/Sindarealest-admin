@@ -1,8 +1,10 @@
-import { sameOrigin,now,issueSession,passwordHash,randomToken,equalHash,sessionCookie,json,error } from "../../../_customer-auth.js";
+import { sameOrigin,emailTestAllowed,now,issueSession,passwordHash,randomToken,equalHash,sessionCookie,json,error } from "../../../_customer-auth.js";
 import { rateLimitPublicRequest,readJsonBodyLimited } from "../../../_lib.js";
 const normalizeEmail=x=>String(x||"").trim().toLowerCase();
 export async function onRequestPost({request,env}) {
   if(!sameOrigin(request))return error("Yêu cầu không hợp lệ.",403);
+  // Email has no verified ownership or password recovery yet. Run only on isolated Preview.
+  if(!emailTestAllowed(request))return error("Đăng nhập Email đang được hoàn thiện.",503);
   if(!env?.DB)return error("Dịch vụ tài khoản chưa sẵn sàng.",503);
   const parsed=await readJsonBodyLimited(request,2048);
   if(parsed.error||!parsed.value||typeof parsed.value!=="object"||Array.isArray(parsed.value))
