@@ -42,3 +42,9 @@ export function nextSkuForPrefix(rows,prefix) {
   }
   return officialSku(prefix,max+1);
 }
+
+/** Default display name for newly added Giày thể thao; numbering follows the official SKU. */
+export function defaultSneakerTitle(sku) {
+  const match=/^SD-SN(\d{3,6})$/.exec(String(sku||'').trim().toUpperCase());
+  return match?'Giày Thể Thao VIP Da Cá Sấu Mẫu #'+match[1]:'';
+}
