@@ -90,9 +90,13 @@ public final class MainActivity extends Activity {
         root.addView(text("SinDarealest · Taobao Import",22,true));
         TextView sub=text("Duyệt Taobao → chọn ảnh hợp lệ → tạo bản nháp Admin",14,false);
         sub.setPadding(0,dp(8),0,dp(24));root.addView(sub);
-        Button openTaobao=button("1 · Mở Taobao để đăng nhập",root);
-        openTaobao.setOnClickListener(v->openTab(TAOBAO));
-        TextView hint=text("Bạn đăng nhập trên trang chính thức bằng trình duyệt. Ứng dụng không đọc tài khoản Taobao. Có thể chia sẻ ảnh trực tiếp từ ứng dụng khác vào SinDarealest Import, nếu ứng dụng đó hỗ trợ.",13,false);
+        Button openTaobao=button("1 · Duyệt Taobao / lấy ảnh trên trang",root);
+        openTaobao.setOnClickListener(v->{
+            Intent browser=new Intent(this,TaobaoBrowserActivity.class);
+            if(!sharedSource.isEmpty())browser.putExtra("product_link",sharedSource);
+            startActivity(browser);
+        });
+        TextView hint=text("Mở sản phẩm Taobao trong trình duyệt ứng dụng, đăng nhập tài khoản cá nhân nếu Taobao hỗ trợ. Bấm “Tìm ảnh trang này”, tự chọn ảnh và xác nhận lưu. Nếu Taobao chặn trình duyệt nhúng, dùng Chrome hoặc Chia sẻ ảnh → SinDarealest Import.",13,false);
         hint.setPadding(0,dp(8),0,dp(20));root.addView(hint);
         Button importer=button("2 · Chọn ảnh / nhập lên Admin",root);
         importer.setOnClickListener(v->openImport());
@@ -101,7 +105,7 @@ public final class MainActivity extends Activity {
         Button info=button("Hướng dẫn và bảo mật",root);
         info.setOnClickListener(v->new AlertDialog.Builder(this)
             .setTitle("Cách nhập sản phẩm")
-            .setMessage("1. Đăng nhập Taobao bằng Chrome và tìm sản phẩm.\n2. Lưu ảnh được phép sử dụng, hoặc chọn Chia sẻ ảnh → SinDarealest Import nếu có tùy chọn.\n3. Ảnh chia sẻ sẽ được lưu vào Pictures/SinDarealest Import.\n4. Nhấn Nhập lên Admin, chọn ảnh, điền tên, danh mục và lưu bản nháp ẨN.\n\nKhông thu thập mật khẩu/cookie Taobao, không quét ảnh trong trang, không yêu cầu quyền đọc tất cả ảnh. Nếu Taobao không hỗ trợ chia sẻ ảnh, hãy dùng thao tác lưu ảnh thông thường.")
+            .setMessage("1. Nhấn Duyệt Taobao / lấy ảnh, đăng nhập tài khoản cá nhân nếu trang cho phép.\n2. Mở sản phẩm rồi bấm Tìm ảnh trang này. Chỉ các ảnh hiển thị trong trang có URL CDN được hỗ trợ mới được liệt kê.\n3. Xác nhận ảnh được phép sử dụng và lưu vào Pictures/SinDarealest Import.\n4. Mở Admin, chọn ảnh, nhập danh mục/giá, tạo bản nháp ẨN.\n\nNếu Taobao hạn chế WebView, hãy mở trong Chrome hoặc ứng dụng Taobao và sử dụng tùy chọn Lưu/Chia sẻ ảnh. Công cụ không xin API doanh nghiệp, không đọc mật khẩu/cookie, không vượt chặn và không bảo đảm tải mọi ảnh.")
             .setPositiveButton("Đã hiểu",null).show());
         setContentView(scroll);
     }
