@@ -1,4 +1,4 @@
-name: QA sneaker default title (isolated Preview)
+name: QA all-category default product titles (isolated Preview)
 on:
   push:
     branches: [feat/default-sneaker-name-2026-10-28]
@@ -8,6 +8,7 @@ on:
       - 'functions/api/admin/products.js'
       - 'public/admin/index.html'
       - 'tests/sneaker-default-title.test.mjs'
+      - 'tests/admin-liquid-glass-contract.test.mjs'
       - 'tests/e2e/sneaker-default-title.spec.js'
       - 'package.json'
 permissions:
