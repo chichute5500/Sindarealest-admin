@@ -96,7 +96,11 @@ for(const provider of ["zalo","google"]){
     assert.equal(init.redirect,"manual","Provider token/profile fetch must never follow redirects");
     const addr=String(url);
     if(addr.includes("access_token")||addr.includes("googleapis.com/token"))return new Response(JSON.stringify({access_token:"test-access"}),{status:200});
-    if(addr.includes("graph.zalo.me"))return new Response(JSON.stringify({id:"123456",name:"Khách Zalo"}),{status:200});
+    if(addr.includes("graph.zalo.me")){
+      assert.ok(!new URL(addr).searchParams.has("appsecret_proof"),
+        "Official Zalo Social /me is called with access_token header and fields only");
+      return new Response(JSON.stringify({error:0,id:"zalo_opaque-42",name:"Khách Zalo"}),{status:200});
+    }
     if(addr.includes("openidconnect.googleapis.com"))return new Response(JSON.stringify({sub:"google-sub-1",email_verified:true,email:"test@example.com",name:"Khách Google"}),{status:200});
     throw Error("Unexpected outbound request: "+addr);
   };
@@ -114,6 +118,8 @@ for(const provider of ["zalo","google"]){
     const data=await session.json();
     assert.equal(data.authenticated,true);
     assert.equal(data.user.provider,provider);
+    if(provider==="zalo")
+      assert.ok(DB.accounts.has("zalo:zalo_opaque-42"),"Opaque, nonnumeric Zalo ID is accepted");
     const replay=await (provider==="zalo"?zaloCallback:googleCallback)({request:request(url,browserCookie),env});
     assert.equal(replay.status,302);
     assert.ok(replay.headers.get("Location").includes("failed"),"OAuth state must be one-use");
@@ -123,6 +129,29 @@ for(const provider of ["zalo","google"]){
     assert.equal((await noSession.json()).authenticated,false);
   }finally{globalThis.fetch=tokenFetch;}
 }
+// Zalo /me may return an API error encoded in HTTP 200, even with an id property.
+const badStart=await zaloStart({request:request("/api/customer/auth/zalo/start"),env});
+assert.equal(badStart.status,302);
+const badState=new URL(badStart.headers.get("Location")).searchParams.get("state");
+const priorAccounts=DB.accounts.size;
+const prevFetch=globalThis.fetch;
+globalThis.fetch=async(url,init)=>{
+  assert.equal(init.redirect,"manual");
+  if(String(url).includes("/access_token"))
+    return Response.json({access_token:"fake-zalo-token"});
+  if(String(url).includes("graph.zalo.me"))
+    return Response.json({error:-1241,message:"Invalid appsecret_proof",id:"111111"});
+  throw Error("Unexpected provider request");
+};
+try{
+  const badCallback=await zaloCallback({request:request(
+    "/api/customer/auth/zalo/callback?state="+badState+"&code=not-real",
+    badStart.headers.get("Set-Cookie").split(";")[0]),env});
+  assert.equal(badCallback.status,302);
+  assert.match(badCallback.headers.get("Location"),/failed/);
+  assert.equal(DB.accounts.size,priorAccounts,
+    "HTTP 200 Zalo API error must never create or authenticate a customer");
+}finally{globalThis.fetch=prevFetch;}
 const invalid=await zaloStart({request:request("/api/customer/auth/zalo/start?x=1"),env:{DB}});
 assert.equal(invalid.status,503);
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
