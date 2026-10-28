@@ -91,10 +91,19 @@ export async function startFlow(env,provider) {
 export async function consumeFlow(env,provider,state,request) {
   const browser=cookies(request,FLOW_COOKIE);
   if (!/^[a-f0-9]{48}$/.test(state)|| !/^[a-f0-9]{48}$/.test(browser)) return null;
-  // Atomic consume: replay of a state cannot reuse a verifier.
-  const row=await env.DB.prepare("DELETE FROM customer_auth_flows WHERE state_hash=? AND provider=? AND browser_hash=? AND expires_at>? RETURNING verifier")
-    .bind(await digest(state),provider,await digest(browser),now()).first();
-  return row?.verifier || null;
+  const stateHash=await digest(state),browserHash=await digest(browser),timestamp=now();
+  // Cloudflare D1's first() reliably supports SELECT. Read the verifier first,
+  // then atomically delete the same one-time state row. Only the request that
+  // deletes exactly one matching row may exchange its provider authorization code.
+  const sqlWhere="state_hash=? AND provider=? AND browser_hash=? AND expires_at>?";
+  const args=[stateHash,provider,browserHash,timestamp];
+  const row=await env.DB.prepare("SELECT verifier FROM customer_auth_flows WHERE "+sqlWhere)
+    .bind(...args).first();
+  if(typeof row?.verifier!=="string" || !row.verifier)return null;
+  const deletion=await env.DB.prepare("DELETE FROM customer_auth_flows WHERE "+sqlWhere)
+    .bind(...args).run();
+  if(Number(deletion?.meta?.changes)!==1)return null;
+  return row.verifier;
 }
 export async function beginSession(env,provider,subject,name,email=null) {
   if (!["zalo","google"].includes(provider) || !subject || subject.length>255) throw Error("bad identity");
