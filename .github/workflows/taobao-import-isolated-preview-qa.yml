@@ -6,6 +6,11 @@ on:
       - '.github/workflows/taobao-import-isolated-preview-qa.yml'
       - 'public/admin/taobao-import.html'
       - 'functions/api/admin/import-draft.js'
+      - 'functions/_taobao-official.js'
+      - 'functions/api/admin/taobao-photos.js'
+      - 'functions/api/admin/taobao-photo.js'
+      - 'tools/taobao-import/web/taobao-import-client.js'
+      - 'tests/taobao-official-import.test.mjs'
       - 'functions/api/admin/upload.js'
       - 'functions/_lib.js'
       - 'migrations/**'
@@ -40,6 +45,7 @@ jobs:
           npm run check
           node tools/taobao-import/tests/import-draft.test.mjs
           node tests/taobao-import-local-d1-r2.test.mjs
+          node tests/taobao-official-import.test.mjs
       - name: Exercise real Chromium IndexedDB across reloads
         shell: bash
         run: |
