@@ -15,6 +15,18 @@ PR: #150 DRAFT. This is a new authentication feature. Do **not** merge/deploy wi
 - Google OAuth client created and configured for web.
 - Connector **cannot read Cloudflare bindings, secret values or deployment state**. Owner confirmation of saving is not a runtime connection test. Never put real secret values in GitHub/docs.
 
+## Exact Cloudflare project naming (confirmed by Owner)
+
+- **Pages project `sindarealest-admin-preview`** is a separate Cloudflare project from the production storefront `sindarealest2`.
+- URL `.../pages/view/sindarealest-admin-preview/settings/production` is the **Production tab inside the separate admin-preview Pages project**, not the storefront's Production environment. Do not confuse the two.
+- Owner screenshot showed **no D1 binding or variables in the visible section** of this admin-preview project's Production settings; it did not prove the D1 database resource itself is absent.
+- If no existing, verified, isolated D1 belongs to that Preview project, create `sindarealest-customer-auth-preview` (or another explicit Preview-only name), then bind its ID to `DB` on `sindarealest-admin-preview`. Never attach storefront Production DB, and do not replace any existing verified binding without reviewing its database ID.
+- For a **newly empty** D1, migration 0011 **alone is insufficient**: the OAuth and email rate limiter uses `public_rate_limits` from prior schema migrations, so apply the full required ordered baseline before 0011. Validate on isolated D1 only and redeploy the Preview project for binding changes to take effect.
+- Source code now allows the exact trusted origins `https://sindarealest2.pages.dev` and `https://sindarealest-admin-preview.pages.dev`, with matching OAuth callback origin per request; arbitrary Host or X-Forwarded-Host are never trusted.
+- Real Preview OAuth sign-in requires providers to explicitly accept the **Preview** callback domain; the Owner's previously registered **Production** callbacks are not sufficient. Do not swap or overwrite production callbacks just to make Preview pass.
+- Email self-service is intentionally **disabled on the primary storefront** pending verified ownership and account recovery; it is allowed only on the isolated `sindarealest-admin-preview.pages.dev` origin for disposable QA.
+- Google and Zalo Cloudflare secrets saved on the storefront project are **not automatically copied** to the separate admin-preview Pages project.
+
 ## Current functionality on DRAFT branch
 
 - Zalo Social OAuth V4 code exchange with 43-character PKCE verifier, unique browser-bound OAuth state, single-use expiration, server-side App Secret, API appsecret proof.
