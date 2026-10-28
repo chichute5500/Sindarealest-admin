@@ -259,8 +259,8 @@ public final class MainActivity extends Activity {
             payload.put("deviceId", deviceId);
             payload.put("fcmToken", token);
         } catch (Exception ignored) { return; }
-        final String script = "(function(){fetch('/api/admin/android-device',{"
-            + "method:'POST',credentials:'same-origin',cache:'no-store',"
+        final String script = "(function(){fetch('/api/admin/push-subscriptions',{"
+            + "method:'PUT',credentials:'same-origin',cache:'no-store',"
             + "headers:{'Content-Type':'application/json','X-SD-Android-App':'2'},"
             + "body:" + JSONObject.quote(payload.toString())
             + "}).then(function(r){return r.json().then(function(d){return !!r.ok&&!!d.ok;});})"
