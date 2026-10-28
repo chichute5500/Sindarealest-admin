@@ -22,6 +22,10 @@ const response=await req('/d1/database/'+database+'/query',{sql,params:[]});
 const q=Array.isArray(response)?response[0]:response;
 if(!q?.success||!Array.isArray(q.results))throw Error('CATEGORY_D1_QUERY_FAILED');
 console.log('CATEGORY_D1_AUDIT='+JSON.stringify(q.results));
+const d=await req('/d1/database/'+database+'/query',{sql:"SELECT id,sku,title,category,category_label,slug,published FROM products WHERE category IN ('giay-the-thao','wallets') ORDER BY sku LIMIT 40",params:[]});
+const detail=Array.isArray(d)?d[0]:d;
+if(!detail?.success||!Array.isArray(detail.results))throw Error('CATEGORY_ALIAS_QUERY_FAILED');
+console.log('CATEGORY_ALIAS_ROWS='+JSON.stringify(detail.results));
 console.log('CATEGORY_D1_COUNTS='+JSON.stringify({
  published:q.results.filter(r=>Number(r.published)===1).reduce((n,r)=>n+Number(r.n),0),
  canonicalCodes:new Set(q.results.filter(r=>Number(r.published)===1).map(r=>r.category)).size,
