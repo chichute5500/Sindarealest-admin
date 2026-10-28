@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+const order=html.match(/const categoryOrder=(\[[^;]+\]);/)?.[1];
+assert.ok(order,'category order missing');
+const categories=JSON.parse(order.replace(/'/g,'"'));
+assert.equal(new Set(categories).size,categories.length);
+assert.ok(categories.includes('vi-nam'));
+assert.ok(!categories.includes('wallets'));
+assert.match(html,/c==='wallets'\|\|c==='vi-da'\?'vi-nam':c/);
+assert.match(html,/p.category==='wallets'\?'vi-nam':p.category/);
+assert.match(html,/"wallets":"vinam"/);
+assert.match(html,/"vi-nam":"vinam"/);
+console.log('CATALOG_DUPLICATE_ALIAS=PASS single_vi_nam=true legacy_links_preserved=true');
