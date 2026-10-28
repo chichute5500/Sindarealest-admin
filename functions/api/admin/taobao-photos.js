@@ -5,6 +5,20 @@ import {resolveItemId,topParams,readTopImages,imageTicket} from '../../_taobao-o
  * Official Taobao Open Platform only. Never fetches item page HTML and never
  * accepts a client-supplied network host for fetching.
  */
+/**
+ * Reports if the official API has been configured on THIS Cloudflare deployment.
+ * A status-only response never reveals API credentials, cookies or other secrets.
+ * The UI uses this to avoid advertising an unusable "auto-download" button.
+ */
+export async function onRequestGet(context) {
+  const auth = await requireAdmin(context);
+  if (auth.response) return auth.response;
+  const env = context.env || {};
+  const configured = Boolean(env.TAOBAO_APP_KEY && env.TAOBAO_APP_SECRET);
+  return json({ ok: true, configured, provider: 'taobao_official_api',
+    reason: configured ? null : 'Taobao Open Platform AppKey/AppSecret chưa được cấu hình trên bản triển khai này.'
+  }, 200, { 'Cache-Control': 'private, no-store' });
+}
 export async function onRequestPost(context) {
   const auth=await requireAdmin(context);
   if(auth.response)return auth.response;
