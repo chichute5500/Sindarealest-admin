@@ -21,3 +21,15 @@
 
 #accountMenuView .account-guest[hidden] { display:none!important; }
 #sdCustomerAuth .sd-auth-provider:disabled { opacity:.55;cursor:not-allowed; }
+
+/* Authentication outcome stays visible above the provider choices.
+   Scoped to Account, with the existing subtle glass palette. */
+#sdCustomerAuth .sd-auth-message:not([hidden]) {
+  position:sticky;top:0;z-index:2;box-sizing:border-box;
+  padding:12px 13px;margin:0 0 12px;min-height:0;
+  border:1px solid currentColor;border-radius:12px;
+  background:var(--card-glass,rgba(245,247,246,.96));
+  font-size:12px;font-weight:600;line-height:1.55;
+}
+#sdCustomerAuth .sd-auth-message[data-kind="error"] { color:#a54130; }
+#sdCustomerAuth .sd-auth-message[data-kind="success"] { color:#226c4b; }
