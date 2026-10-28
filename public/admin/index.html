@@ -2098,7 +2098,7 @@ function syncDefaultSneakerTitle(){
  }
  if(input.value.trim()&&!unchangedSuggestion)return;
  const sku=nextSkuForCategory('sneakers');
- if(!/^SD-SN\\d{3,6}$/.test(sku))return;
+ if(!/^SD-SN\d{3,6}$/.test(sku))return;
  generatedSneakerTitle='Giày Thể Thao VIP Da Cá Sấu Mẫu #'+sku.slice(5);
  input.value=generatedSneakerTitle;
  input.setCustomValidity('');
