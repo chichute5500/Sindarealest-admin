@@ -27,6 +27,19 @@ PR: #150 DRAFT. This is a new authentication feature. Do **not** merge/deploy wi
 - Email self-service is intentionally **disabled on the primary storefront** pending verified ownership and account recovery; it is allowed only on the isolated `sindarealest-admin-preview.pages.dev` origin for disposable QA.
 - Google and Zalo Cloudflare secrets saved on the storefront project are **not automatically copied** to the separate admin-preview Pages project.
 
+## Real Cloudflare Pages PREVIEW deployment — PASS (2026-10-29)
+
+- Cloudflare Pages project: `sindarealest-admin-preview`, environment: **Preview** (not Production).
+- Exact branch: `feat/zalo-customer-login-2026-10-29`.
+- Cloudflare-truncated branch alias: `https://feat-zalo-customer-login-202.sindarealest-admin-preview.pages.dev`. Never use project-root `sindarealest-admin-preview.pages.dev` because that is the project's Production domain.
+- Successful deployed immutable URL: `https://a73b0192.sindarealest-admin-preview.pages.dev`, but real auth is intentionally restricted to the trusted branch alias (not arbitrary hash deployment hosts).
+- GitHub Actions Preview deployment with read-only Cloudflare project guard and required source tests: [run #40769412675](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40769412675) — **SUCCESS**.
+- **Independent live verification** from GitHub runner against actual Cloudflare Preview: homepage 200 with customer drawer; `GET /api/customer/session` 200, guest unauthenticated and Zalo/Google/Email Preview flags enabled; `GET /api/customer/auth/zalo/start` and `/google/start` each 302 with correct Preview callback, unique PKCE/state, Secure HttpOnly cookie. These requests create only two expiring OAuth flow rows in isolated Preview D1, not social accounts or orders.
+- Guard confirmed D1 Preview UUID differs from `sindarealest2` Production D1; Preview IMAGES and ORIGINALS R2 exact; Preview Google/Zalo variable names and secret types present. Secret values never logged.
+- This proves **runtime backend can start both logins**, **not** that the actual external Zalo/Google accounts finished signing in, because the **exact Preview callback URLs are not yet known to be allowed** in both provider consoles. Do not claim real social sign-in E2E PASS.
+- Email password self-service remains **Preview-only for QA** and has no verified-email/forgot-password release gate.
+- No merge to main; no Production D1 writes or deployment.
+
 ## Current functionality on DRAFT branch
 
 - Zalo Social OAuth V4 code exchange with 43-character PKCE verifier, unique browser-bound OAuth state, single-use expiration, server-side App Secret, API appsecret proof.
