@@ -52,3 +52,17 @@
 - Không xóa/sửa/ghi Production; không merge khi chưa được duyệt.
 
 **Tóm tắt trạng thái:** Technical QA **PASS**; Preview **deployed**; PR #137 **DRAFT**; **Owner Visual PASS còn chờ** ở chất liệu Liquid Glass tròn sau ảnh phản hồi.
+
+
+## 7. Cập nhật thực hiện sau phản hồi Owner: kính chưa có hiệu ứng nổi (2026-10-28)
+
+**Phần này thay thế tình trạng CSS và QA ở mục 3–5 phía trên; không đổi các Owner PASS cũ.** Owner phản hồi rõ: các nút size vẫn chưa có hiệu ứng Liquid Glass như biểu tượng trái tim. Không được hiểu là PASS phiên bản `925272ae7`.
+
+- Commit CSS: `7b8b5246cfdf9b58a6d4c7e6b82165eb989205de`; commit test: `247727fd498465b5fd9b5c5bd004bfccc5fef288` (**source được QA/deploy mới nhất**).
+- Chỉ sửa CSS scoped `#productOverlay .sd-product-option-chip` trong `public/index.html`: kính 40×40px có nhiều lớp radial/linear gradient bán trong suốt, inner rim `::before`, vệt phản sáng cong `::after`, bóng ngoài/inset và trạng thái xanh kính khi chọn; theme tối riêng. Không chỉnh biểu tượng trái tim, theme hay nghiệp vụ giỏ/API.
+- Thêm assertion Playwright ở `tests/e2e/product-options-mobile-desktop.spec.js` để bắt buộc gradient khúc xạ đa lớp, inner rim 1px, specular arc 2px trên cả chip thường/đã chọn; ngăn regression về nút tròn xám phẳng, vẫn kiểm tra 40×40, keyboard, checkout/Admin trên mobile 390px và PC 1366px sáng/tối.
+- [Chrome QA run 40629569428](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629569428): **SUCCESS**, các bước source/test, Chrome, binding safety Preview D1/R2, Preview deploy và upload ảnh đều SUCCESS.
+- [Ảnh Chrome mới artifact 12790653555](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629569428/artifacts/12790653555): 32 ảnh PC/mobile light/dark, nhất là `shoe-mobile-light.png`, `shoe-mobile-dark.png`, `shoe-desktop-light.png`, `shoe-desktop-dark.png`. Đã đối chiếu ảnh crop với artifact cũ 12787424063: kính sau sửa có viền highlight cong và bóng thể tích thấy rõ, cả light/dark.
+- [Source CI 40629569500](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629569500), [source CI 40629574487](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629574487), [Admin Preview 40629574527](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629574527): **SUCCESS**.
+- Preview đã deploy bản mới: https://product-options-1028.sindarealest-admin-preview.pages.dev/ . Screenshot QA là fixture (không phải danh mục/đơn Production); source không thao tác Production D1/R2.
+- **Trạng thái: Technical PASS; Owner Visual PASS CHƯA CÓ** cho bản mới và PR #137 tiếp tục OPEN/DRAFT/CHƯA MERGE. Nếu Owner vẫn chưa hài lòng, chỉ tinh chỉnh option CSS sau khi đối chiếu ảnh mới; không xóa hoặc làm lại nghiệp vụ đã PASS.
