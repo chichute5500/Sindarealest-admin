@@ -62,6 +62,19 @@ for(const cfg of [
   await page.locator('[data-action="add"]').first().click();
   await expect(page.locator('#backdrop')).not.toHaveClass(/hidden/);
   const title=page.locator('#pTitle'),category=page.locator('#pCategory');
+  // Owner screenshot regression: entering "Thêm sản phẩm mới" without selecting
+  // a category must still show a legible muted title pattern, never an empty box.
+  await expect(category).toHaveValue('');
+  await expect(title).toHaveValue('');
+  await expect(title).toHaveAttribute('placeholder','Tên Danh Mục VIP Da Cá Sấu Mẫu #…');
+  const initialStyle=await title.evaluate(el=>({
+   placeholder:el.getAttribute('placeholder'),
+   color:getComputedStyle(el,'::placeholder').color,
+   opacity:getComputedStyle(el,'::placeholder').opacity
+  }));
+  expect(initialStyle.opacity).toBe('1');
+  expect(initialStyle.color).toBe(cfg.theme==='dark'?'rgb(175, 197, 213)':'rgb(112, 135, 153)');
+  await page.screenshot({path:dir+'/initial-hint-'+cfg.label+'.png',animations:'disabled'});
   for(const [chosen,label,ordinal] of categories){
    await category.fill(chosen);
    await expect(title).toHaveValue('');
