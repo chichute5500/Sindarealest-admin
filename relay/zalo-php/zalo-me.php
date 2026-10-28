@@ -34,9 +34,9 @@ if (!is_dir($secretDir) || !is_readable($secretPath)) {
 $secret = trim((string) file_get_contents($secretPath));
 if (strlen($secret) < 32) answer(503, ['error' => 'unconfigured']);
 $length = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
-if ($length < 1 || $length > 8192) answer(413, ['error' => 'body_too_large']);
+if ($length > 8192) answer(413, ['error' => 'body_too_large']);
 $raw = file_get_contents('php://input', false, null, 0, 8193);
-if (!is_string($raw) || strlen($raw) !== $length || strlen($raw) > 8192)
+if (!is_string($raw) || !$raw || ($length > 0 && strlen($raw) !== $length) || strlen($raw) > 8192)
     answer(400, ['error' => 'bad_request']);
 $t = $_SERVER['HTTP_X_SD_TIME'] ?? '';
 $n = $_SERVER['HTTP_X_SD_NONCE'] ?? '';
@@ -106,5 +106,7 @@ $id = $profile['id'] ?? null;
 $subject = is_string($id) ? $id : (is_int($id) ? (string) $id : '');
 if (!preg_match('/^[A-Za-z0-9:_-]{1,255}$/D', $subject))
     answer(502, ['error' => 'upstream_invalid']);
-$name = is_string($profile['name'] ?? null) ? mb_substr($profile['name'], 0, 100) : 'Khách hàng';
+$name = is_string($profile['name'] ?? null)
+    ? (function_exists('mb_substr') ? mb_substr($profile['name'], 0, 100) : substr($profile['name'], 0, 300))
+    : 'Khách hàng';
 answer(200, ['error' => 0, 'id' => $subject, 'name' => $name]);
