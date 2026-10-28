@@ -8,17 +8,17 @@ jobs:
   signed-build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      KEYSTORE_B64: ${{ secrets.SD_TAOBAO_ANDROID_KEYSTORE_B64 }}
-      SD_TAOBAO_RELEASE_STORE_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_STORE_PASSWORD }}
-      SD_TAOBAO_RELEASE_KEY_ALIAS: ${{ secrets.SD_TAOBAO_ANDROID_KEY_ALIAS }}
-      SD_TAOBAO_RELEASE_KEY_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
       - name: Check approved branch, immutable source and durable signing credentials
         shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.SD_TAOBAO_ANDROID_KEYSTORE_B64 }}
+          SD_TAOBAO_RELEASE_STORE_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_STORE_PASSWORD }}
+          SD_TAOBAO_RELEASE_KEY_ALIAS: ${{ secrets.SD_TAOBAO_ANDROID_KEY_ALIAS }}
+          SD_TAOBAO_RELEASE_KEY_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
           test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
@@ -60,6 +60,8 @@ jobs:
           gradle-version: '8.13'
       - name: Load encrypted owner signing key only in ephemeral runner
         shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.SD_TAOBAO_ANDROID_KEYSTORE_B64 }}
         run: |
           set -euo pipefail
           umask 077
@@ -69,6 +71,10 @@ jobs:
           echo "SD_TAOBAO_RELEASE_KEYSTORE_FILE=$key_path" >> "$GITHUB_ENV"
       - name: Build signed APK and run Android lint
         working-directory: tools/taobao-import/android
+        env:
+          SD_TAOBAO_RELEASE_STORE_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_STORE_PASSWORD }}
+          SD_TAOBAO_RELEASE_KEY_ALIAS: ${{ secrets.SD_TAOBAO_ANDROID_KEY_ALIAS }}
+          SD_TAOBAO_RELEASE_KEY_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_KEY_PASSWORD }}
         run: gradle --no-daemon --stacktrace :app:assembleRelease :app:lintRelease
       - name: Verify signed APK and SHA-256
         shell: bash
