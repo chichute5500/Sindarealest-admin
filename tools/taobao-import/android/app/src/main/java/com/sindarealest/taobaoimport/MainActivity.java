@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 public final class MainActivity extends Activity {
     private static final String TAOBAO = "https://www.taobao.com/";
     // Verify before signing: this page must be deployed with /api/admin/import-draft.
-    private static final String ADMIN_IMPORT = "https://sindarealest2.pages.dev/admin/taobao-import.html";
+    private static final String ADMIN_IMPORT = BuildConfig.ADMIN_IMPORT_URL;
     private static final int MAX_IMAGES = 30;
     private static final long MAX_IMAGE_BYTES = 20L * 1024 * 1024;
     private final ExecutorService imageWorker = Executors.newSingleThreadExecutor();
