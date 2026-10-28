@@ -6,8 +6,11 @@ android {
         applicationId = "com.sindarealest.taobaoimport"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.2.0-qa"
+        // A stable signing certificate plus monotonically increasing versionCode
+        // lets Android install future native updates over the existing owner APK.
+        val ownerVersionCode = System.getenv("SD_TAOBAO_RELEASE_VERSION_CODE")?.toIntOrNull()
+        versionCode = ownerVersionCode?.takeIf { it in 1..1999999999 } ?: 1
+        versionName = if (ownerVersionCode != null) "1.0.$versionCode" else "0.2.0-qa"
     }
     buildFeatures { buildConfig = true }
     // Release signing credentials are injected only by a protected CI job.
