@@ -86,16 +86,20 @@ assert.ok(admin.includes('id="productCategoryGrid" class="product-category-grid"
  'The category picker renders its own 15-item visual table, not browser-native datalist');
 assert.ok(admin.includes('id="productCategoryToggle"'),
  'The category field has a keyboard-accessible open/close control');
-assert.ok(admin.includes("productCategoryGrid.innerHTML=Object.entries(DEFAULT_PRODUCT_LABELS)"),
+assert.ok(admin.includes("const official=Object.entries(DEFAULT_PRODUCT_LABELS)"),
  'The grid always lists all 15 official categories');
 assert.ok(admin.includes("productCategoryInput.dispatchEvent(new Event('input',{bubbles:true}))"),
  'Selecting an option triggers category-linked title and product guidance updates');
-assert.ok(admin.includes("productCategoryInput.value=DEFAULT_PRODUCT_LABELS[code]"),
+assert.ok(admin.includes("productCategoryInput.value=button.dataset.categoryLabel"),
  'Category choice persists the official display name in the form');
 assert.ok(admin.includes("productCategoryInput.addEventListener('click'"),
  'Tapping the field opens the grid on a phone');
 assert.ok(admin.includes('inputmode="none" placeholder="Chọn danh mục trong bảng"'),
  'Do not obscure category choices with Android keyboard when tapping');
+assert.ok(admin.includes("const extras=[...new Set(products.map(p=>skuCategory(p.category)||p.category)"),
+ 'Preserve historical categories alongside the official 15 options');
+assert.ok(admin.includes("refreshCategoryOptions();"),'Reload the category grid when Admin data changes');
+assert.ok(!admin.includes("$('#categoryOptions').innerHTML"),'No stale datalist should remain');
 assert.ok(!admin.includes('list="categoryOptions"'),
  'Native datalist must not silently replace the required visible selection table');
 assert.match(admin,/function syncDefaultProductTitle\(\)\{/);
