@@ -9,6 +9,8 @@ on:
       - 'public/admin/index.html'
       - 'tests/sneaker-default-title.test.mjs'
       - 'tests/admin-liquid-glass-contract.test.mjs'
+      - 'tests/admin-upgrade.test.mjs'
+      - 'tests/category-canonical-dedupe.test.mjs'
       - 'tests/e2e/sneaker-default-title.spec.js'
       - 'package.json'
 permissions:
