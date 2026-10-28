@@ -147,7 +147,8 @@ assert.match(html,/\.detail-buy-now\{--sd-action-rgb:242,152,70;--sd-action-bord
 assert.match(html,/--sd-action-rgb:126,177,215/);
 assert.match(html,/background:linear-gradient\(135deg,rgba\(255,255,255,\.65\),rgba\(var\(--sd-action-rgb\),\.30\)\)/);
 assert.ok(html.includes("$('#detailBuyNow').addEventListener('click'"));
-assert.ok(html.includes("if(!id||!addToCart(id))return;closeDetail(false,false);openCheckout()"));
+assert.ok(html.includes("option=selectedDetailOption(currentProduct)"),"Buy now must require the product-specific selection");
+assert.ok(html.includes("if(!id||option===null||!addToCart(id,option))return;closeDetail(false,false);openCheckout()"),"Buy now must preserve the selected option and keep Owner-PASS checkout flow");
 assert.ok(!detail.includes('id="detailZalo"')||detail.indexOf('id="detailZalo"')>detail.indexOf('id="detailBuyNow"'));
 assert.match(html,/border:1px solid rgba\(205,167,93,\.60\)/);
 assert.match(html,/background:linear-gradient\(135deg,rgba\(255,252,236,\.82\),rgba\(244,214,148,\.44\)\)/);
