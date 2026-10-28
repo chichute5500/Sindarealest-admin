@@ -56,7 +56,7 @@ let response = await seoMiddleware(homepageContext);
 let text = await response.text();
 assert.equal(response.status,200);
 assert.match(text,/og:url" content="https:\/\/shop\.example\//);
-assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest-light-blue-20261027\.jpg/);
+assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest-crisp-20261028\.jpg/);
 assert.match(text,/canonical" href="https:\/\/shop\.example\//);
 
 const seoDB = {
