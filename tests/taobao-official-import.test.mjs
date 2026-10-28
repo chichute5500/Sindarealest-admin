@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 import {createSession} from '../functions/_lib.js';
 import {md5,topParams,topSignature,itemIdFromLink,extractTaobaoLink,resolveItemId,allowedImageUrl,readTopImages,imageTicket,verifyImageTicket}
   from '../functions/_taobao-official.js';
-import {onRequestPost as getPhotos} from '../functions/api/admin/taobao-photos.js';
+import {onRequestPost as getPhotos,onRequestGet as getReadiness} from '../functions/api/admin/taobao-photos.js';
 import {onRequestGet as getImage} from '../functions/api/admin/taobao-photo.js';
 const h=(input)=>createHash('md5').update(input).digest('hex').toUpperCase();
 for(const test of ['', 'abc', 'SinDarealest', 'Sản phẩm da cá sấu', '🚀', '123'.repeat(50)])assert.equal(md5(test),h(test));
@@ -77,6 +77,15 @@ try{
     }
     throw Error('UNAPPROVED_HOST '+url);
   };
+  const deniedReadiness=await getReadiness({request:request('/api/admin/taobao-photos','GET',undefined,false),env});
+  assert.equal(deniedReadiness.status,401,'Capability check must reject anonymous requests');
+  const ready=await getReadiness({request:request('/api/admin/taobao-photos'),env});
+  assert.equal(ready.status,200);
+  const readyBody=await ready.json();
+  assert.equal(readyBody.configured,true);
+  assert.equal(JSON.stringify(readyBody).includes(env.TAOBAO_APP_SECRET),false,'No secrets exposed');
+  const missing=await getReadiness({request:request('/api/admin/taobao-photos'),env:{...env,TAOBAO_APP_KEY:undefined}});
+  assert.equal((await missing.json()).configured,false,'Missing credentials detected before import attempt');
   const body={link:'https://item.taobao.com/item.htm?id=123456789',permissionConfirmed:true};
   let r=await getPhotos({request:request('/api/admin/taobao-photos','POST',body,false),env});assert.equal(r.status,401);
   r=await getPhotos({request:request('/api/admin/taobao-photos','POST',{...body,permissionConfirmed:false}),env});assert.equal(r.status,400);
