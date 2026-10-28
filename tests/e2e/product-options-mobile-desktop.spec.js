@@ -57,7 +57,7 @@ for(const cfg of [
    return {background:css.backgroundColor,shadow:css.boxShadow,
     backdrop:css.backdropFilter,webkitBackdrop:css.webkitBackdropFilter};
   });
-  expect(idleGlass.background).toMatch(/rgba\\(/);
+  expect(idleGlass.background).toMatch(/rgba\(/);
   expect(idleGlass.backdrop+' '+idleGlass.webkitBackdrop).toContain('blur(18px)');
   expect(idleGlass.shadow).not.toBe('none');
   const chipMetrics=await page.locator('#detailVariants .sd-product-option-chip').evaluateAll(nodes=>nodes.map(x=>({
