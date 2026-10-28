@@ -8,6 +8,7 @@ on:
       - 'public/**'
       - 'migrations/**'
       - 'scripts/verify-customer-auth-preview.mjs'
+      - 'scripts/check-customer-auth-preview-live.mjs'
       - '.github/workflows/customer-auth-preview-deploy.yml'
       - 'tests/customer-auth-*.test.mjs'
   workflow_dispatch:
@@ -60,6 +61,9 @@ jobs:
           npx wrangler pages deploy public
           --project-name sindarealest-admin-preview
           --branch feat/zalo-customer-login-2026-10-29
+      - name: Real deployed Preview smoke — D1 session and OAuth start
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/check-customer-auth-preview-live.mjs
       - name: Record deployment target, never reveal secret values
         if: steps.creds.outputs.ready == 'true'
         run: |
