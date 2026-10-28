@@ -1,0 +1,32 @@
+/** Read-only release regressions. No D1, R2 or Production network access. */
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const read = path => readFileSync(new URL('../'+path,import.meta.url),'utf8');
+const deploy=read('.github/workflows/deploy.yml');
+assert.doesNotMatch(deploy,/run:\s*node scripts\/cutover-production-catalog-2026-10-27\.mjs/,
+  'An ordinary deployment must never execute an old destructive catalog cutover');
+assert.match(deploy,/npm run check/);
+assert.match(deploy,/npm test/);
+const store=read('public/index.html');
+const opens=[...store.matchAll(/<style(?:\s|>)/gi)].length;
+const closes=[...store.matchAll(/<\/style\s*>/gi)].length;
+assert.equal(opens,closes,'Storefront CSS raw-text elements must not be nested');
+assert.doesNotMatch(store,/<style id="sd-catalog-liquid-glass-reference-2026-10-23">/,
+  'Previously invalid nested CSS token must not be reintroduced');
+assert.match(store,/Removed historical nested style token and the invalid first :root rule/);
+assert.equal([...store.matchAll(/\.welcome-content>\*\{animation:none!important\}/g)].length,2,
+  'Only the base and reduced-motion Welcome motion guards should remain');
+const admin=read('public/admin/index.html');
+assert.match(admin,/expectedProduct:JSON\.parse\(JSON\.stringify\(editing\)\)/,
+  'Full Admin edit must send original immutable snapshot');
+assert.match(admin,/type="password" autocomplete="current-password"/,
+  'Restore confirmation must not expose a plain-text password input');
+assert.match(admin,/X-SD-Restore-Password/);
+const product=read('functions/api/admin/products/[id].js');
+assert.match(product,/fields\.some\(key => JSON\.stringify\(expected\[key\]\)/);
+assert.match(product,/AND updated_at IS \?/,
+  'Full save must CAS all raw field values atomically before writing');
+const restore=read('functions/api/admin/restore.js');
+assert.match(restore,/constantTimeTextEqual\(reauth, context\.env\.ADMIN_PASSWORD\)/);
+assert.match(restore,/return fail\("Cần xác thực lại mật khẩu quản trị/);
+console.log('PASS: production deployment is D1 read-only, editor PUT uses CAS, CSS nested markup repaired, Restore requires fresh password.');
