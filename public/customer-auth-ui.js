@@ -25,14 +25,17 @@ if(root){
       profile_rejected:"Không lấy được hồ sơ từ Zalo/Google sau khi cấp quyền.",
       profile_invalid:"Zalo/Google chưa trả về mã định danh tài khoản hợp lệ.",
       profile_api_error:"Zalo trả về lỗi khi lấy thông tin tài khoản, dù đã cấp quyền. Hệ thống đang kiểm tra lỗi này.",
+      profile_relay_unavailable:"Máy chủ Việt Nam dùng để xác minh tài khoản Zalo chưa kết nối được. Bạn có thể dùng Google để đăng nhập.",
       callback_error:"Lỗi xử lý callback. Máy chủ sẽ cần kiểm tra luồng đăng nhập.",
       session_store:"Đã lấy được hồ sơ, nhưng không thể tạo phiên tài khoản trong cơ sở dữ liệu Preview.",
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
     };
     if(authReturn==="success")notify("Đã xác thực. Đang kiểm tra phiên đăng nhập…","success");
-    else notify("Đăng nhập chưa thành công. "+(/^profile_api_error_-?\d{1,5}$/.test(reason) ?
-      "Zalo báo mã lỗi API "+reason.slice("profile_api_error_".length)+". Vui lòng gửi mã lỗi này để kiểm tra." :
-      (reasonMessages[reason]||reasonMessages.unknown)),"error");
+    else notify("Đăng nhập chưa thành công. "+(reason==="profile_api_error_-501" ?
+      "Zalo báo lỗi -501 khi máy chủ lấy thông tin tài khoản. Có thể liên quan đến IP máy chủ ở ngoài Việt Nam; Shop đang xử lý kết nối. Bạn có thể đăng nhập qua Google." :
+      /^profile_api_error_-?\d{1,5}$/.test(reason) ?
+        "Zalo báo mã lỗi API "+reason.slice("profile_api_error_".length)+". Vui lòng gửi mã lỗi này để kiểm tra." :
+        (reasonMessages[reason]||reasonMessages.unknown)),"error");
     params.delete("customer_auth");params.delete("auth_reason");
     const rest=window.location.pathname+(params.size?"?"+params:"")+window.location.hash;
     history.replaceState(history.state,"",rest);
