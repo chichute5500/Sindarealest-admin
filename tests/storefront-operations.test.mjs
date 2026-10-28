@@ -50,13 +50,13 @@ assert.ok(uploadSource.includes('form.get("claimToken")') && warrantyClaimSource
 const adminOrdersSource = readFileSync(new URL('../functions/api/admin/orders.js', import.meta.url), 'utf8');
 assert.ok(adminOrdersSource.includes('COALESCE(sa.full_address,c.address)') && adminOrdersSource.includes('LEFT JOIN order_shipping_addresses'), 'Admin orders must show the shipping address captured for that order');
 
-const html = '<!doctype html><html><head><meta name="description" content="Home"><meta property="og:title" content="Home"><meta property="og:image" content="/og-sindarealest-light-blue-20261027.jpg"><meta name="twitter:image" content="/og-sindarealest-light-blue-20261027.jpg"><link rel="canonical" href="/"><title>Home</title></head><body></body></html>';
+const html = '<!doctype html><html><head><meta name="description" content="Home"><meta property="og:title" content="Home"><meta property="og:image" content="/og-sindarealest-crisp-20261028.jpg"><meta name="twitter:image" content="/og-sindarealest-crisp-20261028.jpg"><link rel="canonical" href="/"><title>Home</title></head><body></body></html>';
 const homepageContext = { request: new Request('https://shop.example/'), env: {}, next: async () => new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}) };
 let response = await seoMiddleware(homepageContext);
 let text = await response.text();
 assert.equal(response.status,200);
 assert.match(text,/og:url" content="https:\/\/shop\.example\//);
-assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest-light-blue-20261027\.jpg/);
+assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest-crisp-20261028\.jpg/);
 assert.match(text,/canonical" href="https:\/\/shop\.example\//);
 
 const seoDB = {
