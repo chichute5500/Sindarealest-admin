@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+const code=readFileSync(new URL('../scripts/canonicalize-two-sneaker-categories-production.mjs',import.meta.url),'utf8');
+assert.match(code,/UPDATE products SET category='sneakers', category_label='Giày thể thao'/);
+assert.match(code,/SELECT COUNT\(\*\) FROM products WHERE published=1 AND category='sneakers'/);
+assert.match(code,/CANONICAL_D1=PASS/);
+assert.match(code,/sku_slug_prices_images_descriptions_unchanged=true/);
+assert.match(code,/b29731e7-48da-4418-8c21-5a04d316241d/);
+assert.match(code,/2f86e258-bcf4-470c-a53c-bb27560be464/);
+assert.ok(!/DELETE FROM products|UPDATE orders|UPDATE order_items|DELETE FROM orders/i.test(code));
+console.log('D1_CANONICALIZATION_GUARDS=PASS');
