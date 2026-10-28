@@ -1,5 +1,5 @@
 // Read-only schema-compatible Storefront helper. No Admin/D1 writes.
-export const PRODUCT_CATEGORY_ROUTE_SLUGS = Object.freeze({"sneakers":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vinam","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung","vi-nam":"vinam","vi-cam-tay":"vicamtay","cap-tab-laptop":"caplaptop","clutch":"clutch","mu":"mu","tui-deo-cheo":"tuideocheo","tui-golf":"tuigolf","tui-nu":"tuinu"});
+export const PRODUCT_CATEGORY_ROUTE_SLUGS = Object.freeze({"sneakers":"sneaker","giay-the-thao":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vinam","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung","vi-nam":"vinam","vi-cam-tay":"vicamtay","cap-tab-laptop":"caplaptop","clutch":"clutch","mu":"mu","tui-deo-cheo":"tuideocheo","tui-golf":"tuigolf","tui-nu":"tuinu"});
 export function productCategoryRouteSlug(value) {
   const key = String(value || "").trim().toLocaleLowerCase("en");
   if (Object.hasOwn(PRODUCT_CATEGORY_ROUTE_SLUGS, key)) return PRODUCT_CATEGORY_ROUTE_SLUGS[key];

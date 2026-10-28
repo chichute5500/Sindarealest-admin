@@ -37,7 +37,7 @@ const valid = validateProduct({
 });
 assert.equal(valid.error, undefined, 'sản phẩm hợp lệ phải qua kiểm tra');
 assert.equal(valid.value.sku, 'SD-236');
-assert.equal(valid.value.category, 'wallets');
+assert.equal(valid.value.category, 'vi-nam', 'Tên Ví da phải chuẩn hóa sang Ví nam, không tạo danh mục legacy wallets');
 assert.equal(valid.value.price, null, 'không tự gán giá');
 assert.equal(valid.value.stock, null, 'không tự gán tồn kho');
 

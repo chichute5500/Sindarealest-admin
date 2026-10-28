@@ -1,3 +1,4 @@
+import { normalizeCatalogCategory } from "./_catalog-sku.js";
 const encoder = new TextEncoder();
 const SESSION_COOKIE = "sd_admin_session";
 const SESSION_SECONDS = 10 * 60;
@@ -352,9 +353,10 @@ export function validateProduct(input, existing = null) {
   if (!/^[A-Z0-9][A-Z0-9._-]{0,47}$/.test(sku)) return { error: "Mã sản phẩm nội bộ/SKU không hợp lệ. SKU thương mại phải được nhập và xác nhận rõ ràng." };
   const rawCategory = String(input.category ?? "").trim();
   if (!rawCategory || rawCategory.length > 80) return { error: "Danh mục là bắt buộc và tối đa 80 ký tự." };
-  const aliases = { sneaker: "sneakers", sneakers: "sneakers", "giay-luoi": "loafers", loafers: "loafers", "giay-tay": "dress-shoes", "dress-shoes": "dress-shoes", "thắt-lưng": "belts", "that-lung": "belts", belts: "belts", "vi-da": "wallets", wallets: "wallets", dep: "sandals", sandals: "sandals", "day-dong-ho": "watch-straps", "op-dien-thoai": "phone-cases" };
-  const categoryKey = slugify(rawCategory);
-  const category = existing && rawCategory === existing.categoryLabel ? existing.category : (Object.hasOwn(aliases, categoryKey) ? aliases[categoryKey] : (/^[a-z0-9-]+$/.test(rawCategory) ? rawCategory : categoryKey));
+  // One source of truth for official category aliases. The SKU allocator has
+  // always mapped "Giày thể thao" to SD-SN; persist that same canonical key
+  // rather than creating a second D1 category called "giay-the-thao".
+  const category = normalizeCatalogCategory(rawCategory);
   const description = String(input.description ?? "");
   if (description.length > 10000) return { error: "Mô tả tối đa 10.000 ký tự." };
   const price = optionalInteger(input.price, "Giá");
