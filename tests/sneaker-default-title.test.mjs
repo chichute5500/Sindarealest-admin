@@ -94,7 +94,7 @@ assert.ok(admin.includes("productCategoryInput.value=button.dataset.categoryLabe
  'Category choice persists the official display name in the form');
 assert.ok(admin.includes("productCategoryInput.addEventListener('click'"),
  'Tapping the field opens the grid on a phone');
-assert.ok(admin.includes('inputmode="none" placeholder="Chọn danh mục trong bảng"'),
+assert.ok(admin.includes('inputmode="none" placeholder="Chọn danh mục"'),
  'Do not obscure category choices with Android keyboard when tapping');
 assert.ok(admin.includes("const extras=[...new Set(products.map(p=>skuCategory(p.category)||p.category)"),
  'Preserve historical categories alongside the official 15 options');
