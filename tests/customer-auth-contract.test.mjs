@@ -58,10 +58,10 @@ class FakeDB {
         throw Error("Unhandled first SQL: "+query);
       }
     })};
+  }
   async batch(){
     // The real SQLite integration test exercises the actual atomic counter.
     return [{success:true},{results:[{attempts:1}]}];
-  }
   }
 }
 const DB=new FakeDB();
