@@ -82,6 +82,22 @@ assert.equal(result.status,201);
 assert.equal(result.body.product.title,'Giày Lười Da Cá Sấu Riêng','Custom names work on non-sneaker categories');
 
 const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
+assert.ok(admin.includes('id="productCategoryGrid" class="product-category-grid"'),
+ 'The category picker renders its own 15-item visual table, not browser-native datalist');
+assert.ok(admin.includes('id="productCategoryToggle"'),
+ 'The category field has a keyboard-accessible open/close control');
+assert.ok(admin.includes("productCategoryGrid.innerHTML=Object.entries(DEFAULT_PRODUCT_LABELS)"),
+ 'The grid always lists all 15 official categories');
+assert.ok(admin.includes("productCategoryInput.dispatchEvent(new Event('input',{bubbles:true}))"),
+ 'Selecting an option triggers category-linked title and product guidance updates');
+assert.ok(admin.includes("productCategoryInput.value=DEFAULT_PRODUCT_LABELS[code]"),
+ 'Category choice persists the official display name in the form');
+assert.ok(admin.includes("productCategoryInput.addEventListener('click'"),
+ 'Tapping the field opens the grid on a phone');
+assert.ok(admin.includes('inputmode="none" placeholder="Chọn danh mục trong bảng"'),
+ 'Do not obscure category choices with Android keyboard when tapping');
+assert.ok(!admin.includes('list="categoryOptions"'),
+ 'Native datalist must not silently replace the required visible selection table');
 assert.match(admin,/function syncDefaultProductTitle\(\)\{/);
 assert.ok(admin.includes("input.placeholder=editing?'':'Tên Danh Mục VIP Da Cá Sấu Mẫu #…'"),
  'Blank category on the Add Product screen must still show a faint sample name');
