@@ -29,6 +29,12 @@ if(root){
         zalo.disabled=!data.providers?.zalo;
         zalo.title=data.providers?.zalo?"":"Zalo App Secret chưa có ở môi trường này";
       }
+      // Email is Preview-only until verified ownership + recovery are implemented.
+      const emailEnabled=Boolean(data.providers?.email);
+      emailForm.hidden=!emailEnabled;
+      q("[data-auth-toggle]").hidden=!emailEnabled;
+      q("[data-auth-email-note]").hidden=emailEnabled;
+      q("[data-auth-unverified-caption]").hidden=!emailEnabled;
       authOptions.hidden=active;signed.hidden=!active;
       if(guest)guest.hidden=active;
       if(active){
