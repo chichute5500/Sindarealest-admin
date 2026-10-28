@@ -1,0 +1,106 @@
+name: Taobao Android owner-signed one-install release
+# Manual only; no Production deploy or credential export.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  signed-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      KEYSTORE_B64: ${{ secrets.SD_TAOBAO_ANDROID_KEYSTORE_B64 }}
+      SD_TAOBAO_RELEASE_STORE_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_STORE_PASSWORD }}
+      SD_TAOBAO_RELEASE_KEY_ALIAS: ${{ secrets.SD_TAOBAO_ANDROID_KEY_ALIAS }}
+      SD_TAOBAO_RELEASE_KEY_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check approved branch, immutable source and durable signing credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feat/product-options-shoes-belts-phone-2026-10-28'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          for name in KEYSTORE_B64 SD_TAOBAO_RELEASE_STORE_PASSWORD SD_TAOBAO_RELEASE_KEY_ALIAS SD_TAOBAO_RELEASE_KEY_PASSWORD; do
+            test -n "${!name}" || { echo "::error::Missing protected signing secret: $name"; exit 1; }
+          done
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run security, API, and disposable real D1/R2 checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-fund
+          npm run check
+          npm test
+          node tools/taobao-import/tests/import-draft.test.mjs
+          node tests/taobao-import-local-d1-r2.test.mjs
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Load encrypted owner signing key only in ephemeral runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          key_path="$RUNNER_TEMP/owner-release-keystore.p12"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$key_path"
+          test -s "$key_path"
+          echo "SD_TAOBAO_RELEASE_KEYSTORE_FILE=$key_path" >> "$GITHUB_ENV"
+      - name: Build signed APK and run Android lint
+        working-directory: tools/taobao-import/android
+        run: gradle --no-daemon --stacktrace :app:assembleRelease :app:lintRelease
+      - name: Verify signed APK and SHA-256
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk='tools/taobao-import/android/app/build/outputs/apk/release/app-release.apk'
+          test -s "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$apk"
+          sha256sum "$apk"
+      - name: Retain candidate only for emulator verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: taobao-owner-signed-qa-only
+          path: tools/taobao-import/android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 2
+  emulator:
+    needs: signed-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: taobao-owner-signed-qa-only
+          path: signed-qa
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_7
+          script: bash tools/taobao-import/tests/emulator-smoke.sh signed-qa/app-release.apk
+      - name: Publish ONE emulator-verified owner-signed APK, never signing secrets
+        uses: actions/upload-artifact@v4
+        with:
+          name: SinDarealest-Taobao-Android-Owner-Release
+          path: signed-qa/app-release.apk
+          retention-days: 30
