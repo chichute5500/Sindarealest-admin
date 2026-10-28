@@ -10,6 +10,14 @@ await_ui() {
     adb shell uiautomator dump /sdcard/window.xml >/dev/null 2>&1 || true
     adb shell cat /sdcard/window.xml > "$output" 2>/dev/null || true
     if grep -Fq "$needle" "$output"; then return 0; fi
+    # GitHub's Google Pixel Launcher occasionally ANRs immediately after emulator boot.
+    # Dismiss ONLY that system overlay and refocus the inspected app. Never mask
+    # exceptions in the SinDarealest process or accept absent UI as a PASS.
+    if grep -Fq "Pixel Launcher isn't responding" "$output"; then
+      echo 'System emulator launcher ANR; dismissing system overlay and refocusing importer'
+      adb shell input keyevent 4 >/dev/null || true
+      adb shell am start -n "$PKG/.MainActivity" >/dev/null || true
+    fi
     sleep 2
   done
   echo "FAIL: Android UI did not show expected text: $needle" >&2

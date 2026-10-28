@@ -121,8 +121,8 @@ jobs:
         with:
           api-level: 35
           arch: x86_64
-          target: google_apis
-          profile: pixel_7
+          target: default
+          profile: pixel_2
           script: bash tools/taobao-import/tests/emulator-smoke.sh signed-qa/app-release.apk signed-test-helper/qa-sender-debug.apk
       - name: Publish ONE emulator-verified owner-signed APK, never signing secrets
         uses: actions/upload-artifact@v4

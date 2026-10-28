@@ -103,8 +103,8 @@ jobs:
         with:
           api-level: 35
           arch: x86_64
-          target: google_apis
-          profile: pixel_7
+          target: default
+          profile: pixel_2
           script: bash tools/taobao-import/tests/emulator-smoke.sh qa-apk/app-debug.apk qa-helper/qa-sender-debug.apk
       - name: Attach emulator screenshot (QA only)
         if: always()
