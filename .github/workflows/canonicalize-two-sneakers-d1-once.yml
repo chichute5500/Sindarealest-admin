@@ -1,0 +1,40 @@
+name: Normalize exactly two sneaker categories in Production D1 (no deploy)
+on:
+  push:
+    branches:
+      - ops/canonicalize-two-sneakers-d1-2026-10-28
+    paths:
+      - .github/workflows/canonicalize-two-sneakers-d1-once.yml
+permissions:
+  contents: read
+concurrency:
+  group: owner-2026-10-28-two-sneakers-d1
+  cancel-in-progress: false
+jobs:
+  canonicalize-two-sneakers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check out exact isolated script
+        uses: actions/checkout@v4
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate exact two SKU and ID guards
+        run: |
+          node --check scripts/canonicalize-two-sneaker-categories-production.mjs
+          node tests/canonicalize-two-sneaker-d1-guards.test.mjs
+      - name: Update exact two product categories and verify all 15 groups
+        run: node scripts/canonicalize-two-sneaker-categories-production.mjs
+      - name: Store before-image only for recovery
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: two-sneaker-category-backup
+          path: backup/sneaker-alias-before-2026-10-28.json
+          if-no-files-found: ignore
+          retention-days: 7
