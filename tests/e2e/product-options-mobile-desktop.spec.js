@@ -42,33 +42,39 @@ for(const cfg of [
   await expect(page.locator('[data-option-value="43"]')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#sdDetailOption')).toHaveValue('42');
   await expect(page.locator('#detailVariants .sd-product-option-choices')).toHaveCSS('flex-wrap','wrap');
-  // Reuse the same transparent Liquid Glass material as the storefront icons.
-  const selectedGlass=await page.locator('[data-option-value="42"]').evaluate(node=>{
-   const css=getComputedStyle(node);
-   return {backgroundImage:css.backgroundImage,backdrop:css.backdropFilter,
-    webkitBackdrop:css.webkitBackdropFilter,shadow:css.boxShadow,borderColor:css.borderTopColor};
+  // Match the *actual heart icon*, including circular geometry and the original 16px glass blur.
+  const surfaces=await page.evaluate(()=>{
+   const style=node=>{
+    const css=getComputedStyle(node),rect=node.getBoundingClientRect();
+    return {width:rect.width,height:rect.height,radius:css.borderRadius,
+     background:css.backgroundColor,border:css.borderTopColor,
+     backdrop:css.backdropFilter,webkitBackdrop:css.webkitBackdropFilter,
+     shadow:css.boxShadow,backgroundImage:css.backgroundImage};
+   };
+   return {heart:style(document.querySelector('#detailFavorite')),
+    idle:style(document.querySelector('[data-option-value="41"]')),
+    selected:style(document.querySelector('[data-option-value="42"]'))};
   });
-  expect(selectedGlass.backgroundImage).toContain('linear-gradient');
-  expect(selectedGlass.backdrop+' '+selectedGlass.webkitBackdrop).toContain('blur(18px)');
-  expect(selectedGlass.shadow).not.toBe('none');
-  expect(selectedGlass.borderColor).not.toBe('transparent');
-  const idleGlass=await page.locator('[data-option-value="41"]').evaluate(node=>{
-   const css=getComputedStyle(node);
-   return {background:css.backgroundColor,shadow:css.boxShadow,
-    backdrop:css.backdropFilter,webkitBackdrop:css.webkitBackdropFilter};
-  });
-  expect(idleGlass.background).toMatch(/rgba\(/);
-  expect(idleGlass.backdrop+' '+idleGlass.webkitBackdrop).toContain('blur(18px)');
-  expect(idleGlass.shadow).not.toBe('none');
-  const chipMetrics=await page.locator('#detailVariants .sd-product-option-chip').evaluateAll(nodes=>nodes.map(x=>({
+  for(const surface of [surfaces.heart,surfaces.idle,surfaces.selected]){
+   expect(surface.width).toBe(40);
+   expect(surface.height).toBe(40);
+   expect(surface.radius).toBe('50%');
+   expect(surface.backdrop+' '+surface.webkitBackdrop).toContain('blur(16px)');
+  }
+  expect(surfaces.idle.background).toBe(surfaces.heart.background);
+  expect(surfaces.idle.border).toBe(surfaces.heart.border);
+  expect(surfaces.idle.shadow).toBe(surfaces.heart.shadow);
+  expect(surfaces.selected.backgroundImage).toContain('linear-gradient');
+  expect(surfaces.selected.border).not.toBe(surfaces.idle.border);
+    const chipMetrics=await page.locator('#detailVariants .sd-product-option-chip').evaluateAll(nodes=>nodes.map(x=>({
    w:x.getBoundingClientRect().width,h:x.getBoundingClientRect().height,
    text:x.textContent,viewWidth:window.innerWidth,
    outerRight:x.getBoundingClientRect().right
   })));
   expect(chipMetrics).toHaveLength(7);
   for(const metric of chipMetrics){
-   expect(metric.w).toBeLessThanOrEqual(60);
-   expect(metric.h).toBeGreaterThanOrEqual(36);
+   expect(metric.w).toBe(40);
+   expect(metric.h).toBe(40);
    expect(metric.outerRight).toBeLessThanOrEqual(metric.viewWidth+1);
    expect(metric.text).toMatch(/^(38|39|40|41|42|43|44)$/);
   }
@@ -90,6 +96,9 @@ for(const cfg of [
   await expect(page.locator('[data-option-value="4.0"]')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('#sdDetailOption')).toHaveValue('4.0');
   await expect(page.locator('[data-option-value="4.0"]')).toHaveText('4,0');
+  await expect(page.locator('[data-option-value="4.0"]')).toHaveCSS('border-radius','50%');
+  const beltCircle=await page.locator('[data-option-value="4.0"]').boundingBox();
+  expect(beltCircle.width).toBe(40);expect(beltCircle.height).toBe(40);
   await page.screenshot({path:dir+'/belt-'+cfg.label+'.png',animations:'disabled'});
   await page.locator('#detailAdd').click();
   await close();
