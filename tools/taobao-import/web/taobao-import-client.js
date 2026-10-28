@@ -23,10 +23,20 @@ async function request(path, options={}) {
   return data;
 }
 function status(value, kind='') { const el=$('status');el.hidden=false;el.textContent=value;el.className='status '+kind; }
-function allowedSource(input) {
-  try { const u=new URL(input),host=u.hostname.toLowerCase();return u.protocol==='https:'&&['taobao.com','tmall.com','tb.cn'].some(d=>host===d||host.endsWith('.'+d)); }
-  catch { return false; }
+function parseTaobaoShare(input) {
+  if(typeof input!=='string'||input.length>8192)return null;
+  for(const m of input.matchAll(/https:\/\/[^\\s<>"'，。；、]+/g)){
+    const candidate=m[0].replace(/[)】。，；、]+$/g,'');
+    try {
+      const u=new URL(candidate),host=u.hostname.toLowerCase();
+      if(u.protocol==='https:'&&!u.username&&!u.password&&!u.port&&
+        ['taobao.com','tmall.com','tb.cn'].some(d=>host===d||host.endsWith('.'+d)))
+        return u.href;
+    }catch{}
+  }
+  return null;
 }
+function allowedSource(input) {return Boolean(parseTaobaoShare(input));}
 function localGet() { try {return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');}catch{return null;} }
 function localSet(value) { try { localStorage.setItem(STORAGE_KEY,JSON.stringify(value)); return true; } catch { return false; } }
 function localClear() { try { localStorage.removeItem(STORAGE_KEY); } catch {} }
@@ -73,8 +83,9 @@ async function photoClear() {
 function fields() {return {title:$('title').value,category:$('category').value,price:$('price').value,fulfillment:$('fulfillment').value,description:$('description').value};}
 function persistMeta() {localSet({version:2,importId,completed,creationAttempted,fields:fields(),order:items.map(x=>x.key),source:$('taobaoLink').value.trim(),rightsConfirmed:$('photoRights').checked});}
 function applySource(source) {
-  if(source&&source.length<=2200&&allowedSource(source)){
-    $('sourceLink').href=source;$('sourceLink').hidden=false;$('noSource').hidden=true;
+  const url=parseTaobaoShare(source);
+  if(url){
+    $('sourceLink').href=url;$('sourceLink').hidden=false;$('noSource').hidden=true;
     $('taobaoLink').value=source;
   }
 }
@@ -159,9 +170,9 @@ const autoMessage=(message,bad=false)=>{
   const el=$('autoStatus');el.textContent=message;el.className='status '+(bad?'bad':'');
 };
 $('taobaoLink').addEventListener('input',()=>{
-  const link=$('taobaoLink').value.trim();
-  if(allowedSource(link)){
-    $('sourceLink').href=link;$('sourceLink').hidden=false;$('noSource').hidden=true;
+  const link=$('taobaoLink').value.trim(),url=parseTaobaoShare(link);
+  if(url){
+    $('sourceLink').href=url;$('sourceLink').hidden=false;$('noSource').hidden=true;
   }else{
     $('sourceLink').hidden=true;$('noSource').hidden=!link;
   }
@@ -171,7 +182,7 @@ $('photoRights').addEventListener('change',persistMeta);
 $('autoPhotos').addEventListener('click',async()=>{
   if(busy||creationAttempted||completed)return;
   const link=$('taobaoLink').value.trim();
-  if(!allowedSource(link)){autoMessage('Vui lòng dán URL Taobao/Tmall đầy đủ có https:// và id sản phẩm.',true);return;}
+  if(!allowedSource(link)){autoMessage('Dán link sản phẩm Taobao hoặc toàn bộ nội dung chia sẻ từ ứng dụng, kể cả tiếng Trung.',true);return;}
   if(!$('photoRights').checked){autoMessage('Cần xác nhận quyền sử dụng ảnh trước khi lấy.',true);return;}
   busy=true;lockFields();
   let added=0,failed=0;
