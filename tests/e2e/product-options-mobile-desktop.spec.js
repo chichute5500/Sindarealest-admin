@@ -42,7 +42,7 @@ for(const cfg of [
   await expect(page.locator('[data-option-value="43"]')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#sdDetailOption')).toHaveValue('42');
   await expect(page.locator('#detailVariants .sd-product-option-choices')).toHaveCSS('flex-wrap','wrap');
-  // Match the FINAL heart icon Liquid Glass material (22px), plus circular geometry.
+  // Match the heart's circular lens and blur while compensating for the pale options background.
   const surfaces=await page.evaluate(()=>{
    const style=node=>{
     const css=getComputedStyle(node),rect=node.getBoundingClientRect();
@@ -62,12 +62,22 @@ for(const cfg of [
    expect(surface.backdrop).toBe(surfaces.heart.backdrop);
    expect(surface.backdrop).toContain('blur(22px)');
   }
-  expect(surfaces.idle.backgroundImage).toBe(surfaces.heart.backgroundImage);
-  expect(surfaces.idle.background).toBe(surfaces.heart.background);
-  expect(surfaces.idle.border).toBe(surfaces.heart.border);
-  expect(surfaces.idle.shadow).toBe(surfaces.heart.shadow);
+  // A 42%-white heart on dark leather looks grey. The same white fill on
+  // the pale detail panel becomes opaque white; the chip needs a smokier
+  // transparent under-tint to reproduce the visible glass, not just CSS parity.
+  expect(surfaces.idle.backgroundImage).toContain('linear-gradient');
+  expect(surfaces.idle.background).not.toBe(surfaces.heart.background);
+  expect(surfaces.idle.shadow).not.toBe('none');
   expect(surfaces.selected.backgroundImage).toContain('linear-gradient');
   expect(surfaces.selected.border).not.toBe(surfaces.idle.border);
+  expect(surfaces.selected.background).not.toBe(surfaces.idle.background);
+  if(cfg.scheme==='light'){
+   expect(surfaces.idle.background).toContain('112, 118, 124');
+   expect(surfaces.selected.background).toContain('104, 129, 147');
+  }else{
+   expect(surfaces.idle.background).toContain('13, 38, 59');
+   expect(surfaces.selected.background).toContain('14, 45, 71');
+  }
     const chipMetrics=await page.locator('#detailVariants .sd-product-option-chip').evaluateAll(nodes=>nodes.map(x=>({
    w:x.getBoundingClientRect().width,h:x.getBoundingClientRect().height,
    text:x.textContent,viewWidth:window.innerWidth,
