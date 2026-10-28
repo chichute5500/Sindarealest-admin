@@ -1,56 +1,32 @@
-# SinDarealest × Taobao Import — Android source prototype
+# SinDarealest × Taobao — Android image-import tool
 
-**Trạng thái:** mã nguồn mẫu / chưa build APK / chưa triển khai lên GitHub hoặc Cloudflare.
+**Active source:** `chichute5500/Sindarealest-admin`, branch `feat/product-options-shoes-belts-phone-2026-10-28`, PR #137 **DRAFT**, unmerged. No writes to `main` and no Production deployment approved.
 
-## Tổng quan
+**Status as of 28 Oct 2026:** Android Debug build and lint passed on GitHub CI; isolated Cloudflare Preview and end-to-end local D1/R2 tests passed; Chrome real IndexedDB reload tests passed. Cross-app Android Emulator image sharing must PASS and an owner-signed stable Release APK must be produced before distributing one installation to the owner. Do **not** distribute ephemeral CI Debug APK.
 
-- Ứng dụng Android hiển thị hai nút dùng Chrome Custom Tabs: Taobao và khu vực nhập ảnh của SinDarealest.
-- Đăng nhập Taobao xảy ra ở browser thật, không có màn hình giả, không thu thập mật khẩu/cookie/sessions, không dùng code tiêm vào Taobao, không tự động quét/download nội dung.
-- Người dùng tự tải ảnh được phép sử dụng từ Taobao/nhà cung cấp vào Downloads và chọn nhiều ảnh trong web importer.
-- Android nhận URL chia sẻ qua `ACTION_SEND` (chỉ domain taobao.com/tmall.com/tb.cn); chuyển URL vào fragment `#source=` phía client; không lưu trên server và không gán vào nội dung sản phẩm.
-- Web importer chạy trong cùng origin Admin đã đăng nhập, gọi API `/api/admin/session`, `/api/admin/login`, `/api/admin/upload`, `/api/admin/products` đã có.
-- WebP tối đa 5 MB và ảnh gốc JPEG/PNG/WebP tối đa 20 MB. Hiện máy chủ đã yêu cầu cả bản WebP và bản gốc; dùng R2 `IMAGES`/`ORIGINALS`.
-- Khi tạo sản phẩm luôn `published:false` để giữ chế độ ẩn. SKU chính thức được API server cấp.
+## Architecture and permissions
 
-## Sơ đồ
+- Android main application ID `com.sindarealest.taobaoimport`, API 29+, Chrome Custom Tabs for `https://www.taobao.com/` and a trusted SinDarealest importer. It never captures Taobao credentials, cookies or HTML.
+- Native Android Sharesheet accepts text links from domains `taobao.com`, `tmall.com`, `tb.cn`, or user-shared JPEG/PNG/WebP images. Image files from other apps are copied through scoped `ContentResolver` to `Pictures/SinDarealest Import`; no broad storage permissions.
+- User selects and confirms images in `public/admin/taobao-import.html`. The page stores draft fields and queued images locally in IndexedDB; computes client-side SHA-256 to reject byte-identical images; optimizes public derivatives to WebP while retaining the original. Uploads use existing `/api/admin/upload` with Admin session, R2 `IMAGES` and separate private `ORIGINALS`.
+- A **new dedicated** `/api/admin/import-draft` endpoint creates an unpublished D1 product using a single client-generated UUID and server-generated official SKU. Retry with the same UUID returns the original row, never inserts a duplicate, and rejects changed/published state. This does not change ordinary Admin products API.
+- Preview Android Debug URL is `https://taobao-import-20261028.sindarealest-admin-preview.pages.dev/admin/taobao-import.html`. The Release variant points to `https://sindarealest2.pages.dev/admin/taobao-import.html`. **The Production path is not confirmed deployed; release is blocked until verified.** App uses web-hosted importer to reduce future APK reinstallations.
+- No Taobao HTML scraping, login automation, bypass of anti-bot restrictions or guarantee of automatically collecting all Taobao product gallery photos. Use only photos which the owner is permitted to reuse.
 
-Taobao (Chrome Custom Tabs)
-  → tải ảnh được phép sử dụng về Android
-  → File Picker ở trang `/admin/taobao-import.html`
-  → API upload (same-site session; 2 ảnh WebP & original)
-  → R2 `IMAGES` và `ORIGINALS`
-  → POST `/api/admin/products` với `published:false`
-  → D1 sản phẩm nháp ẩn, Owner duyệt ở `/admin/`.
+## Automated verification
 
-## Cách tích hợp trang nhập ảnh
+- `.github/workflows/taobao-import-isolated-preview-qa.yml` — project checks, mock API regressions, **real local** Miniflare D1/R2 tests with separate buckets, actual Chromium IndexedDB reload tests, read-only Preview-vs-Production binding check, deploy only independent Preview, HTTP page 200 and unauthenticated importer 401.
+- `.github/workflows/taobao-import-android-qa.yml` — compile Android Debug, lint, validate the **Release variant** with disposable QA signing key (destroyed, never distributed), build an **independently packaged QA image sender**. Emulator installs target app and test sender, starts target, shares real content:// PNG across packages, checks image saved, trusted/fake Taobao share links, dark theme, and Java crash logs. The QA sender APK is never part of owner Release.
+- `.github/workflows/taobao-import-owner-release.yml` — manual-only gate, requires owner-supplied *persistent* keystore in protected GitHub Secrets, verified Production importer and Admin auth, project/API/storage tests, signed APK and Emulator acceptance. Keeps only a single owner-signed artifact after all gates; no key material uploaded. This workflow is on the feature branch and requires appropriate GitHub Actions workflow availability before manual dispatch.
+- Server checks `node tools/taobao-import/tests/import-draft.test.mjs`, `node tests/taobao-import-local-d1-r2.test.mjs`. Browser spec `tests/e2e/taobao-import-real-indexeddb.spec.js`.
 
-Sao chép file `web/public/admin/taobao-import.html` vào `public/admin/taobao-import.html` trong repository `chichute5500/Sindarealest-admin` ở **nhánh thử nghiệm được phép** (không đưa lên `main` khi chưa nghiệm thu). Không cần sửa API và không cần migration, nhưng cần kiểm thử lại các chính sách bảo mật ứng dụng, admin login, hình ảnh, R2/ORIGINALS và session rotation trước deploy.
+## Release blockers and rules
 
-> Địa chỉ gợi ý: `https://sindarealest2.pages.dev/admin/taobao-import.html` — **chưa kiểm chứng đây là hostname deployment Admin thực tế**. Phải xác minh URL trước khi phát hành APK.
+1. Cross-app Emulator step must **PASS**, including real image saving. No temporary bypass, no claiming PASS solely from Gradle build.
+2. Real Taobao account login and photo sharing can only be tested with the owner's explicit on-device interaction; don't claim it ran in CI.
+3. Production page/API must be approved and deployed in due course without exposing Preview D1/R2 as Production. No unattended `main` merge or Production writes from this importer branch.
+4. Stable, owner-controlled signing key must be securely provisioned; reusing **the same** key on every release is necessary for normal install-over updates. CI-generated disposable keys are for QA only and must never be handed out as release packages.
+5. Publish **one** APK to owner only after all verifiable gates above have completed. Never ask them to repeatedly install Debug builds.
+6. Image upload may leave unreferenced R2 images after interrupted operations; any cleanup must be explicitly scoped, audited and never delete real product assets without verification.
 
-## Cách build ứng dụng Android
-
-Thư mục `android/` là source Android Studio (Java, compileSdk 36, minSdk 26, targetSdk 35, AndroidX Browser 1.10.0, Gradle Android Plugin 8.13.0).
-
-1. Mở `android/` bằng Android Studio (JDK 17 / Android SDK 36). Nếu Android Studio yêu cầu Gradle Wrapper, tạo từ bản Gradle 8.13 cài trên máy bằng `gradle wrapper --gradle-version 8.13`.
-2. **Xác minh và cập nhật hằng số `ADMIN_IMPORT`** trong `MainActivity.java` tới domain Admin đang chạy thử. Không nhập mật khẩu vào source code.
-3. Sync Gradle; build `assembleDebug`. Chỉ cài file APK đã được Android Studio tạo ra trên thiết bị thử. Không cấp quyền `READ_EXTERNAL_STORAGE` hay `MANAGE_EXTERNAL_STORAGE` — web importer dùng system file picker.
-4. Dùng Chrome để đăng nhập Taobao nếu được hỗ trợ, chọn ảnh đã tải về, mở import, đăng nhập Admin, nhập sản phẩm nháp, kiểm tra trên Admin.
-
-**Lưu ý:** bộ này chưa bao gồm Android Gradle Wrapper jar/binary; cần Android Studio hoặc Gradle để lấy các thành phần build. Không tuyên bố đã tạo được APK.
-
-## Rủi ro cần kiểm thử trước khi dùng chính thức
-
-- Taobao có thể giới hạn thao tác đăng nhập / tải ảnh và yêu cầu xác thực bổ sung. Công cụ **không vượt bảo vệ website** hoặc truy xuất API chưa được phép.
-- Ảnh hoặc mô tả đăng lại cần có quyền hợp lệ từ người sở hữu quyền. Không dùng ảnh từ trang không cho phép tái sử dụng.
-- URL chia sẻ có thể có tham số cá nhân; công cụ chỉ giữ trong Activity RAM, gắn vào URL fragment để frontend hiển thị, không gửi trực tiếp trong body hoặc request URL lên server. Người dùng có thể xóa URL fragment bằng chính importer trước khi thao tác tiếp.
-- Mỗi upload riêng lẻ đã ghi vào R2; nếu việc tạo sản phẩm thất bại có thể còn ảnh chưa gắn với sản phẩm. Nên bổ sung dọn rác ảnh mồ côi với quy trình xác nhận trong phase sau, không xóa tự động trên production.
-- Ứng dụng hiện có một sản phẩm mỗi lần nhập, giới hạn 30 ảnh, không có tự động dịch giá/size và không có thu thập hàng loạt từ Taobao.
-- Web page chủ động login Admin tại same-origin; không đọc hoặc lưu `HttpOnly` token Admin trong JavaScript, không lưu mật khẩu Admin. Phiên có thể hết hạn sau 10 phút không hoạt động và cần đăng nhập lại.
-- Test cả Android Chrome, Chrome Custom Tabs, shared URL, private R2 original, 401/403/413, hết session khi đang upload, dark/light, tải ảnh 20MB, 30 ảnh, category, giá rỗng, và xác nhận `published=false` trên D1.
-
-## Phạm vi đã kiểm tra (2026-10-28)
-
-Đã đọc trực tiếp từ repo nhánh `feat/product-options-shoes-belts-phone-2026-10-28`: `functions/api/admin/upload.js`, `functions/api/admin/products.js`, `functions/api/admin/login.js`, `functions/api/admin/session.js`, `functions/_catalog-sku.js`, `functions/_lib.js`, `public/admin/index.html`, `wrangler.toml`.
-
-Không sửa repository và không thay đổi trạng thái PR #137. Source này được tạo độc lập để Owner duyệt thiết kế và luồng sử dụng, sau đó mới tích hợp lên nhánh được phép.
+See `tools/taobao-import/tests/emulator-smoke.sh`, the two dedicated GitHub Actions workflows, and PR #137 for current QA results. Keep the existing Owner-PASS Storefront/Admin unaffected.
