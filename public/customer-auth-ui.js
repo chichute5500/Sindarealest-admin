@@ -24,7 +24,8 @@ if(root){
       token_invalid:"Nhà cung cấp không trả về token hợp lệ.",
       profile_rejected:"Không lấy được hồ sơ từ Zalo/Google sau khi cấp quyền.",
       profile_invalid:"Nhà cung cấp chưa trả thông tin tài khoản hợp lệ.",
-      callback_error:"Lỗi khi xử lý callback hoặc ghi phiên đăng nhập vào cơ sở dữ liệu.",
+      callback_error:"Lỗi xử lý callback. Máy chủ sẽ cần kiểm tra luồng đăng nhập.",
+      session_store:"Đã lấy được hồ sơ, nhưng không thể tạo phiên tài khoản trong cơ sở dữ liệu Preview.",
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
     };
     if(authReturn==="success")notify("Đã xác thực. Đang kiểm tra phiên đăng nhập…","success");
