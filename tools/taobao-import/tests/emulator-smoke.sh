@@ -43,9 +43,12 @@ echo "MediaStore QA insert result: $inserted"
 media_uri="$(printf '%s' "$inserted" | sed -n 's/.*\(content:\/\/media\/[^[:space:]]*\).*/\1/p' | tr -d '\r' | head -1)"
 if [ -z "$media_uri" ]; then
   query="$(adb shell content query --uri content://media/external/images/media \
-    --projection _id:_display_name --where "_display_name='sd-import-qa.png'" 2>&1 || true)"
-  echo "MediaStore QA query: $query"
-  media_id="$(printf '%s' "$query" | sed -n 's/.*_id=\([0-9][0-9]*\).*/\1/p' | head -1)"
+    --projection _id:_display_name 2>&1 || true)"
+  # Avoid passing shell-escaped SQL into adb content --where: some emulators
+  # strip the string quotes and reject filenames containing '-' as SQL tokens.
+  media_id="$(printf '%s' "$query" | grep -F 'sd-import-qa.png' \
+    | sed -n 's/.*_id=\([0-9][0-9]*\).*/\1/p' | head -1 || true)"
+  echo "MediaStore QA query matched source: $([ -n "$media_id" ] && echo yes || echo no)"
   if [ -n "$media_id" ]; then media_uri="content://media/external/images/media/$media_id"; fi
 fi
 test -n "$media_uri" || { echo "FAIL: synthetic MediaStore URI unavailable" >&2; exit 1; }
