@@ -2,7 +2,7 @@
 
 **Active source:** `chichute5500/Sindarealest-admin`, branch `feat/product-options-shoes-belts-phone-2026-10-28`, PR #137 **DRAFT**, unmerged. No writes to `main` and no Production deployment approved.
 
-**Status as of 28 Oct 2026:** Android Debug build and lint passed on GitHub CI; isolated Cloudflare Preview and end-to-end local D1/R2 tests passed; Chrome real IndexedDB reload tests passed. Cross-app Android Emulator image sharing must PASS and an owner-signed stable Release APK must be produced before distributing one installation to the owner. Do **not** distribute ephemeral CI Debug APK.
+**Checkpoint 28 Oct 2026:** Android Debug build, lint, temporary-key Release signing, emulator install/launch, real cross-app Android image sharing into scoped MediaStore, approved-link and fake-link checks, system-dark UI and crash checks **PASS** (GitHub Actions run `40641190590`). Isolated Cloudflare Preview HTTP + Admin access checks, real local D1/R2, and Chromium IndexedDB reload/import acceptance also **PASS**. **No owner-distributable APK has been signed yet.** Never distribute ephemeral CI Debug APK or the disposable QA-signed Release.
 
 ## Architecture and permissions
 
@@ -22,11 +22,13 @@
 
 ## Release blockers and rules
 
-1. Cross-app Emulator step must **PASS**, including real image saving. No temporary bypass, no claiming PASS solely from Gradle build.
+1. Cross-app Emulator **PASS verified on AOSP API 35**; repeat the same acceptance on the final owner-signed APK before releasing. Real Taobao login on the owner's phone is still untested.
 2. Real Taobao account login and photo sharing can only be tested with the owner's explicit on-device interaction; don't claim it ran in CI.
 3. Production page/API must be approved and deployed in due course without exposing Preview D1/R2 as Production. No unattended `main` merge or Production writes from this importer branch.
 4. Stable, owner-controlled signing key must be securely provisioned; reusing **the same** key on every release is necessary for normal install-over updates. CI-generated disposable keys are for QA only and must never be handed out as release packages.
 5. Publish **one** APK to owner only after all verifiable gates above have completed. Never ask them to repeatedly install Debug builds.
 6. Image upload may leave unreferenced R2 images after interrupted operations; any cleanup must be explicitly scoped, audited and never delete real product assets without verification.
 
-See `tools/taobao-import/tests/emulator-smoke.sh`, the two dedicated GitHub Actions workflows, and PR #137 for current QA results. Keep the existing Owner-PASS Storefront/Admin unaffected.
+Release workflow: `.github/workflows/taobao-import-owner-release.yml` accepts an explicit `taobao-android-owner-release-v*` tag on the approved tested commit; it is blocked if owner signing secrets or the exact Production importer HTML/API are absent. A stable signing key and monotonically increasing `SD_TAOBAO_RELEASE_VERSION_CODE` support install-over updates. The normal web importer remains independently updateable without a new APK.
+
+See `tools/taobao-import/tests/emulator-smoke.sh`, GitHub Actions [Android verification run](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40641190590), and PR #137 for QA evidence. Keep Owner-PASS Storefront/Admin unaffected.
