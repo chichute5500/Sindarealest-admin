@@ -8,6 +8,66 @@ const HOSTS = ['taobao.com', 'tmall.com', 'tb.cn'];
 export const allowedTaobaoHost = host => typeof host === 'string' &&
   HOSTS.some(d => host.toLowerCase() === d || host.toLowerCase().endsWith('.' + d));
 
+/**
+ * Taobao share text often contains a Chinese title, a short URL and a copy code.
+ * Return ONLY the first strict HTTPS Taobao-family URL; never pass the rest of
+ * the share text to a network request.
+ */
+export function extractTaobaoLink(text) {
+  if(typeof text!=='string'||text.length>8192)return null;
+  for(const m of text.matchAll(/https:\/\/[^\s<>"'，。；、]+/g)){
+    const candidate=m[0].replace(/[)】。，；、]+$/g,'');
+    try{
+      const url=new URL(candidate);
+      if(url.protocol==='https:' && !url.username&&!url.password && !url.port &&
+        allowedTaobaoHost(url.hostname) && candidate.length<=2200)return url.toString();
+    }catch{}
+  }
+  return null;
+}
+const allowedRedirect = raw => {
+  try{
+    const url=new URL(raw);
+    return url.protocol==='https:'&&!url.username&&!url.password&&!url.port&&allowedTaobaoHost(url.hostname);
+  }catch{return false}
+};
+/**
+ * Follow only HTTP redirects among fixed official Taobao/Tmall/tb.cn hosts.
+ * No product-page HTML scraping and no browser credentials. Safe in Workers.
+ * Short links that require JS/cookies/captcha return an explicit failure.
+ */
+export async function resolveItemId(link,request=fetch) {
+  const source=extractTaobaoLink(link) || (allowedRedirect(link) ? link : null);
+  if(!source)return {error:'INVALID_TAOBAO_SHARE_LINK'};
+  const quick=itemIdFromLink(source);
+  if(quick)return {itemId:quick,canonicalUrl:source};
+  let current=new URL(source);
+  if(!['tb.cn','e.tb.cn','m.tb.cn','c.tb.cn'].includes(current.hostname))
+    return {error:'TAOBAO_ITEM_ID_NOT_FOUND'};
+  const visited=new Set();
+  for(let i=0;i<6;i++){
+    if(visited.has(current.href))return {error:'TAOBAO_REDIRECT_LOOP'};
+    visited.add(current.href);
+    let res;
+    try {
+      // Stop on redirects and validate each Location BEFORE making next fetch.
+      res=await request(current.href,{method:'GET',redirect:'manual',
+        headers:{Accept:'text/html,application/xhtml+xml'},
+        signal:AbortSignal.timeout(8000)});
+    }catch{return {error:'TAOBAO_SHORT_LINK_UNREACHABLE'};}
+    const location=res.headers?.get('location');
+    if(res.body){try{await res.body.cancel()}catch{}}
+    if(res.status<300||res.status>399||!location)
+      return {error:'TAOBAO_SHORT_LINK_UNRESOLVED'};
+    let next;
+    try{next=new URL(location,current)}catch{return {error:'TAOBAO_UNSAFE_REDIRECT'};}
+    if(!allowedRedirect(next.href))return {error:'TAOBAO_UNSAFE_REDIRECT'};
+    const id=itemIdFromLink(next.href);
+    if(id)return {itemId:id,canonicalUrl:next.href};
+    current=next;
+  }
+  return {error:'TAOBAO_REDIRECT_LIMIT'};
+}
 export function itemIdFromLink(link) {
   if (typeof link !== 'string' || link.length > 2200) return null;
   try {
