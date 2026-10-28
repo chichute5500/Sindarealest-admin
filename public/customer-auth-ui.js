@@ -19,6 +19,16 @@ if(root){
       const res=await fetch("/api/customer/session",{credentials:"same-origin",cache:"no-store"});
       if(!res.ok)return;
       const data=await res.json(),active=!!data.authenticated;
+      const google=q("[data-auth-google]"),zalo=q("[data-auth-zalo]");
+      if(google){
+        google.disabled=!data.providers?.google;
+        google.textContent=data.providers?.google?"Tiếp tục với Google":"Google (chưa cấu hình)";
+        google.title=data.providers?.google?"":"Cần tạo Google OAuth Client ID và Secret trong Google Cloud";
+      }
+      if(zalo){
+        zalo.disabled=!data.providers?.zalo;
+        zalo.title=data.providers?.zalo?"":"Zalo App Secret chưa có ở môi trường này";
+      }
       authOptions.hidden=active;signed.hidden=!active;
       if(guest)guest.hidden=active;
       if(active){
