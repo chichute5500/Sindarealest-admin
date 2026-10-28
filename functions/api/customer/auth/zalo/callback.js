@@ -12,10 +12,12 @@ export async function onRequestGet({request,env}) {
   if(!url.searchParams.has("code"))return fail("no_code");
   const code=url.searchParams.get("code")||"";
   if(code.length>2048)return fail("invalid_code");
+  let phase="state_store";
   try {
     const verifier=await consumeFlow(env,"zalo",url.searchParams.get("state")||"",request);
     if(!verifier)return fail("invalid_state");
     const body=new URLSearchParams({code,app_id:ZALO_APP_ID,code_verifier:verifier,grant_type:"authorization_code"});
+    phase="token_network";
     const tokenResponse=await fetch("https://oauth.zaloapp.com/v4/access_token",{
       method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded","secret_key":env.ZALO_APP_SECRET},
       body,redirect:"error",signal:AbortSignal.timeout(10000)
@@ -28,6 +30,7 @@ export async function onRequestGet({request,env}) {
     const profileUrl=new URL("https://graph.zalo.me/v2.0/me");
     profileUrl.searchParams.set("fields","id,name");
     profileUrl.searchParams.set("appsecret_proof",await zaloAppSecretProof(token.access_token,env.ZALO_APP_SECRET));
+    phase="profile_network";
     const profileResponse=await fetch(profileUrl.toString(),{
       headers:{"access_token":token.access_token},
       redirect:"error",signal:AbortSignal.timeout(10000)
@@ -39,5 +42,5 @@ export async function onRequestGet({request,env}) {
     try {session=await beginSession(env,"zalo",String(profile.id),profile.name);}
     catch {return fail("session_store");}
     return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
-  }catch{return fail("callback_error");}
+  }catch{return fail(phase); }
 }
