@@ -68,6 +68,7 @@ test -s "$TEST_APK" || { echo 'FAIL: WebView instrumentation not built' >&2; exi
 adb install -r "$TEST_APK"
 adb logcat -c
 adb shell am instrument -w   com.sindarealest.taobaoimport.test/androidx.test.runner.AndroidJUnitRunner   | tee /tmp/taobao-instrumented-webview.txt
+# Print Android diagnostic logs whether instrumentation passed or failed.
+adb logcat -d -s SD_TAOBAO_LIVE:I SD_TAOBAO_QA:I '*:S' | tail -40 || true
 grep -q 'OK (2 tests)' /tmp/taobao-instrumented-webview.txt   || { echo 'FAIL: WebView DOM scan / live-page probe instrumentation' >&2; exit 1; }
-adb logcat -d -s SD_TAOBAO_LIVE:I SD_TAOBAO_QA:I '*:S' | tail -25
 echo 'PASS: APK installs/starts; Taobao link accepted, fake host rejected, dark theme and crash checks pass.'

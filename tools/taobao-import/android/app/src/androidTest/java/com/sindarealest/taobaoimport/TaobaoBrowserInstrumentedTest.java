@@ -44,16 +44,24 @@ public final class TaobaoBrowserInstrumentedTest {
                 scan.performClick();
             });
             AtomicReference<String> visible=new AtomicReference<>("");
+            AtomicReference<String> browserUrl=new AtomicReference<>("");
             for(int i=0;i<30;i++){
                 scenario.onActivity(activity->{
-                    View status=find(activity.getWindow().getDecorView(),"Đã tìm được");
-                    if(status instanceof TextView)visible.set(((TextView)status).getText().toString());
+                    try{
+                        java.lang.reflect.Field field=TaobaoBrowserActivity.class.getDeclaredField("status");
+                        field.setAccessible(true);
+                        TextView fieldValue=(TextView)field.get(activity);
+                        visible.set(fieldValue.getText().toString());
+                    }catch(Exception err){visible.set("STATUS_REFLECTION_ERROR "+err);}
+                    View web=walkWeb(activity.getWindow().getDecorView());
+                    if(web instanceof WebView)browserUrl.set(((WebView)web).getUrl());
                 });
                 if(visible.get().contains("2 liên kết ảnh"))break;
                 Thread.sleep(200);
             }
-            assertTrue("Only 2 allowed CDN image URLs from DOM; actual scan="+visible.get(),
-                visible.get().contains("2 liên kết ảnh"));
+            Log.i("SD_TAOBAO_QA","Fixture browser URL="+browserUrl.get()+"; scan result="+visible.get());
+            assertTrue("2 allowed CDN image URLs required; URL="+browserUrl.get()+
+                "; actual scan="+visible.get(),visible.get().contains("2 liên kết ảnh"));
             Log.i("SD_TAOBAO_QA","PASS fixture: logged-in style product DOM scan returns 2 allowed CDN URLs, no JavaScript bridge");
         }
     }

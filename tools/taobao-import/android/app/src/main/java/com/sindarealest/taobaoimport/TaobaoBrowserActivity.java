@@ -190,7 +190,7 @@ public final class TaobaoBrowserActivity extends Activity {
         String qaHtml = BuildConfig.DEBUG ? getIntent().getStringExtra("sd_qa_visible_html") : null;
         if(qaHtml != null && qaHtml.length() <= 12000) {
             web.loadDataWithBaseURL("https://item.taobao.com/item.htm?id=997261786690",
-                    qaHtml,"text/html","UTF-8",null);
+                    qaHtml,"text/html","UTF-8","https://item.taobao.com/item.htm?id=997261786690");
         } else {
             String original=getIntent().getStringExtra("product_link");
             navigate(safePage(original)?original:HOME);
