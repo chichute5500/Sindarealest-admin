@@ -281,20 +281,25 @@ for (const [id, label] of [
   ['productEditorTabs', 'product editor tablist'],
   ['productTabDetails', 'basic information tab'],
   ['productTabGallery', 'image tab'],
-  ['productTabPricing', 'other/fulfillment tab'],
   ['productPanelDetails', 'basic information tab panel'],
   ['productPanelGallery', 'image tab panel'],
-  ['productPanelPricing', 'other tab panel']
+  ['pFulfillmentToggle', 'order type toggle in basic information']
 ]) has('id="' + id + '"', label);
 has('#productPanelDetails #pPrice{width:100%;min-width:0!important;max-width:100%;font-size:11px}', 'mobile editor keeps price accessible');
 has('id="pPrice" class="control" type="number" min="0" step="1" inputmode="numeric" placeholder="Chưa có giá" title="Để trống nếu chưa có giá"', 'optional VND price remains');
 has('role="tablist" aria-label="Nhóm thông tin sản phẩm"', 'named product tablist');
 has('role="tabpanel" aria-labelledby="productTabDetails"', 'basic panel relationship');
 has('role="tabpanel" aria-labelledby="productTabGallery" hidden', 'initially hidden image panel');
-has('role="tabpanel" aria-labelledby="productTabPricing" hidden', 'initially hidden other panel');
+has('id="pFulfillmentType" type="hidden" value="made_to_order"', 'new products default to made-to-order without an extra tab');
+has('id="pFulfillmentToggle" class="product-fulfillment-toggle"', 'basic info provides a direct order-type button');
+assert.ok(!adminHtml.includes('id="productTabPricing"')&&!adminHtml.includes('id="productPanelPricing"'), 'the empty Other tab is removed');
 assert.ok(adminHtml.indexOf('id="pPrice"') < adminHtml.indexOf('id="productPanelGallery"'), 'price belongs to the basic info panel before the images tab');
 assert.ok(!adminHtml.includes('id="pStock"'), 'stock entry removed');
-assert.ok(adminHtml.indexOf('id="productPanelGallery"') < adminHtml.indexOf('id="productPanelPricing"'), 'images tab appears before the other tab');
+assert.ok(adminHtml.indexOf('id="pFulfillmentToggle"') < adminHtml.indexOf('id="productPanelGallery"'), 'order type must appear alongside category in Basic Info');
+has('class="field span2 product-category-duo"', 'category and order type belong to one side-by-side row');
+has('#productPanelDetails .product-category-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))', 'two equal-width fields stay alongside each other even on narrow screens');
+has("field.value=field.value==='in_stock'?'made_to_order':'in_stock'", 'one tap alternates made-to-order and ready stock');
+has("p?.fulfillmentType==='in_stock'?'in_stock':'made_to_order';syncFulfillmentToggle()", 'new products default to made-to-order and editing preserves ready stock');
 has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
 has("for(const panel of $$('.editor-tab-panel'))panel.hidden=panel.dataset.productPanel!==name", 'all editor tab panels are iterated without throwing when the editor opens');
 has("const editorContent=$('#backdrop .editorcontent');if(editorContent)editorContent.scrollTop=0", 'switching editor tabs resets the shared scroll position so the selected panel starts at its heading');
