@@ -320,7 +320,7 @@ has("const invalidInput=$('#productForm').querySelector(':invalid')", 'product e
 has('setProductEditorTab(panel.dataset.productPanel)', 'invalid form fields reveal their owning tab before focus moves');
 has('invalidInput.focus()', 'product form focuses the invalid control after opening its tab');
 has('white-space:nowrap;overflow-wrap:normal;letter-spacing:-.025em', 'product editor tabs keep Vietnamese labels on a single line');
-has('grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,.65fr)', 'basic information tab receives enough width for its Vietnamese label');
+has('grid-template-columns:repeat(2,minmax(0,1fr));height:52px;min-height:52px;max-height:52px', 'the two remaining editor tabs share equal widths and have compact fixed height');
 has("el.tabIndex>=0&&el.getClientRects().length>0", 'modal focus trap excludes inactive tabs');
 assert.match(baselineSpec, /await expect\(page\.locator\('#productTabDetails'\)\)\.toHaveAttribute\('aria-selected', 'true'\);/,
   'Playwright should verify the product editor defaults to its details tab');
