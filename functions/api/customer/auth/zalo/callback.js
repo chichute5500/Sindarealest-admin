@@ -1,4 +1,4 @@
-import { ZALO_APP_ID,ORIGIN,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error } from "../../../../_customer-auth.js";
+import { ZALO_APP_ID,ORIGIN,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error,zaloAppSecretProof } from "../../../../_customer-auth.js";
 export async function onRequestGet({request,env}) {
   if(new URL(request.url).origin!==ORIGIN||!configured(env,"zalo"))return error("Đăng nhập Zalo chưa sẵn sàng.",503);
   const url=new URL(request.url);
@@ -17,7 +17,12 @@ export async function onRequestGet({request,env}) {
     if(!tokenResponse.ok)return fail();
     const token=await tokenResponse.json();
     if(typeof token.access_token!=="string"||!token.access_token)return fail();
-    const profileResponse=await fetch("https://graph.zalo.me/v2.0/me?fields=id%2Cname",{
+    // The Zalo App enables App Secret Proof for access-token API calls.
+    // The secret stays on the server and is never sent to the client.
+    const profileUrl=new URL("https://graph.zalo.me/v2.0/me");
+    profileUrl.searchParams.set("fields","id,name");
+    profileUrl.searchParams.set("appsecret_proof",await zaloAppSecretProof(token.access_token,env.ZALO_APP_SECRET));
+    const profileResponse=await fetch(profileUrl.toString(),{
       headers:{"access_token":token.access_token},
       redirect:"error",signal:AbortSignal.timeout(10000)
     });
