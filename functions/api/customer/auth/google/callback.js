@@ -3,13 +3,18 @@ export async function onRequestGet({request,env}) {
   const origin=customerOrigin(request);
   if(!origin||!configured(env,"google"))return error("Đăng nhập Google chưa sẵn sàng.",503);
   const url=new URL(request.url);
-  const fail=()=>redirect(origin+"/?customer_auth=failed",[clearFlow()]);
-  if(url.searchParams.has("error")||!url.searchParams.has("code"))return fail();
+  // Diagnostic reason is a fixed, non-sensitive code. Never expose auth codes,
+  // provider payloads, identity data, access tokens or OAuth verifier.
+  const fail=(reason="unknown")=>redirect(origin+"/?customer_auth=failed"+(
+    origin.includes("sindarealest-admin-preview.pages.dev") ? "&auth_reason="+reason : ""
+  ),[clearFlow()]);
+  if(url.searchParams.has("error"))return fail("provider_denied");
+  if(!url.searchParams.has("code"))return fail("no_code");
   const code=url.searchParams.get("code")||"";
-  if(code.length>2048)return fail();
+  if(code.length>2048)return fail("invalid_code");
   try {
     const verifier=await consumeFlow(env,"google",url.searchParams.get("state")||"",request);
-    if(!verifier)return fail();
+    if(!verifier)return fail("invalid_state");
     const body=new URLSearchParams({
       code,client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,
       redirect_uri:callback("google",origin),grant_type:"authorization_code",code_verifier:verifier
@@ -18,17 +23,17 @@ export async function onRequestGet({request,env}) {
       method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body,redirect:"error",signal:AbortSignal.timeout(10000)
     });
-    if(!tokenResponse.ok)return fail();
+    if(!tokenResponse.ok)return fail("token_rejected");
     const token=await tokenResponse.json();
-    if(typeof token.access_token!=="string"||!token.access_token)return fail();
+    if(typeof token.access_token!=="string"||!token.access_token)return fail("token_invalid");
     const profileResponse=await fetch("https://openidconnect.googleapis.com/v1/userinfo",{
       headers:{"Authorization":"Bearer "+token.access_token},
       redirect:"error",signal:AbortSignal.timeout(10000)
     });
-    if(!profileResponse.ok)return fail();
+    if(!profileResponse.ok)return fail("profile_rejected");
     const profile=await profileResponse.json();
-    if(!profile.sub||profile.email_verified!==true)return fail();
+    if(!profile.sub||profile.email_verified!==true)return fail("profile_invalid");
     const session=await beginSession(env,"google",String(profile.sub),profile.name,profile.email);
     return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
-  }catch{return fail();}
+  }catch{return fail("callback_error");}
 }
