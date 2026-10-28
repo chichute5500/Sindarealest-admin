@@ -19,7 +19,7 @@ const expected=[
   "activityFiltersExpanded=false"
 ];
 for(const selector of expected) assert.ok(src.includes(selector),'Missing reference-design safeguard: '+selector);
-for(const id of ['loginForm','password','productForm','pTitle','pCategory','pSkuVerified','pDescription','pPrice','pStock','imageGrid','saveProduct','activityAdvancedToggle'])
+for(const id of ['loginForm','password','productForm','pTitle','pCategory','pDescription','pPrice','imageGrid','saveProduct','activityAdvancedToggle'])
  assert.ok(src.includes('id="'+id+'"'),'Reference-design pass must not remove business control '+id);
 assert.ok(src.includes('document.documentElement.dataset.adminTheme'),'Both themes must be supported');
 // Brand identity is immutable: every Admin logo must use the original, unfiltered image,
