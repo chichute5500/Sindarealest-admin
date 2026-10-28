@@ -240,6 +240,7 @@ public final class MainActivity extends Activity {
             }
         });
         installPrivateExportBridge();
+        installOwnerDeviceBridge();
         if (saved != null && web.restoreState(saved) != null) {
             // Preserves navigation and logged-in session across Android process recovery.
         } else {
@@ -308,6 +309,17 @@ public final class MainActivity extends Activity {
         }
         if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},NOTIFY_PERMISSION_REQUEST);
+    }
+
+    // Notify native Android immediately after Owner login; restricted to our HTTPS origin.
+    private void installOwnerDeviceBridge() {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) return;
+        WebViewCompat.addWebMessageListener(web, "SDAdminDevice",
+            Collections.singleton("https://" + ALLOWED_HOST),
+            (view, message, origin, isMainFrame, replyProxy) -> {
+                if (!isMainFrame || !trusted(origin) || !"ready".equals(message.getData())) return;
+                main.post(() -> { lastEnrollmentAttempt = 0; registerAndroidSession(); });
+            });
     }
 
     private void installPrivateExportBridge() {
