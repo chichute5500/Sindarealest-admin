@@ -3,7 +3,7 @@ on:
   push:
     branches: [integration/owner-pass-product-options-main-2026-10-28]
     paths:
-      - '.github/workflows/qa-product-options-20261028.yml'
+      - '.github/workflows/qa-product-options-main-20261028.yml'
       - 'public/index.html'
       - 'functions/api/orders.js'
       - 'functions/api/checkout-quote.js'
