@@ -1,4 +1,5 @@
-import { ZALO_APP_ID,customerOrigin,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error,zaloAppSecretProof } from "../../../../_customer-auth.js";
+import { ZALO_APP_ID,customerOrigin,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error } from "../../../../_customer-auth.js";
+import {getZaloProfile} from "../../../../_zalo-profile.js";
 export async function onRequestGet({request,env}) {
   const origin=customerOrigin(request);
   if(!origin||!configured(env,"zalo"))return error("Đăng nhập Zalo chưa sẵn sàng.",503);
@@ -25,20 +26,12 @@ export async function onRequestGet({request,env}) {
     if(!tokenResponse.ok)return fail("token_rejected");
     const token=await tokenResponse.json();
     if(typeof token.access_token!=="string"||!token.access_token)return fail("token_invalid");
-    // The Owner enabled appsecret_proof enforcement for access-token APIs.
-    // Official Zalo PHP SDK sends HMAC-SHA256(access_token,app_secret)
-    // as the appsecret_proof REQUEST HEADER (not a URL query parameter).
-    // Keep both access token and computed proof entirely server-side.
-    const profileUrl=new URL("https://graph.zalo.me/v2.0/me");
-    profileUrl.searchParams.set("fields","id,name");
+    // Verified Zalo profile is required before issuing customer session.
+    // For confirmed profile API -501 only, an optional self-hosted private
+    // Vietnam relay may be used if explicitly configured. No public proxy.
     phase="profile_network";
-    const profileResponse=await fetch(profileUrl.toString(),{
-      headers:{"access_token":token.access_token,
-        "appsecret_proof":await zaloAppSecretProof(token.access_token,env.ZALO_APP_SECRET)},
-      redirect:"manual",signal:AbortSignal.timeout(10000)
-    });
-    if(!profileResponse.ok)return fail("profile_rejected");
-    const profile=await profileResponse.json();
+    const profile=await getZaloProfile(env,token.access_token);
+    if(profile?.error==="relay_unavailable")return fail("profile_relay_unavailable");
     // Zalo can return a JSON error with HTTP 200; never accept one as an identity.
     if(!profile || typeof profile!=="object")
       return fail("profile_api_error");
