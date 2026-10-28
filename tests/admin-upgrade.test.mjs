@@ -15,7 +15,7 @@ assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin con
 assert.ok(admin.includes("sdAdminRoot") && admin.includes("sdAdminGuard"), "Admin Back must remain in admin with route state synchronized");
 assert.ok(read("../functions/api/warranty-lookup.js").includes("warranty_lookup:") && !read("../functions/api/warranty-lookup.js").includes("warrantyCode: code"), "Lookup API must return only masked codes plus short-lived action tokens");
 assert.ok(read("../functions/_storefront-route.js").includes("isVerifiedCommercialSku(row)") && read("../functions/_storefront-route.js").includes("encodeURIComponent(key)") && middleware.includes("canonicalProductPath(product)"), "Product canonical URL must use a verified SKU or immutable ID and category route");
-assert.ok(admin.includes('id="pCategory" class="control" list="categoryOptions"'), "Product category should support selecting existing or typing new categories");
+assert.ok(admin.includes('id="pCategory" class="control"') && admin.includes('id="productCategoryGrid"') && admin.includes('data-category-label=') && admin.includes("productCategoryInput.value=button.dataset.categoryLabel"), "Product category must provide a visible picker of official and existing categories while preserving the editable text value");
 assert.ok(admin.includes("refreshCategoryOptions()"), "Product categories should expand from existing product data");
 assert.ok(admin.includes("position:absolute;right:5px"), "Password eye should be compact and placed inside the right edge of the password field");
 assert.ok(admin.includes('id="generateDescription"'), "AI description action missing");
