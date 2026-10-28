@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
-  ZALO_APP_ID,ORIGIN,randomToken,pkce,passwordHash,equalHash,
+  ZALO_APP_ID,ORIGIN,randomToken,pkce,passwordHash,equalHash,zaloAppSecretProof,
   startFlow,consumeFlow,flowCookie,beginSession,getAccount,sessionCookie,endSession
 } from "../functions/_customer-auth.js";
 import { onRequestGet as zaloStart } from "../functions/api/customer/auth/zalo/start.js";
@@ -11,6 +11,9 @@ import { onRequestGet as googleCallback } from "../functions/api/customer/auth/g
 import { onRequestGet as customerSession } from "../functions/api/customer/session.js";
 import { onRequestPost as logout } from "../functions/api/customer/logout.js";
 assert.equal(ZALO_APP_ID,"3933116436838564742");
+assert.match(await zaloAppSecretProof("token-for-qa","test-only-zalo-secret"),/^[a-f0-9]{64}$/);
+assert.notEqual(await zaloAppSecretProof("token-for-qa","test-only-zalo-secret"),
+  await zaloAppSecretProof("different-token-for-qa","test-only-zalo-secret"));
 assert.equal(ORIGIN,"https://sindarealest2.pages.dev");
 const verifier=randomToken(32);
 assert.match(verifier,/^[a-f0-9]{64}$/);
