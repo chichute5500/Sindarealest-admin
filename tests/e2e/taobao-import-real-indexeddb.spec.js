@@ -36,7 +36,7 @@ test('Taobao importer persists photos across reload and commits one hidden draft
 
   await page.goto('http://127.0.0.1:4173/admin/taobao-import.html');
   await expect(page.locator('#picker')).toBeVisible();
-  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/itkAAAAASUVORK5CYII=','base64');
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAALUlEQVR4nGOclmLDQEvARFPTRy0YtWDUglELRi0YtWDUglELRi0YtWDUAioCAD2+AXadpnZ5AAAAAElFTkSuQmCC','base64');
   await page.locator('#picker').setInputFiles([
     {name:'sample-one.png',mimeType:'image/png',buffer:png},
     {name:'sample-two.png',mimeType:'image/png',buffer:png},
