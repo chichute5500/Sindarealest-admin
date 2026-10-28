@@ -1,7 +1,8 @@
-import { ORIGIN,callback,configured,startFlow,pkce,flowCookie,redirect,error } from "../../../../_customer-auth.js";
+import { customerOrigin,callback,configured,startFlow,pkce,flowCookie,redirect,error } from "../../../../_customer-auth.js";
 import { rateLimitPublicRequest } from "../../../../_lib.js";
 export async function onRequestGet({request,env}) {
-  if(new URL(request.url).origin!==ORIGIN || !configured(env,"google"))return error("Đăng nhập Google chưa được cấu hình.",503);
+  const origin=customerOrigin(request);
+  if(!origin || !configured(env,"google"))return error("Đăng nhập Google chưa được cấu hình.",503);
   try {
     // Rate-limit OAuth start before creating one-use state rows in D1.
     const limit=await rateLimitPublicRequest(env,request,"customer_oauth_google",10,900);
@@ -11,7 +12,7 @@ export async function onRequestGet({request,env}) {
     const flow=await startFlow(env,"google");
     const url=new URL("https://accounts.google.com/o/oauth2/v2/auth");
     for(const [key,value] of Object.entries({
-      client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback("google"),
+      client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback("google",origin),
       response_type:"code",scope:"openid email profile",state:flow.state,
       code_challenge_method:"S256",code_challenge:await pkce(flow.verifier),
       prompt:"select_account"
