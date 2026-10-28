@@ -6,6 +6,7 @@ android {
         applicationId = "com.sindarealest.taobaoimport"
         minSdk = 29
         targetSdk = 35
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // A stable signing certificate plus monotonically increasing versionCode
         // lets Android install future native updates over the existing owner APK.
         val ownerVersionCode = System.getenv("SD_TAOBAO_RELEASE_VERSION_CODE")?.toIntOrNull()
@@ -39,4 +40,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
-dependencies { implementation("androidx.browser:browser:1.10.0") }
+dependencies {
+    implementation("androidx.browser:browser:1.10.0")
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:core:1.6.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+}

@@ -30,7 +30,7 @@ jobs:
           gradle-version: '8.13'
       - name: Compile, lint, run JVM unit tests
         working-directory: tools/taobao-import/android
-        run: gradle --no-daemon --stacktrace :app:assembleDebug :app:lintDebug :qa-sender:assembleDebug
+        run: gradle --no-daemon --stacktrace :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug :qa-sender:assembleDebug
       - name: Verify RELEASE APK can be signed using one temporary QA-only key
         shell: bash
         run: |
@@ -69,6 +69,13 @@ jobs:
           path: tools/taobao-import/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 3
 
+      - name: Save debug-only browser instrumentation (not user APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: taobao-webview-instrumentation-qa
+          path: tools/taobao-import/android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          retention-days: 3
+
       - name: Store separate emulator-only cross-package share sender
         uses: actions/upload-artifact@v4
         with:
@@ -93,6 +100,10 @@ jobs:
         with:
           name: taobao-import-emulator-image-sender
           path: qa-helper
+      - uses: actions/download-artifact@v4
+        with:
+          name: taobao-webview-instrumentation-qa
+          path: qa-webview-test
       - name: Enable hardware-assisted emulator
         shell: bash
         run: |
@@ -105,7 +116,7 @@ jobs:
           arch: x86_64
           target: default
           profile: pixel_2
-          script: bash tools/taobao-import/tests/emulator-smoke.sh qa-apk/app-debug.apk qa-helper/qa-sender-debug.apk
+          script: bash tools/taobao-import/tests/emulator-smoke.sh qa-apk/app-debug.apk qa-helper/qa-sender-debug.apk qa-webview-test/app-debug-androidTest.apk
       - name: Attach emulator screenshot (QA only)
         if: always()
         uses: actions/upload-artifact@v4

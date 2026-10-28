@@ -185,8 +185,16 @@ public final class TaobaoBrowserActivity extends Activity {
             try {tab.launchUrl(this,target);}
             catch(Exception err){startActivity(new Intent(Intent.ACTION_VIEW,target));}
         });
-        String original=getIntent().getStringExtra("product_link");
-        navigate(safePage(original)?original:HOME);
+        // A deterministic *debug-only* fixture is used by emulator instrumentation
+        // to exercise the real user-triggered DOM scan; it never ships in Release.
+        String qaHtml = BuildConfig.DEBUG ? getIntent().getStringExtra("sd_qa_visible_html") : null;
+        if(qaHtml != null && qaHtml.length() <= 12000) {
+            web.loadDataWithBaseURL("https://item.taobao.com/item.htm?id=997261786690",
+                    qaHtml,"text/html","UTF-8",null);
+        } else {
+            String original=getIntent().getStringExtra("product_link");
+            navigate(safePage(original)?original:HOME);
+        }
     }
     private void navigate(String url) {
         if(!safePage(url)){
