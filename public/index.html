@@ -4614,37 +4614,51 @@ html.dark #productOverlay .detail-actions .detail-purchase-button{
 #productOverlay .detail-variants:not([hidden]){display:grid;gap:8px;margin:14px 0 15px;padding:12px 14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);min-width:0}
 #productOverlay .sd-product-option-label{display:block;font-weight:700;font-size:12px;color:var(--ink)}
 #productOverlay .sd-product-option-choices{display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:flex-start;min-width:0}
-/* True circular 40px buttons share the FINAL icon material above with #detailFavorite.
-   Keep only option geometry and selected tint here to avoid another competing glass system. */
+/* Round Liquid Glass options, optically balanced against a pale options panel.
+   Heart icon sits over a dark photo, so its exact translucent white fill looks
+   opaque white over this panel. A grey-tinted transparent lens restores the same
+   visible smoked-glass depth without changing the approved heart icon itself. */
 #productOverlay .sd-product-option-chip{
- -webkit-appearance:none;appearance:none;display:inline-flex;align-items:center;justify-content:center;
- flex:0 0 40px;width:40px;min-width:40px;max-width:40px;height:40px;min-height:40px;max-height:40px;
- aspect-ratio:1;padding:0;margin:0;border:1px solid rgba(255,255,255,.72);border-radius:50%;
- background:rgba(255,255,255,.42);color:#142a3c;
- backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);
- box-shadow:0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80);
- font:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer;isolation:isolate;
+ -webkit-appearance:none;appearance:none;
+ display:inline-flex;align-items:center;justify-content:center;flex:0 0 40px;
+ width:40px;min-width:40px;max-width:40px;height:40px;min-height:40px;max-height:40px;
+ aspect-ratio:1;padding:0;margin:0;border-radius:50%;
+ border:1px solid rgba(225,238,248,.80);
+ background:linear-gradient(150deg,rgba(255,255,255,.23),rgba(102,112,121,.26)),rgba(112,118,124,.36);
+ -webkit-backdrop-filter:blur(22px) saturate(180%);
+ backdrop-filter:blur(22px) saturate(180%);
+ box-shadow:0 8px 24px rgba(28,58,78,.20),inset 0 1px 0 rgba(255,255,255,.76),inset 0 -1px 0 rgba(59,88,107,.17),inset 0 0 0 1px rgba(247,252,255,.10);
+ color:#142a3c;font:inherit;font-size:13px;font-weight:700;line-height:1;
+ cursor:pointer;isolation:isolate;
  transition:transform .14s cubic-bezier(.2,.7,.2,1),background .14s cubic-bezier(.2,.7,.2,1),border-color .14s cubic-bezier(.2,.7,.2,1),box-shadow .14s cubic-bezier(.2,.7,.2,1)
 }
-/* The heart uses ID-specific !important colors; mirror its computed surface exactly. */
 html.dark #productOverlay .sd-product-option-chip{
- color:#eaf3fb;background:rgba(13,38,59,.58);border-color:rgba(234,243,251,.28);
- box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(234,243,251,.17)
+ color:#eaf3fb;border-color:rgba(234,243,251,.28);
+ background:linear-gradient(150deg,rgba(184,218,240,.12),rgba(7,27,46,.18)),rgba(13,38,59,.58);
+ box-shadow:0 8px 24px rgba(0,0,0,.25),inset 0 1px 0 rgba(234,243,251,.25),inset 0 -1px 0 rgba(0,6,18,.20)
 }
-#productOverlay .sd-product-option-chip:active{transform:scale(.94)}
+@media(hover:hover) and (pointer:fine){
+ #productOverlay .sd-product-option-chip:hover{
+  border-color:rgba(219,240,255,.96);
+  background:linear-gradient(150deg,rgba(255,255,255,.32),rgba(89,117,137,.28)),rgba(106,123,137,.39);
+  box-shadow:0 9px 24px rgba(26,67,96,.23),inset 0 1px 0 rgba(255,255,255,.88),inset 0 -1px 0 rgba(59,88,107,.20)
+ }
+ html.dark #productOverlay .sd-product-option-chip:hover{
+  background:linear-gradient(150deg,rgba(198,230,250,.20),rgba(22,62,92,.24)),rgba(13,38,59,.64)
+ }
+}
+#productOverlay .sd-product-option-chip:active{transform:scale(.94);box-shadow:inset 0 2px 7px rgba(0,12,28,.18),inset 0 1px 0 rgba(255,255,255,.36)}
 #productOverlay .sd-product-option-chip.is-selected{
- border-color:var(--sd-icon-press-color) !important;
- background:
-  radial-gradient(125% 115% at 12% 0%,rgba(255,255,255,.94) 0%,rgba(255,255,255,.43) 27%,rgba(255,255,255,0) 65%),
-  linear-gradient(145deg,rgba(235,247,255,.71) 0%,rgba(161,210,243,.47) 46%,rgba(94,165,213,.40) 100%) !important;
- box-shadow:var(--sd-icon-shell-shadow),inset 0 0 0 1px rgba(92,145,185,.23) !important
+ border-color:rgba(62,127,176,.88);
+ background:linear-gradient(145deg,rgba(244,251,255,.34),rgba(77,151,206,.31)),rgba(104,129,147,.40);
+ box-shadow:0 8px 24px rgba(32,83,119,.23),inset 0 1px 0 rgba(255,255,255,.78),inset 0 0 0 1px rgba(84,158,211,.27);
+ color:#102d43
 }
 html.dark #productOverlay .sd-product-option-chip.is-selected{
- border-color:var(--sd-icon-press-color) !important;
- background:
-  radial-gradient(125% 115% at 12% 0%,rgba(214,241,255,.36) 0%,rgba(157,206,238,.18) 28%,rgba(255,255,255,0) 66%),
-  linear-gradient(145deg,rgba(48,99,136,.80) 0%,rgba(21,64,95,.72) 48%,rgba(8,33,55,.78) 100%) !important;
- box-shadow:var(--sd-icon-shell-shadow),inset 0 0 0 1px rgba(163,214,252,.22) !important
+ border-color:rgba(148,207,245,.88);
+ background:linear-gradient(145deg,rgba(157,213,250,.30),rgba(43,105,149,.24)),rgba(14,45,71,.68);
+ box-shadow:0 8px 24px rgba(0,4,15,.34),inset 0 1px 0 rgba(229,247,255,.45),inset 0 0 0 1px rgba(150,212,253,.26);
+ color:#edf7ff
 }
 #productOverlay .sd-product-option-chip:focus-visible{outline:2px solid var(--sd-icon-press-color);outline-offset:3px}
 #productOverlay .sd-product-option-control{
