@@ -25,7 +25,8 @@ assert.doesNotMatch(response.headers.get('Set-Cookie') || '', /sd_admin_session=
 const adminUi = (await import('node:fs')).readFileSync(new URL('../public/admin/index.html', import.meta.url), 'utf8');
 assert.match(adminUi,/async function logout\(inactive=false\)\{[\s\S]*?if\(!inactive\)\{try\{await api\('\/api\/admin\/logout'/, 'Only explicit logout may call the shared cookie-revocation endpoint');
 assert.match(adminUi,/setTimeout\(\(\)=>logout\(true\),600000\)/, 'The 10-minute inactivity guard must still lock its own tab');
-assert.match(adminUi,/document\.hidden\|\|auditLogPolling/, 'Admin polling must pause in hidden tabs and while another request is in flight');
-assert.match(adminUi,/finally\{auditLogPolling=false\}/, 'Admin polling lock must always release');
+assert.match(adminUi,/if\(document\.hidden\|\|\$\('#appView'\)\.classList\.contains\('hidden'\)\|\|busy\|\|resetBusy\)return false/, 'Admin polling must pause in hidden tabs and during edits');
+assert.match(adminUi,/if\(adminSyncPromise\)\{if\(!full\)return adminSyncPromise/, 'Admin polling must not overlap requests');
+assert.match(adminUi,/finally\{adminSyncPromise=null\}/, 'Admin polling lock must always release');
 
 console.log('Admin session rotation regression tests passed.');
