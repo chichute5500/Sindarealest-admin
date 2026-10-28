@@ -32,7 +32,7 @@ for(const cfg of [
  test('Grey placeholder for all 15 categories, blank save and custom names: '+cfg.label,async({page})=>{
   await page.setViewportSize({width:cfg.w,height:cfg.h});
   await page.emulateMedia({colorScheme:cfg.theme,reducedMotion:'reduce'});
-  const errors=[],submitted=[];
+  const errors=[],submitted=[],visibilityWrites=[];
   page.on('pageerror',e=>errors.push(e.message));
   const items=[{
     id:'qa-sneaker-024',sku:'SD-SN024',skuVerified:true,title:'Giày Thể Thao VIP Da Cá Sấu Mẫu #024',
@@ -41,6 +41,15 @@ for(const cfg of [
   }];
   await page.route('**/api/admin/**',async route=>{
    const path=new URL(route.request().url()).pathname;
+   if(path==='/api/admin/products/qa-sneaker-024'&&route.request().method()==='PATCH'){
+    const payload=route.request().postDataJSON();
+    visibilityWrites.push(payload);
+    if(payload.field!=='published'||typeof payload.value!=='boolean'||payload.expectedValue!==items[0].published)
+     return route.fulfill({status:409,contentType:'application/json',body:JSON.stringify({error:'Đã thay đổi từ thiết bị khác'})});
+    items[0].published=payload.value;
+    return route.fulfill({status:200,contentType:'application/json',
+     body:JSON.stringify({ok:true,message:'Đã cập nhật sản phẩm.',product:{...items[0]}})});
+   }
    if(path==='/api/admin/products'&&route.request().method()==='POST'){
     const payload=route.request().postDataJSON();
     submitted.push(payload);
@@ -59,6 +68,33 @@ for(const cfg of [
   });
   await page.goto(base+'/admin/?view=products',{waitUntil:'domcontentloaded'});
   await expect(page.locator('#appView')).not.toHaveClass(/hidden/);
+  // A visible card switch replaces the pencil; it must not open the editor.
+  const cardSwitch=()=>page.locator('[data-toggle-published="qa-sneaker-024"]:visible').first();
+  await expect(cardSwitch()).toHaveAttribute('role','switch');
+  await expect(cardSwitch()).toHaveAttribute('aria-checked','true');
+  await expect(cardSwitch()).toContainText('Hiện');
+  await expect(page.locator('#main button.product-mobile-edit:visible')).toHaveCount(0);
+  await expect(page.locator('#main .product-table thead th')).not.toContainText(['Tồn kho']);
+  expect(await page.locator('#main').innerText()).not.toContain('Chưa kiểm kê');
+  await page.screenshot({path:dir+'/card-switch-green-'+cfg.label+'.png',animations:'disabled'});
+  await cardSwitch().click();
+  await expect.poll(()=>visibilityWrites.length).toBe(1);
+  expect(visibilityWrites[0]).toEqual({field:'published',value:false,expectedValue:true});
+  await expect(cardSwitch()).toHaveAttribute('aria-checked','false');
+  await expect(cardSwitch()).toContainText('Ẩn');
+  await expect(page.locator('#backdrop')).toHaveClass(/hidden/);
+  await page.screenshot({path:dir+'/card-switch-red-'+cfg.label+'.png',animations:'disabled'});
+  await cardSwitch().click();
+  await expect.poll(()=>visibilityWrites.length).toBe(2);
+  expect(visibilityWrites[1]).toEqual({field:'published',value:true,expectedValue:false});
+  await expect(cardSwitch()).toHaveAttribute('aria-checked','true');
+  // Tapping the card body still opens product editing.
+  await page.locator('#main [data-product-row="qa-sneaker-024"] .prodname').click();
+  await expect(page.locator('#backdrop')).not.toHaveClass(/hidden/);
+  for(const id of ['#pSku','#pSkuVerified','#pStock','#pPublished'])
+   await expect(page.locator(id)).toHaveCount(0);
+  await page.locator('#editorCancel').click();
+  await expect(page.locator('#backdrop')).toHaveClass(/hidden/);
   await page.locator('[data-action="add"]').first().click();
   await expect(page.locator('#backdrop')).not.toHaveClass(/hidden/);
   const title=page.locator('#pTitle'),category=page.locator('#pCategory');
@@ -114,6 +150,10 @@ for(const cfg of [
   await expect.poll(()=>submitted.length).toBe(1);
   expect(submitted[0].title).toBe('');
   expect(submitted[0].category).toBe('Giày Thể Thao');
+  expect(submitted[0].published).toBe(true);
+  expect(submitted[0].stock).toBe(null);
+  expect(submitted[0].sku).toBe('');
+  expect(submitted[0].skuVerified).toBe(true);
   expect(submitted[0]).not.toHaveProperty('autoSneakerTitle');
   // Separate new product: a custom title must be sent unchanged.
   await page.locator('[data-action="add"]').first().click();
