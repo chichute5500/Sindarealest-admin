@@ -38,7 +38,7 @@ assert.ok(allowedImageUrl('//img.alicdn.com/imgextra/x.jpg'));
 assert.equal(allowedImageUrl('https://img.alicdn.com.evil.invalid/a.jpg'),null);
 assert.equal(allowedImageUrl('https://127.0.0.1/a.jpg'),null);
 assert.equal(allowedImageUrl('http://img.alicdn.com/a.jpg'),null);
-const env={TAOBAO_APP_KEY:'qa-app-key',TAOBAO_APP_SECRET:'qa-secret',SESSION_SECRET:'qa-session-secret-64-bytes-abcdefghijklmnopqrstuvwxyz0123456789',TAOBAO_ITEM_API_METHOD:'taobao.item.detail.get'};
+const env={DB:{},ADMIN_PASSWORD:'qa-only-admin-password',TAOBAO_APP_KEY:'qa-app-key',TAOBAO_APP_SECRET:'qa-secret',SESSION_SECRET:'qa-session-secret-64-bytes-abcdefghijklmnopqrstuvwxyz0123456789',TAOBAO_ITEM_API_METHOD:'taobao.item.detail.get'};
 const params=topParams('123456789',env,new Date('2026-10-28T05:00:00Z'));
 assert.equal(params.timestamp,'2026-10-28 13:00:00');
 assert.equal(params.method,'taobao.item.detail.get');
@@ -80,7 +80,7 @@ try{
   const body={link:'https://item.taobao.com/item.htm?id=123456789',permissionConfirmed:true};
   let r=await getPhotos({request:request('/api/admin/taobao-photos','POST',body,false),env});assert.equal(r.status,401);
   r=await getPhotos({request:request('/api/admin/taobao-photos','POST',{...body,permissionConfirmed:false}),env});assert.equal(r.status,400);
-  r=await getPhotos({request:request('/api/admin/taobao-photos','POST',body),env:{SESSION_SECRET:env.SESSION_SECRET}});assert.equal(r.status,503);
+  r=await getPhotos({request:request('/api/admin/taobao-photos','POST',body),env:{...env,TAOBAO_APP_KEY:undefined}});assert.equal(r.status,503);
   r=await getPhotos({request:request('/api/admin/taobao-photos','POST',body),env});assert.equal(r.status,200);
   const data=await r.json();assert.equal(data.images.length,2);assert.equal(data.itemId,'123456789');
   assert.equal(remoteCount,1,'Only one official API request, no HTML scraping');
