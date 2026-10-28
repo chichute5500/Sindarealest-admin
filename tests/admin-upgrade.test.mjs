@@ -8,7 +8,7 @@ const products = read("../functions/api/admin/products.js");
 const middleware = read("../functions/_middleware.js");
 const ai = read("../functions/api/admin/ai-description.js");
 const push = read("../functions/api/admin/push-subscriptions.js");
-assert.ok(admin.includes('id="pSku"') && admin.includes('id="pSkuVerified"') && admin.includes("skuVerified:$('#pSkuVerified').checked"), "Admin must allow a commercial SKU to be entered and explicitly verified");
+assert.ok(!admin.includes('id="pSku"') && !admin.includes('id="pSkuVerified"') && admin.includes("sku:editing?.sku||'',skuVerified:editing?.skuVerified??true"), "Admin auto-allocates SKU on create and preserves verified SKU on edit without manual controls");
 assert.ok(admin.includes("Object.hasOwn(labels,log.action)"), "audit event labels must not resolve inherited prototype properties");
 assert.ok(lib.includes("normalizeCatalogCategory(rawCategory)") && catalogSku.includes("Object.hasOwn(CATEGORY_ALIASES,slug)"), "product category aliases must be prototype-safe in the canonical shared helper");
 assert.ok(admin.includes("-webkit-tap-highlight-color: transparent"), "Admin controls should not flash blue when tapped on Android");
