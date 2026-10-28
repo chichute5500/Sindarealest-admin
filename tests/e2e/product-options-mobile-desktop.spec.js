@@ -42,6 +42,24 @@ for(const cfg of [
   await expect(page.locator('[data-option-value="43"]')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#sdDetailOption')).toHaveValue('42');
   await expect(page.locator('#detailVariants .sd-product-option-choices')).toHaveCSS('flex-wrap','wrap');
+  // Reuse the same transparent Liquid Glass material as the storefront icons.
+  const selectedGlass=await page.locator('[data-option-value="42"]').evaluate(node=>{
+   const css=getComputedStyle(node);
+   return {backgroundImage:css.backgroundImage,backdrop:css.backdropFilter,
+    webkitBackdrop:css.webkitBackdropFilter,shadow:css.boxShadow,borderColor:css.borderTopColor};
+  });
+  expect(selectedGlass.backgroundImage).toContain('linear-gradient');
+  expect(selectedGlass.backdrop+' '+selectedGlass.webkitBackdrop).toContain('blur(18px)');
+  expect(selectedGlass.shadow).not.toBe('none');
+  expect(selectedGlass.borderColor).not.toBe('transparent');
+  const idleGlass=await page.locator('[data-option-value="41"]').evaluate(node=>{
+   const css=getComputedStyle(node);
+   return {background:css.backgroundColor,shadow:css.boxShadow,
+    backdrop:css.backdropFilter,webkitBackdrop:css.webkitBackdropFilter};
+  });
+  expect(idleGlass.background).toMatch(/rgba\\(/);
+  expect(idleGlass.backdrop+' '+idleGlass.webkitBackdrop).toContain('blur(18px)');
+  expect(idleGlass.shadow).not.toBe('none');
   const chipMetrics=await page.locator('#detailVariants .sd-product-option-chip').evaluateAll(nodes=>nodes.map(x=>({
    w:x.getBoundingClientRect().width,h:x.getBoundingClientRect().height,
    text:x.textContent,viewWidth:window.innerWidth,
@@ -77,6 +95,13 @@ for(const cfg of [
   await close();
   await open('qa-phone');
   await expect(page.locator('#sdDetailOption')).toHaveAttribute('maxlength','80');
+  const phoneGlass=await page.locator('#sdDetailOption').evaluate(node=>{
+   const css=getComputedStyle(node);
+   return {backdrop:css.backdropFilter,webkitBackdrop:css.webkitBackdropFilter,shadow:css.boxShadow,width:node.getBoundingClientRect().width};
+  });
+  expect(phoneGlass.backdrop+' '+phoneGlass.webkitBackdrop).toContain('blur(18px)');
+  expect(phoneGlass.shadow).not.toBe('none');
+  expect(phoneGlass.width).toBeLessThanOrEqual(281);
   await page.locator('#detailAdd').click();
   await expect(page.locator('#sdDetailOptionMessage')).toContainText('Vui lòng nhập');
   await page.locator('#sdDetailOption').fill('iPhone 16 Pro Max');
