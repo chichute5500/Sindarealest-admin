@@ -1,5 +1,5 @@
 import {fail,json,requireAdmin,readJsonBodyLimited} from '../../_lib.js';
-import {itemIdFromLink,topParams,readTopImages,imageTicket} from '../../_taobao-official.js';
+import {resolveItemId,topParams,readTopImages,imageTicket} from '../../_taobao-official.js';
 
 /**
  * Official Taobao Open Platform only. Never fetches item page HTML and never
@@ -13,8 +13,20 @@ export async function onRequestPost(context) {
   const body=parsed.value;
   if(!body||typeof body!=='object'||Array.isArray(body))return fail('Thiếu đường dẫn Taobao.',400);
   if(body.permissionConfirmed!==true)return fail('Cần xác nhận quyền sử dụng ảnh từ nhà cung cấp.',400);
-  const id=itemIdFromLink(body.link);
-  if(!id)return fail('Link Taobao không hợp lệ hoặc là link rút gọn. Hãy mở Taobao, sao chép URL chi tiết có id=...',400);
+  const resolved=await resolveItemId(body.link);
+  if(resolved.error){
+    const errors={
+      INVALID_TAOBAO_SHARE_LINK:'Nội dung không có link Taobao/Tmall hợp lệ.',
+      TAOBAO_ITEM_ID_NOT_FOUND:'Không tìm thấy mã sản phẩm trong link Taobao.',
+      TAOBAO_SHORT_LINK_UNREACHABLE:'Không mở được link Taobao rút gọn từ máy chủ. Bạn có thể mở link trong Chrome, sao chép URL sản phẩm đầy đủ rồi dán lại.',
+      TAOBAO_SHORT_LINK_UNRESOLVED:'Link rút gọn cần mở bằng Taobao/Chrome để lấy URL sản phẩm, vì Taobao không trả chuyển hướng HTTP có mã sản phẩm.',
+      TAOBAO_UNSAFE_REDIRECT:'Link rút gọn chuyển sang tên miền không nằm trong Taobao/Tmall nên đã chặn.',
+      TAOBAO_REDIRECT_LOOP:'Link Taobao bị lặp chuyển hướng.',
+      TAOBAO_REDIRECT_LIMIT:'Link Taobao chuyển hướng quá nhiều lần.'
+    };
+    return fail(errors[resolved.error]||'Không giải mã được link Taobao.',422);
+  }
+  const id=resolved.itemId;
   const env=context.env||{};
   if(!env.TAOBAO_APP_KEY||!env.TAOBAO_APP_SECRET||!env.SESSION_SECRET)
     return fail('Chưa kết nối API chính thức của Taobao. Cần AppKey/AppSecret có quyền đọc thông tin sản phẩm; đăng nhập Taobao trên Chrome không thay thế quyền API.',503);
