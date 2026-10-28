@@ -108,6 +108,15 @@ try{
     const out=await session({request:makeRequest("/api/customer/session",cookie),env});
     assert.equal((await out.json()).authenticated,false);
   }
+  // Abuse guard: each OAuth provider has an atomic per-client 15-minute budget.
+  // One Zalo start was already counted above; 9 more allowed, the 11th rejected.
+  for(let attempt=0;attempt<9;attempt++) {
+    const response=await zaloStart({request:makeRequest("/api/customer/auth/zalo/start"),env});
+    assert.equal(response.status,302);
+  }
+  const blocked=await zaloStart({request:makeRequest("/api/customer/auth/zalo/start"),env});
+  assert.equal(blocked.status,429,"must reject repeated OAuth state creation");
+  assert.equal(count("customer_auth_flows"),9,"blocked attempt did not allocate new D1 state");
   // Email account is isolated from orders, no email-only claim into customer records.
   const body={mode:"register",name:"Khách Email Thử",email:"qa+mail@example.test",password:"pass_2026!test-safe"};
   const registered=await email({request:makeRequest("/api/customer/auth/email","","POST",body,ORIGIN),env});
