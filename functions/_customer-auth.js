@@ -120,6 +120,13 @@ export async function passwordHash(password,salt,iterations=210000) {
     salt:enc.encode(salt),iterations},imported,256);
   return Array.from(new Uint8Array(bits),b=>b.toString(16).padStart(2,"0")).join("");
 }
+export async function zaloAppSecretProof(accessToken,appSecret) {
+  if(typeof accessToken!=="string" || !accessToken || typeof appSecret!=="string" || !appSecret)
+    throw new Error("Zalo token proof requires secret");
+  const key=await crypto.subtle.importKey("raw",enc.encode(appSecret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  const signature=await crypto.subtle.sign("HMAC",key,enc.encode(accessToken));
+  return Array.from(new Uint8Array(signature),b=>b.toString(16).padStart(2,"0")).join("");
+}
 export function equalHash(a,b) {
   if(typeof a!=="string"||typeof b!=="string"||a.length!==b.length)return false;
   let diff=0;for(let i=0;i<a.length;i++)diff|=a.charCodeAt(i)^b.charCodeAt(i);
