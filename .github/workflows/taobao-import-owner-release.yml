@@ -2,6 +2,11 @@ name: Taobao Android owner-signed one-install release
 # Manual only; no Production deploy or credential export.
 on:
   workflow_dispatch:
+  # Signed releases can be promoted by an explicit immutable tag on the tested
+  # feature commit without merging unrelated PR #137 changes into Production.
+  push:
+    tags:
+      - 'taobao-android-owner-release-v*'
 permissions:
   contents: read
 jobs:
@@ -22,7 +27,11 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
-          test "$GITHUB_REF" = 'refs/heads/feat/product-options-shoes-belts-phone-2026-10-28'
+          if [[ "$GITHUB_REF" != 'refs/heads/feat/product-options-shoes-belts-phone-2026-10-28' &&
+                "$GITHUB_REF" != refs/tags/taobao-android-owner-release-v* ]]; then
+            echo '::error::Release trigger must be the approved feature branch or an explicit owner release tag'
+            exit 1
+          fi
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           for name in KEYSTORE_B64 SD_TAOBAO_RELEASE_STORE_PASSWORD SD_TAOBAO_RELEASE_KEY_ALIAS SD_TAOBAO_RELEASE_KEY_PASSWORD; do
             test -n "${!name}" || { echo "::error::Missing protected signing secret: $name"; exit 1; }
@@ -34,7 +43,9 @@ jobs:
           base='https://sindarealest2.pages.dev'
           status="$(curl -sSL --max-time 30 -o "$RUNNER_TEMP/owner-import-page.html" -w '%{http_code}' "$base/admin/taobao-import.html")"
           test "$status" = '200' || { echo "::error::Production importer is not published yet (HTTP $status), release blocked"; exit 1; }
-          grep -q 'SinDarealest' "$RUNNER_TEMP/owner-import-page.html" || { echo "::error::Production import page mismatch"; exit 1; }
+          grep -q '<title>Nhập ảnh Taobao · SinDarealest Admin</title>' "$RUNNER_TEMP/owner-import-page.html" || { echo '::error::Production importer HTML identity mismatch'; exit 1; }
+          grep -q 'id="picker"' "$RUNNER_TEMP/owner-import-page.html" || { echo '::error::Production importer file-picker missing'; exit 1; }
+          grep -q 'id="createForm"' "$RUNNER_TEMP/owner-import-page.html" || { echo '::error::Production importer product form missing'; exit 1; } || { echo "::error::Production import page mismatch"; exit 1; }
           code="$(curl -sSL --max-time 30 -o "$RUNNER_TEMP/owner-unauthed.json" -w '%{http_code}' "$base/api/admin/import-draft?id=12345678-1234-4234-8234-000000000001")"
           test "$code" = '401' || { echo "::error::Admin import API did not enforce auth on Production (HTTP $code)"; exit 1; }
       - uses: actions/setup-node@v4
