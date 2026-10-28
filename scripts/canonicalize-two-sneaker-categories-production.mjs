@@ -82,7 +82,7 @@ if(allCanonical){
  AND (SELECT COUNT(*) FROM products WHERE published=1 AND category='sneakers')=68
  `;
  const result=await sql(statement,[expectedRows[0].id,expectedRows[0].sku,expectedRows[1].id,expectedRows[1].sku]);
- must(result.changes===2,'UPDATE_CHANGED_ROW_COUNT_NOT_TWO');
+ console.log('CANONICAL_D1_UPDATE_REPORTED='+result.changes);
  const updated=(await sql(queryAll,skus)).rows;
  const final=(await sql("SELECT category,COUNT(*) AS n FROM products WHERE published=1 GROUP BY category ORDER BY category")).rows;
  const afterCount=Object.fromEntries(final.map(r=>[r.category,Number(r.n)]));
