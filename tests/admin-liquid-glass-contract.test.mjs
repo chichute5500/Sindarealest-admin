@@ -308,7 +308,9 @@ has("setProductEditorTab(tabs[next].dataset.productTab,true)", 'Arrow/Home/End t
 has("function openEditor(p,initialTab='details'){setProductEditorTab('details');", 'product editor defaults to details, while allowing image tap to open gallery');
 has('<form id="productForm" novalidate>', 'custom product validation can reveal invalid controls hidden in another tab');
 has('function syncProductIdentityValidity()', 'product editor rejects whitespace-only identity fields');
-has("title.setCustomValidity(title.value.trim()?'':'Vui lòng nhập tên sản phẩm.')", 'title validation is based on trimmed content');
+has("title.setCustomValidity(title.value.trim()||(!title.required&&title.placeholder)?'':'Vui lòng nhập tên sản phẩm.')", 'title validation permits a blank value only for a new catalog product with a canonical default');
+has('input.required=!isNewOfficial', 'existing products and unknown categories still require a typed name');
+has("input.placeholder=DEFAULT_PRODUCT_LABELS[key]+' VIP Da Cá Sấu Mẫu #'+suffix", 'category-specific default is only a muted placeholder, never filled text');
 has("category.setCustomValidity(category.value.trim()?'':'Vui lòng chọn hoặc nhập danh mục.')", 'category validation is based on trimmed content');
 has("const invalidInput=$('#productForm').querySelector(':invalid')", 'product editor preserves native required/min/step validity checks');
 has('setProductEditorTab(panel.dataset.productPanel)', 'invalid form fields reveal their owning tab before focus moves');
