@@ -47,3 +47,15 @@ Latest isolated QA: [Actions run 40644101545](https://github.com/chichute5500/Si
 - Taobao official `taobao.item.detail.get` API requires a registered Open Platform AppKey/AppSecret; the docs list this method as requiring no merchant login permission, but actual API enrollment and exact image fields still require live verification. Browser login does not give server-side API credentials.
 - **Do not distribute or call the importer fully automatic** until the given short link resolves, the authorized API returns its image gallery, and image import into Preview is demonstrated with the real images. Do not fake a successful result with mock images.
 - No merge to main or Production change is authorized. PR #137 remains Draft.
+
+## Experiment: personal-account WebView DOM image extraction — 28 Oct 2026
+
+Branch-only Android implementation in `TaobaoBrowserActivity.java`. No Chrome cookie theft, no JS interface, no automated login, no Taobao API business credentials. The user opens the official Taobao product within the app's isolated WebView and *manually* taps `Tìm ảnh trang này`; the app evaluates DOM image URL attributes only on a validated Taobao/Tmall HTTPS hostname, restricts returned URLs to HTTPS Ali CDN, displays a choice dialog and requests rights confirmation before bounded downloads to scoped MediaStore.
+
+**Verified** in GitHub Actions [run 40651856316](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40651856316), Android Emulator API 35:
+- APK install, share-link validation, cross-app image MediaStore import, OS dark mode, crash check: PASS.
+- New on-device instrumentation **2/2 PASS**. Synthetic Taobao-hosted HTML fixture contained 2 valid Ali CDN image attributes plus bad HTTP/unapproved-host attributes; button press reported `Đã tìm được 2 liên kết ảnh`. This proves the real WebView DOM scan works *when compatible images are present in the rendered page*.
+- Actual Owner product `https://item.taobao.com/item.htm?id=997261786690`, *unauthenticated emulator*: JS returned `{"host":"","title":"","imgCount":0}`. **No images retrieved**. Network or anti-bot/login restrictions cannot be distinguished from this result; do not assert the seller page is accessible or that photos were downloaded. No Taobao account login was performed.
+- Test-only HTML injection is guarded by `BuildConfig.DEBUG`; Release APK cannot activate it. The test APK and temporary signing key are not for owner distribution.
+
+**Still not validated:** Taobao personal-account login within Android WebView on a physical device, full gallery retrieval from that logged-in account, and actual import of those images to SinDarealest. No owner-signed Release APK created and no Production merge. Do not label personal login/photo extraction as PASS. If Taobao rejects WebView login, use Taobao's legitimate share/save-photo workflow.
