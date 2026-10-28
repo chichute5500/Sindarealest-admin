@@ -299,6 +299,7 @@ assert.ok(adminHtml.indexOf('id="pFulfillmentToggle"') < adminHtml.indexOf('id="
 has('class="field span2 product-category-duo"', 'category and order type belong to one side-by-side row');
 has('#productPanelDetails .product-category-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))', 'two equal-width fields stay alongside each other even on narrow screens');
 has("field.value=field.value==='in_stock'?'made_to_order':'in_stock'", 'one tap alternates made-to-order and ready stock');
+has("!$('#pFulfillmentToggle').contains(event.target))setProductCategoryGridOpen(false)", 'outside-click dismissal must not steal the first pointer tap on the type toggle while the category grid is open');
 has("p?.fulfillmentType==='in_stock'?'in_stock':'made_to_order';syncFulfillmentToggle()", 'new products default to made-to-order and editing preserves ready stock');
 has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
 has("for(const panel of $$('.editor-tab-panel'))panel.hidden=panel.dataset.productPanel!==name", 'all editor tab panels are iterated without throwing when the editor opens');
