@@ -2091,7 +2091,30 @@ function beginProductQuickEdit(trigger){
   finally{busy=false}
  });
 }
+async function toggleProductPublished(button){
+ const id=button?.dataset.togglePublished,idx=products.findIndex(p=>String(p.id)===String(id));
+ if(!id||idx<0||button.disabled||busy)return;
+ const item=products[idx],next=!item.published;
+ const buttons=[...document.querySelectorAll('[data-toggle-published]')].filter(el=>el.dataset.togglePublished===id);
+ for(const b of buttons){b.disabled=true;b.setAttribute('aria-busy','true')}
+ try{
+  const result=await api('/api/admin/products/'+encodeURIComponent(id),{
+   method:'PATCH',body:JSON.stringify({field:'published',value:next,expectedValue:item.published})
+  });
+  products[idx]={...item,...result.product};
+  render();
+  toast(next?'Đã hiển thị sản phẩm trên web.':'Đã ẩn sản phẩm khỏi web.');
+ }catch(ex){
+  // Never leave the switch visually toggled after a failed or stale write.
+  toast(ex.message||'Không thể thay đổi hiển thị. Hãy thử lại.');
+  try{const fresh=await api('/api/admin/products');if(Array.isArray(fresh.products))products=fresh.products;render()}catch{}
+ }finally{
+  for(const b of buttons){b.disabled=false;b.removeAttribute('aria-busy')}
+ }
+}
 document.addEventListener('click',e=>{
+ const toggle=e.target.closest('[data-toggle-published]');
+ if(toggle){e.preventDefault();void toggleProductPublished(toggle);return}
  const photo=e.target.closest('[data-inline-photo]');
  if(photo){e.preventDefault();openEditor(products.find(p=>String(p.id)===String(photo.dataset.inlinePhoto)),'gallery');return}
  const edit=e.target.closest('[data-inline-edit]');
