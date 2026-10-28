@@ -136,3 +136,29 @@ test('Taobao link UI displays missing official API clearly, never claims photos 
   await expect(page.locator('#autoStatus')).toContainText('Chưa kết nối API chính thức');
   await expect(page.locator('.photo')).toHaveCount(0);
 });
+
+
+test('Owner exact Chinese Taobao share content is accepted in the link field', async ({page})=>{
+  let received='';
+  const realShare='【淘宝】大促价保 https://e.tb.cn/h.j5Ma8gaXVlwPWsu?tk=DIRtTyxDQpc CZ193 「黑色全真鳄鱼皮鞋2025新款休闲板鞋男系带低帮鞋舒适时尚真皮男鞋」 点击链接直接打开 或者 淘宝搜索直接打开';
+  await page.route('**/api/admin/**',async route=>{
+    const u=new URL(route.request().url());
+    if(u.pathname==='/api/admin/session')return route.fulfill({status:200,json:{ok:true,authenticated:true}});
+    if(u.pathname==='/api/admin/taobao-photos'){
+      received=route.request().postDataJSON().link;
+      return route.fulfill({status:422,json:{ok:false,error:'Link rút gọn cần mở bằng Taobao/Chrome để lấy URL sản phẩm.'}});
+    }
+    return route.fulfill({status:404,json:{ok:false,error:'Unmocked API route'}});
+  });
+  await page.goto('http://127.0.0.1:4173/admin/taobao-import.html');
+  await page.locator('#taobaoLink').fill(realShare);
+  await expect(page.locator('#sourceLink')).toBeVisible();
+  await expect(page.locator('#sourceLink')).toHaveAttribute('href','https://e.tb.cn/h.j5Ma8gaXVlwPWsu?tk=DIRtTyxDQpc');
+  await page.locator('#photoRights').check();
+  await page.locator('#autoPhotos').click();
+  await expect(page.locator('#autoStatus')).toContainText('Link rút gọn cần mở');
+  expect(received).toBe(realShare);
+  await expect(page.locator('.photo')).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('#taobaoLink')).toHaveValue(realShare);
+});
