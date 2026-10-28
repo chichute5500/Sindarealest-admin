@@ -116,7 +116,7 @@ jobs:
           arch: x86_64
           target: default
           profile: pixel_2
-          script: bash tools/taobao-import/tests/emulator-smoke.sh qa-apk/app-debug.apk qa-helper/qa-sender-debug.apk qa-webview-test/app-debug-androidTest.apk
+          script: SD_TAOBAO_REQUIRE_WEBVIEW_INSTRUMENTATION=1 bash tools/taobao-import/tests/emulator-smoke.sh qa-apk/app-debug.apk qa-helper/qa-sender-debug.apk qa-webview-test/app-debug-androidTest.apk
       - name: Attach emulator screenshot (QA only)
         if: always()
         uses: actions/upload-artifact@v4
