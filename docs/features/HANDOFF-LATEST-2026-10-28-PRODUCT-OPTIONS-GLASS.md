@@ -66,3 +66,14 @@
 - [Source CI 40629569500](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629569500), [source CI 40629574487](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629574487), [Admin Preview 40629574527](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40629574527): **SUCCESS**.
 - Preview đã deploy bản mới: https://product-options-1028.sindarealest-admin-preview.pages.dev/ . Screenshot QA là fixture (không phải danh mục/đơn Production); source không thao tác Production D1/R2.
 - **Trạng thái: Technical PASS; Owner Visual PASS CHƯA CÓ** cho bản mới và PR #137 tiếp tục OPEN/DRAFT/CHƯA MERGE. Nếu Owner vẫn chưa hài lòng, chỉ tinh chỉnh option CSS sau khi đối chiếu ảnh mới; không xóa hoặc làm lại nghiệp vụ đã PASS.
+
+
+## 8. Owner PASS và kiểm toán CSS tiền merge — 2026-10-28
+
+- **Owner Visual PASS**: Owner đã duyệt bản Liquid Glass sửa theo icon trái tim gốc tại **source SHA `10144a0c48e70e98e437c53faa62681f1d7f7de4`**, thay cho các ghi chú “chờ Visual PASS” trong lịch sử bên trên.
+- **Pre-merge CSS audit** thực hiện ngay trên source này và đối chiếu `main` SHA `a5605ea9a18320854ac45d913c9f5cc939cd1ff2`.
+- Storefront: parser tĩnh so sánh khai báo CSS theo selector + property + media context. `main`: **687** nhóm khai báo chồng giá trị; nhánh tính năng: **687**. **Không phát sinh thêm nhóm trùng khác giá trị từ PR #137** (0 gained, 0 lost). Đây là các lớp CSS lịch sử; không đồng nghĩa 687 lỗi thực tế.
+- Các selector `#productOverlay .sd-product-option-*` xuất hiện trong đúng một nhóm stylesheet cuối, dành riêng cho nút size/bản dây và field phone. Dark-mode, hover, active, selected và responsive là ghi đè dự kiến. Có vài override mobile mang cùng giá trị font-size nên không tạo xung đột thực tế.
+- Storefront có hai CSS ngoài: `public/material-gallery.css` và `public/code-hero.css`; không có selector trùng vùng lựa chọn mới. CSS nội tuyến Admin trên nhánh **giống hệt `main`** (đã so sánh nội dung). Các lớp CSS/icon gốc có override lịch sử nhưng nằm ngoài thay đổi PR; không sửa các phần Owner đã PASS.
+- [Chrome PC/mobile light/dark workflow 40631397505](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40631397505): **SUCCESS, 20/20**, bao gồm các kiểm chứng computed CSS so với nút tim; D1/R2 isolation, Preview deploy và artifact đều SUCCESS. [Admin Preview 40631403783](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40631403783) và [source validation 40631403351](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40631403351) SUCCESS trên source này.
+- **Quyết định:** không đụng CSS lịch sử đã PASS; không cần sửa CSS mới trước merge. **Chưa merge PR #137**, chưa thay `main`, Production D1/R2. Cần Owner ra lệnh riêng để merge/deploy Production.
