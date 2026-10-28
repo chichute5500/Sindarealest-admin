@@ -12,6 +12,7 @@ export async function onRequestGet({request,env}) {
   if(!url.searchParams.has("code"))return fail("no_code");
   const code=url.searchParams.get("code")||"";
   if(code.length>2048)return fail("invalid_code");
+  let phase="state_store";
   try {
     const verifier=await consumeFlow(env,"google",url.searchParams.get("state")||"",request);
     if(!verifier)return fail("invalid_state");
@@ -19,6 +20,7 @@ export async function onRequestGet({request,env}) {
       code,client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,
       redirect_uri:callback("google",origin),grant_type:"authorization_code",code_verifier:verifier
     });
+    phase="token_network";
     const tokenResponse=await fetch("https://oauth2.googleapis.com/token",{
       method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
       body,redirect:"error",signal:AbortSignal.timeout(10000)
@@ -26,6 +28,7 @@ export async function onRequestGet({request,env}) {
     if(!tokenResponse.ok)return fail("token_rejected");
     const token=await tokenResponse.json();
     if(typeof token.access_token!=="string"||!token.access_token)return fail("token_invalid");
+    phase="profile_network";
     const profileResponse=await fetch("https://openidconnect.googleapis.com/v1/userinfo",{
       headers:{"Authorization":"Bearer "+token.access_token},
       redirect:"error",signal:AbortSignal.timeout(10000)
@@ -37,5 +40,5 @@ export async function onRequestGet({request,env}) {
     try {session=await beginSession(env,"google",String(profile.sub),profile.name,profile.email);}
     catch {return fail("session_store");}
     return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
-  }catch{return fail("callback_error");}
+  }catch{return fail(phase); }
 }
