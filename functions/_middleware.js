@@ -1,4 +1,5 @@
 import { createSession, sessionCookie, verifySession } from "./_lib.js";
+import { sendAdminPush } from "./_notifications.js";
 import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
@@ -25,6 +26,19 @@ export async function onRequest(context) {
   if (url.pathname.startsWith('/api/admin/') && context.request.method !== 'OPTIONS') {
     const hadValidSession = await verifySession(context.request, context.env);
     const response = await context.next();
+    // Notify only after a successful write. The two order endpoints already
+    // emit their own detailed notifications, so do not send a duplicate.
+    if (response.ok && ["POST","PUT","PATCH","DELETE"].includes(context.request.method)) {
+      const part=url.pathname.slice("/api/admin/".length).split("/")[0];
+      const labels={products:"Sản phẩm",warranties:"Bảo hành",settings:"Cài đặt",
+        "payment-requests":"Yêu cầu thanh toán","payment-transactions":"Thanh toán",
+        "payment-qr":"QR thanh toán","payment-qr-upload":"QR thanh toán",
+        "restore":"Khôi phục dữ liệu"};
+      if(Object.hasOwn(labels,part)) {
+        const task=sendAdminPush(context.env,{title:labels[part]+" được cập nhật",body:"Có thay đổi mới trong quản trị SinDarealest.",url:"/admin/"});
+        if(typeof context.waitUntil==="function")context.waitUntil(task); else await task;
+      }
+    }
     // Never rotate a session on a response that already sets/clears a cookie.
     // In particular, logout must not be followed by a fresh valid session cookie.
     if (!hadValidSession || !response.ok || !context.env?.SESSION_SECRET || response.headers.has("Set-Cookie")) return response;
@@ -32,6 +46,15 @@ export async function onRequest(context) {
     const headers = new Headers(response.headers);
     headers.append('Set-Cookie', sessionCookie(token));
     return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  }
+  // Customer warranty requests are important even when Admin is closed.
+  if(url.pathname==="/api/warranty-claims" && context.request.method==="POST") {
+    const response=await context.next();
+    if(response.status===201){
+      const task=sendAdminPush(context.env,{title:"Yêu cầu bảo hành mới",body:"Khách hàng vừa gửi yêu cầu hỗ trợ bảo hành.",url:"/admin/"});
+      if(typeof context.waitUntil==="function")context.waitUntil(task); else await task;
+    }
+    return response;
   }
   // Canonical catalog routes are real server-rendered entry points to the same
   // Storefront app. Never route them through product detail SQL or a blank 404.
