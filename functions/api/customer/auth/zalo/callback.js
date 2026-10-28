@@ -1,8 +1,9 @@
-import { ZALO_APP_ID,ORIGIN,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error,zaloAppSecretProof } from "../../../../_customer-auth.js";
+import { ZALO_APP_ID,customerOrigin,configured,consumeFlow,beginSession,sessionCookie,clearFlow,redirect,error,zaloAppSecretProof } from "../../../../_customer-auth.js";
 export async function onRequestGet({request,env}) {
-  if(new URL(request.url).origin!==ORIGIN||!configured(env,"zalo"))return error("Đăng nhập Zalo chưa sẵn sàng.",503);
+  const origin=customerOrigin(request);
+  if(!origin||!configured(env,"zalo"))return error("Đăng nhập Zalo chưa sẵn sàng.",503);
   const url=new URL(request.url);
-  const fail=()=>redirect(ORIGIN+"/?customer_auth=failed",[clearFlow()]);
+  const fail=()=>redirect(origin+"/?customer_auth=failed",[clearFlow()]);
   if(url.searchParams.has("error")||!url.searchParams.has("code"))return fail();
   const code=url.searchParams.get("code")||"";
   if(code.length>2048)return fail();
@@ -30,6 +31,6 @@ export async function onRequestGet({request,env}) {
     const profile=await profileResponse.json();
     if(!/^[0-9]{1,50}$/.test(String(profile.id||"")))return fail();
     const session=await beginSession(env,"zalo",String(profile.id),profile.name);
-    return redirect(ORIGIN+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
+    return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
   }catch{return fail();}
 }
