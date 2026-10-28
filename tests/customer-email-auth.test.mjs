@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {onRequestPost as emailAuth} from "../functions/api/customer/auth/email.js";
 import {onRequestGet as getSession} from "../functions/api/customer/session.js";
 import {onRequestPost as logout} from "../functions/api/customer/logout.js";
-import {ORIGIN} from "../functions/_customer-auth.js";
+import {PREVIEW_ORIGIN as ORIGIN} from "../functions/_customer-auth.js";
 
 class FakeDB {
   constructor(){this.accounts=new Map();this.sessions=new Map();this.limits=new Map();}
@@ -50,6 +50,12 @@ const req=(payload,origin=ORIGIN)=>new Request(ORIGIN+"/api/customer/auth/email"
 const signup={mode:"register",name:"Khách Thử",email:"buyer@example.test",password:"NewPass-Secure!2026"};
 const crossSite=await emailAuth({request:req(signup,"https://evil.example"),env});
 assert.equal(crossSite.status,403);
+// Production must reject unverified-email self-service even with valid credentials.
+const productionSignup=await emailAuth({request:new Request("https://sindarealest2.pages.dev/api/customer/auth/email",{
+  method:"POST",headers:{"Content-Type":"application/json",Origin:"https://sindarealest2.pages.dev"},
+  body:JSON.stringify(signup)
+}),env});
+assert.equal(productionSignup.status,503);
 const bad=await emailAuth({request:req({...signup,password:"123"}),env});
 assert.equal(bad.status,400);
 const signed=await emailAuth({request:req(signup),env});
