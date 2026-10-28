@@ -190,7 +190,7 @@ const restoredProduct = {
 };
 const makeRestoreRequest = (payload) => new Request('https://shop.example/api/admin/restore', {
   method: 'POST',
-  headers: { Cookie: `sd_admin_session=${token}`, Origin: 'https://shop.example', 'Content-Type': 'application/json' },
+  headers: { Cookie: `sd_admin_session=${token}`, Origin: 'https://shop.example', 'Content-Type': 'application/json', 'X-SD-Restore-Password': secrets.ADMIN_PASSWORD },
   body: JSON.stringify(payload),
 });
 const validBackup = { format: 'sindarealest-backup-v1', settings: { showPrices: false }, products: [restoredProduct] };
@@ -203,6 +203,7 @@ const oversizedDeclaredRequest = new Request('https://shop.example/api/admin/res
     Cookie: `sd_admin_session=${token}`,
     Origin: 'https://shop.example',
     'Content-Type': 'application/json',
+    'X-SD-Restore-Password': secrets.ADMIN_PASSWORD,
     'Content-Length': String(20 * 1024 * 1024 + 1),
   },
   body: JSON.stringify(validBackup),
