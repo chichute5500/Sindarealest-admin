@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RunWith(AndroidJUnit4.class)
 public final class TaobaoBrowserInstrumentedTest {
     private static View find(View node,String fragment) {
-        if(node instanceof TextView && ((TextView)node).getText().toString().contains(fragment))return node;
+        if(node instanceof Button && ((Button)node).getText().toString().contains(fragment))return node;
         if(node instanceof ViewGroup) {
             ViewGroup group=(ViewGroup)node;
             for(int i=0;i<group.getChildCount();i++){
