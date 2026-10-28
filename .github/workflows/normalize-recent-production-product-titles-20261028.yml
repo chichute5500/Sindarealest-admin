@@ -1,0 +1,49 @@
+name: Normalize 22 newly created Production product names (guarded, one-time)
+on:
+  push:
+    branches: [fix/recent-production-product-titles-2026-10-28]
+    paths:
+      - 'scripts/standardize-recent-production-product-titles.mjs'
+      - '.github/workflows/normalize-recent-production-product-titles-20261028.yml'
+permissions:
+  contents: read
+concurrency:
+  group: sd-new-product-title-normalize-20261028
+  cancel-in-progress: false
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check out immutable source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Verify exact bounded maintenance branch and SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/fix/recent-production-product-titles-2026-10-28'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Read-only verify exact Production D1 and save 22-item rollback manifest
+        run: node scripts/standardize-recent-production-product-titles.mjs prepare
+      - name: Normalize only verified newly-created titles (SKU and URL unchanged)
+        run: node scripts/standardize-recent-production-product-titles.mjs apply
+      - name: Preserve 22-item before/after manifest for rollback
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recent-production-product-titles-backup
+          path: artifacts/recent-product-titles-20261028/rollback-manifest.json
+          if-no-files-found: warn
+          retention-days: 7
