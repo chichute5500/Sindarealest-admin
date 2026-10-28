@@ -1,0 +1,52 @@
+name: One-time owner sneaker VIP title rename (no deploy)
+
+on:
+  push:
+    branches:
+      - chore/rename-sneakers-vip-2026-10-28
+    paths:
+      - .github/workflows/rename-sneakers-vip-once.yml
+      - scripts/rename-sneakers-vip-plan.mjs
+      - scripts/rename-sneakers-vip-production.mjs
+      - tests/rename-sneakers-vip.test.mjs
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-d1-sneaker-vip-title-once
+  cancel-in-progress: false
+
+jobs:
+  rename-sneaker-titles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout isolated title-only branch
+        uses: actions/checkout@v4
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check and test strict SKU mapping
+        run: |
+          node --check scripts/rename-sneakers-vip-plan.mjs
+          node --check scripts/rename-sneakers-vip-production.mjs
+          node tests/rename-sneakers-vip.test.mjs
+
+      - name: Rename only published sneakers in verified Production D1
+        run: node scripts/rename-sneakers-vip-production.mjs
+
+      - name: Save title-only backup for rollback
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: before-vip-sneaker-rename
+          path: backup/sneaker-titles-before-2026-10-28.json
+          if-no-files-found: ignore
+          retention-days: 7
