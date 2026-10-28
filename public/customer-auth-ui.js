@@ -6,19 +6,59 @@ if(root){
   const emailForm=q("form"),message=q("[data-auth-message]");
   const guest=root.parentElement?.querySelector(".account-guest");
   const $name=q("[data-auth-user]"),$provider=q("[data-auth-provider]");
-  const notify=(text)=>{message.textContent=text||"";};
+  const notify=(text,kind="error")=>{
+    message.textContent=text||"";
+    message.hidden=!text;
+    message.dataset.kind=kind;
+  };
   const params=new URLSearchParams(window.location.search);
-  if(params.has("customer_auth")){
-    notify(params.get("customer_auth")==="success"?"Đã đăng nhập thành công.":"Đăng nhập chưa thành công. Vui lòng thử lại.");
-    params.delete("customer_auth");
+  const authReturn=params.get("customer_auth");
+  if(authReturn){
+    const reason=params.get("auth_reason")||"unknown";
+    const reasonMessages={
+      provider_denied:"Bạn đã hủy cấp quyền trên Zalo/Google hoặc nhà cung cấp từ chối yêu cầu.",
+      no_code:"Zalo/Google chưa gửi mã xác thực về website.",
+      invalid_code:"Mã xác thực được trả về không hợp lệ.",
+      invalid_state:"Phiên bảo mật không khớp. Hãy sử dụng cùng một trình duyệt từ đầu đến cuối, không đổi tab hoặc chế độ ẩn danh.",
+      token_rejected:"Zalo/Google từ chối mã đăng nhập ở bước trao đổi token. Cần kiểm tra cấu hình OAuth trên máy chủ.",
+      token_invalid:"Nhà cung cấp không trả về token hợp lệ.",
+      profile_rejected:"Không lấy được hồ sơ từ Zalo/Google sau khi cấp quyền.",
+      profile_invalid:"Nhà cung cấp chưa trả thông tin tài khoản hợp lệ.",
+      callback_error:"Lỗi khi xử lý callback hoặc ghi phiên đăng nhập vào cơ sở dữ liệu.",
+      unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
+    };
+    if(authReturn==="success")notify("Đã xác thực. Đang kiểm tra phiên đăng nhập…","success");
+    else notify("Đăng nhập chưa thành công. "+(reasonMessages[reason]||reasonMessages.unknown),"error");
+    params.delete("customer_auth");params.delete("auth_reason");
     const rest=window.location.pathname+(params.size?"?"+params:"")+window.location.hash;
     history.replaceState(history.state,"",rest);
+    // OAuth returns to a new document. Reopen the approved Account drawer
+    // only after the existing Welcome animation has completed.
+    window.addEventListener("load",()=>{
+      const drawer=document.getElementById("accountDrawer");
+      const show=()=>{
+        if(drawer?.classList.contains("open"))return true;
+        if(document.body.classList.contains("welcome-active"))return false;
+        const button=document.getElementById("mobileAccountNav")||document.getElementById("accountOpen");
+        if(!button)return false;
+        button.click();
+        return drawer?.classList.contains("open")||false;
+      };
+      if(show())return;
+      const observer=new MutationObserver(()=>{if(show())observer.disconnect();});
+      observer.observe(document.body,{attributes:true,attributeFilter:["class"]});
+      window.setTimeout(()=>observer.disconnect(),10000);
+    },{once:true});
   }
   const refresh=async()=>{
     try{
       const res=await fetch("/api/customer/session",{credentials:"same-origin",cache:"no-store"});
-      if(!res.ok)return;
+      if(!res.ok){notify("Máy chủ chưa đọc được phiên tài khoản (HTTP "+res.status+").");return;}
       const data=await res.json(),active=!!data.authenticated;
+      if(authReturn==="success" && !active)
+        notify("Nhà cung cấp đã trả về nhưng trình duyệt chưa giữ được phiên. Hãy kiểm tra cookie hoặc lỗi xử lý callback.","error");
+      else if(authReturn==="success" && active)
+        notify("Đăng nhập thành công. Tài khoản đã được xác nhận.","success");
       const google=q("[data-auth-google]"),zalo=q("[data-auth-zalo]");
       if(google){
         google.disabled=!data.providers?.google;
