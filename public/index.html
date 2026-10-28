@@ -4017,31 +4017,8 @@ html.dark .not-found-card{background:rgba(7,27,43,.62);border-color:rgba(92,145,
 
 
 
-/* CSS source repair: historical nested <style> token and its first :root
-   were rejected by CSS parsing. Preserve the inactive declarations to avoid
-   changing the Owner-approved light/dark catalog palette. */
-/*
-historical-nested-style-marker
-/* Catalog-only Liquid Glass recreation from docs/design-reference/liquid-glass-product-filters.png.
-   The dedicated product-status filter panel is intentionally omitted; keep search and category chips scoped to #products. */
-/* Glass surface includes a moving diagonal specular sweep and translucent selected bloom; catalog Preview audit bound to deployed source revision. */
-:root{
-  --sd-catalog-glass-default:rgba(255,255,255,0.48);
-  --sd-catalog-glass-hover:rgba(255,255,255,0.72);
-  --sd-catalog-glass-selected:rgba(255,255,255,0.82);
-  --sd-catalog-ice:#EDF6FF;
-  --sd-catalog-ice-soft:#DCEEFF;
-  --sd-catalog-white:#FFFFFF;
-  --sd-catalog-ink:#183B5B;
-  --sd-catalog-muted:#6C89A6;
-  --sd-catalog-accent:#1684E8;
-  --sd-catalog-edge:#B5D9F8;
-  --sd-catalog-edge-soft:rgba(181,217,248,0.74);
-  --sd-catalog-shadow:0 12px 30px rgba(37,88,128,0.11),inset 0 1px 0 rgba(255,255,255,0.88),inset 0 -1px 0 rgba(108,137,166,0.10);
-  --sd-catalog-shadow-hover:0 10px 24px rgba(37,105,157,0.15),inset 0 1px 0 rgba(255,255,255,0.96),inset 0 -1px 0 rgba(108,137,166,0.08);
-  --sd-catalog-shadow-selected:0 0 0 1px rgba(255,255,255,0.96),0 0 0 2px rgba(157,211,250,0.62),0 0 10px 2px rgba(83,169,255,0.23),0 6px 16px rgba(49,137,224,0.13),inset 0 1px 0 rgba(255,255,255,0.96),inset 0 -2px 6px rgba(90,154,223,0.14);
-}
-*/
+/* Removed historical nested style token and the invalid first :root rule;
+   both were inactive in the original browser CSS parse. */
 html.dark{
   --sd-catalog-glass-default:rgba(17,49,73,0.68);
   --sd-catalog-glass-hover:rgba(55,103,139,0.58);
