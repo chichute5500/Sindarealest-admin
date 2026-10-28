@@ -262,9 +262,9 @@ export function generateProductDescription(row) {
      ? 'Mã '+sku+' tương ứng với đúng mẫu trong bộ sưu tập, giúp bạn dễ tra cứu và trao đổi về lựa chọn của mình.'
      : 'Điểm nhấn từ chất liệu và kiểu dáng trong tên gọi là cơ sở để bạn khám phá mẫu này kỹ hơn.');
  const intro=pick(p.open,index+category.length);
- const style=pick(p.style,index*3+category.length);
+ const style=pick(p.style,index*2+category.length);
  const detail=pick(p.detail,index*5+1);
- const bridge=pick(LINKS,index*7+category.length);
+ const bridge=pick(LINKS,index*3+category.length);
  const closer=pick(CLOSERS,index*11+category.length);
  const description=[
    intro+' '+title+' là lựa chọn thuộc nhóm '+p.kind+' của SinDarealest, hướng tới '+p.place+'. '+focus,
