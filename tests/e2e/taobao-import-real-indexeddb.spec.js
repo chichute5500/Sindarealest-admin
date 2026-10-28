@@ -162,3 +162,24 @@ test('Owner exact Chinese Taobao share content is accepted in the link field', a
   await page.reload();
   await expect(page.locator('#taobaoLink')).toHaveValue(realShare);
 });
+
+test('Taobao API readiness is explicit; do not enable auto-download when credentials are absent',async ({page})=>{
+  let downloadRequests=0;
+  await page.route('**/api/admin/**',async route=>{
+    const u=new URL(route.request().url()),method=route.request().method();
+    if(u.pathname==='/api/admin/session')return route.fulfill({status:200,json:{ok:true,authenticated:true}});
+    if(u.pathname==='/api/admin/taobao-photos'&&method==='GET')
+      return route.fulfill({status:200,json:{ok:true,configured:false,reason:'Missing Taobao AppKey'}});
+    if(u.pathname==='/api/admin/taobao-photos'&&method==='POST'){
+      downloadRequests++;return route.fulfill({status:503,json:{ok:false,error:'Not configured'}});
+    }
+    return route.fulfill({status:404,json:{ok:false,error:'Unknown mocked API'}});
+  });
+  await page.goto('http://127.0.0.1:4173/admin/taobao-import.html');
+  await expect(page.locator('#apiReadiness')).toContainText('Chưa thể tự tải ảnh');
+  await expect(page.locator('#autoPhotos')).toBeDisabled();
+  await page.locator('#taobaoLink').fill('https://item.taobao.com/item.htm?id=997261786690');
+  await expect(page.locator('#sourceLink')).toBeVisible();
+  expect(downloadRequests).toBe(0);
+  await expect(page.locator('#picker')).toBeEnabled();
+});
