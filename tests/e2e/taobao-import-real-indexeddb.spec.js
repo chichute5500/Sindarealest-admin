@@ -89,6 +89,8 @@ test('Taobao link input downloads official API images into the draft gallery',as
   await page.route('**/api/admin/**',async route=>{
     const url=new URL(route.request().url());
     if(url.pathname==='/api/admin/session')return route.fulfill({status:200,json:{ok:true,authenticated:true}});
+    if(url.pathname==='/api/admin/taobao-photos' && req.method()==='GET')
+      return route.fulfill({status:200,json:{ok:true,configured:true}});
     if(url.pathname==='/api/admin/taobao-photos'){
       queryCount++;
       const body=route.request().postDataJSON();
@@ -144,6 +146,8 @@ test('Owner exact Chinese Taobao share content is accepted in the link field', a
   await page.route('**/api/admin/**',async route=>{
     const u=new URL(route.request().url());
     if(u.pathname==='/api/admin/session')return route.fulfill({status:200,json:{ok:true,authenticated:true}});
+    if(u.pathname==='/api/admin/taobao-photos'&&route.request().method()==='GET')
+      return route.fulfill({status:200,json:{ok:true,configured:true}});
     if(u.pathname==='/api/admin/taobao-photos'){
       received=route.request().postDataJSON().link;
       return route.fulfill({status:422,json:{ok:false,error:'Link rút gọn cần mở bằng Taobao/Chrome để lấy URL sản phẩm.'}});
