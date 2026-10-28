@@ -1,6 +1,7 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
 import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, checkoutTransferSku, checkoutTransferReferenceMatches } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
+import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
 const phoneOk = (value) => /^[+0-9() .-]{9,20}$/.test(value);
@@ -24,22 +25,37 @@ export async function onRequestPost({ request, env }) {
   if (!phoneOk(phone)) return fail("Số điện thoại chưa hợp lệ.");
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("Email chưa hợp lệ.");
   if (!Array.isArray(body?.items) || body.items.length < 1 || body.items.length > 50) return fail("Giỏ hàng không hợp lệ.");
-  const requested = new Map();
+  const requested = [];
+  const totalsById = new Map();
   for (const item of body.items) {
     const id = clean(item?.id, 100), quantity = Number(item?.quantity);
-    if (!id || !Number.isInteger(quantity) || quantity < 1 || quantity > 50) return fail("Sản phẩm hoặc số lượng không hợp lệ.");
-    requested.set(id, (requested.get(id) || 0) + quantity);
+    if (!id || !Number.isInteger(quantity) || quantity < 1 || quantity > 50 || (item?.option != null && typeof item.option !== "string")) return fail("Sản phẩm, lựa chọn hoặc số lượng không hợp lệ.");
+    requested.push({ id, quantity, option: item?.option ?? "" });
+    totalsById.set(id, (totalsById.get(id) || 0) + quantity);
   }
-  if ([...requested.values()].some(q => q > 50)) return fail("Số lượng mỗi sản phẩm tối đa là 50.");
+  if ([...totalsById.values()].some(q => q > 50)) return fail("Số lượng mỗi sản phẩm tối đa là 50.");
   try {
-    const ids = [...requested.keys()];
-    const rows = await env.DB.prepare(`SELECT id,sku,sku_verified,title,price,stock,published,source_price_confirmed,fulfillment_type FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
+    const ids = [...totalsById.keys()];
+    const rows = await env.DB.prepare(`SELECT id,sku,sku_verified,title,category,price,stock,published,source_price_confirmed,fulfillment_type FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
     const byId = new Map((rows.results || []).map(p => [p.id, p]));
     if (byId.size !== ids.length || ids.some(id => !byId.has(id) || Number(byId.get(id).published) !== 1)) return fail("Một hoặc nhiều sản phẩm không còn khả dụng. Vui lòng tải lại danh mục.", 409);
-    for (const id of ids) { const product = byId.get(id), stock = product.stock; if (stock !== null && stock !== undefined && requested.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của ${Number(product.sku_verified) === 1 ? "SKU " + product.sku : "sản phẩm " + product.title} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
+    for (const id of ids) { const product = byId.get(id), stock = product.stock; if (stock !== null && stock !== undefined && totalsById.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của ${Number(product.sku_verified) === 1 ? "SKU " + product.sku : "sản phẩm " + product.title} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
+    // Validate options against the authoritative database category, not
+    // browser-submitted product names. Keep different sizes as separate lines.
+    const selected = new Map();
+    for (const line of requested) {
+      const p = byId.get(line.id);
+      const option = normalizeProductOption(p.category, line.option);
+      if (option === null) return fail("Vui lòng chọn đúng size, bản dây hoặc dòng điện thoại cho sản phẩm.", 400);
+      const key = JSON.stringify([line.id, option]);
+      const previous = selected.get(key);
+      if (previous) previous.quantity += line.quantity;
+      else selected.set(key, { id: line.id, option, quantity: line.quantity });
+    }
     const showPrices = (await getSetting(env.DB, "show_prices", "0")) === "1";
-    const items = ids.map(id => {
-      const p = byId.get(id), quantity = requested.get(id);
+    const items = [...selected.values()].map(line => {
+      const p = byId.get(line.id), quantity = line.quantity;
+      const suffix = productOptionLabel(p.category, line.option);
       const rawPrice = p.price;
       const candidatePrice = rawPrice === null || rawPrice === undefined || (typeof rawPrice === "string" && !rawPrice.trim())
         ? null
@@ -48,7 +64,7 @@ export async function onRequestPost({ request, env }) {
         && Number.isSafeInteger(candidatePrice) && candidatePrice >= 0
         ? candidatePrice
         : null;
-      return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, fulfillmentType: normalizeFulfillmentType(p.fulfillment_type), title: p.title, quantity, price: confirmedPrice };
+      return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, fulfillmentType: normalizeFulfillmentType(p.fulfillment_type), title: p.title + (suffix ? " · " + suffix : ""), shoeSize: productOptionKind(p.category) === "shoe" ? line.option : "", quantity, price: confirmedPrice };
     });
     const priceKnown = items.every(i => Number.isSafeInteger(i.price) && i.price >= 0);
     const subtotal = priceKnown ? items.reduce((sum, i) => sum + i.price * i.quantity, 0) : null;
@@ -105,7 +121,12 @@ export async function onRequestPost({ request, env }) {
     ).bind(orderId, fullName, phone, email));
 
     statements.push(env.DB.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address) VALUES(?,?,?,?,?,?,?)").bind(orderId,provinceCode,province,wardCode,ward,streetAddress,address));
-    for (const item of items) statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.skuVerified?1:0,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity,item.fulfillmentType));
+    for (const item of items) {
+      statements.push(env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(item.id,orderId,item.productId,item.sku,item.skuVerified?1:0,item.title,item.quantity,item.price,item.price === null ? null : item.price * item.quantity,item.fulfillmentType));
+      // Already-existing order_item_details table (migration 0005) ensures
+      // warranty lookups receive shoe size without a Production D1 migration.
+      if (item.shoeSize) statements.push(env.DB.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(item.id,item.shoeSize));
+    }
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, customerPaymentVerified:false })));
     await env.DB.batch(statements);
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
