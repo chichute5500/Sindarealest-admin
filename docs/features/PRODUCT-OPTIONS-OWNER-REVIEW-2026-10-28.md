@@ -57,3 +57,15 @@
 - [Source checks](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40578106322): **SUCCESS**; [Admin Preview regression](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40578117361): **SUCCESS**.
 - Preview đã cập nhật thành công: https://product-options-1028.sindarealest-admin-preview.pages.dev/
 - **Chờ Owner PASS mới merge.** Không chạm `main`, Production D1 hoặc R2.
+
+## Owner yêu cầu nút tròn Liquid Glass giống nút trái tim — hoàn tất 2026-10-28
+
+- Sửa theo ý Owner: **không phải ô vuông bo góc**; từng size giày 38–44 và hai bản dây 3,5 / 4,0 cm là **nút kính tròn 40 × 40 px**, tự xuống hàng nếu màn hình quá hẹp.
+- Giữ chính xác kiểu bề mặt nút trái tim yêu thích **sau khi tính toàn bộ cascade CSS thực tế**: màu nền, viền, bóng đổ, blur(22px) saturate(180%) cho cả sáng/tối. Ô đã chọn có lớp kính xanh nhạt nổi bật; focus rõ; nút giữ trạng thái `aria-pressed` và hỗ trợ bàn phím. Không đổi UI nhập dòng điện thoại vì đây là trường văn bản.
+- Phát hiện lớp CSS icon-final cuối trang khiến nguồn style cũ và style thực tế khác nhau. Đã điều chỉnh option theo **computed style** của nút trái tim, không tác động trực tiếp giao diện nút trái tim hoặc các icon đã PASS.
+- Chrome browser tests so sánh 40×40, `border-radius:50%`, `backgroundImage/backgroundColor`, `border`, `boxShadow`, `backdropFilter` giữa ô size và nút trái tim trên **mobile/PC light/dark**; tiếp tục chạy giỏ, checkout, Admin, legacy cart.
+- **Source SHA đã nghiệm chứng:** `d35be79dcc406cf2cd4201a8f781e95702e7c83f`.
+- [Chrome QA 40620708628](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40620708628): **SUCCESS 20/20**; safety bindings PASS, Preview riêng deploy SUCCESS.
+- [Source CI 40620708677](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40620708677): **SUCCESS**. [Admin Preview 40620717313](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40620717313): **SUCCESS**.
+- **Preview:** https://product-options-1028.sindarealest-admin-preview.pages.dev/
+- PR #137 DRAFT và chưa merge; `main` / Production D1/R2 không thay đổi. Chờ Owner nghiệm thu.
