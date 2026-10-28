@@ -1,0 +1,76 @@
+name: Taobao importer isolated Preview and real D1/R2 QA
+on:
+  push:
+    branches: [feat/product-options-shoes-belts-phone-2026-10-28]
+    paths:
+      - '.github/workflows/taobao-import-isolated-preview-qa.yml'
+      - 'public/admin/taobao-import.html'
+      - 'functions/api/admin/import-draft.js'
+      - 'functions/api/admin/upload.js'
+      - 'functions/_lib.js'
+      - 'migrations/**'
+      - 'tests/taobao-import-local-d1-r2.test.mjs'
+      - 'tools/taobao-import/tests/import-draft.test.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sd-taobao-import-isolated-preview
+  cancel-in-progress: true
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify exact source and isolated real D1/R2 import
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feat/product-options-shoes-belts-phone-2026-10-28'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          npm ci --no-fund
+          npm run check
+          node tools/taobao-import/tests/import-draft.test.mjs
+          node tests/taobao-import-local-d1-r2.test.mjs
+      - name: Verify nonproduction D1/R2 isolation before deploy
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/taobao-preview.json"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest2" > "$RUNNER_TEMP/taobao-production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/taobao-preview.json" "$RUNNER_TEMP/taobao-production.json"
+      - name: Deploy ONLY to independent Preview project
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          npx wrangler pages deploy public --project-name 'sindarealest-admin-preview' --branch 'taobao-import-20261028' --commit-hash "$GITHUB_SHA" --commit-message "Taobao importer isolated preview $GITHUB_SHA"
+      - name: Smoke real Preview and anonymous API rejection
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://taobao-import-20261028.sindarealest-admin-preview.pages.dev'
+          for attempt in $(seq 1 10); do
+            if curl -fsS --max-time 20 "$base/admin/taobao-import.html" > "$RUNNER_TEMP/taobao-page.html"; then break; fi
+            sleep 3
+          done
+          grep -q 'SinDarealest' "$RUNNER_TEMP/taobao-page.html"
+          code="$(curl --silent --show-error --max-time 30 --output "$RUNNER_TEMP/taobao-unauthed.json" --write-out '%{http_code}' "$base/api/admin/import-draft?id=12345678-1234-4234-8234-000000000001")"
+          test "$code" = '401' || { echo "::error::Expected anonymous request rejection 401, got $code"; exit 1; }
+          echo 'PASS: independent Cloudflare Preview and anonymous importer access denied.'
