@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createHmac } from "node:crypto";
 import {
   ZALO_APP_ID,ORIGIN,randomToken,pkce,passwordHash,equalHash,zaloAppSecretProof,
   startFlow,consumeFlow,flowCookie,beginSession,getAccount,sessionCookie,endSession
@@ -12,6 +13,9 @@ import { onRequestGet as customerSession } from "../functions/api/customer/sessi
 import { onRequestPost as logout } from "../functions/api/customer/logout.js";
 assert.equal(ZALO_APP_ID,"3933116436838564742");
 assert.match(await zaloAppSecretProof("token-for-qa","test-only-zalo-secret"),/^[a-f0-9]{64}$/);
+assert.equal(await zaloAppSecretProof("token-for-qa","test-only-zalo-secret"),
+  createHmac("sha256","test-only-zalo-secret").update("token-for-qa").digest("hex"),
+  "Zalo proof must match official PHP SDK hash_hmac(sha256, token, app_secret)");
 assert.notEqual(await zaloAppSecretProof("token-for-qa","test-only-zalo-secret"),
   await zaloAppSecretProof("different-token-for-qa","test-only-zalo-secret"));
 assert.equal(ORIGIN,"https://sindarealest2.pages.dev");
@@ -98,7 +102,13 @@ for(const provider of ["zalo","google"]){
     if(addr.includes("access_token")||addr.includes("googleapis.com/token"))return new Response(JSON.stringify({access_token:"test-access"}),{status:200});
     if(addr.includes("graph.zalo.me")){
       assert.ok(!new URL(addr).searchParams.has("appsecret_proof"),
-        "Official Zalo Social /me is called with access_token header and fields only");
+        "Never put proof in a URL query parameter");
+      assert.ok(!new URL(addr).searchParams.has("access_token"),
+        "Never expose access_token in a URL");
+      assert.equal(init.headers.access_token,"test-access");
+      assert.equal(init.headers.appsecret_proof,
+        createHmac("sha256","test-only-zalo-secret").update("test-access").digest("hex"),
+        "Social /me requires appsecret_proof in the HTTP header when app enforcement is on");
       return new Response(JSON.stringify({error:0,id:"zalo_opaque-42",name:"Khách Zalo"}),{status:200});
     }
     if(addr.includes("openidconnect.googleapis.com"))return new Response(JSON.stringify({sub:"google-sub-1",email_verified:true,email:"test@example.com",name:"Khách Google"}),{status:200});
@@ -139,8 +149,11 @@ globalThis.fetch=async(url,init)=>{
   assert.equal(init.redirect,"manual");
   if(String(url).includes("/access_token"))
     return Response.json({access_token:"fake-zalo-token"});
-  if(String(url).includes("graph.zalo.me"))
+  if(String(url).includes("graph.zalo.me")){
+    assert.equal(init.headers.appsecret_proof,
+      createHmac("sha256","test-only-zalo-secret").update("fake-zalo-token").digest("hex"));
     return Response.json({error:-1241,message:"Invalid appsecret_proof",id:"111111"});
+  }
   throw Error("Unexpected provider request");
 };
 try{
