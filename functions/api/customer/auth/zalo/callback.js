@@ -40,9 +40,15 @@ export async function onRequestGet({request,env}) {
     if(!profileResponse.ok)return fail("profile_rejected");
     const profile=await profileResponse.json();
     // Zalo can return a JSON error with HTTP 200; never accept one as an identity.
-    if(!profile || typeof profile!=="object" ||
-       (Object.hasOwn(profile,"error") && profile.error!==0))
+    if(!profile || typeof profile!=="object")
       return fail("profile_api_error");
+    if(Object.hasOwn(profile,"error") && String(profile.error)!=="0"){
+      // Only return a bounded numeric status code on isolated Preview.
+      // Do not reveal the provider's arbitrary message or any credential.
+      const code=Number(profile.error);
+      return fail(Number.isSafeInteger(code) && code>=-99999 && code<=99999 ?
+        "profile_api_error_"+code : "profile_api_error");
+    }
     // Zalo's documentation defines id as an opaque UserId, not necessarily decimal.
     // Bound the provider subject to the schema and reject missing/unsafe identity values.
     const subject=typeof profile.id==="string"?profile.id:
