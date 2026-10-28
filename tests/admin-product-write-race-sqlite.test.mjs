@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
-import {createSession} from '../functions/_lib.js';
+import {createSession,fromRow,toAdminProduct} from '../functions/_lib.js';
 import {onRequestPut,onRequestDelete} from '../functions/api/admin/products/[id].js';
 
 const SESSION_SECRET='test-only-concurrency-session-secret-1234567890';
@@ -50,7 +50,7 @@ function adapter(mode='normal') {
     },
   };
 }
-function request(method) {
+function request(method,expectedProduct) {
   return new Request('https://qa.invalid/api/admin/products/'+id,{
     method,
     headers:{
@@ -60,13 +60,15 @@ function request(method) {
       ...(method==='PUT'?{'Content-Type':'application/json'}:{})
     },
     ...(method==='PUT'?{body:JSON.stringify({
+      expectedProduct,
       title:'Sản phẩm thử nghiệm đã cập nhật',sku:'QA-001',category:'sneakers',
       fulfillmentType:'in_stock',price:125000,stock:3,images:[],published:true
     })}:{})
   });
 }
-async function execute(method,mode='normal'){
-  const context={params:{id},request:request(method),env:{DB:adapter(mode),ADMIN_PASSWORD,SESSION_SECRET}};
+async function execute(method,mode='normal',snapshotAtOpen=null){
+  const expectedProduct=snapshotAtOpen || toAdminProduct(fromRow(db.prepare('SELECT * FROM products WHERE id=?').get(id)));
+  const context={params:{id},request:request(method,expectedProduct),env:{DB:adapter(mode),ADMIN_PASSWORD,SESSION_SECRET}};
   return method==='PUT'?onRequestPut(context):onRequestDelete(context);
 }
 
@@ -80,6 +82,15 @@ const beforeUpdate=snapshot();
 const updateLost=await execute('PUT','race');
 assert.equal(updateLost.status,409,'stale product PUT must not report success');
 assert.deepEqual(snapshot(),beforeUpdate,'stale PUT must not forge a success audit');
+seed();
+const staleOpened=toAdminProduct(fromRow(db.prepare('SELECT * FROM products WHERE id=?').get(id)));
+db.prepare('UPDATE products SET price=? WHERE id=?').run(999999,id);
+const beforeStale=snapshot();
+const staleFullEdit=await execute('PUT','normal',staleOpened);
+assert.equal(staleFullEdit.status,409,'second device edits must reject stale full-editor snapshot');
+assert.equal(db.prepare('SELECT price FROM products WHERE id=?').get(id).price,999999,'concurrent price cannot be overwritten');
+assert.deepEqual(snapshot(),beforeStale,'stale full-editor cannot forge audit events');
+db.prepare('DELETE FROM products WHERE id=?').run(id);
 seed();
 const beforeDelete=snapshot();
 const deleteLost=await execute('DELETE','race');

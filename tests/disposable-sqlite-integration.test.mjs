@@ -73,6 +73,7 @@ const post=(path,body,withAuth=true)=>new Request('https://qa.invalid'+path,{
     Origin:'https://qa.invalid',
     'Sec-Fetch-Site':'same-origin',
     'Content-Type':'application/json',
+    ...(path==='/api/admin/restore'?{'X-SD-Restore-Password':PASSWORD}:{}),
     ...(withAuth?{Cookie:'sd_admin_session='+session}:{})
   },
   body:JSON.stringify(body)

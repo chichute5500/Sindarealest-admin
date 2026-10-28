@@ -43,7 +43,7 @@ try{
   const headers={Cookie:'sd_admin_session='+await createSession(secret),
     Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin'};
   const req=(path,method,body)=>new Request('https://qa.invalid'+path,{
-    method,headers:{...headers,...(body===undefined?{}:{'Content-Type':'application/json'})},
+    method,headers:{...headers,...(body===undefined?{}:{'Content-Type':'application/json'}),...(path==='/api/admin/restore'?{'X-SD-Restore-Password':password}:{})},
     ...(body===undefined?{}:{body:JSON.stringify(body)})});
   const first=async(sql,...values)=>DB.prepare(sql).bind(...values).first();
   const setting=async key=>(await first('SELECT value FROM settings WHERE key=?',key))?.value??null;

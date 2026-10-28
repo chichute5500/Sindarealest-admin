@@ -12,12 +12,29 @@ export async function onRequestPut(context) {
     const row = await context.env.DB.prepare("SELECT * FROM products WHERE id = ? LIMIT 1").bind(id).first();
     if (!row) return fail("Không tìm thấy sản phẩm.", 404);
     const existing = fromRow(row);
+    // Full-editor PUT must declare the snapshot opened by the owner. Quick
+    // single-field PATCH already uses a separate field-level CAS contract.
+    const expected = body.expectedProduct;
+    const fields = ["id","slug","sku","skuVerified","title","category","categoryLabel",
+      "description","price","stock","published","images","sourcePriceConfirmed",
+      "sortOrder","fulfillmentType"];
+    const current = toAdminProduct(existing);
+    if (!expected || typeof expected !== "object" || Array.isArray(expected) ||
+        fields.some(key => !Object.hasOwn(expected,key)))
+      return fail("Thiếu phiên bản sản phẩm ban đầu. Hãy tải lại và mở sản phẩm trước khi lưu.", 409);
+    if (fields.some(key => JSON.stringify(expected[key]) !== JSON.stringify(current[key])))
+      return fail("Sản phẩm đã thay đổi trên thiết bị khác. Hãy tải lại trước khi lưu.", 409);
     const checked = validateProduct(body, existing);
     if (checked.error) return fail(checked.error);
     const p = checked.value;
     const result = await context.env.DB.batch([
-      context.env.DB.prepare("UPDATE products SET slug=?,sku=?,sku_verified=?,title=?,category=?,category_label=?,description=?,price=?,stock=?,published=?,images_json=?,source_price_confirmed=?,sort_order=?,fulfillment_type=?,updated_at=datetime('now') WHERE id=?")
-        .bind(p.slug,p.sku,p.skuVerified?1:0,p.title,p.category,p.categoryLabel,p.description,p.price,p.stock,p.published,JSON.stringify(p.images),p.sourcePriceConfirmed?1:0,p.sortOrder,p.fulfillmentType,id),
+      context.env.DB.prepare("UPDATE products SET slug=?,sku=?,sku_verified=?,title=?,category=?,category_label=?,description=?,price=?,stock=?,published=?,images_json=?,source_price_confirmed=?,sort_order=?,fulfillment_type=?,updated_at=datetime('now') " +
+        "WHERE id=? AND slug IS ? AND sku IS ? AND sku_verified IS ? AND title IS ? AND category IS ? " +
+        "AND category_label IS ? AND description IS ? AND price IS ? AND stock IS ? AND published IS ? " +
+        "AND images_json IS ? AND source_price_confirmed IS ? AND sort_order IS ? AND fulfillment_type IS ? AND updated_at IS ?")
+        .bind(p.slug,p.sku,p.skuVerified?1:0,p.title,p.category,p.categoryLabel,p.description,p.price,p.stock,p.published,JSON.stringify(p.images),p.sourcePriceConfirmed?1:0,p.sortOrder,p.fulfillmentType,id,
+          row.slug,row.sku,row.sku_verified,row.title,row.category,row.category_label,row.description,row.price,row.stock,
+          row.published,row.images_json,row.source_price_confirmed,row.sort_order,row.fulfillment_type,row.updated_at),
       // If the product disappeared after the preflight SELECT, do not write
       // a false success event into the audit trail.
       context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'product_updated', 'product', ?, ? WHERE changes()=1").bind(crypto.randomUUID(),id,JSON.stringify({ sku:p.sku,title:p.title,published:!!p.published }))

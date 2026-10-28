@@ -1,0 +1,46 @@
+name: Admin current-screen and live search independent browser QA
+on:
+  push:
+    branches: [audit/full-security-css-qa-2026-10-28]
+    paths:
+      - 'public/admin/index.html'
+      - 'tests/e2e/admin-current-screens-readonly.spec.js'
+      - 'tests/e2e/admin-search-live-input-race.spec.js'
+      - '.github/workflows/qa-admin-current-20261028.yml'
+permissions:
+  contents: read
+jobs:
+  qa:
+    name: Current Owner-PASS Admin 12 screens and slow search 390/1366 light/dark
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - run: npm install --no-fund
+      - run: npm install --no-save --no-package-lock --no-fund @playwright/test
+      - run: npx playwright install --with-deps chromium
+      - name: Browser QA against isolated synthetic GET fixtures only
+        shell: bash
+        env:
+          SD_OPTIONS_BASE_URL: http://127.0.0.1:4173
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public > "$RUNNER_TEMP/admin-current-qa.log" 2>&1 &
+          for i in $(seq 1 50); do if curl -fsS http://127.0.0.1:4173/admin/ >/dev/null; then break; fi; sleep .5; done
+          npx playwright test tests/e2e/admin-current-screens-readonly.spec.js tests/e2e/admin-search-live-input-race.spec.js \
+            --config=playwright.owner-gesture.config.js --workers=2 --reporter=list
+      - name: Screenshot evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: admin-current-browser-${{ github.sha }}
+          path: |
+            artifacts/current-admin-screens/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn

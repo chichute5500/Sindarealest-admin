@@ -74,12 +74,9 @@ jobs:
       - name: Verify Production Pages and private R2 bindings
         run: node scripts/verify-pages-bindings.mjs
 
-      - name: One-time owner-approved Production catalog cleanup and official SKUs
-        # This script checks exact Pages/D1 production identity, read-only preflight,
-        # deletes only unpublished product rows, then verifies 15-category SKUs.
-        # Idempotent marker ensures later unpublished drafts are never deleted.
-        if: github.event_name == 'push'
-        run: node scripts/cutover-production-catalog-2026-10-27.mjs
+      # Production catalog cutover was completed on 2026-10-27.
+      # NEVER run a mutating D1 cutover from the routine production deploy.
+      # Restore/migrations/catalog changes need a separately reviewed manual run.
 
       - name: Deploy to verified Cloudflare Pages project
         if: success()

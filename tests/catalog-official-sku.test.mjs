@@ -33,7 +33,7 @@ assert.throws(()=>planCatalogCutover([...published,{...published[0]}]),/CATALOG_
 assert.throws(()=>planCatalogCutover(hidden),/CATALOG_/);
 const deploy=readFileSync(new URL('../.github/workflows/deploy.yml',import.meta.url),'utf8');
 const cutover=readFileSync(new URL('../scripts/cutover-production-catalog-2026-10-27.mjs',import.meta.url),'utf8');
-assert.match(deploy,/One-time owner-approved Production catalog cleanup/);
+assert.doesNotMatch(deploy,/run:\s*node scripts\/cutover-production-catalog-2026-10-27\.mjs/,'Historical catalog mutation must not run automatically with every Production deployment');
 assert.match(cutover,/DELETE FROM products WHERE published=0/);
 assert.match(cutover,/CATALOG_CUTOVER=ALREADY_COMPLETED/);
 assert.match(cutover,/const liveIsOfficial=/,'Recognize an already-assigned official SKU cohort');
