@@ -69,3 +69,16 @@
 - [Source CI 40620708677](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40620708677): **SUCCESS**. [Admin Preview 40620717313](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40620717313): **SUCCESS**.
 - **Preview:** https://product-options-1028.sindarealest-admin-preview.pages.dev/
 - PR #137 DRAFT và chưa merge; `main` / Production D1/R2 không thay đổi. Chờ Owner nghiệm thu.
+
+
+## Bàn giao cập nhật sau phản hồi ảnh thực tế của Owner (2026-10-28)
+
+**Tài liệu ưu tiên mới nhất:**
+- [HANDOFF-LATEST-2026-10-28-PRODUCT-OPTIONS-GLASS.md](./HANDOFF-LATEST-2026-10-28-PRODUCT-OPTIONS-GLASS.md)
+- [PROMPT-NEXT-CHAT-2026-10-28-PRODUCT-OPTIONS-GLASS.md](./PROMPT-NEXT-CHAT-2026-10-28-PRODUCT-OPTIONS-GLASS.md)
+
+**Chú ý thay thế cho trạng thái nghiệm thu thị giác cũ:** Owner đã cung cấp ảnh điện thoại chỉ rõ nút size tròn có nền trắng sữa, **không giống** icon trái tim Liquid Glass. Sau phản hồi, source tại SHA `925272ae72327e53c839d845bc3a15bf3be1b085` đã sửa các nút size/bản dây thành **ống kính xám trong suốt** trên panel sáng, theme tối tách riêng, selected xanh kính. Nút trái tim và hệ icon không đổi. Ghi nhận **Owner Visual PASS vẫn CHƯA CÓ** cho thay đổi này; tuyệt đối không tự đổi trạng thái dù CI xanh.
+
+[Chrome QA 40622064394](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40622064394): 20/20 PASS, deploy Preview riêng SUCCESS, D1/R2 separation checks PASS. [Ảnh QA mới nhất — artifact 12787424063](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40622064394/artifacts/12787424063). [Source CI 40622064498](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40622064498) và [Admin Preview 40622070296](https://github.com/chichute5500/Sindarealest-admin/actions/runs/40622070296) cũng SUCCESS.
+
+PR #137 còn DRAFT, chưa merge, không thay Production. Khi chuyển chat, **đọc tài liệu HANDOFF mới trước**, xác minh GitHub HEAD vì các commit sau source này chỉ là tài liệu. Mục tiêu là kiểm tra/so sánh ảnh thật của kính xám và xin Owner PASS, không làm lại nghiệp vụ size đã xong.
