@@ -2046,7 +2046,7 @@ function beginProductQuickEdit(trigger){
  form.addEventListener('submit',async e=>{
   e.preventDefault();if(busy)return;
   const raw=input.value;
-  if(field==='price'&&raw!==''&&(!/^\\d+$/.test(raw)||!Number.isSafeInteger(Number(raw))||Number(raw)>2000000000)){
+  if(field==='price'&&raw!==''&&(!/^\d+$/.test(raw)||!Number.isSafeInteger(Number(raw))||Number(raw)>2000000000)){
    toast('Giá phải là số nguyên từ 0 đến 2 tỷ đồng.');input.focus();return;
   }
   const value=field==='price'?(raw===''?null:Number(raw)):
