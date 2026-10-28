@@ -60,6 +60,22 @@ jobs:
           npm test
           node tools/taobao-import/tests/import-draft.test.mjs
           node tests/taobao-import-local-d1-r2.test.mjs
+      - name: Check real Chrome persistence and image import before release signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          if command -v google-chrome >/dev/null 2>&1; then
+            export SD_OWNER_QA_SYSTEM_CHROME=1
+          else
+            npx playwright install chromium
+          fi
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public >/tmp/taobao-release-browser.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/admin/taobao-import.html >/dev/null; then break; fi
+            sleep .3
+          done
+          npx playwright test tests/e2e/taobao-import-real-indexeddb.spec.js --config=playwright.owner-gesture.config.js --reporter=list
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
