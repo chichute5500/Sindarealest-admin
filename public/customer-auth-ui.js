@@ -23,7 +23,8 @@ if(root){
       token_rejected:"Zalo/Google từ chối mã đăng nhập ở bước trao đổi token. Cần kiểm tra cấu hình OAuth trên máy chủ.",
       token_invalid:"Nhà cung cấp không trả về token hợp lệ.",
       profile_rejected:"Không lấy được hồ sơ từ Zalo/Google sau khi cấp quyền.",
-      profile_invalid:"Nhà cung cấp chưa trả thông tin tài khoản hợp lệ.",
+      profile_invalid:"Zalo/Google chưa trả về mã định danh tài khoản hợp lệ.",
+      profile_api_error:"Zalo trả về lỗi khi lấy thông tin tài khoản, dù đã cấp quyền. Hệ thống đang kiểm tra lỗi này.",
       callback_error:"Lỗi xử lý callback. Máy chủ sẽ cần kiểm tra luồng đăng nhập.",
       session_store:"Đã lấy được hồ sơ, nhưng không thể tạo phiên tài khoản trong cơ sở dữ liệu Preview.",
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
@@ -59,7 +60,11 @@ if(root){
       if(authReturn==="success" && !active)
         notify("Nhà cung cấp đã trả về nhưng trình duyệt chưa giữ được phiên. Hãy kiểm tra cookie hoặc lỗi xử lý callback.","error");
       else if(authReturn==="success" && active)
-        notify("Đăng nhập thành công. Tài khoản đã được xác nhận.","success");
+        notify("Đăng nhập thành công qua "+({zalo:"Zalo",google:"Google",email:"Email"}[data.user?.provider]||"tài khoản")+". Tài khoản đã được xác nhận.","success");
+      // An existing login is independent of a newly failed OAuth attempt.
+      // Do not present an old session as a successful login from another provider.
+      else if(authReturn==="failed" && active)
+        notify(message.textContent+" Phiên "+({zalo:"Zalo",google:"Google",email:"Email"}[data.user?.provider]||"trước đó")+" vẫn đang hoạt động.","error");
       const google=q("[data-auth-google]"),zalo=q("[data-auth-zalo]");
       if(google){
         google.disabled=!data.providers?.google;
