@@ -83,6 +83,12 @@ assert.equal(result.body.product.title,'Giày Lười Da Cá Sấu Riêng','Cust
 
 const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
 assert.match(admin,/function syncDefaultProductTitle\(\)\{/);
+assert.ok(admin.includes("input.placeholder=editing?'':'Tên Danh Mục VIP Da Cá Sấu Mẫu #…'"),
+ 'Blank category on the Add Product screen must still show a faint sample name');
+assert.ok(admin.includes('#productPanelDetails #pTitle::placeholder{color:#708799;opacity:1'),
+ 'Light theme sample must be visible but muted');
+assert.ok(admin.includes(':root[data-admin-theme="dark"] #productPanelDetails #pTitle::placeholder{color:#afc5d5;opacity:1'),
+ 'Dark theme sample must remain visible');
 assert.match(admin,/if\(isNewOfficial\)\{/,'Only new official category products get a placeholder');
 assert.match(admin,/input\.required=!isNewOfficial/);
 assert.match(admin,/input\.placeholder=DEFAULT_PRODUCT_LABELS\[key\]\+' VIP Da Cá Sấu Mẫu #'\+suffix/);
