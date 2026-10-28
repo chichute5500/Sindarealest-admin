@@ -1,13 +1,33 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createSession} from '../functions/_lib.js';
-import {md5,topParams,topSignature,itemIdFromLink,allowedImageUrl,readTopImages,imageTicket,verifyImageTicket}
+import {md5,topParams,topSignature,itemIdFromLink,extractTaobaoLink,resolveItemId,allowedImageUrl,readTopImages,imageTicket,verifyImageTicket}
   from '../functions/_taobao-official.js';
 import {onRequestPost as getPhotos} from '../functions/api/admin/taobao-photos.js';
 import {onRequestGet as getImage} from '../functions/api/admin/taobao-photo.js';
 const h=(input)=>createHash('md5').update(input).digest('hex').toUpperCase();
 for(const test of ['', 'abc', 'SinDarealest', 'Sản phẩm da cá sấu', '🚀', '123'.repeat(50)])assert.equal(md5(test),h(test));
 assert.equal(itemIdFromLink('https://item.taobao.com/item.htm?id=123456789&from=share'),'123456789');
+const realShare='【淘宝】大促价保 https://e.tb.cn/h.j5Ma8gaXVlwPWsu?tk=DIRtTyxDQpc CZ193 「黑色全真鳄鱼皮鞋2025新款休闲板鞋男系带低帮鞋舒适时尚真皮男鞋」 点击链接直接打开 或者 淘宝搜索直接打开';
+const realShort='https://e.tb.cn/h.j5Ma8gaXVlwPWsu?tk=DIRtTyxDQpc';
+assert.equal(extractTaobaoLink(realShare),realShort,'Owner provided real Taobao share format');
+assert.equal(itemIdFromLink(realShare),null,'Short-link does not contain an item id without resolving');
+let shortRequests=0;
+const resolveStub=async(url,options)=>{
+  shortRequests++;
+  assert.equal(options.redirect,'manual');
+  assert.equal(url,realShort);
+  return new Response(null,{status:302,headers:{Location:'https://item.taobao.com/item.htm?id=123456789'}});
+};
+assert.deepEqual(await resolveItemId(realShare,resolveStub),
+ {itemId:'123456789',canonicalUrl:'https://item.taobao.com/item.htm?id=123456789'});
+assert.equal(shortRequests,1);
+const unsafe=await resolveItemId(realShort,async()=>new Response(null,{status:302,
+ headers:{Location:'http://127.0.0.1/admin'}}));
+assert.equal(unsafe.error,'TAOBAO_UNSAFE_REDIRECT');
+const unresolved=await resolveItemId(realShort,async()=>new Response('JavaScript required',{status:200}));
+assert.equal(unresolved.error,'TAOBAO_SHORT_LINK_UNRESOLVED');
+
 assert.equal(itemIdFromLink('https://detail.tmall.com/item.htm?num_iid=123456789'),'123456789');
 for(const evil of ['http://item.taobao.com/item.htm?id=123456789',
  'https://taobao.com.evil.invalid/item.htm?id=123456789',
