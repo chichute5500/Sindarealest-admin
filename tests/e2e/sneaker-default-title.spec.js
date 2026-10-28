@@ -98,6 +98,28 @@ for(const cfg of [
   await page.locator('[data-action="add"]').first().click();
   await expect(page.locator('#backdrop')).not.toHaveClass(/hidden/);
   const title=page.locator('#pTitle'),category=page.locator('#pCategory');
+  const typeButton=page.locator('#pFulfillmentToggle'),typeValue=page.locator('#pFulfillmentType');
+  await expect(page.locator('#productEditorTabs [data-product-tab]')).toHaveCount(2);
+  await expect(page.locator('#productTabPricing')).toHaveCount(0);
+  await expect(typeButton).toBeVisible();
+  await expect(typeButton).toContainText('Hàng đặt làm');
+  await expect(typeValue).toHaveValue('made_to_order');
+  await expect(typeButton).toHaveAttribute('aria-pressed','false');
+  const sideBySide=await page.locator('.product-category-duo').evaluate(el=>{
+   const [left,right]=[el.querySelector('.product-category-cell'),el.querySelector('.product-fulfillment-cell')].map(node=>node.getBoundingClientRect());
+   return {leftWidth:left.width,rightWidth:right.width,xDiff:right.x-left.x,yDiff:Math.abs(left.y-right.y)};
+  });
+  expect(sideBySide.yDiff).toBeLessThan(3);
+  expect(sideBySide.xDiff).toBeGreaterThan(0);
+  expect(Math.abs(sideBySide.leftWidth-sideBySide.rightWidth)).toBeLessThan(3);
+  await typeButton.click();
+  await expect(typeButton).toContainText('Hàng có sẵn');
+  await expect(typeValue).toHaveValue('in_stock');
+  await expect(typeButton).toHaveAttribute('aria-pressed','true');
+  await typeButton.click();
+  await expect(typeButton).toContainText('Hàng đặt làm');
+  await expect(typeValue).toHaveValue('made_to_order');
+  await page.screenshot({path:dir+'/basic-category-type-'+cfg.label+'.png',animations:'disabled'});
   // Owner screenshot regression: entering "Thêm sản phẩm mới" without selecting
   // a category must still show a legible muted title pattern, never an empty box.
   await expect(category).toHaveValue('');
@@ -154,14 +176,19 @@ for(const cfg of [
   expect(submitted[0].stock).toBe(null);
   expect(submitted[0].sku).toBe('');
   expect(submitted[0].skuVerified).toBe(true);
+  expect(submitted[0].fulfillmentType).toBe('made_to_order');
   expect(submitted[0]).not.toHaveProperty('autoSneakerTitle');
   // Separate new product: a custom title must be sent unchanged.
   await page.locator('[data-action="add"]').first().click();
   await page.locator('#pCategory').fill('Túi Nữ');
   await page.locator('#pTitle').fill('Túi Da Cá Sấu Đặt Riêng');
+  await expect(page.locator('#pFulfillmentType')).toHaveValue('made_to_order');
+  await page.locator('#pFulfillmentToggle').click();
+  await expect(page.locator('#pFulfillmentType')).toHaveValue('in_stock');
   await page.locator('#saveProduct').click();
   await expect.poll(()=>submitted.length).toBe(2);
   expect(submitted[1].title).toBe('Túi Da Cá Sấu Đặt Riêng');
+  expect(submitted[1].fulfillmentType).toBe('in_stock');
   expect(errors).toEqual([]);
  });
 }
