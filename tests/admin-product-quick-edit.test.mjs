@@ -56,8 +56,22 @@ row=db.prepare('SELECT * FROM products WHERE id=?').get(id);
 assert.equal(row.images_json,JSON.stringify(images));
 assert.equal(row.title,before.title);assert.equal(row.description,before.description);
 assert.equal(row.published,before.published);assert.equal(row.stock,before.stock);
+// Card visibility is the only public publishing control: atomic and audited.
+// A failed or stale toggle must never silently overwrite another device.
+assert.equal((await patch('published',false,true)).status,200,'Owner hides product directly from its card');
+row=db.prepare('SELECT * FROM products WHERE id=?').get(id);
+assert.equal(row.published,0);
+assert.equal(row.stock,before.stock,'Visibility must never change stored stock');
+assert.equal(row.sku,before.sku,'Visibility must preserve server-assigned SKU');
+assert.equal(row.price,3300000);
+assert.equal((await patch('published',true,true)).status,409,'Stale switch cannot override remote Admin changes');
+assert.equal(db.prepare('SELECT published FROM products WHERE id=?').get(id).published,0);
+assert.equal((await patch('published','true',false)).status,400,'Reject non-boolean publish input');
+assert.equal((await patch('published',true,false)).status,200,'Owner can show the same product again');
+assert.equal(db.prepare('SELECT published FROM products WHERE id=?').get(id).published,1);
+assert.equal((await patch('published',false,true,false)).status,401,'Hide action requires Admin authentication');
 const audits=db.prepare('SELECT COUNT(*) AS c FROM audit_logs').get().c;
-assert.equal(audits,5,'Audit exactly one event per quick edit');
+assert.equal(audits,7,'Audit exactly one event per quick edit, including both visibility changes');
 assert.equal((await patch('images',[],['images/example1.webp'])).status,409,'Stale photo reorder must not overwrite concurrent gallery');
 assert.equal(db.prepare('SELECT COUNT(*) AS c FROM audit_logs').get().c,audits,'Conflict must not forge an audit');
 assert.equal((await patch('price',-100,3300000)).status,400);
@@ -68,6 +82,7 @@ const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'
 for(const marker of [
  'data-inline-photo=','data-product-row=','data-inline-edit="fulfillmentType"',
  'data-inline-edit="category"','data-inline-edit="price"',
+ 'data-toggle-published=','role="switch"','function toggleProductPublished(button)',
  'function beginProductQuickEdit(','function openEditor(p,initialTab=',
  "if(initialTab==='gallery')setProductEditorTab('gallery',true)",
  'function moveGalleryImage(','function removeGalleryImage(index){',
