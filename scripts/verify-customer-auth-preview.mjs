@@ -52,7 +52,8 @@ for(const name of ["ZALO_APP_SECRET","GOOGLE_CLIENT_SECRET"]){
   if(vars[name]?.type!=="secret_text")
     throw new Error(name+" is not stored as an encrypted Secret in Pages PREVIEW");
 }
-const previewHost="feat-zalo-customer-login-2026-10-29."+TARGET_PROJECT+".pages.dev";
+// Cloudflare branch aliases truncate long branch names; use the exact alias returned by deploy logs.
+const previewHost="feat-zalo-customer-login-202."+TARGET_PROJECT+".pages.dev";
 console.log("PASS: Preview-only deployment safety gate");
 console.log("Project:",TARGET_PROJECT,"Production branch:",project.production_branch);
 console.log("Environment: preview; DB isolated from storefront Production by UUID");
