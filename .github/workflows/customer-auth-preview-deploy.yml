@@ -12,6 +12,9 @@ on:
       - 'scripts/check-customer-auth-preview-callback.mjs'
       - '.github/workflows/customer-auth-preview-deploy.yml'
       - 'tests/customer-auth-*.test.mjs'
+      - 'tests/customer-zalo-region.test.mjs'
+      - 'relay/**'
+      - 'package.json'
   workflow_dispatch:
 
 permissions:
