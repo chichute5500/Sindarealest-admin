@@ -91,7 +91,9 @@ for(const provider of ["zalo","google"]){
   assert.ok(state&&browserCookie);
   assert.ok(!authorize.toString().includes("test-only-"));
   const tokenFetch=globalThis.fetch;
-  globalThis.fetch=async(url)=> {
+  globalThis.fetch=async(url,init={})=> {
+    // Cloudflare Workers does not support redirect:"error", only manual.
+    assert.equal(init.redirect,"manual","Provider token/profile fetch must never follow redirects");
     const addr=String(url);
     if(addr.includes("access_token")||addr.includes("googleapis.com/token"))return new Response(JSON.stringify({access_token:"test-access"}),{status:200});
     if(addr.includes("graph.zalo.me"))return new Response(JSON.stringify({id:"123456",name:"Khách Zalo"}),{status:200});
