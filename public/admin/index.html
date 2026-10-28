@@ -2093,13 +2093,18 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('click',e=>{const n=e.target.closest('[data-view]');if(n){const morePanel=$('#mobileMorePanel'),moreTrigger=$('#mobileMoreTrigger'),choseMoreItem=Boolean(n.closest('#mobileMorePanel'));morePanel?.classList.add('hidden');moreTrigger?.setAttribute('aria-expanded','false');if(choseMoreItem)moreTrigger?.focus();setView(n.dataset.view);return}const a=e.target.closest('[data-action]');if(!a)return;if(a.dataset.action==='toggle-more'){const panel=$('#mobileMorePanel'),open=panel?.classList.contains('hidden');panel?.classList.toggle('hidden',!open);a.setAttribute('aria-expanded',String(Boolean(open)));return}if(a.dataset.action==='back-to-orders'){closeOrderDetails(a.dataset.id);return}if(a.dataset.action==='order-detail-to-row'){jumpToOrderActions(a.dataset.id);return}if(a.dataset.action==='view-order-customer'){showOrderCustomerProfile(a.dataset.name);return}if(a.dataset.action==='add')openEditor(null);if(a.dataset.action==='edit')openEditor(products.find(p=>p.id===a.dataset.id));if(a.dataset.action==='backup')downloadBackup();if(a.dataset.action==='retry-customers'){retryCustomers();return}if(a.dataset.action==='retry-warranties'){retryWarranties();return}if(a.dataset.action==='reset-skus'){resetAllSkus(a);return}});
 async function resetAllSkus(button){if(resetBusy||busy)return;const count=products.filter(p=>p.published&&!p.skuVerified).length;const verifiedCount=products.filter(p=>p.published&&p.skuVerified).length;if(count===0){toast('Không có SKU sản phẩm đang bán cần cấp lại.');return}const approved=window.confirm(`Bạn sắp cấp SKU chính thức cho ${count} sản phẩm đang bán cần xác minh. ${verifiedCount} SKU đã xác nhận và mọi sản phẩm ẩn được giữ nguyên. Tiếp tục?`);if(!approved)return;resetBusy=true;if(button){button.disabled=true;button.textContent='Đang cấp SKU chính thức…'}try{const result=await api('/api/admin/products/reset-skus',{method:'POST',body:JSON.stringify({confirm:true})});await loadData();render();toast(result.message||`Đã cấp SKU chính thức cho ${result.count||0} sản phẩm.`)}catch(ex){window.alert('Không thể đặt lại SKU: '+(ex.message||'Lỗi không xác định.'))}finally{resetBusy=false;if(button){button.disabled=false;button.textContent='↻ Cấp SKU chính thức'}}}
 function refreshCategoryOptions(){
- const official=Object.entries(CAT).filter(([code])=>code!=='wallets');
- // Dedupe by canonical category ID, not by case or legacy display text.
- const labels=official.map(([,name])=>name);
- const extraCodes=[...new Set(products.map(p=>skuCategory(p.category)||p.category).filter(code=>code&&!Object.prototype.hasOwnProperty.call(CAT,code)))];
- const extras=extraCodes.map(code=>products.find(p=>(skuCategory(p.category)||p.category)===code)?.categoryLabel||code);
- const names=[...new Set([...labels,...extras])].sort((a,b)=>a.localeCompare(b,'vi'));
- $('#categoryOptions').innerHTML=names.map(name=>'<option value="'+esc(name)+'"></option>').join('');
+ // Build an explicit picker instead of native datalist. Keep the 15 official
+ // categories and retain any historical labels already present in the DB.
+ const official=Object.entries(DEFAULT_PRODUCT_LABELS);
+ const extras=[...new Set(products.map(p=>skuCategory(p.category)||p.category)
+  .filter(code=>code&&!Object.hasOwn(DEFAULT_PRODUCT_LABELS,code)))].map(code=>
+  [code,products.find(p=>(skuCategory(p.category)||p.category)===code)?.categoryLabel||code]);
+ const choices=[...official,...extras.sort((a,b)=>a[1].localeCompare(b[1],'vi'))];
+ const grid=$('#productCategoryGrid');
+ if(!grid)return;
+ grid.innerHTML=choices.map(([code,label])=>
+  '<button type="button" class="product-category-option" data-category-pick="'+esc(code)+'" data-category-label="'+esc(label)+'" aria-pressed="false">'+esc(label)+'</button>'
+ ).join('');
 }
 const adminModalReturnFocus=new Map();
 function activateAdminModal(backdrop,initialFocusSelector){const active=document.activeElement;if(!adminModalReturnFocus.has(backdrop.id))adminModalReturnFocus.set(backdrop.id,active instanceof HTMLElement&&!backdrop.contains(active)?active:null);backdrop.classList.remove('hidden');backdrop.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';const initial=backdrop.querySelector(initialFocusSelector);if(initial instanceof HTMLElement)initial.focus()}
@@ -2139,7 +2144,8 @@ const productCategoryInput=$('#pCategory'),productCategoryToggle=$('#productCate
 function syncCategorySelection(){
  const current=skuCategory(productCategoryInput.value);
  for(const button of productCategoryGrid.querySelectorAll('[data-category-pick]'))
-  button.setAttribute('aria-pressed',String(button.dataset.categoryPick===current));
+  button.setAttribute('aria-pressed',String(button.dataset.categoryPick===current||
+   (!current&&button.dataset.categoryLabel===productCategoryInput.value)));
 }
 function setProductCategoryGridOpen(open){
  const visible=Boolean(open)&&!$('#backdrop').classList.contains('hidden');
@@ -2149,14 +2155,12 @@ function setProductCategoryGridOpen(open){
  productCategoryToggle.setAttribute('aria-label',visible?'Đóng bảng chọn danh mục':'Mở bảng chọn danh mục');
  if(visible)syncCategorySelection();
 }
-productCategoryGrid.innerHTML=Object.entries(DEFAULT_PRODUCT_LABELS).map(([code,label])=>
- '<button type="button" class="product-category-option" data-category-pick="'+esc(code)+'" aria-pressed="false">'+esc(label)+'</button>'
-).join('');
+refreshCategoryOptions();
 productCategoryGrid.addEventListener('click',event=>{
  const button=event.target.closest('[data-category-pick]');
  if(!button)return;
  const code=button.dataset.categoryPick;
- productCategoryInput.value=DEFAULT_PRODUCT_LABELS[code];
+ productCategoryInput.value=button.dataset.categoryLabel;
  productCategoryInput.dispatchEvent(new Event('input',{bubbles:true}));
  setProductCategoryGridOpen(false);
  productCategoryToggle.focus({preventScroll:true});
