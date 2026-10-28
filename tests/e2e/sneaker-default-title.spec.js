@@ -1,0 +1,238 @@
+import {test,expect} from '@playwright/test';
+import {mkdirSync} from 'node:fs';
+
+// All APIs are intercepted. This test never writes Preview or Production D1/R2.
+const base=process.env.SD_SNEAKER_DEFAULT_BASE_URL||'http://127.0.0.1:4173';
+const dir='artifacts/sneaker-default-title';
+mkdirSync(dir,{recursive:true});
+test.use({serviceWorkers:'block'});
+const categories=[
+ ['Giày Thể Thao','Giày Thể Thao','025'],
+ ['Giày Lười','Giày Lười','001'],
+ ['Giày Tây','Giày Tây','001'],
+ ['Thắt Lưng','Thắt Lưng','001'],
+ ['Dép','Dép','001'],
+ ['Dây Đồng Hồ','Dây Đồng Hồ','001'],
+ ['Ốp Điện Thoại','Ốp Điện Thoại','001'],
+ ['Ví Nam','Ví Nam','001'],
+ ['Ví Cầm Tay','Ví Cầm Tay','001'],
+ ['Cặp – Tab – Laptop','Cặp – Tab – Laptop','001'],
+ ['Clutch','Clutch','001'],
+ ['Mũ','Mũ','001'],
+ ['Túi Đeo Chéo','Túi Đeo Chéo','001'],
+ ['Túi Golf','Túi Golf','001'],
+ ['Túi Nữ','Túi Nữ','001']
+];
+for(const cfg of [
+ {label:'mobile-light',w:390,h:844,theme:'light'},
+ {label:'mobile-dark',w:390,h:844,theme:'dark'},
+ {label:'desktop-light',w:1366,h:900,theme:'light'},
+ {label:'desktop-dark',w:1366,h:900,theme:'dark'}
+]){
+ test('Grey placeholder for all 15 categories, blank save and custom names: '+cfg.label,async({page})=>{
+  await page.setViewportSize({width:cfg.w,height:cfg.h});
+  await page.emulateMedia({colorScheme:cfg.theme,reducedMotion:'reduce'});
+  const errors=[],submitted=[],visibilityWrites=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  const items=[{
+    id:'qa-sneaker-024',sku:'SD-SN024',skuVerified:true,title:'Giày Thể Thao VIP Da Cá Sấu Mẫu #024',
+    category:'sneakers',categoryLabel:'Giày Thể Thao',description:'',images:[],
+    published:true,price:5800000,stock:0,fulfillmentType:'made_to_order'
+  }];
+  await page.route('**/api/admin/**',async route=>{
+   const path=new URL(route.request().url()).pathname;
+   if(path==='/api/admin/products/qa-sneaker-024'&&route.request().method()==='PATCH'){
+    const payload=route.request().postDataJSON();
+    visibilityWrites.push(payload);
+    if(payload.field!=='published'||typeof payload.value!=='boolean'||payload.expectedValue!==items[0].published)
+     return route.fulfill({status:409,contentType:'application/json',body:JSON.stringify({error:'Đã thay đổi từ thiết bị khác'})});
+    items[0].published=payload.value;
+    return route.fulfill({status:200,contentType:'application/json',
+     body:JSON.stringify({ok:true,message:'Đã cập nhật sản phẩm.',product:{...items[0]}})});
+   }
+   if(path==='/api/admin/products'&&route.request().method()==='POST'){
+    const payload=route.request().postDataJSON();
+    submitted.push(payload);
+    items.push({...payload,id:'qa-added-'+submitted.length,sku:'SD-SN025',skuVerified:true,title:payload.title||'Giày Thể Thao VIP Da Cá Sấu Mẫu #025'});
+    return route.fulfill({status:201,contentType:'application/json',
+      body:JSON.stringify({ok:true,message:'Đã thêm sản phẩm.',product:items.at(-1)})});
+   }
+   const data=path==='/api/admin/products'?{products:items}:
+     path==='/api/admin/orders'?{orders:[]}:
+     path==='/api/admin/customers'?{customers:[]}:
+     path==='/api/admin/warranties'?{warranties:[],claims:[]}:
+     path==='/api/admin/audit-logs'?{logs:[]}:
+     path==='/api/admin/settings'?{showPrices:true}:
+     path==='/api/admin/payment-qr'?{active:false,pending:false}:{ok:true};
+   return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
+  });
+  await page.goto(base+'/admin/?view=products',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#appView')).not.toHaveClass(/hidden/);
+  // A visible card switch replaces the pencil; it must not open the editor.
+  const cardSwitch=()=>page.locator('[data-toggle-published="qa-sneaker-024"]:visible').first();
+  await expect(cardSwitch()).toHaveAttribute('role','switch');
+  await expect(cardSwitch()).toHaveAttribute('aria-checked','true');
+  await expect(cardSwitch()).toContainText('Hiện');
+  await expect(page.locator('#main button.product-mobile-edit:visible')).toHaveCount(0);
+  await expect(page.locator('#main .product-table thead')).not.toContainText('Tồn kho');
+  expect(await page.locator('#main').innerText()).not.toContain('Chưa kiểm kê');
+  await page.screenshot({path:dir+'/card-switch-green-'+cfg.label+'.png',animations:'disabled'});
+  await cardSwitch().click();
+  await expect.poll(()=>visibilityWrites.length).toBe(1);
+  expect(visibilityWrites[0]).toEqual({field:'published',value:false,expectedValue:true});
+  await expect(cardSwitch()).toHaveAttribute('aria-checked','false');
+  await expect(cardSwitch()).toContainText('Ẩn');
+  await expect(page.locator('#backdrop')).toHaveClass(/hidden/);
+  await page.screenshot({path:dir+'/card-switch-red-'+cfg.label+'.png',animations:'disabled'});
+  await cardSwitch().click();
+  await expect.poll(()=>visibilityWrites.length).toBe(2);
+  expect(visibilityWrites[1]).toEqual({field:'published',value:true,expectedValue:false});
+  await expect(cardSwitch()).toHaveAttribute('aria-checked','true');
+  // Tapping the card body still opens product editing.
+  await page.locator('#main [data-product-row="qa-sneaker-024"] .prodname').click();
+  await expect(page.locator('#backdrop')).not.toHaveClass(/hidden/);
+  for(const id of ['#pSku','#pSkuVerified','#pStock','#pPublished'])
+   await expect(page.locator(id)).toHaveCount(0);
+  await page.locator('#editorCancel').click();
+  await expect(page.locator('#backdrop')).toHaveClass(/hidden/);
+  await page.locator('[data-action="add"]').first().click();
+  await expect(page.locator('#backdrop')).not.toHaveClass(/hidden/);
+  const title=page.locator('#pTitle'),category=page.locator('#pCategory');
+  const typeButton=page.locator('#pFulfillmentToggle'),typeValue=page.locator('#pFulfillmentType');
+  await expect(page.locator('#productEditorTabs [data-product-tab]')).toHaveCount(2);
+  await expect(page.locator('#productTabPricing')).toHaveCount(0);
+  await expect(typeButton).toBeVisible();
+  await expect(typeButton).toContainText('Hàng đặt làm');
+  await expect(typeValue).toHaveValue('made_to_order');
+  await expect(typeButton).toHaveAttribute('aria-pressed','false');
+  // Owner screenshot regression: CSS grid must NOT stretch the editor's tab
+  // row to fill empty screen height (both on Basic Info and on Gallery).
+  const tabMeasure=async()=>page.locator('#productEditorTabs').evaluate(el=>{
+   const outer=el.getBoundingClientRect(),children=[...el.querySelectorAll('.editor-tab')].map(b=>b.getBoundingClientRect());
+   return {height:outer.height,childHeights:children.map(x=>x.height),top:outer.top,
+    contentAlign:getComputedStyle(el.parentElement).alignContent};
+  });
+  const basics=await tabMeasure();
+  expect(basics.height).toBeGreaterThanOrEqual(42);
+  expect(basics.height).toBeLessThanOrEqual(56);
+  expect(Math.abs(basics.childHeights[0]-basics.childHeights[1])).toBeLessThan(2);
+  const controls=await page.locator('.product-category-duo').evaluate(el=>{
+   const l=el.querySelector('#pCategory').getBoundingClientRect(),r=el.querySelector('#pFulfillmentToggle').getBoundingClientRect();
+   return {leftHeight:l.height,rightHeight:r.height,topDiff:Math.abs(l.top-r.top)};
+  });
+  expect(Math.abs(controls.leftHeight-controls.rightHeight)).toBeLessThan(2);
+  expect(controls.leftHeight).toBeGreaterThanOrEqual(44);
+  expect(controls.leftHeight).toBeLessThanOrEqual(52);
+  expect(controls.topDiff).toBeLessThan(3);
+  await page.screenshot({path:dir+'/balanced-basics-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#productTabGallery').click();
+  await expect(page.locator('#productPanelGallery')).toBeVisible();
+  const galleryTabs=await tabMeasure();
+  expect(galleryTabs.height).toBeLessThanOrEqual(56);
+  expect(Math.abs(galleryTabs.height-basics.height)).toBeLessThan(2);
+  await page.screenshot({path:dir+'/balanced-gallery-'+cfg.label+'.png',animations:'disabled'});
+  await page.locator('#productTabDetails').click();
+  await expect(page.locator('#productPanelDetails')).toBeVisible();
+  const backTabs=await tabMeasure();
+  expect(Math.abs(backTabs.height-basics.height)).toBeLessThan(2);
+  const sideBySide=await page.locator('.product-category-duo').evaluate(el=>{
+   const [left,right]=[el.querySelector('.product-category-cell'),el.querySelector('.product-fulfillment-cell')].map(node=>node.getBoundingClientRect());
+   return {leftWidth:left.width,rightWidth:right.width,xDiff:right.x-left.x,yDiff:Math.abs(left.y-right.y)};
+  });
+  expect(sideBySide.yDiff).toBeLessThan(3);
+  expect(sideBySide.xDiff).toBeGreaterThan(0);
+  expect(Math.abs(sideBySide.leftWidth-sideBySide.rightWidth)).toBeLessThan(3);
+  await typeButton.click();
+  await expect(typeButton).toContainText('Hàng có sẵn');
+  await expect(typeValue).toHaveValue('in_stock');
+  await expect(typeButton).toHaveAttribute('aria-pressed','true');
+  await typeButton.click();
+  await expect(typeButton).toContainText('Hàng đặt làm');
+  await expect(typeValue).toHaveValue('made_to_order');
+  await page.screenshot({path:dir+'/basic-category-type-'+cfg.label+'.png',animations:'disabled'});
+  // Owner screenshot regression: entering "Thêm sản phẩm mới" without selecting
+  // a category must still show a legible muted title pattern, never an empty box.
+  await expect(category).toHaveValue('');
+  await expect(title).toHaveValue('');
+  await expect(title).toHaveAttribute('placeholder','Tên Danh Mục VIP Da Cá Sấu Mẫu #…');
+  const initialStyle=await title.evaluate(el=>({
+   placeholder:el.getAttribute('placeholder'),
+   color:getComputedStyle(el,'::placeholder').color,
+   opacity:getComputedStyle(el,'::placeholder').opacity
+  }));
+  expect(initialStyle.opacity).toBe('1');
+  expect(initialStyle.color).toBe(cfg.theme==='dark'?'rgb(175, 197, 213)':'rgb(112, 135, 153)');
+  await page.screenshot({path:dir+'/initial-hint-'+cfg.label+'.png',animations:'disabled'});
+  // Owner regression: a browser datalist is not a usable category table on Android.
+  // Tapping the chevron must reveal all 15 real, selectable category cells.
+  await page.locator('#productCategoryToggle').click();
+  const grid=page.locator('#productCategoryGrid');
+  await expect(grid).toBeVisible();
+  // The dropdown must sit BELOW the whole half-width row, not cover the
+  // adjacent type button: one tap must work even with categories expanded.
+  const nonOverlapping=await page.locator('#pFulfillmentToggle').evaluate((button)=>{
+   const rect=button.getBoundingClientRect(),popup=document.querySelector('#productCategoryGrid').getBoundingClientRect();
+   return popup.top>=rect.bottom-2;
+  });
+  expect(nonOverlapping).toBe(true);
+  await typeButton.click();
+  await expect(typeValue).toHaveValue('in_stock');
+  await expect(grid).toBeHidden();
+  await typeButton.click();
+  await expect(typeValue).toHaveValue('made_to_order');
+  await page.locator('#productCategoryToggle').click();
+  await expect(grid).toBeVisible();
+  await expect(grid.locator('[data-category-pick]')).toHaveCount(15);
+  await expect(page.locator('#productCategoryToggle')).toHaveAttribute('aria-expanded','true');
+  await page.screenshot({path:dir+'/category-table-'+cfg.label+'.png',animations:'disabled'});
+  await grid.locator('[data-category-pick="loafers"]').click();
+  await expect(category).toHaveValue('Giày Lười');
+  await expect(title).toHaveAttribute('placeholder','Giày Lười VIP Da Cá Sấu Mẫu #001');
+  await expect(grid).toBeHidden();
+  await expect(page.locator('#productCategoryToggle')).toHaveAttribute('aria-expanded','false');
+  await category.click();
+  await expect(grid).toBeVisible();
+  await expect(grid.locator('[data-category-pick="loafers"]')).toHaveAttribute('aria-pressed','true');
+  await grid.locator('[data-category-pick="sneakers"]').click();
+  await expect(category).toHaveValue('Giày Thể Thao');
+  await expect(title).toHaveAttribute('placeholder','Giày Thể Thao VIP Da Cá Sấu Mẫu #025');
+  for(const [chosen,label,ordinal] of categories){
+   await category.fill(chosen);
+   await expect(title).toHaveValue('');
+   await expect(title).toHaveAttribute('placeholder',label+' VIP Da Cá Sấu Mẫu #'+ordinal);
+   expect(await title.evaluate(el=>el.required)).toBe(false);
+  }
+  await category.fill('Giày Thể Thao');
+  await expect(title).toHaveAttribute('placeholder','Giày Thể Thao VIP Da Cá Sấu Mẫu #025');
+  await page.screenshot({path:dir+'/'+cfg.label+'.png',animations:'disabled'});
+  // Custom entry is real text and must survive subsequent category updates.
+  await title.fill('Giày Phối Màu Theo Yêu Cầu');
+  await category.fill('Mũ');
+  await expect(title).toHaveValue('Giày Phối Màu Theo Yêu Cầu');
+  await title.fill('');
+  await category.fill('Giày Thể Thao');
+  await expect(title).toHaveValue('');
+  await page.locator('#saveProduct').click();
+  await expect.poll(()=>submitted.length).toBe(1);
+  expect(submitted[0].title).toBe('');
+  expect(submitted[0].category).toBe('Giày Thể Thao');
+  expect(submitted[0].published).toBe(true);
+  expect(submitted[0].stock).toBe(null);
+  expect(submitted[0].sku).toBe('');
+  expect(submitted[0].skuVerified).toBe(true);
+  expect(submitted[0].fulfillmentType).toBe('made_to_order');
+  expect(submitted[0]).not.toHaveProperty('autoSneakerTitle');
+  // Separate new product: a custom title must be sent unchanged.
+  await page.locator('[data-action="add"]').first().click();
+  await page.locator('#pCategory').fill('Túi Nữ');
+  await page.locator('#pTitle').fill('Túi Da Cá Sấu Đặt Riêng');
+  await expect(page.locator('#pFulfillmentType')).toHaveValue('made_to_order');
+  await page.locator('#pFulfillmentToggle').click();
+  await expect(page.locator('#pFulfillmentType')).toHaveValue('in_stock');
+  await page.locator('#saveProduct').click();
+  await expect.poll(()=>submitted.length).toBe(2);
+  expect(submitted[1].title).toBe('Túi Da Cá Sấu Đặt Riêng');
+  expect(submitted[1].fulfillmentType).toBe('in_stock');
+  expect(errors).toEqual([]);
+ });
+}

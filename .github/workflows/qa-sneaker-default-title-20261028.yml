@@ -1,0 +1,99 @@
+name: QA all-category default product titles (isolated Preview)
+on:
+  push:
+    branches: [feat/default-sneaker-name-2026-10-28]
+    paths:
+      - '.github/workflows/qa-sneaker-default-title-20261028.yml'
+      - 'functions/_catalog-sku.js'
+      - 'functions/api/admin/products.js'
+      - 'functions/api/admin/products/[id].js'
+      - 'tests/admin-product-quick-edit.test.mjs'
+      - 'tests/admin-reference-visual-contract.test.mjs'
+      - 'tests/admin-upgrade.test.mjs'
+      - 'public/admin/index.html'
+      - 'tests/sneaker-default-title.test.mjs'
+      - 'tests/admin-liquid-glass-contract.test.mjs'
+      - 'tests/admin-upgrade.test.mjs'
+      - 'tests/category-canonical-dedupe.test.mjs'
+      - 'tests/e2e/sneaker-default-title.spec.js'
+      - 'package.json'
+permissions:
+  contents: read
+concurrency:
+  group: sd-sneaker-default-title-1028
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Verify isolated branch and source provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feat/default-sneaker-name-2026-10-28'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Complete source, data and UI regression checks
+        run: |
+          npm install --no-fund
+          npm run check
+          npm test
+      - name: Chrome browser setup
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          if command -v google-chrome >/dev/null 2>&1; then
+            google-chrome --version
+            echo 'SD_OWNER_QA_SYSTEM_CHROME=1' >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium
+          fi
+      - name: Verify Admin new-product title across PC/mobile light/dark
+        shell: bash
+        env:
+          SD_SNEAKER_DEFAULT_BASE_URL: http://127.0.0.1:4173
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public >/tmp/sneaker-default-qa.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/admin/ >/dev/null; then break; fi
+            sleep .3
+          done
+          npx playwright test tests/e2e/sneaker-default-title.spec.js --config=playwright.owner-gesture.config.js --reporter=list
+      - name: Verify independent Preview D1/R2 and Production isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/sneaker-preview.json"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest2" > "$RUNNER_TEMP/sneaker-production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/sneaker-preview.json" "$RUNNER_TEMP/sneaker-production.json"
+      - name: Deploy only to isolated Preview for Owner review
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = 'refs/heads/feat/default-sneaker-name-2026-10-28'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          npx wrangler pages deploy public --project-name 'sindarealest-admin-preview' --branch 'sneaker-title-1028' --commit-hash "$GITHUB_SHA" --commit-message "Owner sneaker naming review $GITHUB_SHA"
+          echo 'Preview: https://sneaker-title-1028.sindarealest-admin-preview.pages.dev/admin/'
+      - name: Preserve review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sneaker-default-title-${{ github.sha }}
+          path: |
+            artifacts/sneaker-default-title/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14

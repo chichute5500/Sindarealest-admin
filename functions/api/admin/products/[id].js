@@ -56,12 +56,12 @@ export async function onRequestPatch(context) {
   const input = parsed.value;
   if (parsed.error || !input || typeof input !== "object" || Array.isArray(input)) return fail("Thao tác chỉnh nhanh không hợp lệ.");
   const { field, value, expectedValue } = input;
-  if (!["category", "price", "images", "fulfillmentType"].includes(field) || !Object.hasOwn(input, "expectedValue")) return fail("Trường chỉnh nhanh không hợp lệ.");
+  if (!["category", "price", "images", "fulfillmentType", "published"].includes(field) || !Object.hasOwn(input, "expectedValue")) return fail("Trường chỉnh nhanh không hợp lệ.");
   try {
     const row = await context.env.DB.prepare("SELECT * FROM products WHERE id=? LIMIT 1").bind(id).first();
     if (!row) return fail("Không tìm thấy sản phẩm.", 404);
     const existing = fromRow(row);
-    const before = field === "fulfillmentType" ? existing.fulfillmentType : field === "category"
+    const before = field === "published" ? existing.published : field === "fulfillmentType" ? existing.fulfillmentType : field === "category"
       ? { category: existing.category, categoryLabel: existing.categoryLabel }
       : field === "images" ? existing.images : existing.price;
     if (JSON.stringify(before) !== JSON.stringify(expectedValue))
@@ -75,7 +75,10 @@ export async function onRequestPatch(context) {
       published: existing.published, images: existing.images,
       fulfillmentType: existing.fulfillmentType
     };
-    if (field === "category") {
+    if (field === "published") {
+      if (typeof value !== "boolean") return fail("Trạng thái hiển thị phải là bật hoặc tắt.", 400);
+      checkInput.published = value;
+    } else if (field === "category") {
       if (!value || typeof value !== "object" || Array.isArray(value) ||
           typeof value.category !== "string" || !/^[a-z0-9-]{1,80}$/.test(value.category) ||
           typeof value.categoryLabel !== "string" || !value.categoryLabel.trim() ||
@@ -92,7 +95,10 @@ export async function onRequestPatch(context) {
     const checked = validateProduct(checkInput, existing);
     if (checked.error) return fail(checked.error, 400);
     const after = checked.value;
-    if (field === "category") {
+    if (field === "published") {
+      updates = context.env.DB.prepare("UPDATE products SET published=?, updated_at=datetime('now') WHERE id=? AND published=?")
+        .bind(after.published ? 1 : 0, id, row.published);
+    } else if (field === "category") {
       updates = context.env.DB.prepare("UPDATE products SET category=?, category_label=?, updated_at=datetime('now') WHERE id=? AND category=? AND category_label=?")
         .bind(after.category, after.categoryLabel, id, row.category, row.category_label);
     } else if (field === "fulfillmentType") {

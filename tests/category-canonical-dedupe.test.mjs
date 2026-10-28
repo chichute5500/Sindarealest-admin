@@ -55,8 +55,12 @@ assert.match(html.innerHTML,/data-category="vi-nam"[^>]*>Ví Nam · 2<\/button>/
 assert.ok(!html.innerHTML.includes('data-category="giay-the-thao"'));
 assert.ok(!html.innerHTML.includes('data-category="wallets"'));
 assert.match(admin,/const SKU_CATEGORY_ALIASES=[^;]*'giay-the-thao':'sneakers'/);
-assert.match(admin,/Object\.entries\(CAT\)\.filter\(\(\[code\]\)=>code!=='wallets'\)/);
+assert.match(admin,/const official=Object\.entries\(DEFAULT_PRODUCT_LABELS\)/,
+ 'The picker uses fifteen canonical category labels, never the legacy wallets alias');
+assert.match(admin,/const extras=\[\.\.\.new Set\(products\.map\(p=>skuCategory\(p.category\)\|\|p.category\)/,
+ 'Historical category labels are deduplicated by canonical category');
 assert.match(admin,/Object\.keys\(CAT\)\.filter\(code=>code!=='wallets'\)/);
-assert.ok(admin.includes('<datalist id="categoryOptions"><option value="Giày Thể Thao">'));
-assert.ok(!admin.includes('<datalist id="categoryOptions"><option value="Sneaker">'));
+assert.ok(admin.includes('id="productCategoryGrid" class="product-category-grid"'));
+assert.ok(!admin.includes('<datalist id="categoryOptions">'),
+ 'The 15-category selection table should replace the Android native datalist');
 console.log('PASS: 15-canonical-category dedupe across API, Admin, storefront; aliases retain existing links.');

@@ -42,3 +42,22 @@ export function nextSkuForPrefix(rows,prefix) {
   }
   return officialSku(prefix,max+1);
 }
+
+/** Canonical default labels for all 15 official catalog categories. */
+export const DEFAULT_PRODUCT_CATEGORY_NAMES = Object.freeze({
+  sneakers:'Giày Thể Thao',loafers:'Giày Lười','dress-shoes':'Giày Tây',
+  belts:'Thắt Lưng',sandals:'Dép','watch-straps':'Dây Đồng Hồ',
+  'phone-cases':'Ốp Điện Thoại','vi-nam':'Ví Nam','vi-cam-tay':'Ví Cầm Tay',
+  'cap-tab-laptop':'Cặp – Tab – Laptop',clutch:'Clutch',mu:'Mũ',
+  'tui-deo-cheo':'Túi Đeo Chéo','tui-golf':'Túi Golf','tui-nu':'Túi Nữ'
+});
+
+/** Only derive names from the authoritative, newly allocated official SKU. */
+export function defaultProductTitle(category,sku) {
+  const key=normalizeCatalogCategory(category),prefix=officialSkuPrefix(key);
+  if(!prefix||!Object.hasOwn(DEFAULT_PRODUCT_CATEGORY_NAMES,key))return '';
+  const raw=String(sku||'').trim().toUpperCase();
+  const ordinal=raw.startsWith(prefix)?raw.slice(prefix.length):'';
+  if(!/^\d{3,6}$/.test(ordinal)||Number(ordinal)<1)return '';
+  return DEFAULT_PRODUCT_CATEGORY_NAMES[key]+' VIP Da Cá Sấu Mẫu #'+ordinal;
+}
