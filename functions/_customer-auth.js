@@ -2,11 +2,21 @@
 const enc = new TextEncoder();
 export const ZALO_APP_ID = "3933116436838564742";
 export const ORIGIN = "https://sindarealest2.pages.dev";
+export const PREVIEW_ORIGIN = "https://sindarealest-admin-preview.pages.dev";
 export const CUSTOMER_COOKIE = "sd_customer_login";
 const FLOW_COOKIE = "sd_customer_oauth";
 const sessionSeconds = 7 * 86400;
 const flowSeconds = 600;
-export const callback = (provider) => ORIGIN + "/api/customer/auth/" + provider + "/callback";
+// Only two explicitly trusted Pages hosts can participate in customer auth.
+// Do not derive redirect URLs from untrusted request Host/X-Forwarded-Host headers.
+export function customerOrigin(request) {
+  try {
+    const origin=new URL(request.url).origin;
+    return origin===ORIGIN || origin===PREVIEW_ORIGIN ? origin : null;
+  }catch{return null;}
+}
+export const callback = (provider,origin=ORIGIN) => origin + "/api/customer/auth/" + provider + "/callback";
+export const emailTestAllowed = request => customerOrigin(request)===PREVIEW_ORIGIN;
 export const configured = (env, provider) => Boolean(env?.DB && (provider === "zalo" ?
   typeof env.ZALO_APP_SECRET === "string" && env.ZALO_APP_SECRET.length >= 8 :
   provider === "google" ?
@@ -64,8 +74,8 @@ export function redirect(url,setCookies=[]) {
   return new Response(null,{status:302,headers:h});
 }
 export const sameOrigin = request => {
-  try {return new URL(request.url).origin === ORIGIN && request.headers.get("Origin") === ORIGIN;}
-  catch{return false;}
+  const origin=customerOrigin(request);
+  return Boolean(origin && request.headers.get("Origin") === origin);
 };
 export async function pkce(verifier) {
   const hash=new Uint8Array(await crypto.subtle.digest("SHA-256",enc.encode(verifier)));
