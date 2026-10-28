@@ -30,7 +30,7 @@ adb install -r "$APK"
 adb shell am start -W -n "$PKG/.MainActivity" | tee /tmp/taobao-first-launch.txt
 grep -Eq 'Status: ok|Activity: com.sindarealest.taobaoimport/.MainActivity' /tmp/taobao-first-launch.txt
 await_ui 'SinDarealest' /tmp/taobao-first-screen.xml
-await_ui 'Mở Taobao' /tmp/taobao-first-screen.xml
+await_ui 'Duyệt Taobao' /tmp/taobao-first-screen.xml
 adb shell am start -W -a android.intent.action.SEND -t text/plain \
   --es android.intent.extra.TEXT 'https://item.taobao.com/item.htm?id=12345678' \
   -n "$PKG/.MainActivity" | tee /tmp/taobao-shared-link.txt
