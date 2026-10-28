@@ -89,7 +89,7 @@ test('Taobao link input downloads official API images into the draft gallery',as
   await page.route('**/api/admin/**',async route=>{
     const url=new URL(route.request().url());
     if(url.pathname==='/api/admin/session')return route.fulfill({status:200,json:{ok:true,authenticated:true}});
-    if(url.pathname==='/api/admin/taobao-photos' && req.method()==='GET')
+    if(url.pathname==='/api/admin/taobao-photos' && route.request().method()==='GET')
       return route.fulfill({status:200,json:{ok:true,configured:true}});
     if(url.pathname==='/api/admin/taobao-photos'){
       queryCount++;
