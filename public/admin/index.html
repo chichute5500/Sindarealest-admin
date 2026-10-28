@@ -1469,6 +1469,9 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 @media(min-width:821px){#adminPullRefresh{display:none}}
 @media(prefers-reduced-motion:reduce){#adminPullRefresh{transition:none}#adminPullRefresh[data-loading="true"] .pull-icon{animation:none}}
 
+/* A readable but unmistakably muted name suggestion in the new-product dialog. */
+#productPanelDetails #pTitle::placeholder{color:#708799;opacity:1;font-weight:400}
+:root[data-admin-theme="dark"] #productPanelDetails #pTitle::placeholder{color:#afc5d5;opacity:1}
 </style>
 
 
@@ -2097,8 +2100,10 @@ function syncDefaultProductTitle(){
  const input=$('#pTitle'),key=skuCategory($('#pCategory').value);
  const isNewOfficial=!editing&&key&&Object.hasOwn(DEFAULT_PRODUCT_LABELS,key);
  input.required=!isNewOfficial;
- // The grey placeholder is never a real input value or a saved title.
- input.placeholder='';
+ // Show the format even before a category is selected. Once selected,
+ // the grey hint resolves to that category and its next expected SKU number.
+ // It is never a submitted or persisted name.
+ input.placeholder=editing?'':'Tên Danh Mục VIP Da Cá Sấu Mẫu #…';
  if(isNewOfficial){
   const sku=nextSkuForCategory(key),prefix=SKU_RULES[key];
   const suffix=sku.startsWith(prefix)?sku.slice(prefix.length):'';
