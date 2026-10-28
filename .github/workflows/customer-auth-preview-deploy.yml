@@ -9,6 +9,7 @@ on:
       - 'migrations/**'
       - 'scripts/verify-customer-auth-preview.mjs'
       - 'scripts/check-customer-auth-preview-live.mjs'
+      - 'scripts/check-customer-auth-preview-callback.mjs'
       - '.github/workflows/customer-auth-preview-deploy.yml'
       - 'tests/customer-auth-*.test.mjs'
   workflow_dispatch:
@@ -64,6 +65,9 @@ jobs:
       - name: Real deployed Preview smoke — D1 session and OAuth start
         if: steps.creds.outputs.ready == 'true'
         run: node scripts/check-customer-auth-preview-live.mjs
+      - name: Real Preview D1 OAuth callback with one-time deliberately invalid code
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/check-customer-auth-preview-callback.mjs
       - name: Record deployment target, never reveal secret values
         if: steps.creds.outputs.ready == 'true'
         run: |
