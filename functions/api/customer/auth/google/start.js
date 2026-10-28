@@ -1,0 +1,15 @@
+import { ORIGIN,callback,configured,startFlow,pkce,flowCookie,redirect,error } from "../../../../_customer-auth.js";
+export async function onRequestGet({request,env}) {
+  if(new URL(request.url).origin!==ORIGIN || !configured(env,"google"))return error("Đăng nhập Google chưa được cấu hình.",503);
+  try {
+    const flow=await startFlow(env,"google");
+    const url=new URL("https://accounts.google.com/o/oauth2/v2/auth");
+    for(const [key,value] of Object.entries({
+      client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback("google"),
+      response_type:"code",scope:"openid email profile",state:flow.state,
+      code_challenge_method:"S256",code_challenge:await pkce(flow.verifier),
+      prompt:"select_account"
+    }))url.searchParams.set(key,value);
+    return redirect(url.toString(),[flowCookie(flow.browser)]);
+  }catch{return error("Chưa thể bắt đầu đăng nhập Google.",503);}
+}
