@@ -20,6 +20,7 @@ jobs:
       - name: Check approved branch, immutable source and durable signing credentials
         shell: bash
         env:
+          GH_TOKEN: ${{ github.token }}
           KEYSTORE_B64: ${{ secrets.SD_TAOBAO_ANDROID_KEYSTORE_B64 }}
           SD_TAOBAO_RELEASE_STORE_PASSWORD: ${{ secrets.SD_TAOBAO_ANDROID_STORE_PASSWORD }}
           SD_TAOBAO_RELEASE_KEY_ALIAS: ${{ secrets.SD_TAOBAO_ANDROID_KEY_ALIAS }}
@@ -35,8 +36,8 @@ jobs:
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           # Reject tags pointing at stale or unrelated commits. The tested,
           # owner-approved branch HEAD must be the exact source being signed.
-          git fetch --no-tags --depth=1 origin refs/heads/feat/product-options-shoes-belts-phone-2026-10-28
-          test "$(git rev-parse FETCH_HEAD)" = "$GITHUB_SHA" || { echo "::error::Release tag is not on current approved feature HEAD"; exit 1; }
+          approved_sha="$(curl -fsS --max-time 20 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/git/ref/heads/feat/product-options-shoes-belts-phone-2026-10-28" | jq -r '.object.sha')"
+          test "$approved_sha" = "$GITHUB_SHA" || { echo "::error::Release tag is not on current approved feature HEAD"; exit 1; }
           for name in KEYSTORE_B64 SD_TAOBAO_RELEASE_STORE_PASSWORD SD_TAOBAO_RELEASE_KEY_ALIAS SD_TAOBAO_RELEASE_KEY_PASSWORD; do
             test -n "${!name}" || { echo "::error::Missing protected signing secret: $name"; exit 1; }
           done
