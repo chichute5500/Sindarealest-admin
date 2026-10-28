@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Nhập ảnh Taobao · SinDarealest Admin</title>
+<style>
+:root { color-scheme:light; --bg:#f1f7fb; --panel:#fff; --ink:#203b4b; --sub:#637888; --border:#cddfea; --primary:#467d99; --dark:#1b556e; --danger:#b03541; --good:#276c54; --glass:rgba(255,255,255,.78);font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#111c24;--panel:#1b2b36;--ink:#e4f2f7;--sub:#a5bfcb;--border:#375361;--primary:#85b8d0;--dark:#a7d4e5;--danger:#f4a6b0;--good:#8bdebc;--glass:rgba(28,46,57,.88)}}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at 15% 0%,rgba(119,187,220,.24),transparent 48%),var(--bg);color:var(--ink)}
+main{max-width:630px;margin:auto;padding:calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 55px)}
+header{display:flex;align-items:center;gap:13px;margin-bottom:20px} .mark{width:49px;height:49px;border:1px solid var(--border);border-radius:18px;display:grid;place-items:center;background:linear-gradient(130deg,rgba(255,255,255,.9),rgba(144,205,225,.4));font-size:24px;color:#265b73}
+small,.muted{color:var(--sub)} h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:0 0 12px}p{font-size:13px;line-height:1.6;margin:6px 0 12px}
+.panel{background:var(--glass);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 8px 30px rgba(18,66,87,.04)}
+label{display:block;font-size:12px;font-weight:650;margin-bottom:6px}input,select,textarea,button{font:inherit;max-width:100%}input:not([type=file]),select,textarea{width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--border);border-radius:11px;padding:12px;margin-bottom:12px;font-size:14px;outline-offset:2px}
+input[type=file]{width:100%;color:var(--ink);font-size:13px}input[type=file]::file-selector-button{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--ink);margin:0 9px 0 0}
+.btn{border:1px solid var(--border);background:var(--panel);color:var(--ink);border-radius:12px;padding:11px 15px;cursor:pointer;font-weight:650;font-size:13px}.btn.primary{color:#fff;background:#3e7895;border-color:#3e7895}.btn:disabled{opacity:.5;cursor:not-allowed}.btn.small{padding:6px 9px;font-size:12px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid>div{min-width:0}
+.status{font-size:13px;line-height:1.5;border-radius:11px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);margin-top:12px;white-space:pre-wrap}.status.bad{color:var(--danger);border-color:var(--danger)}.status.good{color:var(--good)}
+#photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.photo{border:1px solid var(--border);border-radius:13px;background:var(--panel);overflow:hidden}.photo img{width:100%;height:145px;object-fit:contain;background:#e6edf2}.photo .bar{display:flex;align-items:center;gap:4px;padding:7px}.photo .bar span{flex:1;font-size:11px;color:var(--sub);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.photo .bar .btn{padding:6px}.photo .uploaded{display:block;font-size:10px;color:var(--good);padding:0 8px 7px}
+.progress{height:7px;overflow:hidden;border-radius:8px;background:var(--border);margin:11px 0 4px}.progress span{display:block;height:100%;background:var(--primary);width:0;transition:width .2s ease}
+a{color:var(--dark)}#sourceLink{overflow-wrap:anywhere} [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header><div class="mark" aria-hidden="true">◈</div><div><h1>SinDarealest · Nhập ảnh</h1><small>Taobao → Ảnh sản phẩm → Bản nháp Admin</small></div></header>
+<section class="panel" id="loginPanel" hidden>
+<h2>Đăng nhập SinDarealest Admin</h2><p>Đăng nhập quản trị trên chính website SinDarealest. Công cụ không yêu cầu mật khẩu Taobao.</p>
+<form id="loginForm"><label for="adminPassword">Mật khẩu Admin</label><input type="password" id="adminPassword" autocomplete="current-password" required><button class="btn primary" type="submit">Đăng nhập Admin</button></form>
+<div id="loginMsg" class="status" role="status" hidden></div>
+</section>
+<div id="work" hidden>
+<section class="panel"><h2>1. Nguồn sản phẩm</h2><p>Ảnh cần được tải về điện thoại bằng chức năng hợp lệ của trình duyệt hoặc từ nhà cung cấp đã cho phép sử dụng.</p><a id="sourceLink" target="_blank" rel="noopener noreferrer" hidden>Mở link Taobao vừa chia sẻ</a><p class="muted" id="noSource">Chưa nhận được link. Bạn vẫn có thể chọn ảnh đã lưu trên điện thoại.</p></section>
+<section class="panel"><h2>2. Chọn và sắp xếp ảnh</h2><label for="picker">Ảnh gốc JPEG, PNG, WebP · tối đa 20 MB/ảnh · 30 ảnh/sản phẩm</label><input id="picker" type="file" accept="image/jpeg,image/png,image/webp" multiple><p class="muted">Ảnh đầu tiên là ảnh đại diện. Bấm ↑ ↓ để sắp xếp, ✕ để loại khỏi danh sách.</p><div id="photos" aria-live="polite"></div><p id="count" class="muted">Chưa chọn ảnh.</p></section>
+<section class="panel"><h2>3. Thông tin sản phẩm</h2>
+<form id="createForm">
+<label for="title">Tên sản phẩm *</label><input id="title" maxlength="180" placeholder="Ví dụ: Giày lười da cá sấu màu đen" required>
+<label for="category">Danh mục *</label><select id="category" required>
+<option value="">— Chọn danh mục —</option>
+<option value="sneakers">Giày thể thao (Sneaker)</option><option value="loafers">Giày lười</option><option value="dress-shoes">Giày tây</option><option value="belts">Thắt lưng</option><option value="sandals">Dép</option><option value="watch-straps">Dây đồng hồ</option><option value="phone-cases">Ốp điện thoại</option><option value="vi-nam">Ví nam</option><option value="vi-cam-tay">Ví cầm tay</option><option value="cap-tab-laptop">Cặp – Tab – Laptop</option><option value="clutch">Clutch</option><option value="mu">Mũ</option><option value="tui-deo-cheo">Túi đeo chéo</option><option value="tui-golf">Túi golf</option><option value="tui-nu">Túi nữ</option>
+</select>
+<div class="grid"><div><label for="price">Giá bán (VNĐ, có thể để trống)</label><input id="price" type="number" min="0" max="2000000000" step="1" inputmode="numeric" placeholder="Chưa định giá"></div><div><label for="fulfillment">Loại hàng</label><select id="fulfillment"><option value="unclassified">Chưa phân loại</option><option value="made_to_order">Hàng đặt riêng</option><option value="in_stock">Hàng có sẵn</option></select></div></div>
+<label for="description">Mô tả (tuỳ chọn)</label><textarea id="description" rows="3" maxlength="10000" placeholder="Đặc điểm đã được xác minh…"></textarea>
+<div class="status good">✓ Sản phẩm chỉ được tạo ở trạng thái <strong>ẨN / BẢN NHÁP</strong>. Không công khai lên web khi chưa duyệt.</div>
+<div class="progress" aria-hidden="true"><span id="bar"></span></div>
+<div class="actions"><button class="btn primary" id="submit" type="submit">Tải ảnh & tạo bản nháp</button><button class="btn" type="button" id="newDraft" hidden>Bắt đầu sản phẩm khác</button><a href="/admin/" target="_blank" rel="noopener" class="btn" style="text-decoration:none">Mở Admin</a></div>
+<div id="status" class="status" role="status" aria-live="polite" hidden></div>
+</form></section>
+</div>
+<footer><p class="muted">Công cụ chỉ gửi ảnh bạn chủ động chọn lên hệ thống của chính SinDarealest. Không đọc cookie hay mật khẩu Taobao.</p></footer>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const MAX_ORIGINAL = 20 * 1024 * 1024, MAX_DERIVATIVE = 5 * 1024 * 1024;
+const validType = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const STORAGE_KEY = 'sdi-import-v2';
+const DATABASE_NAME = 'sindarealest-import-v2';
+const items = [];
+function newUuid(){if(typeof crypto.randomUUID==='function')return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const x=[...b].map(v=>v.toString(16).padStart(2,'0')).join('');return `${x.slice(0,8)}-${x.slice(8,12)}-${x.slice(12,16)}-${x.slice(16,20)}-${x.slice(20)}`;}
+let busy = false, completed = false, creationAttempted = false;
+let importId = newUuid();
+let dbPromise;
+
+async function request(path, options={}) {
+  const response = await fetch(path, {credentials:'same-origin',cache:'no-store',...options});
+  let data;
+  try { data = await response.json(); } catch { throw Error('Máy chủ trả về dữ liệu không hợp lệ.'); }
+  if (!response.ok || data.ok === false) throw Error(data.error || data.message || `Máy chủ báo lỗi ${response.status}.`);
+  return data;
+}
+function status(value, kind='') { const el=$('status');el.hidden=false;el.textContent=value;el.className='status '+kind; }
+function allowedSource(input) {
+  try { const u=new URL(input),host=u.hostname.toLowerCase();return u.protocol==='https:'&&['taobao.com','tmall.com','tb.cn'].some(d=>host===d||host.endsWith('.'+d)); }
+  catch { return false; }
+}
+function localGet() { try {return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');}catch{return null;} }
+function localSet(value) { try { localStorage.setItem(STORAGE_KEY,JSON.stringify(value)); return true; } catch { return false; } }
+function localClear() { try { localStorage.removeItem(STORAGE_KEY); } catch {} }
+
+// Binary originals stay in the phone's browser storage, never localStorage.
+// IndexedDB transactions must finish before UI reports a file safely stored.
+function openDb() {
+  if (dbPromise) return dbPromise;
+  dbPromise = new Promise(resolve => {
+    try {
+      const req = indexedDB.open(DATABASE_NAME,1);
+      req.onupgradeneeded=()=>{ if(!req.result.objectStoreNames.contains('photos')) req.result.createObjectStore('photos',{keyPath:'key'}); };
+      req.onsuccess=()=>resolve(req.result);
+      req.onerror=()=>resolve(null);
+      req.onblocked=()=>resolve(null);
+    } catch { resolve(null); }
+  });
+  return dbPromise;
+}
+async function photoWrite(value) {
+  const db=await openDb();if(!db)return false;
+  return new Promise(resolve=>{
+    try {const tx=db.transaction('photos','readwrite');tx.objectStore('photos').put(value);tx.oncomplete=()=>resolve(true);tx.onerror=()=>resolve(false);tx.onabort=()=>resolve(false);}
+    catch{resolve(false);}
+  });
+}
+async function photoDelete(key) {
+  const db=await openDb();if(!db)return;
+  return new Promise(resolve=>{
+    try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').delete(key);tx.oncomplete=()=>resolve();tx.onerror=()=>resolve();tx.onabort=()=>resolve();}catch{resolve();}
+  });
+}
+async function photoAll() {
+  const db=await openDb();if(!db)return [];
+  return new Promise(resolve=>{
+    try {const tx=db.transaction('photos','readonly');const req=tx.objectStore('photos').getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>resolve([]);}
+    catch{resolve([]);}
+  });
+}
+async function photoClear() {
+  const db=await openDb();if(!db)return;
+  return new Promise(resolve=>{try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').clear();tx.oncomplete=()=>resolve();tx.onerror=()=>resolve();tx.onabort=()=>resolve();}catch{resolve();}});
+}
+function fields() {return {title:$('title').value,category:$('category').value,price:$('price').value,fulfillment:$('fulfillment').value,description:$('description').value};}
+function persistMeta() {localSet({version:2,importId,completed,creationAttempted,fields:fields(),order:items.map(x=>x.key),source:$('sourceLink').hidden?'':$('sourceLink').href});}
+function applySource(source) {
+  if(source&&source.length<=2200&&allowedSource(source)){$('sourceLink').href=source;$('sourceLink').hidden=false;$('noSource').hidden=true;}
+}
+function lockFields() {
+  for(const id of ['title','category','price','fulfillment','description'])$(id).disabled=busy||creationAttempted||completed;
+  $('picker').disabled=busy||creationAttempted||completed;
+  $('submit').disabled=busy||completed;
+  $('submit').textContent=creationAttempted&&!completed?'Kiểm tra / hoàn tất bản nháp':'Tải ảnh & tạo bản nháp';
+  $('newDraft').hidden=!completed;
+}
+async function restore() {
+  const meta=localGet();
+  const p=new URLSearchParams(location.hash.slice(1));const source=p.get('source');
+  if(location.hash)history.replaceState(null,'',location.pathname+location.search);
+  if(meta?.version===2 && /^[0-9a-f-]{36}$/.test(meta.importId)){
+    importId=meta.importId;completed=Boolean(meta.completed);creationAttempted=Boolean(meta.creationAttempted);
+    for(const [id,v] of Object.entries(meta.fields||{}))if(['title','category','price','fulfillment','description'].includes(id)&&typeof v==='string')$(id).value=v;
+    const entries=await photoAll();const byKey=new Map(entries.map(x=>[x.key,x]));
+    for(const key of meta.order||[]){const x=byKey.get(key);if(!x||!(x.file instanceof Blob))continue;
+      items.push({key:x.key,file:x.file,preview:URL.createObjectURL(x.file),uploaded:x.uploaded||null,name:x.name||x.file.name||'image'});
+    }
+    if(items.length || creationAttempted || completed)status(completed?'Đã khôi phục bản nháp đã tạo.':'Đã khôi phục phiên nhập đang dở và những ảnh đã lưu trên thiết bị.','good');
+    applySource(meta.source);
+  } else await photoClear();
+  if(source)applySource(source);
+  persistMeta();render();lockFields();
+}
+async function checkSession() {
+  try{await request('/api/admin/session');$('work').hidden=false;$('loginPanel').hidden=true;}
+  catch{$('work').hidden=true;$('loginPanel').hidden=false;}
+}
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();const btn=e.submitter;btn.disabled=true;
+  try{await request('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('adminPassword').value})});$('adminPassword').value='';$('loginMsg').hidden=true;await checkSession();}
+  catch(ex){$('loginMsg').hidden=false;$('loginMsg').textContent=ex.message;$('loginMsg').className='status bad';}
+  finally{btn.disabled=false;}
+});
+function render() {
+  const el=$('photos');el.replaceChildren();
+  for(let i=0;i<items.length;i++){
+    const item=items[i],wrap=document.createElement('div'),img=document.createElement('img');wrap.className='photo';img.src=item.preview;img.alt='Ảnh '+(i+1);img.loading='lazy';
+    const bar=document.createElement('div');bar.className='bar';const name=document.createElement('span');name.textContent=(i===0?'★ ':'')+item.name;bar.append(name);
+    for(const [symbol,action,disabled] of [['↑','up',i===0],['↓','down',i===items.length-1],['✕','remove',false]]){
+      const btn=document.createElement('button');btn.type='button';btn.textContent=symbol;btn.className='btn small';btn.disabled=busy||creationAttempted||completed||disabled;btn.setAttribute('aria-label',action+' '+item.name);
+      btn.addEventListener('click',async()=>{
+        if(action==='remove'){URL.revokeObjectURL(item.preview);items.splice(i,1);await photoDelete(item.key);}
+        else{const other=action==='up'?i-1:i+1;[items[i],items[other]]=[items[other],items[i]];}
+        persistMeta();render();
+      });bar.append(btn);
+    }
+    wrap.append(img,bar);if(item.uploaded){const yes=document.createElement('span');yes.className='uploaded';yes.textContent='✓ Đã tải lên';wrap.append(yes);}el.append(wrap);
+  }
+  $('count').textContent=`Đã chọn ${items.length}/30 ảnh`;
+}
+$('picker').addEventListener('change',async e=>{
+  const errors=[];
+  for(const file of Array.from(e.target.files||[])){
+    if(items.length>=30){errors.push('Chỉ chọn tối đa 30 ảnh.');break;}
+    if(!validType.has(file.type)||!file.size||file.size>MAX_ORIGINAL){errors.push(file.name+': chỉ nhận JPEG/PNG/WebP 1–20 MB.');continue;}
+    if(items.some(x=>x.name===file.name&&x.file.size===file.size&&x.file.lastModified===file.lastModified)){errors.push(file.name+': ảnh có thể bị trùng.');continue;}
+    const key=newUuid(),ok=await photoWrite({key,file,name:file.name,uploaded:null});
+    if(!ok){errors.push(file.name+': không lưu được ảnh trên thiết bị. Vui lòng kiểm tra dung lượng hoặc quyền lưu trữ.');continue;}
+    items.push({key,file,name:file.name,preview:URL.createObjectURL(file),uploaded:null});
+  }
+  e.target.value='';persistMeta();render();if(errors.length)status(errors.join('\n'),'bad');
+});
+async function toWebp(file){
+  let bitmap;
+  try{
+    bitmap=await createImageBitmap(file);
+    if(bitmap.width>12000||bitmap.height>12000||bitmap.width*bitmap.height>60000000)throw Error('Độ phân giải ảnh quá lớn; hãy thu nhỏ ảnh trước khi nhập.');
+    let edge=2400;
+    for(let scale=0;scale<4;scale++){
+      const ratio=Math.min(1,edge/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(bitmap.width*ratio));canvas.height=Math.max(1,Math.round(bitmap.height*ratio));
+      const ctx=canvas.getContext('2d',{alpha:false});if(!ctx)throw Error('Không thể tối ưu ảnh trên thiết bị này.');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+      for(const q of [.88,.78,.66]){const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',q));if(blob?.type==='image/webp'&&blob.size>0&&blob.size<=MAX_DERIVATIVE)return blob;}
+      edge=Math.round(edge*.75);
+    }
+    throw Error('Ảnh vượt 5 MB sau tối ưu; giảm kích thước trước khi nhập.');
+  }finally{bitmap?.close?.();}
+}
+function payload() {
+  const title=$('title').value.trim(),category=$('category').value,n=$('price').value.trim(),price=n===''?null:Number(n);
+  if(!title||!category||(n!==''&&(!Number.isSafeInteger(price)||price<0||price>2e9)))throw Error('Tên, danh mục hoặc giá không hợp lệ.');
+  return {importId,title,category,categoryLabel:$('category').selectedOptions[0].textContent,description:$('description').value,price,stock:null,fulfillmentType:$('fulfillment').value,published:false,images:items.map(x=>x.uploaded)};
+}
+async function confirmExisting(body) {
+  const found=await request('/api/admin/import-draft?id='+encodeURIComponent(importId));
+  if(!found.exists)return null;
+  if(found.product?.published!==false)throw Error('Sản phẩm đã đổi trạng thái hoặc không còn là bản nháp; cần kiểm tra Admin.');
+  if(found.product?.title!==body.title)throw Error('Mã nhập đã trùng dữ liệu khác; cần kiểm tra Admin.');
+  return found.product;
+}
+function finish(product) {
+  completed=true;persistMeta();$('bar').style.width='100%';
+  status(`✓ Đã tạo bản nháp ẨN\nSKU: ${product.sku}\nTên: ${product.title}\nHãy mở Admin để kiểm tra trước khi công khai.`, 'good');
+}
+$('createForm').addEventListener('input',()=>{if(!busy&&!creationAttempted)persistMeta();});
+$('createForm').addEventListener('change',()=>{if(!busy&&!creationAttempted)persistMeta();});
+$('createForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(busy||completed)return;
+  if(!items.length){status('Vui lòng chọn ít nhất một ảnh.','bad');return;}
+  let body;
+  try{body=payload();}catch(ex){status(ex.message,'bad');return;}
+  if(!creationAttempted&&!confirm(`Tải ${items.length} ảnh rồi tạo sản phẩm ẨN trên Admin?`))return;
+  busy=true;lockFields();render();
+  try{
+    if(creationAttempted){const found=await confirmExisting(body);if(found){finish(found);return;}}
+    for(let i=0;i<items.length;i++){
+      const item=items[i];
+      if(!item.uploaded){
+        status(`Đang tải ảnh ${i+1}/${items.length}: ${item.name}`);
+        const derivative=await toWebp(item.file),form=new FormData();form.append('file',derivative,'optimized.webp');form.append('original',item.file,item.name);
+        const out=await request('/api/admin/upload',{method:'POST',body:form});
+        if(!/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(out.url||''))throw Error('Máy chủ trả về đường dẫn ảnh không hợp lệ.');
+        item.uploaded=out.url;
+        if(!await photoWrite({key:item.key,file:item.file,name:item.name,uploaded:item.uploaded}))throw Error('Không lưu được tiến trình tải ảnh; cần kiểm tra dung lượng thiết bị.');
+      }
+      $('bar').style.width=(i+1)/items.length*90+'%';
+    }
+    body=payload();creationAttempted=true;persistMeta();lockFields();
+    status('Ảnh đã tải lên. Đang tạo bản nháp…');
+    const result=await request('/api/admin/import-draft',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(result.product?.published!==false)throw Error('Máy chủ không xác nhận bản nháp ẩn; cần kiểm tra Admin.');
+    finish(result.product);
+  }catch(ex){
+    let resolved=false;
+    if(creationAttempted){try{const found=await confirmExisting(body);if(found){finish(found);resolved=true;}}catch{}}
+    if(!resolved){status('Chưa hoàn tất: '+ex.message+'\nTiến trình đã được lưu. Bấm kiểm tra / hoàn tất để tiếp tục an toàn.','bad');
+      if(/phiên đăng nhập|chưa đăng nhập|401/.test(ex.message))checkSession();}
+  }finally{busy=false;lockFields();render();}
+});
+$('newDraft').addEventListener('click',async()=>{
+  if(!completed||busy)return;
+  for(const item of items)URL.revokeObjectURL(item.preview);
+  items.length=0;await photoClear();localClear();importId=newUuid();completed=false;creationAttempted=false;
+  $('createForm').reset();$('sourceLink').hidden=true;$('sourceLink').removeAttribute('href');$('noSource').hidden=false;$('bar').style.width='0';$('status').hidden=true;persistMeta();render();lockFields();
+});
+window.addEventListener('pagehide',()=>{if(!busy)persistMeta();for(const item of items)URL.revokeObjectURL(item.preview);});
+window.addEventListener('pageshow',event=>{if(event.persisted){for(const item of items)item.preview=URL.createObjectURL(item.file);render();}});
+(async()=>{await restore();await checkSession();})();
+
+</script>
+</body>
+</html>

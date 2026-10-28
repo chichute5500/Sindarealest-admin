@@ -1,0 +1,46 @@
+name: SinDarealest Taobao Android isolated compile QA
+# This workflow does not deploy Cloudflare, read production secrets, or publish APKs.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/taobao-import/android/**'
+      - 'tools/taobao-import/web/**'
+      - 'tools/taobao-import/tests/**'
+      - '.github/workflows/taobao-import-android-qa.yml'
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install pinned Android SDK
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+      - name: Compile, lint, run JVM unit tests
+        working-directory: tools/taobao-import/android
+        run: gradle --no-daemon --stacktrace :app:assembleDebug :app:lintDebug
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify importer idempotent draft API tests
+        run: node tools/taobao-import/tests/import-draft.test.mjs
+      - name: SHA-256 verification (CI only, not release distribution)
+        run: sha256sum tools/taobao-import/android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Keep Android CI artifact internal until final validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: taobao-import-android-debug-qa
+          path: tools/taobao-import/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 3
