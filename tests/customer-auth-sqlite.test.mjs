@@ -119,6 +119,15 @@ try{
   assert.equal(count("customer_auth_flows"),9,"blocked attempt did not allocate new D1 state");
   // Preview is a different Pages project. Callback URLs must use its exact host,
   // not hard-code the storefront Production domain.
+  // The project root URL is its Production environment, not branch Preview.
+  const projectProduction="https://sindarealest-admin-preview.pages.dev";
+  const projectRootRequest=await googleStart({request:makeRequest(
+    "/api/customer/auth/google/start","","GET",null,null,projectProduction),env});
+  assert.equal(projectRootRequest.status,503);
+  const emailRoot=await email({request:makeRequest(
+    "/api/customer/auth/email","","POST",{mode:"register",name:"QA",email:"qa@example.test",password:"Password-test-2026!!"},
+    projectProduction,projectProduction),env});
+  assert.equal(emailRoot.status,403,"reject untrusted project Production root before Email processing");
   const previewStart=await googleStart({request:makeRequest(
     "/api/customer/auth/google/start","","GET",null,null,PREVIEW_ORIGIN),env});
   assert.equal(previewStart.status,302);
@@ -128,7 +137,7 @@ try{
   const previewCb=await googleCallback({request:makeRequest(
     "/api/customer/auth/google/callback?code=preview-qa&state="+previewAuthUrl.searchParams.get("state"),
     previewCookie,"GET",null,null,PREVIEW_ORIGIN),env});
-  assert.match(previewCb.headers.get("Location"),/^https:\/\/sindarealest-admin-preview\.pages\.dev\/\?customer_auth=success$/);
+  assert.equal(previewCb.headers.get("Location"),PREVIEW_ORIGIN+"/?customer_auth=success");
   const previewSession=previewCb.headers.get("Set-Cookie").match(/sd_customer_login=[a-f0-9]{64}/)?.[0];
   assert.ok(previewSession);
   assert.equal((await logout({request:makeRequest("/api/customer/logout",previewSession,"POST",null,PREVIEW_ORIGIN,PREVIEW_ORIGIN),env})).status,200);
