@@ -12,7 +12,7 @@ import { onRequestGet as googleCallback } from "../functions/api/customer/auth/g
 import { onRequestPost as email } from "../functions/api/customer/auth/email.js";
 import { onRequestGet as session } from "../functions/api/customer/session.js";
 import { onRequestPost as logout } from "../functions/api/customer/logout.js";
-import { ORIGIN } from "../functions/_customer-auth.js";
+import { ORIGIN,PREVIEW_ORIGIN } from "../functions/_customer-auth.js";
 const db=new DatabaseSync(":memory:");
 db.exec("PRAGMA foreign_keys=ON");
 for(const name of [
@@ -56,8 +56,8 @@ const env={
   GOOGLE_CLIENT_ID:"test-id.apps.googleusercontent.com",
   GOOGLE_CLIENT_SECRET:"disposable-google-secret"
 };
-const makeRequest=(path,cookie="",method="GET",body=null,origin=null)=>
-  new Request(ORIGIN+path,{method,headers:{
+const makeRequest=(path,cookie="",method="GET",body=null,origin=null,base=ORIGIN)=>
+  new Request(base+path,{method,headers:{
     ...(cookie?{Cookie:cookie}:{}),
     ...(origin?{Origin:origin}:{}),
     ...(body?{"Content-Type":"application/json","CF-Connecting-IP":"198.51.100.3"}:{})
@@ -117,12 +117,29 @@ try{
   const blocked=await zaloStart({request:makeRequest("/api/customer/auth/zalo/start"),env});
   assert.equal(blocked.status,429,"must reject repeated OAuth state creation");
   assert.equal(count("customer_auth_flows"),9,"blocked attempt did not allocate new D1 state");
+  // Preview is a different Pages project. Callback URLs must use its exact host,
+  // not hard-code the storefront Production domain.
+  const previewStart=await googleStart({request:makeRequest(
+    "/api/customer/auth/google/start","","GET",null,null,PREVIEW_ORIGIN),env});
+  assert.equal(previewStart.status,302);
+  const previewAuthUrl=new URL(previewStart.headers.get("Location"));
+  assert.equal(previewAuthUrl.searchParams.get("redirect_uri"),PREVIEW_ORIGIN+"/api/customer/auth/google/callback");
+  const previewCookie=previewStart.headers.get("Set-Cookie").split(";")[0];
+  const previewCb=await googleCallback({request:makeRequest(
+    "/api/customer/auth/google/callback?code=preview-qa&state="+previewAuthUrl.searchParams.get("state"),
+    previewCookie,"GET",null,null,PREVIEW_ORIGIN),env});
+  assert.match(previewCb.headers.get("Location"),/^https:\/\/sindarealest-admin-preview\.pages\.dev\/\?customer_auth=success$/);
+  const previewSession=previewCb.headers.get("Set-Cookie").match(/sd_customer_login=[a-f0-9]{64}/)?.[0];
+  assert.ok(previewSession);
+  assert.equal((await logout({request:makeRequest("/api/customer/logout",previewSession,"POST",null,PREVIEW_ORIGIN,PREVIEW_ORIGIN),env})).status,200);
   // Email account is isolated from orders, no email-only claim into customer records.
   const body={mode:"register",name:"Khách Email Thử",email:"qa+mail@example.test",password:"pass_2026!test-safe"};
-  const registered=await email({request:makeRequest("/api/customer/auth/email","","POST",body,ORIGIN),env});
+  const deniedOnProduction=await email({request:makeRequest("/api/customer/auth/email","","POST",body,ORIGIN),env});
+  assert.equal(deniedOnProduction.status,503,"no public Email signup until verification and recovery");
+  const registered=await email({request:makeRequest("/api/customer/auth/email","","POST",body,PREVIEW_ORIGIN,PREVIEW_ORIGIN),env});
   assert.equal(registered.status,201,"actual INSERT with FK and constraints");
   assert.equal(count("customer_auth_accounts"),3);
-  const login=await email({request:makeRequest("/api/customer/auth/email","","POST",{...body,mode:"login"},ORIGIN),env});
+  const login=await email({request:makeRequest("/api/customer/auth/email","","POST",{...body,mode:"login"},PREVIEW_ORIGIN,PREVIEW_ORIGIN),env});
   assert.equal(login.status,200);
   assert.equal(count("customer_auth_sessions"),2);
   assert.equal(count("orders"),0,"never create/claim real customer orders");
