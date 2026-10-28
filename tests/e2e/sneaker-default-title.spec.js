@@ -138,6 +138,20 @@ for(const cfg of [
   await page.locator('#productCategoryToggle').click();
   const grid=page.locator('#productCategoryGrid');
   await expect(grid).toBeVisible();
+  // The dropdown must sit BELOW the whole half-width row, not cover the
+  // adjacent type button: one tap must work even with categories expanded.
+  const nonOverlapping=await page.locator('#pFulfillmentToggle').evaluate((button)=>{
+   const rect=button.getBoundingClientRect(),popup=document.querySelector('#productCategoryGrid').getBoundingClientRect();
+   return popup.top>=rect.bottom-2;
+  });
+  expect(nonOverlapping).toBe(true);
+  await typeButton.click();
+  await expect(typeValue).toHaveValue('in_stock');
+  await expect(grid).toBeHidden();
+  await typeButton.click();
+  await expect(typeValue).toHaveValue('made_to_order');
+  await page.locator('#productCategoryToggle').click();
+  await expect(grid).toBeVisible();
   await expect(grid.locator('[data-category-pick]')).toHaveCount(15);
   await expect(page.locator('#productCategoryToggle')).toHaveAttribute('aria-expanded','true');
   await page.screenshot({path:dir+'/category-table-'+cfg.label+'.png',animations:'disabled'});
