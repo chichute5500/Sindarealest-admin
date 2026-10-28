@@ -10,6 +10,7 @@ on:
       - 'functions/_lib.js'
       - 'migrations/**'
       - 'tests/taobao-import-local-d1-r2.test.mjs'
+      - 'tests/e2e/taobao-import-real-indexeddb.spec.js'
       - 'tools/taobao-import/tests/import-draft.test.mjs'
   workflow_dispatch:
 permissions:
@@ -39,6 +40,22 @@ jobs:
           npm run check
           node tools/taobao-import/tests/import-draft.test.mjs
           node tests/taobao-import-local-d1-r2.test.mjs
+      - name: Exercise real Chromium IndexedDB across reloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo 'SD_OWNER_QA_SYSTEM_CHROME=1' >> "$GITHUB_ENV"
+          else
+            npx playwright install chromium
+          fi
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public >/tmp/taobao-browser-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/admin/taobao-import.html >/dev/null; then break; fi
+            sleep .3
+          done
+          npx playwright test tests/e2e/taobao-import-real-indexeddb.spec.js --config=playwright.owner-gesture.config.js --reporter=list
       - name: Verify nonproduction D1/R2 isolation before deploy
         shell: bash
         env:
