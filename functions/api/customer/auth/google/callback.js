@@ -33,7 +33,9 @@ export async function onRequestGet({request,env}) {
     if(!profileResponse.ok)return fail("profile_rejected");
     const profile=await profileResponse.json();
     if(!profile.sub||profile.email_verified!==true)return fail("profile_invalid");
-    const session=await beginSession(env,"google",String(profile.sub),profile.name,profile.email);
+    let session;
+    try {session=await beginSession(env,"google",String(profile.sub),profile.name,profile.email);}
+    catch {return fail("session_store");}
     return redirect(origin+"/?customer_auth=success",[clearFlow(),sessionCookie(session)]);
   }catch{return fail("callback_error");}
 }
