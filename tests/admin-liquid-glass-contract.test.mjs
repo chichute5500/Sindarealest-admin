@@ -60,24 +60,20 @@ for (const route of [
 assert.equal(adminHtml.split('</style>').length - 1, 1, 'ADMIN must retain one complete style block');
 assert.match(adminHtml, /<html[^>]*lang="vi"/i, 'ADMIN should declare Vietnamese document language');
 
-// Product editor #4: keep SKU verification and AI-assisted copy explicit and accessible.
+// Owner-approved compact product editor: no SKU, stock or visibility input.
 for (const [id, label] of [
-  ['pSku', 'commercial SKU input'],
-  ['pSkuVerified', 'explicit commercial SKU verification checkbox'],
   ['generateDescription', 'AI description suggestion action'],
   ['pDescription', 'editable product description'],
-  ['pPrice', 'optional product price input'],
-  ['pStock', 'optional stock input']
-]) {
-  has(`id="${id}"`, label);
-}
-has('aria-label="Xác nhận SKU thương mại chính thức"', 'clear accessible label for SKU verification');
-has('Sản phẩm mới sẽ tự cấp SKU chính thức theo danh mục sau khi lưu, không cần xác minh thủ công.', 'new products receive an approved verified SKU automatically');
+  ['pPrice', 'optional product price input']
+]) has(`id="${id}"`, label);
+for(const id of ['pSku','pSkuVerified','pStock','pPublished'])
+ assert.ok(!adminHtml.includes('id="'+id+'"'), 'Removed legacy product editor field: '+id);
+has("sku:editing?.sku||'',skuVerified:editing?.skuVerified??true", 'existing SKU remains unchanged');
+has("stock:editing?.stock??null", 'stored stock remains unchanged');
+has("published:editing?.published??true", 'new products default visible; existing status remains');
 has('AI chỉ đề xuất nội dung; hãy kiểm tra và chỉnh sửa trước khi lưu.', 'human review before saving AI-suggested copy');
-has('class="sku-entry-row"', 'SKU and verification controls share a responsive row');
-has('class="product-description-heading"', 'description label and AI action share a heading row');
-has('placeholder="Chưa có giá"', 'missing price is represented as unknown rather than fabricated');
-has('placeholder="Chưa kiểm kê"', 'unknown stock is distinguished from a counted zero');
+has('class="product-description-heading"', 'description and AI action share heading row');
+has('placeholder="Chưa có giá"', 'unknown price is not invented');
 has('aria-label="Nhóm thông tin sản phẩm"', 'product editor tabs have an accessible group label');
 
 // Screen 8 customer cards should be compact on phones without inventing missing totals or profile photos.
@@ -123,7 +119,8 @@ has('data-action="save-claim" data-id="${esc(c.id)}" aria-label="Lưu yêu cầu
 has('Giữ để phóng to, kéo để đổi vị trí, phím Delete để gỡ ảnh.', 'whole-image gallery keyboard and screenreader instructions');
 has('id="galleryTrash" class="gallery-trash" role="region" aria-label="Thả ảnh vào đây để xóa khỏi bộ ảnh"', 'single accessible gallery drop-to-trash zone');
 has("galleryGrid.addEventListener('keydown'", 'keyboard image reorder/remove fallback');
-has('id="pPublished" type="checkbox" aria-label="Hiển thị sản phẩm"', 'published toggle accessible name');
+has('data-toggle-published=', 'publish toggle appears on product card');
+has('role="switch" aria-checked=', 'switch accessible state');
 has('id="showPrices" type="checkbox" aria-label="Hiển thị giá trên website"', 'public price toggle accessible name');
 has('id="welcomeEnabled" type="checkbox" aria-label="Bật lớp phủ chào mừng"', 'welcome overlay toggle accessible name');
 has('id="watermarkEnabled" type="checkbox" aria-label="Bật watermark"', 'watermark toggle accessible name');
@@ -289,17 +286,14 @@ for (const [id, label] of [
   ['productPanelGallery', 'image tab panel'],
   ['productPanelPricing', 'other tab panel']
 ]) has('id="' + id + '"', label);
-has('#productPanelDetails>.formgrid:has(#pPrice):has(#pStock){grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}', 'mobile product price and stock share one compact row');
-has('#productPanelDetails>.formgrid:has(#pPrice):has(#pStock)>.field.span2{grid-column:1/-1}', 'mobile SKU and description fields remain full width above price and stock');
-has('#productPanelDetails #pPrice,#productPanelDetails #pStock{width:100%;min-width:0!important;max-width:100%;font-size:11px}', 'price and stock inputs stay within their mobile grid columns with compact readable placeholders');
-has('id="pPrice" class="control" type="number" min="0" step="1" inputmode="numeric" placeholder="Chưa có giá" title="Để trống nếu chưa có giá"', 'concise price placeholder preserves the full price-entry instruction in its title');
-has('id="pStock" class="control" type="number" min="0" step="1" inputmode="numeric" placeholder="Chưa kiểm kê" title="Để trống nếu chưa kiểm kê"', 'concise stock placeholder preserves the full stock-entry instruction in its title');
+has('#productPanelDetails #pPrice{width:100%;min-width:0!important;max-width:100%;font-size:11px}', 'mobile editor keeps price accessible');
+has('id="pPrice" class="control" type="number" min="0" step="1" inputmode="numeric" placeholder="Chưa có giá" title="Để trống nếu chưa có giá"', 'optional VND price remains');
 has('role="tablist" aria-label="Nhóm thông tin sản phẩm"', 'named product tablist');
 has('role="tabpanel" aria-labelledby="productTabDetails"', 'basic panel relationship');
 has('role="tabpanel" aria-labelledby="productTabGallery" hidden', 'initially hidden image panel');
 has('role="tabpanel" aria-labelledby="productTabPricing" hidden', 'initially hidden other panel');
 assert.ok(adminHtml.indexOf('id="pPrice"') < adminHtml.indexOf('id="productPanelGallery"'), 'price belongs to the basic info panel before the images tab');
-assert.ok(adminHtml.indexOf('id="pStock"') < adminHtml.indexOf('id="productPanelGallery"'), 'stock belongs to the basic info panel before the images tab');
+assert.ok(!adminHtml.includes('id="pStock"'), 'stock entry removed');
 assert.ok(adminHtml.indexOf('id="productPanelGallery"') < adminHtml.indexOf('id="productPanelPricing"'), 'images tab appears before the other tab');
 has("function setProductEditorTab(name,moveFocus=false)", 'shared editor tab state handler');
 has("for(const panel of $$('.editor-tab-panel'))panel.hidden=panel.dataset.productPanel!==name", 'all editor tab panels are iterated without throwing when the editor opens');
@@ -355,8 +349,8 @@ has('#main:has(#searchBox) .toolbar{grid-template-columns:minmax(0,1fr) minmax(0
 has('.activity-log-filters .field:first-child{grid-column:1/-1}', 'activity-log search gets a full-width row on mobile');
 has('.activity-log-filters .field:nth-child(2){grid-column:1}', 'activity filter select remains usable on mobile');
 has('.activity-log-filters .field:nth-child(3){grid-column:2}', 'clear-filters button stays beside the activity select on mobile');
-has('#main .product-table .product-mobile-edit{display:inline-flex;align-items:center;justify-content:center;width:28px;min-width:28px;min-height:28px;height:28px;padding:4px;border-radius:9px}', 'mobile edit action remains a compact touch-friendly control');
-has('aria-label="Sửa sản phẩm: ${esc(p.title)}"', 'mobile edit action retains a product-specific accessible name');
+has('#main .product-table .product-visibility-toggle{min-width:59px;padding:4px 0;min-height:60px}', 'mobile card has large green/red switch');
+has('function toggleProductPublished(button)', 'switch saves via CAS PATCH');
 has('#main:has(#searchBox) #productResultSummary{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}', 'product result live summary remains accessible without consuming a visible row');
 has('#backdrop>.editor>form{display:flex;flex:1 1 0%;flex-direction:column;min-height:0;overflow:hidden}', 'editor form is bounded above sticky actions so short and long tabs remain usable');
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
