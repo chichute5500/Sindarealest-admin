@@ -3,11 +3,10 @@ plugins {
 }
 // Standard Firebase client configuration from Owner's Android registration.
 // These client identifiers are public; service-account credentials are NEVER included.
-import groovy.json.JsonSlurper
 
 def firebaseFile = file('google-services.json')
 if (!firebaseFile.isFile()) throw new GradleException('Missing Android Firebase client config')
-def firebase = new JsonSlurper().parse(firebaseFile)
+def firebase = new groovy.json.JsonSlurper().parse(firebaseFile)
 def nativeClient = firebase.client?.find { it.client_info?.android_client_info?.package_name == 'com.sindarealest.admin' }
 def firebaseAppId = nativeClient?.client_info?.mobilesdk_app_id
 def firebaseSender = firebase.project_info?.project_number
