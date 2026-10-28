@@ -42,7 +42,7 @@ for(const cfg of [
   await expect(page.locator('[data-option-value="43"]')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#sdDetailOption')).toHaveValue('42');
   await expect(page.locator('#detailVariants .sd-product-option-choices')).toHaveCSS('flex-wrap','wrap');
-  // Match the *actual heart icon*, including circular geometry and the original 16px glass blur.
+  // Match the FINAL heart icon Liquid Glass material (22px), plus circular geometry.
   const surfaces=await page.evaluate(()=>{
    const style=node=>{
     const css=getComputedStyle(node),rect=node.getBoundingClientRect();
@@ -59,8 +59,10 @@ for(const cfg of [
    expect(surface.width).toBe(40);
    expect(surface.height).toBe(40);
    expect(surface.radius).toBe('50%');
-   expect(surface.backdrop+' '+surface.webkitBackdrop).toContain('blur(16px)');
+   expect(surface.backdrop).toBe(surfaces.heart.backdrop);
+   expect(surface.backdrop).toContain('blur(22px)');
   }
+  expect(surfaces.idle.backgroundImage).toBe(surfaces.heart.backgroundImage);
   expect(surfaces.idle.background).toBe(surfaces.heart.background);
   expect(surfaces.idle.border).toBe(surfaces.heart.border);
   expect(surfaces.idle.shadow).toBe(surfaces.heart.shadow);
