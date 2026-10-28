@@ -39,9 +39,16 @@ inserted="$(adb shell content insert \
   --bind _display_name:s:sd-import-qa.png \
   --bind mime_type:s:image/png \
   --bind relative_path:s:Pictures/SinDarealest-QA 2>&1)"
-echo "MediaStore test source: created"
+echo "MediaStore QA insert result: $inserted"
 media_uri="$(printf '%s' "$inserted" | sed -n 's/.*\(content:\/\/media\/[^[:space:]]*\).*/\1/p' | tr -d '\r' | head -1)"
-test -n "$media_uri" || { echo "FAIL: synthetic MediaStore image URI was not created" >&2; exit 1; }
+if [ -z "$media_uri" ]; then
+  query="$(adb shell content query --uri content://media/external/images/media \
+    --projection _id:_display_name --where "_display_name='sd-import-qa.png'" 2>&1 || true)"
+  echo "MediaStore QA query: $query"
+  media_id="$(printf '%s' "$query" | sed -n 's/.*_id=\([0-9][0-9]*\).*/\1/p' | head -1)"
+  if [ -n "$media_id" ]; then media_uri="content://media/external/images/media/$media_id"; fi
+fi
+test -n "$media_uri" || { echo "FAIL: synthetic MediaStore URI unavailable" >&2; exit 1; }
 adb shell content write --uri "$media_uri" < /tmp/sd-share-source.png
 adb shell am start -W -a android.intent.action.SEND -t image/png \
   --eu android.intent.extra.STREAM "$media_uri" --grant-read-uri-permission \
