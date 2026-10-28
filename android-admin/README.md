@@ -43,3 +43,9 @@ Hoặc chạy GitHub Actions workflow **Admin Android APK — signed installable
 - Bật Cloud Messaging API v1 trong Firebase/Google Cloud cho project tương ứng, cấu hình quyền cho service account.
 - Test thực tế trên Xiaomi 15 Ultra: đăng nhập một lần; cấp quyền thông báo; gửi đơn thử và bảo hành thử; khóa màn hình/thoát app; kiểm tra push; thử đăng xuất để đảm bảo thiết bị bị thu hồi; sau 10 phút mở lại vẫn còn phiên APK; Chrome vẫn timeout 10 phút.
 - GitHub Actions debug key thay đổi giữa các runner; nếu không cài đè được v1.0.0 thì gỡ bản test cũ trước khi cài v1.1.0. Trước release cần keystore Owner cố định để nâng cấp giữ dữ liệu ứng dụng.
+
+
+## Firebase Android client configuration (Owner registered)
+- `app/google-services.json` supplies the Android client ID, sender ID, project ID and public API key at build time via Gradle; no manual GitHub repository secrets are needed for these client identifiers.
+- FCM client registration was imported from the Owner's google-services.json. The file contains Android app public configuration, not Firebase service-account credentials. Keep all privileged service-account keys in Cloudflare encrypted secrets. Never upload service-account JSON to the repository.
+- Requires Owner to set up server-side FCM service-account secret in the Cloudflare Pages Functions environment, apply D1 migration 0010, deploy, then verify real push on device. Building an APK alone does not activate server delivery.

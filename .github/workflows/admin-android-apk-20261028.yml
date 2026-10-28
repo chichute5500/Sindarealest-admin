@@ -47,11 +47,6 @@ jobs:
           install -m 644 -D public/images/brand-emblem.png android-admin/app/src/main/res/drawable/brand_emblem.png
       - name: Compile installable Android APK
         working-directory: android-admin
-        env:
-          SD_FIREBASE_APP_ID: ${{ secrets.SD_FIREBASE_APP_ID }}
-          SD_FIREBASE_SENDER_ID: ${{ secrets.SD_FIREBASE_SENDER_ID }}
-          SD_FIREBASE_PROJECT_ID: ${{ secrets.SD_FIREBASE_PROJECT_ID }}
-          SD_FIREBASE_API_KEY: ${{ secrets.SD_FIREBASE_API_KEY }}
         run: gradle --no-daemon --stacktrace :app:assembleDebug
       - name: Verify APK signature, package, permissions and HTTPS-only transport
         shell: bash
@@ -67,7 +62,8 @@ jobs:
           mkdir -p artifacts
           cp "$APK" artifacts/SinDarealest-Admin-v1.1.0-Android.apk
           sha256sum artifacts/SinDarealest-Admin-v1.1.0-Android.apk | tee artifacts/SHA256.txt
-          if [ -n "${{ secrets.SD_FIREBASE_APP_ID }}" ]; then echo 'FCM Android client configured' > artifacts/PUSH-STATUS.txt; else echo 'FCM NOT CONFIGURED - needs Firebase client secrets and Cloudflare server credentials; push is not active yet' > artifacts/PUSH-STATUS.txt; fi
+          test -s android-admin/app/google-services.json
+          echo 'Firebase Android client config included. Cloudflare FCM sender and production delivery still require separate verification.' > artifacts/PUSH-STATUS.txt
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" > artifacts/SIGNATURE.txt
       - name: Upload real APK, not a placeholder
         uses: actions/upload-artifact@v4
