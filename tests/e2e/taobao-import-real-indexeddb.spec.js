@@ -80,3 +80,59 @@ test('Taobao importer matches dark mobile without overflow', async ({ browser })
   expect(await page.evaluate(()=>getComputedStyle(document.documentElement).colorScheme)).toBe('dark');
   await ctx.close();
 });
+
+
+test('Taobao link input downloads official API images into the draft gallery',async({page})=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const image=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAALUlEQVR4nGOclmLDQEvARFPTRy0YtWDUglELRi0YtWDUAioCAD2+AXadpnZ5AAAAAElFTkSuQmCC','base64');
+  let queryCount=0,photoCount=0;
+  await page.route('**/api/admin/**',async route=>{
+    const url=new URL(route.request().url());
+    if(url.pathname==='/api/admin/session')return route.fulfill({status:200,json:{ok:true,authenticated:true}});
+    if(url.pathname==='/api/admin/taobao-photos'){
+      queryCount++;
+      const body=route.request().postDataJSON();
+      if(!body.permissionConfirmed||!body.link.includes('123456789'))return route.fulfill({status:400,json:{ok:false,error:'invalid input'}});
+      return route.fulfill({status:200,json:{ok:true,itemId:'123456789',title:'Taobao product',
+        images:[{preview:'https://img.alicdn.com/a.png',ticket:'signed-qa-photo-one'}]}});
+    }
+    if(url.pathname==='/api/admin/taobao-photo'){
+      photoCount++;
+      return route.fulfill({status:200,body:image,contentType:'image/png'});
+    }
+    return route.fulfill({status:404,json:{ok:false,error:'Unmocked'}});
+  });
+  await page.goto('http://127.0.0.1:4173/admin/taobao-import.html');
+  await expect(page.locator('#taobaoLink')).toBeVisible();
+  await expect(page.locator('#autoPhotos')).toBeVisible();
+  await page.locator('#taobaoLink').fill('https://item.taobao.com/item.htm?id=123456789');
+  await page.locator('#autoPhotos').click();
+  await expect(page.locator('#autoStatus')).toContainText('Cần xác nhận quyền sử dụng');
+  expect(queryCount).toBe(0);
+  await page.locator('#photoRights').check();
+  await page.locator('#autoPhotos').click();
+  await expect(page.locator('#autoStatus')).toContainText('Đã tự tải 1 ảnh');
+  await expect(page.locator('.photo')).toHaveCount(1);
+  await expect(page.locator('#title')).toHaveValue('');
+  expect(queryCount).toBe(1);expect(photoCount).toBe(1);
+  await page.reload();
+  await expect(page.locator('#taobaoLink')).toHaveValue('https://item.taobao.com/item.htm?id=123456789');
+  await expect(page.locator('.photo')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+test('Taobao link UI displays missing official API clearly, never claims photos were downloaded',async({page})=>{
+  await page.route('**/api/admin/**',async route=>{
+    const url=new URL(route.request().url());
+    if(url.pathname==='/api/admin/session')return route.fulfill({status:200,json:{ok:true,authenticated:true}});
+    if(url.pathname==='/api/admin/taobao-photos')return route.fulfill({status:503,json:{
+      ok:false,error:'Chưa kết nối API chính thức của Taobao. Cần AppKey/AppSecret.'
+    }});
+    return route.fulfill({status:404,json:{ok:false,error:'Unmocked'}});
+  });
+  await page.goto('http://127.0.0.1:4173/admin/taobao-import.html');
+  await page.locator('#taobaoLink').fill('https://item.taobao.com/item.htm?id=123456789');
+  await page.locator('#photoRights').check();
+  await page.locator('#autoPhotos').click();
+  await expect(page.locator('#autoStatus')).toContainText('Chưa kết nối API chính thức');
+  await expect(page.locator('.photo')).toHaveCount(0);
+});
