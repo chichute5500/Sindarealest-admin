@@ -1457,9 +1457,9 @@ let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, f
 const FAVORITES_STORAGE_KEY='sd-favorites';
 const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history';
 const LOCAL_ADDRESS_KEY='sd-shipping-address';
-const categoryLabels={all:'Tất cả',sneakers:'Sneaker',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví nam','vi-nam':'Ví nam','vi-cam-tay':'Ví cầm tay','cap-tab-laptop':'Cặp – Tab – Laptop',clutch:'Clutch',mu:'Mũ','tui-deo-cheo':'Túi đeo chéo','tui-golf':'Túi golf','tui-nu':'Túi nữ',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
-const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','wallets','vi-nam','vi-cam-tay','sandals','watch-straps','phone-cases','cap-tab-laptop','clutch','mu','tui-deo-cheo','tui-golf','tui-nu'];
-const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vinam","vi-nam":"vinam","vi-cam-tay":"vicamtay","cap-tab-laptop":"caplaptop","clutch":"clutch","mu":"mu","tui-deo-cheo":"tuideocheo","tui-golf":"tuigolf","tui-nu":"tuinu","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung"});function routeSlug(value){const key=String(value||'').trim().toLocaleLowerCase('en');if(Object.prototype.hasOwnProperty.call(productCategoryRouteSlugs,key))return productCategoryRouteSlugs[key];return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
+const categoryLabels={all:'Tất cả',sneakers:'Giày Thể Thao',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví nam','vi-nam':'Ví nam','vi-cam-tay':'Ví cầm tay','cap-tab-laptop':'Cặp – Tab – Laptop',clutch:'Clutch',mu:'Mũ','tui-deo-cheo':'Túi đeo chéo','tui-golf':'Túi golf','tui-nu':'Túi nữ',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
+const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','vi-nam','vi-cam-tay','sandals','watch-straps','phone-cases','cap-tab-laptop','clutch','mu','tui-deo-cheo','tui-golf','tui-nu'];
+const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","giay-the-thao":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vinam","vi-nam":"vinam","vi-cam-tay":"vicamtay","cap-tab-laptop":"caplaptop","clutch":"clutch","mu":"mu","tui-deo-cheo":"tuideocheo","tui-golf":"tuigolf","tui-nu":"tuinu","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung"});function routeSlug(value){const key=String(value||'').trim().toLocaleLowerCase('en');if(Object.prototype.hasOwnProperty.call(productCategoryRouteSlugs,key))return productCategoryRouteSlugs[key];return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const imgPath=x=>String(x||'').replace(/^\.\//,'');
 function dismissToast(){const t=$('#toast');if(t)t.classList.remove('show','toast-detail-context');clearTimeout(toastTimer)}
@@ -1723,7 +1723,8 @@ function renderFilters(){
   // Keep old familiar order; show every new published category automatically.
   const counts=Object.create(null),labels=Object.create(null);
   for(const p of products){
-    const c=String(p.category||'').trim();
+    const raw=String(p.category||'').trim();
+    const c=raw==='giay-the-thao'?'sneakers':raw==='wallets'?'vi-nam':raw;
     if(!c||c==='all')continue;
     counts[c]=(counts[c]||0)+1;
     if(!labels[c])labels[c]=String(p.categoryLabel||categoryLabels[c]||c).trim()||c;
@@ -1731,6 +1732,8 @@ function renderFilters(){
   const extras=Object.keys(counts).filter(c=>!categoryOrder.includes(c))
     .sort((a,b)=>labels[a].localeCompare(labels[b],'vi'));
   const visible=['all',...categoryOrder.filter(c=>c!=='all'&&counts[c]),...extras];
+  if(selectedCategory==='giay-the-thao')selectedCategory='sneakers';
+  if(selectedCategory==='wallets')selectedCategory='vi-nam';
   if(selectedCategory!=='all'&&!counts[selectedCategory])selectedCategory='all';
   // Show the active category in the page itself, not only in the address bar.
   const heading=$('#catalogHeading');
@@ -1753,7 +1756,7 @@ function getFiltered(){
  // Newly created products must appear at the top for ALL and category/search.
  // Use the immutable D1 created_at timestamp, not Admin sort_order or update time.
  const matches=orderedSessionProducts().filter(p=>
-  (selectedCategory==='all'||p.category===selectedCategory)&&
+  (selectedCategory==='all'||(p.category==='giay-the-thao'?'sneakers':p.category==='wallets'?'vi-nam':p.category)===selectedCategory)&&
   // Search both human labels and canonical URL slugs (e.g. sneaker,
   // giaytay, tuideocheo), not only product titles or descriptions.
   (!q||foldSearch((p.title||'')+' '+visibleSku(p)+' '+(p.categoryLabel||'')+' '+(p.category||'')+' '+routeSlug(p.category)+' '+(p.description||'')).includes(q)));
