@@ -9,6 +9,50 @@ concurrency:
   group: sd-full-audit-1028-${{ github.sha }}
   cancel-in-progress: false
 jobs:
+  android-apk:
+    name: Android APK compile, WebView TLS and signature audit (no device grant)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - name: Install SDK and Gradle 8.9
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify secure WebView bridge and manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'MIXED_CONTENT_NEVER_ALLOW' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          grep -Fq 'handler.cancel()' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          grep -Fq 'setWebContentsDebuggingEnabled(false)' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          grep -Fq 'android:usesCleartextTraffic="false"' android-admin/app/src/main/AndroidManifest.xml
+          install -m 644 -D public/images/brand-emblem.png android-admin/app/src/main/res/drawable/brand_emblem.png
+      - name: Compile and verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd android-admin
+          gradle --no-daemon :app:assembleDebug
+          apk=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" | grep -F "package: name='com.sindarealest.admin'"
+          ! "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$apk" | grep -E 'READ_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|CAMERA'
+
   source:
     name: API, SQLite, release configuration, dependency security
     runs-on: ubuntu-latest
@@ -45,8 +89,8 @@ jobs:
           set -euo pipefail
           python3 -m http.server 4173 --bind 127.0.0.1 --directory public > "$RUNNER_TEMP/storefront-browser.log" 2>&1 &
           for i in $(seq 1 60); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep .5; done
-          SD_AUDIT_BASE_URL=http://127.0.0.1:4173 SD_STOREFRONT_TEST_URL=http://127.0.0.1:4173/ \
-            npx playwright test tests/e2e/owner-css-parity-security.spec.js tests/e2e/storefront-welcome-device-theme-20261028.spec.js --config=playwright.owner-gesture.config.js --workers=2 --reporter=list
+          SD_AUDIT_BASE_URL=http://127.0.0.1:4173 SD_STOREFRONT_TEST_URL=http://127.0.0.1:4173/ SD_OPTIONS_BASE_URL=http://127.0.0.1:4173 \
+            npx playwright test tests/e2e/owner-css-parity-security.spec.js tests/e2e/storefront-welcome-device-theme-20261028.spec.js tests/e2e/product-options-mobile-desktop.spec.js --config=playwright.owner-gesture.config.js --workers=2 --reporter=list
       - uses: actions/upload-artifact@v4
         if: always()
         with:
