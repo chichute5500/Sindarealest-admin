@@ -1459,10 +1459,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 .product-mobile-inline-metric:has(.product-quick-editor){white-space:normal!important;flex-wrap:wrap}
 .product-quick-editor:focus-within{box-shadow:0 0 0 2px rgba(88,158,208,.22)}
 
-</style>
 
-
-<style id="adminMobileSyncStyles">
 /* Mobile-only pull-to-refresh: overlay never blocks content or gestures. */
 #adminPullRefresh{position:fixed;top:calc(11px + env(safe-area-inset-top));left:50%;z-index:105;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 28px);padding:9px 15px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font-size:12px;font-weight:700;box-shadow:0 9px 28px #0002;pointer-events:none;opacity:0;transform:translate(-50%,-155%);transition:transform .18s ease,opacity .18s ease;will-change:transform}
 #adminPullRefresh[data-visible="true"]{opacity:1}
@@ -1471,7 +1468,11 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 @keyframes sd-admin-spin{to{transform:rotate(360deg)}}
 @media(min-width:821px){#adminPullRefresh{display:none}}
 @media(prefers-reduced-motion:reduce){#adminPullRefresh{transition:none}#adminPullRefresh[data-loading="true"] .pull-icon{animation:none}}
+
 </style>
+
+
+
 </head>
 <body>
 <header class="topbar"><div class="brand"><img class="brand-logo" src="/images/brand-emblem.png" alt="SinDarealest"><div><h1>SINDAREAL EST</h1><p>Luxury in Every Detail</p></div></div><div class="topright"><span class="badge" id="conn">Đang kiểm tra…</span><button class="btn small" id="adminThemeToggle" type="button" title="Chuyển giao diện sáng/tối">◐ Giao diện</button><button class="btn small" id="notificationToggle" type="button" aria-label="Thông báo" aria-expanded="false" aria-controls="notificationPanel"><svg class="bell-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" fill="currentColor" fill-opacity=".11"/><path d="M10 21h4"/><path d="M2.7 7.4c.2-1.9.9-3.5 2.2-4.7M21.3 7.4c-.2-1.9-.9-3.5-2.2-4.7"/></svg><span>Thông báo </span><span id="notificationCount" class="notif-count hidden" aria-label="Số thông báo chưa đọc">0</span></button><button class="btn small" id="logout" type="button" aria-label="Đăng xuất" title="Đăng xuất" hidden><svg class="logout-power-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><path d="M12 2v10"/></svg></button></div></header><section id="notificationPanel" class="notification-panel hidden" aria-label="Trung tâm thông báo"><div class="panelhead" style="padding:0 0 10px"><h3>Hoạt động gần đây</h3><button class="btn small" id="markNotificationsRead" type="button">Đánh dấu đã đọc</button></div><div id="notificationList" class="tiny muted">Đang tải thông báo…</div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn small" id="enablePush" type="button">Bật thông báo đẩy</button><span id="pushStatus" class="tiny muted" style="align-self:center"></span></div></section>
