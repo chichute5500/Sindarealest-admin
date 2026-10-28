@@ -68,6 +68,12 @@ for(const provider of ["zalo","google"]){
   assert.equal(start.status,302);
   const authorize=new URL(start.headers.get("Location"));
   const state=authorize.searchParams.get("state");
+  const stateHash=await import("../functions/_customer-auth.js").then(m=>m.digest(state));
+  const verifierInDB=DB.flows.get(stateHash)?.verifier;
+  assert.match(verifierInDB,/^[A-Za-z0-9_-]{43}$/);
+  assert.match(verifierInDB,/[A-Z]/);
+  assert.match(verifierInDB,/[a-z]/);
+  assert.match(verifierInDB,/[0-9]/);
   const setCookie=start.headers.get("Set-Cookie");
   const browserCookie=setCookie.split(";")[0];
   assert.ok(state&&browserCookie);
