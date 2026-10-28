@@ -9,6 +9,7 @@ on:
       - 'functions/api/checkout-quote.js'
       - 'functions/_product-options.js'
       - 'tests/product-options-flow.test.mjs'
+      - 'tests/dynamic-product-categories.test.mjs'
       - 'tests/e2e/product-options-mobile-desktop.spec.js'
       - 'tests/e2e/product-options-admin-mobile-desktop.spec.js'
       - 'public/admin/index.html'
