@@ -29,11 +29,18 @@ public final class TaobaoBrowserInstrumentedTest {
         return null;
     }
     @Test public void realWebViewFindsOnlyTrustedVisibleProductImages() throws Exception {
+        // Main product gallery and buyer-review photos share the same CDN.
+        // Scanner must collect only the product gallery even if review photos
+        // are already loaded in the DOM below the product.
         String html="<html><body><h1>SinDarealest QA product fixture</h1>"
-            +"<img data-src='https://img.alicdn.com/qa-shoe-1.jpg'>"
+            +"<div class='product-gallery'><img data-src='https://img.alicdn.com/qa-shoe-1.jpg'>"
             +"<img data-original='https://img.alicdn.com/qa-shoe-2.png'>"
             +"<img data-src='http://img.alicdn.com/unsafe.jpg'>"
-            +"<img data-src='https://evil.example/secret.jpg'></body></html>";
+            +"<img data-src='https://evil.example/secret.jpg'></div>"
+            +"<section class='buyer-review-gallery'><h2>用户评价</h2>"
+            +"<img data-src='https://img.alicdn.com/buyer-review-not-product.jpg'></section>"
+            +"<div class='recommendations'><img data-src='https://img.alicdn.com/other-product.jpg'></div>"
+            +"</body></html>";
         Intent intent=new Intent(ApplicationProvider.getApplicationContext(),TaobaoBrowserActivity.class);
         intent.putExtra("sd_qa_visible_html",html);
         try(ActivityScenario<TaobaoBrowserActivity> scenario=ActivityScenario.launch(intent)){
@@ -60,9 +67,9 @@ public final class TaobaoBrowserInstrumentedTest {
                 Thread.sleep(200);
             }
             Log.i("SD_TAOBAO_QA","Fixture browser URL="+browserUrl.get()+"; scan result="+visible.get());
-            assertTrue("2 allowed CDN image URLs required; URL="+browserUrl.get()+
+            assertTrue("2 product gallery URLs (excluding reviews/recommendations) required; URL="+browserUrl.get()+
                 "; actual scan="+visible.get(),visible.get().contains("2 liên kết ảnh"));
-            Log.i("SD_TAOBAO_QA","PASS fixture: logged-in style product DOM scan returns 2 allowed CDN URLs, no JavaScript bridge");
+            Log.i("SD_TAOBAO_QA","PASS fixture: gallery scanner returns 2 product-only CDN URLs, excludes reviews/recommendations");
         }
     }
     @Test public void probeRealTaobaoProductWithoutOwnerCredentials() throws Exception {
