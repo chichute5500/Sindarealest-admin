@@ -1512,7 +1512,7 @@ function adminSyncRender(){
  adminSyncDirty=false;
 }
 async function syncAdminData(full=false){
- if(adminSyncPromise)return adminSyncPromise;
+ if(adminSyncPromise){if(!full)return adminSyncPromise;try{await adminSyncPromise}catch{}return syncAdminData(true)}
  if(!adminSyncSafe())return false;
  const broad=full||Date.now()-lastAdminFullSync>=45000;
  const names=broad?['orders','logs','customers','warranties','products','settings','paymentQr']:['orders','logs'];
@@ -1547,7 +1547,7 @@ async function syncAdminData(full=false){
    }else failures++;
   }
   lastAdminSync=Date.now();
-  if(broad&&failures===0)lastAdminFullSync=lastAdminSync;
+  if(broad)lastAdminFullSync=lastAdminSync;
   adminSyncRender();
   if(full&&failures)throw Error('Một số dữ liệu chưa được cập nhật. Kiểm tra kết nối rồi thử lại.');
   return failures===0;
