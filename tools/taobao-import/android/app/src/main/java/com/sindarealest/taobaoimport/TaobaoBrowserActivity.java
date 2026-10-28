@@ -131,7 +131,7 @@ public final class TaobaoBrowserActivity extends Activity {
         Button external=button("Chrome");
         nav.addView(external,new LinearLayout.LayoutParams(dp(90),dp(49)));
         root.addView(nav);
-        status=text("Đăng nhập Taobao tại website chính thức, mở sản phẩm rồi bấm Tìm ảnh trang này.",12);
+        status=text("Chrome và trình duyệt tích hợp không dùng chung phiên đăng nhập. Nếu Taobao yêu cầu, hãy đăng nhập tại đây, mở sản phẩm rồi bấm Tìm ảnh trang này.",12);
         status.setPadding(dp(12),dp(8),dp(12),dp(8));
         root.addView(status);
 
@@ -371,6 +371,12 @@ public final class TaobaoBrowserActivity extends Activity {
     @Override public void onBackPressed(){
         if(web!=null&&web.canGoBack()){web.goBack();return;}
         super.onBackPressed();
+    }
+    @Override protected void onPause(){
+        // Persist WebView session cookies without exposing them to the app.
+        // Taobao may still expire or refuse the session at its discretion.
+        CookieManager.getInstance().flush();
+        super.onPause();
     }
     @Override protected void onDestroy(){
         worker.shutdownNow();
