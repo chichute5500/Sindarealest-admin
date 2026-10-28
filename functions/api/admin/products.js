@@ -1,5 +1,5 @@
 import { fail, fromRow, genericDbError, json, productInsertStatement, readJsonBodyLimited, requireAdmin, toAdminProduct, validateProduct } from "../../_lib.js";
-import { officialSkuPrefix, nextSkuForPrefix } from "../../_catalog-sku.js";
+import { officialSkuPrefix, nextSkuForPrefix, defaultSneakerTitle } from "../../_catalog-sku.js";
 
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
@@ -19,6 +19,9 @@ export async function onRequestPost(context) {
   const body = parsedBody.value;
   const prefix=officialSkuPrefix(body?.category||body?.categoryLabel);
   if(!prefix)return fail("Danh mục chưa có tiền tố SKU chính thức. Vui lòng chọn một trong 15 danh mục đã duyệt.",400);
+  // Apply the suggested sneaker name only for new products with an untouched
+  // Admin suggestion or no explicit title. Never overwrite a custom title.
+  const useDefaultSneakerTitle=prefix==='SD-SN'&&(body.autoSneakerTitle===true||!String(body.title??'').trim());
   // New products always receive an official, server-generated SKU.
   // Ignore client-provided SKU/verification flags to prevent accidental duplicates,
   // spoofed commercial SKUs or a new 'SKU chưa xác minh' state.
@@ -26,6 +29,7 @@ export async function onRequestPost(context) {
     const rows=await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(prefix+"%").all();
     body.sku=nextSkuForPrefix(rows.results,prefix);
     body.skuVerified=true;
+    if(useDefaultSneakerTitle)body.title=defaultSneakerTitle(body.sku);
   } catch { return fail("Không thể cấp SKU chính thức. Vui lòng thử lại.",503); }
   const checked = validateProduct(body);
   if (checked.error) return fail(checked.error);
@@ -49,7 +53,9 @@ export async function onRequestPost(context) {
       }
       try {
         const rows=await context.env.DB.prepare("SELECT sku FROM products WHERE sku LIKE ?").bind(prefix+"%").all();
-        p={ ...p,sku:nextSkuForPrefix(rows.results,prefix),skuVerified:true };
+        const nextSku=nextSkuForPrefix(rows.results,prefix);
+        p={ ...p,sku:nextSku,skuVerified:true,
+          ...(useDefaultSneakerTitle?{title:defaultSneakerTitle(nextSku)}:{}) };
       } catch {
         return fail("Không thể đọc lại SKU sau xung đột. Vui lòng thử lại.", 503);
       }
