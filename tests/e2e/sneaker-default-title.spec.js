@@ -74,7 +74,7 @@ for(const cfg of [
   await expect(cardSwitch()).toHaveAttribute('aria-checked','true');
   await expect(cardSwitch()).toContainText('Hiện');
   await expect(page.locator('#main button.product-mobile-edit:visible')).toHaveCount(0);
-  await expect(page.locator('#main .product-table thead th')).not.toContainText(['Tồn kho']);
+  await expect(page.locator('#main .product-table thead')).not.toContainText('Tồn kho');
   expect(await page.locator('#main').innerText()).not.toContain('Chưa kiểm kê');
   await page.screenshot({path:dir+'/card-switch-green-'+cfg.label+'.png',animations:'disabled'});
   await cardSwitch().click();
