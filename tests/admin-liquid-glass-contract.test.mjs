@@ -344,7 +344,7 @@ has('@media(min-width:681px){#backdrop>.editor>.editorhead{padding-top:10px;padd
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'editor content remains scrollable inside its bounded region while not stretching tab rows');
 has('#backdrop{top:70px;bottom:calc(66px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header and above bottom navigation without a dimmed backdrop');
 has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--bg);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
-has('#productEditorTabs{position:sticky;top:0;gap:2px;padding:1px}', 'mobile product editor tabs stick directly below the editor header without covering form fields');
+has('#productEditorTabs{position:sticky;top:0;height:48px;min-height:48px;max-height:48px;gap:3px;padding:4px}', 'mobile product editor tabs stay compact without covering form fields');
 has('.product-editor-tabs{position:sticky;top:0;z-index:3;', 'desktop editor tabs stick at the top of their own scroll viewport without covering gallery headings');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
@@ -363,7 +363,7 @@ has('#main .product-table .product-visibility-toggle{min-width:59px;padding:4px 
 has('function toggleProductPublished(button)', 'switch saves via CAS PATCH');
 has('#main:has(#searchBox) #productResultSummary{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}', 'product result live summary remains accessible without consuming a visible row');
 has('#backdrop>.editor>form{display:flex;flex:1 1 0%;flex-direction:column;min-height:0;overflow:hidden}', 'editor form is bounded above sticky actions so short and long tabs remain usable');
-has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
+has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
 
 has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:52px;width:52px}}', 'thumbnail rail remains touchable on narrow phones');
 has(':root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
@@ -371,7 +371,7 @@ has('role="group" tabindex="0" aria-label="Ảnh ', 'whole-photo keyboard-focusa
 has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('')", 'all supporting images are rendered inside the mobile thumbnail rail');
 
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
-has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
+has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
 has('#backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}', 'mobile editor action footer does not shrink');
 has('@media(max-width:360px){#backdrop>.editor>form>.editorfooter{gap:6px;padding-left:8px;padding-right:8px}', 'narrow-phone gallery actions use a compact single-row footer');
 has('#backdrop>.editor>form>.editorfooter .btn{padding-inline:9px;font-size:10px;white-space:nowrap}', 'narrow-phone gallery action labels remain on one line');
