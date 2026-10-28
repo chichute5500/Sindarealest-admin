@@ -37,11 +37,15 @@ test('Taobao importer persists photos across reload and commits one hidden draft
   await page.goto('http://127.0.0.1:4173/admin/taobao-import.html');
   await expect(page.locator('#picker')).toBeVisible();
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAALUlEQVR4nGOclmLDQEvARFPTRy0YtWDUglELRi0YtWDUglELRi0YtWDUAioCAD2+AXadpnZ5AAAAAElFTkSuQmCC','base64');
+  const png2 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAALUlEQVR4nGOUWxXFQEvARFPTRy0YtWDUglELRi0YtWDUglELRi0YtWDUAioCAErBAWLbgoKrAAAAAElFTkSuQmCC','base64');
   await page.locator('#picker').setInputFiles([
     {name:'sample-one.png',mimeType:'image/png',buffer:png},
-    {name:'sample-two.png',mimeType:'image/png',buffer:png},
+    {name:'sample-two.png',mimeType:'image/png',buffer:png2},
   ]);
   await expect(page.locator('.photo')).toHaveCount(2);
+  await page.locator('#picker').setInputFiles({name:'same-content-different-name.png',mimeType:'image/png',buffer:png});
+  await expect(page.locator('.photo')).toHaveCount(2);
+  await expect(page.locator('#status')).toContainText('ảnh trùng nội dung');
   await page.locator('#title').fill('Giày lười QA lưu trữ thật');
   await page.locator('#category').selectOption('loafers');
   await page.locator('#price').fill('1900000');

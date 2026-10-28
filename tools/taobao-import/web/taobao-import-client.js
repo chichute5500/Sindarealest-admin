@@ -2,6 +2,11 @@
 const $ = id => document.getElementById(id);
 const MAX_ORIGINAL = 20 * 1024 * 1024, MAX_DERIVATIVE = 5 * 1024 * 1024;
 const validType = new Set(['image/jpeg', 'image/png', 'image/webp']);
+async function imageSha256(file){
+  if(!crypto?.subtle?.digest)return ''; // HTTPS supports content SHA-256; opaque offline preview uses metadata fallback.
+  const digest=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());
+  return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+}
 const STORAGE_KEY = 'sdi-import-v2';
 const DATABASE_NAME = 'sindarealest-import-v2';
 const items = [];
@@ -86,7 +91,7 @@ async function restore() {
     for(const [id,v] of Object.entries(meta.fields||{}))if(['title','category','price','fulfillment','description'].includes(id)&&typeof v==='string')$(id).value=v;
     const entries=await photoAll();const byKey=new Map(entries.map(x=>[x.key,x]));
     for(const key of meta.order||[]){const x=byKey.get(key);if(!x||!(x.file instanceof Blob))continue;
-      items.push({key:x.key,file:x.file,preview:URL.createObjectURL(x.file),uploaded:x.uploaded||null,name:x.name||x.file.name||'image'});
+      items.push({key:x.key,file:x.file,preview:URL.createObjectURL(x.file),uploaded:x.uploaded||null,name:x.name||x.file.name||'image',sha256:x.sha256||''});
     }
     if(items.length || creationAttempted || completed)status(completed?'Đã khôi phục bản nháp đã tạo.':'Đã khôi phục phiên nhập đang dở và những ảnh đã lưu trên thiết bị.','good');
     applySource(meta.source);
@@ -127,9 +132,12 @@ $('picker').addEventListener('change',async e=>{
     if(items.length>=30){errors.push('Chỉ chọn tối đa 30 ảnh.');break;}
     if(!validType.has(file.type)||!file.size||file.size>MAX_ORIGINAL){errors.push(file.name+': chỉ nhận JPEG/PNG/WebP 1–20 MB.');continue;}
     if(items.some(x=>x.name===file.name&&x.file.size===file.size&&x.file.lastModified===file.lastModified)){errors.push(file.name+': ảnh có thể bị trùng.');continue;}
-    const key=newUuid(),ok=await photoWrite({key,file,name:file.name,uploaded:null});
+    let sha256='';
+    try{sha256=await imageSha256(file);}catch{errors.push(file.name+': không đọc được dữ liệu ảnh để kiểm tra trùng.');continue;}
+    if(sha256&&items.some(x=>x.sha256===sha256)){errors.push(file.name+': ảnh trùng nội dung, đã bỏ qua.');continue;}
+    const key=newUuid(),ok=await photoWrite({key,file,name:file.name,uploaded:null,sha256});
     if(!ok){errors.push(file.name+': không lưu được ảnh trên thiết bị. Vui lòng kiểm tra dung lượng hoặc quyền lưu trữ.');continue;}
-    items.push({key,file,name:file.name,preview:URL.createObjectURL(file),uploaded:null});
+    items.push({key,file,name:file.name,preview:URL.createObjectURL(file),uploaded:null,sha256});
   }
   e.target.value='';persistMeta();render();if(errors.length)status(errors.join('\n'),'bad');
 });
@@ -184,7 +192,7 @@ $('createForm').addEventListener('submit',async e=>{
         const out=await request('/api/admin/upload',{method:'POST',body:form});
         if(!/^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(out.url||''))throw Error('Máy chủ trả về đường dẫn ảnh không hợp lệ.');
         item.uploaded=out.url;
-        if(!await photoWrite({key:item.key,file:item.file,name:item.name,uploaded:item.uploaded}))throw Error('Không lưu được tiến trình tải ảnh; cần kiểm tra dung lượng thiết bị.');
+        if(!await photoWrite({key:item.key,file:item.file,name:item.name,uploaded:item.uploaded,sha256:item.sha256||''}))throw Error('Không lưu được tiến trình tải ảnh; cần kiểm tra dung lượng thiết bị.');
       }
       $('bar').style.width=(i+1)/items.length*90+'%';
     }
