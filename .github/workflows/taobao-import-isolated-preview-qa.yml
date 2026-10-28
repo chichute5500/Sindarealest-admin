@@ -46,7 +46,7 @@ jobs:
           set -euo pipefail
           npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
           if command -v google-chrome >/dev/null 2>&1; then
-            echo 'SD_OWNER_QA_SYSTEM_CHROME=1' >> "$GITHUB_ENV"
+            export SD_OWNER_QA_SYSTEM_CHROME=1
           else
             npx playwright install chromium
           fi
