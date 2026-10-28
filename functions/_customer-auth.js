@@ -18,6 +18,18 @@ export function randomToken(length=32) {
   crypto.getRandomValues(bytes);
   return Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
 }
+export function randomPkceVerifier() {
+  // Zalo OAuth V4 documents a 43-character verifier containing uppercase,
+  // lowercase and digits. Use 256 bits of browser/worker CSPRNG entropy.
+  for (;;) {
+    const bytes=new Uint8Array(32);
+    crypto.getRandomValues(bytes);
+    let raw="";
+    for(const byte of bytes)raw+=String.fromCharCode(byte);
+    const value=btoa(raw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    if(value.length===43 && /[a-z]/.test(value) && /[A-Z]/.test(value) && /[0-9]/.test(value)) return value;
+  }
+}
 export async function digest(value) {
   return Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",enc.encode(value))),
     b=>b.toString(16).padStart(2,"0")).join("");
@@ -61,7 +73,7 @@ export async function pkce(verifier) {
   return btoa(str).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 }
 export async function startFlow(env,provider) {
-  const state=randomToken(24),verifier=randomToken(32),browser=randomToken(24);
+  const state=randomToken(24),verifier=randomPkceVerifier(),browser=randomToken(24);
   await env.DB.prepare("INSERT INTO customer_auth_flows(state_hash,provider,verifier,browser_hash,expires_at) VALUES(?,?,?,?,?)")
     .bind(await digest(state),provider,verifier,await digest(browser),now()+flowSeconds).run();
   return {state,verifier,browser};
