@@ -36,15 +36,20 @@ class FakeDB {
           const [token,accountId,expires]=args;this.sessions.set(token,{accountId,expires});
         } else if(query.startsWith("DELETE FROM customer_auth_sessions")){
           this.sessions.delete(args[0]);
+        } else if(query.startsWith("DELETE FROM customer_auth_flows")){
+          const [hash,provider,browser,time]=args,flow=this.flows.get(hash);
+          const changed=!!flow&&flow.provider===provider&&flow.browser===browser&&flow.exp>time;
+          if(changed)this.flows.delete(hash);
+          return {success:true,meta:{changes:changed?1:0}};
         } else throw Error("Unhandled run SQL: "+query);
-        return {success:true};
+        return {success:true,meta:{changes:1}};
       },
       first:async()=>{
-        if(query.startsWith("DELETE FROM customer_auth_flows")){
+        if(query.startsWith("SELECT verifier FROM customer_auth_flows")){
           const [hash,provider,browser,time]=args;
           const f=this.flows.get(hash);
           if(!f||f.provider!==provider||f.browser!==browser||f.exp<=time)return null;
-          this.flows.delete(hash);return {verifier:f.verifier};
+          return {verifier:f.verifier};
         }
         if(query.startsWith("SELECT id FROM customer_auth_accounts")){
           const [provider,subject]=args;
