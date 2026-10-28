@@ -1,0 +1,45 @@
+name: One-time AI-assisted catalog descriptions (no deploy)
+
+on:
+  push:
+    branches:
+      - chore/ai-descriptions-catalog-2026-10-28
+    paths:
+      - .github/workflows/apply-ai-descriptions-once.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-d1-description-refresh-2026-10-28
+  cancel-in-progress: false
+
+jobs:
+  update-descriptions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check out isolated owner change
+        uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate generator and isolated tests
+        run: |
+          node --check scripts/ai-product-description-copy.mjs
+          node --check scripts/apply-ai-product-descriptions-production.mjs
+          node tests/ai-product-description-copy.test.mjs
+      - name: Apply description-only update to verified Production D1
+        run: node scripts/apply-ai-product-descriptions-production.mjs
+      - name: Save catalog title and description backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-descriptions-before-2026-10-28
+          path: backup/catalog-descriptions-before-2026-10-28.json
+          if-no-files-found: ignore
+          retention-days: 7
