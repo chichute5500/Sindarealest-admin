@@ -1,0 +1,66 @@
+name: Admin Android APK — signed installable test build
+on:
+  push:
+    branches: [feat/admin-android-apk-2026-10-28]
+    paths:
+      - 'android-admin/**'
+      - 'public/images/brand-emblem.png'
+      - '.github/workflows/admin-android-apk-20261028.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out exact Android source
+        uses: actions/checkout@v4
+      - name: Use JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android platform and build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Verify approved branding and locked HTTPS backend
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s public/images/brand-emblem.png
+          grep -Fq 'https://sindarealest2.pages.dev/admin/' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          grep -Fq 'MIXED_CONTENT_NEVER_ALLOW' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          grep -Fq 'setWebContentsDebuggingEnabled(false)' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          test -f android-admin/app/src/main/res/xml/file_paths.xml
+          install -m 644 -D public/images/brand-emblem.png android-admin/app/src/main/res/drawable/brand_emblem.png
+      - name: Compile installable Android APK
+        working-directory: android-admin
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+      - name: Verify APK signature, package, permissions and HTTPS-only transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=android-admin/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | tee /tmp/admin-apk-badging.txt
+          grep -Fq "package: name='com.sindarealest.admin'" /tmp/admin-apk-badging.txt
+          grep -Fq "sdkVersion:'29'" /tmp/admin-apk-badging.txt
+          ! "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$APK" | grep -E 'READ_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|CAMERA'
+          mkdir -p artifacts
+          cp "$APK" artifacts/SinDarealest-Admin-v1.0.0-Android.apk
+          sha256sum artifacts/SinDarealest-Admin-v1.0.0-Android.apk | tee artifacts/SHA256.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "$APK" > artifacts/SIGNATURE.txt
+      - name: Upload real APK, not a placeholder
+        uses: actions/upload-artifact@v4
+        with:
+          name: SinDarealest-Admin-Android-APK
+          path: artifacts/
+          retention-days: 30
+          if-no-files-found: error
