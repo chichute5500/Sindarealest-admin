@@ -2,12 +2,12 @@
 const enc = new TextEncoder();
 export const ZALO_APP_ID = "3933116436838564742";
 export const ORIGIN = "https://sindarealest2.pages.dev";
-export const PREVIEW_ORIGIN = "https://sindarealest-admin-preview.pages.dev";
+export const PREVIEW_ORIGIN = "https://feat-zalo-customer-login-2026-10-29.sindarealest-admin-preview.pages.dev";
 export const CUSTOMER_COOKIE = "sd_customer_login";
 const FLOW_COOKIE = "sd_customer_oauth";
 const sessionSeconds = 7 * 86400;
 const flowSeconds = 600;
-// Only two explicitly trusted Pages hosts can participate in customer auth.
+// Only the storefront and the exact Cloudflare Pages branch PREVIEW alias can participate in auth.
 // Do not derive redirect URLs from untrusted request Host/X-Forwarded-Host headers.
 export function customerOrigin(request) {
   try {
