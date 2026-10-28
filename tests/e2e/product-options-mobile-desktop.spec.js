@@ -42,14 +42,18 @@ for(const cfg of [
   await expect(page.locator('[data-option-value="43"]')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#sdDetailOption')).toHaveValue('42');
   await expect(page.locator('#detailVariants .sd-product-option-choices')).toHaveCSS('flex-wrap','wrap');
-  // Match the heart's circular lens and blur while compensating for the pale options background.
+  // Inspect the ORIGINAL heart's computed style: its high-specificity !important
+  // rules override the later unified icon gradient. The size chip must use
+  // that restrained real glass material, not added metallic chrome rims.
   const surfaces=await page.evaluate(()=>{
    const style=node=>{
     const css=getComputedStyle(node),rect=node.getBoundingClientRect();
     return {width:rect.width,height:rect.height,radius:css.borderRadius,
      background:css.backgroundColor,border:css.borderTopColor,
      backdrop:css.backdropFilter,webkitBackdrop:css.webkitBackdropFilter,
-     shadow:css.boxShadow,backgroundImage:css.backgroundImage};
+     shadow:css.boxShadow,backgroundImage:css.backgroundImage,
+     before:getComputedStyle(node,'::before').content,
+     after:getComputedStyle(node,'::after').content};
    };
    return {heart:style(document.querySelector('#detailFavorite')),
     idle:style(document.querySelector('[data-option-value="41"]')),
@@ -62,48 +66,25 @@ for(const cfg of [
    expect(surface.backdrop).toBe(surfaces.heart.backdrop);
    expect(surface.backdrop).toContain('blur(22px)');
   }
-  // A 42%-white heart on dark leather looks grey. The same white fill on
-  // the pale detail panel becomes opaque white; the chip needs a smokier
-  // transparent under-tint to reproduce the visible glass, not just CSS parity.
-  expect(surfaces.idle.backgroundImage).toContain('linear-gradient');
-  if(cfg.scheme==='light')expect(surfaces.idle.background).not.toBe(surfaces.heart.background);
-  // In dark theme the translucent base tint may match the heart exactly.
-  expect(surfaces.idle.shadow).not.toBe('none');
-  // Prevent a regression back to flat, smoky discs: both idle and selected
-  // lenses must retain layered refractive gradients, inner rim and specular arc.
-  for(const surface of [surfaces.idle,surfaces.selected]){
-   expect((surface.backgroundImage.match(/radial-gradient/g)||[]).length).toBeGreaterThanOrEqual(2);
-  }
-  const lensDetails=await page.evaluate(()=>{
-   return ['41','42'].map(value=>{
-    const node=document.querySelector('[data-option-value="'+value+'"]');
-    const inner=getComputedStyle(node,'::before');
-    const arc=getComputedStyle(node,'::after');
-    return {
-     innerContent:inner.content,innerBorder:inner.borderTopWidth,
-     arcContent:arc.content,arcBorder:arc.borderTopWidth,
-     arcPointerEvents:arc.pointerEvents,arcRadius:arc.borderRadius
-    };
-   });
-  });
-  for(const lens of lensDetails){
-   expect(lens.innerContent).not.toBe('none');
-   expect(lens.innerBorder).toBe('1px');
-   expect(lens.arcContent).not.toBe('none');
-   expect(lens.arcBorder).toBe('2px');
-   expect(lens.arcPointerEvents).toBe('none');
-   expect(lens.arcRadius).toBe('50%');
-  }
-
-  expect(surfaces.selected.backgroundImage).toContain('linear-gradient');
+  // The idle chip must match the approved heart's thin border + soft inset
+  // shadow exactly; the lighter panel needs only a modest transparent tint.
+  expect(surfaces.idle.shadow).toBe(surfaces.heart.shadow);
+  expect(surfaces.idle.border).toBe(surfaces.heart.border);
+  expect(surfaces.idle.before).toBe('none');
+  expect(surfaces.idle.after).toBe('none');
+  expect(surfaces.selected.before).toBe('none');
+  expect(surfaces.selected.after).toBe('none');
   expect(surfaces.selected.border).not.toBe(surfaces.idle.border);
   expect(surfaces.selected.background).not.toBe(surfaces.idle.background);
   if(cfg.scheme==='light'){
-   expect(surfaces.idle.background).toContain('112, 118, 124');
-   expect(surfaces.selected.background).toContain('104, 129, 147');
+   expect(surfaces.heart.backgroundImage).toBe('none');
+   expect(surfaces.idle.backgroundImage).toContain('radial-gradient');
+   expect(surfaces.idle.background).toContain('99, 128, 148');
+   expect(surfaces.selected.background).toContain('78, 144, 187');
   }else{
-   expect(surfaces.idle.background).toContain('13, 38, 59');
-   expect(surfaces.selected.background).toContain('14, 45, 71');
+   expect(surfaces.idle.backgroundImage).toBe('none');
+   expect(surfaces.idle.background).toBe(surfaces.heart.background);
+   expect(surfaces.selected.background).toContain('42, 99, 139');
   }
     const chipMetrics=await page.locator('#detailVariants .sd-product-option-chip').evaluateAll(nodes=>nodes.map(x=>({
    w:x.getBoundingClientRect().width,h:x.getBoundingClientRect().height,
