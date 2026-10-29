@@ -36,7 +36,11 @@ assert.ok(auth.includes('const GOOGLE_ONLY_RELEASE = true'),"Only Google sign-in
 assert.ok(auth.includes('const emailAvailable=emailEnabled && !GOOGLE_ONLY_RELEASE'),"Email remains hidden even when Preview email flag is enabled");
 assert.ok(html.includes('id="accountOpen"'),"Desktop Account access missing");
 assert.ok(html.includes('id="mobileAccountNav"'),"Mobile Account access missing");
-assert.ok(html.includes('src="/customer-auth-ui.js?v=google-only-20261029"'),"Google-only auth script must be cache-busted");
+assert.ok(html.includes('src="/customer-auth-ui.js?v=account-welcome-20261029"'),"Google-only auth script must be cache-busted");
+assert.ok(html.includes('<div class="account-guest glass" hidden aria-live="polite">'),"Welcome must start hidden before checking login state");
+assert.ok(html.includes('<strong data-account-welcome-name>Chào mừng</strong>'),"Welcome title must be dynamic, not generic prelogin greeting");
+assert.ok(auth.includes('guest.hidden=!active')&&auth.includes('guestWelcome.textContent="Chào mừng "+customerName'),"Welcome appears only after authenticated session, with account name");
+assert.ok(html.includes('<p class="sd-auth-heading">Tài khoản: <span data-auth-user></span></p>'),"Signed panel must not duplicate personalized welcome");
 assert.ok(auth.includes("window.sdAccountBridge?.onAuth(active)"),"OAuth session must trigger cloud-account sync");
 assert.ok(html.includes("if(accountSyncMode==='cloud')"),"Cloud account branch is required");
 assert.ok(!html.includes("Đăng nhập không tự động liên kết đơn hàng cũ; Shop sẽ bổ sung"),"Outdated local-only notice must be removed");

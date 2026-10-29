@@ -8,6 +8,7 @@ if(root){
   const authOptions=q("[data-auth-options]"),signed=q("[data-auth-signed]");
   const emailForm=q("form"),message=q("[data-auth-message]");
   const guest=root.parentElement?.querySelector(".account-guest");
+  const guestWelcome=guest?.querySelector("[data-account-welcome-name]");
   const $name=q("[data-auth-user]"),$provider=q("[data-auth-provider]");
   const notify=(text,kind="error")=>{
     message.textContent=text||"";
@@ -116,9 +117,13 @@ if(root){
       authOptions.hidden=active;signed.hidden=!active;
       // The storefront bridge owns cloud preferences; no password/PII leaves the authenticated API.
       window.sdAccountBridge?.onAuth(active);
-      if(guest)guest.hidden=active;
+      const customerName=String(data.user?.name||"").trim().slice(0,100)||"Khách hàng";
+      if(guest){
+        if(active&&guestWelcome)guestWelcome.textContent="Chào mừng "+customerName;
+        guest.hidden=!active;
+      }
       if(active){
-        $name.textContent=data.user?.name||"Khách hàng";
+        $name.textContent=customerName;
         const names={zalo:"Zalo",google:"Google",facebook:"Facebook",email:"Email"};
         $provider.textContent=names[data.user?.provider]||"Tài khoản";
       }
