@@ -105,11 +105,13 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   const pressed=await press.evaluate(el=>getComputedStyle(el).boxShadow);
   expect(pressed).toContain('inset');
   await page.screenshot({path:`${dir}/${label}-${mode}-pressed.png`,animations:'disabled'});
+  await press.screenshot({path:`${dir}/${label}-${mode}-pressed-chip-crop.png`,animations:'disabled'});
   await page.mouse.up();
   await expect.poll(()=>press.evaluate(el=>getComputedStyle(el).boxShadow)).toBe(atRest);
   const rectAfter=await press.evaluate(el=>{const r=el.getBoundingClientRect();return [r.width,r.height]});
   expect(rectAfter).toEqual(rectAtRest);
   await page.screenshot({path:`${dir}/${label}-${mode}-released.png`,animations:'disabled'});
+  await press.screenshot({path:`${dir}/${label}-${mode}-released-chip-crop.png`,animations:'disabled'});
   // Chromium's touch protocol, not a mouse-only approximation: test actual
   // touchStart (held finger) and touchEnd on both mobile viewport sizes.
   if(width<=390){
@@ -136,6 +138,13 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
       await expect.poll(()=>press.getAttribute('data-sd-glass-press')).toBe('true');
       await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
       await expect.poll(()=>press.getAttribute('data-sd-glass-press')).toBeNull();
+      // A real touch hold followed by scroll must also clear the pressed
+      // attribute even if the browser omits the usual touchend.
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+      await expect.poll(()=>press.getAttribute('data-sd-glass-press')).toBe('true');
+      await page.evaluate(()=>document.dispatchEvent(new Event('scroll')));
+      await expect.poll(()=>press.getAttribute('data-sd-glass-press')).toBeNull();
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
     } finally {
       await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]}).catch(()=>{});
       await cdp.detach();
