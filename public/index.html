@@ -1372,6 +1372,7 @@ html.sd-catalog-route #products .filter-pill{
       </div>
     </section>
       <p id="accountCloudStatus" class="sd-auth-caption" role="status" aria-live="polite">Đăng nhập Google để đồng bộ dữ liệu.</p>
+      <button id="accountImportLocal" type="button" class="pill-btn tap-target" hidden>Chuyển dữ liệu trên thiết bị vào tài khoản</button>
       <button type="button" class="account-action tap-target" id="accountAddressAction" aria-controls="accountAddressView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="address" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><strong>Địa chỉ giao hàng</strong><small id="accountAddressSummary">Chưa lưu địa chỉ trên thiết bị này</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <button type="button" class="account-action tap-target" id="accountOrdersAction" aria-controls="accountOrdersView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="orders" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3.5h12v17l-3-1.8-3 1.8-3-1.8-3 1.8v-17Z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span><span><strong>Đơn hàng của tôi</strong><small><span id="accountOrderCount">0</span> yêu cầu</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <button type="button" class="account-action tap-target" id="accountFavoritesAction" aria-controls="accountFavoritesView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="favorites" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.6 8.8c0 4.4-8.6 10.1-8.6 10.1S3.4 13.2 3.4 8.8A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.6 2.6Z"/></svg></span><span><strong>Sản phẩm yêu thích</strong><small><span id="accountFavoriteCount">0</span> sản phẩm yêu thích</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
@@ -2718,6 +2719,17 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
 }
 
 let accountSyncMode='guest',cloudOrderHistory=[],cloudSyncEpoch=0,cloudFavoriteQueue=Promise.resolve();
+function accountCloudCanImport(){
+ try{
+  const local=JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY)||'[]');
+  const address=JSON.parse(localStorage.getItem(LOCAL_ADDRESS_KEY)||'null');
+  return (Array.isArray(local)&&local.length>0)||!!(address&&address.fullName&&address.phone);
+ }catch{return false}
+}
+function accountCloudImportVisibility(){
+ const node=$('#accountImportLocal');
+ if(node)node.hidden=accountSyncMode!=='cloud'||!accountCloudCanImport();
+}
 function accountCloudMessage(message){
  const node=$('#accountCloudStatus');if(node)node.textContent=message;
 }
@@ -2735,7 +2747,7 @@ async function accountCloudOnAuth(active){
   accountSyncMode='guest';cloudOrderHistory=[];
   loadFavorites();loadLocalShippingAddress();updateDetailFavoriteButton();
   renderFavoriteList();renderOrderHistory();
-  accountCloudMessage('Đăng nhập Google để đồng bộ dữ liệu giữa các thiết bị.');
+  accountCloudMessage('Đăng nhập Google để đồng bộ dữ liệu giữa các thiết bị.');accountCloudImportVisibility();
   return;
  }
  accountSyncMode='loading';accountCloudMessage('Đang đồng bộ tài khoản Google…');
@@ -2748,13 +2760,13 @@ async function accountCloudOnAuth(active){
   localShippingAddress=data.address||null;
   accountSyncMode='cloud';
   updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();
-  accountCloudMessage('Đã kết nối Google. Yêu thích, địa chỉ và đơn hàng được lưu theo tài khoản.');
+  accountCloudMessage('Đã kết nối Google. Yêu thích, địa chỉ và đơn hàng được lưu theo tài khoản.');accountCloudImportVisibility();
   await accountCloudFetchOrders(epoch);
  }catch(e){
   if(epoch!==cloudSyncEpoch)return;
   accountSyncMode='error';favorites=[];localShippingAddress=null;cloudOrderHistory=[];
   updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();renderOrderHistory();
-  accountCloudMessage(e.message||'Không thể đồng bộ. Vui lòng tải lại trang.');
+  accountCloudMessage(e.message||'Không thể đồng bộ. Vui lòng tải lại trang.');accountCloudImportVisibility();
  }
 }
 function accountCloudSaveFavorites(list){
@@ -2779,6 +2791,34 @@ async function accountCloudAttachOrder(orderNumber,orderAccessToken){
   accountCloudMessage('Đã lưu đơn '+orderNumber+' vào tài khoản Google.');
  }catch(e){accountCloudMessage(e.message||'Đơn còn trên thiết bị; chưa đồng bộ được.')}
 }
+$('#accountImportLocal')?.addEventListener('click',async()=>{
+ if(accountSyncMode!=='cloud')return;
+ const button=$('#accountImportLocal');button.disabled=true;
+ accountCloudMessage('Đang nhập dữ liệu từ thiết bị vào tài khoản Google…');
+ try{
+  let list=[];
+  try{list=JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY)||'[]')}catch{}
+  const known=Array.isArray(list)?list.map(x=>findProductByKey(x)).filter(Boolean).map(favoriteKey):[];
+  const merged=[...new Set([...favorites,...known])].slice(0,100);
+  if(merged.length!==favorites.length){
+   const res=await fetch('/api/customer/profile',{method:'PUT',credentials:'same-origin',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'favorites',favorites:merged})});
+   if(!res.ok)throw Error('Không chuyển được sản phẩm yêu thích.');
+  }
+  let saved=null;
+  try{saved=JSON.parse(localStorage.getItem(LOCAL_ADDRESS_KEY)||'null')}catch{}
+  if(!localShippingAddress && saved?.fullName&&saved?.phone&&saved?.provinceCode&&saved?.wardCode&&saved?.streetAddress){
+   const res=await fetch('/api/customer/profile',{method:'PUT',credentials:'same-origin',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'address',address:saved})});
+   if(!res.ok)throw Error('Không chuyển được địa chỉ. Vui lòng mở Địa chỉ giao hàng để lưu lại.');
+  }
+  // Never link old orders automatically: they require explicit ownership proof per order.
+  await accountCloudOnAuth(true);
+  accountCloudMessage('Đã nhập dữ liệu đã chọn vào tài khoản Google. Đơn cũ cần liên kết riêng.');
+ }catch(e){accountCloudMessage(e.message||'Nhập dữ liệu chưa thành công.')}
+ finally{button.disabled=false}
+});
+
 window.sdAccountBridge={onAuth:accountCloudOnAuth};
 window.addEventListener('sd-storefront-ready',()=>{
  if(accountSyncMode==='cloud'){normalizeFavorites();updateAccountAddressSummary();renderOrderHistory();}
