@@ -63,7 +63,7 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   await page.screenshot({path:`${dir}/${label}-${mode}.png`,animations:'disabled'});
   // Physical press contract: make the actual browser hold the button before
   // capture; a CSS declaration alone is not sufficient. Releasing must restore.
-  const press=page.locator('#categoryFilters .filter-pill').first();
+  const press=page.locator('#categoryFilters .filter-pill[aria-pressed="true"]').first();
   await press.scrollIntoViewIfNeeded();
   const box=await press.boundingBox();
   expect(box).not.toBeNull();
