@@ -20,7 +20,7 @@ assert.match(html, /--page:#eaf3fb/, "Light mode must use the reference ice-blue
 assert.match(html, /--card-glass:rgba\(236,246,255,\.78\)/, "Light product cards must have a clearly visible frosted surface.");
 assert.match(html, /--page:#061522/, "Dark mode must use deep navy instead of pure black.");
 assert.match(html, /--card-glass:rgba\(8,27,46,\.86\)/, "Dark product cards must remain distinct from the page background.");
-assert.match(html, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(36,66,91,\.96\)/, "Dark commitment tiles must use layered navy glass.");
+assert.match(html, /--sd-glass-shell-strong:radial-gradient\(ellipse 120% 140% at 25% -40%,rgba\(70,110,143,\.62\)/, "Dark commitment surfaces use the unified translucent navy optical shell.");
 
 const mobileReferenceStart = html.indexOf("/* Mobile proportions tuned against the reference home screen");
 const mobileReferenceEnd = html.indexOf("@media(max-width:360px){", mobileReferenceStart);
