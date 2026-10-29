@@ -27,3 +27,11 @@ test('one final icon material preserves badge, wishlist and bottom navigation',(
  assert.match(html,/@media\(hover:hover\) and \(pointer:fine\)/);
  assert.match(html,/@media\(prefers-reduced-motion:reduce\)/);
 });
+
+test('dark selected controls cannot mask tactile :active material',()=>{
+ assert.ok(html.includes('html.dark #products .filter-pill.active:active:not(:disabled)'));
+ assert.ok(html.includes('html.dark #productOverlay .detail-actions .detail-purchase-button:active:not(:disabled)'));
+ assert.ok(html.includes('html.dark #productOverlay .sd-product-option-chip.is-selected:active:not(:disabled)'));
+ assert.ok(html.includes('box-shadow:var(--sd-3d-depressed)'));
+ assert.ok(html.includes('transition-duration:105ms'));
+});
