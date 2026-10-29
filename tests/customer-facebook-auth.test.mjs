@@ -24,6 +24,8 @@ sqlite.prepare("INSERT INTO customer_auth_sessions(token_hash,account_id,expires
 sqlite.prepare("INSERT INTO customer_auth_flows(state_hash,provider,verifier,browser_hash,expires_at) VALUES(?,?,?,?,?)")
   .run("legacy-state","google","legacy-verifier","legacy-browser",9999999999);
 sqlite.exec(readFileSync(new URL("../migrations/0012_customer_facebook_auth.sql",import.meta.url),"utf8"));
+for(const migration of ["0013_customer_account_cloud.sql","0014_customer_email_verification.sql"])
+ sqlite.exec(readFileSync(new URL("../migrations/"+migration,import.meta.url),"utf8"));
 assert.equal(sqlite.prepare("SELECT provider FROM customer_auth_accounts WHERE id='existing-google-account'").get().provider,"google");
 assert.equal(sqlite.prepare("SELECT account_id FROM customer_auth_sessions WHERE token_hash='legacy-token-hash'").get().account_id,"existing-google-account");
 assert.equal(sqlite.prepare("SELECT provider FROM customer_auth_flows WHERE state_hash='legacy-state'").get().provider,"google");
