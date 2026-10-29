@@ -6,6 +6,10 @@ import { fileURLToPath } from 'node:url';
 export const PROJECT = 'sindarealest-admin-preview';
 export const BRANCH = 'feature-admin-isolated-handoff-2026-10-20';
 export const ALIAS = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/';
+export const APPROVED_PREVIEWS = new Map([
+  ['feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev', BRANCH],
+  ['admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev', 'feat/admin-liquid-glass-2-2026-10-30']
+]);
 const shaValid = value => /^[a-f0-9]{40}$/i.test(String(value || ''));
 const hostOf = value => { try { const url = new URL(value); return url.protocol === 'https:' ? url.hostname.toLowerCase() : null; } catch { return null; } };
 
@@ -28,7 +32,7 @@ export function safeApiErrorCodes(errors) {
 
 export function assessDeployments(deployments, targetAlias = ALIAS, expectedSha = '') {
   const target = hostOf(targetAlias);
-  if (!target || !target.endsWith('.' + PROJECT + '.pages.dev') || !shaValid(expectedSha))
+  if (!target || !APPROVED_PREVIEWS.has(target) || !target.endsWith('.' + PROJECT + '.pages.dev') || !shaValid(expectedSha))
     return { status: 'NOT_VERIFIED_INVALID_TARGET' };
   const matches = sanitizedDeployments(deployments)
     .filter(item => item.environment === 'preview' && item.stage === 'success' && item.aliases.includes(target))
@@ -36,7 +40,7 @@ export function assessDeployments(deployments, targetAlias = ALIAS, expectedSha 
   if (!matches.length) return { status: 'NOT_VERIFIED_ALIAS_UNMAPPED', expectedSha, aliasHost: target };
   const selected = matches[0];
   const details = { expectedSha, observedSha: selected.sha, branch: selected.branch, deploymentId: selected.id, createdOn: selected.createdOn, aliasHost: target, evidenceScope: 'CLOUDFLARE_PAGES_API_REPORTED_DEPLOYMENT_METADATA_ONLY' };
-  if (selected.branch !== BRANCH) return { status: 'NOT_VERIFIED_BRANCH_MISMATCH', ...details };
+  if (selected.branch !== APPROVED_PREVIEWS.get(target)) return { status: 'NOT_VERIFIED_BRANCH_MISMATCH', ...details };
   if (!shaValid(selected.sha)) return { status: 'NOT_VERIFIED_INVALID_COMMIT', ...details };
   return { status: selected.sha.toLowerCase() === expectedSha.toLowerCase() ? 'REPORTED_SHA_MATCH' : 'REPORTED_SHA_MISMATCH', ...details };
 }
@@ -58,7 +62,7 @@ export async function main(env = process.env) {
       }
       else {
         const data = await response.json();
-        result = data?.success === true && Array.isArray(data.result) ? assessDeployments(data.result, ALIAS, sha) : { status: 'NOT_VERIFIED_API_RESPONSE', expectedSha: sha };
+        result = data?.success === true && Array.isArray(data.result) ? assessDeployments(data.result, env.ADMIN_PREVIEW_ALIAS || ALIAS, sha) : { status: 'NOT_VERIFIED_API_RESPONSE', expectedSha: sha };
       }
     } catch (error) { result = { status: 'NOT_VERIFIED_API_REQUEST_FAILED', errorType: error?.name || 'Error', expectedSha: sha }; }
   }

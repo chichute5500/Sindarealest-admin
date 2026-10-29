@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - feature/admin-isolated-handoff-2026-10-20
+      - feat/admin-liquid-glass-2-2026-10-30
     paths:
       - 'public/admin/index.html'
       # Ship tested Admin API fixes as well as UI changes, never a Storefront or main deployment.
@@ -29,6 +30,7 @@ on:
       - 'tests/e2e/admin-wcag-axe.spec.js'
       - 'tests/admin-reference-visual-contract.test.mjs'
       - 'tests/admin-liquid-glass-contract.test.mjs'
+      - 'tests/admin-liquid-glass-2-contract.test.mjs'
 
 permissions:
   contents: read
@@ -47,16 +49,17 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       # Pin this manual workflow to the isolated Admin project; never use the shared storefront variable.
       CLOUDFLARE_PAGES_PROJECT: sindarealest-admin-preview
-      PREVIEW_BRANCH: feature-admin-isolated-handoff-2026-10-20
+      PREVIEW_BRANCH: admin-glass-2026-10-30
+      ADMIN_PREVIEW_ALIAS: https://admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev/admin/
     steps:
       - name: Guard exact feature branch
         shell: bash
         run: |
           set -euo pipefail
-          test "${GITHUB_REF}" = "refs/heads/feature/admin-isolated-handoff-2026-10-20" || {
-            echo "::error::This workflow may only run from the ADMIN feature branch."
-            exit 1
-          }
+          case "${GITHUB_REF}" in
+            refs/heads/feature/admin-isolated-handoff-2026-10-20|refs/heads/feat/admin-liquid-glass-2-2026-10-30) ;;
+            *) echo "::error::This workflow may only run from an approved ADMIN feature branch."; exit 1 ;;
+          esac
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
           test "$CLOUDFLARE_PAGES_PROJECT" = "sindarealest-admin-preview" || {
