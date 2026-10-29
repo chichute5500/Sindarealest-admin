@@ -1,0 +1,45 @@
+name: One-time Production D1 customer-auth schema (Owner PASS)
+on:
+  push:
+    branches:
+      - feat/zalo-customer-login-2026-10-29
+    paths:
+      - '.github/workflows/customer-auth-production-migrate-once.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-customer-auth-migrate-once
+  cancel-in-progress: false
+
+jobs:
+  apply-once:
+    if: github.event.head_commit.message == 'ops(auth): apply one-time Production D1 auth migration after Owner PASS'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GITHUB_REF_TYPE: branch
+      RELEASE_AUTH_ONE_SHOT: owner-pass-google-20261029
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_PAGES_PROJECT: sindarealest2
+      CLOUDFLARE_PAGES_BRANCH: main
+    steps:
+      - name: Checkout exact authorized feature branch
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Wrangler
+        run: npm install --no-audit --no-fund
+      - name: Validate source and regression tests before touching Production D1
+        run: |
+          npm run check
+          npm test
+      - name: Verify exact Production target, Time Travel bookmark and apply additive auth migrations ONCE
+        run: node scripts/migrate-customer-auth-production-once.mjs
+      - name: Migration completion
+        if: success()
+        run: echo "Production D1 migration 0011-0014 applied once and read-only follow-up verified. Main not yet merged." >> "$GITHUB_STEP_SUMMARY"
