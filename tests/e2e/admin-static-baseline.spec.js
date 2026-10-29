@@ -362,15 +362,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const fixtureApiErrors = [];
   const narrowMobile = { width: 320, height: 640 };
   const compactMobile = { width: 360, height: 800 };
-  // Match the reference's usable app area at 390px CSS width, excluding OS bars.
-  const referenceMobile = { width: 390, height: 640 };
   const mobile = { width: 390, height: 844 };
   const desktop = { width: 1280, height: 800 };
   // Audit every fixture module at narrow widths, not only the product/warranty specials.
   const variants = [
     { viewport: narrowMobile, theme: 'light' },
     { viewport: compactMobile, theme: 'light' },
-    { viewport: referenceMobile, theme: 'light' },
     { viewport: mobile, theme: 'light' },
     { viewport: mobile, theme: 'dark' },
     { viewport: desktop, theme: 'light' }
@@ -847,6 +844,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#main .dashboard-activity-table').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
 
     await captureView('dashboard', 'dashboard', null, true);
+    // Capture the dashboard at the reference phone's usable app height without
+    // multiplying that slower viewport across every route in the QA matrix.
+    const referenceDashboardVariant = { viewport: { width: 390, height: 640 }, theme: 'light' };
+    await page.setViewportSize(referenceDashboardVariant.viewport);
+    await chooseTheme(referenceDashboardVariant.theme);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await saveScreenshot('dashboard-reference-viewport', referenceDashboardVariant);
     await captureView('products', 'products', null, true);
 
     // Screen #3 reference matrix: exercise the actual ADMIN product renderer at every
