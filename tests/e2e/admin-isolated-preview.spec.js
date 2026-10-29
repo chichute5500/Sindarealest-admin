@@ -2,7 +2,11 @@ import { test, expect } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const adminUrl = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/'; // Pin all remote QA to the isolated Admin project.
+const adminUrl = process.env.ADMIN_TEST_URL || 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/';
+const approvedAdminPreviewHosts = new Set([
+  'feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev',
+  'admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev'
+]);
 const adminPassword = process.env.ADMIN_TEST_PASSWORD;
 const accessClientId = process.env.CF_ACCESS_CLIENT_ID;
 const accessClientSecret = process.env.CF_ACCESS_CLIENT_SECRET;
@@ -76,7 +80,7 @@ async function openLoginPage(page, testInfo) {
     const previewTargetUrl = new URL(adminUrl);
     if (
       previewTargetUrl.protocol !== 'https:' ||
-      previewTargetUrl.hostname !== 'feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev' ||
+      !approvedAdminPreviewHosts.has(previewTargetUrl.hostname) ||
       previewTargetUrl.pathname !== '/admin/'
     ) {
       throw new Error('unsafe Preview target');
