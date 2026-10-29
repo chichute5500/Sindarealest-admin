@@ -46,7 +46,7 @@ test('one clear face, one masked optical edge and separate depth roles in both t
  assert.match(html,/radial-gradient\(ellipse 100% 47% at 60% 105%/);
  assert.match(html,/--sd-3d-shadow:0 1px 2px/);
  assert.match(html,/--sd-3d-depressed:0 1px 2px/);
- assert.match(html,/--sd-3d-tray-shadow:/);
+ assert.match(html,/--sd-glass-panel-shadow:/);
  assert.match(html,/--sd-3d-selected:/);
  assert.doesNotMatch(html,/--sd-3d-bevel(?:-pressed)?:/);
 });
