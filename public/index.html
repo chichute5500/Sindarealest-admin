@@ -4450,6 +4450,53 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
 .detail-favorite-btn:focus-visible,.close-btn:focus-visible{
  outline:2px solid #4a88b4!important;outline-offset:3px;
 }
+/* Existing checkout/cart/standard controls share the SAME relief tokens.
+   Never style all button elements or force merchant-specific button colors. */
+.pill-btn,.checkout-backlink,.qty-controls button,.cart-bottom .pill-btn,
+.remove-item,.account-action,.checkout-drawer .sd-checkout-option,
+.checkout-drawer .sd-checkout-copy,.checkout-drawer .sd-checkout-qr-actions .pill-btn{
+ border-color:transparent;
+ background:var(--sd-3d-surface);
+ box-shadow:var(--sd-3d-shadow);
+ transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
+}
+.pill-btn.primary,.checkout-drawer .sd-checkout-option.selected,
+.checkout-drawer .sd-checkout-option[aria-checked="true"]{
+ background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);
+ border-color:transparent;
+}
+.pill-btn:active:not(:disabled),.checkout-backlink:active:not(:disabled),
+.qty-controls button:active:not(:disabled),.remove-item:active:not(:disabled),
+.account-action:active:not(:disabled),
+.checkout-drawer .sd-checkout-option:active:not(:disabled),
+.checkout-drawer .sd-checkout-copy:active:not(:disabled){
+ transform:translateY(1px) scale(.99);
+ box-shadow:var(--sd-3d-depressed);
+ transition-duration:105ms;
+}
+@media(hover:hover) and (pointer:fine){
+ .pill-btn:hover:not(:disabled),.qty-controls button:hover:not(:disabled),
+ .account-action:hover:not(:disabled),.checkout-drawer .sd-checkout-option:hover:not(:disabled){
+  box-shadow:var(--sd-3d-shadow);filter:brightness(1.025);
+ }
+}
+.pill-btn:focus-visible,.checkout-backlink:focus-visible,.qty-controls button:focus-visible,
+.remove-item:focus-visible,.account-action:focus-visible,
+.checkout-drawer .sd-checkout-option:focus-visible,
+.checkout-drawer .sd-checkout-copy:focus-visible{
+ outline:2px solid #4a88b4;outline-offset:3px;
+}
+.pill-btn:disabled,.qty-controls button:disabled,
+.checkout-drawer .sd-checkout-option:disabled{
+ opacity:.55;cursor:not-allowed;box-shadow:inset 2px 2px 5px rgba(100,128,157,.13);
+ transform:none;
+}
+@media(prefers-reduced-motion:reduce){
+ .pill-btn,.checkout-backlink,.qty-controls button,.remove-item,.account-action,
+ .checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy,
+ #productOverlay .detail-purchase-button,#productOverlay .sd-product-option-chip,
+ #productOverlay .sd-product-option-control,.sd-cart-select{transition:none!important;animation:none!important}
+}
 /* Existing four-tab bottom nav: recessed glass, rounded soft rim and tactile selection. */
 @media(max-width:760px){
  #mobileBottomNav.mobile-bottom-nav{
@@ -4572,31 +4619,36 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
  --sd-action-rgb:126,177,215;--sd-action-border-rgb:116,171,211;
  display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:0;
  min-height:50px;padding:11px 12px;border-radius:999px;
- border:1px solid rgba(var(--sd-action-border-rgb),.70);
- background:linear-gradient(135deg,rgba(255,255,255,.65),rgba(var(--sd-action-rgb),.30));
- -webkit-backdrop-filter:blur(15px) saturate(145%);
- backdrop-filter:blur(15px) saturate(145%);
- box-shadow:inset 0 1px 0 rgba(255,255,255,.70),0 7px 19px rgba(var(--sd-action-border-rgb),.11);
+ border:1.5px solid transparent;
+ background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(255,255,255,.72),transparent 70%) padding-box,
+  linear-gradient(145deg,rgba(245,251,255,.91),rgba(var(--sd-action-rgb),.28)) padding-box,
+  var(--sd-3d-rim) border-box;
+ -webkit-backdrop-filter:blur(6px) saturate(112%);backdrop-filter:blur(6px) saturate(112%);
+ box-shadow:var(--sd-3d-shadow);
  color:var(--ink);font-size:clamp(10px,1vw,13px);font-weight:700;line-height:1.35;
- white-space:normal;text-align:center;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease
+ white-space:normal;text-align:center;
+ transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
 }
 #productOverlay .detail-actions .detail-buy-now{--sd-action-rgb:242,152,70;--sd-action-border-rgb:215,119,47}
-#productOverlay .detail-actions .detail-purchase-button:hover{
- border-color:rgba(var(--sd-action-border-rgb),.9);
- box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 9px 24px rgba(var(--sd-action-border-rgb),.18);
- transform:translateY(-2px)
+@media(hover:hover) and (pointer:fine){
+ #productOverlay .detail-actions .detail-purchase-button:hover{
+  box-shadow:var(--sd-3d-shadow);filter:brightness(1.035)
+ }
 }
-#productOverlay .detail-actions .detail-purchase-button:active{transform:scale(.985)}
+#productOverlay .detail-actions .detail-purchase-button:active{
+ transform:translateY(1px) scale(.99);box-shadow:var(--sd-3d-depressed);
+ transition-duration:105ms;
+}
 #productOverlay .detail-actions .detail-purchase-button svg{
  width:18px;height:18px;flex:0 0 18px;fill:none;stroke:currentColor;stroke-linecap:round;
  stroke-linejoin:round;stroke-width:1.75
 }
 #productOverlay .detail-actions .detail-purchase-button span{min-width:0}
 html.dark #productOverlay .detail-actions .detail-purchase-button{
- background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(var(--sd-action-rgb),.27));
- border-color:rgba(var(--sd-action-border-rgb),.68);
- box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 7px 19px rgba(0,0,0,.17);
- color:var(--ink)
+ background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(183,216,243,.24),transparent 68%) padding-box,
+ linear-gradient(145deg,rgba(35,63,87,.93),rgba(var(--sd-action-rgb),.24)) padding-box,
+ var(--sd-3d-rim) border-box;
+ border-color:transparent;box-shadow:var(--sd-3d-shadow);color:var(--ink);
 }
 /* Reserve a zero-height insertion point for future variant selectors. */
 #productOverlay .detail-variants[hidden]{display:none}
@@ -4608,71 +4660,53 @@ html.dark #productOverlay .detail-actions .detail-purchase-button{
    material is a single translucent layer, 22px blur and a restrained 1px inset.
    A light smoked tint compensates for the pale options panel behind the sizes.
    Keep this as one scoped rule set; do not change the favorite icon itself. */
+/* Owner-approved geometry & product-option meaning are retained.
+   Same 3D material as the navigation controls, with selected inset depth. */
 #productOverlay .sd-product-option-chip{
  -webkit-appearance:none;appearance:none;
  display:inline-flex;align-items:center;justify-content:center;flex:0 0 40px;
  width:40px;min-width:40px;max-width:40px;height:40px;min-height:40px;max-height:40px;
  aspect-ratio:1;padding:0;margin:0;border-radius:50%;
- border:1px solid rgba(255,255,255,.72);
- background:radial-gradient(110% 90% at 18% 0%,rgba(255,255,255,.25),transparent 62%),rgba(99,128,148,.27);
- -webkit-backdrop-filter:blur(22px) saturate(180%);
- backdrop-filter:blur(22px) saturate(180%);
- box-shadow:0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80);
- color:#142a3c;font:inherit;font-size:13px;font-weight:700;line-height:1;
- cursor:pointer;
- transition:transform .14s cubic-bezier(.2,.7,.2,1),background .14s cubic-bezier(.2,.7,.2,1),border-color .14s cubic-bezier(.2,.7,.2,1),box-shadow .14s cubic-bezier(.2,.7,.2,1)
+ border:1.5px solid transparent;background:var(--sd-3d-surface);
+ -webkit-backdrop-filter:blur(5px) saturate(110%);backdrop-filter:blur(5px) saturate(110%);
+ box-shadow:var(--sd-3d-shadow);color:var(--sd-3d-ink);
+ font:inherit;font-size:13px;font-weight:700;line-height:1;cursor:pointer;
+ transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
 }
 html.dark #productOverlay .sd-product-option-chip{
- color:#eaf3fb;
- border-color:rgba(234,243,251,.28);
- background:rgba(13,38,59,.58);
- box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(234,243,251,.17)
+ color:#eaf3fb;border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow)
 }
 @media(hover:hover) and (pointer:fine){
- #productOverlay .sd-product-option-chip:hover{
-  background:radial-gradient(110% 90% at 18% 0%,rgba(255,255,255,.31),transparent 62%),rgba(99,128,148,.32);
-  border-color:rgba(255,255,255,.84)
- }
- html.dark #productOverlay .sd-product-option-chip:hover{
-  background:rgba(24,62,91,.64);
-  border-color:rgba(234,243,251,.42)
- }
+ #productOverlay .sd-product-option-chip:hover{box-shadow:var(--sd-3d-shadow);filter:brightness(1.025)}
 }
 #productOverlay .sd-product-option-chip:active{
- transform:scale(.97);
- background:rgba(234,243,251,.48);
- box-shadow:inset 0 2px 8px rgba(20,42,60,.14),inset 0 0 0 1px rgba(92,145,185,.35)
+ transform:translateY(1px) scale(.99);box-shadow:var(--sd-3d-depressed);
+ transition-duration:105ms;
 }
-html.dark #productOverlay .sd-product-option-chip:active{
- background:rgba(92,145,185,.20);
- box-shadow:inset 0 2px 8px rgba(0,0,0,.22),inset 0 0 0 1px rgba(92,145,185,.35)
-}
-/* Selected is the same glass lens, slightly blue-tinted; NOT a raised chrome button. */
+html.dark #productOverlay .sd-product-option-chip:active{box-shadow:var(--sd-3d-depressed)}
 #productOverlay .sd-product-option-chip.is-selected{
- color:#102d43;
- border-color:rgba(92,145,185,.85);
- background:radial-gradient(110% 90% at 18% 0%,rgba(255,255,255,.28),transparent 62%),rgba(78,144,187,.32);
- box-shadow:0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80),inset 0 0 0 1px rgba(92,145,185,.25)
+ color:var(--sd-3d-ink);border-color:transparent;background:var(--sd-3d-surface);
+ box-shadow:var(--sd-3d-selected);
 }
 html.dark #productOverlay .sd-product-option-chip.is-selected{
- color:#eaf3fb;
- border-color:rgba(145,202,240,.71);
- background:rgba(42,99,139,.52);
- box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(234,243,251,.17),inset 0 0 0 1px rgba(145,202,240,.19)
+ color:#eaf3fb;border-color:transparent;background:var(--sd-3d-surface);
+ box-shadow:var(--sd-3d-selected);
 }
 #productOverlay .sd-product-option-chip:focus-visible{outline:2px solid var(--sd-icon-press-color);outline-offset:3px}
 #productOverlay .sd-product-option-control{
  display:block;width:100%;max-width:280px;min-width:0;min-height:42px;
- padding:10px 12px;border:1px solid var(--sd-icon-glass-border);border-radius:10px;
- background:var(--sd-icon-glass-bg);color:var(--ink);
- -webkit-backdrop-filter:blur(18px) saturate(165%);backdrop-filter:blur(18px) saturate(165%);
- box-shadow:var(--sd-icon-glass-shadow);
- font:inherit;font-size:14px;outline-offset:3px
+ padding:10px 12px;border:1.5px solid transparent;border-radius:10px;
+ background:var(--sd-3d-surface);color:var(--ink);
+ -webkit-backdrop-filter:blur(5px) saturate(110%);backdrop-filter:blur(5px) saturate(110%);
+ box-shadow:var(--sd-3d-shadow);font:inherit;font-size:14px;outline-offset:3px;
+ transition:box-shadow 180ms var(--sd-3d-ease);
 }
-#productOverlay .sd-product-option-control:focus-visible{outline:2px solid var(--sd-icon-press-color);border-color:var(--sd-icon-press-color)}
+#productOverlay .sd-product-option-control:focus-visible{
+ outline:2px solid var(--sd-icon-press-color);box-shadow:var(--sd-3d-selected);
+}
 #sdDetailOptionMessage{font-size:11px;color:var(--muted)}
 .sd-cart-option{font-size:11px;color:var(--ink);font-weight:750}
-.sd-cart-select{display:block;max-width:100%;margin:6px 0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;color:var(--ink);background:var(--panel);font-size:11px;text-align:left}
+.sd-cart-select{display:block;max-width:100%;margin:6px 0;padding:7px 8px;border:1.5px solid transparent;border-radius:8px;color:var(--ink);background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow);font-size:11px;text-align:left}
 @media(max-width:760px){#productOverlay .detail-variants:not([hidden]){margin:12px 0;padding:10px 11px}#productOverlay .sd-product-option-chip{font-size:13px}#productOverlay .sd-product-option-control{min-height:44px;font-size:16px}}
 @media(prefers-reduced-motion:reduce){#productOverlay .sd-product-option-chip{transition:none}}
 /* Keep contact description, benefit badges and Zalo below all buying actions. */
