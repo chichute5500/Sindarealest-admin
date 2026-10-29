@@ -4367,6 +4367,39 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]::after{
 </style>
 
 
+<script id="sd-glass-touch-press-controller">
+/* A single delegated touch/pointer controller. Never changes business state,
+   prevents no browser events, and clears upon scroll/cancel/blur. */
+(()=>{
+ const targetSelector='#products .filter-pill,#products .search-field,.icon-btn,.mini-add,'+
+  '.page-btn.page-arrow,.slide-controls button,.featured-arrow,.detail-zoom-btn,'+
+  '.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,.sd-fullscreen-share,'+
+  '.detail-favorite-btn,.close-btn,#mobileBottomNav .mobile-tab,.pill-btn,'+
+  '.checkout-backlink,.qty-controls button,.remove-item,.account-action,'+
+  '.checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy,'+
+  '#productOverlay .sd-product-option-chip,#productOverlay .detail-purchase-button';
+ let pressed=null;
+ const release=()=>{if(pressed){pressed.removeAttribute('data-sd-glass-press');pressed=null;}};
+ const down=e=>{
+  if(e.type==='pointerdown' && (e.button!==0||e.isPrimary===false))return;
+  const node=e.target?.nodeType===1?e.target:e.target?.parentElement;
+  const control=node?.closest?.(targetSelector);
+  if(!control||control.disabled||control.getAttribute('aria-disabled')==='true')return;
+  if(pressed!==control)release();
+  pressed=control;pressed.setAttribute('data-sd-glass-press','true');
+ };
+ document.addEventListener('pointerdown',down,{passive:true});
+ document.addEventListener('touchstart',down,{passive:true});
+ document.addEventListener('pointerup',release,{passive:true});
+ document.addEventListener('pointercancel',release,{passive:true});
+ document.addEventListener('touchend',release,{passive:true});
+ document.addEventListener('touchcancel',release,{passive:true});
+ document.addEventListener('touchmove',release,{passive:true});
+ document.addEventListener('scroll',release,true);
+ window.addEventListener('blur',release);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)release()});
+})();
+</script>
 <style id="sd-unified-icon-system-final">
 /* Unified soft 3D glass: raised prismatic rim, shallow recessed center and
    diffused contact shadow. Shadow changes, not only scale, communicate touch. */
@@ -4850,38 +4883,6 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 
 /* Legacy V2–V9 image-based HERO removed (44 KB); current HERO lives in code-hero.css. */
 </style>
-<script id="sd-glass-touch-press-controller">
-/* A single delegated touch/pointer controller. Never changes business state,
-   prevents no browser events, and clears upon scroll/cancel/blur. */
-(()=>{
- const targetSelector='#products .filter-pill,#products .search-field,.icon-btn,.mini-add,'+
-  '.page-btn.page-arrow,.slide-controls button,.featured-arrow,.detail-zoom-btn,'+
-  '.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,.sd-fullscreen-share,'+
-  '.detail-favorite-btn,.close-btn,#mobileBottomNav .mobile-tab,.pill-btn,'+
-  '.checkout-backlink,.qty-controls button,.remove-item,.account-action,'+
-  '.checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy,'+
-  '#productOverlay .sd-product-option-chip,#productOverlay .detail-purchase-button';
- let pressed=null;
- const release=()=>{if(pressed){pressed.removeAttribute('data-sd-glass-press');pressed=null;}};
- const down=e=>{
-  if(e.type==='pointerdown' && (e.button!==0||e.isPrimary===false))return;
-  const node=e.target?.nodeType===1?e.target:e.target?.parentElement;
-  const control=node?.closest?.(targetSelector);
-  if(!control||control.disabled||control.getAttribute('aria-disabled')==='true')return;
-  if(pressed!==control)release();
-  pressed=control;pressed.setAttribute('data-sd-glass-press','true');
- };
- document.addEventListener('pointerdown',down,{passive:true});
- document.addEventListener('touchstart',down,{passive:true});
- document.addEventListener('pointerup',release,{passive:true});
- document.addEventListener('pointercancel',release,{passive:true});
- document.addEventListener('touchend',release,{passive:true});
- document.addEventListener('touchcancel',release,{passive:true});
- document.addEventListener('touchmove',release,{passive:true});
- document.addEventListener('scroll',release,true);
- window.addEventListener('blur',release);
- document.addEventListener('visibilitychange',()=>{if(document.hidden)release()});
-})();
-</script>
+
 </body>
 </html>
