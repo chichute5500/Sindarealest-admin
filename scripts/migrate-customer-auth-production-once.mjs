@@ -45,10 +45,15 @@ async function cloudflareGet(path,account,token){
  return data.result;
 }
 export async function migrateCustomerAuthProductionOnce(){
+ const trustedPush=process.env.GITHUB_EVENT_NAME==="push"&&
+  process.env.GITHUB_REF_NAME===BRANCH&&process.env.GITHUB_REF_TYPE==="branch";
+ const trustedPr=process.env.GITHUB_EVENT_NAME==="pull_request"&&
+  process.env.GITHUB_HEAD_REF===BRANCH&&process.env.GITHUB_BASE_REF==="main"&&
+  process.env.GITHUB_REPOSITORY==="chichute5500/Sindarealest-admin"&&
+  process.env.SD_AUTH_RELEASE_PR==="150";
  if(process.env.RELEASE_AUTH_ONE_SHOT!=="owner-pass-google-20261029"||
-    process.env.GITHUB_REF_NAME!==BRANCH||
-    process.env.GITHUB_REF_TYPE!=="branch")
-  throw Error("Not the explicitly authorized one-time Owner-PASS feature branch");
+    (!trustedPush&&!trustedPr))
+  throw Error("Not the explicitly authorized one-time Owner-PASS feature branch or same-repository PR #150");
  if(process.env.CLOUDFLARE_PAGES_PROJECT!==PROJECT||
     process.env.CLOUDFLARE_PAGES_BRANCH!=="main")
   throw Error("Not the exact Production Pages target");
