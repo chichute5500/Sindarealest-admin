@@ -84,7 +84,7 @@ test('reference-comparable Admin products use labelled synthetic prices and genu
   await page.setViewportSize({width:390,height:844});
   if((await page.locator('html').getAttribute('data-admin-theme'))!=='light')
     await page.locator('#adminThemeToggle').click();
-  await page.locator('#main .product-table [data-action="edit"]').first().click();
+  await page.locator('#main .product-table tbody tr[data-product-row]').first().click();
   await expect(page.locator('#backdrop .editor')).toBeVisible();
   await expect(page.locator('#pTitle')).toHaveValue(fixtureProducts[0].title);
   await page.screenshot({path:join(folder,'04_product_editor_populated_390x844_light.png'),animations:'disabled'});

@@ -348,10 +348,13 @@ has('#productEditorTabs{position:sticky;top:0;height:48px;min-height:48px;max-he
 has('.product-editor-tabs{position:sticky;top:0;z-index:3;', 'desktop editor tabs stick at the top of their own scroll viewport without covering gallery headings');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
+const productListMarkup = adminHtml.match(/function productList\(\)\{[\s\S]*?\nfunction orderProductImageMarkup/)?.[0] || '';
+assert.doesNotMatch(productListMarkup, /data-action="edit"/, 'product rows open the editor without a separate edit button');
+assert.doesNotMatch(productListMarkup, /Tồn kho|Chưa kiểm kê|Hết hàng|stock\(p\)/, 'inventory remains out of the product list');
 has('class="thumb product-thumb-placeholder" role="img" aria-label="Chưa có ảnh sản phẩm"', 'missing product images use an explicitly labelled placeholder, not a generic branded texture');
 has('.product-thumb-placeholder{display:grid;place-items:center;box-sizing:border-box;', 'missing-image placeholder remains a visual, bounded thumbnail');
-has('#main .product-table .product-mobile-inline-meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;align-items:start;margin-top:3px;max-width:100%}', 'mobile product price and stock are grouped compactly beneath product identity');
-has('#main .product-table .product-mobile-inline-metric{display:flex;align-items:baseline;gap:3px;min-width:0;font-size:9px;line-height:1.1;white-space:nowrap}', 'mobile price and stock labels share a single compact baseline');
+has('#main .product-table .product-mobile-inline-meta{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;align-items:start;margin-top:3px;max-width:100%}', 'mobile product price appears beneath product identity without adding inventory');
+has('#main .product-table .product-mobile-inline-metric{display:flex;align-items:baseline;gap:3px;min-width:0;font-size:9px;line-height:1.1;white-space:nowrap}', 'mobile price label remains compact and readable');
 has('#main .product-table .prodname{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}', 'long product titles truncate neatly without increasing mobile card height');
 has('#main .product-table .product-row-info .sku{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}', 'SKU/category context wraps to two lines on 320–360px phones instead of losing its visible tail');
 has('class="prodname" title="${esc(p.title)}"', 'full product titles remain available via a title attribute when visually truncated');

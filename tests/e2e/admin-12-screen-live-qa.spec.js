@@ -112,9 +112,9 @@ for (const {width,height,theme} of matrix) {
       }
       await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='products');if(!nav)throw new Error('Products navigation missing');nav.click()});
       await page.waitForTimeout(400);
-      const button=page.locator('.tablewrap table tbody tr button[data-action="edit"]:visible').first();
-      if(await button.count()){
-        await button.click();
+      const row=page.locator('.tablewrap table tbody tr[data-product-row]:visible').first();
+      if(await row.count()){
+        await row.click();
         await expect(page.locator('#backdrop')).toBeVisible();
         await shot('04_product_editor','#backdrop');
         await page.locator('#productTabGallery').click();

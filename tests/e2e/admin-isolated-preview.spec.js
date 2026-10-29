@@ -472,9 +472,8 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await page.locator('#searchBox').fill(target.sku);
     await expect(rows).toHaveCount(1);
     stage('opening-product-editor');
-    // Each product row renders a desktop edit button and a mobile edit button;
-    // select the visible one so Playwright does not wait on the hidden responsive variant.
-    await rows.first().locator('button[data-action="edit"]:visible').first().click();
+    // Product rows open the editor on row activation; no separate edit button is rendered.
+    await rows.first().click();
     stage('product-editor-click-completed');
     await expect(page.locator('#backdrop')).toBeVisible();
     await expect(page.locator('#pId')).toHaveValue(target.id);
