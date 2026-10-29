@@ -1,91 +1,101 @@
+// Disposable real SQLite email E2E: Mailjet API is mocked, no real customer email is sent.
 import assert from "node:assert/strict";
+import {DatabaseSync} from "node:sqlite";
+import {readFileSync} from "node:fs";
 import {onRequestPost as emailAuth} from "../functions/api/customer/auth/email.js";
+import {onRequestGet as verifyLink} from "../functions/api/customer/auth/email/verify.js";
 import {onRequestGet as getSession} from "../functions/api/customer/session.js";
 import {onRequestPost as logout} from "../functions/api/customer/logout.js";
-import {PREVIEW_ORIGIN as ORIGIN} from "../functions/_customer-auth.js";
-
-class FakeDB {
-  constructor(){this.accounts=new Map();this.sessions=new Map();this.limits=new Map();}
-  prepare(sql){
-    return {bind:(...args)=>({
-      run:async()=>{
-        if(sql.startsWith("INSERT INTO customer_auth_accounts")){
-          const [id,email,name,listedEmail,salt,hash]=args;
-          if(this.accounts.has(email))throw Error("unique");
-          this.accounts.set(email,{id,provider:"email",display_name:name,email:listedEmail,password_salt:salt,password_hash:hash});
-        }else if(sql.startsWith("INSERT INTO customer_auth_sessions")){
-          const [key,id,expires]=args;this.sessions.set(key,{id,expires});
-        }else if(sql.startsWith("DELETE FROM customer_auth_sessions")){
-          this.sessions.delete(args[0]);
-        }else if(sql.startsWith("DELETE FROM public_rate_limits")){ /* noop */ }
-        else throw Error("Unsupported run: "+sql);
-        return {success:true};
-      },
-      first:async()=>{
-        if(sql.startsWith("SELECT id,password_salt,password_hash FROM customer_auth_accounts")){
-          const a=this.accounts.get(args[0]);return a||null;
-        }
-        if(sql.startsWith("SELECT a.id,a.provider,a.display_name,a.email FROM customer_auth_sessions")){
-          const [hash,now]=args,s=this.sessions.get(hash);
-          if(!s||s.expires<=now)return null;
-          return [...this.accounts.values()].find(a=>a.id===s.id)||null;
-        }
-        throw Error("Unsupported first: "+sql);
-      }
-    })};
-  }
-  async batch(statements){
-    const insert=statements[0],lookup=statements[1];
-    if(!insert||!lookup)throw Error("batch contract");
-    // Fake limiter is intentionally strict: test 6 failed login attempts then block next.
-    this.attempts=(this.attempts||0)+1;
-    return [{success:true},{results:[{attempts:this.attempts}]}];
-  }
-}
-const DB=new FakeDB(),env={DB,SESSION_SECRET:"s".repeat(48)};
-const req=(payload,origin=ORIGIN)=>new Request(ORIGIN+"/api/customer/auth/email",{
-  method:"POST",headers:{"Content-Type":"application/json",Origin:origin,"CF-Connecting-IP":"192.0.2.3"},
-  body:JSON.stringify(payload)
-});
-const signup={mode:"register",name:"Khách Thử",email:"buyer@example.test",password:"Abc123!"};
-const crossSite=await emailAuth({request:req(signup,"https://evil.example"),env});
-assert.equal(crossSite.status,403);
-// Production must reject unverified-email self-service even with valid credentials.
-const productionSignup=await emailAuth({request:new Request("https://sindarealest2.pages.dev/api/customer/auth/email",{
-  method:"POST",headers:{"Content-Type":"application/json",Origin:"https://sindarealest2.pages.dev"},
-  body:JSON.stringify(signup)
-}),env});
-assert.equal(productionSignup.status,503);
-for (const password of ["123","123456"]){
-  const bad=await emailAuth({request:req({...signup,password}),env});
-  assert.equal(bad.status,400,"Passwords shorter than 7 chars must be rejected");
-  assert.match((await bad.json()).error,/tối thiểu 7 ký tự/);
-}
-const signed=await emailAuth({request:req(signup),env});
-assert.equal(signed.status,201);
-const tokenCookie=(signed.headers.get("Set-Cookie")||"").match(/sd_customer_login=[a-f0-9]{64}/)?.[0];
-assert.ok(tokenCookie);
-const session=await getSession({request:new Request(ORIGIN+"/api/customer/session",{headers:{Cookie:tokenCookie}}),env});
-const data=await session.json();
-assert.equal(data.authenticated,true);
-assert.equal(data.user.provider,"email");
-assert.equal(data.user.email,"buyer@example.test");
-const duplicate=await emailAuth({request:req(signup),env});
-assert.equal(duplicate.status,409);
-const wrong=await emailAuth({request:req({...signup,mode:"login",password:"NotTheSamePassword!2026"}),env});
-assert.equal(wrong.status,401);
-const correct=await emailAuth({request:req({...signup,mode:"login"}),env});
-assert.equal(correct.status,200);
-const logoutBad=await logout({request:new Request(ORIGIN+"/api/customer/logout",{method:"POST",headers:{Origin:"https://evil.example",Cookie:tokenCookie}}),env});
-assert.equal(logoutBad.status,403);
-const logoutGood=await logout({request:new Request(ORIGIN+"/api/customer/logout",{method:"POST",headers:{Origin:ORIGIN,Cookie:tokenCookie}}),env});
-assert.equal(logoutGood.status,200);
-const after=await getSession({request:new Request(ORIGIN+"/api/customer/session",{headers:{Cookie:tokenCookie}}),env});
-assert.equal((await after.json()).authenticated,false);
-// Separate rate-limit fixture ensures a long existing password remains valid,
-// without sharing this fake limiter's global attempt counter across test cases.
-const legacyEnv={...env,DB:new FakeDB()};
-const legacy={...signup,email:"buyer-long@example.test",password:"NewPass-Secure!2026"};
-assert.equal((await emailAuth({request:req(legacy),env:legacyEnv})).status,201);
-assert.equal((await emailAuth({request:req({...legacy,mode:"login"}),env:legacyEnv})).status,200);
-console.log("Email auth register/login, password, logout, CSRF and no auto order linking PASS");
+import {PREVIEW_ORIGIN as ORIGIN,ORIGIN as PRODUCTION} from "../functions/_customer-auth.js";
+const sqlite=new DatabaseSync(":memory:");
+sqlite.exec("PRAGMA foreign_keys=ON");
+for(const name of [
+"0001_schema.sql","0003_storefront_operations.sql","0004_admin_notifications.sql",
+"0005_address_warranty_verification.sql","0006_remove_warranty_otp.sql",
+"0007_order_contact_details.sql","0008_product_sku_verification.sql",
+"0009_fulfillment_and_manual_payments.sql","0010_admin_android_devices.sql",
+"0011_customer_auth.sql","0012_customer_facebook_auth.sql",
+"0013_customer_account_cloud.sql","0014_customer_email_verification.sql"])
+ sqlite.exec(readFileSync(new URL("../migrations/"+name,import.meta.url),"utf8"));
+const DB={
+ prepare(sql){
+  let args=[];
+  return {
+   bind(...values){args=values;return this},
+   async first(){return sqlite.prepare(sql).get(...args)??null},
+   async all(){return {results:sqlite.prepare(sql).all(...args)}},
+   async run(){const r=sqlite.prepare(sql).run(...args);return {success:true,meta:{changes:Number(r.changes)}}},
+   _batch(){if(/^\s*SELECT\b/i.test(sql))return {results:sqlite.prepare(sql).all(...args)};
+    const r=sqlite.prepare(sql).run(...args);return {success:true,meta:{changes:Number(r.changes)}}}
+  };
+ },
+ async batch(statements){
+  sqlite.exec("BEGIN IMMEDIATE");
+  try{const output=statements.map(s=>s._batch());sqlite.exec("COMMIT");return output}
+  catch(e){sqlite.exec("ROLLBACK");throw e}
+ }
+};
+const env={DB,SESSION_SECRET:"test-secret-only-".repeat(5),MAILJET_API_KEY:"test-mailjet-key",
+ MAILJET_SECRET_KEY:"test-mailjet-secret",MAILJET_FROM_EMAIL:"sender@example.test"};
+const req=(data,base=ORIGIN,origin=base)=>new Request(base+"/api/customer/auth/email",{
+ method:"POST",headers:{Origin:origin,"Content-Type":"application/json","CF-Connecting-IP":"192.0.2.31"},
+ body:JSON.stringify(data)});
+const mail=[];
+const originalFetch=globalThis.fetch;
+globalThis.fetch=async(url,init)=>{
+ assert.equal(String(url),"https://api.mailjet.com/v3.1/send");
+ assert.equal(init?.method,"POST");
+ assert.match(init?.headers?.get("Authorization")||"",/^Basic /);
+ const data=JSON.parse(init.body);
+ assert.equal(data.Messages.length,1);
+ assert.equal(data.Messages[0].From.Email,env.MAILJET_FROM_EMAIL);
+ mail.push(data.Messages[0]);
+ return Response.json({Messages:[{Status:"success"}]});
+};
+const send=data=>emailAuth({request:req(data),env});
+try {
+ const signup={mode:"register",name:"Khách thử",email:"buyer@example.test",password:"Abc123!"};
+ assert.equal((await emailAuth({request:req(signup,ORIGIN,"https://evil.test"),env})).status,403);
+ assert.equal((await emailAuth({request:req(signup,PRODUCTION),env})).status,503);
+ assert.equal((await send({...signup,password:"123456"})).status,400);
+ const registration=await send(signup);
+ assert.equal(registration.status,202);
+ assert.equal((await registration.json()).verification_required,true);
+ assert.equal(mail.length,1);
+ assert.match(mail[0].TextPart,/\d{6}/);
+ const code=mail[0].TextPart.match(/Mã xác minh: (\d{6})/)[1];
+ const link=mail[0].TextPart.match(/Xác minh Email: (https:\/\/[^\s]+)/)[1];
+ assert.equal((await send({...signup,mode:"login"})).status,403,"Unverified Email cannot sign in");
+ assert.equal((await send({mode:"verify",email:signup.email,code:"000000"===code?"111111":"000000"})).status,400);
+ assert.equal((await send({mode:"verify",email:signup.email,code})).status,200);
+ assert.equal((await send({mode:"verify",email:signup.email,code})).status,400,"OTP is single use");
+ const login=await send({...signup,mode:"login"});
+ assert.equal(login.status,200);
+ const cookie=login.headers.get("Set-Cookie").match(/sd_customer_login=[a-f0-9]{64}/)[0];
+ const session=await getSession({request:new Request(ORIGIN+"/api/customer/session",{headers:{Cookie:cookie}}),env});
+ assert.equal((await session.json()).authenticated,true);
+ assert.equal((await send({mode:"reset-request",email:"unknown@example.test"})).status,200);
+ assert.equal(mail.length,1,"Unknown Email cannot receive reset email");
+ assert.equal((await send({mode:"reset-request",email:signup.email})).status,200);
+ assert.equal(mail.length,2);
+ const resetCode=mail[1].TextPart.match(/Mã xác minh: (\d{6})/)[1];
+ assert.equal((await send({mode:"reset-confirm",email:signup.email,code:"654321"===resetCode?"123456":"654321",password:"Changed987!"})).status,400);
+ assert.equal((await send({mode:"reset-confirm",email:signup.email,code:resetCode,password:"Changed987!"})).status,200);
+ assert.equal((await send({mode:"reset-confirm",email:signup.email,code:resetCode,password:"Changed987!"})).status,400);
+ const invalidated=await getSession({request:new Request(ORIGIN+"/api/customer/session",{headers:{Cookie:cookie}}),env});
+ assert.equal((await invalidated.json()).authenticated,false,"Reset must revoke old sessions");
+ assert.equal((await send({...signup,mode:"login"})).status,401,"Old password must stop working");
+ assert.equal((await send({...signup,mode:"login",password:"Changed987!"})).status,200);
+ const alreadyUsedLink=await verifyLink({request:new Request(link),env});
+ assert.match(alreadyUsedLink.headers.get("Location"),/email_verify_failed/);
+ const another={...signup,email:"link@example.test"};
+ sqlite.prepare("DELETE FROM public_rate_limits").run(); // Isolate this registration boundary fixture.
+ assert.equal((await send(another)).status,202);
+ const secondLink=mail.at(-1).TextPart.match(/Xác minh Email: (https:\/\/[^\s]+)/)[1];
+ const clicked=await verifyLink({request:new Request(secondLink),env});
+ assert.match(clicked.headers.get("Location"),/email_verified/);
+ assert.match(clicked.headers.get("Set-Cookie"),/sd_customer_login=/);
+ const replay=await verifyLink({request:new Request(secondLink),env});
+ assert.match(replay.headers.get("Location"),/email_verify_failed/);
+ console.log("PASS: Mailjet body/OTP/link, unverified gate, one-time verification, 7-char password, reset and session revocation");
+}finally{globalThis.fetch=originalFetch;sqlite.close()}
