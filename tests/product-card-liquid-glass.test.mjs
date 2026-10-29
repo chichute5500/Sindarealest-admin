@@ -153,9 +153,9 @@ console.log("PASS: storefront product cards use reference ice-blue/navy Liquid G
 
 assert.ok(finalThemeCss.includes('body:has(.sd-fullscreen-viewer.open) .mobile-bottom-nav{display:none!important}'),
   "Immersive fullscreen gallery must not be obscured by the persistent app navigation.");
-assert.ok(finalThemeCss.includes('background:rgba(247,252,255,.995)!important;')
-  && finalThemeCss.includes('background:rgba(4,20,34,.995)!important;'),
-  "Persistent mobile navigation must keep sufficient contrast over scrolling content in both themes.");
+assert.ok(finalThemeCss.includes('background:var(--sd-glass-shell-strong)!important;')
+  && finalThemeCss.includes('backdrop-filter:blur(13px) saturate(115%)!important;'),
+  "Persistent navigation uses theme-aware high-legibility translucent glass and restrained blur without opaque plastic.");
 
 
 const sixTileRefinementStart = html.lastIndexOf("/* 2026-10-21 visual refinement: six benefit tiles");
