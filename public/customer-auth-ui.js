@@ -16,17 +16,17 @@ if(root){
   if(authReturn){
     const reason=params.get("auth_reason")||"unknown";
     const reasonMessages={
-      provider_denied:"Bạn đã hủy cấp quyền trên Zalo/Google hoặc nhà cung cấp từ chối yêu cầu.",
-      no_code:"Zalo/Google chưa gửi mã xác thực về website.",
+      provider_denied:"Bạn đã hủy cấp quyền hoặc Facebook, Google, Zalo từ chối yêu cầu.",
+      no_code:"Nhà cung cấp đăng nhập chưa gửi mã xác thực về website.",
       invalid_code:"Mã xác thực được trả về không hợp lệ.",
       invalid_state:"Phiên bảo mật không khớp. Hãy sử dụng cùng một trình duyệt từ đầu đến cuối, không đổi tab hoặc chế độ ẩn danh.",
-      token_rejected:"Zalo/Google từ chối mã đăng nhập ở bước trao đổi token. Cần kiểm tra cấu hình OAuth trên máy chủ.",
+      token_rejected:"Nhà cung cấp từ chối mã xác thực. Hãy kiểm tra URL callback và thiết lập OAuth của Facebook, Google hoặc Zalo.",
       token_invalid:"Nhà cung cấp không trả về token hợp lệ.",
-      profile_rejected:"Không lấy được hồ sơ từ Zalo/Google sau khi cấp quyền.",
-      profile_invalid:"Zalo/Google chưa trả về mã định danh tài khoản hợp lệ.",
+      profile_rejected:"Không lấy được hồ sơ từ nhà cung cấp đăng nhập sau khi cấp quyền.",
+      profile_invalid:"Nhà cung cấp đăng nhập chưa trả về mã định danh tài khoản hợp lệ.",
       profile_api_error:"Zalo trả về lỗi khi lấy thông tin tài khoản, dù đã cấp quyền. Hệ thống đang kiểm tra lỗi này.",
       profile_relay_unavailable:"Máy chủ Việt Nam dùng để xác minh tài khoản Zalo chưa kết nối được. Bạn có thể dùng Google để đăng nhập.",
-      facebook_unavailable:"Facebook Login chưa được cấu hình trên Preview.",
+      facebook_unavailable:"Facebook Login chưa sẵn sàng trên Preview. Kiểm tra URL callback và trạng thái ứng dụng Meta.",
       callback_error:"Lỗi xử lý callback. Máy chủ sẽ cần kiểm tra luồng đăng nhập.",
       session_store:"Đã lấy được hồ sơ, nhưng không thể tạo phiên tài khoản trong cơ sở dữ liệu Preview.",
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
