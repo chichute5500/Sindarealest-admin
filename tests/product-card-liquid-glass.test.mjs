@@ -138,11 +138,16 @@ assert.doesNotMatch(codeHeroCss, /url\(|!important/,
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
-assert.ok(html.includes(".product-info{padding:9px 9px 36px}") && html.includes(".product-info{padding:11px 12px 44px}"),
-  "Product-card content must reserve space for its separate quick-add action instead of letting the cart button overlap price/details.");
-
-assert.ok(html.includes('<div class="product-meta-row"><span class="product-category">') && html.includes("${fulfillmentBadge(p)}"),
-  "Catalog product category and fulfillment status should share one compact metadata row on mobile.");
+const standardProductCard = html.slice(html.indexOf("function productCard("), html.indexOf("function unbindReveal("));
+const featuredProductCard = html.slice(html.indexOf("function featuredProductCard("), html.indexOf("function setupMobileBottomNav("));
+assert.ok(standardProductCard.includes('<div class="product-card-bottom">')
+  && standardProductCard.includes('class="quick-add tap-target"')
+  && !standardProductCard.includes('class="product-category"'),
+  "Catalog cards must omit redundant category text and place quick-add in the compact price row.");
+assert.ok(featuredProductCard.includes('<div class="product-card-bottom">')
+  && featuredProductCard.includes('class="quick-add tap-target"')
+  && !featuredProductCard.includes('class="product-category"'),
+  "Featured cards must use the same compact price-and-cart row without repeating the photo category.");
 assert.ok(html.includes('<div class="product-open" role="button" tabindex="0" data-open-product=')
   && html.includes("if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}"),
   "Product cards must use valid flow-content containers and preserve Enter/Space activation for keyboard users.");
