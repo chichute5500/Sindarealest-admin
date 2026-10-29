@@ -47,7 +47,9 @@ if(root){
       const show=()=>{
         if(drawer?.classList.contains("open"))return true;
         if(document.body.classList.contains("welcome-active"))return false;
-        const button=document.getElementById("mobileAccountNav")||document.getElementById("accountOpen");
+        const button=(window.matchMedia("(max-width:760px)").matches ?
+          document.getElementById("mobileAccountNav") : document.getElementById("accountOpen")) ||
+          document.getElementById("accountOpen") || document.getElementById("mobileAccountNav");
         if(!button)return false;
         button.click();
         return drawer?.classList.contains("open")||false;
@@ -79,14 +81,15 @@ if(root){
         google.title=data.providers?.google?"":"Cần tạo Google OAuth Client ID và Secret trong Google Cloud";
       }
       if(zalo){
-        zalo.disabled=!data.providers?.zalo;
-        zalo.title=data.providers?.zalo?"":"Zalo App Secret chưa có ở môi trường này";
+        zalo.hidden=true;
+        zalo.disabled=true;
+        zalo.title="Zalo Login tạm ngừng để tránh lỗi đăng nhập";
       }
       // Do not expose a clickable login method until Meta app + secret are configured.
       if(facebook){
-        facebook.hidden=!data.providers?.facebook;
-        facebook.disabled=!data.providers?.facebook;
-        facebook.title=data.providers?.facebook?"":"Cần cấu hình Meta App ID và App Secret trên Cloudflare Preview";
+        facebook.hidden=true;
+        facebook.disabled=true;
+        facebook.title="Facebook Login tạm ngừng khi ứng dụng Meta chưa được mở công khai";
       }
       // Email is Preview-only until verified ownership + recovery are implemented.
       const emailEnabled=Boolean(data.providers?.email);

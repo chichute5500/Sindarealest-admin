@@ -40,8 +40,10 @@ assert.ok(html.includes('id="sdCustomerAuth"'),"Preview must have the exact cust
 assert.ok(html.includes('id="accountOpen"'),"PC header must expose the Account button");
 assert.ok(html.includes("$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'))"),
   "PC Account button must open the existing mobile-approved account drawer");
-assert.ok(html.includes('data-auth-facebook'),"Facebook Login button must be present in the Account drawer");
-console.log("PASS: real Preview HTML includes wired desktop Account button and Facebook Login UI.");
+assert.ok(html.includes('data-auth-google>Tiếp tục với Google'),"Google Login must be present in Account drawer");
+assert.ok(html.includes('data-auth-zalo hidden disabled'),"Temporarily disabled Zalo Login must not be offered");
+assert.ok(html.includes('data-auth-facebook hidden disabled'),"Temporarily disabled Facebook Login must not be offered");
+console.log("PASS: real Preview includes wired desktop Account button, Google Login and inactive other providers.");
 for(const provider of ["zalo","google","facebook"]){
   const r=await get(ORIGIN+"/api/customer/auth/"+provider+"/start");
   assert.equal(r.status,302,"OAuth must start on Preview for "+provider);
@@ -54,6 +56,11 @@ for(const provider of ["zalo","google","facebook"]){
     "Provider callback must remain on the exact Cloudflare Preview alias");
   assert.match(auth.searchParams.get("state")||"",/^[a-f0-9]{48}$/);
   if(provider!=="facebook")assert.match(auth.searchParams.get("code_challenge")||"",/^[a-zA-Z0-9_-]{43}$/);
+  if(provider==="google"){
+    assert.equal(auth.searchParams.get("scope"),"openid email profile");
+    assert.equal(auth.searchParams.get("code_challenge_method"),"S256");
+    assert.equal(auth.searchParams.get("prompt"),"select_account");
+  }
   if(provider==="zalo")assert.equal(auth.searchParams.get("app_id"),APP_ID);
   if(provider==="facebook"){
     assert.equal(auth.searchParams.get("client_id"),"2013705155992867");

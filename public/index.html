@@ -33,7 +33,7 @@
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
 <link rel="stylesheet" href="/customer-auth.css?v=fb20261029">
-<script type="module" src="/customer-auth-ui.js?v=fb20261029-meta-2"></script>
+<script type="module" src="/customer-auth-ui.js?v=google-only-20261029"></script>
 <title>SinDarealest — Premium Crocodile Leather Fashion</title>
 <script>(()=>{const root=document.documentElement;
  root.classList.add('js-enabled');
@@ -1351,10 +1351,10 @@ html.sd-catalog-route #products .filter-pill{
       <p class="sd-auth-message" data-auth-message role="status" aria-live="polite" hidden></p>
       <div data-auth-options>
         <p class="sd-auth-heading">Đăng nhập tài khoản</p>
-        <p class="sd-auth-caption">Theo dõi tài khoản SinDarealest. Bạn vẫn có thể đặt hàng không cần đăng nhập.</p>
-        <button type="button" class="sd-auth-provider sd-auth-zalo tap-target" data-auth-zalo>Tiếp tục với Zalo</button>
+        <p class="sd-auth-caption">Đăng nhập bằng Google để sử dụng tài khoản SinDarealest. Bạn vẫn có thể đặt hàng không cần đăng nhập.</p>
+        <button type="button" class="sd-auth-provider sd-auth-zalo tap-target" data-auth-zalo hidden disabled>Tiếp tục với Zalo</button>
         <button type="button" class="sd-auth-provider tap-target" data-auth-google>Tiếp tục với Google</button>
-        <button type="button" class="sd-auth-provider sd-auth-facebook tap-target" data-auth-facebook hidden>Tiếp tục với Facebook</button>
+        <button type="button" class="sd-auth-provider sd-auth-facebook tap-target" data-auth-facebook hidden disabled>Tiếp tục với Facebook</button>
         <form class="sd-auth-email-fields" data-mode="login" autocomplete="on">
           <label data-auth-name-row hidden>Họ và tên<input name="customer_name" autocomplete="name" maxlength="100"></label>
           <label>Địa chỉ Email<input name="customer_email" type="email" autocomplete="email" required maxlength="254"></label>
