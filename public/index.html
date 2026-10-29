@@ -2274,7 +2274,7 @@ function updateFavoriteControls(){const count=favorites.filter(key=>!!findProduc
 function renderFavoriteList(){const list=$('#accountFavoritesList');if(!list)return;const saved=favorites.map(key=>findProductByKey(key)).filter(Boolean);updateFavoriteControls();if(!saved.length){list.innerHTML='<div class="favorites-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 11.1-8.8 11.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z" stroke-linecap="round" stroke-linejoin="round"/></svg><strong>Chưa có sản phẩm yêu thích</strong><p>Mở sản phẩm rồi nhấn biểu tượng trái tim. Đăng nhập Google để đồng bộ sản phẩm yêu thích.</p></div>';return}list.innerHTML=saved.map(p=>{const key=favoriteKey(p),image=allImages(p)[0]||'images/theme-croc-dark.webp?v=20261017-1';return '<article class="favorite-row"><button type="button" class="favorite-product-open" data-favorite-open="'+escapeHtml(key)+'" aria-label="Xem chi tiết '+escapeHtml(p.title||'sản phẩm')+'"><img src="'+escapeHtml(imgPath(image))+'" alt="" loading="eager" decoding="async"><span class="favorite-product-copy"><strong>'+productTitleWithVip(p.title||'Sản phẩm tuyển chọn')+'</strong><small>Mã SKU: '+escapeHtml(visibleSku(p)||'Chưa được cung cấp')+'</small></span></button><button type="button" class="favorite-remove tap-target" data-favorite-remove="'+escapeHtml(key)+'" aria-label="Xóa '+escapeHtml(p.title||'sản phẩm')+' khỏi yêu thích" title="Bỏ yêu thích">×</button></article>'}).join('')}
 function setAccountView(view,focus=true){const showFavorites=view==='favorites',showOrders=view==='orders',showAddress=view==='address',showMenu=!showFavorites&&!showOrders&&!showAddress,menu=$('#accountMenuView'),favoritesPanel=$('#accountFavoritesView'),ordersPanel=$('#accountOrdersView'),addressPanel=$('#accountAddressView'),title=$('#accountDrawerTitle');if(menu)menu.hidden=!showMenu;if(favoritesPanel)favoritesPanel.hidden=!showFavorites;if(ordersPanel)ordersPanel.hidden=!showOrders;if(addressPanel)addressPanel.hidden=!showAddress;if(title)title.textContent=showFavorites?'Sản phẩm yêu thích':showOrders?'Đơn hàng của tôi':showAddress?'Địa chỉ giao hàng':'Tài khoản';if(showFavorites)renderFavoriteList();if(showOrders)renderOrderHistory();if(showAddress)loadAccountAddressView();if(focus)(showFavorites?$('#accountFavoritesBack'):showOrders?$('#accountOrdersBack'):showAddress?$('#accountAddressBack'):$('#accountFavoritesAction'))?.focus({preventScroll:true})}
 function toggleFavorite(key){if(accountSyncMode==='loading'||accountSyncMode==='error'){accountCloudMessage('Chưa sẵn sàng đồng bộ, hãy thử lại.');return false}const product=findProductByKey(key);if(!product)return false;const id=favoriteKey(product);if(!id)return false;const index=favorites.indexOf(id);if(index>=0)favorites.splice(index,1);else favorites.push(id);saveFavorites();updateDetailFavoriteButton(currentProduct);return index<0}
-function normalizeFavorites(){const valid=[...new Set(favorites.map(key=>{const product=findProductByKey(key);return product?favoriteKey(product):''}).filter(Boolean))];const changed=valid.length!==favorites.length||valid.some((key,index)=>key!==favorites[index]);favorites=valid;if(changed)try{localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))}catch(e){}updateFavoriteControls();renderFavoriteList()}
+function normalizeFavorites(){const valid=[...new Set(favorites.map(key=>{const product=findProductByKey(key);return product?favoriteKey(product):''}).filter(Boolean))];const changed=valid.length!==favorites.length||valid.some((key,index)=>key!==favorites[index]);favorites=valid;if(changed&&accountSyncMode==='guest')try{localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))}catch(e){}updateFavoriteControls();renderFavoriteList()}
 function loadLocalShippingAddress(){if(accountSyncMode!=='guest'){updateAccountAddressSummary();return localShippingAddress}try{const saved=JSON.parse(localStorage.getItem(LOCAL_ADDRESS_KEY)||'null');localShippingAddress=saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:null}catch(e){localShippingAddress=null}updateAccountAddressSummary();return localShippingAddress}
 function updateAccountAddressSummary(){const node=$('#accountAddressSummary');if(!node)return;const a=localShippingAddress;if(!a||!a.fullName||!a.phone||!a.province||!a.ward||!a.streetAddress){node.textContent='Chưa lưu địa chỉ nhận hàng';return}node.textContent=String(a.fullName)+' · '+String(a.ward)+', '+String(a.province)}
 function setAccountAddressMessage(message,state=''){const node=$('#accountAddressMessage');if(!node)return;node.textContent=message;node.dataset.state=state}
@@ -2716,6 +2716,80 @@ $('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetai
 async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year').textContent=new Date().getFullYear();loadCart();loadFavorites();loadOrderHistory();loadLocalShippingAddress();bindEvents();try{const res=await fetch('/api/products',{cache:'no-store'});if(!res.ok)throw new Error('API sản phẩm trả về HTTP '+res.status);const payload=await res.json();products=Array.isArray(payload)?payload:(payload.products||payload.data||[]);if(!Array.isArray(products))throw new Error('Dữ liệu sản phẩm không hợp lệ');products=products.map(p=>({...p,images:(p.images||[]).map(imgPath)}));normalizeCart();normalizeFavorites();}catch(err){$('#catalogGrid').innerHTML='<p class="section-note">Không thể tải danh mục từ /api/products. Hãy kiểm tra Cloudflare Pages Functions, binding D1 tên DB và các tệp SQL trong migrations/. Website không dùng danh mục tĩnh cũ khi API gặp lỗi.</p>';return}
  renderFeatured();renderFilters();renderCatalog();renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
 }
+
+let accountSyncMode='guest',cloudOrderHistory=[],cloudSyncEpoch=0,cloudFavoriteQueue=Promise.resolve();
+function accountCloudMessage(message){
+ const node=$('#accountCloudStatus');if(node)node.textContent=message;
+}
+async function accountCloudFetchOrders(epoch){
+ const res=await fetch('/api/customer/orders',{credentials:'same-origin',cache:'no-store'});
+ if(!res.ok)throw Error('Không tải được đơn hàng từ tài khoản.');
+ const data=await res.json();
+ if(epoch!==cloudSyncEpoch)return;
+ cloudOrderHistory=Array.isArray(data.orders)?data.orders:[];
+ renderOrderHistory();
+}
+async function accountCloudOnAuth(active){
+ const epoch=++cloudSyncEpoch;
+ if(!active){
+  accountSyncMode='guest';cloudOrderHistory=[];
+  loadFavorites();loadLocalShippingAddress();updateDetailFavoriteButton();
+  renderFavoriteList();renderOrderHistory();
+  accountCloudMessage('Đăng nhập Google để đồng bộ dữ liệu giữa các thiết bị.');
+  return;
+ }
+ accountSyncMode='loading';accountCloudMessage('Đang đồng bộ tài khoản Google…');
+ try{
+  const res=await fetch('/api/customer/profile',{cache:'no-store',credentials:'same-origin'});
+  if(!res.ok)throw Error('Không tải được hồ sơ trên máy chủ.');
+  const data=await res.json();
+  if(epoch!==cloudSyncEpoch)return;
+  favorites=Array.isArray(data.favorites)?data.favorites.filter(v=>typeof v==='string'):[];
+  localShippingAddress=data.address||null;
+  accountSyncMode='cloud';
+  updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();
+  accountCloudMessage('Đã kết nối Google. Yêu thích, địa chỉ và đơn hàng được lưu theo tài khoản.');
+  await accountCloudFetchOrders(epoch);
+ }catch(e){
+  if(epoch!==cloudSyncEpoch)return;
+  accountSyncMode='error';favorites=[];localShippingAddress=null;cloudOrderHistory=[];
+  updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();renderOrderHistory();
+  accountCloudMessage(e.message||'Không thể đồng bộ. Vui lòng tải lại trang.');
+ }
+}
+function accountCloudSaveFavorites(list){
+ const epoch=cloudSyncEpoch;
+ cloudFavoriteQueue=cloudFavoriteQueue.then(async()=>{
+  if(epoch!==cloudSyncEpoch)return;
+  const res=await fetch('/api/customer/profile',{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'favorites',favorites:list})});
+  if(!res.ok)throw Error('Không lưu được sản phẩm yêu thích lên tài khoản.');
+ }).catch(async e=>{
+  if(epoch!==cloudSyncEpoch)return;
+  accountCloudMessage(e.message);
+  await accountCloudOnAuth(true);
+ });
+}
+async function accountCloudAttachOrder(orderNumber,orderAccessToken){
+ if(accountSyncMode!=='cloud'||!orderAccessToken)return;
+ try{
+  const res=await fetch('/api/customer/orders',{method:'POST',credentials:'same-origin',
+   headers:{'Content-Type':'application/json'},body:JSON.stringify({orderNumber,orderAccessToken})});
+  if(!res.ok)throw Error((await res.json().catch(()=>({}))).error||'Chưa liên kết được đơn.');
+  await accountCloudFetchOrders(cloudSyncEpoch);
+  accountCloudMessage('Đã lưu đơn '+orderNumber+' vào tài khoản Google.');
+ }catch(e){accountCloudMessage(e.message||'Đơn còn trên thiết bị; chưa đồng bộ được.')}
+}
+window.sdAccountBridge={onAuth:accountCloudOnAuth};
+window.addEventListener('sd-storefront-ready',()=>{
+ if(accountSyncMode==='cloud'){normalizeFavorites();updateAccountAddressSummary();renderOrderHistory();}
+});
+$('#accountOrdersList')?.addEventListener('click',event=>{
+ const button=event.target.closest('[data-account-order-attach]');
+ if(!button)return;
+ const order=localOrderHistory.find(o=>o.orderNumber===button.dataset.accountOrderAttach);
+ if(order?.accessToken)accountCloudAttachOrder(order.orderNumber,order.accessToken);
+});
+
 const finishStorefrontStartup=()=>{window.__sdStorefrontReady=true;window.dispatchEvent(new Event('sd-storefront-ready'))};
 init().then(finishStorefrontStartup,finishStorefrontStartup);
 })();
