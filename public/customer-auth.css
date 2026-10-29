@@ -7,6 +7,7 @@
 #sdCustomerAuth .sd-auth-provider { display:flex; align-items:center; justify-content:center; gap:9px; width:100%;
   padding:12px; border:1px solid var(--line); border-radius:13px; margin:8px 0; font:inherit;
   font-weight:700; font-size:13px; cursor:pointer; background:var(--card-glass); color:var(--ink); }
+#sdCustomerAuth .sd-auth-facebook { background:#1877f2; color:#fff; border-color:#1877f2; }
 #sdCustomerAuth .sd-auth-zalo { background: #0866ef; color:white; border-color:#0866ef; }
 #sdCustomerAuth .sd-auth-email-fields { display:grid; gap:9px; margin-top:12px; }
 #sdCustomerAuth label { display:grid; gap:5px; font-size:12px; font-weight:600; }
