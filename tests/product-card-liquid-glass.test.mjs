@@ -164,7 +164,8 @@ assert.ok(sixTileRefinementStart >= 0 && sixTileRefinementEnd > sixTileRefinemen
   "The six-tile satin refinement must be present in the final style block.");
 const sixTileRefinementCss = html.slice(sixTileRefinementStart, sixTileRefinementEnd);
 assert.ok(sixTileRefinementCss.includes(".service-strip.glass{")
-  && sixTileRefinementCss.includes("background:rgba(244,250,255,.24)")
+  && sixTileRefinementCss.includes("background:var(--sd-3d-face)")
+  && sixTileRefinementCss.includes("background:var(--sd-glass-shell)")
   && sixTileRefinementCss.includes(".service-strip .service-copy{")
   && sixTileRefinementCss.includes(".service-strip .service-text strong{font-size:12px")
   && sixTileRefinementCss.includes("html.dark .service-strip.glass{")
