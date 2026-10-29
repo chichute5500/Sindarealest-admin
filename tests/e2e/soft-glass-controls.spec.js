@@ -35,6 +35,18 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   expect(field.shadow).toContain('inset');
   expect(chip.background).toContain('radial-gradient');
   expect(chip.animation).toBe('none');
+  // Ensure the reflective color is masked to one physical rim and cannot
+  // paint over the clear center or create a second bevel shadow.
+  for(const selector of ['#categoryFilters .filter-pill','#products .search-field']){
+   const rim=await page.locator(selector).first().evaluate(el=>{
+    const css=getComputedStyle(el,'::after');
+    return {shadow:css.boxShadow,mask:css.maskComposite,webkitMask:css.webkitMaskComposite,
+      background:css.backgroundImage,opacity:css.opacity};
+   });
+   expect(rim.shadow).toBe('none');
+   expect(rim.background).toContain('radial-gradient');
+   expect(rim.mask==='exclude'||rim.webkitMask==='xor').toBe(true);
+  }
   const pageWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
   expect(pageWidth).toBeLessThanOrEqual(width+1);
   const chipGeometry=await page.locator('#categoryFilters .filter-pill').evaluateAll(nodes=>nodes.map(el=>{
@@ -60,6 +72,14 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
     new Promise(resolve=>setTimeout(resolve,1800))]);
   });
   await page.screenshot({path:`${dir}/${label}-${mode}-all-categories.png`,animations:'disabled'});
+  // Identical selectors and viewport dimensions across before/after builds.
+  // Element crops isolate material from product photos and page scroll.
+  await first.screenshot({path:`${dir}/${label}-${mode}-chip-crop.png`,animations:'disabled'});
+  await search.screenshot({path:`${dir}/${label}-${mode}-search-crop.png`,animations:'disabled'});
+  await icon.screenshot({path:`${dir}/${label}-${mode}-icon-crop.png`,animations:'disabled'});
+  if(width<=760)await page.locator('#mobileBottomNav').screenshot({
+   path:`${dir}/${label}-${mode}-bottom-nav-crop.png`,animations:'disabled'
+  });
   await search.locator('input').fill('TEST-SEARCH-NEVER-MATCH');
   await expect(search.locator('input')).toHaveValue('TEST-SEARCH-NEVER-MATCH');
   await search.locator('input').fill('');
@@ -112,6 +132,10 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
       expect(touchPressed).toContain('inset');
       await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
       await expect.poll(()=>press.evaluate(el=>getComputedStyle(el).boxShadow)).toBe(beforeTouch);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+      await expect.poll(()=>press.getAttribute('data-sd-glass-press')).toBe('true');
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+      await expect.poll(()=>press.getAttribute('data-sd-glass-press')).toBeNull();
     } finally {
       await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]}).catch(()=>{});
       await cdp.detach();
