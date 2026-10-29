@@ -4321,11 +4321,11 @@ html.dark #products .search-field{background:var(--sd-3d-surface-search)}
  opacity:.55;transform:translateY(.5px);transition-duration:105ms;
 }
 #products .filter-pill.active,#products .filter-pill[aria-pressed="true"]{
- color:var(--sd-soft-ink);border-color:transparent;background:var(--sd-3d-face);
+ color:var(--sd-soft-ink);border-color:transparent;background:var(--sd-glass-selected-face);
  box-shadow:var(--sd-3d-selected);animation:none;
 }
 html.dark #products .filter-pill.active,html.dark #products .filter-pill[aria-pressed="true"]{
- color:#fff;border-color:transparent;background:var(--sd-3d-face);box-shadow:var(--sd-3d-selected);
+ color:#fff;border-color:transparent;background:var(--sd-glass-selected-face);box-shadow:var(--sd-3d-selected);
 }
 /* Selected must still physically depress; Dark Mode has an extra html.dark
    specificity level and otherwise masks the ordinary :active shadow. */
@@ -4430,6 +4430,8 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
  --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(255,255,255,.72),rgba(231,245,254,.56) 57%,rgba(226,240,251,.46) 100%) padding-box,var(--sd-3d-rim) border-box;
  --sd-glass-panel-shadow:0 12px 29px rgba(35,80,113,.10),0 2px 5px rgba(43,89,119,.045),inset 1px 2px 3px rgba(109,150,176,.10);
  --sd-glass-input-shadow:0 3px 9px rgba(45,87,118,.075),inset 1px 2px 4px rgba(93,139,167,.14);
+ --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.33),rgba(211,235,250,.18) 65%,rgba(189,224,246,.12) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.33),rgba(211,235,250,.18) 65%,rgba(189,224,246,.12) 100%);
 
  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
  --sd-control-rim:rgba(184,207,225,.45);
@@ -4453,6 +4455,8 @@ html.dark{
  --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(70,110,143,.62),rgba(26,66,94,.62) 57%,rgba(11,41,65,.53) 100%) padding-box,var(--sd-3d-rim) border-box;
  --sd-glass-panel-shadow:0 12px 29px rgba(0,6,18,.26),0 2px 5px rgba(0,7,21,.11),inset 1px 2px 3px rgba(0,16,32,.20);
  --sd-glass-input-shadow:0 3px 9px rgba(0,6,18,.13),inset 1px 2px 4px rgba(0,11,26,.30);
+ --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%);
 
  --sd-control-rim:rgba(114,150,184,.40);
  --sd-control-face:rgba(23,50,73,.86);
@@ -4497,7 +4501,7 @@ html.dark{
  outline:2px solid #b9657d;outline-offset:2px;
 }
 .nav-wrap .navlink.active,.mobile-nav .navlink.active{
- border-color:transparent;background:var(--sd-glass-shell);
+ border-color:transparent;background:var(--sd-glass-selected);
  box-shadow:var(--sd-3d-selected);
 }
 :is(.navlink,.text-link,.contact-link):active,
@@ -4655,8 +4659,8 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
   -webkit-backdrop-filter:none;backdrop-filter:none;
   transition:transform 245ms cubic-bezier(.16,.90,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
  }
- #mobileBottomNav .mobile-tab.is-active{border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);color:var(--sd-control-ink)}
- html.dark #mobileBottomNav .mobile-tab.is-active{background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);color:#fff}
+ #mobileBottomNav .mobile-tab.is-active{border-color:transparent;background:var(--sd-glass-selected);box-shadow:var(--sd-3d-selected);color:var(--sd-control-ink)}
+ html.dark #mobileBottomNav .mobile-tab.is-active{background:var(--sd-glass-selected);box-shadow:var(--sd-3d-selected);color:#fff}
  #mobileBottomNav .mobile-tab:active{
   transform:translateY(1px) scale(.995)!important;box-shadow:var(--sd-3d-depressed)!important;
   transition-duration:105ms!important;
