@@ -218,25 +218,25 @@ assert.ok(
 
 
 const catalogFilterPill = html.match(/\.filter-pill\{[^}]+\}/)?.[0] || "";
-assert.match(catalogFilterPill, /min-height:32px;padding:6px 13px/,
-  "The generic filter-pill fallback should stay compact without changing its horizontal spacing.");
-assert.match(html, /\.filter-pill\{font-size:11px;min-height:35px;padding:7px 13px\}/,
-  "The compact mobile filter-pill fallback should stay slim while retaining readable labels.");
-assert.ok(html.includes('#products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"]),')
-  && html.includes('transform:translateY(1px) scale(.965)'),
-  "Slimming catalog filter pills must preserve the existing press feedback.");
-
-assert.match(html, /#products \.filter-pill\{[^}]*min-height:38px;\s*padding:6px 19px;/,
-  "The visible filter frame must be 38px high while keeping full text and width.");
-
-assert.match(html, /#products \.filter-pill\{min-height:38px;padding:5px 11px;font-size:13\.5px\}/,
-  "Narrow-phone filter frame must be 38px while preserving the original text and horizontal padding.");
-assert.ok(html.includes('.filter-pill.active,.filter-pill:hover{background:var(--panel-strong);border-color:var(--gold);box-shadow:inset 0 1px rgba(255,255,255,.26)}'),
-  "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
-
-assert.ok(html.includes('#products .filter-pill::before{')
-  && html.includes('inset:-3px 0;')
-  && html.includes('pointer-events:auto;'),
-  "The 38px visible chip must preserve a >=44px effective touch area via transparent extensions.");
-assert.ok(html.includes('inset:1px 1px;') && html.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;'),
-  "The specular sweep must sit adjacent to the reduced frame while preserving light/dark selection animation.");
+assert.match(catalogFilterPill,/min-height:32px;padding:6px 13px/,
+ "The generic filter-pill fallback stays compact.");
+assert.match(html,/\.filter-pill\{font-size:11px;min-height:35px;padding:7px 13px\}/,
+ "The approved compact mobile fallback stays available.");
+// Owner-approved 2026-10-29 revision: soften the material, remove neon
+// specular sweeps and scale-up animations, preserve tap/selected states.
+assert.match(html,/#products \.filter-pill:active:not\(:disabled\)/,
+ "A subtle press state must still exist.");
+assert.match(html,/transform:scale\(\.985\);box-shadow:var\(--sd-soft-pressed\)/,
+ "Pressed chips must depress gently rather than bounce upward.");
+assert.match(html,/#products \.filter-pill\.active,#products \.filter-pill\[aria-pressed="true"\]/,
+ "Selected category must keep a visually distinguishable state.");
+assert.match(html,/#products \.filter-pill\{[\s\S]*?min-height:40px;/,
+ "New controls must remain compact in the narrow viewport.");
+assert.match(html,/#products \.filter-pill::before,#products \.filter-pill::after\{content:none\}/,
+ "Do not leave old pseudo-element hit layers or specular sweeps.");
+assert.doesNotMatch(html,/sdCatalogGlassActivate|sdCatalogSpecularSweep/,
+ "No bright sweep or elastic selected animation on new chips.");
+assert.match(html,/@media\(hover:hover\) and \(pointer:fine\)/,
+ "Hover-specific lighting must not run on touch devices.");
+assert.match(html,/@media\(prefers-reduced-motion:reduce\)/,
+ "Reduced motion treatment must remain available.");
