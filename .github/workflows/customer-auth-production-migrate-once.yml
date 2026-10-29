@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: production-customer-auth-migrate-once
@@ -38,8 +39,27 @@ jobs:
         run: |
           npm run check
           npm test
-      - name: Verify exact Production target, Time Travel bookmark and apply additive auth migrations ONCE
+      - name: Verify exact Production target and apply additive auth migrations ONCE
+        id: migrate
         run: node scripts/migrate-customer-auth-production-once.mjs
+      - name: Publish auditable result on exact GitHub commit
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MIGRATION_RESULT: ${{ steps.migrate.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$MIGRATION_RESULT" == "success" ]]; then
+            state=success
+            description='Production D1 customer-auth schema verified after migration'
+          else
+            state=failure
+            description='Production D1 migration did not pass; do not merge'
+          fi
+          jq -n --arg state "$state" --arg description "$description" --arg url "$RUN_URL"             '{state:$state,context:"customer-auth-production-migration",description:$description,target_url:$url}' > /tmp/sd-d1-status.json
+          curl --fail --silent --show-error -X POST             -H "Authorization: Bearer ${GH_TOKEN}"             -H "Accept: application/vnd.github+json"             -H "Content-Type: application/json"             --data-binary @/tmp/sd-d1-status.json             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" >/dev/null
       - name: Migration completion
         if: success()
-        run: echo "Production D1 migration 0011-0014 applied once and read-only follow-up verified. Main not yet merged." >> "$GITHUB_STEP_SUMMARY"
+        run: echo "Production D1 migration 0011-0014 verified. The Main merge remains gated by independent CI." >> "$GITHUB_STEP_SUMMARY"
