@@ -60,13 +60,13 @@ const rules = [...styles.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selector, bo
   selector: selector.trim().replace(/\/\*[\s\S]*?\*\//g, '').trim(),
   body,
 }));
-const orphaned = rules.filter(({ selector }) =>
-  /\.order-(steps|step|number|icon|note)\b/.test(selector)
-  && !selector.startsWith('#order')
-  && !selector.startsWith('@media')
+const orphaned = rules.flatMap(({ selector }) =>
+  [...selector.matchAll(/\.order-(steps|step|number|icon|note)\b/g)]
+    .filter(match => !selector.slice(0, match.index).trimEnd().endsWith('#order'))
+    .map(() => selector)
 );
-assert.deepEqual(orphaned.map(x => x.selector), [],
-  'Order-process styling must stay scoped to #order; competing global selectors are forbidden.');
+assert.deepEqual(orphaned, [],
+  'Every order-process selector, including shared material groups, must remain scoped under #order.');
 
 assert.equal(rules.filter(x => x.selector === '#order .order-steps' && /display:grid/.test(x.body)).length, 1,
   'Exactly one base rule must define the process grid.');

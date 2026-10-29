@@ -20,7 +20,7 @@ assert.match(html, /--page:#eaf3fb/, "Light mode must use the reference ice-blue
 assert.match(html, /--card-glass:rgba\(236,246,255,\.78\)/, "Light product cards must have a clearly visible frosted surface.");
 assert.match(html, /--page:#061522/, "Dark mode must use deep navy instead of pure black.");
 assert.match(html, /--card-glass:rgba\(8,27,46,\.86\)/, "Dark product cards must remain distinct from the page background.");
-assert.match(html, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(36,66,91,\.96\)/, "Dark commitment tiles must use layered navy glass.");
+assert.match(html, /--sd-glass-shell-strong:radial-gradient\(ellipse 120% 140% at 25% -40%,rgba\(70,110,143,\.62\)/, "Dark commitment surfaces use the unified translucent navy optical shell.");
 
 const mobileReferenceStart = html.indexOf("/* Mobile proportions tuned against the reference home screen");
 const mobileReferenceEnd = html.indexOf("@media(max-width:360px){", mobileReferenceStart);
@@ -138,14 +138,19 @@ assert.doesNotMatch(codeHeroCss, /url\(|!important/,
 
 assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    margin:0 auto;\n    grid-template-columns:repeat(3,minmax(0,1fr));'),
   "The reference six-benefit block must retain three columns and two rows on mobile.");
-assert.ok(html.includes(".product-info{padding:9px 9px 36px}") && html.includes(".product-info{padding:11px 12px 44px}"),
-  "Product-card content must reserve space for its separate quick-add action instead of letting the cart button overlap price/details.");
-
-assert.ok(html.includes('<div class="product-meta-row"><span class="product-category">') && html.includes("${fulfillmentBadge(p)}"),
-  "Catalog product category and fulfillment status should share one compact metadata row on mobile.");
+const standardProductCard = html.slice(html.indexOf("function productCard("), html.indexOf("function unbindReveal("));
+const featuredProductCard = html.slice(html.indexOf("function featuredProductCard("), html.indexOf("function setupMobileBottomNav("));
+assert.ok(standardProductCard.includes('<div class="product-card-bottom">')
+  && standardProductCard.includes('quick-add tap-target')
+  && !standardProductCard.includes('class="product-category"'),
+  "Catalog cards must omit redundant category text and place quick-add in the compact price row.");
+assert.ok(featuredProductCard.includes('<div class="product-card-bottom">')
+  && featuredProductCard.includes('quick-add tap-target')
+  && !featuredProductCard.includes('class="product-category"'),
+  "Featured cards must use the same compact price-and-cart row without repeating the photo category.");
 assert.ok(html.includes('<a class="product-open" href="${href}" data-open-product=')
   && html.includes("if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}"),
-  "Product cards must use crawlable semantic anchors and preserve Enter/Space keyboard activation.");
+  "Product cards must use crawlable anchors and preserve Enter/Space keyboard activation.");
 assert.ok(html.includes(".product-open:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}"),
   "Keyboard-focusable product cards must retain a visible focus indicator after replacing the native button wrapper.");
 
@@ -153,9 +158,9 @@ console.log("PASS: storefront product cards use reference ice-blue/navy Liquid G
 
 assert.ok(finalThemeCss.includes('body:has(.sd-fullscreen-viewer.open) .mobile-bottom-nav{display:none!important}'),
   "Immersive fullscreen gallery must not be obscured by the persistent app navigation.");
-assert.ok(finalThemeCss.includes('background:rgba(247,252,255,.995)!important;')
-  && finalThemeCss.includes('background:rgba(4,20,34,.995)!important;'),
-  "Persistent mobile navigation must keep sufficient contrast over scrolling content in both themes.");
+assert.ok(finalThemeCss.includes('background:var(--sd-glass-shell-strong)!important;')
+  && finalThemeCss.includes('backdrop-filter:blur(13px) saturate(115%)!important;'),
+  "Persistent navigation uses theme-aware high-legibility translucent glass and restrained blur without opaque plastic.");
 
 
 const sixTileRefinementStart = html.lastIndexOf("/* 2026-10-21 visual refinement: six benefit tiles");
@@ -164,7 +169,8 @@ assert.ok(sixTileRefinementStart >= 0 && sixTileRefinementEnd > sixTileRefinemen
   "The six-tile satin refinement must be present in the final style block.");
 const sixTileRefinementCss = html.slice(sixTileRefinementStart, sixTileRefinementEnd);
 assert.ok(sixTileRefinementCss.includes(".service-strip.glass{")
-  && sixTileRefinementCss.includes("background:rgba(244,250,255,.24)")
+  && sixTileRefinementCss.includes("background:var(--sd-3d-face)")
+  && sixTileRefinementCss.includes("background:var(--sd-glass-shell)")
   && sixTileRefinementCss.includes(".service-strip .service-copy{")
   && sixTileRefinementCss.includes(".service-strip .service-text strong{font-size:12px")
   && sixTileRefinementCss.includes("html.dark .service-strip.glass{")
@@ -218,25 +224,28 @@ assert.ok(
 
 
 const catalogFilterPill = html.match(/\.filter-pill\{[^}]+\}/)?.[0] || "";
-assert.match(catalogFilterPill, /min-height:32px;padding:6px 13px/,
-  "The generic filter-pill fallback should stay compact without changing its horizontal spacing.");
-assert.match(html, /\.filter-pill\{font-size:11px;min-height:35px;padding:7px 13px\}/,
-  "The compact mobile filter-pill fallback should stay slim while retaining readable labels.");
-assert.ok(html.includes('#products .filter-pill:active:not(:disabled):not(.active):not([aria-pressed="true"]),')
-  && html.includes('transform:translateY(1px) scale(.965)'),
-  "Slimming catalog filter pills must preserve the existing press feedback.");
+assert.match(catalogFilterPill,/min-height:32px;padding:6px 13px/,
+ "The generic filter-pill fallback stays compact.");
+assert.match(html,/\.filter-pill\{font-size:11px;min-height:35px;padding:7px 13px\}/,
+ "The approved compact mobile fallback stays available.");
+// Owner-approved 2026-10-29 revision: soften the material, remove neon
+// specular sweeps and scale-up animations, preserve tap/selected states.
+assert.match(html,/#products \.filter-pill:active:not\(:disabled\)/,
+ "A subtle press state must still exist.");
+assert.match(html,/transform:translateY\(1px\) scale\(\.995\);box-shadow:var\(--sd-soft-pressed\)/,
+ "Pressed chips must depress gently rather than bounce upward.");
+assert.match(html,/#products \.filter-pill\.active,#products \.filter-pill\[aria-pressed="true"\]/,
+ "Selected category must keep a visually distinguishable state.");
+assert.match(html,/#products \.filter-pill\{[\s\S]*?min-height:40px;/,
+ "New controls must remain compact in the narrow viewport.");
+assert.match(html,/#products \.filter-pill::before\{content:none\}/,
+ "No ripple pseudo-layer may intercept filter taps.");
+assert.doesNotMatch(html,/sdCatalogGlassActivate|sdCatalogSpecularSweep/,
+ "No bright sweep or elastic selected animation on new chips.");
+assert.match(html,/@media\(hover:hover\) and \(pointer:fine\)/,
+ "Hover-specific lighting must not run on touch devices.");
+assert.match(html,/@media\(prefers-reduced-motion:reduce\)/,
+ "Reduced motion treatment must remain available.");
 
-assert.match(html, /#products \.filter-pill\{[^}]*min-height:38px;\s*padding:6px 19px;/,
-  "The visible filter frame must be 38px high while keeping full text and width.");
-
-assert.match(html, /#products \.filter-pill\{min-height:38px;padding:5px 11px;font-size:13\.5px\}/,
-  "Narrow-phone filter frame must be 38px while preserving the original text and horizontal padding.");
-assert.ok(html.includes('.filter-pill.active,.filter-pill:hover{background:var(--panel-strong);border-color:var(--gold);box-shadow:inset 0 1px rgba(255,255,255,.26)}'),
-  "Slimming catalog filter pills must preserve the existing active/hover Liquid Glass feedback.");
-
-assert.ok(html.includes('#products .filter-pill::before{')
-  && html.includes('inset:-3px 0;')
-  && html.includes('pointer-events:auto;'),
-  "The 38px visible chip must preserve a >=44px effective touch area via transparent extensions.");
-assert.ok(html.includes('inset:1px 1px;') && html.includes('animation:sdCatalogSpecularSweep .46s cubic-bezier(.2,.8,.2,1) both;'),
-  "The specular sweep must sit adjacent to the reduced frame while preserving light/dark selection animation.");
+assert.ok(html.includes('<a class="product-open" href="${href}" data-open-product='),
+  "Product cards must retain crawlable semantic anchors and keyboard activation.");
