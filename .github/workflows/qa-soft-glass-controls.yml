@@ -5,6 +5,7 @@ on:
       - feat/soft-neumorphic-controls-2026-10-29
     paths:
       - public/index.html
+      - tests/product-card-liquid-glass.test.mjs
       - tests/soft-glass-controls-contract.test.mjs
       - tests/e2e/soft-glass-controls.spec.js
       - .github/workflows/qa-soft-glass-controls.yml
