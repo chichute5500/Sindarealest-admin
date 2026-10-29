@@ -4031,8 +4031,8 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
 }
 
 /* Keep the sticky header frosted, but prevent scrolled page imagery/text from ghosting through the official brand lockup. */
-.nav-wrap .nav{background:rgba(244,250,255,.94)!important}
-html.dark .nav-wrap .nav{background:rgba(4,20,34,.94)!important}
+.nav-wrap .nav{background:rgba(237,245,251,.95)!important;box-shadow:0 4px 12px rgba(48,86,119,.08),inset 0 1px 2px rgba(255,255,255,.63)!important}
+html.dark .nav-wrap .nav{background:rgba(13,36,55,.96)!important;box-shadow:0 4px 12px rgba(0,5,15,.22),inset 0 1px 2px rgba(148,191,219,.16)!important}
 
 /* In light mode, blend the original white image backdrop into the satin surface without changing the source asset; keep Dark-mode product colours untouched. */
 html:not(.dark) .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:normal!important}
@@ -4253,7 +4253,7 @@ html.dark{
 }
 #products .search-field,#products .filter-pill{
  position:relative;isolation:isolate;min-width:0;color:var(--sd-soft-ink);
- border:1.5px solid transparent;background:var(--sd-3d-surface);
+ border:1px solid transparent;background:var(--sd-3d-surface);
  box-shadow:var(--sd-soft-shadow);
  -webkit-backdrop-filter:blur(5px) saturate(110%);backdrop-filter:blur(5px) saturate(110%);
  transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
@@ -4274,8 +4274,8 @@ html.dark #products .search-field,html.dark #products .filter-pill{background:va
 #products .search-field input::placeholder{color:var(--sd-soft-muted);opacity:1}
 #products .search-field input:focus-visible{outline:none}
 #products .search-field:focus-within{
- border-color:rgba(97,149,187,.78);
- box-shadow:var(--sd-soft-pressed),0 0 0 2px rgba(93,145,185,.22);
+ border-color:transparent;
+ box-shadow:var(--sd-3d-selected);
 }
 #products .search-field:has(input:focus-visible){outline:2px solid #437fa9;outline-offset:3px}
 #products .search-field:active{box-shadow:var(--sd-soft-pressed)}
@@ -4293,7 +4293,20 @@ html.dark #products .search-field,html.dark #products .filter-pill{background:va
  transform:none;filter:none;animation:none;
  touch-action:manipulation;
 }
-#products .filter-pill::before,#products .filter-pill::after{content:none}
+#products .filter-pill::before{content:none}
+#products .search-field::after,#products .filter-pill::after{
+ content:"";position:absolute;inset:3px;border-radius:inherit;pointer-events:none;
+ box-shadow:inset 2px 3px 6px rgba(96,125,154,.13),inset -2px -3px 6px rgba(255,255,255,.33);
+}
+html.dark #products .search-field::after,html.dark #products .filter-pill::after{
+ box-shadow:inset 2px 3px 6px rgba(0,9,22,.24),inset -2px -3px 6px rgba(98,144,178,.13);
+}
+#products .filter-pill:active::after{
+ box-shadow:inset 4px 5px 8px rgba(82,115,145,.27),inset -2px -3px 6px rgba(255,255,255,.22);
+}
+html.dark #products .filter-pill:active::after{
+ box-shadow:inset 4px 5px 8px rgba(0,7,20,.38),inset -2px -3px 6px rgba(77,130,165,.14);
+}
 #products .filter-pill.active,#products .filter-pill[aria-pressed="true"]{
  color:var(--sd-soft-ink);border-color:transparent;background:var(--sd-3d-surface);
  box-shadow:var(--sd-3d-selected);animation:none;
@@ -4305,15 +4318,15 @@ html.dark #products .filter-pill.active,html.dark #products .filter-pill[aria-pr
    specificity level and otherwise masks the ordinary :active shadow. */
 html.dark #products .filter-pill.active:active:not(:disabled),
 html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
- box-shadow:var(--sd-soft-pressed);transform:scale(.985);
- transition-duration:105ms;
+ box-shadow:var(--sd-soft-pressed);transform:translateY(1px) scale(.995);
+ transition-duration:115ms;
 }
 @media(hover:hover) and (pointer:fine){
- #products .filter-pill:hover:not(:disabled){box-shadow:var(--sd-3d-shadow);filter:brightness(1.025)}
+ #products .filter-pill:hover:not(:disabled){box-shadow:var(--sd-3d-shadow)}
  #products .search-field:hover:not(:focus-within){box-shadow:var(--sd-3d-shadow)}
 }
 #products .filter-pill:active:not(:disabled){
- transform:scale(.985);box-shadow:var(--sd-soft-pressed);transition-duration:105ms;
+ transform:translateY(1px) scale(.995);box-shadow:var(--sd-soft-pressed);transition-duration:115ms;
 }
 #products .filter-pill:focus-visible{
  outline:2px solid #437fa9;outline-offset:3px;
@@ -4347,45 +4360,51 @@ html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
    diffused contact shadow. Shadow changes, not only scale, communicate touch. */
 :root{
  --sd-3d-ink:#193449;
- --sd-3d-shadow:0 2px 4px rgba(63,94,122,.13),0 11px 24px rgba(44,82,118,.19),
-   inset 1px 2px 2px rgba(255,255,255,.93),inset 5px 5px 10px rgba(93,125,161,.25),
-   inset -4px -5px 9px rgba(255,255,255,.91),inset 0 -1px 2px rgba(75,128,166,.20);
- --sd-3d-depressed:0 1px 3px rgba(48,78,108,.09),
-   inset 5px 6px 12px rgba(76,107,142,.40),inset -3px -3px 7px rgba(255,255,255,.69);
- --sd-3d-selected:0 5px 13px rgba(46,82,115,.12),
-   inset 5px 6px 11px rgba(81,112,145,.33),
-   inset -4px -4px 8px rgba(255,255,255,.78),inset 0 0 0 1px rgba(99,158,193,.27);
- --sd-3d-rim:conic-gradient(from 210deg,rgba(108,161,203,.67),
-   rgba(237,181,216,.71) 18%,rgba(250,254,255,.98) 35%,
-   rgba(122,158,201,.75) 63%,rgba(130,221,216,.77) 81%,rgba(108,161,203,.67));
- --sd-3d-surface:radial-gradient(ellipse 115% 87% at 16% 0%,rgba(255,255,255,.69),transparent 68%) padding-box,
-   linear-gradient(145deg,rgba(242,247,252,.91),rgba(218,232,245,.94) 70%,rgba(214,229,244,.97)) padding-box,
-   var(--sd-3d-rim) border-box;
+ /* Shallow contact and ambient; real depth comes from inner curvature. */
+ --sd-3d-shadow:0 1px 2px rgba(53,85,113,.11),0 4px 10px rgba(51,86,116,.075),
+  inset 0 2px 3px rgba(251,254,255,.65),inset 0 -2px 3px rgba(102,137,168,.18),
+  inset 3px 4px 8px rgba(94,123,152,.25),inset -4px -4px 8px rgba(249,252,255,.52);
+ --sd-3d-depressed:0 1px 2px rgba(53,85,113,.04),
+  inset 0 2px 4px rgba(102,131,161,.29),inset 5px 6px 12px rgba(82,112,146,.38),
+  inset -3px -3px 7px rgba(248,251,255,.39);
+ --sd-3d-selected:0 1px 3px rgba(56,84,116,.065),
+  inset 0 3px 5px rgba(109,137,165,.23),inset 5px 5px 10px rgba(85,113,145,.29),
+  inset -3px -4px 8px rgba(248,251,255,.48);
+ --sd-3d-rim:linear-gradient(135deg,rgba(223,185,213,.33),rgba(236,244,249,.56) 28%,
+  rgba(119,150,182,.30) 61%,rgba(146,195,198,.31) 88%,rgba(147,175,204,.28));
+ --sd-3d-surface:radial-gradient(ellipse 105% 125% at 50% 58%,rgba(153,179,205,.11),transparent 77%) padding-box,
+  linear-gradient(150deg,rgba(222,235,248,.75),rgba(207,225,240,.73)) padding-box,
+  var(--sd-3d-rim) border-box;
+ --sd-3d-tray:linear-gradient(150deg,rgba(238,246,252,.96),rgba(225,239,249,.95));
+ --sd-3d-tray-shadow:0 3px 10px rgba(49,85,119,.09),inset 0 1px 2px rgba(255,255,255,.66);
  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
- --sd-control-rim:rgba(190,212,230,.72);
- --sd-control-face:rgba(231,240,248,.94);
+ --sd-control-rim:rgba(184,207,225,.45);
+ --sd-control-face:rgba(220,233,246,.86);
  --sd-control-ink:var(--sd-3d-ink);
  --sd-control-shadow:var(--sd-3d-shadow);
  --sd-control-down:var(--sd-3d-depressed);
 }
 html.dark{
  --sd-3d-ink:#edf7ff;
- --sd-3d-shadow:0 2px 4px rgba(0,4,12,.29),0 12px 24px rgba(0,5,15,.43),
-   inset 1px 2px 3px rgba(187,226,251,.29),inset 5px 5px 10px rgba(0,10,23,.47),
-   inset -4px -5px 10px rgba(95,147,183,.25),inset 0 -1px 2px rgba(135,196,231,.16);
- --sd-3d-depressed:0 1px 3px rgba(0,4,12,.20),
-   inset 5px 6px 12px rgba(0,4,12,.61),inset -3px -3px 7px rgba(97,151,194,.23);
- --sd-3d-selected:0 4px 12px rgba(0,4,13,.26),
-   inset 5px 6px 11px rgba(0,5,16,.53),
-   inset -4px -4px 8px rgba(91,150,189,.24),inset 0 0 0 1px rgba(159,205,235,.24);
- --sd-3d-rim:conic-gradient(from 210deg,rgba(97,158,198,.64),rgba(191,146,207,.56) 18%,
-   rgba(207,233,249,.80) 35%,rgba(88,135,183,.69) 63%,
-   rgba(85,176,184,.64) 81%,rgba(97,158,198,.64));
- --sd-3d-surface:radial-gradient(ellipse 115% 87% at 16% 0%,rgba(155,195,225,.29),transparent 68%) padding-box,
-   linear-gradient(145deg,rgba(35,67,94,.97),rgba(14,40,63,.97)) padding-box,
-   var(--sd-3d-rim) border-box;
- --sd-control-rim:rgba(122,162,195,.60);
- --sd-control-face:rgba(22,48,72,.96);
+ --sd-3d-shadow:0 1px 2px rgba(0,5,15,.25),0 4px 11px rgba(0,6,16,.17),
+  inset 0 2px 3px rgba(147,184,210,.21),inset 0 -2px 4px rgba(0,12,26,.30),
+  inset 3px 4px 9px rgba(0,9,21,.44),inset -3px -4px 8px rgba(80,124,159,.25);
+ --sd-3d-depressed:0 1px 2px rgba(0,5,15,.11),
+  inset 0 2px 5px rgba(0,8,19,.38),inset 5px 6px 12px rgba(0,5,15,.56),
+  inset -3px -3px 7px rgba(83,139,176,.18);
+ --sd-3d-selected:0 1px 2px rgba(0,5,14,.17),
+  inset 0 3px 5px rgba(0,8,20,.34),inset 5px 5px 10px rgba(0,7,18,.49),
+  inset -3px -4px 8px rgba(80,131,167,.20);
+ --sd-3d-rim:linear-gradient(135deg,rgba(171,140,184,.32),
+  rgba(128,163,190,.41) 30%,rgba(63,104,142,.34) 63%,
+  rgba(92,154,157,.35) 86%,rgba(95,133,167,.30));
+ --sd-3d-surface:radial-gradient(ellipse 105% 125% at 50% 58%,rgba(0,11,24,.18),transparent 77%) padding-box,
+  linear-gradient(150deg,rgba(36,65,89,.91),rgba(20,47,70,.89)) padding-box,
+  var(--sd-3d-rim) border-box;
+ --sd-3d-tray:linear-gradient(150deg,rgba(17,42,62,.97),rgba(11,34,55,.96));
+ --sd-3d-tray-shadow:0 4px 11px rgba(0,5,15,.22),inset 0 1px 2px rgba(148,191,219,.17);
+ --sd-control-rim:rgba(114,150,184,.40);
+ --sd-control-face:rgba(23,50,73,.86);
  --sd-control-ink:var(--sd-3d-ink);
  --sd-control-shadow:var(--sd-3d-shadow);
  --sd-control-down:var(--sd-3d-depressed);
@@ -4394,7 +4413,7 @@ html.dark{
 .detail-zoom-btn,.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,
 .sd-fullscreen-share,.detail-favorite-btn,.close-btn{
  -webkit-appearance:none;appearance:none;display:grid;place-items:center;isolation:isolate;
- border:1.5px solid transparent!important;border-radius:999px;
+ border:1px solid transparent!important;border-radius:999px;
  background:var(--sd-3d-surface)!important;color:var(--sd-control-ink)!important;text-shadow:none!important;
  box-shadow:var(--sd-control-shadow)!important;
  -webkit-backdrop-filter:blur(5px) saturate(110%)!important;
@@ -4414,19 +4433,19 @@ html.dark .sd-fullscreen-share,html.dark .detail-favorite-btn,html.dark .close-b
  .slide-controls button:hover,.featured-arrow:hover,.detail-zoom-btn:hover,
  .detail-gallery-arrow:hover,.sd-fullscreen-close:hover,.sd-fullscreen-arrow:hover,
  .sd-fullscreen-share:hover,.detail-favorite-btn:hover,.close-btn:hover{
-  box-shadow:var(--sd-3d-shadow)!important;filter:brightness(1.025);
+  box-shadow:var(--sd-3d-shadow)!important;
  }
 }
 .icon-btn:active,.mini-add:active,.page-btn.page-arrow:active:not(:disabled),
 .slide-controls button:active,.featured-arrow:active,.detail-zoom-btn:active,
 .sd-fullscreen-close:active,.sd-fullscreen-share:active,.detail-favorite-btn:active,.close-btn:active{
- transform:translateY(1px) scale(.99)!important;
- box-shadow:var(--sd-control-down)!important;filter:brightness(.99);
+ transform:translateY(1px) scale(.995)!important;
+ box-shadow:var(--sd-control-down)!important;
  transition-duration:105ms!important;
 }
-.nav-wrap .menu-btn:active{transform:translateY(-50%) scale(.99)!important;box-shadow:var(--sd-control-down)!important}
+.nav-wrap .menu-btn:active{transform:translateY(-50%) scale(.995)!important;box-shadow:var(--sd-control-down)!important}
 .detail-gallery-arrow:active,.sd-fullscreen-arrow:active{
- transform:translateY(-50%) scale(.99)!important;box-shadow:var(--sd-control-down)!important;
+ transform:translateY(-50%) scale(.995)!important;box-shadow:var(--sd-control-down)!important;
  transition-duration:105ms!important;
 }
 .icon-btn:active svg,.mini-add:active svg,.page-btn.page-arrow:active svg,
@@ -4477,7 +4496,7 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
 .account-action:active:not(:disabled),
 .checkout-drawer .sd-checkout-option:active:not(:disabled),
 .checkout-drawer .sd-checkout-copy:active:not(:disabled){
- transform:translateY(1px) scale(.99);
+ transform:translateY(1px) scale(.995);
  box-shadow:var(--sd-3d-depressed);
  transition-duration:105ms;
 }
@@ -4507,20 +4526,20 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
 /* Existing four-tab bottom nav: recessed glass, rounded soft rim and tactile selection. */
 @media(max-width:760px){
  #mobileBottomNav.mobile-bottom-nav{
-  border:1.5px solid transparent;background:var(--sd-3d-surface);
-  box-shadow:0 9px 22px rgba(42,82,118,.17),inset 0 1px 0 rgba(255,255,255,.56);
+  border:1px solid var(--sd-control-rim);background:var(--sd-3d-tray)!important;
+  box-shadow:var(--sd-3d-tray-shadow)!important;
   -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);
  }
  #mobileBottomNav .mobile-tab{
   min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border:1.5px solid transparent;border-radius:16px;background:var(--sd-3d-surface);
+  border:1px solid transparent;border-radius:16px;background:var(--sd-3d-surface);
   box-shadow:var(--sd-3d-shadow);color:var(--sd-control-ink);
   transition:transform 245ms cubic-bezier(.16,.90,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
  }
  #mobileBottomNav .mobile-tab.is-active{border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);color:var(--sd-control-ink)}
  html.dark #mobileBottomNav .mobile-tab.is-active{background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);color:#fff}
  #mobileBottomNav .mobile-tab:active{
-  transform:translateY(1px) scale(.99)!important;box-shadow:var(--sd-3d-depressed)!important;
+  transform:translateY(1px) scale(.995)!important;box-shadow:var(--sd-3d-depressed)!important;
   transition-duration:105ms!important;
  }
  #mobileBottomNav .mobile-tab:focus-visible{outline:2px solid #4a88b4;outline-offset:2px}
