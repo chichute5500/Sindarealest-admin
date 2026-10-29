@@ -17,7 +17,7 @@ const SCHEMA=[
  ["customer_account_favorites","account_id,product_key"],
  ["customer_account_shipping","account_id,full_name,phone,province,ward,street_address"],
  ["customer_account_orders","account_id,order_id"],
- ["public_rate_limits","bucket"]
+ ["public_rate_limits","scope,ip_hash,window_start,attempts"]
 ];
 export async function checkProductionCustomerAuthReady(){
  const account=process.env.CLOUDFLARE_ACCOUNT_ID||"";
