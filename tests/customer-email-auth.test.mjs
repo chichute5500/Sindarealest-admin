@@ -65,10 +65,19 @@ try {
  assert.match(mail[0].TextPart,/\d{6}/);
  const code=mail[0].TextPart.match(/Mã xác minh: (\d{6})/)[1];
  const link=mail[0].TextPart.match(/Xác minh Email: (https:\/\/[^\s]+)/)[1];
+ const duplicateUnverified=await send(signup);
+ assert.equal(duplicateUnverified.status,409,"An existing unverified email must not create a duplicate");
+ const duplicatePayload=await duplicateUnverified.json();
+ assert.equal(duplicatePayload.verification_required,true,"UI must open OTP recovery view");
+ assert.equal(mail.length,1,"Duplicate registration must never auto-send a second verification email");
  assert.equal((await send({...signup,mode:"login"})).status,403,"Unverified Email cannot sign in");
  assert.equal((await send({mode:"verify",email:signup.email,code:"000000"===code?"111111":"000000"})).status,400);
  assert.equal((await send({mode:"verify",email:signup.email,code})).status,200);
  assert.equal((await send({mode:"verify",email:signup.email,code})).status,400,"OTP is single use");
+ const duplicateVerified=await send(signup);
+ assert.equal(duplicateVerified.status,409,"Verified email must ask user to login");
+ assert.notEqual((await duplicateVerified.json()).verification_required,true,
+   "Verified account must not open resend verification flow");
  const login=await send({...signup,mode:"login"});
  assert.equal(login.status,200);
  const cookie=login.headers.get("Set-Cookie").match(/sd_customer_login=[a-f0-9]{64}/)[0];

@@ -39,14 +39,20 @@ export async function onRequestPost({request,env}) {
    const name=body.name;
    if(typeof name!=="string"||name.trim().length<2||name.length>100)return error("Vui lòng nhập tên từ 2 đến 100 ký tự.");
    const existing=await findEmailAccount(env,email);
-   if(existing)return error("Email đã được đăng ký. Nếu chưa xác minh, hãy chọn Gửi lại mã.",409);
+   if(existing){
+    if(!existing.verified_at)
+      return json({ok:false,verification_required:true,
+        error:"Tài khoản này chưa xác minh Email. Nhập OTP đã nhận hoặc chọn Gửi lại mã."},409);
+    return error("Email đã có tài khoản. Hãy chọn Đăng nhập hoặc Quên mật khẩu.",409);
+   }
    const salt=randomToken(24),hash=await passwordHash(password,salt),id=crypto.randomUUID();
    await env.DB.batch([
     env.DB.prepare("INSERT INTO customer_auth_accounts(id,provider,provider_subject,display_name,email,password_salt,password_hash) VALUES(?,'email',?,?,?,?,?)").bind(id,email,name.trim(),email,salt,hash),
     env.DB.prepare("INSERT INTO customer_auth_email_state(account_id,verified_at,last_sent_at) VALUES(?,NULL,0)").bind(id)
    ]);
    try{await generateChallenge(env,id,email,"verify")}
-   catch{return error("Chưa gửi được Email xác minh. Vui lòng chọn Gửi lại mã.",503)}
+   catch{return json({ok:false,verification_required:true,
+    error:"Tài khoản đã được tạo nhưng chưa gửi được Email. Mở phần xác minh và chọn Gửi lại mã."},503)}
    return json({ok:true,verification_required:true,message:"Đã gửi email chứa OTP 6 số và liên kết xác minh. Vui lòng kiểm tra hộp thư."},202);
   }
   const a=await env.DB.prepare("SELECT a.id,a.password_salt,a.password_hash,v.verified_at FROM customer_auth_accounts a LEFT JOIN customer_auth_email_state v ON v.account_id=a.id WHERE a.provider='email' AND a.provider_subject=?").bind(email).first();

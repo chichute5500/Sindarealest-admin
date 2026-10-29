@@ -8,9 +8,11 @@ const emailOtp=readFileSync(new URL("../public/customer-email-otp-ui.js",import.
 new Script(emailOtp,{filename:"customer-email-otp-ui.js"});
 for(const id of ["sdAuthVerifyForm","sdAuthForgotForm","sdAuthResetForm"])
  assert.ok(html.includes('id="'+id+'"'),"OTP/Reset form missing: "+id);
+assert.ok(auth.includes('payload.mode==="register"&&data.verification_required===true'),"Existing unverified Email must open OTP panel");
+assert.ok(emailOtp.includes('scrollIntoView({block:"nearest"'),"OTP panel must be scrolled into view");
 assert.ok(emailOtp.includes('mode:"reset-confirm"')&&emailOtp.includes('mode:"verify"'),
  "Email verification and reset must be accessible in account drawer");
-assert.ok(html.includes('src="/customer-email-otp-ui.js?v=email-mailjet-20261029"'),
+assert.ok(html.includes('src="/customer-email-otp-ui.js?v=email-recovery-20261029"'),
  "OTP UI must be included after existing Google auth");
 
 let parsed=0;

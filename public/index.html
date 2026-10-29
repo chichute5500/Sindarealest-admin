@@ -32,9 +32,9 @@
 <link rel="preload" href="/fonts/NotoSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
-<link rel="stylesheet" href="/customer-auth.css?v=email-mailjet-20261029">
-<script type="module" src="/customer-auth-ui.js?v=email-mailjet-20261029"></script>
-<script type="module" src="/customer-email-otp-ui.js?v=email-mailjet-20261029"></script>
+<link rel="stylesheet" href="/customer-auth.css?v=email-recovery-20261029">
+<script type="module" src="/customer-auth-ui.js?v=email-recovery-20261029"></script>
+<script type="module" src="/customer-email-otp-ui.js?v=email-recovery-20261029"></script>
 <title>SinDarealest — Premium Crocodile Leather Fashion</title>
 <script>(()=>{const root=document.documentElement;
  root.classList.add('js-enabled');
@@ -1373,7 +1373,7 @@ html.sd-catalog-route #products .filter-pill{
             <label>Mã OTP<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
             <button type="submit" class="sd-auth-submit tap-target">Xác minh Email</button>
           </form>
-          <button type="button" class="sd-auth-text-button tap-target" data-auth-resend>Gửi lại mã (sau 60 giây)</button>
+          <button type="button" class="sd-auth-text-button tap-target" data-auth-resend>Gửi lại mã OTP</button>
           <button type="button" class="sd-auth-text-button tap-target" data-auth-return>Quay lại</button>
         </div>
         <div class="sd-auth-flow" id="sdAuthForgot" hidden>

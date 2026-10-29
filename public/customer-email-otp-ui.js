@@ -18,6 +18,12 @@ if(root){
     panel.hidden=key!==name;
     if(key===name&&email)panel.querySelector('input[name="email"]').value=email;
    }
+   if(name==="verify"){
+    // Keep OTP input and the resend action reachable even when returning
+    // from a failed/already-created registration attempt.
+    panels.verify.querySelector('input[name="code"]').value="";
+    requestAnimationFrame(()=>panels.verify.scrollIntoView({block:"nearest",behavior:"instant"}));
+   }
    if(name==="close"){
     const expanded=$("[data-auth-email]").getAttribute("aria-expanded")==="true";
     login.hidden=!expanded;toggle.hidden=!expanded;forgot.hidden=!expanded||login.dataset.mode==="register";

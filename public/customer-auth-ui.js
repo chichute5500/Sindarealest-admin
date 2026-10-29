@@ -160,7 +160,12 @@ if(root){
       const data=await res.json();
       if(!res.ok){
         notify(data.error||"Đăng nhập không thành công.");
-        if(res.status===403&&payload.mode==="login")window.sdEmailFlow?.show("verify",payload.email);
+        if((res.status===403&&payload.mode==="login")||
+           (payload.mode==="register"&&data.verification_required===true)){
+          // A previous registration may already have created the account before
+          // Mailjet delivered its message. Never ask for a second registration.
+          window.sdEmailFlow?.show("verify",payload.email);
+        }
         return;
       }
       if(data.verification_required){
