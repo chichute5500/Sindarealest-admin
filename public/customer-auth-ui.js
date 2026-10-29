@@ -98,6 +98,8 @@ if(root){
       q("[data-auth-email-note]").hidden=emailEnabled;
       q("[data-auth-unverified-caption]").hidden=!emailEnabled;
       authOptions.hidden=active;signed.hidden=!active;
+      // The storefront bridge owns cloud preferences; no password/PII leaves the authenticated API.
+      window.sdAccountBridge?.onAuth(active);
       if(guest)guest.hidden=active;
       if(active){
         $name.textContent=data.user?.name||"Khách hàng";
