@@ -34,3 +34,9 @@
 }
 #sdCustomerAuth .sd-auth-message[data-kind="error"] { color:#a54130; }
 #sdCustomerAuth .sd-auth-message[data-kind="success"] { color:#226c4b; }
+
+/* Account cloud status and explicit import stay outside the auth root. */
+#accountCloudStatus{font-size:12px;line-height:1.55;color:var(--muted);margin:8px 0}
+#accountImportLocal{font-size:12px;min-height:38px;width:100%;margin:6px 0 12px}
+#accountImportLocal[hidden]{display:none!important}
+#accountImportLocal:disabled{opacity:.55;cursor:wait}
