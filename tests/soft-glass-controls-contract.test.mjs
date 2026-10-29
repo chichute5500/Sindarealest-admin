@@ -39,7 +39,7 @@ test('dark selected controls cannot mask tactile :active material',()=>{
 
 test('one clear face, one masked optical edge and separate depth roles in both themes',()=>{
  assert.match(html,/--sd-3d-face:radial-gradient/);
- assert.match(html,/--sd-3d-surface:var\(--sd-3d-face\) padding-box/);
+ assert.match(html,/--sd-3d-surface:var\(--sd-3d-face\);/);
  assert.match(html,/--sd-3d-surface-search:var\(--sd-3d-face\)/);
  assert.match(html,/--sd-3d-rim:radial-gradient\(ellipse 78% 95% at 0% 1%/);
  assert.match(html,/radial-gradient\(ellipse 55% 113% at 100% 40%/);
@@ -82,7 +82,7 @@ test('Final Glass UI 2.0 replaces opaque legacy shells without duplicating mater
  assert.equal((html.match(/--sd-glass-shell-strong:/g)||[]).length,2,'both themes define the same strong shell');
  assert.equal((html.match(/--sd-glass-panel-shadow:/g)||[]).length,2);
  assert.equal((html.match(/--sd-glass-input-shadow:/g)||[]).length,2);
- assert.match(html,/--sd-glass-shell:var\(--sd-3d-face\) padding-box,var\(--sd-3d-rim\) border-box/);
+ assert.match(html,/--sd-glass-shell:var\(--sd-3d-face\);/);
  assert.doesNotMatch(html,/\.nav-wrap \.nav\{background:rgba\(237,245,251,\.95\)!important/);
  assert.doesNotMatch(html,/\.mobile-bottom-nav\{\s*background:rgba\(247,252,255,\.995\)!important/);
  assert.match(html,/\.nav-wrap \.nav\{border:1px solid transparent;background:var\(--sd-glass-shell-strong\)!important/);
