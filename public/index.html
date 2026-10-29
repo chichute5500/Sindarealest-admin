@@ -4409,18 +4409,19 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
  /* Directional pastel light is painted through the catalog's masked edge only. */
  --sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%,rgba(231,166,209,.47),transparent 79%),radial-gradient(ellipse 55% 113% at 100% 40%,rgba(104,155,215,.40),transparent 83%),radial-gradient(ellipse 100% 47% at 60% 105%,rgba(118,211,202,.42),transparent 79%),linear-gradient(160deg,rgba(229,238,247,.27),rgba(131,166,194,.12));
  /* The soft face is ONE translucent film, not multiple opaque inset fills. */
- --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(247,254,255,.22),rgba(215,239,246,.105) 56%,rgba(194,228,238,.065) 100%);
- --sd-3d-surface:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
+ --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(253,255,255,.53),rgba(238,249,255,.41) 56%,rgba(223,241,250,.34) 100%);
+ --sd-3d-surface:var(--sd-3d-face);
  
  
  --sd-3d-surface-search:var(--sd-3d-face);
  /* Final Glass UI 2.0: one shared optical material for page shells, panels
     and controls. Header/tray use the stronger translucent face for legibility. */
- --sd-glass-shell:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
- --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(255,255,255,.72),rgba(231,245,254,.56) 57%,rgba(226,240,251,.46) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-shell:var(--sd-3d-face);
+ --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(255,255,255,.72),rgba(231,245,254,.56) 57%,rgba(226,240,251,.46) 100%);
  --sd-glass-panel-shadow:0 12px 29px rgba(35,80,113,.10),0 2px 5px rgba(43,89,119,.045),inset 1px 2px 3px rgba(109,150,176,.10);
  --sd-glass-input-shadow:0 3px 9px rgba(45,87,118,.075),inset 1px 2px 4px rgba(93,139,167,.14);
- --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.33),rgba(211,235,250,.18) 65%,rgba(189,224,246,.12) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-input-edge:rgba(147,191,225,.38);
+ --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.33),rgba(211,235,250,.18) 65%,rgba(189,224,246,.12) 100%);
  --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.33),rgba(211,235,250,.18) 65%,rgba(189,224,246,.12) 100%);
 
  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
@@ -4436,16 +4437,17 @@ html.dark{
  --sd-3d-depressed:0 1px 2px rgba(0,5,15,.09),inset 1px 2px 5px rgba(0,7,18,.34),inset -1px -1px 3px rgba(105,164,197,.10);
  --sd-3d-selected:0 1px 2px rgba(0,5,16,.12),inset 1px 2px 4px rgba(0,7,17,.27),inset -1px -1px 3px rgba(107,165,197,.11);
  --sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%,rgba(199,143,188,.36),transparent 79%),radial-gradient(ellipse 55% 113% at 100% 40%,rgba(105,160,214,.42),transparent 83%),radial-gradient(ellipse 100% 47% at 60% 105%,rgba(100,185,188,.39),transparent 79%),linear-gradient(160deg,rgba(143,179,205,.24),rgba(49,99,133,.10));
- --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(147,188,214,.14),rgba(36,80,112,.115) 56%,rgba(14,54,85,.075) 100%);
- --sd-3d-surface:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
+ --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(111,158,194,.27),rgba(33,74,103,.22) 56%,rgba(16,51,80,.19) 100%);
+ --sd-3d-surface:var(--sd-3d-face);
  
  
  --sd-3d-surface-search:var(--sd-3d-face);
- --sd-glass-shell:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
- --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(70,110,143,.62),rgba(26,66,94,.62) 57%,rgba(11,41,65,.53) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-shell:var(--sd-3d-face);
+ --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(70,110,143,.62),rgba(26,66,94,.62) 57%,rgba(11,41,65,.53) 100%);
  --sd-glass-panel-shadow:0 12px 29px rgba(0,6,18,.26),0 2px 5px rgba(0,7,21,.11),inset 1px 2px 3px rgba(0,16,32,.20);
  --sd-glass-input-shadow:0 3px 9px rgba(0,6,18,.13),inset 1px 2px 4px rgba(0,11,26,.30);
- --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-input-edge:rgba(126,183,223,.31);
+ --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%);
  --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%);
 
  --sd-control-rim:rgba(114,150,184,.40);
@@ -4460,6 +4462,53 @@ html.dark{
 .checkout-backlink,.qty-controls button,.account-action,
 .checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy).tap-target::before{
  content:none;
+}
+/* Single physical refraction edge. Painting the rim as a background
+   underneath a translucent face tints the ENTIRE control (wrong). These
+   masks exclude the face pixels; pastel light exists only on curved edges. */
+:where(.nav-wrap .nav,.service-strip .service-copy,
+ #order #orderDetailsToggle,.sd-track-panel,#mobileBottomNav.mobile-bottom-nav,
+ #mobileBottomNav .mobile-tab,.icon-btn,.mini-add,.page-btn.page-arrow,
+ .slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,
+ .detail-favorite-btn,.close-btn,.sd-fullscreen-close,.sd-fullscreen-arrow,
+ .sd-fullscreen-share,.pill-btn,.checkout-backlink,.qty-controls button,
+ .remove-item,.navlink,.text-link,.contact-link,.product-card,.catalog-card,
+ .cart-row,.checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy,
+ #productOverlay .sd-product-option-chip,#productOverlay .detail-purchase-button,
+ #accountDrawer .account-action,#accountDrawer #sdCustomerAuth,
+ #accountDrawer .account-guest)::after{
+ content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ padding:1.2px;background:var(--sd-3d-rim);opacity:.70;
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;
+ mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ mask-composite:exclude;
+ transition:opacity 255ms var(--sd-3d-ease);
+}
+:where(.nav-wrap .nav,.sd-track-panel,.service-strip .service-copy,
+ #mobileBottomNav .mobile-tab,.mini-add,.page-btn.page-arrow,
+ .slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,
+ .detail-favorite-btn,.close-btn,.sd-fullscreen-close,.sd-fullscreen-arrow,
+ .sd-fullscreen-share,.checkout-backlink,.qty-controls button,
+ .remove-item,.navlink,.text-link,.contact-link,.product-card,.catalog-card,
+ .cart-row,.checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy,
+ #productOverlay .sd-product-option-chip,#accountDrawer .account-action,
+ #accountDrawer #sdCustomerAuth,#accountDrawer .account-guest){position:relative}
+:where(.service-strip .service-copy,.icon-btn,#mobileBottomNav .mobile-tab,
+ .pill-btn,.navlink,.text-link,.contact-link,.checkout-drawer .sd-checkout-option,
+ .checkout-drawer .sd-checkout-copy,#productOverlay .detail-purchase-button):active::after{
+ opacity:.44;transition-duration:115ms;
+}
+:where(.service-strip .service-copy,.icon-btn,#mobileBottomNav .mobile-tab,
+ .pill-btn,.navlink,.text-link,.contact-link,.checkout-drawer .sd-checkout-option,
+ .checkout-drawer .sd-checkout-copy,#productOverlay .detail-purchase-button)[data-sd-glass-press="true"]::after{
+ opacity:.44;transition-duration:115ms;
+}
+/* Child surfaces must not composite a second backdrop blur over their tray. */
+#mobileBottomNav .mobile-tab{-webkit-backdrop-filter:none;backdrop-filter:none}
+@media(prefers-reduced-motion:reduce){
+ :where(.nav-wrap .nav,.service-strip .service-copy,.sd-track-panel,
+  .icon-btn,.pill-btn,#mobileBottomNav .mobile-tab)::after{transition:none}
 }
 /* Final Glass UI 2.0 — existing component geometry is unchanged.
    All glass families reference the SAME shell/face/shadow tokens above.
@@ -4481,7 +4530,7 @@ html.dark{
 }
 .sd-track-controls input,.checkout-fields input,.checkout-fields select,.checkout-fields textarea,
 #productOverlay .sd-product-option-control,.warranty-form input,.warranty-form textarea{
- border:1px solid transparent;
+ border:1px solid var(--sd-glass-input-edge);
  background:var(--sd-glass-shell);
  color:var(--ink);
  box-shadow:var(--sd-glass-input-shadow);
@@ -4762,8 +4811,7 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
  display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:0;
  min-height:50px;padding:11px 12px;border-radius:999px;
  border:1.5px solid transparent;
- background:linear-gradient(145deg,rgba(232,247,255,.48),rgba(var(--sd-action-rgb),.21)) padding-box,
-  var(--sd-3d-rim) border-box;
+ background:linear-gradient(145deg,rgba(232,247,255,.48),rgba(var(--sd-action-rgb),.21));
  -webkit-backdrop-filter:blur(6px) saturate(112%);backdrop-filter:blur(6px) saturate(112%);
  box-shadow:var(--sd-3d-shadow);
  color:var(--ink);font-size:clamp(10px,1vw,13px);font-weight:700;line-height:1.35;
@@ -4786,8 +4834,7 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
 }
 #productOverlay .detail-actions .detail-purchase-button span{min-width:0}
 html.dark #productOverlay .detail-actions .detail-purchase-button{
- background:linear-gradient(145deg,rgba(35,74,102,.57),rgba(var(--sd-action-rgb),.21)) padding-box,
- var(--sd-3d-rim) border-box;
+ background:linear-gradient(145deg,rgba(35,74,102,.57),rgba(var(--sd-action-rgb),.21));
  border-color:transparent;box-shadow:var(--sd-3d-shadow);color:var(--ink);
 }
 html.dark #productOverlay .detail-actions .detail-purchase-button:active:not(:disabled){
