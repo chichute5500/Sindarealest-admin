@@ -11,7 +11,7 @@ const matrices=[
 for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
  test(`Soft Neumorphism ${label} ${mode}`,async({page})=>{
   await page.setViewportSize({width,height});
-  await page.emulateMedia({colorScheme:mode,reducedMotion:'reduce'});
+  await page.emulateMedia({colorScheme:mode,reducedMotion:'no-preference'});
   const jsErrors=[];page.on('pageerror',err=>jsErrors.push(err.message));
   const res=await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:30000});
   expect(res?.status()).toBe(200);
@@ -61,6 +61,25 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   }
   await page.locator('#products').scrollIntoViewIfNeeded();
   await page.screenshot({path:`${dir}/${label}-${mode}.png`,animations:'disabled'});
+  // Physical press contract: make the actual browser hold the button before
+  // capture; a CSS declaration alone is not sufficient. Releasing must restore.
+  const press=page.locator('#categoryFilters .filter-pill').first();
+  await press.scrollIntoViewIfNeeded();
+  const box=await press.boundingBox();
+  expect(box).not.toBeNull();
+  await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  const atRest=await press.evaluate(el=>getComputedStyle(el).boxShadow);
+  const rectAtRest=await press.evaluate(el=>{const r=el.getBoundingClientRect();return [r.width,r.height]});
+  await page.mouse.down();
+  await expect.poll(()=>press.evaluate(el=>getComputedStyle(el).boxShadow)).not.toBe(atRest);
+  const pressed=await press.evaluate(el=>getComputedStyle(el).boxShadow);
+  expect(pressed).toContain('inset');
+  await page.screenshot({path:`${dir}/${label}-${mode}-pressed.png`,animations:'disabled'});
+  await page.mouse.up();
+  await expect.poll(()=>press.evaluate(el=>getComputedStyle(el).boxShadow)).toBe(atRest);
+  const rectAfter=await press.evaluate(el=>{const r=el.getBoundingClientRect();return [r.width,r.height]});
+  expect(rectAfter).toEqual(rectAtRest);
+  await page.screenshot({path:`${dir}/${label}-${mode}-released.png`,animations:'disabled'});
   await search.locator('input').focus();
   const focused=await search.evaluate(el=>getComputedStyle(el).boxShadow);
   expect(focused).toContain('inset');
