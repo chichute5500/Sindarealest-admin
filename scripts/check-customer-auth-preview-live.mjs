@@ -37,6 +37,11 @@ const root=await get(ORIGIN+"/");
 assert.equal(root.status,200,"Preview frontend must be publicly reachable");
 const html=await root.text();
 assert.ok(html.includes('id="sdCustomerAuth"'),"Preview must have the exact customer login drawer");
+assert.ok(html.includes('id="accountOpen"'),"PC header must expose the Account button");
+assert.ok(html.includes("$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'))"),
+  "PC Account button must open the existing mobile-approved account drawer");
+assert.ok(html.includes('data-auth-facebook'),"Facebook Login button must be present in the Account drawer");
+console.log("PASS: real Preview HTML includes wired desktop Account button and Facebook Login UI.");
 for(const provider of ["zalo","google","facebook"]){
   const r=await get(ORIGIN+"/api/customer/auth/"+provider+"/start");
   assert.equal(r.status,302,"OAuth must start on Preview for "+provider);
@@ -59,5 +64,5 @@ for(const provider of ["zalo","google","facebook"]){
   assert.ok(cookie.includes("HttpOnly")&&cookie.includes("Secure")&&cookie.includes("SameSite=Lax"));
   console.log(provider.toUpperCase()+": Preview OAuth start 302, PKCE/state/callback/cookie PASS");
 }
-console.log("PASS: real Cloudflare PREVIEW homepage + D1 session + both provider OAuth start endpoints.");
+console.log("PASS: real Cloudflare PREVIEW homepage + PC Account UI + D1 session + three provider OAuth start endpoints.");
 console.log("No social accounts created and no Production backend accessed.");
