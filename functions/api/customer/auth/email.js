@@ -2,8 +2,8 @@ import {sameOrigin,emailTestAllowed,issueSession,passwordHash,randomToken,equalH
 import {rateLimitPublicRequest,readJsonBodyLimited} from "../../../_lib.js";
 import {emailOnly,findEmailAccount,normEmail,emailPattern,generateChallenge,emailChallengeHandler,genericReset,useChallenge} from "../../../_customer-email.js";
 export async function onRequestPost({request,env}) {
- if(!emailTestAllowed(request))return error("Đăng nhập Email chỉ dành cho Preview.",503);
  if(!sameOrigin(request))return error("Yêu cầu không hợp lệ.",403);
+ if(!emailTestAllowed(request))return error("Đăng nhập Email chỉ dành cho Preview.",503);
  if(!emailOnly(request,env))return error("Email xác minh chưa được cấu hình trên Preview.",503);
  const parsed=await readJsonBodyLimited(request,4096);
  if(parsed.error||!parsed.value||typeof parsed.value!=="object"||Array.isArray(parsed.value))
