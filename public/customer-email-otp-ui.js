@@ -5,9 +5,10 @@ if(root){
  const $=s=>root.querySelector(s);
  const panels={verify:$("#sdAuthVerify"),forgot:$("#sdAuthForgot"),reset:$("#sdAuthReset")};
  const login=$(".sd-auth-email-fields"),message=$("[data-auth-message]"),toggle=$("[data-auth-toggle]"),forgot=$("[data-auth-forgot]");
- let resetToken="";
+ let resetToken="",flowMode="close";
  const tell=(text,success=false)=>{message.textContent=text;message.hidden=!text;message.dataset.kind=success?"success":"error"};
  const show=(name,email="")=>{
+   flowMode=name;
    if(name!=="close"){
     const button=$("[data-auth-email]");
     button.setAttribute("aria-expanded","true");
@@ -18,10 +19,11 @@ if(root){
     if(key===name&&email)panel.querySelector('input[name="email"]').value=email;
    }
    if(name==="close"){
-    login.hidden=false;toggle.hidden=false;forgot.hidden=login.dataset.mode==="register";
+    const expanded=$("[data-auth-email]").getAttribute("aria-expanded")==="true";
+    login.hidden=!expanded;toggle.hidden=!expanded;forgot.hidden=!expanded||login.dataset.mode==="register";
    }
  };
- window.sdEmailFlow={show};
+ window.sdEmailFlow={show,isOpen:()=>flowMode!=="close"};
  const call=async body=>{
    const r=await fetch("/api/customer/auth/email",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
    const data=await r.json().catch(()=>({}));

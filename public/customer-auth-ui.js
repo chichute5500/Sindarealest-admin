@@ -101,8 +101,8 @@ if(root){
       emailButton.disabled=!emailEnabled;
       if(!emailEnabled)emailButton.setAttribute("aria-expanded","false");
       const emailExpanded=emailEnabled && emailButton.getAttribute("aria-expanded")==="true";
-      emailForm.hidden=!emailExpanded;
-      q("[data-auth-forgot]").hidden=!emailExpanded||emailForm.dataset.mode==="register";
+      emailForm.hidden=!emailExpanded||Boolean(window.sdEmailFlow?.isOpen());
+      q("[data-auth-forgot]").hidden=!emailExpanded||emailForm.hidden||emailForm.dataset.mode==="register";
       q("[data-auth-toggle]").hidden=!emailExpanded;
       q("[data-auth-email-note]").hidden=emailEnabled;
       q("[data-auth-unverified-caption]").hidden=!emailExpanded;
