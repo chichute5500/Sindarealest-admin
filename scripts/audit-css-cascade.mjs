@@ -3,7 +3,7 @@
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 const load=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
-const paths=['public/index.html','public/admin/index.html','public/code-hero.css','public/material-gallery.css'];
+const paths=['public/index.html','public/admin/index.html','public/code-hero.css','public/material-gallery.css','public/customer-auth.css'];
 const sources=paths.flatMap(file=>{
   const content=load(file);
   if(!file.endsWith('.html'))return [{file,index:0,css:content}];

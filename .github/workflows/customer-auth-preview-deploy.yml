@@ -1,0 +1,92 @@
+name: Customer Auth — Isolated Cloudflare Preview Deploy
+on:
+  push:
+    branches:
+      - feat/zalo-customer-login-2026-10-29
+    paths:
+      - 'functions/**'
+      - 'public/**'
+      - 'migrations/**'
+      - 'scripts/verify-customer-auth-preview.mjs'
+      - 'scripts/migrate-facebook-preview.mjs'
+      - 'scripts/migrate-customer-account-preview.mjs'
+      - 'scripts/check-customer-auth-preview-live.mjs'
+      - 'scripts/check-customer-auth-preview-callback.mjs'
+      - '.github/workflows/customer-auth-preview-deploy.yml'
+      - 'tests/customer-auth-*.test.mjs'
+      - 'tests/customer-email-auth.test.mjs'
+      - 'tests/customer-facebook-auth.test.mjs'
+      - 'tests/customer-zalo-region.test.mjs'
+      - 'relay/**'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: customer-auth-isolated-pages-preview
+  cancel-in-progress: false
+
+jobs:
+  preview-deploy:
+    # Hard stop for all refs other than the original Owner auth feature branch.
+    if: github.ref == 'refs/heads/feat/zalo-customer-login-2026-10-29'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Checkout the exact feature-branch commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Cloudflare deploy credential availability
+        id: creds
+        shell: bash
+        run: |
+          if [[ -n "$CLOUDFLARE_ACCOUNT_ID" && -n "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Cloudflare GitHub credentials not configured. Skipping all remote operations.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Install and test independently before any remote operation
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          npm install --no-audit --no-fund
+          npm run check
+          npm test
+      - name: Syntax-check optional Vietnam shared-hosting PHP relay
+        if: steps.creds.outputs.ready == 'true'
+        run: php -l relay/zalo-php/zalo-me.php
+      - name: Read-only Cloudflare Preview binding and Production-isolation guard
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/verify-customer-auth-preview.mjs
+      - name: Apply Facebook schema migration ONLY to independently verified PREVIEW D1
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/migrate-facebook-preview.mjs
+      - name: Apply customer account cloud tables to VERIFIED Preview D1 only
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/migrate-customer-account-preview.mjs
+      - name: Deploy only the feature branch to the Preview environment
+        if: steps.creds.outputs.ready == 'true'
+        run: >
+          npx wrangler pages deploy public
+          --project-name sindarealest-admin-preview
+          --branch feat/zalo-customer-login-2026-10-29
+      - name: Real deployed Preview smoke — D1 session and OAuth start
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/check-customer-auth-preview-live.mjs
+      - name: Real Preview D1 OAuth callback with one-time deliberately invalid code
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/check-customer-auth-preview-callback.mjs
+      - name: Record deployment target, never reveal secret values
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          echo 'Deployed only the Cloudflare Pages Preview branch of sindarealest-admin-preview.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Branch: feat/zalo-customer-login-2026-10-29; main storefront untouched.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Real OAuth still requires both providers to allow the exact Preview branch callback URI.' >> "$GITHUB_STEP_SUMMARY"
