@@ -1,6 +1,9 @@
 /* Enhancement to existing Owner-PASS Account drawer. Keeps guest checkout unchanged. */
 const root=document.getElementById("sdCustomerAuth");
 if(root){
+  // Public sign-in rollout: Google only on desktop and mobile. Keep staged
+  // providers in source for future QA; never expose them in this release.
+  const GOOGLE_ONLY_RELEASE = true;
   const q=s=>root.querySelector(s);
   const authOptions=q("[data-auth-options]"),signed=q("[data-auth-signed]");
   const emailForm=q("form"),message=q("[data-auth-message]");
@@ -96,15 +99,19 @@ if(root){
       // Email/password is experimental on the isolated Preview only.
       // Never present this option on Production before verification/recovery is completed.
       const emailEnabled=Boolean(data.providers?.email);
+      const emailAvailable=emailEnabled && !GOOGLE_ONLY_RELEASE;
       const emailButton=q("[data-auth-email]");
-      emailButton.hidden=!emailEnabled;
-      emailButton.disabled=!emailEnabled;
-      if(!emailEnabled)emailButton.setAttribute("aria-expanded","false");
-      const emailExpanded=emailEnabled && emailButton.getAttribute("aria-expanded")==="true";
+      emailButton.hidden=!emailAvailable;
+      emailButton.disabled=!emailAvailable;
+      if(!emailAvailable){
+        emailButton.setAttribute("aria-expanded","false");
+        window.sdEmailFlow?.show("close");
+      }
+      const emailExpanded=emailAvailable && emailButton.getAttribute("aria-expanded")==="true";
       emailForm.hidden=!emailExpanded||Boolean(window.sdEmailFlow?.isOpen());
       q("[data-auth-forgot]").hidden=!emailExpanded||emailForm.hidden||emailForm.dataset.mode==="register";
       q("[data-auth-toggle]").hidden=!emailExpanded;
-      q("[data-auth-email-note]").hidden=emailEnabled;
+      q("[data-auth-email-note]").hidden=GOOGLE_ONLY_RELEASE||emailEnabled;
       q("[data-auth-unverified-caption]").hidden=!emailExpanded;
       authOptions.hidden=active;signed.hidden=!active;
       // The storefront bridge owns cloud preferences; no password/PII leaves the authenticated API.
