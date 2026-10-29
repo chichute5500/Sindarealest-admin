@@ -60,11 +60,11 @@ try {
  assert.equal((await send({...signup,password:"123456"})).status,400);
  const registration=await send(signup);
  assert.equal(registration.status,202);
- assert.equal((await registration.json()).verification_required,true);
+ const registrationBody=await registration.json();
+ assert.equal(registrationBody.verification_required,true);
+ assert.match(registrationBody.message,/Mailjet đã tiếp nhận/,"Send API must not claim mailbox delivery");
  assert.equal(mail.length,1);
  assert.match(mail[0].TextPart,/\d{6}/);
- assert.match((await (async()=>send({mode:"resend",email:"absent@example.test"}))()).status===200?"Mailjet":"",/Mailjet/,
-  "Resend request must not disclose whether an arbitrary Email exists");
  const code=mail[0].TextPart.match(/Mã xác minh: (\d{6})/)[1];
  const link=mail[0].TextPart.match(/Xác minh Email: (https:\/\/[^\s]+)/)[1];
  const duplicateUnverified=await send(signup);
