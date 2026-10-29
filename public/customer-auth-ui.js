@@ -92,7 +92,7 @@ if(root){
         facebook.title="Facebook Login tạm ngừng khi ứng dụng Meta chưa được mở công khai";
       }
       // Email is Preview-only until verified ownership + recovery are implemented.
-      const emailEnabled=Boolean(data.providers?.email);
+      const emailEnabled=false; // Hide unverified Preview email/password self-service; Google is the customer sign-in path.
       emailForm.hidden=!emailEnabled;
       q("[data-auth-toggle]").hidden=!emailEnabled;
       q("[data-auth-email-note]").hidden=emailEnabled;
