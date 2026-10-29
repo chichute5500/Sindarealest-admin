@@ -7,6 +7,7 @@ on:
       - public/index.html
       - public/customer-auth.css
       - tests/product-card-liquid-glass.test.mjs
+      - tests/dynamic-product-categories.test.mjs
       - tests/soft-glass-controls-contract.test.mjs
       - tests/e2e/soft-glass-controls.spec.js
       - .github/workflows/qa-soft-glass-controls.yml
