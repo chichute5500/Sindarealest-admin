@@ -846,11 +846,24 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('dashboard', 'dashboard', null, true);
     // Capture the dashboard at the reference phone's usable app height without
     // multiplying that slower viewport across every route in the QA matrix.
-    const referenceDashboardVariant = { viewport: { width: 390, height: 640 }, theme: 'light' };
+    const referenceDashboardVariant = { viewport: { width: 390, height: 650 }, theme: 'light' };
     await page.setViewportSize(referenceDashboardVariant.viewport);
     await chooseTheme(referenceDashboardVariant.theme);
     await page.evaluate(() => window.scrollTo(0, 0));
     await saveScreenshot('dashboard-reference-viewport', referenceDashboardVariant);
+    const referenceDashboardGeometry = await page.evaluate(() => {
+      const revenue = document.querySelector('#main .dashboard-revenue')?.getBoundingClientRect();
+      const navigation = document.querySelector('.mobiletabs')?.getBoundingClientRect();
+      return {
+        viewportWidth: innerWidth,
+        viewportHeight: innerHeight,
+        revenueBottom: revenue ? Math.round(revenue.bottom) : null,
+        navigationTop: navigation ? Math.round(navigation.top) : null
+      };
+    });
+    expect(referenceDashboardGeometry.revenueBottom,
+      'Reference-height dashboard should show the revenue panel above the fixed mobile navigation: ' + JSON.stringify(referenceDashboardGeometry))
+      .toBeLessThanOrEqual(referenceDashboardGeometry.navigationTop - 8);
     await captureView('products', 'products', null, true);
 
     // Screen #3 reference matrix: exercise the actual ADMIN product renderer at every

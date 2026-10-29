@@ -58,7 +58,7 @@ test('reference-comparable Admin products use labelled synthetic prices and genu
   mkdirSync(folder,{recursive:true});
   const captures=[];
   // The first viewport matches the supplied phone's usable app area, excluding OS bars.
-  for(const viewport of [{width:390,height:640},{width:390,height:844},{width:412,height:915},{width:1280,height:800}]){
+  for(const viewport of [{width:390,height:650},{width:390,height:844},{width:412,height:915},{width:1280,height:800}]){
     await page.setViewportSize(viewport);
     for(const theme of ['light','dark']){
       if((await page.locator('html').getAttribute('data-admin-theme'))!==theme)
