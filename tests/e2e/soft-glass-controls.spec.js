@@ -18,6 +18,38 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:30000});
   await page.evaluate(()=>window.__sdDismissWelcome?.());
   await expect(page.locator('body')).not.toHaveClass(/welcome-active/);
+  // Final Glass UI 2.0: screenshot the actual existing storefront, not a
+  // synthetic sample. Keep same 8 viewports/themes for visual comparison.
+  const head=page.locator('.nav-wrap .nav');
+  const benefit=page.locator('.service-strip .service-copy').first();
+  const orderCta=page.locator('#orderDetailsToggle');
+  const tracking=page.locator('#orderTracking .sd-track-panel');
+  const trackingInput=page.locator('#sdTrackInput');
+  for(const part of [head,benefit,orderCta,tracking,trackingInput])
+   await expect(part).toBeAttached();
+  for(const part of [head,benefit,orderCta,tracking]){
+   const paint=await part.evaluate(el=>{
+    const css=getComputedStyle(el);
+    return {face:css.backgroundImage,shadow:css.boxShadow};
+   });
+   expect(paint.face,'Each visible glass family paints the optical rim').toContain('radial-gradient');
+   expect(paint.shadow,'Each glass family has shallow inner relief').toContain('inset');
+  }
+  await benefit.scrollIntoViewIfNeeded();
+  await page.screenshot({path:`${dir}/${label}-${mode}-home-benefits.png`,animations:'disabled'});
+  await head.screenshot({path:`${dir}/${label}-${mode}-header-crop.png`,animations:'disabled'});
+  await page.locator('.service-strip').screenshot({
+   path:`${dir}/${label}-${mode}-benefits-crop.png`,animations:'disabled'
+  });
+  await tracking.scrollIntoViewIfNeeded();
+  await page.screenshot({path:`${dir}/${label}-${mode}-home-tracking.png`,animations:'disabled'});
+  await tracking.screenshot({path:`${dir}/${label}-${mode}-tracking-crop.png`,animations:'disabled'});
+  await trackingInput.screenshot({path:`${dir}/${label}-${mode}-tracking-input-crop.png`,animations:'disabled'});
+  await orderCta.screenshot({path:`${dir}/${label}-${mode}-order-cta-crop.png`,animations:'disabled'});
+  await trackingInput.focus();
+  const trackFocus=await trackingInput.evaluate(el=>getComputedStyle(el).boxShadow);
+  expect(trackFocus).toContain('inset');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width+1);
   await page.locator('#products').scrollIntoViewIfNeeded();
   const search=page.locator('#products .search-field');
   const first=page.locator('#categoryFilters .filter-pill').first();
