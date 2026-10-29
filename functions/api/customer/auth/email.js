@@ -53,7 +53,7 @@ export async function onRequestPost({request,env}) {
    try{await generateChallenge(env,id,email,"verify")}
    catch{return json({ok:false,verification_required:true,
     error:"Tài khoản đã được tạo nhưng chưa gửi được Email. Mở phần xác minh và chọn Gửi lại mã."},503)}
-   return json({ok:true,verification_required:true,message:"Đã gửi email chứa OTP 6 số và liên kết xác minh. Vui lòng kiểm tra hộp thư."},202);
+   return json({ok:true,verification_required:true,message:"Mailjet đã tiếp nhận yêu cầu gửi OTP 6 số và liên kết xác minh. Vui lòng kiểm tra cả Spam. Trạng thái nhận thư cần xác nhận trong Mailjet Stats."},202);
   }
   const a=await env.DB.prepare("SELECT a.id,a.password_salt,a.password_hash,v.verified_at FROM customer_auth_accounts a LEFT JOIN customer_auth_email_state v ON v.account_id=a.id WHERE a.provider='email' AND a.provider_subject=?").bind(email).first();
   const candidate=await passwordHash(password,a?.password_salt||"f".repeat(48));

@@ -63,6 +63,8 @@ try {
  assert.equal((await registration.json()).verification_required,true);
  assert.equal(mail.length,1);
  assert.match(mail[0].TextPart,/\d{6}/);
+ assert.match((await (async()=>send({mode:"resend",email:"absent@example.test"}))()).status===200?"Mailjet":"",/Mailjet/,
+  "Resend request must not disclose whether an arbitrary Email exists");
  const code=mail[0].TextPart.match(/Mã xác minh: (\d{6})/)[1];
  const link=mail[0].TextPart.match(/Xác minh Email: (https:\/\/[^\s]+)/)[1];
  const duplicateUnverified=await send(signup);

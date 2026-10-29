@@ -1367,7 +1367,7 @@ html.sd-catalog-route #products .filter-pill{
         <button type="button" class="sd-auth-text-button tap-target" data-auth-toggle>Chưa có tài khoản? Đăng ký</button>
         <button type="button" class="sd-auth-text-button tap-target" data-auth-forgot hidden>Quên mật khẩu?</button>
         <div class="sd-auth-flow" id="sdAuthVerify" hidden>
-          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư (kể cả Spam). Nhập OTP 6 số hoặc mở liên kết xác minh. Hiệu lực 5 phút.</p>
+          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư và Spam. Nếu không nhận được, xem trạng thái Delivered/Bounced/Blocked trong Mailjet Stats; Mailjet tiếp nhận yêu cầu không đồng nghĩa thư đã được giao. Nhập OTP 6 số hoặc mở liên kết xác minh trong 5 phút.</p>
           <form id="sdAuthVerifyForm">
             <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
             <label>Mã OTP<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>

@@ -25,7 +25,9 @@ export async function mailjetSend(env,to,purpose,otp,link) {
  const response=await fetch("https://api.mailjet.com/v3.1/send",{
   method:"POST",headers,body:JSON.stringify(payload),redirect:"manual",signal:AbortSignal.timeout(10000)
  });
- if(response.status!==200)throw Error("mailjet_send_failed");
+ // The Send API acknowledges intake, NOT mailbox delivery. The latter
+ // must be confirmed in Mailjet message statistics (Delivered/Bounced/Blocked).
+ if(response.status!==200)throw Error("mailjet_http_"+response.status);
  const data=await response.json();
  if(data?.Messages?.[0]?.Status!=="success")throw Error("mailjet_rejected");
  return true;
@@ -47,7 +49,10 @@ export async function generateChallenge(env,accountId,email,purpose){
   PREVIEW_ORIGIN+"/api/customer/auth/email/verify?email="+encodeURIComponent(email)+"&token="+encodeURIComponent(token):
   PREVIEW_ORIGIN+"/#customer-reset="+encodeURIComponent(email)+"&token="+encodeURIComponent(token);
  try{await mailjetSend(env,email,purpose,otp,link)}
- catch{
+ catch(sendError){
+  // Cloudflare logs contain only a non-sensitive failure category. Never log
+  // recipient addresses, tokens, API keys, OTP values, or Mailjet payloads.
+  console.warn("[customer-email] Mailjet submission failed",sendError instanceof Error?sendError.message:"unknown");
   // Fail closed: invalidate the unsent challenge, allow a follow-up retry.
   await env.DB.prepare("UPDATE customer_auth_email_challenges SET consumed_at=? WHERE account_id=? AND purpose=? AND code_hash=? AND consumed_at IS NULL")
    .bind(now(),accountId,purpose,codeHash).run();
@@ -93,7 +98,7 @@ export async function emailChallengeHandler({request,env},action,b){
     const result=await generateChallenge(env,account.id,email,"verify");
     if(result.cooldown)return error("Vui lòng đợi 60 giây trước khi gửi lại.",429);
    }
-   return json({ok:true,message:"Nếu tài khoản chưa xác minh, Shop sẽ gửi email mới."});
+   return json({ok:true,message:"Nếu tài khoản chưa xác minh, Mailjet sẽ tiếp nhận yêu cầu gửi mã mới. Kiểm tra Spam và trạng thái giao thư nếu chưa nhận được."});
   }
   if(action==="reset-request"){
    if(account?.verified_at)await generateChallenge(env,account.id,email,"reset");
