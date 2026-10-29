@@ -54,6 +54,19 @@ for(const path of ["/api/customer/profile","/api/customer/orders"]){
  assert.equal(res.status,401,"Unauthenticated account endpoint must reject: "+path);
 }
 console.log("PASS: real Preview account cloud APIs deny guest reads and account sync UI is present.");
+// Test the real Preview Email password-verification path without creating accounts or storing data.
+// A deliberately unregistered synthetic address must fail with 401, not a generic HTTP 503.
+const emailProbe=await fetch(ORIGIN+"/api/customer/auth/email",{
+ method:"POST",headers:{"Origin":ORIGIN,"Content-Type":"application/json"},
+ body:JSON.stringify({mode:"login",email:"nonexistent-preview-probe-20261029@example.invalid",password:"SampleLoginProbe_2026!!"}),
+ redirect:"manual",cache:"no-store",signal:AbortSignal.timeout(20000)
+});
+const emailReply=await emailProbe.json().catch(()=>({}));
+assert.equal(emailProbe.status,401,
+ "Synthetic unknown-account Email Preview login should return 401, received "+emailProbe.status+
+ " ("+String(emailReply.error||"unknown").slice(0,140)+")");
+console.log("PASS: real Preview Email password verification returns 401 for unknown synthetic login.");
+
 for(const provider of ["zalo","google","facebook"]){
   const r=await get(ORIGIN+"/api/customer/auth/"+provider+"/start");
   assert.equal(r.status,302,"OAuth must start on Preview for "+provider);
