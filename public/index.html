@@ -4468,7 +4468,8 @@ html.dark{
    underneath a translucent face tints the ENTIRE control (wrong). These
    masks exclude the face pixels; pastel light exists only on curved edges. */
 :where(.nav-wrap .nav,.service-strip .service-copy,
- #order #orderDetailsToggle,.sd-track-panel,#mobileBottomNav.mobile-bottom-nav,
+ #order #orderDetailsToggle,#order .order-step,#order .order-assurance-footer,
+ .sd-track-panel,#mobileBottomNav.mobile-bottom-nav,
  #mobileBottomNav .mobile-tab,.icon-btn,.mini-add,.page-btn.page-arrow,
  .slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,
  .detail-favorite-btn,.close-btn,.sd-fullscreen-close,.sd-fullscreen-arrow,
@@ -4487,6 +4488,7 @@ html.dark{
  transition:opacity 255ms var(--sd-3d-ease);
 }
 :where(.nav-wrap .nav,.sd-track-panel,.service-strip .service-copy,
+ #order .order-step,#order .order-assurance-footer,
  #mobileBottomNav .mobile-tab,.mini-add,.page-btn.page-arrow,
  .slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,
  .detail-favorite-btn,.close-btn,.sd-fullscreen-close,.sd-fullscreen-arrow,
@@ -4512,11 +4514,13 @@ html.dark{
 #mobileBottomNav .mobile-tab{-webkit-backdrop-filter:none;backdrop-filter:none}
 @media(prefers-reduced-motion:reduce){
  :where(.nav-wrap .nav,.service-strip .service-copy,.sd-track-panel,
+  #order .order-step,#order .order-assurance-footer,
   .icon-btn,.pill-btn,#mobileBottomNav .mobile-tab)::after{transition:none}
 }
 /* Final Glass UI 2.0 — existing component geometry is unchanged.
    All glass families reference the SAME shell/face/shadow tokens above.
    No extra per-component gradient stacks and no additional nested blur layers. */
+#order .order-step,#order .order-assurance-footer,
 .sd-track-panel,.sd-track-order,
 .checkout-drawer .sd-checkout-box,.checkout-drawer .sd-checkout-option,
 .checkout-drawer .sd-checkout-copy,.cart-row,
@@ -4525,6 +4529,9 @@ html.dark{
  border-color:transparent;
  background:var(--sd-glass-shell);
  box-shadow:var(--sd-3d-shadow);
+}
+#order .order-step,#order .order-assurance-footer{
+ -webkit-backdrop-filter:blur(9px) saturate(111%);backdrop-filter:blur(9px) saturate(111%);
 }
 .sd-track-panel{
  border:1px solid transparent;
