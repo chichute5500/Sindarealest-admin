@@ -145,7 +145,7 @@ assert.match(detail, /id="detailBuyNow"[^>]*>[\\s\\S]*?<svg/);
 assert.equal((detail.match(/class="pill-btn primary detail-purchase-button/g)||[]).length,2);
 assert.match(html,/\.detail-buy-now\{--sd-action-rgb:242,152,70;--sd-action-border-rgb:215,119,47\}/);
 assert.match(html,/--sd-action-rgb:126,177,215/);
-assert.match(html,/linear-gradient\(145deg,rgba\(245,251,255,\.91\),rgba\(var\(--sd-action-rgb\),\.28\)\) padding-box/,"Blue and orange CTAs retain matching layered glass while using their separate color tokens.");
+assert.match(html,/linear-gradient\(145deg,rgba\(221,236,248,\.73\),rgba\(var\(--sd-action-rgb\),\.19\)\) padding-box/,"Blue and orange CTAs retain matching layered glass while using their separate color tokens.");
 assert.match(html,/var\(--sd-3d-rim\) border-box/,"Purchase controls preserve the shared prismatic 3D rim.");
 assert.match(html,/#productOverlay \.detail-actions \.detail-purchase-button:active\{/,"Purchase controls must still offer the tactile active state.");
 assert.ok(html.includes("$('#detailBuyNow').addEventListener('click'"));
