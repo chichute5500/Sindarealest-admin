@@ -37,8 +37,12 @@ test('dark selected controls cannot mask tactile :active material',()=>{
 });
 
 test('owner soft inset uses a recessed center, curved bevel and restrained contact depth',()=>{
- assert.match(html,/--sd-3d-rim:linear-gradient\(135deg/);
+ assert.match(html,/--sd-3d-rim:radial-gradient\\(ellipse 78% 95% at 0% 1%/);
+ assert.match(html,/at 100% 40%/);
+ assert.match(html,/at 60% 105%/);
  assert.doesNotMatch(html,/--sd-3d-rim:conic-gradient/);
+ assert.match(html,/--sd-3d-surface-search:/);
+ assert.match(html,/--sd-3d-bevel-pressed:/);
  assert.match(html,/#products \.search-field::after,#products \.filter-pill::after\{/);
  assert.match(html,/--sd-3d-shadow:0 1px 2px/);
  assert.match(html,/--sd-3d-depressed:0 1px 2px/);
@@ -56,4 +60,13 @@ test('touch press controller survives scroll, cancel and does not alter product 
  assert.match(html,/addEventListener\('scroll',release,true/);
  assert.match(html,/removeAttribute\('data-sd-glass-press'\)/);
  assert.match(html,/#products \.filter-pill\[data-sd-glass-press="true"\]/);
+});
+
+test('no extra plastic rings: a thin curved bevel, directional pastel light and layered optical fill',()=>{
+ assert.match(html,/#products \.search-field::after,#products \.filter-pill::after\{/);
+ assert.match(html,/position:absolute;inset:1px;border-radius:inherit;pointer-events:none/);
+ assert.match(html,/background:var\(--sd-3d-surface-search\)/);
+ assert.match(html,/radial-gradient\(ellipse 55% 113% at 100% 40%/);
+ assert.match(html,/radial-gradient\(ellipse 100% 47% at 60% 105%/);
+ assert.doesNotMatch(html,/--sd-3d-surface:linear-gradient\(145deg,rgba\(242,247,252,\.91\)/);
 });
