@@ -97,7 +97,7 @@ test('Final Glass UI 2.0 replaces opaque legacy shells without duplicating mater
  assert.match(html,/\.service-strip \.service-copy\{min-height:70px/);
  assert.match(html,/#order \.order-cta--compact #orderDetailsToggle\{min-height:42px/);
  assert.match(html,/#warrantyLookupSubmit\{min-height:40px/);
- assert.match(html,/#order \.order-cta--compact #orderDetailsToggle\{min-height:46px[^}]+background:var\(--sd-glass-shell\)/);
+ assert.match(html,/#order \.order-cta--compact #orderDetailsToggle\{min-height:42px[^}]+background:var\(--sd-glass-shell\)/);
  assert.match(html,/\.product-card,\.catalog-card\{\s*border-radius:18px;border-color:transparent;\s*background:var\(--sd-glass-shell\)/);
 });
 test('Interactive surfaces, forms, nav, order tracking, cart and account use shared optics',()=>{
