@@ -50,6 +50,15 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
    expect(await tabs.count()).toBe(4);
    expect((await tabs.first().evaluate(el=>getComputedStyle(el).boxShadow))).toContain('inset');
   }
+  // Reference comparison: capture the original ALL-categories layout before
+  // selecting another category, which intentionally switches to a deep route.
+  await page.locator('#products').scrollIntoViewIfNeeded();
+  await page.evaluate(async()=>{
+   const imgs=[...document.querySelectorAll('#catalogGrid img')].slice(0,4);
+   await Promise.race([Promise.all(imgs.map(img=>img.decode().catch(()=>{}))),
+    new Promise(resolve=>setTimeout(resolve,1800))]);
+  });
+  await page.screenshot({path:`${dir}/${label}-${mode}-all-categories.png`,animations:'disabled'});
   await search.locator('input').fill('TEST-SEARCH-NEVER-MATCH');
   await expect(search.locator('input')).toHaveValue('TEST-SEARCH-NEVER-MATCH');
   await search.locator('input').fill('');
