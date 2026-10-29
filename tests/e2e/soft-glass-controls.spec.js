@@ -29,10 +29,13 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
    await expect(part).toBeAttached();
   for(const part of [head,benefit,orderCta]){
    const paint=await part.evaluate(el=>{
-    const css=getComputedStyle(el);
-    return {face:css.backgroundImage,shadow:css.boxShadow};
+    const css=getComputedStyle(el),rim=getComputedStyle(el,'::after');
+    return {shadow:css.boxShadow,rimBackground:rim.backgroundImage,
+     rimMask:rim.maskComposite,webkitRimMask:rim.webkitMaskComposite};
    });
-   expect(paint.face,'Each control paints the shared optical rim').toContain('radial-gradient');
+   expect(paint.rimBackground,'Shared optical rim is painted on the masked edge layer').toContain('radial-gradient');
+   expect(paint.rimMask.includes('exclude')||paint.webkitRimMask.includes('xor'),
+    'The rim mask leaves the glass face clear').toBe(true);
    expect(paint.shadow,'Raised glass keeps its ambient contact shadow').not.toBe('none');
    expect(paint.shadow,'Resting controls stay free of cushioned inset rings').not.toContain('inset');
   }
