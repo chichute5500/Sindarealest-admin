@@ -67,7 +67,7 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
    return {shadow:css.boxShadow,background:css.backgroundImage,color:css.color,
     rect:{x:r.x,y:r.y,width:r.width,height:r.height},animation:css.animationName};
   });
-  const chip=await readSurface('#categoryFilters .filter-pill');
+  const chip=await readSurface('#categoryFilters .filter-pill[aria-pressed="false"]');
   const field=await readSurface('#products .search-field');
   expect(chip.shadow,'Resting category glass must remain raised').not.toContain('inset');
   expect(field.shadow,'Resting search glass must remain raised').not.toContain('inset');
