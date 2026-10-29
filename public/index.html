@@ -4253,12 +4253,12 @@ html.dark{
 }
 #products .search-field,#products .filter-pill{
  position:relative;isolation:isolate;min-width:0;color:var(--sd-soft-ink);
- border:1px solid transparent;background:var(--sd-3d-surface);
+ border:1px solid transparent;background:var(--sd-3d-face);
  box-shadow:var(--sd-soft-shadow);
  -webkit-backdrop-filter:blur(4px) saturate(106%);backdrop-filter:blur(4px) saturate(106%);
  transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
 }
-html.dark #products .search-field,html.dark #products .filter-pill{background:var(--sd-3d-surface)}
+html.dark #products .search-field,html.dark #products .filter-pill{background:var(--sd-3d-face)}
 html.dark #products .search-field{background:var(--sd-3d-surface-search)}
 #products .search-field{
  background:var(--sd-3d-surface-search);
@@ -4296,22 +4296,28 @@ html.dark #products .search-field{background:var(--sd-3d-surface-search)}
  touch-action:manipulation;
 }
 #products .filter-pill::before{content:none}
-/* A continuous curved lens edge, without concentric shadows or hard outlines. */
+/* One real optical rim: the mask excludes the entire clear center.
+   Pastel reflections exist only across a continuous 1.4px curved edge;
+   a secondary inner bevel/shadow would create the unwanted plastic rings. */
 #products .search-field::after,#products .filter-pill::after{
- content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;
- box-shadow:var(--sd-3d-bevel);opacity:.82;
- transition:opacity 125ms ease,box-shadow 125ms ease;
+ content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ padding:1.4px;background:var(--sd-3d-rim);opacity:.88;
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;
+ mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ mask-composite:exclude;
+ transition:opacity 250ms var(--sd-3d-ease),transform 250ms var(--sd-3d-ease);
 }
 #products .filter-pill:active::after,#products .filter-pill[data-sd-glass-press="true"]::after,
 #products .search-field:active::after,#products .search-field[data-sd-glass-press="true"]::after{
- box-shadow:var(--sd-3d-bevel-pressed);opacity:.57;
+ opacity:.55;transform:translateY(.5px);transition-duration:105ms;
 }
 #products .filter-pill.active,#products .filter-pill[aria-pressed="true"]{
- color:var(--sd-soft-ink);border-color:transparent;background:var(--sd-3d-surface);
+ color:var(--sd-soft-ink);border-color:transparent;background:var(--sd-3d-face);
  box-shadow:var(--sd-3d-selected);animation:none;
 }
 html.dark #products .filter-pill.active,html.dark #products .filter-pill[aria-pressed="true"]{
- color:#fff;border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);
+ color:#fff;border-color:transparent;background:var(--sd-3d-face);box-shadow:var(--sd-3d-selected);
 }
 /* Selected must still physically depress; Dark Mode has an extra html.dark
    specificity level and otherwise masks the ordinary :active shadow. */
@@ -4332,12 +4338,6 @@ html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
 html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
  transform:translateY(1px) scale(.995);box-shadow:var(--sd-soft-pressed);
  transition-duration:115ms;
-}
-#products .filter-pill[data-sd-glass-press="true"]::after{
- box-shadow:inset 4px 5px 8px rgba(82,115,145,.27),inset -2px -3px 6px rgba(255,255,255,.22);
-}
-html.dark #products .filter-pill[data-sd-glass-press="true"]::after{
- box-shadow:inset 4px 5px 8px rgba(0,7,20,.38),inset -2px -3px 6px rgba(77,130,165,.14);
 }
 #products .filter-pill:focus-visible{
  outline:2px solid #437fa9;outline-offset:3px;
@@ -4405,16 +4405,17 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]::after{
 :root{
  --sd-3d-ink:#193449;
  /* Shallow contact and ambient; real depth comes from inner curvature. */
- --sd-3d-shadow:0 1px 2px rgba(54,89,124,.105),0 5px 11px rgba(47,84,120,.07),inset 0 1px 2px rgba(255,255,255,.63),inset 2px 3px 6px rgba(97,128,158,.13),inset -2px -3px 6px rgba(251,254,255,.26);
- --sd-3d-depressed:0 1px 2px rgba(47,85,120,.045),inset 0 2px 3px rgba(93,124,156,.24),inset 3px 4px 7px rgba(80,114,145,.25),inset -2px -2px 5px rgba(255,255,255,.23);
- --sd-3d-selected:0 1px 3px rgba(51,85,120,.065),inset 0 2px 3px rgba(100,132,159,.17),inset 3px 4px 7px rgba(83,118,150,.19),inset -2px -2px 6px rgba(255,255,255,.22);
- --sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%,rgba(231,166,209,.52),transparent 79%),radial-gradient(ellipse 55% 113% at 100% 40%,rgba(104,155,215,.42),transparent 83%),radial-gradient(ellipse 100% 47% at 60% 105%,rgba(118,211,202,.44),transparent 79%),linear-gradient(160deg,rgba(229,238,247,.48),rgba(131,166,194,.24));
- --sd-3d-surface:radial-gradient(ellipse 96% 90% at 8% 3%,rgba(255,237,249,.19),transparent 70%) padding-box,radial-gradient(ellipse 90% 65% at 92% 101%,rgba(166,230,224,.12),transparent 73%) padding-box,linear-gradient(155deg,rgba(233,243,251,.58),rgba(218,234,247,.43)) padding-box,var(--sd-3d-rim) border-box;
- --sd-3d-tray:linear-gradient(150deg,rgba(236,245,251,.86),rgba(222,239,249,.82));
- --sd-3d-tray-shadow:0 3px 9px rgba(48,85,117,.075),inset 0 1px 1px rgba(255,255,255,.53);
- --sd-3d-surface-search:radial-gradient(ellipse 110% 92% at 5% 0%,rgba(254,237,250,.14),transparent 74%) padding-box,linear-gradient(145deg,rgba(230,242,252,.38),rgba(218,235,246,.30)) padding-box,var(--sd-3d-rim) border-box;
- --sd-3d-bevel:inset 0 2px 3px rgba(93,124,157,.14),inset 0 -2px 3px rgba(255,255,255,.28);
- --sd-3d-bevel-pressed:inset 0 3px 5px rgba(79,113,143,.25),inset 0 -1px 3px rgba(255,255,255,.17);
+ --sd-3d-shadow:0 1px 2px rgba(54,89,124,.12),0 6px 13px rgba(47,84,120,.065),inset 1px 2px 3px rgba(97,128,158,.11);
+ --sd-3d-depressed:0 1px 2px rgba(47,85,120,.035),inset 1px 2px 4px rgba(80,114,145,.22),inset -1px -1px 3px rgba(255,255,255,.16);
+ --sd-3d-selected:0 1px 2px rgba(51,85,120,.06),inset 1px 2px 4px rgba(83,118,150,.17),inset -1px -1px 3px rgba(255,255,255,.13);
+ /* Directional pastel light is painted through the catalog's masked edge only. */
+ --sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%,rgba(231,166,209,.47),transparent 79%),radial-gradient(ellipse 55% 113% at 100% 40%,rgba(104,155,215,.40),transparent 83%),radial-gradient(ellipse 100% 47% at 60% 105%,rgba(118,211,202,.42),transparent 79%),linear-gradient(160deg,rgba(229,238,247,.27),rgba(131,166,194,.12));
+ /* The soft face is ONE translucent film, not multiple opaque inset fills. */
+ --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(247,254,255,.22),rgba(215,239,246,.105) 56%,rgba(194,228,238,.065) 100%);
+ --sd-3d-surface:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
+ --sd-3d-tray:linear-gradient(150deg,rgba(236,245,251,.68),rgba(222,239,249,.61));
+ --sd-3d-tray-shadow:0 3px 9px rgba(48,85,117,.075),inset 0 1px 2px rgba(255,255,255,.24);
+ --sd-3d-surface-search:var(--sd-3d-face);
 
  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
  --sd-control-rim:rgba(184,207,225,.45);
@@ -4425,16 +4426,15 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]::after{
 }
 html.dark{
  --sd-3d-ink:#edf7ff;
- --sd-3d-shadow:0 1px 2px rgba(0,5,15,.20),0 5px 11px rgba(0,7,19,.14),inset 0 1px 2px rgba(152,195,223,.22),inset 2px 3px 7px rgba(0,12,27,.31),inset -2px -3px 7px rgba(92,144,177,.17);
- --sd-3d-depressed:0 1px 2px rgba(0,5,15,.11),inset 0 2px 4px rgba(0,8,23,.35),inset 3px 4px 8px rgba(0,7,18,.41),inset -2px -2px 5px rgba(105,164,197,.13);
- --sd-3d-selected:0 1px 3px rgba(0,5,16,.13),inset 0 2px 4px rgba(0,8,19,.26),inset 3px 4px 7px rgba(0,7,17,.32),inset -2px -2px 5px rgba(107,165,197,.13);
- --sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%,rgba(199,143,188,.39),transparent 79%),radial-gradient(ellipse 55% 113% at 100% 40%,rgba(105,160,214,.45),transparent 83%),radial-gradient(ellipse 100% 47% at 60% 105%,rgba(100,185,188,.42),transparent 79%),linear-gradient(160deg,rgba(143,179,205,.31),rgba(49,99,133,.23));
- --sd-3d-surface:radial-gradient(ellipse 96% 90% at 8% 3%,rgba(210,173,204,.085),transparent 70%) padding-box,radial-gradient(ellipse 90% 65% at 92% 101%,rgba(112,202,208,.09),transparent 73%) padding-box,linear-gradient(155deg,rgba(41,77,103,.63),rgba(17,50,74,.50)) padding-box,var(--sd-3d-rim) border-box;
- --sd-3d-tray:linear-gradient(150deg,rgba(20,48,70,.89),rgba(12,39,62,.85));
- --sd-3d-tray-shadow:0 3px 10px rgba(0,5,15,.16),inset 0 1px 2px rgba(148,190,218,.14);
- --sd-3d-surface-search:radial-gradient(ellipse 110% 92% at 5% 0%,rgba(208,175,201,.09),transparent 74%) padding-box,linear-gradient(145deg,rgba(36,69,96,.54),rgba(18,49,73,.44)) padding-box,var(--sd-3d-rim) border-box;
- --sd-3d-bevel:inset 0 2px 3px rgba(0,9,21,.23),inset 0 -2px 3px rgba(111,159,191,.15);
- --sd-3d-bevel-pressed:inset 0 3px 5px rgba(0,6,19,.36),inset 0 -1px 3px rgba(96,153,188,.10);
+ --sd-3d-shadow:0 1px 2px rgba(0,5,15,.20),0 6px 13px rgba(0,7,19,.12),inset 1px 2px 4px rgba(0,12,27,.24);
+ --sd-3d-depressed:0 1px 2px rgba(0,5,15,.09),inset 1px 2px 5px rgba(0,7,18,.34),inset -1px -1px 3px rgba(105,164,197,.10);
+ --sd-3d-selected:0 1px 2px rgba(0,5,16,.12),inset 1px 2px 4px rgba(0,7,17,.27),inset -1px -1px 3px rgba(107,165,197,.11);
+ --sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%,rgba(199,143,188,.36),transparent 79%),radial-gradient(ellipse 55% 113% at 100% 40%,rgba(105,160,214,.42),transparent 83%),radial-gradient(ellipse 100% 47% at 60% 105%,rgba(100,185,188,.39),transparent 79%),linear-gradient(160deg,rgba(143,179,205,.24),rgba(49,99,133,.10));
+ --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(147,188,214,.14),rgba(36,80,112,.115) 56%,rgba(14,54,85,.075) 100%);
+ --sd-3d-surface:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
+ --sd-3d-tray:linear-gradient(150deg,rgba(20,48,70,.70),rgba(12,39,62,.64));
+ --sd-3d-tray-shadow:0 3px 10px rgba(0,5,15,.16),inset 0 1px 2px rgba(148,190,218,.12);
+ --sd-3d-surface-search:var(--sd-3d-face);
 
  --sd-control-rim:rgba(114,150,184,.40);
  --sd-control-face:rgba(23,50,73,.86);
