@@ -47,7 +47,7 @@ const req=(payload,origin=ORIGIN)=>new Request(ORIGIN+"/api/customer/auth/email"
   method:"POST",headers:{"Content-Type":"application/json",Origin:origin,"CF-Connecting-IP":"192.0.2.3"},
   body:JSON.stringify(payload)
 });
-const signup={mode:"register",name:"Khách Thử",email:"buyer@example.test",password:"NewPass-Secure!2026"};
+const signup={mode:"register",name:"Khách Thử",email:"buyer@example.test",password:"Abc123!"};
 const crossSite=await emailAuth({request:req(signup,"https://evil.example"),env});
 assert.equal(crossSite.status,403);
 // Production must reject unverified-email self-service even with valid credentials.
@@ -56,8 +56,11 @@ const productionSignup=await emailAuth({request:new Request("https://sindareales
   body:JSON.stringify(signup)
 }),env});
 assert.equal(productionSignup.status,503);
-const bad=await emailAuth({request:req({...signup,password:"123"}),env});
-assert.equal(bad.status,400);
+for (const password of ["123","123456"]){
+  const bad=await emailAuth({request:req({...signup,password}),env});
+  assert.equal(bad.status,400,"Passwords shorter than 7 chars must be rejected");
+  assert.match((await bad.json()).error,/tối thiểu 7 ký tự/);
+}
 const signed=await emailAuth({request:req(signup),env});
 assert.equal(signed.status,201);
 const tokenCookie=(signed.headers.get("Set-Cookie")||"").match(/sd_customer_login=[a-f0-9]{64}/)?.[0];
@@ -67,6 +70,10 @@ const data=await session.json();
 assert.equal(data.authenticated,true);
 assert.equal(data.user.provider,"email");
 assert.equal(data.user.email,"buyer@example.test");
+// Existing users who choose longer passwords must remain compatible.
+const legacy={...signup,email:"buyer-long@example.test",password:"NewPass-Secure!2026"};
+assert.equal((await emailAuth({request:req(legacy),env})).status,201);
+assert.equal((await emailAuth({request:req({...legacy,mode:"login"}),env})).status,200);
 const duplicate=await emailAuth({request:req(signup),env});
 assert.equal(duplicate.status,409);
 const wrong=await emailAuth({request:req({...signup,mode:"login",password:"NotTheSamePassword!2026"}),env});

@@ -33,7 +33,7 @@
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
 <link rel="stylesheet" href="/customer-auth.css?v=auth-icons-20261029">
-<script type="module" src="/customer-auth-ui.js?v=auth-icons-20261029"></script>
+<script type="module" src="/customer-auth-ui.js?v=email-min7-20261029"></script>
 <title>SinDarealest — Premium Crocodile Leather Fashion</title>
 <script>(()=>{const root=document.documentElement;
  root.classList.add('js-enabled');
@@ -1359,7 +1359,8 @@ html.sd-catalog-route #products .filter-pill{
         <form id="sdAuthEmailFields" class="sd-auth-email-fields" data-mode="login" autocomplete="on" hidden>
           <label data-auth-name-row hidden>Họ và tên<input name="customer_name" autocomplete="name" maxlength="100"></label>
           <label>Địa chỉ Email<input name="customer_email" type="email" autocomplete="email" required maxlength="254"></label>
-          <label>Mật khẩu<input name="customer_password" type="password" autocomplete="current-password" required minlength="12" maxlength="256"></label>
+          <label>Mật khẩu<input name="customer_password" type="password" autocomplete="current-password" required minlength="7" maxlength="256" aria-describedby="sdAuthPasswordHint"></label>
+          <small class="sd-auth-password-hint" id="sdAuthPasswordHint" data-auth-password-hint hidden>Mật khẩu tối thiểu 7 ký tự. Nên dùng chữ, số và ký tự đặc biệt.</small>
           <button type="submit" class="sd-auth-submit tap-target" data-auth-submit>Đăng nhập bằng Email</button>
         </form>
         <button type="button" class="sd-auth-text-button tap-target" data-auth-toggle>Chưa có tài khoản? Đăng ký</button>

@@ -133,6 +133,8 @@ if(root){
     q("[data-auth-name-row]").hidden=!register;
     q("[data-auth-submit]").textContent=register?"Tạo tài khoản":"Đăng nhập bằng Email";
     q("[data-auth-toggle]").textContent=register?"Đã có tài khoản? Đăng nhập":"Chưa có tài khoản? Đăng ký";
+    q("[data-auth-password-hint]")?.toggleAttribute("hidden",!register);
+    q('[name="customer_password"]').autocomplete=register?"new-password":"current-password";
     notify("");
   });
   emailForm.addEventListener("submit",async event=>{

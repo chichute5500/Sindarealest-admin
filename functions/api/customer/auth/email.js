@@ -13,7 +13,7 @@ export async function onRequestPost({request,env}) {
   const email=normalizeEmail(parsed.value.email);
   if(!["register","login"].includes(mode)||!email||email.length>254||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||typeof password!=="string"||
-    password.length<12||password.length>256)return error("Email hoặc mật khẩu không hợp lệ (mật khẩu tối thiểu 12 ký tự).",400);
+    password.length<7||password.length>256)return error("Email hoặc mật khẩu không hợp lệ (mật khẩu tối thiểu 7 ký tự).",400);
   try {
     // Limit password grinding and signup abuse by caller address, never by email alone.
     const rate=await rateLimitPublicRequest(env,request,"customer_auth_"+mode,mode==="login"?6:3,900);

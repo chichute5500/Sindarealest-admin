@@ -16,6 +16,9 @@ for(const marker of ['id="accountCloudStatus"','id="accountImportLocal"',"window
 assert.ok(auth.includes('google.querySelector("[data-auth-provider-label]").textContent'),"Google status update must preserve its logo");
 assert.ok(html.includes('data-auth-email aria-expanded="false"'),"Email method must have accessible expand state");
 assert.ok(html.includes('id="sdAuthEmailFields"'),"Email method must expand the existing form");
+assert.ok(html.includes('name="customer_password" type="password" autocomplete="current-password" required minlength="7"'),"Email password field must accept 7+ characters");
+assert.ok(html.includes('data-auth-password-hint hidden'),"Sign-up password requirement should appear only on registration");
+assert.ok(auth.includes('toggleAttribute("hidden",!register)'),"Password hint must track registration mode");
 assert.ok((html.match(/fill="#(?:4285F4|34A853|FBBC05|EA4335)"/g)||[]).length===4,"Google G must retain all four brand colors");
 assert.ok(auth.includes('const emailEnabled=Boolean(data.providers?.email)'),"Email must be Preview-only by API flag");
 assert.ok(auth.includes("window.sdAccountBridge?.onAuth(active)"),"OAuth session must trigger cloud-account sync");

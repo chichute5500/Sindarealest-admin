@@ -43,6 +43,7 @@ assert.ok(html.includes("$('#accountOpen')?.addEventListener('click',()=>toggleS
 assert.ok(html.includes('data-auth-google aria-label="Tiếp tục với Google"'),"Google Login icon button must be present");
 assert.ok(html.includes('data-auth-email aria-expanded="false"'),"Email icon button must be present, hidden unless Preview allows it");
 assert.ok(html.includes('sd-auth-google-mark')&&html.includes('sd-auth-email-mark'),"Both method icons must be present");
+assert.ok(html.includes('name="customer_password" type="password" autocomplete="current-password" required minlength="7"'),"Preview registration password minimum should be 7");
 assert.ok(html.includes('data-auth-zalo hidden disabled'),"Temporarily disabled Zalo Login must not be offered");
 assert.ok(html.includes('data-auth-facebook hidden disabled'),"Temporarily disabled Facebook Login must not be offered");
 console.log("PASS: real Preview includes wired desktop Account button, Google Login and inactive other providers.");
