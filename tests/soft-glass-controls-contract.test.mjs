@@ -37,7 +37,7 @@ test('dark selected controls cannot mask tactile :active material',()=>{
 });
 
 test('owner soft inset uses a recessed center, curved bevel and restrained contact depth',()=>{
- assert.match(html,/--sd-3d-rim:radial-gradient\\(ellipse 78% 95% at 0% 1%/);
+ assert.ok(html.includes('--sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%'));
  assert.match(html,/at 100% 40%/);
  assert.match(html,/at 60% 105%/);
  assert.doesNotMatch(html,/--sd-3d-rim:conic-gradient/);
