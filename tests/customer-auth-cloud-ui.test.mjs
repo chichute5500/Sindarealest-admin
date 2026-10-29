@@ -32,6 +32,11 @@ assert.ok(html.includes('data-auth-password-hint hidden'),"Sign-up password requ
 assert.ok(auth.includes('toggleAttribute("hidden",!register)'),"Password hint must track registration mode");
 assert.ok((html.match(/fill="#(?:4285F4|34A853|FBBC05|EA4335)"/g)||[]).length===4,"Google G must retain all four brand colors");
 assert.ok(auth.includes('const emailEnabled=Boolean(data.providers?.email)'),"Email must be Preview-only by API flag");
+assert.ok(auth.includes('const GOOGLE_ONLY_RELEASE = true'),"Only Google sign-in must be shown on PC and mobile");
+assert.ok(auth.includes('const emailAvailable=emailEnabled && !GOOGLE_ONLY_RELEASE'),"Email remains hidden even when Preview email flag is enabled");
+assert.ok(html.includes('id="accountOpen"'),"Desktop Account access missing");
+assert.ok(html.includes('id="mobileAccountNav"'),"Mobile Account access missing");
+assert.ok(html.includes('src="/customer-auth-ui.js?v=google-only-20261029"'),"Google-only auth script must be cache-busted");
 assert.ok(auth.includes("window.sdAccountBridge?.onAuth(active)"),"OAuth session must trigger cloud-account sync");
 assert.ok(html.includes("if(accountSyncMode==='cloud')"),"Cloud account branch is required");
 assert.ok(!html.includes("Đăng nhập không tự động liên kết đơn hàng cũ; Shop sẽ bổ sung"),"Outdated local-only notice must be removed");
