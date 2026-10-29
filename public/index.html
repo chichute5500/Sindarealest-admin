@@ -1822,11 +1822,14 @@ function syncCatalogFromLocation(){
 function navigateCatalog(category='all'){
  const key=category==='all'?'all':String(category||'all');
  const path=key==='all'?'/sanpham':'/sanpham/'+routeSlug(key);
+ const wasCatalogRoute=/^\/sanpham(?:\/|$)/i.test(location.pathname)&&!location.hash;
  if(location.pathname!==path||location.hash)history.pushState({sdCatalog:true},'',path);
  setCatalogLandingMode(true);
- selectedCategory=key;page=1;renderFilters();renderCatalog();
+ selectedCategory=key;page=1;renderFilters();renderCatalogWithTransition(()=>renderCatalog());
  setActiveNav('products');
- if(typeof window!=='undefined')window.scrollTo({top:0,behavior:'instant'});
+ // Keep the user's reading position when switching chips inside the catalog.
+ // Only an entry from another section needs to move to the catalog top.
+ if(!wasCatalogRoute&&typeof window!=='undefined')window.scrollTo({top:0,behavior:'instant'});
 }
 let selectedCategory='all';
 // Fisher-Yates shuffle once per loaded catalog: no reshuffle while paging,
@@ -1848,6 +1851,22 @@ const fulfillmentLabels={in_stock:'Hàng có sẵn',made_to_order:'Hàng đặt 
 const detailFulfillmentLabels={in_stock:'Có sẵn',made_to_order:'Hàng đặt riêng',unclassified:'Cần xác nhận'};
 function productFulfillmentType(p){const raw=p?.fulfillmentType??p?.fulfillment_type;return raw==='in_stock'||raw==='made_to_order'||raw==='unclassified'?raw:'unclassified'}
 function fulfillmentBadge(p,detail=false){const type=productFulfillmentType(p),label=detail?detailFulfillmentLabels[type]:fulfillmentLabels[type];return '<span class="fulfillment-badge fulfillment-'+type+'" data-fulfillment-type="'+type+'">'+escapeHtml(label)+'</span>'}
+let catalogTransitionTimer=0;
+function renderCatalogWithTransition(update){
+  const grid=$('#catalogGrid');
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if(!grid||reduced){update();return}
+  clearTimeout(catalogTransitionTimer);
+  grid.classList.remove('sd-catalog-enter');
+  grid.classList.add('sd-catalog-switching');
+  catalogTransitionTimer=window.setTimeout(()=>{
+    update();
+    grid.classList.remove('sd-catalog-switching');
+    void grid.offsetWidth;
+    grid.classList.add('sd-catalog-enter');
+    catalogTransitionTimer=window.setTimeout(()=>grid.classList.remove('sd-catalog-enter'),360);
+  },120);
+}
 function renderFilters(){
   // Filter categories are driven by the public Admin/D1 catalog.
   // Keep old familiar order; show every new published category automatically.
@@ -1865,18 +1884,32 @@ function renderFilters(){
   if(selectedCategory==='giay-the-thao')selectedCategory='sneakers';
   if(selectedCategory==='wallets')selectedCategory='vi-nam';
   if(selectedCategory!=='all'&&!counts[selectedCategory])selectedCategory='all';
-  // Show the active category in the page itself, not only in the address bar.
   const heading=$('#catalogHeading');
   if(heading)heading.textContent=selectedCategory==='all'
     ? 'Tất cả sản phẩm'
     : displayProductName(labels[selectedCategory]||categoryLabels[selectedCategory]||selectedCategory);
-  $('#categoryFilters').innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target '+(selectedCategory===c?'active':'')+'" data-category="'+escapeHtml(c)+'" aria-pressed="'+(selectedCategory===c)+'">'+escapeHtml(c==='all'?categoryLabels.all:displayProductName(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
-  // Center the chosen chip in its own horizontal row without scrolling the page.
+  const strip=$('#categoryFilters');
+  const signature=visible.map(c=>[c,labels[c]||categoryLabels[c]||c,counts[c]||0].join(':')).join('|');
+  // Keep the chip DOM stable while only the selected state changes. This lets
+  // the active glass surface transition between real elements instead of
+  // snapping after an innerHTML replacement.
+  if(strip.dataset.filterSignature!==signature){
+    strip.innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target" data-category="'+escapeHtml(c)+'" aria-pressed="false">'+escapeHtml(c==='all'?categoryLabels.all:displayProductName(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
+    strip.dataset.filterSignature=signature;
+  }
+  strip.querySelectorAll('.filter-pill').forEach(button=>{
+    const active=button.dataset.category===selectedCategory;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+  // Center the chosen chip in its own horizontal row without jumping the page.
   if(typeof document!=='undefined'&&document.documentElement?.classList.contains('sd-catalog-route')){
-    const strip=$('#categoryFilters'),chip=strip?.querySelector('.filter-pill.active');
+    const chip=strip.querySelector('.filter-pill.active');
     if(strip&&chip){
       const area=strip.getBoundingClientRect(),item=chip.getBoundingClientRect();
-      strip.scrollLeft+=item.left-area.left-(area.width-item.width)/2;
+      const delta=item.left-area.left-(area.width-item.width)/2;
+      const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      strip.scrollTo({left:Math.max(0,strip.scrollLeft+delta),behavior:reduced?'auto':'smooth'});
     }
   }
 }
@@ -4365,6 +4398,31 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
 @media(prefers-reduced-motion:reduce){
  #products .search-field,#products .filter-pill{transition:none!important;animation:none!important}
  #products .filter-pill:active{transform:none}
+}
+/* Smooth category switching: preserve the current view, then reveal the new cards softly. */
+#products #catalogGrid{
+  transition:opacity 120ms cubic-bezier(.22,.7,.25,1),transform 120ms cubic-bezier(.22,.7,.25,1);
+  will-change:opacity,transform;
+}
+#products #catalogGrid.sd-catalog-switching{
+  opacity:.22;
+  transform:translateY(5px);
+}
+#products #catalogGrid.sd-catalog-enter{
+  animation:sdCatalogGridEnter 280ms cubic-bezier(.22,.7,.25,1) both;
+}
+@keyframes sdCatalogGridEnter{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+#products .catalog-tools .filter-pill{
+  transition:background 240ms cubic-bezier(.22,.7,.25,1),color 240ms cubic-bezier(.22,.7,.25,1),border-color 240ms cubic-bezier(.22,.7,.25,1),box-shadow 260ms cubic-bezier(.22,.7,.25,1),transform 115ms cubic-bezier(.2,.7,.2,1);
+}
+#products .catalog-tools .filter-pills{scroll-behavior:smooth;}
+@media(prefers-reduced-motion:reduce){
+  #products #catalogGrid{transition:none!important;animation:none!important;transform:none!important;opacity:1!important;}
+  #products .catalog-tools .filter-pill{transition:none!important;}
+  #products .catalog-tools .filter-pills{scroll-behavior:auto;}
 }
 </style>
 
