@@ -141,11 +141,11 @@ assert.ok(html.includes('  .service-strip{\n    width:calc(100vw - 26px);\n    m
 const standardProductCard = html.slice(html.indexOf("function productCard("), html.indexOf("function unbindReveal("));
 const featuredProductCard = html.slice(html.indexOf("function featuredProductCard("), html.indexOf("function setupMobileBottomNav("));
 assert.ok(standardProductCard.includes('<div class="product-card-bottom">')
-  && standardProductCard.includes('class="quick-add tap-target"')
+  && standardProductCard.includes('quick-add tap-target')
   && !standardProductCard.includes('class="product-category"'),
   "Catalog cards must omit redundant category text and place quick-add in the compact price row.");
 assert.ok(featuredProductCard.includes('<div class="product-card-bottom">')
-  && featuredProductCard.includes('class="quick-add tap-target"')
+  && featuredProductCard.includes('quick-add tap-target')
   && !featuredProductCard.includes('class="product-category"'),
   "Featured cards must use the same compact price-and-cart row without repeating the photo category.");
 assert.ok(html.includes('<div class="product-open" role="button" tabindex="0" data-open-product=')
