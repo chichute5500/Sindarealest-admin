@@ -90,6 +90,7 @@ export async function emailChallengeHandler({request,env},action){
   const account=await findEmailAccount(env,email);
   if(action==="resend"){
    if(account&&!account.verified_at){
+    await env.DB.prepare("INSERT OR IGNORE INTO customer_auth_email_state(account_id,verified_at,last_sent_at) VALUES(?,NULL,0)").bind(account.id).run();
     const result=await generateChallenge(env,account.id,email,"verify");
     if(result.cooldown)return error("Vui lòng đợi 60 giây trước khi gửi lại.",429);
    }

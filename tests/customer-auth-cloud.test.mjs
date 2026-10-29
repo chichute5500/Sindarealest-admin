@@ -12,7 +12,7 @@ for(const name of [
  "0005_address_warranty_verification.sql","0006_remove_warranty_otp.sql",
  "0007_order_contact_details.sql","0008_product_sku_verification.sql",
  "0009_fulfillment_and_manual_payments.sql","0010_admin_android_devices.sql",
- "0011_customer_auth.sql","0012_customer_facebook_auth.sql","0013_customer_account_cloud.sql"
+ "0011_customer_auth.sql","0012_customer_facebook_auth.sql","0013_customer_account_cloud.sql","0014_customer_email_verification.sql"
 ])db.exec(readFileSync(new URL("../migrations/"+name,import.meta.url),"utf8"));
 const DB={
  prepare(sql){let values=[];return {

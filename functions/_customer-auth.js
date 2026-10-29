@@ -129,7 +129,7 @@ export async function issueSession(env,accountId) {
 export async function getAccount(env,request) {
   const token=cookies(request,CUSTOMER_COOKIE);
   if(!/^[a-f0-9]{64}$/.test(token)||!env?.DB)return null;
-  return env.DB.prepare("SELECT a.id,a.provider,a.display_name,a.email FROM customer_auth_sessions s JOIN customer_auth_accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?")
+  return env.DB.prepare("SELECT a.id,a.provider,a.display_name,a.email FROM customer_auth_sessions s JOIN customer_auth_accounts a ON a.id=s.account_id LEFT JOIN customer_auth_email_state v ON v.account_id=a.id WHERE s.token_hash=? AND s.expires_at>? AND (a.provider<>'email' OR v.verified_at IS NOT NULL)")
     .bind(await digest(token),now()).first();
 }
 export async function endSession(env,request) {

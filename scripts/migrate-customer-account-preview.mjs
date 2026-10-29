@@ -41,6 +41,8 @@ try{
  mkdirSync(join(folder,"migrations"));
  copyFileSync(new URL("../migrations/0013_customer_account_cloud.sql",import.meta.url),
   join(folder,"migrations","0013_customer_account_cloud.sql"));
+ copyFileSync(new URL("../migrations/0014_customer_email_verification.sql",import.meta.url),
+  join(folder,"migrations","0014_customer_email_verification.sql"));
  writeFileSync(join(folder,"wrangler.toml"),[
   'name = "sd-auth-preview-cloud-migration"','compatibility_date = "2026-10-12"',
   '[[d1_databases]]','binding = "DB"','database_name = '+JSON.stringify(db),
@@ -52,4 +54,6 @@ try{
 }finally{rmSync(folder,{recursive:true,force:true})}
 const rows=await query("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('customer_account_favorites','customer_account_shipping','customer_account_orders')");
 if(rows.length!==3)throw Error("Expected three account cloud tables in Preview D1");
+const verified=await query("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('customer_auth_email_state','customer_auth_email_challenges')");
+if(verified.length!==2)throw Error("Expected email verification tables in Preview D1");
 console.log("PASS: three customer account tables present on isolated Preview D1; Production untouched.");
