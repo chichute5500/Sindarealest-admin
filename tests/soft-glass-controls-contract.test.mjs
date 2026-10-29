@@ -36,21 +36,19 @@ test('dark selected controls cannot mask tactile :active material',()=>{
  assert.ok(html.includes('transition-duration:105ms'));
 });
 
-test('owner soft inset uses a recessed center, curved bevel and restrained contact depth',()=>{
- assert.ok(html.includes('--sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%'));
- assert.match(html,/at 100% 40%/);
- assert.match(html,/at 60% 105%/);
- assert.doesNotMatch(html,/--sd-3d-rim:conic-gradient/);
- assert.match(html,/--sd-3d-surface-search:/);
- assert.match(html,/--sd-3d-bevel-pressed:/);
- assert.match(html,/#products \.search-field::after,#products \.filter-pill::after\{/);
+test('one clear face, one masked optical edge and separate depth roles in both themes',()=>{
+ assert.match(html,/--sd-3d-face:radial-gradient/);
+ assert.match(html,/--sd-3d-surface:var\(--sd-3d-face\) padding-box/);
+ assert.match(html,/--sd-3d-surface-search:var\(--sd-3d-face\)/);
+ assert.match(html,/--sd-3d-rim:radial-gradient\(ellipse 78% 95% at 0% 1%/);
+ assert.match(html,/radial-gradient\(ellipse 55% 113% at 100% 40%/);
+ assert.match(html,/radial-gradient\(ellipse 100% 47% at 60% 105%/);
  assert.match(html,/--sd-3d-shadow:0 1px 2px/);
  assert.match(html,/--sd-3d-depressed:0 1px 2px/);
- assert.match(html,/#products \.filter-pill:active::after/);
  assert.match(html,/--sd-3d-tray-shadow:/);
- assert.match(html,/prefers-reduced-motion:reduce/);
+ assert.match(html,/--sd-3d-selected:/);
+ assert.doesNotMatch(html,/--sd-3d-bevel(?:-pressed)?:/);
 });
-
 test('touch press controller survives scroll, cancel and does not alter product business state',()=>{
  assert.match(html,/id="sd-glass-touch-press-controller"/);
  assert.match(html,/addEventListener\('touchstart',down/);
@@ -62,11 +60,19 @@ test('touch press controller survives scroll, cancel and does not alter product 
  assert.match(html,/#products \.filter-pill\[data-sd-glass-press="true"\]/);
 });
 
-test('no extra plastic rings: a thin curved bevel, directional pastel light and layered optical fill',()=>{
- assert.match(html,/#products \.search-field::after,#products \.filter-pill::after\{/);
- assert.match(html,/position:absolute;inset:1px;border-radius:inherit;pointer-events:none/);
- assert.match(html,/background:var\(--sd-3d-surface-search\)/);
- assert.match(html,/radial-gradient\(ellipse 55% 113% at 100% 40%/);
- assert.match(html,/radial-gradient\(ellipse 100% 47% at 60% 105%/);
- assert.doesNotMatch(html,/--sd-3d-surface:linear-gradient\(145deg,rgba\(242,247,252,\.91\)/);
+test('catalog excludes color below the face; rim cannot introduce a second bevel ring',()=>{
+ const start=html.indexOf('/* One real optical rim:');
+ const end=html.indexOf('#products .filter-pill.active,#products .filter-pill[aria-pressed="true"]',start);
+ assert.ok(start>0 && end>start);
+ const rim=html.slice(start,end);
+ assert.match(rim,/position:absolute;inset:0;border-radius:inherit;pointer-events:none/);
+ assert.match(rim,/padding:1\.4px;background:var\(--sd-3d-rim\)/);
+ assert.match(rim,/-webkit-mask-composite:xor/);
+ assert.match(rim,/mask-composite:exclude/);
+ assert.doesNotMatch(rim,/box-shadow:/);
+ assert.match(rim,/transition:opacity 250ms/);
+ assert.match(rim,/transition-duration:105ms/);
+ assert.doesNotMatch(html,/#products \.filter-pill\[data-sd-glass-press="true"\]::after\{\s*box-shadow:/);
+ assert.match(html,/#products \.search-field,#products \.filter-pill\{/);
+ assert.match(html,/background:var\(--sd-3d-face\)/);
 });
