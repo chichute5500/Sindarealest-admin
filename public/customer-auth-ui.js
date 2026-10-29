@@ -77,7 +77,7 @@ if(root){
         facebook=q("[data-auth-facebook]");
       if(google){
         google.disabled=!data.providers?.google;
-        google.textContent=data.providers?.google?"Tiếp tục với Google":"Google (chưa cấu hình)";
+        google.querySelector("[data-auth-provider-label]").textContent=data.providers?.google?"Tiếp tục với Google":"Google (chưa cấu hình)";
         google.title=data.providers?.google?"":"Cần tạo Google OAuth Client ID và Secret trong Google Cloud";
       }
       if(zalo){
@@ -91,12 +91,18 @@ if(root){
         facebook.disabled=true;
         facebook.title="Facebook Login tạm ngừng khi ứng dụng Meta chưa được mở công khai";
       }
-      // Email is Preview-only until verified ownership + recovery are implemented.
-      const emailEnabled=false; // Hide unverified Preview email/password self-service; Google is the customer sign-in path.
-      emailForm.hidden=!emailEnabled;
-      q("[data-auth-toggle]").hidden=!emailEnabled;
+      // Email/password is experimental on the isolated Preview only.
+      // Never present this option on Production before verification/recovery is completed.
+      const emailEnabled=Boolean(data.providers?.email);
+      const emailButton=q("[data-auth-email]");
+      emailButton.hidden=!emailEnabled;
+      emailButton.disabled=!emailEnabled;
+      if(!emailEnabled)emailButton.setAttribute("aria-expanded","false");
+      const emailExpanded=emailEnabled && emailButton.getAttribute("aria-expanded")==="true";
+      emailForm.hidden=!emailExpanded;
+      q("[data-auth-toggle]").hidden=!emailExpanded;
       q("[data-auth-email-note]").hidden=emailEnabled;
-      q("[data-auth-unverified-caption]").hidden=!emailEnabled;
+      q("[data-auth-unverified-caption]").hidden=!emailExpanded;
       authOptions.hidden=active;signed.hidden=!active;
       // The storefront bridge owns cloud preferences; no password/PII leaves the authenticated API.
       window.sdAccountBridge?.onAuth(active);
@@ -111,6 +117,16 @@ if(root){
   q('[data-auth-zalo]').addEventListener("click",()=>{location.assign("/api/customer/auth/zalo/start");});
   q('[data-auth-google]').addEventListener("click",()=>{location.assign("/api/customer/auth/google/start");});
   q('[data-auth-facebook]').addEventListener("click",()=>{location.assign("/api/customer/auth/facebook/start");});
+  q('[data-auth-email]').addEventListener("click",()=>{
+    const button=q("[data-auth-email]");
+    if(button.disabled)return;
+    const expanded=button.getAttribute("aria-expanded")==="true";
+    button.setAttribute("aria-expanded",String(!expanded));
+    emailForm.hidden=expanded;
+    q("[data-auth-toggle]").hidden=expanded;
+    q("[data-auth-unverified-caption]").hidden=expanded;
+    if(!expanded)q('[name="customer_email"]')?.focus({preventScroll:true});
+  });
   q('[data-auth-toggle]').addEventListener("click",()=>{
     const register=emailForm.dataset.mode!=="register";
     emailForm.dataset.mode=register?"register":"login";

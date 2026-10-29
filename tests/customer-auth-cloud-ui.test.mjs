@@ -13,6 +13,11 @@ assert.ok(parsed>=3,"All storefront inline JS must parse");
 for(const marker of ['id="accountCloudStatus"','id="accountImportLocal"',"window.sdAccountBridge={onAuth:accountCloudOnAuth}","accountCloudAttachOrder(orderNumber,result.orderAccessToken||'')",'data-account-order-attach']){
  assert.ok(html.includes(marker),"Account cloud UI missing: "+marker);
 }
+assert.ok(auth.includes('google.querySelector("[data-auth-provider-label]").textContent'),"Google status update must preserve its logo");
+assert.ok(html.includes('data-auth-email aria-expanded="false"'),"Email method must have accessible expand state");
+assert.ok(html.includes('id="sdAuthEmailFields"'),"Email method must expand the existing form");
+assert.ok((html.match(/fill="#(?:4285F4|34A853|FBBC05|EA4335)"/g)||[]).length===4,"Google G must retain all four brand colors");
+assert.ok(auth.includes('const emailEnabled=Boolean(data.providers?.email)'),"Email must be Preview-only by API flag");
 assert.ok(auth.includes("window.sdAccountBridge?.onAuth(active)"),"OAuth session must trigger cloud-account sync");
 assert.ok(html.includes("if(accountSyncMode==='cloud')"),"Cloud account branch is required");
 assert.ok(!html.includes("Đăng nhập không tự động liên kết đơn hàng cũ; Shop sẽ bổ sung"),"Outdated local-only notice must be removed");

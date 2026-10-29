@@ -40,3 +40,50 @@
 #accountImportLocal{font-size:12px;min-height:38px;width:100%;margin:6px 0 12px}
 #accountImportLocal[hidden]{display:none!important}
 #accountImportLocal:disabled{opacity:.55;cursor:wait}
+
+/* Sign-in method icons: exact brand-color G on an opaque light disc; neutral email pictogram.
+   Scoped to customer drawer only; no global liquid-glass/theme overrides. */
+#sdCustomerAuth .sd-auth-provider.sd-auth-google,
+#sdCustomerAuth .sd-auth-provider.sd-auth-email {
+  position:relative;
+  box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;
+  min-height:50px;padding:12px 15px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--card-glass);
+  color:var(--ink);
+  transition:background-color .18s ease,border-color .18s ease,transform .18s ease;
+}
+#sdCustomerAuth .sd-auth-provider-icon {
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  display:inline-flex;align-items:center;justify-content:center;
+  box-sizing:border-box;flex:0 0 26px;width:26px;height:26px;
+}
+#sdCustomerAuth .sd-auth-google-mark {
+  background:#fff;border-radius:50%;padding:4px;
+}
+#sdCustomerAuth .sd-auth-provider-icon svg {
+  display:block;flex:none;width:18px;height:18px;aspect-ratio:1/1;
+}
+#sdCustomerAuth .sd-auth-email-mark svg {width:21px;height:21px}
+#sdCustomerAuth .sd-auth-provider-label {
+  display:block;width:100%;padding:0 28px;
+  text-align:center;font-size:14px;font-weight:650;line-height:1.4;
+  white-space:normal;
+}
+#sdCustomerAuth .sd-auth-provider.sd-auth-google:not(:disabled):hover,
+#sdCustomerAuth .sd-auth-provider.sd-auth-email:not(:disabled):hover {
+  transform:translateY(-1px);
+  border-color:var(--ink);
+}
+#sdCustomerAuth .sd-auth-provider.sd-auth-google:not(:disabled):active,
+#sdCustomerAuth .sd-auth-provider.sd-auth-email:not(:disabled):active {transform:translateY(0)}
+#sdCustomerAuth .sd-auth-provider.sd-auth-email[aria-expanded="true"] {
+  border-color:var(--ink);
+}
+#sdCustomerAuth .sd-auth-email-fields[hidden] {display:none!important}
+@media (prefers-reduced-motion:reduce) {
+  #sdCustomerAuth .sd-auth-provider.sd-auth-google,
+  #sdCustomerAuth .sd-auth-provider.sd-auth-email {transition:none}
+}

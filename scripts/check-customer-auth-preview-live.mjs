@@ -40,7 +40,9 @@ assert.ok(html.includes('id="sdCustomerAuth"'),"Preview must have the exact cust
 assert.ok(html.includes('id="accountOpen"'),"PC header must expose the Account button");
 assert.ok(html.includes("$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'))"),
   "PC Account button must open the existing mobile-approved account drawer");
-assert.ok(html.includes('data-auth-google>Tiếp tục với Google'),"Google Login must be present in Account drawer");
+assert.ok(html.includes('data-auth-google aria-label="Tiếp tục với Google"'),"Google Login icon button must be present");
+assert.ok(html.includes('data-auth-email aria-expanded="false"'),"Email icon button must be present, hidden unless Preview allows it");
+assert.ok(html.includes('sd-auth-google-mark')&&html.includes('sd-auth-email-mark'),"Both method icons must be present");
 assert.ok(html.includes('data-auth-zalo hidden disabled'),"Temporarily disabled Zalo Login must not be offered");
 assert.ok(html.includes('data-auth-facebook hidden disabled'),"Temporarily disabled Facebook Login must not be offered");
 console.log("PASS: real Preview includes wired desktop Account button, Google Login and inactive other providers.");
