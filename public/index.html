@@ -73,8 +73,8 @@ button,a,[role="button"],img,svg{ -webkit-tap-highlight-color: transparent; }
 @font-face{font-family:SD Sans;src:url('fonts/NotoSans-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
 @font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
 @font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
-:root{color-scheme:only light;--page:#eaf3fb;--ink:#142a3c;--muted:#5b7488;--gold:#5c91b9;--gold-hi:#b9dcf6;--line:rgba(235,247,255,.88);--nav-bg:rgba(244,250,255,.50);--nav-glass-hover:rgba(255,255,255,.36);--glass:rgba(245,250,255,.66);--card-glass:rgba(236,246,255,.78);--shadow:0 18px 44px rgba(41,84,119,.15);--card-ink:#142a3c;--soft-line:rgba(74,116,147,.18);--panel:rgba(238,247,255,.70);--panel-strong:rgba(248,252,255,.86);--benefit-tile-glass:linear-gradient(145deg,rgba(255,255,255,.88) 0%,rgba(236,246,255,.82) 48%,rgba(216,234,249,.74) 100%);--benefit-tile-border:rgba(255,255,255,.80);--benefit-tile-shadow:0 8px 21px rgba(37,72,98,.12),inset 0 1px 0 rgba(255,255,255,.84),inset 0 -1px 0 rgba(68,112,144,.07),inset 0 0 0 1px rgba(255,255,255,.14);--benefit-tile-hover-shadow:0 12px 27px rgba(37,72,98,.16),inset 0 1px 0 rgba(255,255,255,.92),inset 0 -1px 0 rgba(68,112,144,.06),inset 0 0 0 1px rgba(255,255,255,.20);--body-overlay:rgba(232,244,255,.035);--nav-ink:#142a3c;--nav-muted:rgba(20,42,60,.78);--lightness:1}
-html.dark{color-scheme:only dark;--page:#061522;--ink:#edf7ff;--muted:#abc3d7;--gold:#9bcdf3;--gold-hi:#d9f0ff;--line:rgba(176,215,243,.36);--nav-bg:rgba(7,24,41,.64);--nav-glass-hover:rgba(164,211,244,.20);--glass:rgba(13,35,56,.78);--card-glass:rgba(8,27,46,.86);--shadow:0 18px 44px rgba(0,7,18,.46);--card-ink:#edf7ff;--soft-line:rgba(176,213,239,.24);--panel:rgba(8,27,46,.78);--panel-strong:rgba(10,32,53,.90);--benefit-tile-glass:linear-gradient(145deg,rgba(36,66,91,.96) 0%,rgba(24,49,72,.94) 48%,rgba(12,31,50,.92) 100%);--benefit-tile-border:rgba(204,231,250,.44);--benefit-tile-shadow:0 10px 24px rgba(0,6,16,.30),inset 0 1px 0 rgba(232,246,255,.42),inset 0 -1px 0 rgba(0,8,19,.20),inset 0 0 0 1px rgba(184,219,244,.10);--benefit-tile-hover-shadow:0 13px 28px rgba(0,6,16,.36),inset 0 1px 0 rgba(243,250,255,.56),inset 0 -1px 0 rgba(0,8,19,.18),inset 0 0 0 1px rgba(198,228,248,.14);--body-overlay:rgba(0,7,18,.26);--nav-ink:#edf7ff;--nav-muted:rgba(237,247,255,.80);--lightness:.92}
+:root{color-scheme:only light;--page:#eaf3fb;--ink:#142a3c;--muted:#5b7488;--gold:#5c91b9;--gold-hi:#b9dcf6;--line:rgba(235,247,255,.88);--nav-bg:rgba(244,250,255,.50);--nav-glass-hover:rgba(255,255,255,.36);--glass:rgba(245,250,255,.66);--card-glass:rgba(236,246,255,.78);--shadow:0 18px 44px rgba(41,84,119,.15);--card-ink:#142a3c;--soft-line:rgba(74,116,147,.18);--panel:rgba(238,247,255,.70);--panel-strong:rgba(248,252,255,.86);--body-overlay:rgba(232,244,255,.035);--nav-ink:#142a3c;--nav-muted:rgba(20,42,60,.78);--lightness:1}
+html.dark{color-scheme:only dark;--page:#061522;--ink:#edf7ff;--muted:#abc3d7;--gold:#9bcdf3;--gold-hi:#d9f0ff;--line:rgba(176,215,243,.36);--nav-bg:rgba(7,24,41,.64);--nav-glass-hover:rgba(164,211,244,.20);--glass:rgba(13,35,56,.78);--card-glass:rgba(8,27,46,.86);--shadow:0 18px 44px rgba(0,7,18,.46);--card-ink:#edf7ff;--soft-line:rgba(176,213,239,.24);--panel:rgba(8,27,46,.78);--panel-strong:rgba(10,32,53,.90);--body-overlay:rgba(0,7,18,.26);--nav-ink:#edf7ff;--nav-muted:rgba(237,247,255,.80);--lightness:.92}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:106px;background:var(--page);transition:background-color .24s ease,color .24s ease}body{margin:0;min-height:100vh;position:relative;isolation:isolate;overflow-x:hidden;background:var(--page);color:var(--ink);font-family:SD Sans,Arial,sans-serif;transition:background-color .24s ease,color .24s ease}
 .theme-bg{position:fixed;inset:0;z-index:-3;pointer-events:none;background-position:center center;background-repeat:no-repeat;background-size:cover;transform:none;will-change:opacity;transition:opacity .24s ease,filter .24s ease}
 .theme-bg--dark{opacity:0;background-color:#061522;background-image:radial-gradient(ellipse at 18% 12%,rgba(106,174,219,.36) 0%,transparent 38%),radial-gradient(ellipse at 79% 39%,rgba(26,87,128,.42) 0%,transparent 42%),radial-gradient(ellipse at 39% 88%,rgba(57,117,157,.28) 0%,transparent 43%),linear-gradient(128deg,#04101d 0%,#0a2740 24%,#142d44 43%,#061725 60%,#12344d 78%,#04111e 100%);filter:hue-rotate(0deg) saturate(.82) brightness(.82) contrast(.92)}
@@ -169,7 +169,7 @@ html.js-enabled :is(.hero-copy,.section-head,.order-cta)[data-reveal].is-visible
   transition-delay:min(var(--reveal-delay,0ms),90ms);
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html.js-enabled [data-reveal]{opacity:1;transform:none;filter:none}}
-@media(min-width:1500px){}
+
 @media(max-width:1050px){.wrap{width:min(100% - 36px,1390px)}.navlinks{gap:0}.navlink{padding:0 9px}.brand-name{font-size:17px}.promise{grid-template-columns:1fr;gap:15px}.promise-tags{grid-template-columns:repeat(4,minmax(0,1fr))}.mosaic{grid-template-rows:180px 145px}.contact-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:760px){.wrap{width:calc(100% - 28px)}.nav-wrap{top:7px;padding:8px 8px 0}.nav{min-height:52px;padding:6px 8px 6px 11px;gap:5px;min-width:0}.brand{flex:0 1 auto;min-width:0}.brand-symbol{width:25px;height:29px}.brand-name{font-size:16px}.navlinks{display:none}.nav-actions{gap:0;flex-shrink:0}.nav-actions .icon-btn{width:33px;height:33px}.menu-btn{display:grid}.mobile-nav{width:100%}.section{padding:22px 0 25px}.section-head{align-items:start;gap:10px;margin-bottom:13px}.section-title{font-size:27px}.section-note{font-size:9px;max-width:180px}.featured-grid,.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.product-photo{aspect-ratio:1/0.86}.product-info{padding:9px}.product-title{font-size:13px}.product-category{font-size:8px}.product-card-bottom{margin-top:8px}.product-detail-cta{font-size:8px}.mini-add{width:27px;height:27px}.promise{padding:19px 15px;border-radius:20px}.promise h2{font-size:28px}.promise p{font-size:9px}.promise-tags{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.promise-tag{font-size:8px;padding:7px 8px;min-height:39px}.promise-tag i{width:20px;height:20px}.mosaic{grid-template-columns:1fr 1fr;grid-template-rows:230px 150px 150px;gap:8px}.mosaic-card:first-child{grid-column:span 2;grid-row:auto}.mosaic-card.art-main{grid-row:auto;grid-column:span 2}.mosaic-card.small .mosaic-title{font-size:17px}.mosaic-card.small .mosaic-content{max-width:92%}.custom-section{grid-template-columns:1fr;gap:10px}.custom-text{padding:24px 20px}.custom-text h2{font-size:34px}.custom-image{min-height:220px}.catalog-tools{align-items:stretch;min-width:0}.search-field{width:100%;min-width:0;flex:0 0 100%;order:-1;min-height:44px}.search-field input{font-size:12px}.filter-pills{width:100%;flex:0 0 100%;min-width:0;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap;max-width:100%;padding:2px 2px 8px;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}.filter-pill{flex:0 0 auto;width:max-content;min-width:max-content;white-space:nowrap;scroll-snap-align:start;font-size:10px;padding:8px 12px}.contact-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.footer-top{flex-wrap:wrap}.footer-tagline{display:none}.footer-bottom{font-size:7px;flex-direction:column;gap:7px}.detail-layout{grid-template-columns:1fr;gap:8px;padding:14px}.detail-main-image{aspect-ratio:1/0.78}.detail-copy{padding:4px 3px 10px}.detail-copy h2{font-size:30px}.overlay{padding:8px}.detail-modal{max-height:94dvh;border-radius:18px}.detail-actions{grid-template-columns:1fr 1fr}.cart-drawer{padding:15px}.text-link{font-size:8px}}
 @media(max-width:390px){.brand-name{font-size:14px}.brand-symbol{width:22px;height:27px}.nav-actions .icon-btn{width:30px;height:30px}.nav{gap:2px}.nav-actions{gap:0}#cartOpen .cart-count{right:-2px;top:-2px;min-width:15px;height:15px;font-size:8px;transform:translate(15%,-15%)}.contact-link{padding:8px 7px}.contact-icon{width:24px;height:24px}}
@@ -218,7 +218,7 @@ html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(236,246,25
 /* Guard against long product names and narrow controls overflowing or colliding. */
 .product-card,.product-open,.product-info,.product-title,.product-category,.detail-copy,.cart-row,.cart-row>div,.contact-link>span:last-child{min-width:0}
 .product-title{overflow-wrap:anywhere;hyphens:auto;line-height:1.38}.product-info{padding-bottom:47px}.product-card-bottom{min-width:0}.product-detail-cta{overflow-wrap:anywhere}.cart-row strong{overflow-wrap:anywhere;line-height:1.45}.cart-row small{overflow-wrap:anywhere;line-height:1.5}.detail-actions .pill-btn{line-height:1.45;white-space:normal;min-height:42px}.contact-link{overflow:hidden}.contact-link small{overflow-wrap:anywhere;word-break:break-word}
-@media(max-width:1050px){}
+
 @media(max-width:760px){.welcome-logo{width:min(62vw,220px);max-height:220px}.welcome-tagline{letter-spacing:.16em;font-size:8px}.welcome-content p{font-size:13px;margin:20px 0 17px}.craftsmanship-points{gap:10px}.craftsmanship-points small{font-size:9px}.detail-gallery-arrow{width:33px;height:33px}.detail-gallery-prev{left:8px}.detail-gallery-next{right:8px}.detail-image-count{right:8px;bottom:8px}.product-title{font-size:13px;min-height:0}.product-info{padding-bottom:45px}.cart-row{grid-template-columns:58px minmax(0,1fr) 22px;gap:8px;padding:8px}.cart-row img{width:58px;height:58px}.cart-row strong{font-size:12px}.remove-item{font-size:20px;min-width:22px}.contact-link small{font-size:7.5px}.section-note{max-width:46%;}}
 @media(max-width:390px){.welcome-logo{width:min(62vw,190px);max-height:190px}.welcome-tagline{font-size:7px;letter-spacing:.13em}.detail-actions{grid-template-columns:1fr}.detail-order-link{font-size:9px}}
 @media(hover:none){.product-card:hover,.pill-btn:hover{transform:none}.product-card:hover .product-photo img{transform:none}}
@@ -2960,7 +2960,7 @@ html.dark .service-strip .service-icon{border-color:rgba(204,231,250,.38);backgr
 .service-strip .service-text{display:flex;flex:1 1 auto;align-items:center;justify-content:center;min-width:0;text-align:center}
 .service-strip .service-text strong{display:block;min-width:0;color:var(--ink);font-size:11px;font-weight:750;line-height:1.25;overflow-wrap:anywhere}
 .service-strip .service:hover{transform:translateY(-1px)}
-.service-strip .service:hover .service-copy{border-color:var(--gold-hi);box-shadow:var(--benefit-tile-hover-shadow)}
+.service-strip .service:hover .service-copy{filter:brightness(1.025)}
 .service-strip .service:active{transform:scale(.99)}
 .service-strip .service:focus-visible{outline:none}
 .service-strip .service:focus-visible .service-copy{outline:2px solid var(--gold-hi);outline-offset:3px}
@@ -3072,11 +3072,9 @@ html.dark .theme-watermark{opacity:.045}
 .theme-bg--light::after{background:linear-gradient(118deg,rgba(239,247,255,.78),rgba(226,240,251,.80) 52%,rgba(246,250,255,.76)),radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.38),transparent 38%)}
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.76),rgba(7,31,51,.72) 52%,rgba(3,17,30,.78)),radial-gradient(ellipse at 20% 15%,rgba(91,157,202,.15),transparent 40%),radial-gradient(ellipse at 82% 58%,rgba(37,100,148,.12),transparent 42%)}
 
-@media(max-width:760px){
-}
-@media(max-width:350px){
-}
-@media(prefers-reduced-motion:reduce){}
+
+
+
 
 
 /* Final background calibration: keep the branded texture subtle and remove the oversized page-level watermark. */
@@ -3482,8 +3480,7 @@ html.dark .theme-bg--dark{filter:none!important}
 .section-title{letter-spacing:-.035em}
 .text-link,.pill-btn{border-color:rgba(145,190,222,.46);box-shadow:inset 0 1px 0 rgba(255,255,255,.60),0 4px 14px rgba(49,91,123,.06)}
 html.dark .text-link,html.dark .pill-btn{border-color:rgba(151,197,229,.36);box-shadow:inset 0 1px 0 rgba(235,246,255,.10),0 4px 14px rgba(0,0,0,.12)}
-@media(min-width:761px){
-}
+
 /* Product cards share the soft, bright/deep-blue glass surface from the reference boards. */
 .product-card,.catalog-card{
   border-radius:18px;border-color:transparent;
@@ -3808,16 +3805,14 @@ html.dark .sd-fullscreen-share{
 }
 
 /* Historical hero styling block; image effects are prohibited by the presentation-asset lock below. */
-@media(max-width:760px){
-}
+
 
 /* Full storefront visual pass: restore satin depth and match the mobile reference rhythm. */
 /* sd-static-reference-final-pass-2026-10-21 */
 .theme-bg--light::after{background:linear-gradient(118deg,rgba(225,241,255,.07),rgba(211,231,249,.03) 52%,rgba(237,247,255,.07))}
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.10),rgba(7,31,51,.06) 52%,rgba(3,17,30,.12))}
 /* The reference headline breaks after “Phong cách”, not after “đẳng”. */
-@media(max-width:760px){
-}
+
 /* Keep the welcome screen airy like the supplied splash reference while retaining its existing entry action and copy. */
 .welcome-content{
   width:min(90vw,480px)!important;
@@ -3870,16 +3865,13 @@ html.dark .sd-fullscreen-share{
   -webkit-backdrop-filter:blur(24px) saturate(145%);
   backdrop-filter:blur(24px) saturate(145%);
 }
-@media(max-width:760px){
-}
+
 
 
 
 /* Desktop fallback hero: keep the headline, description and CTA in a deliberate editorial stack when the exact SKU is absent. */
-@media(min-width:761px){
-}
-@media(min-width:761px) and (max-width:1000px){
-}
+
+
 
 /* Explicitly size mobile drawers so the persistent bottom navigation stays visible. */
 @media(max-width:760px){
@@ -4017,8 +4009,7 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   .service-strip .service-copy{min-height:72px;padding:7px 3px}
   .service-strip .service-text strong{font-size:10px}
 }
-@media(max-width:760px){
-}
+
 
 /* Compact populated carts on phones; preserve the empty-cart state and checkout scrolling. */
 @media(max-width:760px){
@@ -4037,8 +4028,7 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   }
   .cart-drawer:has(.cart-row) .cart-bottom{margin-top:auto}
 }
-@media(max-width:760px){
-}
+
 
 /* Keep the sticky header frosted, but prevent scrolled page imagery/text from ghosting through the official brand lockup. */
 .nav-wrap .nav{border:1px solid transparent;background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-glass-panel-shadow)!important;-webkit-backdrop-filter:blur(17px) saturate(114%);backdrop-filter:blur(17px) saturate(114%)}
@@ -4079,8 +4069,7 @@ body.welcome-active #accountDrawer,body.welcome-active #cartDrawer,body.welcome-
 .welcome-splash{z-index:2147483000!important}
 body:has(#welcomeSplash) #accountDrawer,body:has(#welcomeSplash) #cartDrawer,body:has(#welcomeSplash) #checkoutDrawer{visibility:hidden!important;pointer-events:none!important;transform:translateX(105%)!important}
 /* Historical desktop image fade superseded by the protected hero presentation-asset lock. */
-@media(min-width:761px){
-}
+
 </style>
 
 
@@ -4230,9 +4219,8 @@ html.dark .not-found-card{background:rgba(7,27,43,.62);border-color:rgba(92,145,
 /* Bring product-detail trust icons into the same navy 24x24 thin-stroke system. */
 .promise-tag i{color:var(--ink)}
 .promise-tag i svg{display:block;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-@media(min-width:761px){}
-@media(min-width:761px) and (max-width:1000px){
-}
+
+
 
 
 
@@ -4240,17 +4228,17 @@ html.dark .not-found-card{background:rgba(7,27,43,.62);border-color:rgba(92,145,
 /* SINDAREALEST soft-inset material: catalog controls only.
    The catalog tools are layout, not a second glass button. */
 :root{
- --sd-soft-face:rgba(235,241,248,.90);
- --sd-soft-edge:rgba(202,218,233,.84);
+ 
+ 
  --sd-soft-ink:#193449;
  --sd-soft-muted:#536a7e;
  --sd-soft-shadow:var(--sd-3d-shadow);
  --sd-soft-pressed:var(--sd-3d-depressed);
- --sd-soft-easing:cubic-bezier(.2,.7,.2,1);
+ 
 }
 html.dark{
- --sd-soft-face:rgba(22,45,66,.94);
- --sd-soft-edge:rgba(109,148,179,.58);
+ 
+ 
  --sd-soft-ink:#edf7ff;
  --sd-soft-muted:#b5cde0;
  --sd-soft-shadow:var(--sd-3d-shadow);
@@ -4423,8 +4411,8 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
  /* The soft face is ONE translucent film, not multiple opaque inset fills. */
  --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(247,254,255,.22),rgba(215,239,246,.105) 56%,rgba(194,228,238,.065) 100%);
  --sd-3d-surface:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
- --sd-3d-tray:linear-gradient(150deg,rgba(236,245,251,.68),rgba(222,239,249,.61));
- --sd-3d-tray-shadow:0 3px 9px rgba(48,85,117,.075),inset 0 1px 2px rgba(255,255,255,.24);
+ 
+ 
  --sd-3d-surface-search:var(--sd-3d-face);
  /* Final Glass UI 2.0: one shared optical material for page shells, panels
     and controls. Header/tray use the stronger translucent face for legibility. */
@@ -4437,7 +4425,7 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
 
  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
  --sd-control-rim:rgba(184,207,225,.45);
- --sd-control-face:rgba(220,233,246,.86);
+ 
  --sd-control-ink:var(--sd-3d-ink);
  --sd-control-shadow:var(--sd-3d-shadow);
  --sd-control-down:var(--sd-3d-depressed);
@@ -4450,8 +4438,8 @@ html.dark{
  --sd-3d-rim:radial-gradient(ellipse 78% 95% at 0% 1%,rgba(199,143,188,.36),transparent 79%),radial-gradient(ellipse 55% 113% at 100% 40%,rgba(105,160,214,.42),transparent 83%),radial-gradient(ellipse 100% 47% at 60% 105%,rgba(100,185,188,.39),transparent 79%),linear-gradient(160deg,rgba(143,179,205,.24),rgba(49,99,133,.10));
  --sd-3d-face:radial-gradient(ellipse 90% 135% at 20% -35%,rgba(147,188,214,.14),rgba(36,80,112,.115) 56%,rgba(14,54,85,.075) 100%);
  --sd-3d-surface:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
- --sd-3d-tray:linear-gradient(150deg,rgba(20,48,70,.70),rgba(12,39,62,.64));
- --sd-3d-tray-shadow:0 3px 10px rgba(0,5,15,.16),inset 0 1px 2px rgba(148,190,218,.12);
+ 
+ 
  --sd-3d-surface-search:var(--sd-3d-face);
  --sd-glass-shell:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
  --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(70,110,143,.62),rgba(26,66,94,.62) 57%,rgba(11,41,65,.53) 100%) padding-box,var(--sd-3d-rim) border-box;
@@ -4461,7 +4449,7 @@ html.dark{
  --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%);
 
  --sd-control-rim:rgba(114,150,184,.40);
- --sd-control-face:rgba(23,50,73,.86);
+ 
  --sd-control-ink:var(--sd-3d-ink);
  --sd-control-shadow:var(--sd-3d-shadow);
  --sd-control-down:var(--sd-3d-depressed);
@@ -4688,41 +4676,33 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
  }
 }
 /* Desktop Hero visual correction: preserve the PNG's intrinsic aspect ratio and match the reference's product emphasis. */
-@media(min-width:1001px){
-}
-@media(max-width:1000px){}
-@media(max-width:760px){}
+
+
+
 
 /* Tablet Hero pedestal stays under the shoes without extending beyond the right edge. */
-@media(min-width:761px) and (max-width:1000px){
-}
 
-@media(min-width:761px) and (max-width:1000px){}
+
+
 
 /* Tablet Hero scale correction: account for the transparent margins inside the original PNG. */
-@media(min-width:761px) and (max-width:1000px){
-}
+
 
 
 /* Mobile Hero — owner reference, single authoritative layout.
    The 1200x1600 source PNG has ~83% alpha: never scale its blank canvas to the layout.
    Reference composition: text on left, shoe silhouettes at upper right, marble below. */
-@media(max-width:760px){
-}
-@media(max-width:390px){
-}
-@media(max-width:375px){
-}
+
+
+
 
 
 
 /* Cross-device Hero design system: desktop and tablet inherit the same broad,
    curved mineral shelf, two localized shoe contact shadows, and the original
    source PNG used by the owner-accepted mobile layout. No edits below 761px. */
-@media(min-width:761px){
-}
-@media(min-width:761px) and (max-width:1000px){
-}
+
+
 
 
 
