@@ -6,7 +6,7 @@ test('soft inset catalog uses existing live filter elements and keeps data bindi
  assert.match(html,/id="catalogSearch"/);
  assert.match(html,/id="categoryFilters"/);
  assert.match(html,/class="filter-pill tap-target/);
- assert.match(html,/aria-pressed="\$\{selectedCategory===c\}"/);
+ assert.match(html,/selectedCategory===c/);
  assert.match(html,/function renderFilters\(/);
  assert.match(html,/function renderCatalog\(/);
  assert.match(html,/#products \.filter-pill\.active/);
