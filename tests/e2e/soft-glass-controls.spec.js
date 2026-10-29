@@ -192,6 +192,33 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
       await cdp.detach();
     }
   }
+  const orderToggle=page.locator('#orderDetailsToggle');
+  await orderToggle.click();
+  const orderDetails=page.locator('#orderDetailsPanel');
+  await expect(orderDetails).toBeVisible();
+  const orderCards=page.locator('#orderDetailsPanel .order-step');
+  await expect(orderCards).toHaveCount(4);
+  const orderMaterial=await orderCards.evaluateAll(nodes=>nodes.map(el=>{
+   const css=getComputedStyle(el),rim=getComputedStyle(el,'::after');
+   return {shadow:css.boxShadow,face:css.backgroundImage,rim:rim.backgroundImage,
+    mask:rim.maskComposite,webkitMask:rim.webkitMaskComposite};
+  }));
+  expect(orderMaterial.every(x=>!x.shadow.includes('inset')&&x.shadow!=='none'
+   &&x.face.includes('radial-gradient')&&x.rim.includes('radial-gradient')
+   &&(x.mask.includes('exclude')||x.webkitMask.includes('xor'))),
+   'Expanded order steps use the shared raised face and masked optical rim').toBe(true);
+  const assuranceFooter=page.locator('#orderDetailsPanel .order-assurance-footer');
+  const footerMaterial=await assuranceFooter.evaluate(el=>{
+   const css=getComputedStyle(el),rim=getComputedStyle(el,'::after');
+   return {shadow:css.boxShadow,rim:rim.backgroundImage,mask:rim.maskComposite,
+    webkitMask:rim.webkitMaskComposite};
+  });
+  expect(footerMaterial.shadow).not.toContain('inset');
+  expect(footerMaterial.rim).toContain('radial-gradient');
+  expect(footerMaterial.mask.includes('exclude')||footerMaterial.webkitMask.includes('xor')).toBe(true);
+  await orderDetails.screenshot({path:`${dir}/${label}-${mode}-order-details.png`,animations:'disabled'});
+  await orderToggle.click();
+  await expect(orderDetails).toBeHidden();
   await search.locator('input').focus();
   const focused=await search.evaluate(el=>getComputedStyle(el).boxShadow);
   expect(focused).toContain('inset');
