@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createHmac } from "node:crypto";
+import { createHmac,pbkdf2Sync } from "node:crypto";
 import {
   ZALO_APP_ID,ORIGIN,randomToken,pkce,passwordHash,equalHash,zaloAppSecretProof,
   startFlow,consumeFlow,flowCookie,beginSession,getAccount,sessionCookie,endSession
@@ -26,6 +26,10 @@ const salt=randomToken(24),hash=await passwordHash("Safe-Password-For-Testing-20
 assert.equal(hash.length,64);
 assert.ok(equalHash(hash,await passwordHash("Safe-Password-For-Testing-2026",salt)));
 assert.ok(!equalHash(hash,await passwordHash("NOT-Safe-Password-For-Testing-2026",salt)));
+let reference=Buffer.from("Safe-Password-For-Testing-2026");
+for(let round=0;round<3;round++)
+  reference=pbkdf2Sync(reference,"sd-customer-email-v2:"+round+":"+salt,100000,32,"sha256");
+assert.equal(hash,reference.toString("hex"),"Worker-compatible password hash must equal three 100k PBKDF2 rounds");
 class FakeDB {
   constructor(){this.flows=new Map();this.accounts=new Map();this.sessions=new Map();}
   prepare(query){

@@ -137,11 +137,22 @@ export async function endSession(env,request) {
   if(/^[a-f0-9]{64}$/.test(token)&&env?.DB)
     await env.DB.prepare("DELETE FROM customer_auth_sessions WHERE token_hash=?").bind(await digest(token)).run();
 }
-export async function passwordHash(password,salt,iterations=210000) {
-  const imported=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveBits"]);
-  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",
-    salt:enc.encode(salt),iterations},imported,256);
-  return Array.from(new Uint8Array(bits),b=>b.toString(16).padStart(2,"0")).join("");
+// Cloudflare Workers caps each PBKDF2 deriveBits operation at 100,000 iterations.
+// Three domain-separated rounds avoid the runtime's 210,000-iteration exception,
+// retaining 300,000 total KDF iterations. This version is Preview-only until
+// verified Email ownership, recovery and a production-grade password KDF exist.
+export async function passwordHash(password,salt) {
+  if(typeof password!=="string"||typeof salt!=="string"||!salt)throw Error("Invalid password KDF input");
+  let material=enc.encode(password);
+  for(let round=0;round<3;round++){
+    const imported=await crypto.subtle.importKey("raw",material,"PBKDF2",false,["deriveBits"]);
+    material=new Uint8Array(await crypto.subtle.deriveBits({
+      name:"PBKDF2",hash:"SHA-256",
+      salt:enc.encode("sd-customer-email-v2:"+round+":"+salt),
+      iterations:100000
+    },imported,256));
+  }
+  return Array.from(material,b=>b.toString(16).padStart(2,"0")).join("");
 }
 export async function zaloAppSecretProof(accessToken,appSecret) {
   if(typeof accessToken!=="string" || !accessToken || typeof appSecret!=="string" || !appSecret)
