@@ -162,3 +162,10 @@ test('Cart removal, one-row shoe sizes, and compact catalog cards retain their l
  assert.ok(html.includes('.product-card .product-card-bottom{display:flex;align-items:center;flex-direction:row'));
  assert.ok(html.includes('.product-card .product-card-footer{padding:0 13px 12px'));
 });
+test('cart gaps and benefit tiles use a single rounded glass face',()=>{
+ assert.match(html,/\.service\{\s*min-width:0;min-height:78px;height:auto;[\s\S]*?padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;/);
+ assert.match(html,/html\.dark \.service-copy\{background:linear-gradient\(145deg,rgba\(28,57,79,\.74\),rgba\(11,35,54,\.70\)\)/);
+ assert.match(html,/#cartDrawer\{background:var\(--sd-reference-surface\)!important\}/);
+ assert.match(html,/\.cart-list\{width:100%;align-items:stretch\}/);
+ assert.match(html,/\.cart-row\{width:100%;box-sizing:border-box\}/);
+});

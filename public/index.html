@@ -3654,14 +3654,11 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   }
   .service{
     min-width:0;min-height:78px;height:auto;
-    display:flex;align-items:center;justify-content:center;
-    padding:9px 5px;border-radius:17px;
-    background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(227,241,252,.70));
-    border:1px solid rgba(255,255,255,.96);
-    box-shadow:0 6px 16px rgba(39,78,108,.08),inset 0 1px 0 rgba(255,255,255,.92);
+    display:flex;align-items:stretch;justify-content:stretch;
+    padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;
   }
-  html.dark .service{background:linear-gradient(145deg,rgba(25,53,76,.94),rgba(8,29,48,.94));border-color:rgba(192,223,245,.34);box-shadow:0 7px 16px rgba(0,0,0,.15),inset 0 1px 0 rgba(239,248,255,.10)}
-  .service-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:100%;text-align:center}
+  .service-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:100%;padding:9px 5px;border:0;border-radius:17px;background:linear-gradient(145deg,rgba(255,255,255,.88),rgba(227,241,252,.70));box-shadow:0 6px 16px rgba(39,78,108,.08),inset 0 1px 0 rgba(255,255,255,.92);text-align:center}
+  html.dark .service-copy{background:linear-gradient(145deg,rgba(28,57,79,.74),rgba(11,35,54,.70));box-shadow:0 5px 13px rgba(0,0,0,.12),inset 0 1px 0 rgba(239,248,255,.10)}
   .service-icon{width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.76);border:1px solid rgba(151,190,218,.45);box-shadow:0 3px 8px rgba(41,84,117,.08)}
   .service-icon svg{width:18px;height:18px}
   .service-text{display:block;min-width:0}
@@ -3754,7 +3751,7 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
 }
 @media(max-width:390px){
   .service-strip{gap:6px;padding:8px}
-  .service{min-height:75px;padding:8px 3px}
+  .service{min-height:75px;padding:0}
   .service-text strong{font-size:9px}
   .sd-fullscreen-stage{padding-left:27px;padding-right:27px}
   .sd-fullscreen-thumb{flex-basis:49px;width:49px;height:49px}
@@ -3860,12 +3857,15 @@ html.dark .sd-fullscreen-share{
   .nav-wrap .nav .brand-name{white-space:nowrap}
   .nav-wrap .nav .nav-actions{margin-left:auto!important;flex:0 0 auto}
 }
-/* Make drawers read as frosted-glass sheets, not let storefront text ghost through. */
+/* Frosted drawer sheets stay distinct while keeping gaps between nested cards translucent. */
 .account-drawer,.cart-drawer,.checkout-drawer{
   background:var(--sd-reference-surface-strong)!important;
   -webkit-backdrop-filter:blur(24px) saturate(145%);
   backdrop-filter:blur(24px) saturate(145%);
 }
+#cartDrawer{background:var(--sd-reference-surface)!important}
+.cart-list{width:100%;align-items:stretch}
+.cart-row{width:100%;box-sizing:border-box}
 
 
 
