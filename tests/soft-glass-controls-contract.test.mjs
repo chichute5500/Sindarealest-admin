@@ -41,9 +41,9 @@ test('one clear face, one masked optical edge and separate depth roles in both t
  assert.match(html,/--sd-3d-face:radial-gradient/);
  assert.match(html,/--sd-3d-surface:var\(--sd-3d-face\);/);
  assert.match(html,/--sd-3d-surface-search:var\(--sd-3d-face\)/);
- assert.match(html,/--sd-3d-rim:radial-gradient\(ellipse 78% 95% at 0% 1%/);
- assert.match(html,/radial-gradient\(ellipse 55% 113% at 100% 40%/);
- assert.match(html,/radial-gradient\(ellipse 100% 47% at 60% 105%/);
+ assert.match(html,/--sd-3d-rim:radial-gradient\(ellipse 70% 92% at 1% 0%/);
+ assert.match(html,/radial-gradient\(ellipse 53% 108% at 100% 36%/);
+ assert.match(html,/radial-gradient\(ellipse 100% 47% at 60% 110%/);
  assert.match(html,/--sd-3d-shadow:0 1px 2px/);
  assert.match(html,/--sd-3d-depressed:0 1px 2px/);
  assert.match(html,/--sd-glass-panel-shadow:/);
@@ -67,7 +67,8 @@ test('catalog excludes color below the face; rim cannot introduce a second bevel
  assert.ok(start>0 && end>start);
  const rim=html.slice(start,end);
  assert.match(rim,/position:absolute;inset:0;border-radius:inherit;pointer-events:none/);
- assert.match(rim,/padding:1\.4px;background:var\(--sd-3d-rim\)/);
+ assert.match(rim,/padding:1\.75px;background:var\(--sd-3d-rim\)/);
+ assert.match(rim,/filter:blur\(\.43px\)/);
  assert.match(rim,/-webkit-mask-composite:xor/);
  assert.match(rim,/mask-composite:exclude/);
  assert.doesNotMatch(rim,/box-shadow:/);
