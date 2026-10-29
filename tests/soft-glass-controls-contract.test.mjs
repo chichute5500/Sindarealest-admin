@@ -46,3 +46,14 @@ test('owner soft inset uses a recessed center, curved bevel and restrained conta
  assert.match(html,/--sd-3d-tray-shadow:/);
  assert.match(html,/prefers-reduced-motion:reduce/);
 });
+
+test('touch press controller survives scroll, cancel and does not alter product business state',()=>{
+ assert.match(html,/id="sd-glass-touch-press-controller"/);
+ assert.match(html,/addEventListener\('touchstart',down/);
+ assert.match(html,/addEventListener\('touchend',release/);
+ assert.match(html,/addEventListener\('touchcancel',release/);
+ assert.match(html,/addEventListener\('touchmove',release/);
+ assert.match(html,/addEventListener\('scroll',release,true/);
+ assert.match(html,/removeAttribute\('data-sd-glass-press'\)/);
+ assert.match(html,/#products \.filter-pill\[data-sd-glass-press="true"\]/);
+});
