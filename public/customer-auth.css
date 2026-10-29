@@ -87,3 +87,12 @@
   #sdCustomerAuth .sd-auth-provider.sd-auth-google,
   #sdCustomerAuth .sd-auth-provider.sd-auth-email {transition:none}
 }
+
+/* Mailjet OTP and password reset panels: inherit approved Liquid Glass drawer. */
+#sdCustomerAuth .sd-auth-flow{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card-glass)}
+#sdCustomerAuth .sd-auth-flow[hidden],#sdCustomerAuth .sd-auth-flow [hidden]{display:none!important}
+#sdCustomerAuth .sd-auth-flow form{display:grid;gap:10px}
+#sdCustomerAuth .sd-auth-flow input{min-height:44px}
+#sdCustomerAuth .sd-auth-flow .sd-auth-text-button{display:block;margin:10px 0 0;text-align:left}
+#sdCustomerAuth [data-auth-forgot]{display:block;margin:8px 0 0}
+#sdCustomerAuth [data-auth-forgot][hidden]{display:none!important}

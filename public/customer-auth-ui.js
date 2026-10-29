@@ -31,7 +31,9 @@ if(root){
       session_store:"Đã lấy được hồ sơ, nhưng không thể tạo phiên tài khoản trong cơ sở dữ liệu Preview.",
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
     };
-    if(authReturn==="success")notify("Đã xác thực. Đang kiểm tra phiên đăng nhập…","success");
+    if(authReturn==="email_verified")notify("Email đã xác minh thành công. Tài khoản đã kích hoạt.","success");
+    else if(authReturn==="email_verify_failed")notify("Liên kết xác minh sai hoặc hết hạn. Hãy yêu cầu mã mới.","error");
+    else if(authReturn==="success")notify("Đã xác thực. Đang kiểm tra phiên đăng nhập…","success");
     else notify("Đăng nhập chưa thành công. "+(reason==="profile_api_error_-501" ?
       "Zalo báo lỗi -501 khi máy chủ lấy thông tin tài khoản. Có thể liên quan đến IP máy chủ ở ngoài Việt Nam; Shop đang xử lý kết nối. Bạn có thể đăng nhập qua Google." :
       /^profile_api_error_-?\d{1,5}$/.test(reason) ?
@@ -100,6 +102,7 @@ if(root){
       if(!emailEnabled)emailButton.setAttribute("aria-expanded","false");
       const emailExpanded=emailEnabled && emailButton.getAttribute("aria-expanded")==="true";
       emailForm.hidden=!emailExpanded;
+      q("[data-auth-forgot]").hidden=!emailExpanded||emailForm.dataset.mode==="register";
       q("[data-auth-toggle]").hidden=!emailExpanded;
       q("[data-auth-email-note]").hidden=emailEnabled;
       q("[data-auth-unverified-caption]").hidden=!emailExpanded;
@@ -125,6 +128,8 @@ if(root){
     emailForm.hidden=expanded;
     q("[data-auth-toggle]").hidden=expanded;
     q("[data-auth-unverified-caption]").hidden=expanded;
+    q("[data-auth-forgot]").hidden=expanded||emailForm.dataset.mode==="register";
+    if(expanded)window.sdEmailFlow?.show("close");
     if(!expanded)q('[name="customer_email"]')?.focus({preventScroll:true});
   });
   q('[data-auth-toggle]').addEventListener("click",()=>{
@@ -134,6 +139,7 @@ if(root){
     q("[data-auth-submit]").textContent=register?"Tạo tài khoản":"Đăng nhập bằng Email";
     q("[data-auth-toggle]").textContent=register?"Đã có tài khoản? Đăng nhập":"Chưa có tài khoản? Đăng ký";
     q("[data-auth-password-hint]")?.toggleAttribute("hidden",!register);
+    q("[data-auth-forgot]").hidden=register;
     q('[name="customer_password"]').autocomplete=register?"new-password":"current-password";
     notify("");
   });
@@ -152,8 +158,17 @@ if(root){
         body:JSON.stringify(payload)
       });
       const data=await res.json();
-      if(!res.ok){notify(data.error||"Đăng nhập không thành công.");return;}
-      emailForm.reset();notify("Đăng nhập thành công.");
+      if(!res.ok){
+        notify(data.error||"Đăng nhập không thành công.");
+        if(res.status===403&&payload.mode==="login")window.sdEmailFlow?.show("verify",payload.email);
+        return;
+      }
+      if(data.verification_required){
+        emailForm.reset();notify(data.message||"Kiểm tra Email để xác minh.","success");
+        window.sdEmailFlow?.show("verify",payload.email);
+        return;
+      }
+      emailForm.reset();notify("Đăng nhập thành công.","success");
       await refresh();
     }catch{notify("Không thể kết nối. Vui lòng thử lại.");}
     finally{submit.disabled=false;}

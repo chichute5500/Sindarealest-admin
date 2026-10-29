@@ -32,8 +32,9 @@
 <link rel="preload" href="/fonts/NotoSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
-<link rel="stylesheet" href="/customer-auth.css?v=auth-icons-20261029">
-<script type="module" src="/customer-auth-ui.js?v=email-min7-20261029"></script>
+<link rel="stylesheet" href="/customer-auth.css?v=email-mailjet-20261029">
+<script type="module" src="/customer-auth-ui.js?v=email-mailjet-20261029"></script>
+<script type="module" src="/customer-email-otp-ui.js?v=email-mailjet-20261029"></script>
 <title>SinDarealest — Premium Crocodile Leather Fashion</title>
 <script>(()=>{const root=document.documentElement;
  root.classList.add('js-enabled');
@@ -1364,7 +1365,36 @@ html.sd-catalog-route #products .filter-pill{
           <button type="submit" class="sd-auth-submit tap-target" data-auth-submit>Đăng nhập bằng Email</button>
         </form>
         <button type="button" class="sd-auth-text-button tap-target" data-auth-toggle>Chưa có tài khoản? Đăng ký</button>
-        <p class="sd-auth-caption" data-auth-unverified-caption>Email chỉ để thử nghiệm trên Preview. Chưa hỗ trợ xác minh hoặc khôi phục mật khẩu; không dùng email để nhận quyền xem đơn cũ.</p>
+        <button type="button" class="sd-auth-text-button tap-target" data-auth-forgot hidden>Quên mật khẩu?</button>
+        <div class="sd-auth-flow" id="sdAuthVerify" hidden>
+          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư (kể cả Spam). Nhập OTP 6 số hoặc mở liên kết xác minh. Hiệu lực 5 phút.</p>
+          <form id="sdAuthVerifyForm">
+            <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
+            <label>Mã OTP<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
+            <button type="submit" class="sd-auth-submit tap-target">Xác minh Email</button>
+          </form>
+          <button type="button" class="sd-auth-text-button tap-target" data-auth-resend>Gửi lại mã (sau 60 giây)</button>
+          <button type="button" class="sd-auth-text-button tap-target" data-auth-return>Quay lại</button>
+        </div>
+        <div class="sd-auth-flow" id="sdAuthForgot" hidden>
+          <p class="sd-auth-heading">Quên mật khẩu</p><p class="sd-auth-caption">Nhập Email để nhận OTP và liên kết đặt lại mật khẩu.</p>
+          <form id="sdAuthForgotForm">
+            <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
+            <button type="submit" class="sd-auth-submit tap-target">Gửi mã đặt lại</button>
+          </form>
+          <button type="button" class="sd-auth-text-button tap-target" data-auth-return>Quay lại</button>
+        </div>
+        <div class="sd-auth-flow" id="sdAuthReset" hidden>
+          <p class="sd-auth-heading">Đặt lại mật khẩu</p><p class="sd-auth-caption">Nhập OTP từ Email hoặc dùng liên kết đã nhận.</p>
+          <form id="sdAuthResetForm">
+            <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
+            <label data-reset-code-row>Mã OTP<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></label>
+            <label>Mật khẩu mới<input name="password" type="password" autocomplete="new-password" minlength="7" maxlength="256" required></label>
+            <button type="submit" class="sd-auth-submit tap-target">Đổi mật khẩu</button>
+          </form>
+          <button type="button" class="sd-auth-text-button tap-target" data-auth-return>Quay lại</button>
+        </div>
+        <p class="sd-auth-caption" data-auth-unverified-caption>Email trên Preview phải xác minh bằng OTP hoặc liên kết trước khi đăng nhập. Không tự gắn đơn cũ bằng email.</p>
         <p class="sd-auth-caption" data-auth-email-note hidden>Đăng nhập Email sẽ được mở sau khi hoàn thiện xác minh email và khôi phục mật khẩu.</p>
       </div>
       <div data-auth-signed hidden>
