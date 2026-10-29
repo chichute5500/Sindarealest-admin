@@ -44,6 +44,13 @@ assert.ok(html.includes('data-auth-google>Tiếp tục với Google'),"Google Lo
 assert.ok(html.includes('data-auth-zalo hidden disabled'),"Temporarily disabled Zalo Login must not be offered");
 assert.ok(html.includes('data-auth-facebook hidden disabled'),"Temporarily disabled Facebook Login must not be offered");
 console.log("PASS: real Preview includes wired desktop Account button, Google Login and inactive other providers.");
+assert.ok(html.includes('id="accountCloudStatus"'),"Cloud sync status must be displayed");
+assert.ok(html.includes('id="accountImportLocal"'),"Local data import must require explicit click");
+for(const path of ["/api/customer/profile","/api/customer/orders"]){
+ const res=await get(ORIGIN+path);
+ assert.equal(res.status,401,"Unauthenticated account endpoint must reject: "+path);
+}
+console.log("PASS: real Preview account cloud APIs deny guest reads and account sync UI is present.");
 for(const provider of ["zalo","google","facebook"]){
   const r=await get(ORIGIN+"/api/customer/auth/"+provider+"/start");
   assert.equal(r.status,302,"OAuth must start on Preview for "+provider);
