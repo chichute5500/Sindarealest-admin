@@ -4488,6 +4488,272 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
   transition:none!important;animation:none!important;
  }
 }
+/* Desktop Hero visual correction: preserve the PNG's intrinsic aspect ratio and match the reference's product emphasis. */
+@media(min-width:1001px){
+}
+@media(max-width:1000px){}
+@media(max-width:760px){}
+
+/* Tablet Hero pedestal stays under the shoes without extending beyond the right edge. */
+@media(min-width:761px) and (max-width:1000px){
+}
+
+@media(min-width:761px) and (max-width:1000px){}
+
+/* Tablet Hero scale correction: account for the transparent margins inside the original PNG. */
+@media(min-width:761px) and (max-width:1000px){
+}
+
+
+/* Mobile Hero — owner reference, single authoritative layout.
+   The 1200x1600 source PNG has ~83% alpha: never scale its blank canvas to the layout.
+   Reference composition: text on left, shoe silhouettes at upper right, marble below. */
+@media(max-width:760px){
+}
+@media(max-width:390px){
+}
+@media(max-width:375px){
+}
+
+
+
+/* Cross-device Hero design system: desktop and tablet inherit the same broad,
+   curved mineral shelf, two localized shoe contact shadows, and the original
+   source PNG used by the owner-accepted mobile layout. No edits below 761px. */
+@media(min-width:761px){
+}
+@media(min-width:761px) and (max-width:1000px){
+}
+
+
+
+/* Touchscreen asking for desktop site: retain the same premium visual language,
+   but prioritize readable navigation and product cards over a miniature PC page.
+   Chrome's "Desktop site" may still choose a wide layout viewport; CSS cannot
+   override browser-controlled page zoom, so never promise forced mobile mode. */
+@media (pointer:coarse) and (min-width:761px) {
+  .nav-wrap .nav{min-height:68px!important;gap:10px!important;padding:9px 14px!important}
+  .nav-wrap .nav .brand{flex:1 1 auto!important;min-width:0!important}
+  .nav-wrap .nav .brand-symbol{width:38px!important;height:42px!important}
+  .nav-wrap .nav .brand-name{font-size:22px!important}
+  .nav-wrap .nav .brand-tagline{font-size:10px!important}
+  .nav-wrap .navlinks{display:none!important}
+  .nav-wrap .nav-actions{margin-left:auto!important}
+  .nav-wrap .nav-actions .icon-btn{width:42px!important;height:42px!important}
+  .nav-wrap .nav-actions .menu-btn{display:grid!important}
+  .mobile-nav.open{display:grid!important}
+  .mobile-nav .navlink{font-size:16px!important;min-height:46px!important}
+  .featured-grid,.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}
+  .product-card .product-info,.catalog-card .product-info{padding:16px 18px 44px!important}
+  .product-card .product-title,.catalog-card .product-title{font-size:20px!important}
+  .product-card .product-category,.catalog-card .product-category{font-size:14px!important}
+  .product-card .product-detail-cta,.catalog-card .product-detail-cta{font-size:14px!important}
+  .product-card .product-sku,.catalog-card .product-sku{font-size:11px!important}
+}
+@media (pointer:fine) and (min-width:1101px){
+  .nav-wrap .nav .brand-symbol{width:36px;height:40px}
+  .nav-wrap .nav .brand-name{font-size:20px}
+  .nav-wrap .navlinks .navlink{font-size:11px}
+}
+
+
+
+/* Product detail: same-row SKU and minimal translucent status pill. */
+#productOverlay .detail-meta-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:12px;min-width:0;margin:3px 0 13px}
+#productOverlay .detail-meta-row .product-sku{display:block;flex:0 1 44%;min-width:0;margin:0;text-align:right;overflow-wrap:anywhere;font-size:10px;line-height:1.45;letter-spacing:.07em}
+#productOverlay .detail-meta-row .fulfillment-detail{display:flex;flex:1 1 56%;min-width:0;align-items:center;justify-content:flex-start;margin:0}
+#productOverlay .detail-meta-row .fulfillment-badge{
+ display:inline-flex;align-items:center;justify-content:center;max-width:100%;min-height:30px;margin:0;padding:6px 12px;
+ white-space:nowrap;border-radius:999px;border:1px solid rgba(205,167,93,.60);
+ background:linear-gradient(135deg,rgba(255,252,236,.82),rgba(244,214,148,.44));
+ box-shadow:inset 0 1px 0 rgba(255,255,246,.93),inset 0 -1px rgba(188,144,75,.12),0 3px 10px rgba(96,67,24,.07);
+ -webkit-backdrop-filter:blur(12px) saturate(145%);backdrop-filter:blur(12px) saturate(145%);
+ color:#61431f;font-size:10px;font-weight:650;letter-spacing:0;line-height:1.2
+}
+html.dark #productOverlay .detail-meta-row .fulfillment-badge{
+ border-color:rgba(226,186,104,.50);background:linear-gradient(135deg,rgba(155,119,64,.37),rgba(90,65,31,.43));
+ box-shadow:inset 0 1px rgba(255,239,205,.19),inset 0 -1px rgba(87,55,18,.15),0 4px 12px rgba(0,8,17,.12);color:#ffe6b2
+}
+#productOverlay .detail-copy #detailTitle{font-weight:700;letter-spacing:-.027em;overflow-wrap:anywhere}
+/* One purchase control with two identical liquid-glass treatments.
+   The orange button differs ONLY in hue; geometry and effects stay identical. */
+#productOverlay .detail-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0 12px}
+#productOverlay .detail-actions .detail-purchase-button{
+ --sd-action-rgb:126,177,215;--sd-action-border-rgb:116,171,211;
+ display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:0;
+ min-height:50px;padding:11px 12px;border-radius:999px;
+ border:1px solid rgba(var(--sd-action-border-rgb),.70);
+ background:linear-gradient(135deg,rgba(255,255,255,.65),rgba(var(--sd-action-rgb),.30));
+ -webkit-backdrop-filter:blur(15px) saturate(145%);
+ backdrop-filter:blur(15px) saturate(145%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.70),0 7px 19px rgba(var(--sd-action-border-rgb),.11);
+ color:var(--ink);font-size:clamp(10px,1vw,13px);font-weight:700;line-height:1.35;
+ white-space:normal;text-align:center;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease
+}
+#productOverlay .detail-actions .detail-buy-now{--sd-action-rgb:242,152,70;--sd-action-border-rgb:215,119,47}
+#productOverlay .detail-actions .detail-purchase-button:hover{
+ border-color:rgba(var(--sd-action-border-rgb),.9);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 9px 24px rgba(var(--sd-action-border-rgb),.18);
+ transform:translateY(-2px)
+}
+#productOverlay .detail-actions .detail-purchase-button:active{transform:scale(.985)}
+#productOverlay .detail-actions .detail-purchase-button svg{
+ width:18px;height:18px;flex:0 0 18px;fill:none;stroke:currentColor;stroke-linecap:round;
+ stroke-linejoin:round;stroke-width:1.75
+}
+#productOverlay .detail-actions .detail-purchase-button span{min-width:0}
+html.dark #productOverlay .detail-actions .detail-purchase-button{
+ background:linear-gradient(135deg,rgba(255,255,255,.15),rgba(var(--sd-action-rgb),.27));
+ border-color:rgba(var(--sd-action-border-rgb),.68);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 7px 19px rgba(0,0,0,.17);
+ color:var(--ink)
+}
+/* Reserve a zero-height insertion point for future variant selectors. */
+#productOverlay .detail-variants[hidden]{display:none}
+#productOverlay .detail-variants:not([hidden]){display:grid;gap:8px;margin:14px 0 15px;padding:12px 14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);min-width:0}
+#productOverlay .sd-product-option-label{display:block;font-weight:700;font-size:12px;color:var(--ink)}
+#productOverlay .sd-product-option-choices{display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:flex-start;min-width:0}
+/* Match the ACTUAL approved favorite lens (#productOverlay #detailFavorite),
+   NOT the lower-specificity unified icon gradients. That heart's real computed
+   material is a single translucent layer, 22px blur and a restrained 1px inset.
+   A light smoked tint compensates for the pale options panel behind the sizes.
+   Keep this as one scoped rule set; do not change the favorite icon itself. */
+#productOverlay .sd-product-option-chip{
+ -webkit-appearance:none;appearance:none;
+ display:inline-flex;align-items:center;justify-content:center;flex:0 0 40px;
+ width:40px;min-width:40px;max-width:40px;height:40px;min-height:40px;max-height:40px;
+ aspect-ratio:1;padding:0;margin:0;border-radius:50%;
+ border:1px solid rgba(255,255,255,.72);
+ background:radial-gradient(110% 90% at 18% 0%,rgba(255,255,255,.25),transparent 62%),rgba(99,128,148,.27);
+ -webkit-backdrop-filter:blur(22px) saturate(180%);
+ backdrop-filter:blur(22px) saturate(180%);
+ box-shadow:0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80);
+ color:#142a3c;font:inherit;font-size:13px;font-weight:700;line-height:1;
+ cursor:pointer;
+ transition:transform .14s cubic-bezier(.2,.7,.2,1),background .14s cubic-bezier(.2,.7,.2,1),border-color .14s cubic-bezier(.2,.7,.2,1),box-shadow .14s cubic-bezier(.2,.7,.2,1)
+}
+html.dark #productOverlay .sd-product-option-chip{
+ color:#eaf3fb;
+ border-color:rgba(234,243,251,.28);
+ background:rgba(13,38,59,.58);
+ box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(234,243,251,.17)
+}
+@media(hover:hover) and (pointer:fine){
+ #productOverlay .sd-product-option-chip:hover{
+  background:radial-gradient(110% 90% at 18% 0%,rgba(255,255,255,.31),transparent 62%),rgba(99,128,148,.32);
+  border-color:rgba(255,255,255,.84)
+ }
+ html.dark #productOverlay .sd-product-option-chip:hover{
+  background:rgba(24,62,91,.64);
+  border-color:rgba(234,243,251,.42)
+ }
+}
+#productOverlay .sd-product-option-chip:active{
+ transform:scale(.97);
+ background:rgba(234,243,251,.48);
+ box-shadow:inset 0 2px 8px rgba(20,42,60,.14),inset 0 0 0 1px rgba(92,145,185,.35)
+}
+html.dark #productOverlay .sd-product-option-chip:active{
+ background:rgba(92,145,185,.20);
+ box-shadow:inset 0 2px 8px rgba(0,0,0,.22),inset 0 0 0 1px rgba(92,145,185,.35)
+}
+/* Selected is the same glass lens, slightly blue-tinted; NOT a raised chrome button. */
+#productOverlay .sd-product-option-chip.is-selected{
+ color:#102d43;
+ border-color:rgba(92,145,185,.85);
+ background:radial-gradient(110% 90% at 18% 0%,rgba(255,255,255,.28),transparent 62%),rgba(78,144,187,.32);
+ box-shadow:0 8px 24px rgba(20,42,60,.10),inset 0 1px 0 rgba(255,255,255,.80),inset 0 0 0 1px rgba(92,145,185,.25)
+}
+html.dark #productOverlay .sd-product-option-chip.is-selected{
+ color:#eaf3fb;
+ border-color:rgba(145,202,240,.71);
+ background:rgba(42,99,139,.52);
+ box-shadow:0 8px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(234,243,251,.17),inset 0 0 0 1px rgba(145,202,240,.19)
+}
+#productOverlay .sd-product-option-chip:focus-visible{outline:2px solid var(--sd-icon-press-color);outline-offset:3px}
+#productOverlay .sd-product-option-control{
+ display:block;width:100%;max-width:280px;min-width:0;min-height:42px;
+ padding:10px 12px;border:1px solid var(--sd-icon-glass-border);border-radius:10px;
+ background:var(--sd-icon-glass-bg);color:var(--ink);
+ -webkit-backdrop-filter:blur(18px) saturate(165%);backdrop-filter:blur(18px) saturate(165%);
+ box-shadow:var(--sd-icon-glass-shadow);
+ font:inherit;font-size:14px;outline-offset:3px
+}
+#productOverlay .sd-product-option-control:focus-visible{outline:2px solid var(--sd-icon-press-color);border-color:var(--sd-icon-press-color)}
+#sdDetailOptionMessage{font-size:11px;color:var(--muted)}
+.sd-cart-option{font-size:11px;color:var(--ink);font-weight:750}
+.sd-cart-select{display:block;max-width:100%;margin:6px 0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;color:var(--ink);background:var(--panel);font-size:11px;text-align:left}
+@media(max-width:760px){#productOverlay .detail-variants:not([hidden]){margin:12px 0;padding:10px 11px}#productOverlay .sd-product-option-chip{font-size:13px}#productOverlay .sd-product-option-control{min-height:44px;font-size:16px}}
+@media(prefers-reduced-motion:reduce){#productOverlay .sd-product-option-chip{transition:none}}
+/* Keep contact description, benefit badges and Zalo below all buying actions. */
+#productOverlay .detail-aftercare{display:flex;flex-direction:column;gap:14px;margin-top:25px;padding-top:19px;border-top:1px solid var(--line)}
+#productOverlay .detail-aftercare .detail-desc{margin:0}
+#productOverlay .detail-aftercare .promise-tags{margin:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#productOverlay .detail-aftercare .detail-zalo-contact{align-self:stretch;min-height:42px;font-size:11px}
+@media(max-width:390px){
+ #productOverlay .detail-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #productOverlay .detail-actions .detail-purchase-button{padding:10px 7px;gap:6px;font-size:10px;min-height:51px}
+ #productOverlay .detail-actions .detail-purchase-button svg{width:16px;height:16px;flex-basis:16px}
+}
+@media(hover:none){
+ #productOverlay .detail-actions .detail-purchase-button:hover{transform:none}
+}
+
+/* Prices: Giá: amount as unboxed text, including the detail modal. */
+.product-card .product-card-bottom{display:flex;align-items:flex-start;flex-direction:column;justify-content:flex-start;gap:7px;min-width:0}
+.product-card .product-price{
+ display:inline;max-width:100%;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;
+ -webkit-backdrop-filter:none;backdrop-filter:none;color:var(--ink);font-size:clamp(12px,1.1vw,16px);
+ line-height:1.35;font-weight:600;letter-spacing:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere
+}
+.product-card .product-price-amount{font-weight:800}
+.product-card .product-title{font-weight:700}
+.product-card .product-detail-cta{align-self:flex-start;padding-right:36px}
+html.dark .product-card .product-price{color:#f4d5a4}
+#productOverlay .detail-price:not([hidden]){
+ display:block;width:auto;max-width:100%;min-height:0;margin:6px 0 14px;padding:0;border:0;border-radius:0;
+ background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+ color:var(--ink);font-size:clamp(20px,2.1vw,27px);font-weight:750;letter-spacing:-.02em;line-height:1.3;overflow-wrap:anywhere
+}
+#productOverlay .detail-price:not([hidden])::before{content:none;display:none}
+html.dark #productOverlay .detail-price:not([hidden]){color:#f4d5a4}
+@media(max-width:760px){
+ #productOverlay .detail-meta-row{gap:9px;margin:5px 0 11px}
+ #productOverlay .detail-meta-row .product-sku{font-size:8.5px;letter-spacing:.03em}
+ #productOverlay .detail-meta-row .fulfillment-badge{padding:6px 10px;min-height:29px;font-size:9px}
+ #productOverlay .detail-price:not([hidden]){font-size:clamp(20px,5.5vw,24px)}
+ .product-card .product-price{font-size:clamp(11px,3.4vw,14px)}
+ .product-card .product-card-bottom{gap:6px}
+}
+
+
+/* Owner 27/10: made-to-order disclosure; scoped to product cards, detail and checkout only. */
+.product-card .sd-card-status-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-width:0}
+.product-card .sd-card-status-row>.fulfillment-badge{flex:0 1 auto;min-width:0;margin:0;padding:4px 7px;font-size:9px;line-height:1.25;white-space:normal}
+.product-card .sd-card-status-row>.product-sku{flex:0 1 50%;min-width:0;max-width:50%;text-align:right;font-size:8px;line-height:1.35;letter-spacing:.025em;overflow-wrap:anywhere}
+.product-card .sd-card-making-time{display:block;width:100%;margin:5px 0 0;color:#946527;font-size:10px;font-weight:700;line-height:1.35}
+html.dark .product-card .sd-card-making-time{color:#f3d09a}
+#productOverlay .sd-detail-production[hidden],.checkout-drawer .sd-order-production-caution[hidden]{display:none!important}
+#productOverlay .sd-detail-production{display:grid;gap:5px;margin:0 0 14px;padding:11px 13px;border:1px solid rgba(190,146,76,.38);border-radius:13px;background:linear-gradient(120deg,rgba(255,248,229,.64),rgba(245,223,172,.19));color:var(--ink)}
+#productOverlay .sd-detail-production strong{color:#895b20;font-size:12px;line-height:1.4}
+#productOverlay .sd-detail-production span{color:var(--muted);font-size:11px;line-height:1.55}
+html.dark #productOverlay .sd-detail-production{border-color:rgba(213,169,94,.45);background:linear-gradient(120deg,rgba(139,99,48,.28),rgba(75,53,31,.20))}
+html.dark #productOverlay .sd-detail-production strong{color:#f7d69c}
+.checkout-drawer .sd-order-production-caution{gap:5px;border-color:rgba(190,146,76,.45);background:linear-gradient(120deg,rgba(255,247,225,.42),var(--sd-reference-surface,var(--glass)))}
+.checkout-drawer .sd-order-production-caution strong{font-size:11px;color:#895b20}
+.checkout-drawer .sd-order-production-caution p{margin:0;font-size:10px;color:var(--muted);line-height:1.55}
+html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
+@media(max-width:760px){
+ .product-card .sd-card-status-row{gap:5px}
+ .product-card .sd-card-status-row>.fulfillment-badge{font-size:7px;padding:3px 5px}
+ .product-card .sd-card-status-row>.product-sku{font-size:7px;letter-spacing:0}
+ .product-card .sd-card-making-time{font-size:8px;margin-top:4px}
+ #productOverlay .sd-detail-production{padding:10px 11px}
+ #productOverlay .sd-detail-production strong{font-size:11px}
+ #productOverlay .sd-detail-production span{font-size:10px}
+}
+
+/* Legacy V2–V9 image-based HERO removed (44 KB); current HERO lives in code-hero.css. */
 </style>
 </body>
 </html>
