@@ -146,15 +146,15 @@ try{
   const deniedOnProduction=await email({request:makeRequest("/api/customer/auth/email","","POST",body,ORIGIN),env});
   assert.equal(deniedOnProduction.status,503,"no public Email signup until verification and recovery");
   const registered=await email({request:makeRequest("/api/customer/auth/email","","POST",body,PREVIEW_ORIGIN,PREVIEW_ORIGIN),env});
-  assert.equal(registered.status,201,"actual INSERT with FK and constraints");
-  assert.equal(count("customer_auth_accounts"),3);
+  assert.equal(registered.status,503,"Email must fail closed without Mailjet secrets");
+  assert.equal(count("customer_auth_accounts"),2,"No unverified account created without Mailjet");
   const login=await email({request:makeRequest("/api/customer/auth/email","","POST",{...body,mode:"login"},PREVIEW_ORIGIN,PREVIEW_ORIGIN),env});
-  assert.equal(login.status,200);
-  assert.equal(count("customer_auth_sessions"),2);
+  assert.equal(login.status,503,"Email login must remain off without Mailjet");
+  // The separate Mailjet-mocked test exercises successful verified Email flows.
   assert.equal(count("orders"),0,"never create/claim real customer orders");
   assert.equal(count("customers"),0);
   assert.equal(db.prepare("PRAGMA foreign_key_check").all().length,0);
   assert.ok(providerCalls.some(x=>x.url.includes("graph.zalo.me")));
   assert.ok(providerCalls.some(x=>x.url.includes("openidconnect.googleapis.com")));
-  console.log("DISPOSABLE REAL SQLITE customer auth: Zalo/Google OAuth, replay, CSRF, sessions, logout, Email and migration 0011 PASS");
+  console.log("DISPOSABLE REAL SQLITE customer auth: Zalo/Google OAuth, replay, CSRF, sessions, logout, Email fail-closed and migration 0014 PASS");
 }finally{globalThis.fetch=fetchBefore;db.close();}
