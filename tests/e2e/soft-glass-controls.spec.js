@@ -96,10 +96,17 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
     const cdp=await page.context().newCDPSession(page);
     try{
       await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+      // scrollIntoViewIfNeeded may leave chips adjacent to the fixed bottom tray.
+      // Center before touch, and verify the real hit target before dispatch.
+      await press.evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest'}));
+      await page.waitForTimeout(120);
       const bounds=await press.boundingBox();
+      const x=bounds.x+bounds.width/2,y=bounds.y+bounds.height/2;
+      const hit=await press.evaluate((el,{x,y})=>
+        el===document.elementFromPoint(x,y)||el.contains(document.elementFromPoint(x,y)),{x,y});
+      expect(hit,'Touch center must not be occluded by sticky navigation').toBe(true);
       const beforeTouch=await press.evaluate(el=>getComputedStyle(el).boxShadow);
-      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',
-        touchPoints:[{x:bounds.x+bounds.width/2,y:bounds.y+bounds.height/2}]});
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
       await expect.poll(()=>press.evaluate(el=>getComputedStyle(el).boxShadow)).not.toBe(beforeTouch);
       const touchPressed=await press.evaluate(el=>getComputedStyle(el).boxShadow);
       expect(touchPressed).toContain('inset');
