@@ -91,7 +91,7 @@ response = await createOrder({request:new Request('https://shop.example/api/orde
 assert.equal(response.status,403,'cross-origin order submission is rejected');
 response = await createWarrantyClaim({request:new Request('https://shop.example/api/warranty-claims',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
 assert.equal(response.status,403,'cross-origin warranty submission is rejected');
-const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT \* FROM products/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',sku_verified:1,category:'sneakers',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
+const sitemapResponse = await sitemap({ request:new Request('https://shop.example/sitemap.xml'), env:{DB:{prepare(sql){assert.match(sql,/SELECT id,slug,sku,sku_verified,category,updated_at FROM products/);return {async all(){return {results:[{id:'test-product-id',slug:'test-sneaker',sku:'SD-SN001',sku_verified:1,category:'sneakers',updated_at:'2026-01-01 00:00:00'}]}}}}}} });
 const sitemapText = await sitemapResponse.text();
 assert.equal(sitemapResponse.status,200);
 assert.match(sitemapText,/https:\/\/shop\.example\/sanpham\/sneaker\/SD-SN001/);
