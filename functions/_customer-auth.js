@@ -21,7 +21,11 @@ export const configured = (env, provider) => Boolean(env?.DB && (provider === "z
   typeof env.ZALO_APP_SECRET === "string" && env.ZALO_APP_SECRET.length >= 8 :
   provider === "google" ?
     typeof env.GOOGLE_CLIENT_ID === "string" && env.GOOGLE_CLIENT_ID.includes(".apps.googleusercontent.com") &&
-    typeof env.GOOGLE_CLIENT_SECRET === "string" && env.GOOGLE_CLIENT_SECRET.length >= 8 : true));
+    typeof env.GOOGLE_CLIENT_SECRET === "string" && env.GOOGLE_CLIENT_SECRET.length >= 8 :
+  provider === "facebook" ?
+    typeof env.FACEBOOK_APP_ID === "string" && /^[0-9]{6,32}$/.test(env.FACEBOOK_APP_ID) &&
+    typeof env.FACEBOOK_APP_SECRET === "string" && env.FACEBOOK_APP_SECRET.length >= 16 :
+  provider === "email"));
 export const now = () => Math.floor(Date.now()/1000);
 export function randomToken(length=32) {
   const bytes = new Uint8Array(length);
@@ -106,7 +110,7 @@ export async function consumeFlow(env,provider,state,request) {
   return row.verifier;
 }
 export async function beginSession(env,provider,subject,name,email=null) {
-  if (!["zalo","google"].includes(provider) || !subject || subject.length>255) throw Error("bad identity");
+  if (!["zalo","google","facebook"].includes(provider) || !subject || subject.length>255) throw Error("bad identity");
   const id=crypto.randomUUID(),display=String(name||"Khách hàng").slice(0,100);
   const safeEmail=email?String(email).slice(0,254):null;
   await env.DB.prepare("INSERT OR IGNORE INTO customer_auth_accounts(id,provider,provider_subject,display_name,email) VALUES(?,?,?,?,?)")
