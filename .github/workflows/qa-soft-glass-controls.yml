@@ -1,0 +1,107 @@
+name: Soft Liquid Glass — Owner isolated Preview and browser QA
+on:
+  push:
+    branches:
+      - feat/soft-neumorphic-controls-2026-10-29
+    paths:
+      - public/index.html
+      - tests/soft-glass-controls-contract.test.mjs
+      - tests/e2e/soft-glass-controls.spec.js
+      - .github/workflows/qa-soft-glass-controls.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sd-soft-glass-owner-preview-1029
+  cancel-in-progress: true
+jobs:
+  source-and-preview:
+    if: github.ref == 'refs/heads/feat/soft-neumorphic-controls-2026-10-29'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH: soft-neumorphism-1029
+      SD_SOFT_GLASS_BASE_URL: https://soft-neumorphism-1029.sindarealest-admin-preview.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Pin source to isolated owner review branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feat/soft-neumorphic-controls-2026-10-29"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$CF_TARGET" = "sindarealest-admin-preview"
+          test "$CF_BRANCH" = "soft-neumorphism-1029"
+          test "$CF_BRANCH" != "main"
+      - name: Source integrity, automated tests and focused control contracts
+        run: |
+          npm install --no-audit --no-fund
+          npm run check
+          npm test
+          node --test tests/soft-glass-controls-contract.test.mjs
+      - name: Verify credentials for explicitly isolated Preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_API_TOKEN"
+      - name: Read-only check Preview D1/R2 not Production D1/R2
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-preview.json"
+          curl -fsS --max-time 30 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest2" > "$RUNNER_TEMP/production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-preview.json" "$RUNNER_TEMP/production.json"
+      - name: Deploy only a new branch alias on the isolated Preview project
+        run: >
+          npx wrangler pages deploy public
+          --project-name "$CF_TARGET"
+          --branch "$CF_BRANCH"
+          --commit-hash "$GITHUB_SHA"
+          --commit-message "Soft Neumorphic controls review $GITHUB_SHA"
+      - name: Prepare Playwright browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          if command -v google-chrome >/dev/null 2>&1; then
+            google-chrome --version
+            echo 'SD_OWNER_QA_SYSTEM_CHROME=1' >> "$GITHUB_ENV"
+          else
+            npx playwright install --with-deps chromium
+          fi
+      - name: Browser QA on actual deployed Preview — 360, 390, 768, 1440 light/dark
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 25); do
+            if curl -fsS --max-time 12 "$SD_SOFT_GLASS_BASE_URL/" >/dev/null; then break; fi
+            sleep 2
+          done
+          curl -fsS --max-time 15 "$SD_SOFT_GLASS_BASE_URL/" >/dev/null
+          npx playwright test tests/e2e/soft-glass-controls.spec.js --config=playwright.owner-gesture.config.js --reporter=list
+      - name: Save screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soft-glass-controls-${{ github.sha }}
+          path: |
+            artifacts/soft-glass-controls/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Report reviewed source and preview, no production rollout
+        run: |
+          echo "Branch $GITHUB_REF, SHA $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Preview: $SD_SOFT_GLASS_BASE_URL/" >> "$GITHUB_STEP_SUMMARY"
+          echo "Only Preview alias deployed. No main merge, D1 writes or Production deployment." >> "$GITHUB_STEP_SUMMARY"
