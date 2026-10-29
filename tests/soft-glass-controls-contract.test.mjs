@@ -138,6 +138,8 @@ test('Cart removal, one-row shoe sizes, and compact catalog cards retain their l
  assert.ok(render.includes('aria-label="Xóa sản phẩm">Xóa</button>'));
  assert.ok(html.includes('.cart-row{grid-template-columns:68px minmax(0,1fr) max-content'));
  assert.ok(html.includes('.cart-row{grid-template-columns:60px minmax(0,1fr) max-content'));
+ assert.ok(html.includes('.cart-row{grid-template-columns:58px minmax(0,1fr) max-content;gap:8px;padding:8px'));
+ assert.ok(html.includes('.remove-item{font-size:10px;min-width:42px;min-height:30px;padding:5px 8px}'));
  assert.ok(html.includes("kind==='shoe'?' sd-product-option-choices--shoe'"));
  assert.ok(html.includes('grid-template-columns:repeat(7,minmax(0,1fr))'));
  const start=html.indexOf('function productCard('),end=html.indexOf('/* Bidirectional blur reveal',start);
