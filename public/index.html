@@ -4328,6 +4328,18 @@ html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
 #products .filter-pill:active:not(:disabled){
  transform:translateY(1px) scale(.995);box-shadow:var(--sd-soft-pressed);transition-duration:115ms;
 }
+/* Touch-held state: same inset relief as :active, stronger specificity than selected. */
+#products .filter-pill[data-sd-glass-press="true"]:not(:disabled),
+html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
+ transform:translateY(1px) scale(.995);box-shadow:var(--sd-soft-pressed);
+ transition-duration:115ms;
+}
+#products .filter-pill[data-sd-glass-press="true"]::after{
+ box-shadow:inset 4px 5px 8px rgba(82,115,145,.27),inset -2px -3px 6px rgba(255,255,255,.22);
+}
+html.dark #products .filter-pill[data-sd-glass-press="true"]::after{
+ box-shadow:inset 4px 5px 8px rgba(0,7,20,.38),inset -2px -3px 6px rgba(77,130,165,.14);
+}
 #products .filter-pill:focus-visible{
  outline:2px solid #437fa9;outline-offset:3px;
 }
@@ -4457,6 +4469,18 @@ html.dark .sd-fullscreen-share,html.dark .detail-favorite-btn,html.dark .close-b
 .icon-btn.tap-target::before,.mini-add.tap-target::before,.featured-arrow.tap-target::before,
 .detail-gallery-arrow.tap-target::before,.sd-fullscreen-arrow.tap-target::before,
 #mobileBottomNav .mobile-tab.tap-target::before{content:none!important}
+/* Shared 3D press fallback for browser touch sequences without stable :active. */
+:is(.icon-btn,.mini-add,.page-btn.page-arrow,.slide-controls button,.featured-arrow,
+.detail-zoom-btn,.sd-fullscreen-close,.sd-fullscreen-share,.detail-favorite-btn,.close-btn,
+.pill-btn,.checkout-backlink,.qty-controls button,.remove-item,.account-action,
+.sd-checkout-option,.sd-checkout-copy)[data-sd-glass-press="true"]{
+ box-shadow:var(--sd-3d-depressed)!important;
+ transform:translateY(1px) scale(.995)!important;transition-duration:115ms!important;
+}
+:is(.nav-wrap .menu-btn,.detail-gallery-arrow,.sd-fullscreen-arrow)[data-sd-glass-press="true"]{
+ box-shadow:var(--sd-3d-depressed)!important;
+ transform:translateY(-50%) scale(.995)!important;transition-duration:115ms!important;
+}
 #productOverlay #detailFavorite:not([aria-pressed="true"]):active svg{color:var(--sd-control-ink)!important;transform:none!important}
 .detail-favorite-btn[aria-pressed="true"],
 html.dark .detail-favorite-btn[aria-pressed="true"],
@@ -4543,6 +4567,10 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
   transition-duration:105ms!important;
  }
  #mobileBottomNav .mobile-tab:focus-visible{outline:2px solid #4a88b4;outline-offset:2px}
+ #mobileBottomNav .mobile-tab[data-sd-glass-press="true"]{
+  transform:translateY(1px) scale(.995)!important;
+  box-shadow:var(--sd-3d-depressed)!important;transition-duration:115ms!important;
+ }
 }
 @media(prefers-reduced-motion:reduce){
  .icon-btn,.mini-add,.page-btn.page-arrow,.slide-controls button,.featured-arrow,
@@ -4680,6 +4708,10 @@ html.dark #productOverlay .detail-actions .detail-purchase-button:active:not(:di
  box-shadow:var(--sd-3d-depressed);transform:translateY(1px) scale(.99);
  transition-duration:105ms;
 }
+#productOverlay .detail-actions .detail-purchase-button[data-sd-glass-press="true"]:not(:disabled){
+ box-shadow:var(--sd-3d-depressed)!important;transform:translateY(1px) scale(.995)!important;
+ transition-duration:115ms!important;
+}
 /* Reserve a zero-height insertion point for future variant selectors. */
 #productOverlay .detail-variants[hidden]{display:none}
 #productOverlay .detail-variants:not([hidden]){display:grid;gap:8px;margin:14px 0 15px;padding:12px 14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);min-width:0}
@@ -4728,6 +4760,10 @@ html.dark #productOverlay .sd-product-option-chip.is-selected:active:not(:disabl
  transition-duration:105ms;
 }
 #productOverlay .sd-product-option-chip:focus-visible{outline:2px solid var(--sd-icon-press-color);outline-offset:3px}
+#productOverlay .sd-product-option-chip[data-sd-glass-press="true"]:not(:disabled){
+ box-shadow:var(--sd-3d-depressed)!important;transform:translateY(1px) scale(.995)!important;
+ transition-duration:115ms!important;
+}
 #productOverlay .sd-product-option-control{
  display:block;width:100%;max-width:280px;min-width:0;min-height:42px;
  padding:10px 12px;border:1.5px solid transparent;border-radius:10px;
@@ -4814,5 +4850,38 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 
 /* Legacy V2–V9 image-based HERO removed (44 KB); current HERO lives in code-hero.css. */
 </style>
+<script id="sd-glass-touch-press-controller">
+/* A single delegated touch/pointer controller. Never changes business state,
+   prevents no browser events, and clears upon scroll/cancel/blur. */
+(()=>{
+ const targetSelector='#products .filter-pill,#products .search-field,.icon-btn,.mini-add,'+
+  '.page-btn.page-arrow,.slide-controls button,.featured-arrow,.detail-zoom-btn,'+
+  '.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,.sd-fullscreen-share,'+
+  '.detail-favorite-btn,.close-btn,#mobileBottomNav .mobile-tab,.pill-btn,'+
+  '.checkout-backlink,.qty-controls button,.remove-item,.account-action,'+
+  '.checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy,'+
+  '#productOverlay .sd-product-option-chip,#productOverlay .detail-purchase-button';
+ let pressed=null;
+ const release=()=>{if(pressed){pressed.removeAttribute('data-sd-glass-press');pressed=null;}};
+ const down=e=>{
+  if(e.type==='pointerdown' && (e.button!==0||e.isPrimary===false))return;
+  const node=e.target?.nodeType===1?e.target:e.target?.parentElement;
+  const control=node?.closest?.(targetSelector);
+  if(!control||control.disabled||control.getAttribute('aria-disabled')==='true')return;
+  if(pressed!==control)release();
+  pressed=control;pressed.setAttribute('data-sd-glass-press','true');
+ };
+ document.addEventListener('pointerdown',down,{passive:true});
+ document.addEventListener('touchstart',down,{passive:true});
+ document.addEventListener('pointerup',release,{passive:true});
+ document.addEventListener('pointercancel',release,{passive:true});
+ document.addEventListener('touchend',release,{passive:true});
+ document.addEventListener('touchcancel',release,{passive:true});
+ document.addEventListener('touchmove',release,{passive:true});
+ document.addEventListener('scroll',release,true);
+ window.addEventListener('blur',release);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)release()});
+})();
+</script>
 </body>
 </html>
