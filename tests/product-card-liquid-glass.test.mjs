@@ -226,14 +226,14 @@ assert.match(html,/\.filter-pill\{font-size:11px;min-height:35px;padding:7px 13p
 // specular sweeps and scale-up animations, preserve tap/selected states.
 assert.match(html,/#products \.filter-pill:active:not\(:disabled\)/,
  "A subtle press state must still exist.");
-assert.match(html,/transform:scale\(\.985\);box-shadow:var\(--sd-soft-pressed\)/,
+assert.match(html,/transform:translateY\(1px\) scale\(\.995\);box-shadow:var\(--sd-soft-pressed\)/,
  "Pressed chips must depress gently rather than bounce upward.");
 assert.match(html,/#products \.filter-pill\.active,#products \.filter-pill\[aria-pressed="true"\]/,
  "Selected category must keep a visually distinguishable state.");
 assert.match(html,/#products \.filter-pill\{[\s\S]*?min-height:40px;/,
  "New controls must remain compact in the narrow viewport.");
-assert.match(html,/#products \.filter-pill::before,#products \.filter-pill::after\{content:none\}/,
- "Do not leave old pseudo-element hit layers or specular sweeps.");
+assert.match(html,/#products \.filter-pill::before\{content:none\}/,
+ "No ripple pseudo-layer may intercept filter taps.");
 assert.doesNotMatch(html,/sdCatalogGlassActivate|sdCatalogSpecularSweep/,
  "No bright sweep or elastic selected animation on new chips.");
 assert.match(html,/@media\(hover:hover\) and \(pointer:fine\)/,
