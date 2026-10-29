@@ -71,14 +71,20 @@ assert.match(css, /grid-template-columns:repeat\(6,minmax\(0,1fr\)/,
   'Desktop must provide six equal columns for the primary commitment tiles.');
 assert.match(css, /border-radius:15px/,
   'Commitment faces must be compact rounded cards, not long pills.');
-assert.match(css, /background:var\(--benefit-tile-glass\)/,
-  'Each commitment must use the theme-specific glass gradient.');
-assert.ok(css.includes('box-shadow:var(--benefit-tile-shadow)') && css.includes('box-shadow:var(--benefit-tile-hover-shadow)'),
-  'Commitment faces must retain layered elevation and the hover state.');
-assert.ok(css.includes('border:1px solid var(--benefit-tile-border)'),
-  'Commitment faces must retain a theme-specific visible rim.');
-assert.match(css, /backdrop-filter:blur\(22px\) saturate\(160%\);-webkit-backdrop-filter:blur\(22px\) saturate\(160%\)/,
-  'Commitment faces must retain the frosted-glass treatment.');
+// Geometry remains in this responsive stylesheet. All visual material now
+// comes from the ONE shared optical system instead of duplicate tile gradients.
+const baseTileRule=css.match(/\.service-strip \.service-copy\{([^}]*)\}/)?.[1]||'';
+assert.doesNotMatch(baseTileRule,/\b(?:background|backdrop-filter|box-shadow)\s*:/,
+ 'No obsolete tile material may shadow the optical shell');
+const opticalStart=html.indexOf('/* 2026-10-21 visual refinement: six benefit tiles');
+const opticalEnd=html.indexOf('</style>',opticalStart);
+const opticalTiles=html.slice(opticalStart,opticalEnd);
+assert.match(opticalTiles,/\.service-strip \.service-copy\{[^}]*background:var\(--sd-glass-shell\)/,
+ 'All six benefit cards use one shared refractive shell');
+assert.match(opticalTiles,/\.service-strip \.service-copy\{[^}]*box-shadow:var\(--sd-3d-shadow\)/,
+ 'Benefit card shadows inherit one shared contact/ambient hierarchy');
+assert.match(opticalTiles,/html\.dark \.service-strip \.service-copy\{background:var\(--sd-glass-shell\)/,
+ 'The same optical system applies in Dark Mode');
 assert.match(css, /\.service-strip \.service-icon\{[^}]*border:1px solid rgba\(122,168,198,\.42\)[^}]*border-radius:50%[^}]*background:rgba\(255,255,255,\.58\)[^}]*box-shadow:/,
   'Reference-aligned benefit icons must have a subtle rounded glass chip inside each tile.');
 assert.match(css, /html\.dark \.service-strip \.service-icon\{[^}]*border-color:rgba\(204,231,250,\.38\)[^}]*background:rgba\(130,179,215,\.16\)[^}]*box-shadow:/,
@@ -91,16 +97,13 @@ assert.match(css, /\.service-strip \.service-icon\{[^}]*flex:0 0 28px[^}]*width:
   'Desktop benefit icon chips must be large enough to match the approved glass-icon reference.');
 assert.match(css, /\.service-strip \.service-icon svg\{display:block;width:17px;height:17px/,
   'Desktop benefit SVG strokes must stay legible at the larger reference-aligned chip scale.');
-const lightThemeTokens = html.match(/:root\{([^}]*)\}/)?.[1] || '';
-const darkThemeTokens = html.match(/html\.dark\{([^}]*)\}/)?.[1] || '';
-assert.match(lightThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(255,255,255,\.88\)/,
-  'Light mode must use an ice-blue translucent glass surface.');
-assert.match(darkThemeTokens, /--benefit-tile-glass:linear-gradient\(145deg,rgba\(36,66,91,\.96\)/,
-  'Dark mode must use high-opacity layered navy glass.');
-assert.match(lightThemeTokens, /--benefit-tile-border:rgba\(255,255,255,\.80\)/,
-  'Light mode must keep a bright glass rim.');
-assert.match(darkThemeTokens, /--benefit-tile-border:rgba\(204,231,250,\.44\)/,
-  'Dark mode must keep a clear blue-steel rim.');
+const opticalRoot=html.slice(html.indexOf('<style id="sd-unified-icon-system-final">'));
+assert.equal((opticalRoot.match(/--sd-glass-shell-strong:/g)||[]).length,2,
+ 'Light and Dark define the same translucent optical header/tray material');
+assert.equal((opticalRoot.match(/--sd-3d-rim:radial-gradient/g)||[]).length,2,
+ 'Directional pink, blue and cyan reflections are theme-aware');
+assert.doesNotMatch(html,/--benefit-tile-(?:glass|border|shadow|hover-shadow):/,
+ 'Obsolete standalone benefit material tokens must not return');
 assert.match(css, /@media\(max-width:1050px\) and \(min-width:761px\)\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)/,
   'Tablet must use three columns.');
 assert.match(css, /@media\(max-width:760px\)\{[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)/,
