@@ -21,7 +21,7 @@ for(let attempt=1;attempt<=8;attempt++){
     if(r.status===200) {
       const value=await r.json();
       if(value?.ok===true && value.authenticated===false &&
-        value.providers?.zalo===true && value.providers?.google===true && value.providers?.email===true) {
+        value.providers?.zalo===true && value.providers?.google===true && value.providers?.facebook===true && value.providers?.email===true) {
         session=value;break;
       }
       throw new Error("Preview session payload missing expected auth capabilities");
@@ -37,19 +37,23 @@ const root=await get(ORIGIN+"/");
 assert.equal(root.status,200,"Preview frontend must be publicly reachable");
 const html=await root.text();
 assert.ok(html.includes('id="sdCustomerAuth"'),"Preview must have the exact customer login drawer");
-for(const provider of ["zalo","google"]){
+for(const provider of ["zalo","google","facebook"]){
   const r=await get(ORIGIN+"/api/customer/auth/"+provider+"/start");
   assert.equal(r.status,302,"OAuth must start on Preview for "+provider);
   const location=r.headers.get("Location");
   const auth=new URL(location);
   assert.equal(auth.protocol,"https:");
-  assert.equal(auth.hostname,provider==="zalo"?"oauth.zaloapp.com":"accounts.google.com");
+  assert.equal(auth.hostname,provider==="zalo"?"oauth.zaloapp.com":provider==="google"?"accounts.google.com":"www.facebook.com");
   assert.equal(auth.searchParams.get("redirect_uri"),
     ORIGIN+"/api/customer/auth/"+provider+"/callback",
     "Provider callback must remain on the exact Cloudflare Preview alias");
   assert.match(auth.searchParams.get("state")||"",/^[a-f0-9]{48}$/);
-  assert.match(auth.searchParams.get("code_challenge")||"",/^[a-zA-Z0-9_-]{43}$/);
+  if(provider!=="facebook")assert.match(auth.searchParams.get("code_challenge")||"",/^[a-zA-Z0-9_-]{43}$/);
   if(provider==="zalo")assert.equal(auth.searchParams.get("app_id"),APP_ID);
+  if(provider==="facebook"){
+    assert.equal(auth.searchParams.get("client_id"),"2013705155992867");
+    assert.equal(auth.searchParams.get("scope"),"public_profile");
+  }
   const cookie=r.headers.get("Set-Cookie")||"";
   assert.ok(cookie.startsWith("sd_customer_oauth="),"missing browser-bound state cookie");
   assert.ok(cookie.includes("HttpOnly")&&cookie.includes("Secure")&&cookie.includes("SameSite=Lax"));
