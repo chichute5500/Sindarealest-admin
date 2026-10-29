@@ -1,3 +1,4 @@
+import { checkProductionCustomerAuthReady } from './check-customer-auth-production-ready.mjs';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 import {
@@ -104,6 +105,9 @@ async function main() {
   } catch {
     throw new Error('Migration 0010_admin_android_devices.sql thiếu trên Production D1; dừng deploy để bảo vệ dữ liệu.');
   }
+  // New Google customer sessions require migrations 0011-0014 before a Production deploy.
+  // This preflight is read-only; it never applies or repairs Production schema.
+  await checkProductionCustomerAuthReady();
   if (!ci) {
     const confirm = await ask(`Gõ chính xác DEPLOY ${project} ${branch} để triển khai`);
     if (confirm !== `DEPLOY ${project} ${branch}`) throw new Error('Xác nhận không khớp; đã hủy deploy.');
