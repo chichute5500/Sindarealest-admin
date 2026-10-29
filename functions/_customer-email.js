@@ -78,12 +78,11 @@ export async function useChallenge(env,accountId,purpose,{code,token}){
 export async function findEmailAccount(env,email){
  return env.DB.prepare("SELECT a.id,a.display_name,v.verified_at FROM customer_auth_accounts a LEFT JOIN customer_auth_email_state v ON v.account_id=a.id WHERE a.provider='email' AND a.provider_subject=?").bind(email).first();
 }
-export async function emailChallengeHandler({request,env},action){
+export async function emailChallengeHandler({request,env},action,b){
  if(!emailOnly(request,env))return error("Email đang được cấu hình trên Preview.",503);
  if(request.headers.get("Origin")!==customerOrigin(request))return error("Yêu cầu không hợp lệ.",403);
- const parsed=await readJsonBodyLimited(request,4096);
- if(parsed.error||!parsed.value||typeof parsed.value!=="object"||Array.isArray(parsed.value))return error("Dữ liệu không hợp lệ.");
- const b=parsed.value,email=normEmail(b.email);
+ if(!b||typeof b!=="object"||Array.isArray(b))return error("Dữ liệu không hợp lệ.");
+ const email=normEmail(b.email);
  if(!emailPattern.test(email)||email.length>254)return error("Email không hợp lệ.");
  try{
   if(!await allow(env,request,action,action==="reset-request"?4:6))return error("Vui lòng thử lại sau 15 phút.",429);

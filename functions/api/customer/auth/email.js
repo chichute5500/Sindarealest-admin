@@ -9,7 +9,7 @@ export async function onRequestPost({request,env}) {
  if(parsed.error||!parsed.value||typeof parsed.value!=="object"||Array.isArray(parsed.value))
   return error("Thông tin đăng nhập không hợp lệ.",400);
  const body=parsed.value,mode=body.mode,email=normEmail(body.email),password=body.password;
- if(["resend","verify","reset-request"].includes(mode))return emailChallengeHandler({request,env},mode);
+ if(["resend","verify","reset-request"].includes(mode))return emailChallengeHandler({request,env},mode,body);
  if(!emailPattern.test(email)||email.length>254)return error("Email không hợp lệ.");
  if(mode==="reset-confirm"){
   if(typeof password!=="string"||password.length<7||password.length>256)return error("Mật khẩu mới phải từ 7 đến 256 ký tự.");
