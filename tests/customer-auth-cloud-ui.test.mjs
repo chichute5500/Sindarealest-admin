@@ -48,6 +48,7 @@ assert.ok(html.includes('id="sdAccountToast"'),"Login result needs an overlay no
 assert.ok(auth.includes('root.hidden=active')&&auth.includes('showToast(text,"success")'),"Successful login must swap cards and use transient toast");
 assert.ok(auth.includes('3800')&&auth.includes('toast.hidden=true'),"Success alert must auto-dismiss");
 assert.ok(auth.includes('await refresh();notify("Đã đăng xuất.","success");'),"Logout must restore Google-only login and display a brief toast");
+assert.ok(auth.includes('signed?.querySelector("[data-auth-logout]")?.addEventListener'),"Logout button listener must move into personalized welcome card");
 assert.ok(auth.includes("window.sdAccountBridge?.onAuth(active)"),"OAuth session must trigger cloud-account sync");
 assert.ok(html.includes("if(accountSyncMode==='cloud')"),"Cloud account branch is required");
 assert.ok(!html.includes("Đăng nhập không tự động liên kết đơn hàng cũ; Shop sẽ bổ sung"),"Outdated local-only notice must be removed");

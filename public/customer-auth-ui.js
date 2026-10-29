@@ -223,7 +223,7 @@ if(root){
     }catch{notify("Không thể kết nối. Vui lòng thử lại.");}
     finally{submit.disabled=false;}
   });
-  q("[data-auth-logout]").addEventListener("click",async()=>{
+  signed?.querySelector("[data-auth-logout]")?.addEventListener("click",async()=>{
     try{
       const res=await fetch("/api/customer/logout",{method:"POST",credentials:"same-origin"});
       if(!res.ok)throw Error("logout");

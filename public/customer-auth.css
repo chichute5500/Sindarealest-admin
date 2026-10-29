@@ -182,7 +182,7 @@ html.dark #accountDrawer {
   border:1px solid var(--sd-account-button-edge);
   background:var(--sd-account-button);color:var(--ink);
   box-shadow:inset 0 1px 0 var(--sd-account-highlight),0 3px 10px rgba(21,66,102,.11);
-  font:600 12px/1.3 inherit;cursor:pointer;
+  font:inherit;font-size:12px;font-weight:600;line-height:1.3;cursor:pointer;
 }
 #accountDrawer .sd-account-logout:focus-visible,
 #accountDrawer #accountClose:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
