@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+const authCss=readFileSync(new URL('../public/customer-auth.css',import.meta.url),'utf8');
 test('soft inset catalog uses existing live filter elements and keeps data binding',()=>{
  assert.match(html,/id="catalogSearch"/);
  assert.match(html,/id="categoryFilters"/);
@@ -75,4 +76,44 @@ test('catalog excludes color below the face; rim cannot introduce a second bevel
  assert.doesNotMatch(html,/#products \.filter-pill\[data-sd-glass-press="true"\]::after\{\s*box-shadow:/);
  assert.match(html,/#products \.search-field,#products \.filter-pill\{/);
  assert.match(html,/background:var\(--sd-3d-face\)/);
+});
+
+test('Final Glass UI 2.0 replaces opaque legacy shells without duplicating materials',()=>{
+ assert.equal((html.match(/--sd-glass-shell-strong:/g)||[]).length,2,'both themes define the same strong shell');
+ assert.equal((html.match(/--sd-glass-panel-shadow:/g)||[]).length,2);
+ assert.equal((html.match(/--sd-glass-input-shadow:/g)||[]).length,2);
+ assert.match(html,/--sd-glass-shell:var\(--sd-3d-face\) padding-box,var\(--sd-3d-rim\) border-box/);
+ assert.doesNotMatch(html,/\.nav-wrap \.nav\{background:rgba\(237,245,251,\.95\)!important/);
+ assert.doesNotMatch(html,/\.mobile-bottom-nav\{\s*background:rgba\(247,252,255,\.995\)!important/);
+ assert.match(html,/\.nav-wrap \.nav\{border:1px solid transparent;background:var\(--sd-glass-shell-strong\)!important/);
+ assert.match(html,/#mobileBottomNav\.mobile-bottom-nav\{\s*border:1px solid transparent;background:var\(--sd-glass-shell-strong\)!important/);
+ assert.match(html,/\.service-strip \.service-copy\{\s*min-height:78px;[^}]+background:var\(--sd-glass-shell\)/);
+ assert.match(html,/#order \.order-cta--compact #orderDetailsToggle\{min-height:46px[^}]+background:var\(--sd-glass-shell\)/);
+ assert.match(html,/\.product-card,\.catalog-card\{\s*border-radius:18px;border-color:transparent;\s*background:var\(--sd-glass-shell\)/);
+});
+test('Interactive surfaces, forms, nav, order tracking, cart and account use shared optics',()=>{
+ const finalCss=html.slice(html.indexOf('<style id="sd-unified-icon-system-final">'));
+ for(const selector of ['.sd-track-panel','.sd-track-controls input','.checkout-fields input',
+   '.checkout-fields select','.checkout-fields textarea','.nav-wrap .navlink.active',
+   '.checkout-drawer .sd-checkout-option','.cart-row','.contact-link']){
+  assert.ok(finalCss.includes(selector),selector+' must opt into the shared system');
+ }
+ assert.match(html,/\.service-strip \.service\[data-sd-glass-press="true"\] \.service-copy/);
+ assert.match(html,/\.service-strip \.service,.navlink,.text-link,.contact-link,.icon-btn/);
+ assert.match(finalCss,/\[aria-invalid="true"\]/);
+ assert.match(finalCss,/@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(authCss,/background:var\(--sd-glass-shell-strong,var\(--sd-account-surface\)\)/);
+ assert.match(authCss,/background:var\(--sd-glass-shell,var\(--sd-account-button\)\)/);
+ assert.match(authCss,/#sdCustomerAuth \.sd-auth-google-mark/);
+});
+test('Style sheet order and functional features stay intact after refactor',()=>{
+ const styles=(html.match(/<style(?:\s|>)/g)||[]).length;
+ const ends=(html.match(/<\/style>/g)||[]).length;
+ assert.equal(styles,ends);
+ assert.match(html,/<\/style>\s*<\/body>\s*<\/html>\s*$/);
+ for(const anchor of ['id="welcomeSplash"','id="categoryFilters"','id="sdTrackForm"',
+  'id="mobileBottomNav"','id="accountDrawer"','id="checkoutDrawer"','function renderCatalog(',
+  'function openCheckout(']){
+  assert.ok(html.includes(anchor),anchor+' disappeared');
+ }
 });
