@@ -192,7 +192,19 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
       await cdp.detach();
     }
   }
+  await page.goto(base+'/',{waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:30000});
+  await page.evaluate(()=>window.__sdDismissWelcome?.());
+  await expect(page.locator('body')).not.toHaveClass(/welcome-active/);
+  await page.locator('#products').scrollIntoViewIfNeeded();
+  const storefrontCards=page.locator('#products .product-card');
+  await expect(storefrontCards.first()).toBeVisible();
+  expect(await storefrontCards.locator('.product-category').count(),
+   'Catalog cards must not repeat the category already shown on the photo').toBe(0);
+  const cardAdd=storefrontCards.first().locator('.product-card-bottom .quick-add');
+  await expect(cardAdd).toHaveCount(1);
   const orderToggle=page.locator('#orderDetailsToggle');
+  await orderToggle.scrollIntoViewIfNeeded();
   await orderToggle.click();
   const orderDetails=page.locator('#orderDetailsPanel');
   await expect(orderDetails).toBeVisible();

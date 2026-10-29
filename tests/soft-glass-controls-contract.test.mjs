@@ -130,3 +130,24 @@ test('Hero CTA retains approved blink and gains same prismatic rim without layou
  assert.match(heroCss,/html\.dark \.sd-code-hero \.sdh-cta:active\{box-shadow:/);
  assert.match(heroCss,/\.sd-code-hero \.sdh-cta\{position:relative;isolation:isolate/);
 });
+
+
+test('Cart removal, one-row shoe sizes, and compact catalog cards retain their labels and layout',()=>{
+ const render=html.slice(html.indexOf('function renderCart('),html.indexOf('function openCart('));
+ assert.ok(render.includes('class="remove-item tap-target"'));
+ assert.ok(render.includes('aria-label="Xóa sản phẩm">Xóa</button>'));
+ assert.ok(html.includes('.cart-row{grid-template-columns:68px minmax(0,1fr) max-content'));
+ assert.ok(html.includes('.cart-row{grid-template-columns:60px minmax(0,1fr) max-content'));
+ assert.ok(html.includes("kind==='shoe'?' sd-product-option-choices--shoe'"));
+ assert.ok(html.includes('grid-template-columns:repeat(7,minmax(0,1fr))'));
+ const start=html.indexOf('function productCard('),end=html.indexOf('/* Bidirectional blur reveal',start);
+ const card=html.slice(start,end);
+ assert.ok(!card.includes('product-category'));
+ assert.ok(/product-card-bottom[\s\S]*quick-add/.test(card));
+ const featuredStart=html.indexOf('function featuredProductCard('),featuredEnd=html.indexOf('/*',featuredStart);
+ const featured=html.slice(featuredStart,featuredEnd);
+ assert.ok(!featured.includes('product-category'));
+ assert.ok(/product-card-bottom[\s\S]*quick-add/.test(featured));
+ assert.ok(html.includes('.product-card .product-card-bottom{display:flex;align-items:center;flex-direction:row'));
+ assert.ok(html.includes('.product-card .product-card-footer{padding:0 13px 12px'));
+});
