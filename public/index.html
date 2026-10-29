@@ -4301,6 +4301,13 @@ html.dark #products .search-field,html.dark #products .filter-pill{background:va
 html.dark #products .filter-pill.active,html.dark #products .filter-pill[aria-pressed="true"]{
  color:#fff;border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);
 }
+/* Selected must still physically depress; Dark Mode has an extra html.dark
+   specificity level and otherwise masks the ordinary :active shadow. */
+html.dark #products .filter-pill.active:active:not(:disabled),
+html.dark #products .filter-pill[aria-pressed="true"]:active:not(:disabled){
+ box-shadow:var(--sd-soft-pressed);transform:scale(.985);
+ transition-duration:105ms;
+}
 @media(hover:hover) and (pointer:fine){
  #products .filter-pill:hover:not(:disabled){box-shadow:var(--sd-3d-shadow);filter:brightness(1.025)}
  #products .search-field:hover:not(:focus-within){box-shadow:var(--sd-3d-shadow)}
@@ -4650,6 +4657,10 @@ html.dark #productOverlay .detail-actions .detail-purchase-button{
  var(--sd-3d-rim) border-box;
  border-color:transparent;box-shadow:var(--sd-3d-shadow);color:var(--ink);
 }
+html.dark #productOverlay .detail-actions .detail-purchase-button:active:not(:disabled){
+ box-shadow:var(--sd-3d-depressed);transform:translateY(1px) scale(.99);
+ transition-duration:105ms;
+}
 /* Reserve a zero-height insertion point for future variant selectors. */
 #productOverlay .detail-variants[hidden]{display:none}
 #productOverlay .detail-variants:not([hidden]){display:grid;gap:8px;margin:14px 0 15px;padding:12px 14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);min-width:0}
@@ -4691,6 +4702,11 @@ html.dark #productOverlay .sd-product-option-chip:active{box-shadow:var(--sd-3d-
 html.dark #productOverlay .sd-product-option-chip.is-selected{
  color:#eaf3fb;border-color:transparent;background:var(--sd-3d-surface);
  box-shadow:var(--sd-3d-selected);
+}
+#productOverlay .sd-product-option-chip.is-selected:active:not(:disabled),
+html.dark #productOverlay .sd-product-option-chip.is-selected:active:not(:disabled){
+ box-shadow:var(--sd-3d-depressed);transform:translateY(1px) scale(.99);
+ transition-duration:105ms;
 }
 #productOverlay .sd-product-option-chip:focus-visible{outline:2px solid var(--sd-icon-press-color);outline-offset:3px}
 #productOverlay .sd-product-option-control{
