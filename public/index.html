@@ -4278,7 +4278,7 @@ html.dark #products .search-field,html.dark #products .filter-pill{background:va
  box-shadow:var(--sd-3d-selected);
 }
 #products .search-field:has(input:focus-visible){outline:2px solid #437fa9;outline-offset:3px}
-#products .search-field:active{box-shadow:var(--sd-soft-pressed)}
+#products .search-field:active{box-shadow:var(--sd-soft-pressed);transition-duration:120ms}
 #products .catalog-tools .filter-pills{
  display:flex;align-items:center;align-content:flex-start;
  flex-wrap:wrap;width:100%;min-width:0;max-width:100%;
@@ -4646,8 +4646,8 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
  display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:0;
  min-height:50px;padding:11px 12px;border-radius:999px;
  border:1.5px solid transparent;
- background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(255,255,255,.72),transparent 70%) padding-box,
-  linear-gradient(145deg,rgba(245,251,255,.91),rgba(var(--sd-action-rgb),.28)) padding-box,
+ background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(255,255,255,.21),transparent 70%) padding-box,
+  linear-gradient(145deg,rgba(221,236,248,.73),rgba(var(--sd-action-rgb),.19)) padding-box,
   var(--sd-3d-rim) border-box;
  -webkit-backdrop-filter:blur(6px) saturate(112%);backdrop-filter:blur(6px) saturate(112%);
  box-shadow:var(--sd-3d-shadow);
@@ -4671,7 +4671,7 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
 }
 #productOverlay .detail-actions .detail-purchase-button span{min-width:0}
 html.dark #productOverlay .detail-actions .detail-purchase-button{
- background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(183,216,243,.24),transparent 68%) padding-box,
+ background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(183,216,243,.12),transparent 68%) padding-box,
  linear-gradient(145deg,rgba(35,63,87,.93),rgba(var(--sd-action-rgb),.24)) padding-box,
  var(--sd-3d-rim) border-box;
  border-color:transparent;box-shadow:var(--sd-3d-shadow);color:var(--ink);
