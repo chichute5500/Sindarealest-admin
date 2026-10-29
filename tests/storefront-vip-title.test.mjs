@@ -27,7 +27,7 @@ assert.match(css,/font-family:"SD Sans"/,"VIP must use the existing Noto Sans we
 assert.match(css,/font-style:normal/,"VIP must not be italic");
 assert.doesNotMatch(css,/font-style:italic/);
 assert.match(html,/<h3 class="product-title">\$\{productTitleWithVip/,"Catalog must highlight VIP");
-assert.match(html,/<button class="featured-title product-title"[^>]*>\$\{productTitleWithVip/,"Featured VIP styling must match");
+assert.match(html,/<a class="featured-title product-title"[^>]*>\$\{productTitleWithVip/,"Featured VIP styling must match");
 assert.match(html,/\$\('#detailTitle'\)\.innerHTML=productTitleWithVip/,"Product detail must highlight VIP safely");
 assert.match(html,/<div class="cart-row-copy"><strong>\$\{productTitleWithVip/,"Cart product names must highlight VIP");
 assert.match(html,/name\.innerHTML=productTitleWithVip/,"Checkout product names must highlight VIP");
