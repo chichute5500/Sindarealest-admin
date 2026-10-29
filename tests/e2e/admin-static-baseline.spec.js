@@ -362,12 +362,15 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const fixtureApiErrors = [];
   const narrowMobile = { width: 320, height: 640 };
   const compactMobile = { width: 360, height: 800 };
+  // Match the reference image's 864×1536 device ratio at a 390px CSS width.
+  const referenceMobile = { width: 390, height: 693 };
   const mobile = { width: 390, height: 844 };
   const desktop = { width: 1280, height: 800 };
   // Audit every fixture module at narrow widths, not only the product/warranty specials.
   const variants = [
     { viewport: narrowMobile, theme: 'light' },
     { viewport: compactMobile, theme: 'light' },
+    { viewport: referenceMobile, theme: 'light' },
     { viewport: mobile, theme: 'light' },
     { viewport: mobile, theme: 'dark' },
     { viewport: desktop, theme: 'light' }

@@ -31,6 +31,12 @@ on:
       - 'tests/admin-reference-visual-contract.test.mjs'
       - 'tests/admin-liquid-glass-contract.test.mjs'
       - 'tests/admin-liquid-glass-2-contract.test.mjs'
+      # Refresh exact-source provenance after Preview QA or reference capture changes.
+      - 'scripts/admin-preview-provenance-readonly.mjs'
+      - 'tests/admin-preview-provenance.test.mjs'
+      - 'tests/e2e/admin-static-baseline.spec.js'
+      - 'tests/e2e/admin-reference-same-data-qa.spec.js'
+      - 'tests/e2e/admin-isolated-preview.spec.js'
 
 permissions:
   contents: read

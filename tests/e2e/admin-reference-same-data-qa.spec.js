@@ -57,7 +57,8 @@ test('reference-comparable Admin products use labelled synthetic prices and genu
   const folder=join(root,'artifacts','admin-reference-same-data',String(process.env.GITHUB_SHA||'local').slice(0,12));
   mkdirSync(folder,{recursive:true});
   const captures=[];
-  for(const viewport of [{width:390,height:844},{width:412,height:915},{width:1280,height:800}]){
+  // The first viewport matches the supplied 864×1536 phone reference ratio at 390px CSS width.
+  for(const viewport of [{width:390,height:693},{width:390,height:844},{width:412,height:915},{width:1280,height:800}]){
     await page.setViewportSize(viewport);
     for(const theme of ['light','dark']){
       if((await page.locator('html').getAttribute('data-admin-theme'))!==theme)
