@@ -4421,8 +4421,8 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
  --sd-glass-panel-shadow:0 12px 29px rgba(35,80,113,.10),0 2px 5px rgba(43,89,119,.045),inset 1px 2px 3px rgba(109,150,176,.10);
  --sd-glass-input-shadow:0 3px 9px rgba(45,87,118,.075),inset 1px 2px 4px rgba(93,139,167,.14);
  --sd-glass-input-edge:rgba(147,191,225,.38);
- --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.33),rgba(211,235,250,.18) 65%,rgba(189,224,246,.12) 100%);
- --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.33),rgba(211,235,250,.18) 65%,rgba(189,224,246,.12) 100%);
+ --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.45),rgba(211,235,250,.26) 65%,rgba(189,224,246,.16) 100%);
+ --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.45),rgba(211,235,250,.26) 65%,rgba(189,224,246,.16) 100%);
 
  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
  --sd-control-rim:rgba(184,207,225,.45);
@@ -4447,8 +4447,8 @@ html.dark{
  --sd-glass-panel-shadow:0 12px 29px rgba(0,6,18,.26),0 2px 5px rgba(0,7,21,.11),inset 1px 2px 3px rgba(0,16,32,.20);
  --sd-glass-input-shadow:0 3px 9px rgba(0,6,18,.13),inset 1px 2px 4px rgba(0,11,26,.30);
  --sd-glass-input-edge:rgba(126,183,223,.31);
- --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%);
- --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.31),rgba(31,79,117,.22) 65%,rgba(20,69,104,.16) 100%);
+ --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.41),rgba(31,79,117,.29) 65%,rgba(20,69,104,.19) 100%);
+ --sd-glass-selected-face:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.41),rgba(31,79,117,.29) 65%,rgba(20,69,104,.19) 100%);
 
  --sd-control-rim:rgba(114,150,184,.40);
  
@@ -4478,7 +4478,7 @@ html.dark{
  #accountDrawer .account-action,#accountDrawer #sdCustomerAuth,
  #accountDrawer .account-guest)::after{
  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
- padding:1.2px;background:var(--sd-3d-rim);opacity:.70;
+ padding:1.5px;background:var(--sd-3d-rim);opacity:.82;
  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
  -webkit-mask-composite:xor;
  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
@@ -4502,6 +4502,9 @@ html.dark{
 :where(.service-strip .service-copy,.icon-btn,#mobileBottomNav .mobile-tab,
  .pill-btn,.navlink,.text-link,.contact-link,.checkout-drawer .sd-checkout-option,
  .checkout-drawer .sd-checkout-copy,#productOverlay .detail-purchase-button)[data-sd-glass-press="true"]::after{
+ opacity:.44;transition-duration:115ms;
+}
+.service-strip .service[data-sd-glass-press="true"] .service-copy::after{
  opacity:.44;transition-duration:115ms;
 }
 /* Child surfaces must not composite a second backdrop blur over their tray. */
