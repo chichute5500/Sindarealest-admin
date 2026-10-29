@@ -90,6 +90,26 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   const rectAfter=await press.evaluate(el=>{const r=el.getBoundingClientRect();return [r.width,r.height]});
   expect(rectAfter).toEqual(rectAtRest);
   await page.screenshot({path:`${dir}/${label}-${mode}-released.png`,animations:'disabled'});
+  // Chromium's touch protocol, not a mouse-only approximation: test actual
+  // touchStart (held finger) and touchEnd on both mobile viewport sizes.
+  if(width<=390){
+    const cdp=await page.context().newCDPSession(page);
+    try{
+      await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+      const bounds=await press.boundingBox();
+      const beforeTouch=await press.evaluate(el=>getComputedStyle(el).boxShadow);
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',
+        touchPoints:[{x:bounds.x+bounds.width/2,y:bounds.y+bounds.height/2}]});
+      await expect.poll(()=>press.evaluate(el=>getComputedStyle(el).boxShadow)).not.toBe(beforeTouch);
+      const touchPressed=await press.evaluate(el=>getComputedStyle(el).boxShadow);
+      expect(touchPressed).toContain('inset');
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+      await expect.poll(()=>press.evaluate(el=>getComputedStyle(el).boxShadow)).toBe(beforeTouch);
+    } finally {
+      await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]}).catch(()=>{});
+      await cdp.detach();
+    }
+  }
   await search.locator('input').focus();
   const focused=await search.evaluate(el=>getComputedStyle(el).boxShadow);
   expect(focused).toContain('inset');
