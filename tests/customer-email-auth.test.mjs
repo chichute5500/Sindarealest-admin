@@ -70,10 +70,6 @@ const data=await session.json();
 assert.equal(data.authenticated,true);
 assert.equal(data.user.provider,"email");
 assert.equal(data.user.email,"buyer@example.test");
-// Existing users who choose longer passwords must remain compatible.
-const legacy={...signup,email:"buyer-long@example.test",password:"NewPass-Secure!2026"};
-assert.equal((await emailAuth({request:req(legacy),env})).status,201);
-assert.equal((await emailAuth({request:req({...legacy,mode:"login"}),env})).status,200);
 const duplicate=await emailAuth({request:req(signup),env});
 assert.equal(duplicate.status,409);
 const wrong=await emailAuth({request:req({...signup,mode:"login",password:"NotTheSamePassword!2026"}),env});
@@ -86,4 +82,10 @@ const logoutGood=await logout({request:new Request(ORIGIN+"/api/customer/logout"
 assert.equal(logoutGood.status,200);
 const after=await getSession({request:new Request(ORIGIN+"/api/customer/session",{headers:{Cookie:tokenCookie}}),env});
 assert.equal((await after.json()).authenticated,false);
+// Separate rate-limit fixture ensures a long existing password remains valid,
+// without sharing this fake limiter's global attempt counter across test cases.
+const legacyEnv={...env,DB:new FakeDB()};
+const legacy={...signup,email:"buyer-long@example.test",password:"NewPass-Secure!2026"};
+assert.equal((await emailAuth({request:req(legacy),env:legacyEnv})).status,201);
+assert.equal((await emailAuth({request:req({...legacy,mode:"login"}),env:legacyEnv})).status,200);
 console.log("Email auth register/login, password, logout, CSRF and no auto order linking PASS");
