@@ -7,7 +7,7 @@ const valid = ({sha=expected, aliases=['https://feature-admin-isolated-hando.sin
   id, aliases, environment, created_on, deployment_trigger:{metadata:{branch,commit_hash:sha}}, latest_stage:{name:'deploy',status:stage}
 });
 assert.equal(assessDeployments([valid()],alias,expected).status,'REPORTED_SHA_MATCH');
-assert.equal(assessDeployments([valid({aliases:['https://admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev'],branch:'feat/admin-liquid-glass-2-2026-10-30'})],glassAlias,expected).status,'REPORTED_SHA_MATCH');
+assert.equal(assessDeployments([valid({aliases:['https://admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev'],branch:'admin-glass-2026-10-30'})],glassAlias,expected).status,'REPORTED_SHA_MATCH');
 assert.equal(assessDeployments([valid({aliases:['https://admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev']})],glassAlias,expected).status,'NOT_VERIFIED_BRANCH_MISMATCH');
 assert.equal(assessDeployments([valid({branch:'feat/admin-liquid-glass-2-2026-10-30'})],alias,expected).status,'NOT_VERIFIED_BRANCH_MISMATCH');
 assert.equal(assessDeployments([valid({sha:old})],alias,expected).status,'REPORTED_SHA_MISMATCH');

@@ -688,7 +688,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await page.setViewportSize(variant.viewport);
     await page.evaluate(() => window.scrollTo(0, 0));
     await chooseTheme(variant.theme);
-    await page.locator('[data-product-row]:visible').first().click();
+    await page.locator('[data-product-row]:visible .prodname').first().click();
     await expect(page.locator('#backdrop')).toBeVisible();
     expect(pageErrors, 'Opening Product Editor must not throw a browser JavaScript error').toEqual([]);
     await expect(page.locator('#backdrop')).toHaveAttribute('aria-hidden', 'false');

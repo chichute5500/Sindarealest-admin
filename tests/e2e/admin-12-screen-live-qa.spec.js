@@ -114,7 +114,7 @@ for (const {width,height,theme} of matrix) {
       await page.waitForTimeout(400);
       const row=page.locator('.tablewrap table tbody tr[data-product-row]:visible').first();
       if(await row.count()){
-        await row.click();
+        await row.locator('.prodname').click();
         await expect(page.locator('#backdrop')).toBeVisible();
         await shot('04_product_editor','#backdrop');
         await page.locator('#productTabGallery').click();

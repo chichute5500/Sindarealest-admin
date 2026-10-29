@@ -473,7 +473,7 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await expect(rows).toHaveCount(1);
     stage('opening-product-editor');
     // Product rows open the editor on row activation; no separate edit button is rendered.
-    await rows.first().click();
+    await rows.first().locator('.prodname').click();
     stage('product-editor-click-completed');
     await expect(page.locator('#backdrop')).toBeVisible();
     await expect(page.locator('#pId')).toHaveValue(target.id);
