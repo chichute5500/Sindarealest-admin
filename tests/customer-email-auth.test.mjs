@@ -76,6 +76,8 @@ try {
  assert.equal((await session.json()).authenticated,true);
  assert.equal((await send({mode:"reset-request",email:"unknown@example.test"})).status,200);
  assert.equal(mail.length,1,"Unknown Email cannot receive reset email");
+ // Simulate the documented 60-second resend cooldown passing for the same account.
+ sqlite.prepare("UPDATE customer_auth_email_state SET last_sent_at=0").run();
  assert.equal((await send({mode:"reset-request",email:signup.email})).status,200);
  assert.equal(mail.length,2);
  const resetCode=mail[1].TextPart.match(/Mã xác minh: (\d{6})/)[1];
