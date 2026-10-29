@@ -30,7 +30,13 @@ assert.ok(html.includes('id="sdAuthEmailFields"'),"Email method must expand the 
 assert.ok(html.includes('name="customer_password" type="password" autocomplete="current-password" required minlength="7"'),"Email password field must accept 7+ characters");
 assert.ok(html.includes('data-auth-password-hint hidden'),"Sign-up password requirement should appear only on registration");
 assert.ok(auth.includes('toggleAttribute("hidden",!register)'),"Password hint must track registration mode");
-assert.ok((html.match(/fill="#(?:4285F4|34A853|FBBC05|EA4335)"/g)||[]).length===4,"Google G must retain all four brand colors");
+const googleSignInSvg=html.match(/class="sd-auth-provider-icon sd-auth-google-mark" aria-hidden="true">(<svg[\\s\\S]*?<\\/svg>)<\\/span>/)?.[1]||"";
+const googleWelcomeSvg=html.match(/class="sd-account-google-mark" data-account-google-mark aria-hidden="true">(<svg[\\s\\S]*?<\\/svg>)<\\/span>/)?.[1]||"";
+for(const [context,svg] of [["sign-in",googleSignInSvg],["signed-in welcome",googleWelcomeSvg]]){
+ assert.ok(svg,context+" Google logo must be an SVG, not a text G");
+ for(const color of ["#4285F4","#34A853","#FBBC05","#EA4335"])
+  assert.ok(svg.includes('fill="'+color+'"'),context+" Google logo missing color "+color);
+}
 assert.ok(auth.includes('const emailEnabled=Boolean(data.providers?.email)'),"Email must be Preview-only by API flag");
 assert.ok(auth.includes('const GOOGLE_ONLY_RELEASE = true'),"Only Google sign-in must be shown on PC and mobile");
 assert.ok(auth.includes('const emailAvailable=emailEnabled && !GOOGLE_ONLY_RELEASE'),"Email remains hidden even when Preview email flag is enabled");
