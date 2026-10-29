@@ -26,6 +26,7 @@ if(root){
       profile_invalid:"Zalo/Google chưa trả về mã định danh tài khoản hợp lệ.",
       profile_api_error:"Zalo trả về lỗi khi lấy thông tin tài khoản, dù đã cấp quyền. Hệ thống đang kiểm tra lỗi này.",
       profile_relay_unavailable:"Máy chủ Việt Nam dùng để xác minh tài khoản Zalo chưa kết nối được. Bạn có thể dùng Google để đăng nhập.",
+      facebook_unavailable:"Facebook Login chưa được cấu hình trên Preview.",
       callback_error:"Lỗi xử lý callback. Máy chủ sẽ cần kiểm tra luồng đăng nhập.",
       session_store:"Đã lấy được hồ sơ, nhưng không thể tạo phiên tài khoản trong cơ sở dữ liệu Preview.",
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
@@ -65,12 +66,13 @@ if(root){
       if(authReturn==="success" && !active)
         notify("Nhà cung cấp đã trả về nhưng trình duyệt chưa giữ được phiên. Hãy kiểm tra cookie hoặc lỗi xử lý callback.","error");
       else if(authReturn==="success" && active)
-        notify("Đăng nhập thành công qua "+({zalo:"Zalo",google:"Google",email:"Email"}[data.user?.provider]||"tài khoản")+". Tài khoản đã được xác nhận.","success");
+        notify("Đăng nhập thành công qua "+({zalo:"Zalo",google:"Google",facebook:"Facebook",email:"Email"}[data.user?.provider]||"tài khoản")+". Tài khoản đã được xác nhận.","success");
       // An existing login is independent of a newly failed OAuth attempt.
       // Do not present an old session as a successful login from another provider.
       else if(authReturn==="failed" && active)
         notify(message.textContent+" Phiên "+({zalo:"Zalo",google:"Google",email:"Email"}[data.user?.provider]||"trước đó")+" vẫn đang hoạt động.","error");
-      const google=q("[data-auth-google]"),zalo=q("[data-auth-zalo]");
+      const google=q("[data-auth-google]"),zalo=q("[data-auth-zalo]"),
+        facebook=q("[data-auth-facebook]");
       if(google){
         google.disabled=!data.providers?.google;
         google.textContent=data.providers?.google?"Tiếp tục với Google":"Google (chưa cấu hình)";
@@ -79,6 +81,12 @@ if(root){
       if(zalo){
         zalo.disabled=!data.providers?.zalo;
         zalo.title=data.providers?.zalo?"":"Zalo App Secret chưa có ở môi trường này";
+      }
+      // Do not expose a clickable login method until Meta app + secret are configured.
+      if(facebook){
+        facebook.hidden=!data.providers?.facebook;
+        facebook.disabled=!data.providers?.facebook;
+        facebook.title=data.providers?.facebook?"":"Cần cấu hình Meta App ID và App Secret trên Cloudflare Preview";
       }
       // Email is Preview-only until verified ownership + recovery are implemented.
       const emailEnabled=Boolean(data.providers?.email);
@@ -90,13 +98,14 @@ if(root){
       if(guest)guest.hidden=active;
       if(active){
         $name.textContent=data.user?.name||"Khách hàng";
-        const names={zalo:"Zalo",google:"Google",email:"Email"};
+        const names={zalo:"Zalo",google:"Google",facebook:"Facebook",email:"Email"};
         $provider.textContent=names[data.user?.provider]||"Tài khoản";
       }
     }catch{notify("Chưa kết nối được tài khoản. Bạn vẫn có thể đặt hàng không cần đăng nhập.");}
   };
   q('[data-auth-zalo]').addEventListener("click",()=>{location.assign("/api/customer/auth/zalo/start");});
   q('[data-auth-google]').addEventListener("click",()=>{location.assign("/api/customer/auth/google/start");});
+  q('[data-auth-facebook]').addEventListener("click",()=>{location.assign("/api/customer/auth/facebook/start");});
   q('[data-auth-toggle]').addEventListener("click",()=>{
     const register=emailForm.dataset.mode!=="register";
     emailForm.dataset.mode=register?"register":"login";
