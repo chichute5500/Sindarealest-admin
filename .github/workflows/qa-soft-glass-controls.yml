@@ -9,6 +9,7 @@ on:
       - tests/product-card-liquid-glass.test.mjs
       - tests/dynamic-product-categories.test.mjs
       - tests/soft-glass-controls-contract.test.mjs
+      - tests/order-trust-layout.test.mjs
       - tests/e2e/soft-glass-controls.spec.js
       - .github/workflows/qa-soft-glass-controls.yml
   workflow_dispatch:
