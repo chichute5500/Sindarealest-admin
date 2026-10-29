@@ -30,8 +30,14 @@ assert.ok(html.includes('id="sdAuthEmailFields"'),"Email method must expand the 
 assert.ok(html.includes('name="customer_password" type="password" autocomplete="current-password" required minlength="7"'),"Email password field must accept 7+ characters");
 assert.ok(html.includes('data-auth-password-hint hidden'),"Sign-up password requirement should appear only on registration");
 assert.ok(auth.includes('toggleAttribute("hidden",!register)'),"Password hint must track registration mode");
-const googleSignInSvg=html.match(/class="sd-auth-provider-icon sd-auth-google-mark" aria-hidden="true">(<svg[\\s\\S]*?<\\/svg>)<\\/span>/)?.[1]||"";
-const googleWelcomeSvg=html.match(/class="sd-account-google-mark" data-account-google-mark aria-hidden="true">(<svg[\\s\\S]*?<\\/svg>)<\\/span>/)?.[1]||"";
+const googleSvgInside=marker=>{
+ const start=html.indexOf(marker);
+ if(start<0)return "";
+ const end=html.indexOf("</span>",start);
+ return end>start?html.slice(start,end):"";
+};
+const googleSignInSvg=googleSvgInside('class="sd-auth-provider-icon sd-auth-google-mark" aria-hidden="true"');
+const googleWelcomeSvg=googleSvgInside('class="sd-account-google-mark" data-account-google-mark aria-hidden="true"');
 for(const [context,svg] of [["sign-in",googleSignInSvg],["signed-in welcome",googleWelcomeSvg]]){
  assert.ok(svg,context+" Google logo must be an SVG, not a text G");
  for(const color of ["#4285F4","#34A853","#FBBC05","#EA4335"])
