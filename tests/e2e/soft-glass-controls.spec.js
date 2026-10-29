@@ -27,14 +27,20 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   const trackingInput=page.locator('#sdTrackInput');
   for(const part of [head,benefit,orderCta,tracking,trackingInput])
    await expect(part).toBeAttached();
-  for(const part of [head,benefit,orderCta,tracking]){
+  for(const part of [head,benefit,orderCta]){
    const paint=await part.evaluate(el=>{
     const css=getComputedStyle(el);
     return {face:css.backgroundImage,shadow:css.boxShadow};
    });
-   expect(paint.face,'Each visible glass family paints the optical rim').toContain('radial-gradient');
-   expect(paint.shadow,'Each glass family has shallow inner relief').toContain('inset');
+   expect(paint.face,'Each control paints the shared optical rim').toContain('radial-gradient');
+   expect(paint.shadow,'Raised glass keeps its ambient contact shadow').not.toBe('none');
+   expect(paint.shadow,'Resting controls stay free of cushioned inset rings').not.toContain('inset');
   }
+  const trackingPaint=await tracking.evaluate(el=>{
+   const css=getComputedStyle(el);return {face:css.backgroundImage,shadow:css.boxShadow};
+  });
+  expect(trackingPaint.face).toContain('radial-gradient');
+  expect(trackingPaint.shadow,'The tracking panel retains its shallow panel recess').toContain('inset');
   await benefit.scrollIntoViewIfNeeded();
   await page.screenshot({path:`${dir}/${label}-${mode}-home-benefits.png`,animations:'disabled'});
   await head.screenshot({path:`${dir}/${label}-${mode}-header-crop.png`,animations:'disabled'});
@@ -63,8 +69,8 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   });
   const chip=await readSurface('#categoryFilters .filter-pill');
   const field=await readSurface('#products .search-field');
-  expect(chip.shadow).toContain('inset');
-  expect(field.shadow).toContain('inset');
+  expect(chip.shadow,'Resting category glass must remain raised').not.toContain('inset');
+  expect(field.shadow,'Resting search glass must remain raised').not.toContain('inset');
   expect(chip.background).toContain('radial-gradient');
   expect(chip.animation).toBe('none');
   // Ensure the reflective color is masked to one physical rim and cannot
@@ -87,12 +93,12 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   expect(chipGeometry.every(c=>c.width>0&&c.width<=width)).toBe(true);
   const icon=page.locator('.nav-actions .icon-btn').first();
   await expect(icon).toBeVisible();
-  expect((await icon.evaluate(el=>getComputedStyle(el).boxShadow))).toContain('inset');
+  expect((await icon.evaluate(el=>getComputedStyle(el).boxShadow))).not.toContain('inset');
   if(width<=760){
    await expect(page.locator('#mobileBottomNav')).toBeVisible();
    const tabs=page.locator('#mobileBottomNav .mobile-tab');
    expect(await tabs.count()).toBe(4);
-   expect((await tabs.first().evaluate(el=>getComputedStyle(el).boxShadow))).toContain('inset');
+   expect((await tabs.first().evaluate(el=>getComputedStyle(el).boxShadow))).not.toContain('inset');
   }
   // Reference comparison: capture the original ALL-categories layout before
   // selecting another category, which intentionally switches to a deep route.
@@ -119,6 +125,7 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
     const second=page.locator('#categoryFilters .filter-pill').nth(1);
     await second.click();
     await expect(second).toHaveAttribute('aria-pressed','true');
+    expect((await second.evaluate(el=>getComputedStyle(el).boxShadow))).toContain('inset');
     expect((await second.evaluate(el=>getComputedStyle(el).animationName))).toBe('none');
   }
   await page.locator('#products').scrollIntoViewIfNeeded();
