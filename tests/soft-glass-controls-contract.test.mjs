@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
 const authCss=readFileSync(new URL('../public/customer-auth.css',import.meta.url),'utf8');
+const heroCss=readFileSync(new URL('../public/code-hero.css',import.meta.url),'utf8');
 test('soft inset catalog uses existing live filter elements and keeps data binding',()=>{
  assert.match(html,/id="catalogSearch"/);
  assert.match(html,/id="categoryFilters"/);
@@ -117,4 +118,13 @@ test('Style sheet order and functional features stay intact after refactor',()=>
   'function openCheckout(']){
   assert.ok(html.includes(anchor),anchor+' disappeared');
  }
+});
+
+test('Hero CTA retains approved blink and gains same prismatic rim without layout changes',()=>{
+ assert.match(heroCss,/\.sd-code-hero \.sdh-cta--zalo::before\{[^}]*sdh-cta-border-pulse/);
+ assert.match(heroCss,/\.sd-code-hero \.sdh-cta::after\{[^}]*background:var\(--sd-3d-rim/);
+ assert.match(heroCss,/\.sd-code-hero \.sdh-cta::after\{[^}]*mask-composite:exclude/);
+ assert.match(heroCss,/\.sd-code-hero \.sdh-cta:active\{transform:translateY\(1px\);box-shadow:/);
+ assert.match(heroCss,/html\.dark \.sd-code-hero \.sdh-cta:active\{box-shadow:/);
+ assert.match(heroCss,/\.sd-code-hero \.sdh-cta\{position:relative;isolation:isolate/);
 });
