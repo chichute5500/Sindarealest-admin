@@ -1,0 +1,33 @@
+name: Customer Google — Production release preflight (read only)
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-auth-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_PAGES_PROJECT: sindarealest2
+      CLOUDFLARE_PAGES_BRANCH: main
+    steps:
+      - name: Checkout branch under review
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Wrangler
+        run: npm install --no-audit --no-fund
+      - name: Check Production OAuth configuration and D1 schema (read-only)
+        run: node scripts/check-customer-auth-production-ready.mjs
+      - name: Readiness scope
+        if: success()
+        run: echo "Read-only Production readiness PASS. Actual release requires Owner PASS and a separate manual, backed-up D1 migration when schema missing." >> "$GITHUB_STEP_SUMMARY"

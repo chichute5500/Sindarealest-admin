@@ -1,3 +1,5 @@
+> **LATEST 2026-10-29 — supersedes historical status text below where different.** Latest code checkpoint `0a77b0c50543ab8d4712de72cf3310355ef0123a` on `feat/zalo-customer-login-2026-10-29`, PR #150 DRAFT. User's screenshots confirmed real Google sign-in once, but new Account layout/Google-only Liquid Glass redesign is **NOT OWNER PASS**. Initial code fixes `1dba51f`, `0a77b0c` are deployed to isolated Preview with source CI + Admin Preview tests + deploy smoke PASS; visual desktop/mobile light/dark and real-login/logout of newest layout still need independent comparison/Owner approval. See [latest Account handoff](./HANDOFF-LATEST-2026-10-29-ACCOUNT-LIQUID-GLASS.md) and [next-chat prompt](./PROMPT-NEXT-CHAT-2026-10-29-ACCOUNT-LIQUID-GLASS.md). Do **not** merge or modify production.
+
 # SinDarealest customer login — release and safety checkpoint (2026-10-29)
 
 Repository: `chichute5500/Sindarealest-admin`

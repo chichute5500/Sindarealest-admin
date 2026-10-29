@@ -148,9 +148,9 @@ assert.ok(featuredProductCard.includes('<div class="product-card-bottom">')
   && featuredProductCard.includes('quick-add tap-target')
   && !featuredProductCard.includes('class="product-category"'),
   "Featured cards must use the same compact price-and-cart row without repeating the photo category.");
-assert.ok(html.includes('<div class="product-open" role="button" tabindex="0" data-open-product=')
+assert.ok(html.includes('<a class="product-open" href="${href}" data-open-product=')
   && html.includes("if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}"),
-  "Product cards must use valid flow-content containers and preserve Enter/Space activation for keyboard users.");
+  "Product cards must use crawlable anchors and preserve Enter/Space keyboard activation.");
 assert.ok(html.includes(".product-open:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}"),
   "Keyboard-focusable product cards must retain a visible focus indicator after replacing the native button wrapper.");
 
@@ -246,3 +246,6 @@ assert.match(html,/@media\(hover:hover\) and \(pointer:fine\)/,
  "Hover-specific lighting must not run on touch devices.");
 assert.match(html,/@media\(prefers-reduced-motion:reduce\)/,
  "Reduced motion treatment must remain available.");
+
+assert.ok(html.includes('<a class="product-open" href="${href}" data-open-product='),
+  "Product cards must retain crawlable semantic anchors and keyboard activation.");

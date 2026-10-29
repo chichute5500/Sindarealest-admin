@@ -51,6 +51,18 @@ assert.ok(front.indexOf(verificationTag)>front.indexOf('<head>')&&front.indexOf(
   'Google verification tag must be inside head for Googlebot');
 
 assert.ok(front.includes('href="/sanpham"'));
+// Cards have real crawlable links, while normal clicks still open the SPA
+// overlay. Modified clicks must retain browser-native new-tab behavior.
+assert.ok(front.includes('function productHref(p){'));
+assert.ok(front.includes('<a class="product-open" href="${href}" data-open-product='));
+assert.ok(front.includes('<a class="product-open featured-open" href="${href}" data-open-product='));
+assert.ok(front.includes('<a class="featured-title product-title" href="${href}" data-open-product='));
+assert.ok(front.includes('if(e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault()'));
+const seoHrefSource=front.slice(front.indexOf('function productHref(p){'),front.indexOf('\nfunction productCard('));
+const hrefContext={routeSlug:productCategoryRouteSlug,encodeURIComponent};
+assert.equal(runInNewContext(seoHrefSource+"\nproductHref({id:'uuid-1',category:'dress-shoes',skuVerified:false})",hrefContext),'/sanpham/giaytay/uuid-1');
+assert.equal(runInNewContext(seoHrefSource+"\nproductHref({id:'uuid-1',category:'sneakers',sku:'SD-SN001',skuVerified:true})",hrefContext),'/sanpham/sneaker/SD-SN001');
+
 assert.ok(!front.includes('href="#products"'));
 assert.match(front,/function navigateCatalog\(/);
 assert.match(front,/function syncCatalogFromLocation\(/);

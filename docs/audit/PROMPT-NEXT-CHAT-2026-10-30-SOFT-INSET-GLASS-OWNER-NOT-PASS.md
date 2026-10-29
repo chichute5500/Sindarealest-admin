@@ -1,3 +1,5 @@
+> **Cập nhật 2026-10-30:** Owner đã PASS bản Preview cuối cùng và cho phép đưa PR #152 lên `main`. Trạng thái “chưa PASS/không merge” bên dưới là lịch sử tại thời điểm bàn giao, không còn là trạng thái hiện tại.
+
 # PROMPT CHAT MỚI — TIẾP TỤC TRỰC TIẾP SINDAREALEST LIQUID GLASS (OWNER CHƯA PASS)
 
 Tiếp tục trực tiếp dự án **SinDarealest** trên GitHub. Đây là task đang dở, **không bắt đầu lại**, không hỏi lại lịch sử đã có trong docs, không chỉ viết CSS mẫu/prompt, không dựng demo. Owner vừa nghiệm thu ảnh mới nhất và xác nhận rõ: **CHƯA PASS**.

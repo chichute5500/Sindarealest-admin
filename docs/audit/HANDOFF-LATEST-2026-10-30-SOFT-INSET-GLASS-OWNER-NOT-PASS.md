@@ -1,3 +1,5 @@
+> **Cập nhật 2026-10-30:** Owner đã PASS bản Preview cuối cùng và cho phép đưa PR #152 lên `main`. Trạng thái “chưa PASS/không merge” bên dưới là lịch sử tại thời điểm bàn giao, không còn là trạng thái hiện tại.
+
 # SINDAREALEST — HANDOFF LATEST / LIQUID GLASS SOFT INSET 3D — OWNER CHƯA PASS
 
 **Ngày bàn giao:** 2026-10-30 (Asia/Ho_Chi_Minh)  
