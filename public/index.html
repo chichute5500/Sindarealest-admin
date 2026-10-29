@@ -3484,13 +3484,13 @@ html.dark .text-link,html.dark .pill-btn{border-color:rgba(151,197,229,.36);box-
 }
 /* Product cards share the soft, bright/deep-blue glass surface from the reference boards. */
 .product-card,.catalog-card{
-  border-radius:18px;
-  background:var(--sd-reference-surface);
-  box-shadow:0 9px 25px rgba(38,82,116,.09),inset 0 1px 0 rgba(255,255,255,.78);
+  border-radius:18px;border-color:transparent;
+  background:var(--sd-glass-shell);
+  box-shadow:var(--sd-3d-shadow);
 }
 html.dark .product-card,html.dark .catalog-card{
-  background:var(--sd-reference-surface);
-  box-shadow:0 10px 26px rgba(0,5,14,.24),inset 0 1px 0 rgba(231,245,255,.09);
+  background:var(--sd-glass-shell);
+  box-shadow:var(--sd-3d-shadow);
 }
 .product-photo{background:rgba(235,245,253,.62)}
 .product-photo img{object-position:center;transition:transform .45s ease}
@@ -3668,7 +3668,7 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   .service-text strong{font-size:clamp(9px,2.65vw,10.5px);line-height:1.3;font-weight:700;overflow-wrap:normal}
   #order{padding:16px 0 12px}
   @media(max-width:380px){#order{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}}
-  #order .order-cta--compact #orderDetailsToggle{min-height:46px;font-size:11px;padding:10px 14px;border:1px solid rgba(139,187,220,.70);background:var(--sd-reference-surface);box-shadow:var(--sd-reference-shadow)}
+  #order .order-cta--compact #orderDetailsToggle{min-height:46px;font-size:11px;padding:10px 14px;border:1px solid transparent;background:var(--sd-glass-shell);box-shadow:var(--sd-3d-shadow)}
   .section#featured{padding-top:18px}
   #featured .eyebrow{display:none!important}
   #featured .section-head{display:flex;flex-direction:row;align-items:end;justify-content:space-between;gap:8px;margin:0 0 13px}
@@ -3942,14 +3942,14 @@ html.dark .product-photo img{mix-blend-mode:normal}
 /* Keep the fixed navigation readable above scrolling content and remove it from the immersive full-screen gallery. */
 @media(max-width:760px){
  .mobile-bottom-nav{
-   background:rgba(247,252,255,.995)!important;
-   -webkit-backdrop-filter:blur(24px) saturate(150%)!important;
-   backdrop-filter:blur(24px) saturate(150%)!important;
-   box-shadow:0 12px 30px rgba(25,63,91,.20),inset 0 1px 0 rgba(255,255,255,.98)!important;
+   background:var(--sd-glass-shell-strong)!important;
+   -webkit-backdrop-filter:blur(13px) saturate(115%)!important;
+   backdrop-filter:blur(13px) saturate(115%)!important;
+   box-shadow:var(--sd-glass-panel-shadow)!important;
  }
  html.dark .mobile-bottom-nav{
-   background:rgba(4,20,34,.995)!important;
-   box-shadow:0 12px 30px rgba(0,0,0,.40),inset 0 1px 0 rgba(228,243,255,.15)!important;
+   background:var(--sd-glass-shell-strong)!important;
+   box-shadow:var(--sd-glass-panel-shadow)!important;
  }
  body:has(.sd-fullscreen-viewer.open) .mobile-bottom-nav{display:none!important}
  body:has(.sd-fullscreen-viewer.open) .sd-fullscreen-thumbs{bottom:calc(52px + env(safe-area-inset-bottom))!important}
@@ -3967,34 +3967,42 @@ html.dark .product-photo img{mix-blend-mode:normal}
 
 
 /* 2026-10-21 visual refinement: six benefit tiles stay readable while preserving the satin beneath the glass. */
+/* Container is a quiet glass tray; six individual optical shells do the work. */
 .service-strip.glass{
-  background:rgba(244,250,255,.24);
-  border-color:rgba(255,255,255,.54);
-  box-shadow:0 12px 30px rgba(38,82,116,.08),inset 0 1px 0 rgba(255,255,255,.38);
-  backdrop-filter:blur(18px) saturate(135%);
-  -webkit-backdrop-filter:blur(18px) saturate(135%);
+  background:var(--sd-3d-face);
+  border-color:var(--sd-control-rim);
+  box-shadow:var(--sd-glass-panel-shadow);
+  -webkit-backdrop-filter:blur(12px) saturate(115%);backdrop-filter:blur(12px) saturate(115%);
 }
 html.dark .service-strip.glass{
-  background:rgba(5,22,38,.36);
-  border-color:rgba(177,214,239,.32);
-  box-shadow:0 12px 30px rgba(0,0,0,.20),inset 0 1px 0 rgba(228,243,255,.14);
+  background:var(--sd-3d-face);border-color:var(--sd-control-rim);
+  box-shadow:var(--sd-glass-panel-shadow);
 }
 .service-strip .service-copy{
   min-height:78px;padding:10px 8px;gap:7px;
-  background:linear-gradient(145deg,rgba(255,255,255,.62) 0%,rgba(236,246,255,.48) 52%,rgba(216,234,249,.38) 100%);
-  border-color:rgba(255,255,255,.66);
-  box-shadow:0 7px 20px rgba(37,72,98,.10),inset 0 1px 0 rgba(255,255,255,.72),inset 0 -1px 0 rgba(68,112,144,.06);
-  backdrop-filter:blur(17px) saturate(145%);-webkit-backdrop-filter:blur(17px) saturate(145%);
+  border:1px solid transparent;
+  background:var(--sd-glass-shell);
+  box-shadow:var(--sd-3d-shadow);
+  -webkit-backdrop-filter:blur(9px) saturate(111%);backdrop-filter:blur(9px) saturate(111%);
+  transition:transform 245ms var(--sd-3d-ease),box-shadow 260ms var(--sd-3d-ease);
 }
 .service-strip .service-text strong{font-size:12px;line-height:1.35;letter-spacing:-.01em}
-.service-strip .service-icon{width:29px;height:29px;flex-basis:29px;background:rgba(255,255,255,.46);border-color:rgba(122,168,198,.35)}
-.service-strip .service-icon svg{width:16px;height:16px}
-html.dark .service-strip .service-copy{
-  background:linear-gradient(145deg,rgba(36,66,91,.70) 0%,rgba(24,49,72,.60) 48%,rgba(12,31,50,.50) 100%);
-  border-color:rgba(204,231,250,.48);
-  box-shadow:0 8px 22px rgba(0,6,16,.27),inset 0 1px 0 rgba(232,246,255,.34),inset 0 -1px 0 rgba(0,8,19,.16);
+.service-strip .service-icon{
+  width:29px;height:29px;flex-basis:29px;
+  background:var(--sd-3d-surface);border:1px solid transparent;
+  box-shadow:var(--sd-3d-shadow);
 }
-html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-color:rgba(204,231,250,.33)}
+.service-strip .service-icon svg{width:16px;height:16px}
+html.dark .service-strip .service-copy{background:var(--sd-glass-shell);box-shadow:var(--sd-3d-shadow)}
+html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-color:transparent}
+@media(hover:hover) and (pointer:fine){
+ .service-strip .service:hover .service-copy{box-shadow:var(--sd-3d-shadow);filter:brightness(1.025)}
+}
+.service-strip .service:active .service-copy,
+.service-strip .service[data-sd-glass-press="true"] .service-copy{
+ transform:translateY(1px);
+ box-shadow:var(--sd-3d-depressed);transition-duration:115ms;
+}
 @media(max-width:760px){
   .service-strip{gap:7px;padding:7px}
   .service-strip .service-copy{min-height:74px;padding:8px 4px;gap:6px;border-radius:14px}
@@ -4031,8 +4039,8 @@ html.dark .service-strip .service-icon{background:rgba(130,179,215,.18);border-c
 }
 
 /* Keep the sticky header frosted, but prevent scrolled page imagery/text from ghosting through the official brand lockup. */
-.nav-wrap .nav{background:rgba(237,245,251,.95)!important;box-shadow:0 4px 12px rgba(48,86,119,.08),inset 0 1px 2px rgba(255,255,255,.63)!important}
-html.dark .nav-wrap .nav{background:rgba(13,36,55,.96)!important;box-shadow:0 4px 12px rgba(0,5,15,.22),inset 0 1px 2px rgba(148,191,219,.16)!important}
+.nav-wrap .nav{border:1px solid transparent;background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-glass-panel-shadow)!important;-webkit-backdrop-filter:blur(17px) saturate(114%);backdrop-filter:blur(17px) saturate(114%)}
+html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-glass-panel-shadow)!important}
 
 /* In light mode, blend the original white image backdrop into the satin surface without changing the source asset; keep Dark-mode product colours untouched. */
 html:not(.dark) .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:normal!important}
@@ -4370,7 +4378,7 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
 /* A single delegated touch/pointer controller. Never changes business state,
    prevents no browser events, and clears upon scroll/cancel/blur. */
 (()=>{
- const targetSelector='#products .filter-pill,#products .search-field,.icon-btn,.mini-add,'+
+ const targetSelector='#products .filter-pill,#products .search-field,.service-strip .service,.navlink,.text-link,.contact-link,.icon-btn,.mini-add,'+
   '.page-btn.page-arrow,.slide-controls button,.featured-arrow,.detail-zoom-btn,'+
   '.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,.sd-fullscreen-share,'+
   '.detail-favorite-btn,.close-btn,#mobileBottomNav .mobile-tab,.pill-btn,'+
@@ -4416,6 +4424,12 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
  --sd-3d-tray:linear-gradient(150deg,rgba(236,245,251,.68),rgba(222,239,249,.61));
  --sd-3d-tray-shadow:0 3px 9px rgba(48,85,117,.075),inset 0 1px 2px rgba(255,255,255,.24);
  --sd-3d-surface-search:var(--sd-3d-face);
+ /* Final Glass UI 2.0: one shared optical material for page shells, panels
+    and controls. Header/tray use the stronger translucent face for legibility. */
+ --sd-glass-shell:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(255,255,255,.72),rgba(231,245,254,.56) 57%,rgba(226,240,251,.46) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-panel-shadow:0 12px 29px rgba(35,80,113,.10),0 2px 5px rgba(43,89,119,.045),inset 1px 2px 3px rgba(109,150,176,.10);
+ --sd-glass-input-shadow:0 3px 9px rgba(45,87,118,.075),inset 1px 2px 4px rgba(93,139,167,.14);
 
  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
  --sd-control-rim:rgba(184,207,225,.45);
@@ -4435,12 +4449,71 @@ html.dark{
  --sd-3d-tray:linear-gradient(150deg,rgba(20,48,70,.70),rgba(12,39,62,.64));
  --sd-3d-tray-shadow:0 3px 10px rgba(0,5,15,.16),inset 0 1px 2px rgba(148,190,218,.12);
  --sd-3d-surface-search:var(--sd-3d-face);
+ --sd-glass-shell:var(--sd-3d-face) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(70,110,143,.62),rgba(26,66,94,.62) 57%,rgba(11,41,65,.53) 100%) padding-box,var(--sd-3d-rim) border-box;
+ --sd-glass-panel-shadow:0 12px 29px rgba(0,6,18,.26),0 2px 5px rgba(0,7,21,.11),inset 1px 2px 3px rgba(0,16,32,.20);
+ --sd-glass-input-shadow:0 3px 9px rgba(0,6,18,.13),inset 1px 2px 4px rgba(0,11,26,.30);
 
  --sd-control-rim:rgba(114,150,184,.40);
  --sd-control-face:rgba(23,50,73,.86);
  --sd-control-ink:var(--sd-3d-ink);
  --sd-control-shadow:var(--sd-3d-shadow);
  --sd-control-down:var(--sd-3d-depressed);
+}
+/* Final Glass UI 2.0 — existing component geometry is unchanged.
+   All glass families reference the SAME shell/face/shadow tokens above.
+   No extra per-component gradient stacks and no additional nested blur layers. */
+.sd-track-panel,.sd-track-order,
+.checkout-drawer .sd-checkout-box,.checkout-drawer .sd-checkout-option,
+.checkout-drawer .sd-checkout-copy,.cart-row,
+.account-drawer .favorite-row,.account-drawer .local-order-card,
+#productOverlay .detail-thumb,.text-link,.contact-link{
+ border-color:transparent;
+ background:var(--sd-glass-shell);
+ box-shadow:var(--sd-3d-shadow);
+}
+.sd-track-panel{
+ border:1px solid transparent;
+ background:var(--sd-glass-shell-strong);
+ box-shadow:var(--sd-glass-panel-shadow);
+ -webkit-backdrop-filter:blur(13px) saturate(112%);backdrop-filter:blur(13px) saturate(112%);
+}
+.sd-track-controls input,.checkout-fields input,.checkout-fields select,.checkout-fields textarea,
+#productOverlay .sd-product-option-control,.warranty-form input,.warranty-form textarea{
+ border:1px solid transparent;
+ background:var(--sd-glass-shell);
+ color:var(--ink);
+ box-shadow:var(--sd-glass-input-shadow);
+ transition:box-shadow 240ms var(--sd-3d-ease),border-color 240ms var(--sd-3d-ease);
+}
+.sd-track-controls input:focus-visible,.checkout-fields input:focus-visible,
+.checkout-fields select:focus-visible,.checkout-fields textarea:focus-visible,
+#productOverlay .sd-product-option-control:focus-visible,
+.warranty-form input:focus-visible,.warranty-form textarea:focus-visible{
+ outline:2px solid #4a88b4;outline-offset:2px;
+ box-shadow:var(--sd-3d-selected);
+}
+:is(.sd-track-controls input,.checkout-fields input,.checkout-fields textarea)[aria-invalid="true"]{
+ outline:2px solid #b9657d;outline-offset:2px;
+}
+.nav-wrap .navlink.active,.mobile-nav .navlink.active{
+ border-color:transparent;background:var(--sd-glass-shell);
+ box-shadow:var(--sd-3d-selected);
+}
+:is(.navlink,.text-link,.contact-link):active,
+:is(.navlink,.text-link,.contact-link)[data-sd-glass-press="true"]{
+ transform:translateY(1px);
+ box-shadow:var(--sd-3d-depressed);
+ transition-duration:115ms;
+}
+:is(.sd-track-controls button,.checkout-drawer .sd-checkout-copy):focus-visible{
+ outline:2px solid #4a88b4;outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+ :is(.sd-track-panel,.sd-track-controls input,.checkout-fields input,.checkout-fields select,
+ .checkout-fields textarea,.service-strip .service-copy,.navlink,.text-link,.contact-link){
+  transition:none!important;
+ }
 }
 .icon-btn,.mini-add,.page-btn.page-arrow,.slide-controls button,.featured-arrow,
 .detail-zoom-btn,.detail-gallery-arrow,.sd-fullscreen-close,.sd-fullscreen-arrow,
@@ -4571,14 +4644,15 @@ html.dark .detail-favorite-btn[aria-pressed="true"],
 /* Existing four-tab bottom nav: recessed glass, rounded soft rim and tactile selection. */
 @media(max-width:760px){
  #mobileBottomNav.mobile-bottom-nav{
-  border:1px solid var(--sd-control-rim);background:var(--sd-3d-tray)!important;
-  box-shadow:var(--sd-3d-tray-shadow)!important;
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border:1px solid transparent;background:var(--sd-glass-shell-strong)!important;
+  box-shadow:var(--sd-glass-panel-shadow)!important;
+  -webkit-backdrop-filter:blur(13px) saturate(115%);backdrop-filter:blur(13px) saturate(115%);
  }
  #mobileBottomNav .mobile-tab{
   min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   border:1px solid transparent;border-radius:16px;background:var(--sd-3d-surface);
   box-shadow:var(--sd-3d-shadow);color:var(--sd-control-ink);
+  -webkit-backdrop-filter:none;backdrop-filter:none;
   transition:transform 245ms cubic-bezier(.16,.90,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
  }
  #mobileBottomNav .mobile-tab.is-active{border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-selected);color:var(--sd-control-ink)}
