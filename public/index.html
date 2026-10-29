@@ -421,7 +421,7 @@ html.dark .welcome-footnote i{color:#cbe5fa}
  .welcome-skip{margin-top:9px;min-height:36px;padding:8px 13px}
 }
 
-.warranty-help{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:20px;padding:18px;border:1px solid var(--line);border-radius:20px;margin-top:18px}.warranty-help h3{font:400 24px/1.2 SD Serif,Georgia,serif;margin:7px 0}.warranty-help p{font-size:10px;line-height:1.65;color:var(--muted);margin:0}.warranty-form{display:grid;gap:7px;min-width:0}.warranty-form input,.warranty-form textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.warranty-form input::placeholder,.warranty-form textarea::placeholder{color:var(--muted);opacity:.9}@media(max-width:760px){.warranty-help{grid-template-columns:1fr;gap:12px;padding:14px}}.checkout-form{display:grid;gap:8px;margin:12px 0}.checkout-fields{display:grid;gap:7px}.checkout-fields input,.checkout-fields select,.checkout-fields textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.checkout-fields input::placeholder,.checkout-fields textarea::placeholder{color:var(--muted);opacity:.9}.checkout-message{font-size:10px;line-height:1.55;color:var(--muted);margin:0}.checkout-message:empty{display:none}
+.warranty-help{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:20px;padding:18px;border:1px solid var(--line);border-radius:20px;margin-top:18px}.warranty-help h3{font:400 24px/1.2 SD Serif,Georgia,serif;margin:7px 0}.warranty-help p{font-size:10px;line-height:1.65;color:var(--muted);margin:0}.warranty-form{display:grid;gap:7px;min-width:0}.warranty-form input,.warranty-form textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.warranty-form input::placeholder,.warranty-form textarea::placeholder{color:var(--muted);opacity:.9}@media(max-width:760px){.warranty-help{grid-template-columns:1fr;gap:10px;padding:12px}}.checkout-form{display:grid;gap:8px;margin:12px 0}.checkout-fields{display:grid;gap:7px}.checkout-fields input,.checkout-fields select,.checkout-fields textarea{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif;resize:vertical}.checkout-fields input::placeholder,.checkout-fields textarea::placeholder{color:var(--muted);opacity:.9}.checkout-message{font-size:10px;line-height:1.55;color:var(--muted);margin:0}.checkout-message:empty{display:none}
 
 /* Premium Smooth: quick theme changes and accessible left-side mobile drawer */
 html{transition:background-color .25s ease,color .25s ease}
@@ -3668,7 +3668,7 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   .service-text strong{font-size:clamp(9px,2.65vw,10.5px);line-height:1.3;font-weight:700;overflow-wrap:normal}
   #order{padding:16px 0 12px}
   @media(max-width:380px){#order{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}}
-  #order .order-cta--compact #orderDetailsToggle{min-height:46px;font-size:11px;padding:10px 14px;border:1px solid transparent;background:var(--sd-glass-shell);box-shadow:var(--sd-3d-shadow)}
+  #order .order-cta--compact #orderDetailsToggle{min-height:42px;font-size:11px;padding:8px 14px;border:1px solid transparent;background:var(--sd-glass-shell);box-shadow:var(--sd-3d-shadow)}
   .section#featured{padding-top:18px}
   #featured .eyebrow{display:none!important}
   #featured .section-head{display:flex;flex-direction:row;align-items:end;justify-content:space-between;gap:8px;margin:0 0 13px}
@@ -3691,8 +3691,8 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   .mobile-bottom-nav{
     left:8px;right:8px;
     bottom:calc(6px + env(safe-area-inset-bottom));
-    padding:6px 7px calc(6px + env(safe-area-inset-bottom));
-    min-height:58px;
+    padding:5px 7px calc(5px + env(safe-area-inset-bottom));
+    min-height:54px;
     border:1px solid var(--sd-reference-edge);
     border-radius:26px;
     background:rgba(242,249,255,.76);
@@ -3982,6 +3982,9 @@ html.dark .service-strip.glass{
   transition:transform 245ms var(--sd-3d-ease),box-shadow 260ms var(--sd-3d-ease);
 }
 .service-strip .service-text strong{font-size:12px;line-height:1.35;letter-spacing:-.01em}
+/* The clickable cell is structural only; its child is the single glass shell. */
+.service-strip .service.tap-target::before{content:none}
+#warrantyLookupSubmit{min-height:40px;padding:8px 16px}
 .service-strip .service-icon{
   width:29px;height:29px;flex-basis:29px;
   background:var(--sd-3d-surface);border:1px solid transparent;
@@ -4000,14 +4003,14 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 }
 @media(max-width:760px){
   .service-strip{gap:7px;padding:7px}
-  .service-strip .service-copy{min-height:74px;padding:8px 4px;gap:6px;border-radius:14px}
+  .service-strip .service-copy{min-height:70px;padding:7px 4px;gap:5px;border-radius:14px}
   .service-strip .service-icon{width:24px;height:24px;flex-basis:24px}
   .service-strip .service-icon svg{width:13px;height:13px}
   .service-strip .service-text strong{font-size:11px;line-height:1.3;overflow-wrap:normal;word-break:normal}
 }
 @media(max-width:380px){
   .service-strip{gap:5px;padding:6px}
-  .service-strip .service-copy{min-height:72px;padding:7px 3px}
+  .service-strip .service-copy{min-height:68px;padding:6px 3px}
   .service-strip .service-text strong{font-size:10px}
 }
 
@@ -4404,7 +4407,7 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
 :root{
  --sd-3d-ink:#193449;
  /* Shallow contact and ambient; real depth comes from inner curvature. */
- --sd-3d-shadow:0 2px 4px rgba(48,84,117,.10),0 9px 20px rgba(49,86,119,.12);
+ --sd-3d-shadow:0 2px 4px rgba(48,84,117,.12),0 10px 22px rgba(49,86,119,.14);
  --sd-3d-depressed:0 1px 2px rgba(47,85,120,.035),inset 1px 2px 4px rgba(80,114,145,.22),inset -1px -1px 3px rgba(255,255,255,.16);
  --sd-3d-selected:0 1px 2px rgba(51,85,120,.06),inset 1px 2px 4px rgba(83,118,150,.17),inset -1px -1px 3px rgba(255,255,255,.13);
  /* Directional pastel light is painted through the catalog's masked edge only. */
@@ -4434,7 +4437,7 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
 }
 html.dark{
  --sd-3d-ink:#edf7ff;
- --sd-3d-shadow:0 2px 4px rgba(0,5,15,.20),0 9px 20px rgba(0,7,19,.24);
+ --sd-3d-shadow:0 2px 4px rgba(0,5,15,.22),0 10px 22px rgba(0,7,19,.26);
  --sd-3d-depressed:0 1px 2px rgba(0,5,15,.09),inset 1px 2px 5px rgba(0,7,18,.34),inset -1px -1px 3px rgba(105,164,197,.10);
  --sd-3d-selected:0 1px 2px rgba(0,5,16,.12),inset 1px 2px 4px rgba(0,7,17,.27),inset -1px -1px 3px rgba(107,165,197,.11);
  --sd-3d-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(218,149,201,.25),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(112,172,234,.29),transparent 85%),radial-gradient(ellipse 100% 47% at 60% 110%,rgba(106,212,199,.30),transparent 82%),linear-gradient(180deg,rgba(190,231,255,.63),rgba(94,158,208,.31) 46%,rgba(60,122,175,.20) 72%,rgba(167,230,222,.53));
@@ -4523,7 +4526,7 @@ html.dark{
 #order .order-step,#order .order-assurance-footer,
 .sd-track-panel,.sd-track-order,
 .checkout-drawer .sd-checkout-box,.checkout-drawer .sd-checkout-option,
-.checkout-drawer .sd-checkout-copy,.cart-row,
+.checkout-drawer .sd-checkout-copy,
 .account-drawer .favorite-row,.account-drawer .local-order-card,
 #productOverlay .detail-thumb,.text-link,.contact-link{
  border-color:transparent;
@@ -4532,6 +4535,14 @@ html.dark{
 }
 #order .order-step,#order .order-assurance-footer{
  -webkit-backdrop-filter:blur(9px) saturate(111%);backdrop-filter:blur(9px) saturate(111%);
+}
+.cart-drawer .cart-row{
+ background:linear-gradient(145deg,rgba(255,255,255,.34),rgba(231,243,252,.24));
+ box-shadow:0 2px 5px rgba(41,77,105,.06),0 7px 15px rgba(41,77,105,.07),inset 0 1px 0 rgba(255,255,255,.46)
+}
+html.dark .cart-drawer .cart-row{
+ background:linear-gradient(145deg,rgba(63,103,132,.34),rgba(20,53,77,.28));
+ box-shadow:0 2px 5px rgba(0,5,15,.14),0 7px 15px rgba(0,5,15,.12),inset 0 1px 0 rgba(221,241,254,.10)
 }
 .sd-track-panel{
  border:1px solid transparent;

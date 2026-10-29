@@ -39,6 +39,7 @@ test('dark selected controls cannot mask tactile :active material',()=>{
 });
 
 test('one clear face, one masked optical edge and separate depth roles in both themes',()=>{
+ assert.match(html,/--sd-3d-shadow:0 2px 4px rgba\(48,84,117,\.12\),0 10px 22px/);
  assert.match(html,/--sd-3d-face:radial-gradient/);
  assert.match(html,/--sd-3d-surface:var\(--sd-3d-face\);/);
  assert.match(html,/--sd-3d-surface-search:var\(--sd-3d-face\)/);
@@ -92,6 +93,10 @@ test('Final Glass UI 2.0 replaces opaque legacy shells without duplicating mater
  assert.match(html,/\.nav-wrap \.nav\{border:1px solid transparent;background:var\(--sd-glass-shell-strong\)!important/);
  assert.match(html,/#mobileBottomNav\.mobile-bottom-nav\{\s*border:1px solid transparent;background:var\(--sd-glass-shell-strong\)!important/);
  assert.match(html,/\.service-strip \.service-copy\{\s*min-height:78px;[^}]+background:var\(--sd-glass-shell\)/);
+ assert.match(html,/\.service-strip \.service\.tap-target::before\{content:none\}/);
+ assert.match(html,/\.service-strip \.service-copy\{min-height:70px/);
+ assert.match(html,/#order \.order-cta--compact #orderDetailsToggle\{min-height:42px/);
+ assert.match(html,/#warrantyLookupSubmit\{min-height:40px/);
  assert.match(html,/#order \.order-cta--compact #orderDetailsToggle\{min-height:46px[^}]+background:var\(--sd-glass-shell\)/);
  assert.match(html,/\.product-card,\.catalog-card\{\s*border-radius:18px;border-color:transparent;\s*background:var\(--sd-glass-shell\)/);
 });
@@ -129,6 +134,8 @@ test('Hero CTA retains approved blink and gains same prismatic rim without layou
  assert.match(heroCss,/\.sd-code-hero \.sdh-cta:active\{transform:translateY\(1px\);box-shadow:/);
  assert.match(heroCss,/html\.dark \.sd-code-hero \.sdh-cta:active\{box-shadow:/);
  assert.match(heroCss,/\.sd-code-hero \.sdh-cta\{position:relative;isolation:isolate/);
+ assert.match(heroCss,/min-height:50px;[^}]+radial-gradient\(ellipse at 24% 7%/);
+ assert.match(heroCss,/@keyframes sdh-cta-border-pulse\{0%,100%\{opacity:\.28\}50%\{opacity:\.78\}/);
 });
 
 
@@ -139,6 +146,8 @@ test('Cart removal, one-row shoe sizes, and compact catalog cards retain their l
  assert.ok(html.includes('.cart-row{grid-template-columns:68px minmax(0,1fr) max-content'));
  assert.ok(html.includes('.cart-row{grid-template-columns:60px minmax(0,1fr) max-content'));
  assert.ok(html.includes('.cart-row{grid-template-columns:58px minmax(0,1fr) max-content;gap:8px;padding:8px'));
+  assert.ok(html.includes('.cart-drawer .cart-row{\n background:linear-gradient(145deg,rgba(255,255,255,.34)'));
+  assert.ok(html.includes('min-height:54px;'), 'bottom navigation remains slim with 44px controls');
  assert.ok(html.includes('.remove-item{font-size:10px;min-width:42px;min-height:30px;padding:5px 8px}'));
  assert.ok(html.includes("kind==='shoe'?' sd-product-option-choices--shoe'"));
  assert.ok(html.includes('grid-template-columns:repeat(7,minmax(0,1fr))'));
