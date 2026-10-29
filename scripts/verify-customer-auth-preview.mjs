@@ -48,6 +48,11 @@ for(const name of ["ZALO_APP_SECRET","GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET"])
   if(!Object.hasOwn(vars,name))
     throw new Error("Missing "+name+" in the PAGES PREVIEW environment of "+TARGET_PROJECT);
 }
+// Meta credentials are required before enabling Facebook on Preview.
+// Compare only the public App ID; never expose Facebook App Secret in output.
+if(vars.FACEBOOK_APP_ID?.value!=="2013705155992867" ||
+   vars.FACEBOOK_APP_SECRET?.type!=="secret_text")
+  throw new Error("Facebook App ID / encrypted App Secret not configured in the exact Pages PREVIEW environment");
 for(const name of ["ZALO_APP_SECRET","GOOGLE_CLIENT_SECRET"]){
   if(vars[name]?.type!=="secret_text")
     throw new Error(name+" is not stored as an encrypted Secret in Pages PREVIEW");
@@ -58,5 +63,5 @@ console.log("PASS: Preview-only deployment safety gate");
 console.log("Project:",TARGET_PROJECT,"Production branch:",project.production_branch);
 console.log("Environment: preview; DB isolated from storefront Production by UUID");
 console.log("R2 bindings: Preview IMAGES + ORIGINALS confirmed");
-console.log("OAuth variables: names and secret types confirmed (values never printed)");
+console.log("OAuth variables: Google/Zalo/Facebook names and secret types confirmed (values never printed)");
 console.log("Branch alias:",previewHost);
