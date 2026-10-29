@@ -5,12 +5,37 @@ if(root){
   // providers in source for future QA; never expose them in this release.
   const GOOGLE_ONLY_RELEASE = true;
   const q=s=>root.querySelector(s);
-  const authOptions=q("[data-auth-options]"),signed=q("[data-auth-signed]");
+  const authOptions=q("[data-auth-options]"),signed=root.parentElement?.querySelector("[data-auth-signed]");
   const emailForm=q("form"),message=q("[data-auth-message]");
   const guest=root.parentElement?.querySelector(".account-guest");
   const guestWelcome=guest?.querySelector("[data-account-welcome-name]");
-  const $name=q("[data-auth-user]"),$provider=q("[data-auth-provider]");
+  const $provider=guest?.querySelector("[data-auth-provider]");
+  const googleMark=guest?.querySelector("[data-account-google-mark]");
+  const drawer=document.getElementById("accountDrawer"),toast=document.getElementById("sdAccountToast");
+  let toastTimer=0,toastObserver=null;
+  const showToast=(text,kind="success")=>{
+    window.clearTimeout(toastTimer);
+    toastObserver?.disconnect();
+    if(!toast)return;
+    if(!text){toast.hidden=true;toast.textContent="";return;}
+    const display=()=>{
+      toast.textContent=text;toast.dataset.kind=kind;toast.hidden=false;
+      toastTimer=window.setTimeout(()=>{toast.hidden=true;toast.textContent="";},3800);
+    };
+    if(drawer?.classList.contains("open"))display();
+    else if(drawer){
+      toastObserver=new MutationObserver(()=>{
+        if(drawer.classList.contains("open")){toastObserver?.disconnect();display();}
+      });
+      toastObserver.observe(drawer,{attributes:true,attributeFilter:["class"]});
+      window.setTimeout(()=>toastObserver?.disconnect(),10000);
+    }
+  };
   const notify=(text,kind="error")=>{
+    if(kind==="success"){
+      message.textContent="";message.hidden=true;
+      showToast(text,"success");return;
+    }
     message.textContent=text||"";
     message.hidden=!text;
     message.dataset.kind=kind;
@@ -37,7 +62,7 @@ if(root){
     };
     if(authReturn==="email_verified")notify("Email đã xác minh thành công. Tài khoản đã kích hoạt.","success");
     else if(authReturn==="email_verify_failed")notify("Liên kết xác minh sai hoặc hết hạn. Hãy yêu cầu mã mới.","error");
-    else if(authReturn==="success")notify("Đã xác thực. Đang kiểm tra phiên đăng nhập…","success");
+    else if(authReturn==="success")notify("");
     else notify("Đăng nhập chưa thành công. "+(reason==="profile_api_error_-501" ?
       "Zalo báo lỗi -501 khi máy chủ lấy thông tin tài khoản. Có thể liên quan đến IP máy chủ ở ngoài Việt Nam; Shop đang xử lý kết nối. Bạn có thể đăng nhập qua Google." :
       /^profile_api_error_-?\d{1,5}$/.test(reason) ?
@@ -66,19 +91,22 @@ if(root){
       window.setTimeout(()=>observer.disconnect(),10000);
     },{once:true});
   }
+  let pendingAuthResult=authReturn;
   const refresh=async()=>{
+    const oauthResult=pendingAuthResult;
+    pendingAuthResult=null;
     try{
       const res=await fetch("/api/customer/session",{credentials:"same-origin",cache:"no-store"});
-      if(!res.ok){notify("Máy chủ chưa đọc được phiên tài khoản (HTTP "+res.status+").");return;}
+      if(!res.ok){root.hidden=false;if(guest)guest.hidden=true;notify("Máy chủ chưa đọc được phiên tài khoản (HTTP "+res.status+").");return;}
       const data=await res.json(),active=!!data.authenticated;
-      if(authReturn==="success" && !active)
+      if(oauthResult==="success" && !active)
         notify("Nhà cung cấp đã trả về nhưng trình duyệt chưa giữ được phiên. Hãy kiểm tra cookie hoặc lỗi xử lý callback.","error");
-      else if(authReturn==="success" && active)
+      else if(oauthResult==="success" && active)
         notify("Đăng nhập thành công qua "+({zalo:"Zalo",google:"Google",facebook:"Facebook",email:"Email"}[data.user?.provider]||"tài khoản")+". Tài khoản đã được xác nhận.","success");
       // An existing login is independent of a newly failed OAuth attempt.
       // Do not present an old session as a successful login from another provider.
-      else if(authReturn==="failed" && active)
-        notify(message.textContent+" Phiên "+({zalo:"Zalo",google:"Google",email:"Email"}[data.user?.provider]||"trước đó")+" vẫn đang hoạt động.","error");
+      else if(oauthResult==="failed" && active)
+        showToast(message.textContent+" Phiên trước đó vẫn đang hoạt động.","error");
       const google=q("[data-auth-google]"),zalo=q("[data-auth-zalo]"),
         facebook=q("[data-auth-facebook]");
       if(google){
@@ -114,20 +142,25 @@ if(root){
       q("[data-auth-toggle]").hidden=!emailExpanded;
       q("[data-auth-email-note]").hidden=GOOGLE_ONLY_RELEASE||emailEnabled;
       q("[data-auth-unverified-caption]").hidden=!emailExpanded;
-      authOptions.hidden=active;signed.hidden=!active;
-      // The storefront bridge owns cloud preferences; no password/PII leaves the authenticated API.
-      window.sdAccountBridge?.onAuth(active);
+      authOptions.hidden=active;
+      if(signed)signed.hidden=!active;
       const customerName=String(data.user?.name||"").trim().slice(0,100)||"Khách hàng";
       if(guest){
         if(active&&guestWelcome)guestWelcome.textContent="Chào mừng "+customerName;
+        if(active&&$provider){
+          const names={zalo:"Zalo",google:"Google",facebook:"Facebook",email:"Email"};
+          $provider.textContent=names[data.user?.provider]||"Tài khoản";
+        }
+        if(googleMark)googleMark.hidden=!active||data.user?.provider!=="google";
         guest.hidden=!active;
       }
-      if(active){
-        $name.textContent=customerName;
-        const names={zalo:"Zalo",google:"Google",facebook:"Facebook",email:"Email"};
-        $provider.textContent=names[data.user?.provider]||"Tài khoản";
-      }
-    }catch{notify("Chưa kết nối được tài khoản. Bạn vẫn có thể đặt hàng không cần đăng nhập.");}
+      root.hidden=active;
+      // The storefront bridge owns cloud preferences; no password/PII leaves the authenticated API.
+      window.sdAccountBridge?.onAuth(active);
+    }catch{
+      root.hidden=false;if(guest)guest.hidden=true;
+      notify("Chưa kết nối được tài khoản. Bạn vẫn có thể đặt hàng không cần đăng nhập.");
+    }
   };
   q('[data-auth-zalo]').addEventListener("click",()=>{location.assign("/api/customer/auth/zalo/start");});
   q('[data-auth-google]').addEventListener("click",()=>{location.assign("/api/customer/auth/google/start");});
@@ -194,7 +227,7 @@ if(root){
     try{
       const res=await fetch("/api/customer/logout",{method:"POST",credentials:"same-origin"});
       if(!res.ok)throw Error("logout");
-      await refresh();notify("Đã đăng xuất.");
+      await refresh();notify("Đã đăng xuất.","success");
     }catch{notify("Không thể đăng xuất. Vui lòng thử lại.");}
   });
   refresh();

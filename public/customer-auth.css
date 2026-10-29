@@ -96,3 +96,142 @@
 #sdCustomerAuth .sd-auth-flow .sd-auth-text-button{display:block;margin:10px 0 0;text-align:left}
 #sdCustomerAuth [data-auth-forgot]{display:block;margin:8px 0 0}
 #sdCustomerAuth [data-auth-forgot][hidden]{display:none!important}
+
+
+/* Account drawer only: restore distinct Liquid Glass layers without changing
+   the Owner-PASS cards, navigation, hero or global theme tokens. */
+#accountDrawer {
+  --sd-account-surface:linear-gradient(145deg,rgba(252,254,255,.89),rgba(223,238,249,.77));
+  --sd-account-edge:rgba(100,151,189,.48);
+  --sd-account-highlight:rgba(255,255,255,.94);
+  --sd-account-shadow:0 9px 26px rgba(30,77,116,.17),inset 0 1px 0 rgba(255,255,255,.98),inset 0 0 0 1px rgba(255,255,255,.35);
+  --sd-account-button:linear-gradient(145deg,rgba(254,255,255,.97),rgba(227,242,251,.92));
+  --sd-account-button-edge:rgba(75,136,177,.66);
+  background:rgba(231,242,251,.94)!important;
+  border-color:rgba(105,158,194,.46);
+  gap:7px;
+}
+html.dark #accountDrawer {
+  --sd-account-surface:linear-gradient(145deg,rgba(19,54,78,.9),rgba(8,35,57,.84));
+  --sd-account-edge:rgba(146,197,231,.49);
+  --sd-account-highlight:rgba(229,246,255,.19);
+  --sd-account-shadow:0 12px 28px rgba(0,8,22,.38),inset 0 1px 0 rgba(223,244,255,.22),inset 0 0 0 1px rgba(142,193,228,.08);
+  --sd-account-button:linear-gradient(145deg,rgba(26,63,89,.97),rgba(10,38,61,.94));
+  --sd-account-button-edge:rgba(163,207,235,.62);
+  background:rgba(5,24,41,.95)!important;
+  border-color:rgba(145,192,222,.42);
+}
+#accountDrawer [hidden] {display:none!important}
+#accountDrawer .sd-account-visually-hidden {
+  position:absolute;width:1px;height:1px;overflow:hidden;padding:0;margin:-1px;
+  border:0;clip-path:inset(50%);white-space:nowrap;
+}
+#accountDrawer .sd-account-header {
+  flex:0 0 40px;min-height:40px;margin:0;padding:0;border:0;background:none;
+  display:flex;align-items:center;justify-content:flex-end;
+}
+#accountDrawer #accountClose {
+  width:40px;height:40px;min-width:40px;min-height:40px;border-radius:50%;
+  border:1px solid var(--sd-account-edge);
+  background:var(--sd-account-button);box-shadow:var(--sd-account-shadow);
+}
+#accountDrawer .account-panel-content{gap:9px;min-width:0}
+#accountDrawer #accountMenuView{min-width:0}
+#accountDrawer #sdCustomerAuth {
+  margin:0 0 8px;padding:17px 16px;border-radius:21px;
+  background:var(--sd-account-surface);border:1px solid var(--sd-account-edge);
+  box-shadow:var(--sd-account-shadow);
+  backdrop-filter:blur(16px) saturate(145%);
+  -webkit-backdrop-filter:blur(16px) saturate(145%);
+}
+#accountDrawer .account-guest,
+#accountDrawer .account-action {
+  background:var(--sd-account-surface);
+  border:1px solid var(--sd-account-edge);
+  box-shadow:var(--sd-account-shadow);
+  backdrop-filter:blur(15px) saturate(145%);
+  -webkit-backdrop-filter:blur(15px) saturate(145%);
+}
+#accountDrawer .account-guest {
+  display:flex;align-items:flex-start;gap:12px;padding:15px;border-radius:20px;
+  margin:0 0 8px;
+}
+#accountDrawer .account-avatar {
+  flex:0 0 46px;width:46px;height:46px;
+  background:var(--sd-account-button);
+  border:1px solid var(--sd-account-button-edge);box-shadow:inset 0 1px 0 var(--sd-account-highlight);
+}
+#accountDrawer .sd-account-identity {flex:1;min-width:0}
+#accountDrawer .sd-account-identity strong {font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+#accountDrawer .sd-account-identity-footer {
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  gap:8px;margin-top:8px;
+}
+#accountDrawer .sd-account-provider {
+  display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;margin:0;
+  font-size:11px;line-height:1.4;color:var(--muted);
+}
+#accountDrawer .sd-account-google-mark {
+  display:inline-grid;place-items:center;flex:0 0 19px;width:19px;height:19px;
+  background:#fff;border:1px solid rgba(102,142,176,.26);border-radius:50%;
+  font-weight:800;font-size:13px;line-height:1;
+  color:#4285f4;
+}
+#accountDrawer .sd-account-logout {
+  min-height:34px;padding:6px 11px;border-radius:12px;
+  border:1px solid var(--sd-account-button-edge);
+  background:var(--sd-account-button);color:var(--ink);
+  box-shadow:inset 0 1px 0 var(--sd-account-highlight),0 3px 10px rgba(21,66,102,.11);
+  font:600 12px/1.3 inherit;cursor:pointer;
+}
+#accountDrawer .sd-account-logout:focus-visible,
+#accountDrawer #accountClose:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+#accountDrawer .sd-account-toast {
+  position:absolute;top:62px;left:18px;right:18px;z-index:5;
+  width:auto;margin:0;padding:12px 14px;border-radius:14px;
+  border:1px solid rgba(65,136,100,.55);
+  background:rgba(228,249,237,.96);color:#176445;
+  box-shadow:0 9px 25px rgba(0,33,35,.19);font-weight:650;font-size:12px;
+  line-height:1.5;pointer-events:none;
+}
+#accountDrawer .sd-account-toast[data-kind="error"]{
+  border-color:rgba(161,69,48,.55);background:rgba(255,237,231,.98);color:#8b3627;
+}
+html.dark #accountDrawer .sd-account-toast{
+  background:rgba(14,61,47,.98);color:#c2f3d8;
+}
+html.dark #accountDrawer .sd-account-toast[data-kind="error"]{
+  background:rgba(81,34,35,.98);color:#ffdfd9;
+}
+#accountDrawer .account-action {
+  border-radius:18px;min-height:62px;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+#accountDrawer .account-action:hover{
+  border-color:var(--sd-account-button-edge);
+  box-shadow:0 12px 30px rgba(22,77,117,.2),inset 0 1px 0 var(--sd-account-highlight);
+}
+#accountDrawer .account-action:active{transform:scale(.992)}
+#accountDrawer .account-action>span.account-action-icon{
+  border:1px solid var(--sd-account-edge);border-radius:11px;
+  background:var(--sd-account-button);
+  box-shadow:inset 0 1px 0 var(--sd-account-highlight),0 3px 8px rgba(28,76,113,.1);
+}
+#sdCustomerAuth .sd-auth-provider.sd-auth-google {
+  min-height:51px;border:1px solid var(--sd-account-button-edge);
+  background:var(--sd-account-button);color:var(--ink);
+  box-shadow:0 6px 18px rgba(30,78,116,.16),inset 0 1px 0 var(--sd-account-highlight),inset 0 0 0 1px rgba(255,255,255,.24);
+}
+#sdCustomerAuth .sd-auth-provider.sd-auth-google:not(:disabled):hover {
+  border-color:var(--ink);
+  box-shadow:0 9px 21px rgba(27,77,117,.23),inset 0 1px 0 var(--sd-account-highlight);
+}
+@media(max-width:760px){
+  #accountDrawer{padding:13px 14px 16px;gap:5px}
+  #accountDrawer .sd-account-header{min-height:38px;flex-basis:38px}
+  #accountDrawer #sdCustomerAuth{padding:16px 14px}
+  #accountDrawer .sd-account-toast{top:55px;left:14px;right:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  #accountDrawer .account-action{transition:none}
+}
