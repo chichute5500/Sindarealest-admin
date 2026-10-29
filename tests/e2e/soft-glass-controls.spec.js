@@ -52,7 +52,8 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
   }
   // Reference comparison: capture the original ALL-categories layout before
   // selecting another category, which intentionally switches to a deep route.
-  await page.locator('#products').scrollIntoViewIfNeeded();
+  await search.scrollIntoViewIfNeeded();
+  await page.evaluate(()=>window.scrollBy(0,-86));
   await page.evaluate(async()=>{
    const imgs=[...document.querySelectorAll('#catalogGrid img')].slice(0,4);
    await Promise.race([Promise.all(imgs.map(img=>img.decode().catch(()=>{}))),
