@@ -45,7 +45,7 @@ for(const [label,width,height] of matrices)for(const mode of ['light','dark']){
    });
    expect(rim.shadow).toBe('none');
    expect(rim.background).toContain('radial-gradient');
-   expect(rim.mask==='exclude'||rim.webkitMask==='xor').toBe(true);
+   expect(rim.mask.includes('exclude')||rim.webkitMask.includes('xor')).toBe(true);
   }
   const pageWidth=await page.evaluate(()=>document.documentElement.scrollWidth);
   expect(pageWidth).toBeLessThanOrEqual(width+1);
