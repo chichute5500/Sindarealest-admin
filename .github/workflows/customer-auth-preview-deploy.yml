@@ -15,6 +15,7 @@ on:
       - '.github/workflows/customer-auth-preview-deploy.yml'
       - 'tests/customer-auth-*.test.mjs'
       - 'tests/customer-email-auth.test.mjs'
+      - 'tests/customer-facebook-auth.test.mjs'
       - 'tests/customer-zalo-region.test.mjs'
       - 'relay/**'
       - 'package.json'
