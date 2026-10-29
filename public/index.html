@@ -2951,7 +2951,9 @@ img { -webkit-user-drag:none; user-select:none; }
 /* Seven supplied brand commitments use the same theme-aware Liquid Glass material. */
 .service-strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch;gap:7px;padding:8px;border-radius:20px}
 .service-strip .service{display:flex;align-items:stretch;justify-content:stretch;box-sizing:border-box;min-width:0;min-height:0;padding:0;aspect-ratio:auto;overflow:visible;border:0;border-radius:0;background:transparent;color:var(--ink);text-align:center;text-decoration:none;transition:transform .3s ease}
-.service-strip .service-copy{position:relative;isolation:isolate;display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;width:100%;min-width:0;min-height:68px;padding:7px 5px;overflow:hidden;border:1px solid var(--benefit-tile-border);border-radius:15px;background:var(--benefit-tile-glass);background-clip:padding-box;color:var(--ink);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);box-shadow:var(--benefit-tile-shadow);transition:background .45s ease,border-color .3s ease,box-shadow .3s ease}
+.service-strip .service-copy{position:relative;isolation:isolate;display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;width:100%;min-width:0;min-height:68px;padding:7px 5px;overflow:hidden;border-radius:15px;color:var(--ink)}
+/* The material is defined only in sd-reference-parity's six-tile section,
+   using sd-unified-icon-system-final optical tokens. */
 .service-strip .service-icon{display:grid;flex:0 0 28px;place-items:center;width:28px;height:28px;border:1px solid rgba(122,168,198,.42);border-radius:50%;background:rgba(255,255,255,.58);box-shadow:0 2px 7px rgba(37,72,98,.10),inset 0 1px 0 rgba(255,255,255,.84);color:var(--gold)}
 .service-strip .service-icon svg{display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 html.dark .service-strip .service-icon{border-color:rgba(204,231,250,.38);background:rgba(130,179,215,.16);box-shadow:0 2px 7px rgba(0,6,16,.22),inset 0 1px 0 rgba(232,246,255,.25)}
@@ -3994,7 +3996,7 @@ html.dark .service-strip.glass{
 }
 .service-strip .service-icon svg{width:16px;height:16px}
 html.dark .service-strip .service-copy{background:var(--sd-glass-shell);box-shadow:var(--sd-3d-shadow)}
-html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-color:transparent}
+html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-color:transparent;box-shadow:var(--sd-3d-shadow)}
 @media(hover:hover) and (pointer:fine){
  .service-strip .service:hover .service-copy{box-shadow:var(--sd-3d-shadow);filter:brightness(1.025)}
 }
@@ -4464,6 +4466,13 @@ html.dark{
  --sd-control-shadow:var(--sd-3d-shadow);
  --sd-control-down:var(--sd-3d-depressed);
 }
+/* Disable obsolete tap pseudo glass on controls now driven by real
+   optical shadow states. Untouched Hero/Welcome retain their approved effects. */
+:is(.service-strip .service,.navlink,.text-link,.contact-link,.pill-btn,
+.checkout-backlink,.qty-controls button,.account-action,
+.checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy).tap-target::before{
+ content:none;
+}
 /* Final Glass UI 2.0 — existing component geometry is unchanged.
    All glass families reference the SAME shell/face/shadow tokens above.
    No extra per-component gradient stacks and no additional nested blur layers. */
@@ -4773,8 +4782,7 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
  display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:0;
  min-height:50px;padding:11px 12px;border-radius:999px;
  border:1.5px solid transparent;
- background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(255,255,255,.21),transparent 70%) padding-box,
-  linear-gradient(145deg,rgba(221,236,248,.73),rgba(var(--sd-action-rgb),.19)) padding-box,
+ background:linear-gradient(145deg,rgba(232,247,255,.48),rgba(var(--sd-action-rgb),.21)) padding-box,
   var(--sd-3d-rim) border-box;
  -webkit-backdrop-filter:blur(6px) saturate(112%);backdrop-filter:blur(6px) saturate(112%);
  box-shadow:var(--sd-3d-shadow);
@@ -4798,8 +4806,7 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
 }
 #productOverlay .detail-actions .detail-purchase-button span{min-width:0}
 html.dark #productOverlay .detail-actions .detail-purchase-button{
- background:radial-gradient(ellipse 125% 95% at 10% 0%,rgba(183,216,243,.12),transparent 68%) padding-box,
- linear-gradient(145deg,rgba(35,63,87,.93),rgba(var(--sd-action-rgb),.24)) padding-box,
+ background:linear-gradient(145deg,rgba(35,74,102,.57),rgba(var(--sd-action-rgb),.21)) padding-box,
  var(--sd-3d-rim) border-box;
  border-color:transparent;box-shadow:var(--sd-3d-shadow);color:var(--ink);
 }
