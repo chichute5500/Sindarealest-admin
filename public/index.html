@@ -1890,21 +1890,24 @@ function renderFilters(){
     : displayProductName(labels[selectedCategory]||categoryLabels[selectedCategory]||selectedCategory);
   const strip=$('#categoryFilters');
   const signature=visible.map(c=>[c,labels[c]||categoryLabels[c]||c,counts[c]||0].join(':')).join('|');
-  // Keep the chip DOM stable while only the selected state changes. This lets
-  // the active glass surface transition between real elements instead of
-  // snapping after an innerHTML replacement.
-  if(strip.dataset.filterSignature!==signature){
-    strip.innerHTML=visible.map(c=>'<button type="button" class="filter-pill tap-target" data-category="'+escapeHtml(c)+'" aria-pressed="false">'+escapeHtml(c==='all'?categoryLabels.all:displayProductName(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>').join('');
-    strip.dataset.filterSignature=signature;
+  // Keep the chip DOM stable in the browser while preserving the simple
+  // innerHTML contract used by the source-level category test harness.
+  const canUpdateInPlace=!!strip&&!!strip.dataset&&typeof strip.querySelectorAll==='function';
+  if(!canUpdateInPlace||strip.dataset.filterSignature!==signature){
+    strip.innerHTML=visible.map(c=>{
+      const active=selectedCategory===c;
+      return '<button type="button" class="filter-pill tap-target'+(active?' active':'')+'" data-category="'+escapeHtml(c)+'" aria-pressed="'+active+'">'+escapeHtml(c==='all'?categoryLabels.all:displayProductName(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</button>';
+    }).join('');
+    if(canUpdateInPlace)strip.dataset.filterSignature=signature;
   }
-  strip.querySelectorAll('.filter-pill').forEach(button=>{
+  if(canUpdateInPlace)strip.querySelectorAll('.filter-pill').forEach(button=>{
     const active=button.dataset.category===selectedCategory;
     button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',String(active));
   });
   // Center the chosen chip in its own horizontal row without jumping the page.
   if(typeof document!=='undefined'&&document.documentElement?.classList.contains('sd-catalog-route')){
-    const chip=strip.querySelector('.filter-pill.active');
+    const chip=canUpdateInPlace?strip.querySelector('.filter-pill.active'):null;
     if(strip&&chip){
       const area=strip.getBoundingClientRect(),item=chip.getBoundingClientRect();
       const delta=item.left-area.left-(area.width-item.width)/2;
