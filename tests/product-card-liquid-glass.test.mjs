@@ -143,9 +143,9 @@ assert.ok(html.includes(".product-info{padding:9px 9px 36px}") && html.includes(
 
 assert.ok(html.includes('<div class="product-meta-row"><span class="product-category">') && html.includes("${fulfillmentBadge(p)}"),
   "Catalog product category and fulfillment status should share one compact metadata row on mobile.");
-assert.ok(html.includes('<div class="product-open" role="button" tabindex="0" data-open-product=')
+assert.ok(html.includes('<a class="product-open" href="${href}" data-open-product=')
   && html.includes("if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}"),
-  "Product cards must use valid flow-content containers and preserve Enter/Space activation for keyboard users.");
+  "Product cards must use crawlable semantic anchors and preserve Enter/Space keyboard activation.");
 assert.ok(html.includes(".product-open:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}"),
   "Keyboard-focusable product cards must retain a visible focus indicator after replacing the native button wrapper.");
 
