@@ -1825,7 +1825,7 @@ function navigateCatalog(category='all'){
  const wasCatalogRoute=/^\/sanpham(?:\/|$)/i.test(location.pathname)&&!location.hash;
  if(location.pathname!==path||location.hash)history.pushState({sdCatalog:true},'',path);
  setCatalogLandingMode(true);
- selectedCategory=key;page=1;renderFilters();renderCatalogWithTransition(()=>renderCatalog());
+ selectedCategory=key;page=1;renderFilters();if(typeof renderCatalogWithTransition==='function')renderCatalogWithTransition(()=>renderCatalog());else renderCatalog();
  setActiveNav('products');
  // Keep the user's reading position when switching chips inside the catalog.
  // Only an entry from another section needs to move to the catalog top.
