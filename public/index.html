@@ -1912,7 +1912,7 @@ function renderFilters(){
       const area=strip.getBoundingClientRect(),item=chip.getBoundingClientRect();
       const delta=item.left-area.left-(area.width-item.width)/2;
       const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-      strip.scrollTo({left:Math.max(0,strip.scrollLeft+delta),behavior:reduced?'auto':'smooth'});
+      if(reduced)strip.scrollLeft+=item.left-area.left-(area.width-item.width)/2;else strip.scrollTo({left:Math.max(0,strip.scrollLeft+delta),behavior:'smooth'});
     }
   }
 }
