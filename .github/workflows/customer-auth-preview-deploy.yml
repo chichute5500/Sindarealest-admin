@@ -8,6 +8,7 @@ on:
       - 'public/**'
       - 'migrations/**'
       - 'scripts/verify-customer-auth-preview.mjs'
+      - 'scripts/migrate-facebook-preview.mjs'
       - 'scripts/check-customer-auth-preview-live.mjs'
       - 'scripts/check-customer-auth-preview-callback.mjs'
       - '.github/workflows/customer-auth-preview-deploy.yml'
@@ -62,6 +63,9 @@ jobs:
       - name: Read-only Cloudflare Preview binding and Production-isolation guard
         if: steps.creds.outputs.ready == 'true'
         run: node scripts/verify-customer-auth-preview.mjs
+      - name: Apply Facebook schema migration ONLY to independently verified PREVIEW D1
+        if: steps.creds.outputs.ready == 'true'
+        run: node scripts/migrate-facebook-preview.mjs
       - name: Deploy only the feature branch to the Preview environment
         if: steps.creds.outputs.ready == 'true'
         run: >
