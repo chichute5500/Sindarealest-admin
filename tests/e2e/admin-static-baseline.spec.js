@@ -846,7 +846,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('dashboard', 'dashboard', null, true);
     // Capture the dashboard at the reference phone's usable app height without
     // multiplying that slower viewport across every route in the QA matrix.
-    const referenceDashboardVariant = { viewport: { width: 390, height: 650 }, theme: 'light' };
+    const referenceDashboardVariant = { viewport: { width: 430, height: 720 }, theme: 'light' };
     await page.setViewportSize(referenceDashboardVariant.viewport);
     await chooseTheme(referenceDashboardVariant.theme);
     await page.evaluate(() => window.scrollTo(0, 0));
