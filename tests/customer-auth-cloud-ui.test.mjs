@@ -4,6 +4,15 @@ import {Script} from "node:vm";
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const auth=readFileSync(new URL("../public/customer-auth-ui.js",import.meta.url),"utf8");
 new Script(auth,{filename:"customer-auth-ui.js"});
+const emailOtp=readFileSync(new URL("../public/customer-email-otp-ui.js",import.meta.url),"utf8");
+new Script(emailOtp,{filename:"customer-email-otp-ui.js"});
+for(const id of ["sdAuthVerifyForm","sdAuthForgotForm","sdAuthResetForm"])
+ assert.ok(html.includes('id="'+id+'"'),"OTP/Reset form missing: "+id);
+assert.ok(emailOtp.includes('mode:"reset-confirm"')&&emailOtp.includes('mode:"verify"'),
+ "Email verification and reset must be accessible in account drawer");
+assert.ok(html.includes('src="/customer-email-otp-ui.js?v=email-mailjet-20261029"'),
+ "OTP UI must be included after existing Google auth");
+
 let parsed=0;
 for(const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)){
  if(!match[2].trim()||/type\s*=\s*["'](?:module|application\/ld\+json)/i.test(match[1]))continue;
