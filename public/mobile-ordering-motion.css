@@ -18,7 +18,6 @@
     padding:15px 13px 10px;
     transform:translate3d(0,calc(100% + 108px),0);
     transition:transform 360ms cubic-bezier(.22,.75,.23,1),visibility 0s linear 360ms;
-    contain:layout;
   }
   #checkoutDrawer.checkout-drawer.open {
     transform:translate3d(0,var(--sd-checkout-pull,0px),0);
