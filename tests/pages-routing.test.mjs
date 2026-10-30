@@ -73,10 +73,11 @@ try {
   assert.ok(!realApiText.includes("API_ROUTE_NOT_FOUND"), "API catch-all must not shadow /api/products");
 
   const fallbackPage = await fetchWithTimeout("/a-nonexistent-static-page");
-  assert.equal(fallbackPage.status, 200, "Non-API paths must retain the configured static fallback");
-  assert.match(await fallbackPage.text(), /SinDarealest/i);
+  assert.equal(fallbackPage.status, 404, "Unknown document paths must return actual HTTP 404");
+  assert.equal(fallbackPage.headers.get("x-robots-tag"), "noindex, nofollow");
+  assert.match(await fallbackPage.text(), /Không tìm thấy trang/i);
 
-  console.log("PASS: local Pages routing — homepage, admin, unknown API JSON 404, real API route precedence, and static fallback.");
+  console.log("PASS: local Pages routing — homepage, admin, unknown API JSON 404, real API route precedence, and genuine 404 document status.");
 } catch (error) {
   console.error("FAIL: local Pages routing smoke test.");
   console.error(error?.stack || error);
