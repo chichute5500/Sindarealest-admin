@@ -128,6 +128,27 @@ const baselineSql = readFileSync(
 );
 const baselineRows = db.prepare(baselineSql).all();
 const optimizedRows = db.prepare(executedSql).all();
+// Verify the actual Admin query plan, not merely an artificial tiny SELECT.
+// The expensive per-order audit predicates must use the composite index.
+const actualAdminPlan = plan(executedSql);
+assert.match(
+  actualAdminPlan, /idx_audit_entity_action_created/,
+  "The exact Admin GET query must use the composite order-audit index"
+);
+// Re-applying the additive migration must be idempotent and preserve all
+// financial/customer/audit records (including history and order timestamps).
+const beforeMigrationReplay = db.prepare(
+  "SELECT (SELECT count(*) FROM orders) AS orders, (SELECT count(*) FROM customers) AS customers, (SELECT count(*) FROM audit_logs) AS audit_logs, (SELECT count(*) FROM order_payment_transactions) AS payments, (SELECT count(*) FROM order_payment_requests) AS requests"
+).get();
+db.exec(readFileSync(new URL("../migrations/0015_d1_rows_read_indexes.sql", import.meta.url), "utf8"));
+const afterMigrationReplay = db.prepare(
+  "SELECT (SELECT count(*) FROM orders) AS orders, (SELECT count(*) FROM customers) AS customers, (SELECT count(*) FROM audit_logs) AS audit_logs, (SELECT count(*) FROM order_payment_transactions) AS payments, (SELECT count(*) FROM order_payment_requests) AS requests"
+).get();
+assert.deepEqual(afterMigrationReplay,beforeMigrationReplay,"Idempotent index migration must not delete or change business record counts");
+assert.deepEqual(
+  db.prepare(executedSql).all(),optimizedRows,
+  "Re-applying the index migration must not change any Admin results"
+);
 assert.deepEqual(
   optimizedRows,baselineRows,
   "All fields, raw amounts, real status dates, joins, row order and nulls must equal original main SQL"
