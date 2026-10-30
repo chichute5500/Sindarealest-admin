@@ -1,0 +1,80 @@
+name: SinDarealest — unified Storefront/Admin + mobile checkout Preview
+
+on:
+  push:
+    branches:
+      - integration/storefront-ux-single-preview-2026-10-31
+    paths:
+      - 'public/**'
+      - 'functions/**'
+      - 'tests/**'
+      - 'package.json'
+      - '.github/workflows/combined-ux-preview-20261031.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sd-combined-ux-preview-20261031
+  cancel-in-progress: false
+
+jobs:
+  test-and-deploy:
+    name: Validate all approved contracts; deploy isolated Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_PREVIEW_PROJECT: sindarealest-admin-preview
+      CF_PREVIEW_BRANCH: combined-ux-1031
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify exact isolated branch / commit / destination
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/integration/storefront-ux-single-preview-2026-10-31'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$CF_PREVIEW_PROJECT" = 'sindarealest-admin-preview'
+          test "$CF_PREVIEW_BRANCH" = 'combined-ux-1031'
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+      - run: npm ci --no-fund
+
+      - name: Check source, migrations, CSS and asset safety
+        run: npm run check
+
+      - name: Run combined full regression suite (including SEO + order sheet)
+        run: npm test
+
+      - name: Read-only verify Preview isolation from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl --fail --silent --show-error --max-time 30 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/sd-combined-preview.json"
+          curl --fail --silent --show-error --max-time 30 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest2" > "$RUNNER_TEMP/sd-combined-production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/sd-combined-preview.json" "$RUNNER_TEMP/sd-combined-production.json"
+
+      - name: Deploy tested commit to isolated Cloudflare Pages Preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = 'refs/heads/integration/storefront-ux-single-preview-2026-10-31'
+          npx wrangler pages deploy public --project-name "$CF_PREVIEW_PROJECT" --branch "$CF_PREVIEW_BRANCH" --commit-hash "$GITHUB_SHA" --commit-message "Combined UX and checkout Preview $GITHUB_SHA"
+
+      - name: Print single Owner review link
+        run: |
+          echo "Preview: https://combined-ux-1031.sindarealest-admin-preview.pages.dev/"
+          echo "Tested and deployed SHA: $GITHUB_SHA"
+          echo "Production untouched; no remote D1 writes."
