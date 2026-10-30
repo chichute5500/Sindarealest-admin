@@ -29,7 +29,9 @@ assert.match(html,/prefers-reduced-motion:reduce/);
 assert.match(admin,/prefers-reduced-motion:reduce/);
 for(const file of [html,admin])assert.match(file,/cubic-bezier\(\.22,1,\.36,1\)/);
 for(const file of [html,admin]){
- const motion=file.match(/<style id="sd-(?:admin-)?ux-audit-motion-20261031">([\s\S]*?)<\/style>/);
+ const motion=file===admin
+  ? file.match(/\/\* sd-admin-ux-audit-motion-20261031 \*\/([\s\S]*?)<\/style>/)
+  : file.match(/<style id="sd-ux-audit-motion-20261031">([\s\S]*?)<\/style>/);
  assert.ok(motion,'Motion rules must be separately scoped');
  assert.doesNotMatch(motion[1],/\b(?:transition|animation)[^;\n]*(?:height|width|top|left)\s*:/i);
 }
