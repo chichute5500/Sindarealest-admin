@@ -181,7 +181,7 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
 test('captures read-only Admin module UI states using explicit local fixtures', async ({ page }) => {
   // This single fixture covers every Admin module plus responsive screenshots.
   // Do not skip checks under slow CI CPU; retain all visual and functional assertions.
-  test.setTimeout(900_000);
+  test.setTimeout(360_000);
   mkdirSync(screenshotDir, { recursive: true });
 
   const fixtureProduct = {
@@ -1113,7 +1113,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#categoryBox')).toHaveValue('all');
     await expect(page.locator('#fulfillmentBox')).toHaveValue('all');
     await expect(productNames).toHaveCount(3);
-    await page.locator('#categoryBox').selectOption('wallets');
+    // The Admin normalizes the fixture alias "wallets" to canonical value "vi-nam".
+    await expect(page.locator('#categoryBox option[value="vi-nam"]')).toHaveCount(1);
+    await page.locator('#categoryBox').selectOption('vi-nam');
     await expect(productNames).toHaveCount(1);
     await expect(productNames).toHaveText('Sản phẩm thử nghiệm giao diện');
     await expect(page.locator('#productResultSummary')).toContainText('Có 1 sản phẩm phù hợp');
