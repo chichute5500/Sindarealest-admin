@@ -307,6 +307,18 @@ test.describe('SinDarealest2 Admin Preview', () => {
     try {
       await expect(page.locator('#appView')).toBeVisible({ timeout: 20_000 });
       await expect(page.locator('#logout')).toBeVisible();
+      await expect.poll(async () => Number((await page.locator('#main .stat .value').first().textContent())?.trim()), {
+        timeout: 15_000
+      }).toBeGreaterThan(0);
+      await page.setViewportSize({ width: 430, height: 720 });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect(page.locator('.mobiletabs')).toBeVisible();
+      mkdirSync(evidenceDir, { recursive: true });
+      await page.screenshot({
+        path: join(evidenceDir, 'dashboard-live-430x720.png'),
+        fullPage: false,
+        animations: 'disabled'
+      });
     } catch (error) {
       const loginError = redact(await page.locator('#loginError').textContent().catch(() => ''));
       const safeDetails = {

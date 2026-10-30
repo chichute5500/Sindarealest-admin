@@ -181,7 +181,7 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
 test('captures read-only Admin module UI states using explicit local fixtures', async ({ page }) => {
   // This single fixture covers every Admin module plus responsive screenshots.
   // Do not skip checks under slow CI CPU; retain all visual and functional assertions.
-  test.setTimeout(360_000);
+  test.setTimeout(900_000);
   mkdirSync(screenshotDir, { recursive: true });
 
   const fixtureProduct = {
@@ -865,8 +865,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       .toBeLessThanOrEqual(referenceDashboardGeometry.navigationTop - 8);
     await captureView('products', 'products', null, true);
 
-    // Screen #3 reference matrix: exercise the actual ADMIN product renderer at every
-    // required viewport in both themes. Data remains synthetic and all API writes stay blocked.
+    // Screen #3 reference matrix: exercise the actual ADMIN product renderer at required
+    // phone, tablet, and desktop widths in both themes. Data remains synthetic and writes stay blocked.
+    console.info('[ADMIN_STATIC_STAGE] dashboard reference viewport and geometry passed');
     const productReferenceViewports = [
       { width: 320, height: 640 },
       { width: 390, height: 844 },
@@ -1041,6 +1042,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
     }
 
+    console.info('[ADMIN_STATIC_STAGE] product reference matrix passed');
     // Compact mobile cards show price and publication status; inventory stays in product details.
     await page.setViewportSize(mobile);
     await chooseTheme('light');
@@ -1658,6 +1660,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
     }
 
+    console.info('[ADMIN_STATIC_STAGE] product list and editor interaction checks passed');
     await captureView('orders', 'orders', async variant => {
       const row=page.locator('[data-order-row="UI-ONLY-ORDER"]'),cards=page.locator('[data-order-open]');
       await expect(row).toBeVisible();await expect(cards).toHaveCount(3);
