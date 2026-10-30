@@ -124,6 +124,32 @@ export async function onRequest(context) {
   const legacyMatch = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   const modernMatch = url.pathname.match(/^\/sanpham\/([a-z0-9][a-z0-9-]{0,99})\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   if (!legacyMatch && !modernMatch) {
+    // Unknown document routes must return a real 404, not the SPA catch-all's HTTP 200.
+    // Keep current category/product routes and all asset/API/Admin handlers intact.
+    const path = url.pathname;
+    const knownDocument = path === "/" || path === "/index.html" || path === "/404.html";
+    const separateSurface = /^\/(?:admin|api|media|payment-qr)(?:\/|$)/i.test(path);
+    const extensionOrSpecial = /\.[a-z0-9]{1,12}$/i.test(path) || path.startsWith("/.well-known/");
+    const isUnknownDocument = (context.request.method === "GET" || context.request.method === "HEAD")
+      && !knownDocument && !separateSurface && !extensionOrSpecial;
+    if (isUnknownDocument) {
+      // The independent asset must exist. Fail closed with a true 404 if routing
+      // or redirect rules accidentally serve index.html instead.
+      const fallback = await context.next(new Request(new URL("/404.html", url.origin), {
+        method: "GET", headers: context.request.headers
+      }));
+      const body = await fallback.text();
+      const valid404 = fallback.ok && body.includes('id="sdNotFoundPage"');
+      const headers = new Headers({
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=60",
+        "X-Robots-Tag": "noindex, nofollow"
+      });
+      hardenStorefrontHtmlHeaders(headers);
+      return new Response(context.request.method === "HEAD" ? null :
+        valid404 ? body : "<!doctype html><html lang=vi><head><meta name=robots content=noindex><title>404 | SinDarealest</title></head><body><h1>Không tìm thấy trang</h1><p><a href=/>Về trang chủ</a></p></body></html>",
+        { status: 404, headers });
+    }
     const response = await context.next();
     if (!response.ok || !["/", "/index.html"].includes(url.pathname) || !(response.headers.get("content-type") || "").includes("text/html")) return response;
     let html = await response.text();

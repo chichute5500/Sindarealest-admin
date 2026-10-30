@@ -86,8 +86,8 @@ assert.doesNotMatch(styles, /,\s*\}/,
   'Stylesheets must not retain a dangling-comma CSS syntax issue.');
 
 assert.match(section, /class="order-cta order-cta--compact"/, 'Homepage order assurance must use one compact pill CTA rather than a tall split card.');
-assert.match(section, /class="order-cta-label" id="order-title">Đặt hàng an tâm<\/span>/, 'The compact order CTA must carry the accessible section label.');
-assert.match(section, /id="orderDetailsToggle"[^>]*aria-expanded="false"[^>]*aria-controls="orderDetailsPanel"/, 'The compact CTA must keep an accessible expanded/collapsed state.');
+assert.match(section, /class="order-cta-label" id="order-title">Thu gọn quy trình<\/span>/, 'The CTA must clearly indicate the default expanded process.');
+assert.match(section, /id="orderDetailsToggle"[^>]*aria-expanded="true"[^>]*aria-controls="orderDetailsPanel"/, 'The visible-by-default CTA must report its correct expanded state.');
 assert.match(html, /#order \.order-cta--compact #orderDetailsToggle\{[^}]*border-radius:999px/, 'The order CTA must use a pill shape.');
 assert.match(html, /function dismissToast\(\)/, 'Drawer transitions must be able to clear the global toast.');
 

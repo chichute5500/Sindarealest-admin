@@ -37,8 +37,8 @@ assert.match(performance,/#welcomeSplash\.is-leaving \.welcome-content\{[\s\S]*?
 assert.match(performance,/#welcomeSplash\.is-leaving\{\n  transition:opacity \.20s ease \.10s,visibility 0s linear \.30s!important/);
 
 // Cold-cache first-paint guard: wait for the correct Noto Serif/Sans glyphs.
-assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular\.ttf"/);
-assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.ttf"/);
+assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2"/);
+assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.woff2"/);
 assert.match(performance,/html\.js-enabled:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title/);
 assert.match(html,/document\.fonts\.load\('400 30px "SD Serif"'/);
 assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="vi" class="sd-experience-storefront">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -29,9 +29,10 @@
 <meta name="twitter:description" content="Giày, túi, ví và phụ kiện da cá sấu thật. Khám phá phong cách riêng cùng SinDarealest.">
 <meta name="twitter:image" content="https://sindarealest2.pages.dev/og-sindarealest-crisp-20261028.jpg">
 <link rel="canonical" href="/">
-<link rel="preload" href="/fonts/NotoSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="/fonts/NotoSerif-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/NotoSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
+<link rel="stylesheet" href="/mobile-ordering-motion.css?v=20261031-combined">
 <link rel="stylesheet" href="/customer-auth.css?v=account-liquid-20261029">
 <script type="module" src="/customer-auth-ui.js?v=account-liquid-20261029"></script>
 <script type="module" src="/customer-email-otp-ui.js?v=email-recovery-20261029"></script>
@@ -69,10 +70,10 @@
 <style>
 /* Avoid Android's blue tap flash without disabling text selection or keyboard focus. */
 button,a,[role="button"],img,svg{ -webkit-tap-highlight-color: transparent; }
-@font-face{font-family:SD Sans;src:url('fonts/NotoSans-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
-@font-face{font-family:SD Sans;src:url('fonts/NotoSans-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
-@font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
-@font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:SD Sans;src:url('fonts/NotoSans-Regular.woff2') format('woff2'),url('fonts/NotoSans-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:SD Sans;src:url('fonts/NotoSans-Bold.woff2') format('woff2'),url('fonts/NotoSans-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Regular.woff2') format('woff2'),url('fonts/NotoSerif-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:SD Serif;src:url('fonts/NotoSerif-Bold.woff2') format('woff2'),url('fonts/NotoSerif-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
 :root{color-scheme:only light;--page:#eaf3fb;--ink:#142a3c;--muted:#5b7488;--gold:#5c91b9;--gold-hi:#b9dcf6;--line:rgba(235,247,255,.88);--nav-bg:rgba(244,250,255,.50);--nav-glass-hover:rgba(255,255,255,.36);--glass:rgba(245,250,255,.66);--card-glass:rgba(236,246,255,.78);--shadow:0 18px 44px rgba(41,84,119,.15);--card-ink:#142a3c;--soft-line:rgba(74,116,147,.18);--panel:rgba(238,247,255,.70);--panel-strong:rgba(248,252,255,.86);--body-overlay:rgba(232,244,255,.035);--nav-ink:#142a3c;--nav-muted:rgba(20,42,60,.78);--lightness:1}
 html.dark{color-scheme:only dark;--page:#061522;--ink:#edf7ff;--muted:#abc3d7;--gold:#9bcdf3;--gold-hi:#d9f0ff;--line:rgba(176,215,243,.36);--nav-bg:rgba(7,24,41,.64);--nav-glass-hover:rgba(164,211,244,.20);--glass:rgba(13,35,56,.78);--card-glass:rgba(8,27,46,.86);--shadow:0 18px 44px rgba(0,7,18,.46);--card-ink:#edf7ff;--soft-line:rgba(176,213,239,.24);--panel:rgba(8,27,46,.78);--panel-strong:rgba(10,32,53,.90);--body-overlay:rgba(0,7,18,.26);--nav-ink:#edf7ff;--nav-muted:rgba(237,247,255,.80);--lightness:.92}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:106px;background:var(--page);transition:background-color .24s ease,color .24s ease}body{margin:0;min-height:100vh;position:relative;isolation:isolate;overflow-x:hidden;background:var(--page);color:var(--ink);font-family:SD Sans,Arial,sans-serif;transition:background-color .24s ease,color .24s ease}
@@ -801,6 +802,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 }
 </style>
 <script src="/material-gallery.js" defer></script>
+<script src="/mobile-ordering-motion.js?v=20261031-combined" defer></script>
 
 <style id="sd-checkout-steps-source-backed-2026-10-27">
 /* Source-backed checkout additions: inherit the real glass, light/dark tokens
@@ -1025,6 +1027,7 @@ html.sd-catalog-route #products .filter-pill{
 }
 </style>
 <style id="sd-desktop-account-entry">@media(max-width:760px){#accountOpen{display:none!important}}</style>
+<link rel="stylesheet" href="/experience-unified.css?v=20261031-full">
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -1036,7 +1039,7 @@ html.sd-catalog-route #products .filter-pill{
     <div class="welcome-overline">A MARK OF DISTINCTION · SINCE YOUR FIRST IMPRESSION</div>
     <img src="logo.png" alt="SinDarealest — Premium Crocodile Leather Fashion" class="welcome-logo">
     <div class="welcome-tagline">PREMIUM CROCODILE LEATHER FASHION</div>
-    <h1 class="welcome-title"><span id="welcomeTitleLine1">Dấu ấn da cá sấu.</span><br><em id="welcomeTitleLine2">Tinh tế trong từng chi tiết.</em></h1>
+    <div class="welcome-title" role="heading" aria-level="2"><span id="welcomeTitleLine1">Dấu ấn da cá sấu.</span><br><em id="welcomeTitleLine2">Tinh tế trong từng chi tiết.</em></div>
     <p id="welcomeText">Từ vân da tự nhiên đến từng đường nét hoàn thiện, mỗi thiết kế được chăm chút để tôn lên chất liệu và phong cách riêng của người sở hữu.</p>
     <div class="welcome-points" aria-label="Giá trị thương hiệu"><span>Hoàn thiện thủ công</span><span>Tỉ mỉ từng chi tiết</span><span>Đặt hàng theo yêu cầu</span></div>
     <div class="welcome-footnote">Tư vấn theo nhu cầu <i>·</i> Hoàn thiện thủ công <i>·</i> Bảo dưỡng trọn đời</div>
@@ -1204,7 +1207,7 @@ html.sd-catalog-route #products .filter-pill{
     <div class="sdh-copy">
       <h1 class="sdh-title" id="sdh-title"><span>Phong cách</span><span class="sdh-em">Đẳng cấp</span><span>từ da cá sấu</span></h1>
       <p class="sdh-description">Sự tinh tế trong từng đường nét, khẳng định giá trị thẩm mỹ của bạn.</p>
-      <a class="sdh-cta sdh-cta--zalo" href="https://zalo.me/0827049192" target="_blank" rel="noopener noreferrer" aria-label="Tư vấn đặt sản phẩm theo yêu cầu của bạn qua Zalo">Tư Vấn Đặt sản phẩm theo yêu cầu của bạn <span class="sdh-cta-arrow" aria-hidden="true">→</span></a>
+      <a class="sdh-cta sdh-cta--zalo" href="https://zalo.me/0827049192" target="_blank" rel="noopener noreferrer" aria-label="Tư vấn đặt sản phẩm theo yêu cầu qua Zalo">Tư vấn đặt sản phẩm theo yêu cầu qua Zalo <span class="sdh-cta-arrow" aria-hidden="true">→</span></a>
     </div>
     <div class="sdh-visual">
       <span class="sdh-aura"></span>
@@ -1223,15 +1226,15 @@ html.sd-catalog-route #products .filter-pill{
       <div class="service tap-target"><span class="service-copy"><span class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h5v5H4zM15 6h5v5h-5zM9.5 13h5v5h-5z"/><path d="M9 8.5h6M7 11v2M17 11v2"/></svg></span><span class="service-text"><strong>Da cá sấu cao cấp</strong></span></span></div>
       <div class="service tap-target"><span class="service-copy"><span class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6 4-4 4 4-4 4zM2 22l10-10M8 5l11 11M5 8 2 5l3-3 3 3M16 19l3 3 3-3-3-3"/></svg></span><span class="service-text"><strong>Hoàn thiện thủ công</strong></span></span></div>
       <div class="service tap-target"><span class="service-copy"><span class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.4 15.4 5 5M8 10.5h5M10.5 8v5"/></svg></span><span class="service-text"><strong>Tỉ mỉ từng chi tiết</strong></span></span></div>
-      <div class="service tap-target"><span class="service-copy"><span class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></span><span class="service-text"><strong>Đa dạng mẫu mã</strong></span></span></div>
+      <div class="service tap-target"><span class="service-copy"><span class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></span><span class="service-text"><strong>Tuyển chọn thiết kế</strong></span></span></div>
     </div>
   </section>
 
 
 
   <section class="section wrap" id="order" aria-labelledby="order-title">
-    <div class="order-cta order-cta--compact" data-reveal><button type="button" class="pill-btn primary tap-target" id="orderDetailsToggle" aria-expanded="false" aria-controls="orderDetailsPanel"><svg class="order-cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="order-cta-label" id="order-title">Đặt hàng an tâm</span><span class="arrow" aria-hidden="true">→</span></button></div>
-    <div id="orderDetailsPanel" class="order-details-panel" hidden>
+    <div class="order-cta order-cta--compact" data-reveal><button type="button" class="pill-btn primary tap-target" id="orderDetailsToggle" aria-expanded="true" aria-controls="orderDetailsPanel"><svg class="order-cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="order-cta-label" id="order-title">Thu gọn quy trình</span><span class="arrow" aria-hidden="true">→</span></button></div>
+    <div id="orderDetailsPanel" class="order-details-panel">
     <div class="section-head" data-reveal><div><div class="eyebrow">A clear process, a considered result</div><h2 class="section-title">Đặt hàng từng bước rõ ràng</h2></div><p class="section-note">Bốn bước rõ ràng; mọi điều kiện quan trọng được xác nhận trước khi đặt cọc.</p></div>
     <div class="order-steps" role="list" aria-label="Quy trình đặt hàng gồm bốn bước">
       <article class="order-step glass" role="listitem" data-reveal><div class="order-step-top"><span class="order-number" aria-label="Bước 1">01</span><span class="order-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="product" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2"/></svg></span></div><h3>Chọn sản phẩm</h3><p>Chọn mẫu yêu thích và ghi lại tên mẫu để được tư vấn nhanh.</p></article>
@@ -1262,7 +1265,7 @@ html.sd-catalog-route #products .filter-pill{
        Avoid repeating the same claims after featured products; keep the editorial flow compact. -->
 
   <section class="section wrap" id="collections">
-    <div class="section-head" data-reveal><div><div class="eyebrow">Made to leave a mark</div><h2 class="section-title">The art of…</h2></div><p class="section-note">Chất liệu được tuyển chọn, đường nét được chăm chút, giá trị đến từ những chi tiết có chủ đích.</p></div>
+    <div class="section-head" data-reveal><div><div class="eyebrow">Made to leave a mark</div><h2 class="section-title">Nghệ thuật chế tác độc bản</h2></div><p class="section-note">Chất liệu được tuyển chọn, đường nét được chăm chút, giá trị đến từ những chi tiết có chủ đích.</p></div>
     <div class="mosaic mosaic-compact">
       <article class="mosaic-card art-main" data-reveal>
         <img class="mosaic-photo" id="artSlide" src="images/5151ab24330c6931.webp" alt="Sản phẩm sneaker da cá sấu trong bộ sưu tập SinDarealest">
@@ -1278,7 +1281,7 @@ html.sd-catalog-route #products .filter-pill{
   <section class="section wrap" id="products">
     <div class="section-head" data-reveal><div><div class="eyebrow">Explore the collection</div><h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2></div><p class="section-note">Khám phá các thiết kế theo danh mục. Liên hệ để được tư vấn biến thể và thông tin sản phẩm.</p></div>
     <div class="catalog-tools" data-reveal><label class="search-field"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.2 4.2"/></svg><input id="catalogSearch" type="search" aria-label="Tìm theo tên sản phẩm hoặc mã SKU" placeholder="Tìm sản phẩm hoặc mã SKU…" autocomplete="off"></label><div class="filter-pills" id="categoryFilters" role="group" aria-label="Lọc theo danh mục"></div></div>
-    <div class="catalog-grid" id="catalogGrid"></div><nav class="pagination" id="pagination" aria-label="Phân trang sản phẩm"></nav><div class="page-summary" id="pageSummary" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div class="catalog-grid" id="catalogGrid"></div><noscript><nav aria-label="Danh mục SinDarealest"><p>Khám phá các danh mục:</p><a href="/sanpham/sneaker">Giày thể thao</a> · <a href="/sanpham/giayluoi">Giày lười</a> · <a href="/sanpham/giaytay">Giày tây</a> · <a href="/sanpham/thatlung">Thắt lưng</a> · <a href="/sanpham/vinam">Ví nam</a> · <a href="/sanpham/dep">Dép</a> · <a href="/sanpham/oplung">Ốp điện thoại</a> · <a href="/sanpham/tuinu">Túi nữ</a></nav></noscript><nav class="pagination" id="pagination" aria-label="Phân trang sản phẩm"></nav><div class="page-summary" id="pageSummary" role="status" aria-live="polite" aria-atomic="true"></div>
   </section>
 </main>
 
@@ -1372,7 +1375,7 @@ html.sd-catalog-route #products .filter-pill{
         <button type="button" class="sd-auth-text-button tap-target" data-auth-toggle>Chưa có tài khoản? Đăng ký</button>
         <button type="button" class="sd-auth-text-button tap-target" data-auth-forgot hidden>Quên mật khẩu?</button>
         <div class="sd-auth-flow" id="sdAuthVerify" hidden>
-          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư và Spam. Nếu không nhận được, xem trạng thái Delivered/Bounced/Blocked trong Mailjet Stats; Mailjet tiếp nhận yêu cầu không đồng nghĩa thư đã được giao. Nhập OTP 6 số hoặc mở liên kết xác minh trong 5 phút.</p>
+          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Vui lòng kiểm tra hộp thư đến hoặc thư mục Spam. Mã OTP có hiệu lực trong 5 phút. Nhập OTP 6 số hoặc mở liên kết xác minh trong 5 phút.</p>
           <form id="sdAuthVerifyForm">
             <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
             <label>Mã OTP<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
@@ -1399,8 +1402,8 @@ html.sd-catalog-route #products .filter-pill{
           </form>
           <button type="button" class="sd-auth-text-button tap-target" data-auth-return>Quay lại</button>
         </div>
-        <p class="sd-auth-caption" data-auth-unverified-caption>Email trên Preview phải xác minh bằng OTP hoặc liên kết trước khi đăng nhập. Không tự gắn đơn cũ bằng email.</p>
-        <p class="sd-auth-caption" data-auth-email-note hidden>Đăng nhập Email sẽ được mở sau khi hoàn thiện xác minh email và khôi phục mật khẩu.</p>
+        <p class="sd-auth-caption" data-auth-unverified-caption>Vui lòng xác minh email bằng OTP hoặc liên kết được gửi đến hộp thư trước khi đăng nhập.</p>
+        <p class="sd-auth-caption" data-auth-email-note hidden>Đăng nhập bằng Email đang được hoàn thiện. Bạn vẫn có thể tiếp tục bằng Google.</p>
       </div>
     </section>
       <p id="accountCloudStatus" class="sd-auth-caption" role="status" aria-live="polite">Đăng nhập Google để đồng bộ dữ liệu.</p>
@@ -1423,7 +1426,7 @@ html.sd-catalog-route #products .filter-pill{
     </div>
     <div id="accountAddressView" class="account-address-view" hidden>
       <div class="orders-view-heading"><button type="button" class="favorites-back tap-target" id="accountAddressBack">← Tài khoản</button><span>Thông tin giao hàng</span></div>
-      <p class="orders-local-note" id="accountAddressPrivacy">Thông tin bạn lưu dưới đây chỉ nằm trong bộ nhớ trình duyệt trên thiết bị hiện tại. Khi gửi yêu cầu đặt hàng, các trường cần thiết sẽ được gửi để cửa hàng tiếp nhận. Không có đồng bộ tài khoản.</p>
+      <p class="orders-local-note" id="accountAddressPrivacy">Khi đăng nhập và đồng bộ thành công, địa chỉ được lưu theo tài khoản. Nếu chưa đăng nhập, địa chỉ chỉ được lưu trên thiết bị này. Thông tin nhận hàng sẽ được gửi tới Shop khi đặt hàng.</p>
       <form id="accountAddressForm" class="account-address-form">
         <label class="address-field"><span>Họ tên *</span><input id="accountAddressFullName" name="fullName" maxlength="120" required autocomplete="name"></label>
         <label class="address-field"><span>Số điện thoại *</span><input id="accountAddressPhone" name="phone" maxlength="24" required autocomplete="tel" inputmode="tel"></label>
@@ -1431,7 +1434,7 @@ html.sd-catalog-route #products .filter-pill{
         <label class="address-field"><span>Tỉnh/thành phố *</span><select id="accountAddressProvince" name="province" required disabled><option value="">Đang tải tỉnh/thành…</option></select></label>
         <label class="address-field"><span>Xã/phường *</span><select id="accountAddressWard" name="ward" required disabled><option value="">Chọn tỉnh/thành trước</option></select></label>
         <label class="address-field"><span>Số nhà, tên đường, thôn/tổ *</span><input id="accountAddressStreet" name="streetAddress" maxlength="300" required autocomplete="street-address"></label>
-        <button type="submit" class="pill-btn primary tap-target" id="accountAddressSave">Lưu địa chỉ trên thiết bị</button>
+        <button type="submit" class="pill-btn primary tap-target" id="accountAddressSave">Lưu địa chỉ</button>
         <p id="accountAddressMessage" class="address-form-message" role="status" aria-live="polite"></p>
       </form>
     </div>
@@ -2350,7 +2353,8 @@ function updateAccountAddressSummary(){const node=$('#accountAddressSummary');if
 function setAccountAddressMessage(message,state=''){const node=$('#accountAddressMessage');if(!node)return;node.textContent=message;node.dataset.state=state}
 async function loadAccountAddressProvinces(savedAddress=null){const select=$('#accountAddressProvince'),ward=$('#accountAddressWard');if(!select||!ward)return;select.disabled=true;ward.disabled=true;select.innerHTML='<option value="">Đang tải tỉnh/thành…</option>';ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';try{const response=await fetch(ADMIN_DIVISIONS_API+'/p/',{cache:'force-cache'});if(!response.ok)throw Error('HTTP '+response.status);const rows=await response.json();if(!Array.isArray(rows)||!rows.length)throw Error('Danh mục không hợp lệ');select.innerHTML='<option value="">Chọn tỉnh/thành phố *</option>'+rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi')).map(p=>'<option value="'+escapeHtml(p.name)+'" data-code="'+escapeHtml(p.code)+'">'+escapeHtml(p.name)+'</option>').join('');select.disabled=false;if(savedAddress){let option=[...select.options].find(o=>(savedAddress.provinceCode&&o.dataset.code===String(savedAddress.provinceCode))||o.value===String(savedAddress.province||''));if(option){select.value=option.value;await loadAccountAddressWards(savedAddress.wardCode,savedAddress.ward)}}}catch{select.innerHTML='<option value="">Không tải được tỉnh/thành</option>';select.disabled=true;ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';ward.disabled=true;setAccountAddressMessage('Không tải được danh mục hành chính. Kiểm tra kết nối rồi thử lại.','error')}}
 async function loadAccountAddressWards(preferredCode='',preferredName=''){const select=$('#accountAddressProvince'),ward=$('#accountAddressWard');if(!select||!ward)return;const code=select.selectedOptions[0]?.dataset.code||'',requestId=++accountAddressWardRequest;ward.disabled=true;ward.innerHTML='<option value="">Đang tải xã/phường…</option>';if(!code){ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';return}try{const response=await fetch(ADMIN_DIVISIONS_API+'/p/'+encodeURIComponent(code)+'?depth=2',{cache:'force-cache'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(requestId!==accountAddressWardRequest)return;const rows=Array.isArray(data.wards)?data.wards:[];if(!rows.length)throw Error('Không có xã/phường');ward.innerHTML='<option value="">Chọn xã/phường *</option>'+rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi')).map(w=>'<option value="'+escapeHtml(w.name)+'" data-code="'+escapeHtml(w.code)+'">'+escapeHtml(w.name)+'</option>').join('');ward.disabled=false;const option=[...ward.options].find(o=>(preferredCode&&o.dataset.code===String(preferredCode))||o.value===String(preferredName||''));if(option)ward.value=option.value;setAccountAddressMessage('')}catch{if(requestId!==accountAddressWardRequest)return;ward.innerHTML='<option value="">Không tải được xã/phường</option>';ward.disabled=true;setAccountAddressMessage('Không tải được xã/phường. Chọn lại tỉnh/thành hoặc thử lại khi có mạng.','error')}}
-async function loadAccountAddressView(){const form=$('#accountAddressForm');if(!form)return;const saved=loadLocalShippingAddress()||{};$('#accountAddressFullName').value=String(saved.fullName||'');$('#accountAddressPhone').value=String(saved.phone||'');$('#accountAddressEmail').value=String(saved.email||'');$('#accountAddressStreet').value=String(saved.streetAddress||'');setAccountAddressMessage('');await loadAccountAddressProvinces(saved)}
+function updateAccountAddressPrivacy(){const notice=$('#accountAddressPrivacy'),save=$('#accountAddressSave');if(notice)notice.textContent=accountSyncMode==='cloud'?'Địa chỉ được lưu theo tài khoản đã đăng nhập và có thể dùng trên thiết bị khác. Thông tin sẽ được gửi tới Shop khi đặt hàng.':accountSyncMode==='guest'?'Chưa đăng nhập: địa chỉ chỉ lưu trên thiết bị này. Đăng nhập và đồng bộ thành công để sử dụng trên các thiết bị khác.':'Tài khoản đang kết nối. Hãy đợi kết quả đồng bộ trước khi lưu địa chỉ.';if(save)save.textContent=accountSyncMode==='cloud'?'Lưu vào tài khoản':accountSyncMode==='guest'?'Lưu trên thiết bị':'Đợi đồng bộ';}
+async function loadAccountAddressView(){const form=$('#accountAddressForm');if(!form)return;updateAccountAddressPrivacy();const saved=loadLocalShippingAddress()||{};$('#accountAddressFullName').value=String(saved.fullName||'');$('#accountAddressPhone').value=String(saved.phone||'');$('#accountAddressEmail').value=String(saved.email||'');$('#accountAddressStreet').value=String(saved.streetAddress||'');setAccountAddressMessage('');await loadAccountAddressProvinces(saved)}
 async function saveAccountAddress(event){event.preventDefault();const form=event.currentTarget;if(!form.checkValidity()){form.reportValidity();setAccountAddressMessage('Kiểm tra các trường bắt buộc trước khi lưu.','error');return}const province=$('#accountAddressProvince'),ward=$('#accountAddressWard'),provinceOption=province.selectedOptions[0],wardOption=ward.selectedOptions[0];if(!provinceOption?.dataset.code||!wardOption?.dataset.code){setAccountAddressMessage('Chọn tỉnh/thành và xã/phường từ danh mục.','error');return}const next={fullName:$('#accountAddressFullName').value.trim(),phone:$('#accountAddressPhone').value.trim(),email:$('#accountAddressEmail').value.trim(),province:province.value,provinceCode:provinceOption.dataset.code,ward:ward.value,wardCode:wardOption.dataset.code,streetAddress:$('#accountAddressStreet').value.trim(),savedAt:new Date().toISOString()};try{
  if(accountSyncMode==='cloud'){
   const response=await fetch('/api/customer/profile',{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'address',address:next})});
@@ -2462,7 +2466,9 @@ async function sdCheckoutLoadQuote(){
  sdCheckoutQuote=data;sdCheckoutChoice='deposit';sdCheckoutRenderQuote();
 }
 function sdCheckoutSetStep(step){
+ const previousStep=sdCheckoutStep;
  sdCheckoutStep=Math.max(1,Math.min(3,Number(step)||1));
+ const sheet=$('#checkoutDrawer');if(sheet)sheet.dataset.sdCheckoutDirection=sdCheckoutStep>previousStep?'forward':sdCheckoutStep<previousStep?'back':'none';
  const productionNote=$('#sdOrderProductionCaution');if(productionNote)productionNote.hidden=!sdCheckoutItems().some(({id})=>productFulfillmentType(findProductByKey(id))==='made_to_order');
  const captions=[['Thông tin liên hệ và địa chỉ nhận hàng','Điền thông tin nhận hàng để tiếp tục chọn hình thức thanh toán.'],['Chọn hình thức thanh toán','Chọn đặt cọc hoặc thanh toán toàn bộ.'],['Kiểm tra và gửi đơn','Gửi đơn để Shop đối chiếu và xác nhận giao dịch.']];
  $('#sdCheckoutStepTitle').textContent=captions[sdCheckoutStep-1][0];$('#sdCheckoutStepSubtitle').textContent=captions[sdCheckoutStep-1][1];
@@ -2491,10 +2497,14 @@ function openCheckout(){
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
- sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='deposit';$('#checkoutSubmit').disabled=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();sdCheckoutSetStep(1);
+ sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='deposit';$('#checkoutSubmit').disabled=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();sdCheckoutSetStep(1);panel.dataset.sdCheckoutDirection='none';
  prefillCheckoutFromLocalAddress();
  const first=panel.querySelector('input[name="fullName"]');
- if(first) setTimeout(()=>first.focus({preventScroll:true}),100);
+ if(first) setTimeout(()=>{
+  if(!panel.classList.contains('open'))return;
+  const mobile=window.matchMedia('(max-width:760px)').matches;
+  (mobile?$('#checkoutClose'):first)?.focus({preventScroll:true});
+ },160);
 }
 function closeCheckout(restoreFocus=true){
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
@@ -4213,7 +4223,6 @@ html.dark .detail-gallery-arrow:active,html.dark .sd-fullscreen-arrow:active{
 </style>
 
 
-<main id="notFoundPage" class="not-found-page" aria-labelledby="notFoundTitle"><section class="not-found-card"><p class="not-found-eyebrow">SINDAREALEST · THỜI TRANG DA CÁ SẤU</p><h1 id="notFoundTitle">404</h1><h2>Không tìm thấy trang</h2><p>Đường dẫn này không tồn tại hoặc nội dung đã được chuyển đi.</p><a class="not-found-home" href="/">Về trang chủ <span aria-hidden="true">→</span></a></section></main>
 <script id="sd-not-found-route-init">
 (() => {
   const rawPath = location.pathname;
@@ -4226,7 +4235,15 @@ html.dark .detail-gallery-arrow:active,html.dark .sd-fullscreen-arrow:active{
   const productRoute = /^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path)
     || /^\/san-pham\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path);
   if (path !== '/' && path !== '/index.html' && !catalogRoute && !productRoute)
+  {
     document.body.classList.add('sd-not-found-route');
+    // Client-side fallback only; Cloudflare middleware serves the dedicated HTTP 404 page.
+    if(typeof document.createElement==='function' && !document.getElementById('notFoundPage')) {
+      const main=document.createElement('main');main.id='notFoundPage';main.className='not-found-page';main.setAttribute('aria-labelledby','notFoundTitle');
+      main.innerHTML='<section class="not-found-card"><p class="not-found-eyebrow">SINDAREALEST · THỜI TRANG DA CÁ SẤU</p><h1 id="notFoundTitle">404</h1><h2>Không tìm thấy trang</h2><p>Đường dẫn này không tồn tại hoặc nội dung đã được chuyển đi.</p><a class="not-found-home" href="/">Về trang chủ <span aria-hidden="true">→</span></a></section>';
+      document.body.appendChild(main);
+    }
+  }
 })();
 </script>
 <style id="sd-not-found-route-styles">
@@ -5068,5 +5085,35 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 /* Legacy V2–V9 image-based HERO removed (44 KB); current HERO lives in code-hero.css. */
 </style>
 
+<style id="sd-ux-audit-motion-20261031">
+/* Animation-only audit: original palette, Liquid Glass material, layout, behavior unchanged. */
+:root{--sd-audit-motion-ease:cubic-bezier(.22,1,.36,1)}
+#cartDrawer.cart-drawer,#accountDrawer.account-drawer{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  transition:transform 360ms var(--sd-audit-motion-ease),visibility 0s linear 360ms;
+}
+#cartDrawer.cart-drawer.open,#accountDrawer.account-drawer.open{
+  transition:transform 400ms var(--sd-audit-motion-ease),visibility 0s;
+}
+@media(min-width:761px){
+ #checkoutDrawer.checkout-drawer{backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform 360ms var(--sd-audit-motion-ease),visibility 0s linear 360ms;transform:translate3d(105%,0,0)}
+ #checkoutDrawer.checkout-drawer.open{transform:translate3d(0,0,0);transition:transform 400ms var(--sd-audit-motion-ease),visibility 0s}
+}
+#cartDrawer.cart-drawer{transform:translate3d(105%,0,0);visibility:hidden;pointer-events:none}
+#cartDrawer.cart-drawer.open{transform:translate3d(0,0,0);visibility:visible;pointer-events:auto}
+#accountDrawer.account-drawer{transform:translate3d(105%,0,0)}
+#accountDrawer.account-drawer.open{transform:translate3d(0,0,0)}
+#checkoutBackdrop.checkout-backdrop{transition:opacity 280ms var(--sd-audit-motion-ease),visibility 0s linear 280ms}
+#checkoutBackdrop.checkout-backdrop.open{transition:opacity 280ms var(--sd-audit-motion-ease),visibility 0s}
+#productOverlay.overlay.open{animation:sd-audit-backdrop-in 260ms var(--sd-audit-motion-ease) both}
+#productOverlay.overlay.open .detail-modal{animation:sd-audit-modal-in 360ms var(--sd-audit-motion-ease) both}
+@keyframes sd-audit-backdrop-in{from{opacity:0}to{opacity:1}}
+@keyframes sd-audit-modal-in{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@media(prefers-reduced-motion:reduce){
+  #cartDrawer.cart-drawer,#accountDrawer.account-drawer,#checkoutDrawer.checkout-drawer,#checkoutBackdrop.checkout-backdrop{transition:none!important}
+  #productOverlay.overlay.open,#productOverlay.overlay.open .detail-modal{animation:none!important}
+}
+</style>
 </body>
 </html>
