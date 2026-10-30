@@ -5076,5 +5076,33 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 /* Legacy V2–V9 image-based HERO removed (44 KB); current HERO lives in code-hero.css. */
 </style>
 
+<style id="sd-ux-audit-motion-20261031">
+/* Animation-only audit: original palette, Liquid Glass material, layout, behavior unchanged. */
+:root{--sd-audit-motion-ease:cubic-bezier(.22,1,.36,1)}
+#cartDrawer.cart-drawer,#accountDrawer.account-drawer,#checkoutDrawer.checkout-drawer{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  transition:transform 360ms var(--sd-audit-motion-ease),visibility 0s linear 360ms;
+}
+#cartDrawer.cart-drawer.open,#accountDrawer.account-drawer.open,#checkoutDrawer.checkout-drawer.open{
+  transition:transform 400ms var(--sd-audit-motion-ease),visibility 0s;
+}
+#cartDrawer.cart-drawer{transform:translate3d(105%,0,0);visibility:hidden;pointer-events:none}
+#cartDrawer.cart-drawer.open{transform:translate3d(0,0,0);visibility:visible;pointer-events:auto}
+#accountDrawer.account-drawer{transform:translate3d(105%,0,0)}
+#accountDrawer.account-drawer.open{transform:translate3d(0,0,0)}
+#checkoutDrawer.checkout-drawer{transform:translate3d(105%,0,0)}
+#checkoutDrawer.checkout-drawer.open{transform:translate3d(0,0,0)}
+#checkoutBackdrop.checkout-backdrop{transition:opacity 280ms var(--sd-audit-motion-ease),visibility 0s linear 280ms}
+#checkoutBackdrop.checkout-backdrop.open{transition:opacity 280ms var(--sd-audit-motion-ease),visibility 0s}
+#productOverlay.overlay.open{animation:sd-audit-backdrop-in 260ms var(--sd-audit-motion-ease) both}
+#productOverlay.overlay.open .detail-modal{animation:sd-audit-modal-in 360ms var(--sd-audit-motion-ease) both}
+@keyframes sd-audit-backdrop-in{from{opacity:0}to{opacity:1}}
+@keyframes sd-audit-modal-in{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@media(prefers-reduced-motion:reduce){
+  #cartDrawer.cart-drawer,#accountDrawer.account-drawer,#checkoutDrawer.checkout-drawer,#checkoutBackdrop.checkout-backdrop{transition:none!important}
+  #productOverlay.overlay.open,#productOverlay.overlay.open .detail-modal{animation:none!important}
+}
+</style>
 </body>
 </html>
