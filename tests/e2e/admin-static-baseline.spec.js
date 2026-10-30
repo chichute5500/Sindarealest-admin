@@ -1246,7 +1246,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
             .toBeLessThanOrEqual(row.clientWidth + 1);
           expect(row.productTitle, 'Existing product titles must remain available to assistive technology').toBeTruthy();
           if (narrowViewport.width <= 360) {
-            expect(row.sku.text, 'SKU/category hint should retain a meaningful SKU label and value').toMatch(/SKU (?:chưa xác minh|thương mại):\s*\S+/i);
+            expect(row.sku.text, 'SKU/category hint should retain a meaningful SKU label and value').toMatch(/SKU (?:chưa xác minh|thương mại|cần kiểm tra):\s*\S+/i);
             expect(row.sku.whiteSpace, 'Narrow-phone SKU hint should wrap instead of being forced to one line').toBe('normal');
             expect(row.sku.overflowWrap, 'Narrow-phone SKU hint may break long segments without horizontal overflow').toBe('anywhere');
             expect(row.sku.lineClamp, 'Narrow-phone SKU hint should wrap to at most two lines').toBe('2');
