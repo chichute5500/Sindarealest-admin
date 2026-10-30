@@ -2083,6 +2083,27 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   }
 }
 
+
+/* Reference background: replace the strong repeat texture with soft icy ambient light. */
+body:not(:has(#loginView:not(.hidden))){
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse at 7% 0%,rgba(255,255,255,.74),transparent 42%),
+    radial-gradient(ellipse at 100% 18%,rgba(190,223,244,.54),transparent 38%),
+    radial-gradient(ellipse at 0% 84%,rgba(184,221,240,.32),transparent 36%),
+    linear-gradient(145deg,rgba(246,252,255,.16),rgba(224,242,252,.12));
+  background-attachment:fixed;
+}
+:root[data-admin-theme="dark"] body:not(:has(#loginView:not(.hidden))){
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse at 8% 0%,rgba(74,120,153,.20),transparent 42%),
+    radial-gradient(ellipse at 100% 22%,rgba(43,89,123,.22),transparent 38%),
+    radial-gradient(ellipse at 0% 84%,rgba(36,78,108,.18),transparent 36%),
+    linear-gradient(145deg,rgba(10,30,46,.08),rgba(4,17,28,.10));
+  background-attachment:fixed;
+}
+
 </style>
 
 
