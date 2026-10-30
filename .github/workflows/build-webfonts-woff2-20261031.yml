@@ -1,0 +1,51 @@
+name: Convert approved Noto fonts to WOFF2 on isolated UX branch
+on:
+  push:
+    branches:
+      - fix/storefront-seo-content-motion-2026-10-31
+    paths:
+      - 'scripts/build-webfonts-woff2.py'
+      - '.github/workflows/build-webfonts-woff2-20261031.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sd-font-woff2-ux-20261031
+  cancel-in-progress: false
+jobs:
+  convert-only-ux-branch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Refuse unexpected branch or Main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/fix/storefront-seo-content-motion-2026-10-31'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install WOFF2 font converter
+        run: python -m pip install --disable-pip-version-check fonttools==4.59.2 brotli==1.1.0
+      - name: Convert and verify all 4 existing Noto TTF fonts
+        run: python scripts/build-webfonts-woff2.py
+      - name: Commit generated WOFF2 assets only to this Preview branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add public/index.html public/fonts/NotoSans-Regular.woff2 public/fonts/NotoSans-Bold.woff2 public/fonts/NotoSerif-Regular.woff2 public/fonts/NotoSerif-Bold.woff2
+          if git diff --cached --quiet; then
+            echo 'No pending font changes'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'perf(font): prefer smaller validated WOFF2 with TTF fallback'
+          git push origin HEAD:refs/heads/fix/storefront-seo-content-motion-2026-10-31
+          echo 'Source branch updated; Preview deploy runs from the new commit only'
