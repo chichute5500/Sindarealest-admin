@@ -2498,7 +2498,11 @@ function openCheckout(){
  sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='deposit';$('#checkoutSubmit').disabled=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();sdCheckoutSetStep(1);panel.dataset.sdCheckoutDirection='none';
  prefillCheckoutFromLocalAddress();
  const first=panel.querySelector('input[name="fullName"]');
- if(first) setTimeout(()=>first.focus({preventScroll:true}),100);
+ if(first) setTimeout(()=>{
+  if(!panel.classList.contains('open'))return;
+  const mobile=window.matchMedia('(max-width:760px)').matches;
+  (mobile?$('#checkoutClose'):first)?.focus({preventScroll:true});
+ },160);
 }
 function closeCheckout(restoreFocus=true){
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
