@@ -1,0 +1,150 @@
+name: Export SinDarealest source code without images
+
+on:
+  push:
+    branches:
+      - export/source-only-no-images-2026-10-31
+    paths:
+      - '.github/workflows/export-source-no-images.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout verified Main source
+        uses: actions/checkout@v4
+        with:
+          ref: cca1ff9be2ab7de4d89702f6dabf80d9bf3c7657
+          path: main-src
+          persist-credentials: false
+      - name: Checkout mobile ordering Preview source
+        uses: actions/checkout@v4
+        with:
+          ref: 043c31a17db2bb578e423a102b0bf63d2b417a5c
+          path: preview-src
+          persist-credentials: false
+
+      - name: Create code-only ZIP files
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+
+          main = Path('main-src')
+          preview = Path('preview-src')
+          out = Path('dist')
+          out.mkdir(exist_ok=True)
+
+          text_extensions = {
+              '.html', '.css', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx',
+              '.json', '.md', '.txt', '.yml', '.yaml', '.toml', '.sql',
+              '.sh', '.py', '.xml', '.csv', '.webmanifest', '.map',
+              '.gitignore', '.gitkeep',
+          }
+          binary_extensions = {
+              '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg',
+              '.ico', '.avif', '.bmp', '.tif', '.tiff', '.heic',
+              '.ttf', '.otf', '.woff', '.woff2', '.eot',
+              '.apk', '.aab', '.mp4', '.mov', '.webm',
+              '.pdf', '.zip', '.gz', '.tar', '.7z', '.rar', '.db',
+              '.sqlite', '.sqlite3', '.bin', '.exe',
+          }
+          private_names = {'google-services.json', '.env', 'credentials.json', 'service-account.json'}
+          excluded_parts = {'.git', 'node_modules', 'images', 'fonts', 'dist', '__pycache__'}
+          config_names = {'package.json', 'wrangler.toml', '.gitignore', 'playwright.config.js', 'playwright.owner-gesture.config.js'}
+
+          def tracked(root):
+              payload = subprocess.check_output(['git', '-C', str(root), 'ls-files', '-z'])
+              for s in payload.decode().split('\x00'):
+                  if not s:
+                      continue
+                  p = Path(s)
+                  if any(part.lower() in excluded_parts for part in p.parts):
+                      continue
+                  if p.suffix.lower() in binary_extensions or p.name.lower() in private_names:
+                      continue
+                  if p.name.startswith('.env') or p.suffix.lower() in {'.pem', '.key', '.p12', '.pfx'}:
+                      continue
+                  if p.suffix.lower() not in text_extensions and p.name not in {'_headers', '_redirects', 'LICENSE', 'Dockerfile'}:
+                      continue
+                  yield s
+
+          def selection(p, kind):
+              if kind == 'complete':
+                  return True
+              if kind == 'storefront':
+                  return (
+                      (p.startswith('public/') and not p.startswith('public/admin/'))
+                      or (p.startswith('functions/') and not p.startswith('functions/api/admin/'))
+                      or p.startswith('migrations/')
+                      or p in config_names
+                  )
+              if kind == 'admin':
+                  return (
+                      p.startswith('public/admin/')
+                      or p.startswith('functions/')
+                      or p.startswith('migrations/')
+                      or p in config_names
+                  )
+              raise ValueError(kind)
+
+          def write_bundle(root, sha, title, kind, dest):
+              count = 0
+              omitted = []
+              with ZipFile(out / dest, 'w', compression=ZIP_DEFLATED, compresslevel=8) as z:
+                  for path in sorted(tracked(root)):
+                      if not selection(path, kind):
+                          continue
+                      raw = (root / path).read_bytes()
+                      try:
+                          raw.decode('utf-8')
+                      except UnicodeDecodeError:
+                          omitted.append(path)
+                          continue
+                      z.writestr(path, raw)
+                      count += 1
+                  intro = (
+                      f'SINDAREALEST — {title}\n'
+                      f'Source commit: {sha}\n'
+                      f'Package: {kind}\n'
+                      f'Contains only text-based source/configuration, with original relative paths.\n'
+                      f'No photos, logos, image assets, font binaries, APKs or videos are included.\n'
+                      f'No private env files or credentials are included.\n'
+                      f'For visual deployment, image and font assets must be restored separately.\n'
+                      f'Included files: {count}\n'
+                      f'Skipped non-text files: {len(omitted)}\n'
+                  )
+                  z.writestr('SOURCE-README.txt', intro)
+              print(dest, count, (out / dest).stat().st_size)
+
+          write_bundle(
+              main, 'cca1ff9be2ab7de4d89702f6dabf80d9bf3c7657',
+              'Web tinh Main', 'storefront',
+              'SinDarealest-WebTinh-Main-KhongAnh.zip')
+          write_bundle(
+              main, 'cca1ff9be2ab7de4d89702f6dabf80d9bf3c7657',
+              'Admin Main', 'admin',
+              'SinDarealest-Admin-Main-KhongAnh.zip')
+          write_bundle(
+              main, 'cca1ff9be2ab7de4d89702f6dabf80d9bf3c7657',
+              'Toan bo ma nguon Main', 'complete',
+              'SinDarealest-ToanBo-Main-KhongAnh.zip')
+          write_bundle(
+              preview, '043c31a17db2bb578e423a102b0bf63d2b417a5c',
+              'Web tinh Preview dat hang mobile', 'storefront',
+              'SinDarealest-WebTinh-Preview-DatHang-KhongAnh.zip')
+          PY
+
+      - name: Attach ZIP archives without images
+        uses: actions/upload-artifact@v4
+        with:
+          name: SinDarealest-MaNguon-KhongAnh-20261031
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 14
