@@ -57,6 +57,21 @@ jobs:
       - name: Run combined full regression suite (including SEO + order sheet)
         run: npm test
 
+      - name: Browser smoke on mobile, desktop and reduced-motion (local isolated Pages)
+        shell: bash
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+          npx playwright test --config playwright.combined.config.mjs
+
+      - name: Attach browser screenshots and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-ux-chromium-test-results
+          path: test-results/
+          if-no-files-found: ignore
+
       - name: Read-only verify Preview isolation from Production
         shell: bash
         run: |
