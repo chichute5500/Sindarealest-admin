@@ -2027,6 +2027,32 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   .mobiletabs .nav{font-size:8px!important}
 }
 
+
+/* Reference screenshot refinement: highlight individual product glass and nav labels. */
+@media(max-width:820px){
+  #main:has(#searchBox)>.pagehead .btn{min-width:104px}
+  #main .product-table tbody tr{
+    border-radius:16px!important;
+    background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(238,249,255,.50)) padding-box,var(--sd-3d-rim) border-box!important;
+    box-shadow:0 12px 25px rgba(48,102,140,.16),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 5px rgba(75,128,158,.10)!important;
+    -webkit-backdrop-filter:blur(16px) saturate(145%);
+    backdrop-filter:blur(16px) saturate(145%);
+  }
+  :root[data-admin-theme="dark"] #main .product-table tbody tr{
+    background:linear-gradient(145deg,rgba(24,50,70,.82),rgba(10,31,48,.74)) padding-box,var(--sd-3d-rim) border-box!important;
+    box-shadow:0 12px 25px rgba(0,4,12,.25),inset 0 1px 0 rgba(220,241,255,.16),inset 0 -2px 5px rgba(0,7,18,.18)!important;
+  }
+  .mobiletabs .nav{
+    font-size:9px!important;
+    white-space:nowrap!important;
+    letter-spacing:-.015em;
+  }
+}
+@media(max-width:350px){
+  #main:has(#searchBox)>.pagehead .btn{min-width:88px}
+  .mobiletabs .nav{font-size:8px!important;white-space:normal!important}
+}
+
 </style>
 
 
