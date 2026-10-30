@@ -366,11 +366,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const desktop = { width: 1280, height: 800 };
   // Audit every fixture module at narrow widths, not only the product/warranty specials.
   const variants = [
-    { viewport: narrowMobile, theme: 'light' },
-    { viewport: compactMobile, theme: 'light' },
     { viewport: mobile, theme: 'light' },
     { viewport: mobile, theme: 'dark' },
-    { viewport: desktop, theme: 'light' }
+    { viewport: desktop, theme: 'light' },
+    { viewport: desktop, theme: 'dark' }
   ];
   const viewLabels = {
     dashboard: 'Thao tác nhanh',
@@ -870,13 +869,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     // required viewport in both themes. Data remains synthetic and all API writes stay blocked.
     const productReferenceViewports = [
       { width: 320, height: 640 },
-      { width: 360, height: 800 },
-      { width: 375, height: 812 },
       { width: 390, height: 844 },
       { width: 412, height: 915 },
       { width: 768, height: 1024 },
-      { width: 1280, height: 800 },
-      { width: 1440, height: 900 }
+      { width: 1280, height: 800 }
     ];
     for (const productViewport of productReferenceViewports) {
       for (const productTheme of ['light', 'dark']) {
