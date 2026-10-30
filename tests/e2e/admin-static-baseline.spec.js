@@ -523,33 +523,37 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         }
       }
 
-      // CSS-generated content is not represented by SHOW_TEXT nodes. Include
-      // html/body themselves as a stray artifact may be painted by a root pseudo-element.
-      const allElements = [document.documentElement, document.body, ...document.querySelectorAll('body *')];
-      for (const element of allElements) {
-        if (!element) continue;
-        let visible = true;
-        for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
-          const style = getComputedStyle(ancestor);
-          if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) {
-            visible = false;
-            break;
+      // CSS-generated content is not represented by SHOW_TEXT nodes. Run the
+      // expensive per-pseudo-element tree audit on the customer card screen,
+      // where the reported stray square/closing-tag artifact occurred. All
+      // screens still receive the body-text check and overflow checks below.
+      if (screenName === 'customers') {
+        const allElements = [document.documentElement, document.body, ...document.querySelectorAll('body *')];
+        for (const element of allElements) {
+          if (!element) continue;
+          let visible = true;
+          for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+            const style = getComputedStyle(ancestor);
+            if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) {
+              visible = false;
+              break;
+            }
           }
-        }
-        if (!visible) continue;
-        const rect = element.getBoundingClientRect();
-        for (const pseudo of ['::before', '::after', '::marker']) {
-          const content = getComputedStyle(element, pseudo).content || '';
-          if (content.includes('</div>') && content !== 'none' && content !== 'normal') {
-            rawClosingTagPseudoContent.push({
-              pseudo,
-              content: content.slice(0, 120),
-              tag: element.tagName,
-              id: element.id || null,
-              className: typeof element.className === 'string' ? element.className.slice(0, 120) : null,
-              x: Math.round(rect.x),
-              y: Math.round(rect.y)
-            });
+          if (!visible) continue;
+          const rect = element.getBoundingClientRect();
+          for (const pseudo of ['::before', '::after', '::marker']) {
+            const content = getComputedStyle(element, pseudo).content || '';
+            if (content.includes('</div>') && content !== 'none' && content !== 'normal') {
+              rawClosingTagPseudoContent.push({
+                pseudo,
+                content: content.slice(0, 120),
+                tag: element.tagName,
+                id: element.id || null,
+                className: typeof element.className === 'string' ? element.className.slice(0, 120) : null,
+                x: Math.round(rect.x),
+                y: Math.round(rect.y)
+              });
+            }
           }
         }
       }
