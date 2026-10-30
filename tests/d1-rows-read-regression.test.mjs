@@ -77,7 +77,8 @@ audit("a-confirmed-2","order-a","order_updated",{status:"confirmed"},"2026-10-26
 audit("a-processing","order-a","order_updated",{status:"processing"},"2026-10-26 14:00:00");
 for(let i=0;i<250;i++) audit("noise-"+i,"unrelated-"+i,"order_updated",{status:"processing"},"2026-10-26 13:00:00");
 // Exercise competing event types and unrelated entities under the same ID.
-audit("unrelated-entity","order-a","order_updated",{status:"completed"},"2026-10-26 14:00:00");
+auditInsert.run("unrelated-entity","qa","order_updated","product","order-a",
+  JSON.stringify({status:"completed"}),"2026-10-26 14:00:00");
 audit("b-completed","order-b","order_updated",{status:"completed"},"2026-10-25 13:00:00");
 
 
