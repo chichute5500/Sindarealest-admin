@@ -28,6 +28,7 @@
       const deltaX = Math.abs(event.clientX - drag.x);
       const deltaY = event.clientY - drag.y;
       if (deltaX > 64 || deltaY < 0) {
+        drag.dy = 0;
         sheet.style.removeProperty('--sd-checkout-pull');
         return;
       }
