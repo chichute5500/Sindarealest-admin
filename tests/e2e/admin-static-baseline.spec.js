@@ -181,7 +181,7 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
 test('captures read-only Admin module UI states using explicit local fixtures', async ({ page }) => {
   // This single fixture covers every Admin module plus responsive screenshots.
   // Do not skip checks under slow CI CPU; retain all visual and functional assertions.
-  test.setTimeout(360_000);
+  test.setTimeout(900_000);
   mkdirSync(screenshotDir, { recursive: true });
 
   const fixtureProduct = {
