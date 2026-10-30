@@ -11,12 +11,12 @@ function has(value, label) {
 has('--bg:#eaf3fb;', 'ice-blue light background token');
 has('--ink:#142a3c;', 'navy light text token');
 has('--gold:#5c91b9;', 'blue accent token');
-has('--bg:#09131d;', 'dark background token');
-has('--ink:#eaf3fb;', 'dark text token');
+has('--bg:#061522;', 'dark background token aligned with Storefront');
+has('--ink:#edf7ff;', 'dark text token aligned with Storefront');
 has('backdrop-filter:blur(22px)', 'liquid-glass blur layer');
 has('data-admin-theme="dark"', 'dark-theme rules');
 has('id="adminThemeColor" content="#eaf3fb"', 'light Android browser chrome theme color');
-has("themeColor.setAttribute('content',dark?'#09131d':'#eaf3fb')", 'dynamic dark/light Android browser chrome color');
+has("themeColor.setAttribute('content',dark?'#061522':'#eaf3fb')", 'dynamic dark/light Android browser chrome color');
 assert.ok(adminHtml.indexOf("Apply the saved/system theme before styles paint") < adminHtml.indexOf('<style>'), 'Theme selection must run before CSS to reduce theme flash');
 has("$('#backdrop').classList.add('hidden')", 'editor overlay reset before login session check');
 has('prefers-reduced-motion:reduce', 'reduced-motion support');

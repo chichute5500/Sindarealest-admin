@@ -20,7 +20,7 @@ test('Admin has exactly one approved blue palette for each theme, not obsolete b
  for(const obsolete of ['--bg:#f4f0e9','--bg:#eee7dc','--bg:#f2eee6','--bg:#090908'])
   assert.ok(!css.includes(obsolete),'Obsolete overwritten theme should be removed: '+obsolete);
  assert.match(css,/:root\{[\s\S]*?color-scheme:only light;[\s\S]*?--bg:#eaf3fb;/);
- assert.match(css,/:root\[data-admin-theme="dark"\]\{[\s\S]*?color-scheme:only dark;[\s\S]*?--bg:#09131d;/);
+ assert.match(css,/:root\[data-admin-theme="dark"\]\{[\s\S]*?color-scheme:only dark;[\s\S]*?--bg:#061522;/);
  assert.match(css,/font-family:Inter,"Noto Sans",system-ui/,'Preserve approved Admin typography');
  assert.match(css,/color:var\(--ink\)/,'Preserve inherited Admin text');
 });

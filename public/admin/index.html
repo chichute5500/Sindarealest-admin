@@ -21,7 +21,7 @@
   const dark=mode==='dark'||(mode==='auto'&&!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches));
   document.documentElement.dataset.adminTheme=dark?'dark':'light';
   const color=document.querySelector('#adminThemeColor');
-  if(color)color.setAttribute('content',dark?'#09131d':'#eaf3fb');
+  if(color)color.setAttribute('content',dark?'#061522':'#eaf3fb');
 })();
 </script>
 <style>
@@ -161,11 +161,11 @@ body{
 .topbar{box-shadow:0 8px 28px rgba(20,42,60,.035)}
 :root[data-admin-theme="dark"]{
   color-scheme:only dark;
-  --bg:#09131d;
-  --paper:rgba(17,34,49,.80);
-  --ink:#eaf3fb;
-  --muted:#a8bfd1;
-  --line:rgba(151,191,218,.22);
+  --bg:#061522;
+  --paper:rgba(8,27,46,.78);
+  --ink:#edf7ff;
+  --muted:#abc3d7;
+  --line:rgba(176,215,243,.36);
   --gold:#8ebce0;
   --danger:#ffb6a7;
   --shadow:0 18px 44px rgba(0,7,18,.46);
@@ -409,12 +409,7 @@ body:has(#loginView:not(.hidden)) .logincard h2{margin-top:0;font-size:26px;lett
 body:has(#loginView:not(.hidden)) .logincard>p:not(.tiny){line-height:1.65}
 @media(max-width:820px){
 .mobiletabs{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:7px 10px calc(7px + env(safe-area-inset-bottom))}
-.mobiletabs .nav{min-height:52px;border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.46),rgba(218,235,247,.24));border-color:rgba(92,145,185,.18);box-shadow:0 3px 9px rgba(37,91,132,.045),inset 0 1px 0 rgba(255,255,255,.78)}
-.mobiletabs .nav.active{background:linear-gradient(145deg,rgba(255,255,255,.84),rgba(206,232,249,.65));border-color:rgba(92,145,185,.32);color:var(--ink);box-shadow:0 6px 15px rgba(37,91,132,.10),inset 0 1px 0 rgba(255,255,255,.96)}
-:root[data-admin-theme="dark"] .mobiletabs .nav{background:rgba(17,34,49,.42);border-color:rgba(142,188,224,.16);box-shadow:inset 0 1px 0 rgba(234,243,251,.07)}
 .mobiletabs .nav.active span:first-child{color:#3e7eaa}
-.mobiletabs .nav span:first-child svg{width:19px;height:19px}
-:root[data-admin-theme="dark"] .mobiletabs .nav.active{background:rgba(92,145,185,.20);color:#eaf3fb;border-color:rgba(142,188,224,.18)}
 }
 @media(max-width:680px){
 #main .mobilecards{width:100%;min-width:0!important;border-collapse:separate;border-spacing:0}
@@ -608,11 +603,11 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 /* Compact dashboard layout uses live counts only; it deliberately avoids fabricated trend data. */
 .stat .label{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:27px}
 .stat .label>span:first-child{min-width:0}
-.stat-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid transparent;border-radius:50%;background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;color:var(--reference-blue);box-shadow:0 8px 18px rgba(38,91,132,.16),0 0 13px rgba(168,207,239,.18),inset 0 1px 0 var(--glass-inner-highlight)}
+.stat-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid transparent;border-radius:50%;background:var(--glass-face) padding-box,var(--glass-edge) border-box;color:var(--reference-blue);box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight)}
 .stat-icon svg{display:block;width:20px;height:20px}
 .dashboard-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
-.dashboard-shortcut{display:flex;align-items:center;justify-content:center;gap:10px;min-height:104px;padding:14px;background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;color:var(--ink);border:1px solid transparent;box-shadow:0 8px 20px rgba(37,91,132,.08),inset 0 1px 0 var(--glass-inner-highlight);backdrop-filter:none;-webkit-backdrop-filter:none}
-.dashboard-shortcut .shortcut-icon{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid transparent;border-radius:50%;background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;color:var(--reference-navy);box-shadow:0 8px 18px rgba(38,91,132,.16),0 0 13px rgba(168,207,239,.18),inset 0 1px 0 var(--glass-inner-highlight)}
+.dashboard-shortcut{display:flex;align-items:center;justify-content:center;gap:10px;min-height:104px;padding:14px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;color:var(--ink);border:1px solid transparent;box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight);backdrop-filter:none;-webkit-backdrop-filter:none}
+.dashboard-shortcut .shortcut-icon{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border:1px solid transparent;border-radius:50%;background:var(--glass-face) padding-box,var(--glass-edge) border-box;color:var(--reference-navy);box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight)}
 .dashboard-shortcut .shortcut-icon svg{display:block;width:21px;height:21px}
 .dashboard-shortcut .shortcut-copy{display:block;min-width:0;flex:1;font-size:10px;line-height:1.4;color:var(--muted)}
 .dashboard-shortcut .shortcut-copy b{display:block;margin:0 0 4px;color:var(--ink);font-size:11px;line-height:1.25;overflow-wrap:anywhere}
@@ -642,11 +637,11 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .dashboard-revenue .panelhead::after{right:43px;top:24px;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.99),rgba(211,235,249,.86) 49%,rgba(132,190,226,.55));box-shadow:0 8px 17px rgba(37,91,132,.18),inset -4px -6px 11px rgba(95,157,194,.22),inset 4px 3px 9px rgba(255,255,255,.92)}
 .dashboard-revenue .panelhead{align-items:flex-start;gap:12px}
 .dashboard-revenue .revenue-period{font-size:10px;color:var(--muted);font-weight:650;white-space:nowrap}
-.dashboard-revenue-empty{display:grid;grid-template-columns:minmax(0,1fr) 64px;align-items:center;gap:14px;min-height:94px;padding:12px 16px;border:1px solid transparent;border-radius:18px;background:linear-gradient(150deg,rgba(255,255,255,.64),rgba(223,241,251,.48)) padding-box,var(--glass-edge) border-box;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(112,166,200,.18),inset 0 5px 12px rgba(255,255,255,.12)}
+.dashboard-revenue-empty{display:grid;grid-template-columns:minmax(0,1fr) 64px;align-items:center;gap:14px;min-height:94px;padding:12px 16px;border:1px solid transparent;border-radius:18px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(112,166,200,.18),inset 0 5px 12px rgba(255,255,255,.12)}
 .dashboard-revenue-copy{min-width:0}
 .dashboard-revenue-copy strong{display:block;margin-bottom:4px;color:var(--ink);font-size:12px}
 .dashboard-revenue-copy p{max-width:620px;margin:0;color:var(--muted);font-size:10px;line-height:1.5}
-.dashboard-revenue-visual{display:grid;place-items:center;width:58px;height:58px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,rgba(92,145,185,.13),rgba(92,145,185,.035));color:var(--gold)}
+.dashboard-revenue-visual{display:grid;place-items:center;width:58px;height:58px;border:1px solid transparent;border-radius:17px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;color:var(--gold);box-shadow:var(--sd-3d-shadow)}
 .dashboard-revenue-visual svg{width:30px;height:30px}
 .panelhead h3,.dashboard-shortcut .shortcut-copy b{font-family:"SD Serif",Georgia,"Times New Roman",serif;font-weight:600}
 @media(max-width:520px){.dashboard-revenue-empty{grid-template-columns:minmax(0,1fr) 42px;gap:8px;padding:10px 12px}.dashboard-revenue-copy strong{font-size:11px}.dashboard-revenue-copy p{font-size:9px;line-height:1.45}.dashboard-revenue-visual{width:40px;height:40px;border-radius:12px}.dashboard-revenue-visual svg{width:23px;height:23px}.dashboard-revenue .panelhead{flex-wrap:wrap;gap:6px}.dashboard-revenue .revenue-period{white-space:normal}}
@@ -1055,30 +1050,58 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 /* Based on the supplied 12-screen 1024×1536 mobile reference. Structural changes
    are confined to Admin skin; APIs, auth, D1, image metadata and unknown values remain intact. */
 :root {
+  /* Keep Admin on the Storefront's canonical Liquid Glass 2.0 optical tokens. */
+  --sd-3d-ink:#193449;
+  --sd-3d-shadow:0 2px 4px rgba(48,84,117,.12),0 10px 22px rgba(49,86,119,.14);
+  --sd-3d-depressed:0 1px 2px rgba(47,85,120,.035),inset 1px 2px 4px rgba(80,114,145,.22),inset -1px -1px 3px rgba(255,255,255,.16);
+  --sd-3d-selected:0 1px 2px rgba(51,85,120,.06),inset 1px 2px 4px rgba(83,118,150,.17),inset -1px -1px 3px rgba(255,255,255,.13);
+  --sd-3d-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(240,158,211,.28),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(100,167,232,.23),transparent 85%),radial-gradient(ellipse 100% 47% at 60% 110%,rgba(102,224,206,.31),transparent 82%),linear-gradient(180deg,rgba(255,255,255,.91),rgba(221,244,255,.48) 46%,rgba(190,222,242,.30) 72%,rgba(233,255,249,.79));
+  --sd-3d-face:radial-gradient(ellipse 108% 94% at 19% -18%,rgba(255,255,255,.70),rgba(255,255,255,.12) 53%,transparent 80%),radial-gradient(ellipse 88% 102% at 108% 106%,rgba(181,219,239,.12),transparent 76%),linear-gradient(142deg,rgba(247,253,255,.50) 0%,rgba(233,248,254,.38) 51%,rgba(216,238,250,.30) 100%);
+  --sd-glass-panel-shadow:0 15px 35px rgba(35,80,113,.13),0 2px 5px rgba(43,89,119,.08),inset 1px 2px 4px rgba(109,150,176,.13),inset 0 -1px 1px rgba(255,255,255,.32);
+  --sd-glass-input-shadow:0 3px 9px rgba(45,87,118,.075),inset 1px 2px 4px rgba(93,139,167,.14);
+  --sd-glass-input-edge:rgba(147,191,225,.38);
+  --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.45),rgba(211,235,250,.26) 65%,rgba(189,224,246,.16) 100%);
+  --sd-control-rim:rgba(184,207,225,.45);
+  --sd-3d-ease:cubic-bezier(.18,.8,.24,1);
+  --glass-face:var(--sd-3d-face);
   --reference-blue:#477eae;
-  --reference-navy:#123d69;
-  --reference-border:rgba(107,158,194,.25);
+  --reference-navy:var(--sd-3d-ink);
+  --reference-border:var(--sd-control-rim);
   --reference-sheet:rgba(251,254,255,.87);
   --glass-surface-start:rgba(255,255,255,.93);
   --glass-surface-end:rgba(225,242,252,.86);
   --glass-inner-highlight:rgba(255,255,255,.99);
-  --glass-shell-shadow:0 19px 36px rgba(37,91,132,.16),0 4px 10px rgba(37,91,132,.10),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -1px 0 rgba(111,164,197,.30),inset 0 5px 14px rgba(255,255,255,.24),inset 0 -7px 15px rgba(111,164,197,.12);
+  --glass-shell-shadow:var(--sd-glass-panel-shadow);
   --glass-blur:18px;
   --glass-nav-blur:26px;
   --glass-press-duration:130ms;
   --glass-release-duration:240ms;
-  --glass-edge:linear-gradient(135deg,rgba(255,255,255,1),rgba(236,195,228,.96) 23%,rgba(154,205,241,.94) 70%,rgba(145,222,207,.92));
+  --glass-edge:var(--sd-3d-rim);
+  --glass-selected-face:var(--sd-glass-selected);
 }
 :root[data-admin-theme="dark"] {
+  --sd-3d-ink:#edf7ff;
+  --sd-3d-shadow:0 2px 4px rgba(0,5,15,.22),0 10px 22px rgba(0,7,19,.26);
+  --sd-3d-depressed:0 1px 2px rgba(0,5,15,.09),inset 1px 2px 5px rgba(0,7,18,.34),inset -1px -1px 3px rgba(105,164,197,.10);
+  --sd-3d-selected:0 1px 2px rgba(0,5,16,.12),inset 1px 2px 4px rgba(0,7,17,.27),inset -1px -1px 3px rgba(107,165,197,.11);
+  --sd-3d-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(218,149,201,.25),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(112,172,234,.29),transparent 85%),radial-gradient(ellipse 100% 47% at 60% 110%,rgba(106,212,199,.30),transparent 82%),linear-gradient(180deg,rgba(190,231,255,.63),rgba(94,158,208,.31) 46%,rgba(60,122,175,.20) 72%,rgba(167,230,222,.53));
+  --sd-3d-face:radial-gradient(ellipse 108% 94% at 19% -18%,rgba(178,219,243,.28),rgba(117,174,205,.07) 53%,transparent 80%),radial-gradient(ellipse 88% 102% at 108% 106%,rgba(48,94,129,.18),transparent 76%),linear-gradient(142deg,rgba(52,103,137,.26) 0%,rgba(32,77,108,.21) 51%,rgba(24,60,85,.27) 100%);
+  --sd-glass-panel-shadow:0 15px 35px rgba(0,6,18,.30),0 2px 5px rgba(0,7,21,.14),inset 1px 2px 4px rgba(0,16,32,.24),inset 0 -1px 1px rgba(150,202,236,.10);
+  --sd-glass-input-shadow:0 3px 9px rgba(0,6,18,.13),inset 1px 2px 4px rgba(0,11,26,.30);
+  --sd-glass-input-edge:rgba(126,183,223,.31);
+  --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(57,115,171,.41),rgba(31,79,117,.29) 65%,rgba(20,69,104,.19) 100%);
+  --sd-control-rim:rgba(114,150,184,.40);
+  --glass-face:var(--sd-3d-face);
   --reference-blue:#92c9ec;
-  --reference-navy:#cfe8fb;
-  --reference-border:rgba(142,188,224,.27);
+  --reference-navy:var(--sd-3d-ink);
+  --reference-border:var(--sd-control-rim);
   --reference-sheet:rgba(18,38,55,.89);
   --glass-surface-start:rgba(33,59,79,.96);
   --glass-surface-end:rgba(13,34,51,.92);
   --glass-inner-highlight:rgba(222,239,251,.20);
-  --glass-shell-shadow:0 17px 34px rgba(0,0,0,.30),0 0 14px rgba(110,163,205,.10),inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(111,164,197,.20);
-  --glass-edge:linear-gradient(135deg,rgba(223,187,218,.70),rgba(145,190,224,.70) 60%,rgba(121,202,190,.64));
+  --glass-shell-shadow:var(--sd-glass-panel-shadow);
+  --glass-edge:var(--sd-3d-rim);
+  --glass-selected-face:var(--sd-glass-selected);
 }
 /* Brand identity is not a theme token. Preserve the original SD emblem pixels:
    never hue-rotate, grayscale, brighten, or recolor the approved logo asset.
@@ -1093,7 +1116,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .topbar{
   top:8px;width:min(calc(100% - 32px),1200px);margin:8px auto 0;padding:9px 13px;
   border:1px solid transparent;border-radius:999px;
-  background:linear-gradient(135deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;
+  background:var(--glass-face) padding-box,var(--glass-edge) border-box;
   box-shadow:var(--glass-shell-shadow);
   backdrop-filter:blur(var(--glass-blur)) saturate(150%);
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(150%);
@@ -1101,47 +1124,47 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .topbar .brand h1,.logincard .brand h1{font:500 20px/1.15 "SD Serif",Georgia,"Times New Roman",serif;letter-spacing:0;text-transform:none}
 .topbar .brand p{margin-top:3px;font-size:9px;letter-spacing:.13em}
 .topright .btn{min-width:44px;min-height:44px;border-radius:50%;padding:0}
-#adminThemeToggle{font-size:0!important;color:var(--reference-navy);border:1px solid transparent;background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;box-shadow:var(--glass-shell-shadow)}
-.topbar .topright #notificationToggle{border:1px solid transparent;background:linear-gradient(145deg,rgba(255,250,235,.96),rgba(249,238,214,.78)) padding-box,linear-gradient(135deg,rgba(255,255,255,.99),rgba(234,205,230,.76) 28%,rgba(168,207,239,.68) 72%,rgba(163,224,210,.74)) border-box;box-shadow:var(--glass-shell-shadow)}
-.topbar .topright #logout{border:1px solid transparent;background:linear-gradient(145deg,rgba(255,250,251,.94),rgba(255,237,237,.78)) padding-box,linear-gradient(135deg,rgba(255,255,255,.99),rgba(234,191,205,.7) 28%,rgba(168,207,239,.64) 72%,rgba(163,224,210,.7)) border-box;box-shadow:var(--glass-shell-shadow)}
+#adminThemeToggle{font-size:0!important;color:var(--reference-navy);border:1px solid transparent;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:var(--sd-3d-shadow)}
+.topbar .topright #notificationToggle{border:1px solid transparent;background:linear-gradient(145deg,rgba(255,250,235,.96),rgba(249,238,214,.78)) padding-box,var(--glass-edge) border-box;box-shadow:var(--sd-3d-shadow)}
+.topbar .topright #logout{border:1px solid transparent;background:linear-gradient(145deg,rgba(255,250,251,.94),rgba(255,237,237,.78)) padding-box,var(--glass-edge) border-box;box-shadow:var(--sd-3d-shadow)}
 #adminThemeToggle::before{content:"◐";font-size:19px;line-height:1}
 #adminThemeToggle[aria-pressed="true"]::before{content:"☀"}
-#adminMenuToggle{display:none;flex:0 0 44px;width:44px;height:44px;padding:0;border-radius:50%;color:var(--reference-navy);border:1px solid transparent;background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;box-shadow:var(--glass-shell-shadow)}
+#adminMenuToggle{display:none;flex:0 0 44px;width:44px;height:44px;padding:0;border-radius:50%;color:var(--reference-navy);border:1px solid transparent;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:var(--sd-3d-shadow)}
 #adminMenuToggle svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
 .topbar .brand{min-width:0}
 .topbar .brand-logo{width:48px;height:48px;flex:0 0 48px}
 .btn,.control,.nav,.editor-tab,.warranty-filter-button,.mobile-more-item,.dashboard-shortcut{
-  transition:transform var(--glass-release-duration) cubic-bezier(.2,.8,.25,1),box-shadow var(--glass-release-duration) ease,background-color var(--glass-release-duration) ease,border-color var(--glass-release-duration) ease,color var(--glass-release-duration) ease;
+  transition:transform var(--glass-release-duration) var(--sd-3d-ease),box-shadow var(--glass-release-duration) var(--sd-3d-ease),background-color var(--glass-release-duration) ease,border-color var(--glass-release-duration) ease,color var(--glass-release-duration) ease;
   touch-action:manipulation;
 }
 .btn:not(:disabled):active,.nav:active,.shortcut:active,.dashboard-shortcut:active,
 .editor-tab:active,.warranty-filter-button:active,.mobile-more-item:active{
-  transform:translateY(2px) scale(.985);
-  box-shadow:inset 0 2px 7px rgba(34,79,113,.16),inset 0 1px 0 var(--glass-inner-highlight);
+  transform:translateY(1px) scale(.985);
+  box-shadow:var(--sd-3d-depressed);
   transition-duration:var(--glass-press-duration);
 }
 .btn:focus-visible,.nav:focus-visible,.control:focus-visible,.editor-tab:focus-visible,
 .warranty-filter-button:focus-visible,.mobile-more-item:focus-visible{outline:2px solid #3179bb;outline-offset:3px}
 .btn:disabled{transform:none;box-shadow:none}
-.btn:not(.primary):not(.danger){background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end));box-shadow:0 5px 13px rgba(37,91,132,.09),inset 0 1px 0 var(--glass-inner-highlight)}
-.nav.active{background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(216,239,253,.82));border:1px solid var(--reference-border);color:var(--reference-navy);box-shadow:0 5px 14px rgba(49,121,187,.14),inset 0 1px 0 var(--glass-inner-highlight)}
-.control{border-radius:12px;border-color:var(--reference-border);background:linear-gradient(145deg,rgba(255,255,255,.86),rgba(233,245,253,.73));box-shadow:inset 0 1px 4px rgba(46,92,125,.08);transition:background-color var(--glass-release-duration) ease,border-color var(--glass-release-duration) ease,box-shadow var(--glass-release-duration) ease}
-:root[data-admin-theme="dark"] .control{background:linear-gradient(145deg,rgba(8,26,39,.84),rgba(20,43,60,.82));border-color:var(--reference-border);color:var(--ink)}
+.btn:not(.primary):not(.danger){border-color:transparent;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight)}
+.nav.active{background:var(--glass-selected-face) padding-box,var(--glass-edge) border-box;border:1px solid transparent;color:var(--reference-navy);box-shadow:var(--sd-3d-shadow),var(--sd-3d-selected)}
+.control{border-radius:12px;border-color:var(--sd-glass-input-edge);background:var(--glass-face);box-shadow:var(--sd-glass-input-shadow);transition:background-color var(--glass-release-duration) ease,border-color var(--glass-release-duration) ease,box-shadow var(--glass-release-duration) ease}
+:root[data-admin-theme="dark"] .control{background:var(--glass-face);border-color:var(--sd-glass-input-edge);color:var(--ink)}
 .panel,.stat,.setting,.shortcut:not(.dashboard-shortcut),.logincard,.editor,.notification-panel,.mobile-more-panel {
   border:1px solid transparent;
-  background:linear-gradient(148deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;
+  background:var(--glass-face) padding-box,var(--glass-edge) border-box;
   box-shadow:var(--glass-shell-shadow);
   backdrop-filter:blur(var(--glass-blur)) saturate(148%);
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(148%);
 }
-.admin-glass-dialog{width:min(92vw,420px);max-width:calc(100vw - 24px);border:1px solid transparent;border-radius:24px;padding:20px;background:linear-gradient(148deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;color:var(--ink);box-shadow:var(--glass-shell-shadow);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%)}
+.admin-glass-dialog{width:min(92vw,420px);max-width:calc(100vw - 24px);border:1px solid transparent;border-radius:24px;padding:20px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;color:var(--ink);box-shadow:var(--glass-shell-shadow);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%)}
 .admin-glass-dialog::backdrop{background:rgba(13,35,56,.34);backdrop-filter:blur(4px)}
 .admin-glass-dialog__form{display:grid;gap:13px}.admin-glass-dialog__actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap}
 #restorePasswordConfirmation{width:100%;min-height:42px;padding:10px;border-radius:12px}
 /* Repeated list rows keep the same glass shell without a separate blur layer per item. */
 #main .mobilecards tbody tr,#main .customer-mobile-summary,.activity-log-card,#main .sd-order-card,.order-detail-item,.order-management-details,.warranty-issue-disclosure,.activity-view-tabs {
   border:1px solid transparent;
-  background:linear-gradient(148deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;
+  background:var(--glass-face) padding-box,var(--glass-edge) border-box;
   box-shadow:var(--glass-shell-shadow);
 }
 :root[data-admin-theme="dark"] .panel,
@@ -1154,7 +1177,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 :root[data-admin-theme="dark"] .activity-log-card,
 :root[data-admin-theme="dark"] #main .sd-order-card,
 :root[data-admin-theme="dark"] .order-detail-item {
-  background:linear-gradient(155deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;
+  background:var(--glass-face) padding-box,var(--glass-edge) border-box;
   box-shadow:var(--glass-shell-shadow);
 }
 .control,.editor-tab-panel,.imagedrop,
@@ -1193,31 +1216,33 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 /* The approved design is airy but must not hide full business controls. */
 @media(max-width:820px) {
   .topbar {
-    min-height:56px;width:calc(100% - 24px);margin:8px 12px 0;padding:6px 11px;
-    border:1px solid transparent;border-radius:999px;
-    background:linear-gradient(135deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;
-    box-shadow:var(--glass-shell-shadow);
+    min-height:56px;width:calc(100% - 24px);margin:6px 12px 0;padding:6px 11px;
+    border:1px solid var(--reference-border);border-radius:999px;
+    background:linear-gradient(135deg,rgba(255,255,255,.91),rgba(226,241,251,.78));
+    box-shadow:0 9px 22px rgba(37,88,127,.08),inset 0 1px 0 rgba(255,255,255,.95);
   }
   #adminMenuToggle{display:inline-flex}
-  :root[data-admin-theme="dark"] .topbar{border-color:transparent;background:linear-gradient(135deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;box-shadow:var(--glass-shell-shadow)}
-  .layout{padding:12px 12px calc(93px + 2 * env(safe-area-inset-bottom))}
-  #main .pagehead{margin-bottom:8px}
-  #main .pagehead h2{font-size:clamp(28px,7.4vw,34px);line-height:1.08}
+  :root[data-admin-theme="dark"] .topbar{background:linear-gradient(135deg,rgba(31,57,76,.94),rgba(13,34,51,.91));border-color:var(--reference-border)}
+  .layout{padding:6px 12px calc(93px + env(safe-area-inset-bottom))}
+  #main .pagehead{margin-bottom:4px}
+  #main .pagehead h2{font-size:clamp(26px,6.6vw,30px);line-height:1.08}
   #main .pagehead .eyebrow{font-size:10px;margin-bottom:4px}
   #main .pagehead p{font-size:11px;max-width:42ch}
-  #main .statgrid{gap:6px;margin-bottom:10px}
-  #main .stat{min-height:82px;padding:8px 10px;border-radius:18px}
+  #main .statgrid{gap:6px;margin-bottom:8px}
+  #main .stat{min-height:76px;padding:6px 10px;border-radius:18px}
   #main .stat .label{font-size:10px}
   #main .stat-icon{flex-basis:32px;width:32px;height:32px}
   #main .stat-icon svg{width:17px;height:17px}
-  #main .stat .value{font-size:22px;line-height:1.05;margin:3px 0 1px}
+  #main .stat .value{font-size:22px;line-height:1.05;margin:4px 0 2px}
   #main .stat .hint{font-size:9px;line-height:1.3}
+  #main .dashboard-quick-panel{margin-bottom:8px!important}
+  #main .dashboard-quick-panel .panelhead{padding:9px 12px 6px}
   #main .dashboard-shortcuts{gap:6px}
-  #main .dashboard-shortcut{min-height:78px;padding:7px 4px;gap:6px;border-radius:18px}
-  #main .dashboard-shortcut .shortcut-icon{flex-basis:42px;width:42px;height:42px}
-  #main .dashboard-revenue{margin-bottom:10px}
-  #main .dashboard-revenue .panelhead{padding:9px 12px 7px}
-  #main .dashboard-revenue-empty{min-height:74px;padding:8px 10px;gap:6px}
+  #main .dashboard-shortcut{min-height:60px;padding:5px 4px;gap:4px;border-radius:18px}
+  #main .dashboard-shortcut .shortcut-icon{flex-basis:32px;width:32px;height:32px}
+  #main .dashboard-revenue{margin-bottom:8px}
+  #main .dashboard-revenue .panelhead{padding:8px 12px 6px}
+  #main .dashboard-revenue-empty{min-height:70px;padding:7px 9px;gap:6px}
   #main .dashboard-revenue-copy strong{font-size:10px;margin-bottom:3px}
   #main .dashboard-revenue-copy p{font-size:8px;line-height:1.3}
   #main .dashboard-revenue-visual{width:36px;height:36px}
@@ -1232,26 +1257,26 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
     left:12px;right:12px;bottom:calc(5px + env(safe-area-inset-bottom));
     gap:5px;min-height:56px;padding:4px 8px;
     border:1px solid transparent;border-radius:999px;
-    background:linear-gradient(145deg,rgba(249,253,255,.97),rgba(221,240,251,.94)) padding-box,var(--glass-edge) border-box;
+    background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--glass-shell-shadow);
     backdrop-filter:blur(var(--glass-nav-blur)) saturate(160%);
     -webkit-backdrop-filter:blur(var(--glass-nav-blur)) saturate(160%);
   }
-  :root[data-admin-theme="dark"] .mobiletabs{background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box}
- .mobiletabs .nav{border:1px solid transparent!important;min-height:46px;padding:3px 2px;border-radius:999px;font-size:10px;line-height:1.25;background:linear-gradient(145deg,rgba(250,254,255,.92),rgba(221,240,252,.84)) padding-box,var(--glass-edge) border-box;box-shadow:0 6px 13px rgba(37,91,132,.11),0 0 10px rgba(168,207,239,.12),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 5px rgba(111,164,197,.10)}
+  :root[data-admin-theme="dark"] .mobiletabs{background:var(--glass-face) padding-box,var(--glass-edge) border-box}
+ .mobiletabs .nav{border:1px solid transparent!important;min-height:46px;padding:3px 2px;border-radius:999px;font-size:10px;line-height:1.25;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight)}
   .mobiletabs .nav span:first-child svg{width:19px;height:19px}
   .mobiletabs .nav.active{
-    background:linear-gradient(145deg,rgba(255,255,255,.99),rgba(205,234,251,.94)) padding-box,var(--glass-edge) border-box!important;color:var(--reference-navy)!important;
+    background:var(--glass-selected-face) padding-box,var(--glass-edge) border-box!important;color:var(--reference-navy)!important;
     border-color:transparent!important;
-    box-shadow:0 8px 20px rgba(49,121,187,.24),0 0 15px rgba(125,194,232,.27),inset 0 1px 0 rgba(255,255,255,1),inset 0 -2px 5px rgba(111,164,197,.16);
+    box-shadow:0 6px 14px rgba(49,121,187,.16),var(--sd-3d-selected),inset 0 1px 0 rgba(255,255,255,.9);
   }
-  :root[data-admin-theme="dark"] .mobiletabs .nav.active{background:linear-gradient(145deg,rgba(59,99,127,.82),rgba(27,57,78,.9)) padding-box,var(--glass-edge) border-box!important;border-color:rgba(142,188,224,.30)!important;color:#eaf3fb!important}
+  :root[data-admin-theme="dark"] .mobiletabs .nav.active{background:var(--glass-selected-face) padding-box,var(--glass-edge) border-box!important;border-color:transparent!important;color:var(--reference-navy)!important}
   .mobile-more-panel{bottom:calc(70px + env(safe-area-inset-bottom))}
   /* Keep the alert above the navigation at narrow 320px Android widths (>=8px gap). */
   .toast{bottom:calc(90px + env(safe-area-inset-bottom))}
   /* Product cards mirror the reference's image-left / information-right rhythm. */
   #main .product-table tbody{gap:7px;padding:8px 0 10px}
-  #main .product-table tbody tr{border:1px solid transparent;border-radius:13px;padding:7px 10px;background:linear-gradient(148deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;box-shadow:0 8px 18px rgba(37,91,132,.09),inset 0 1px 0 var(--glass-inner-highlight)}
+  #main .product-table tbody tr{border:1px solid transparent;border-radius:13px;padding:7px 10px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight)}
   #main .product-table tbody tr td:first-child{padding:3px 0}
   #main .product-table .rowprod{gap:10px;align-items:center}
   #main .product-table .thumb{width:62px;height:62px;flex:0 0 62px;border-radius:9px}
@@ -1630,7 +1655,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>
 (()=>{'use strict';const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));const CAT={sneakers:'Giày Thể Thao',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví nam','vi-nam':'Ví nam','vi-cam-tay':'Ví cầm tay','cap-tab-laptop':'Cặp – Tab – Laptop',clutch:'Clutch',mu:'Mũ','tui-deo-cheo':'Túi đeo chéo','tui-golf':'Túi golf','tui-nu':'Túi nữ',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};const SKU_RULES={sneakers:'SD-SN',loafers:'SD-GL','dress-shoes':'SD-GT',belts:'SD-TL',wallets:'SD-VN','vi-nam':'SD-VN','vi-cam-tay':'SD-VD','cap-tab-laptop':'SD-CA',clutch:'SD-CL',mu:'SD-MU','tui-deo-cheo':'SD-DC','tui-golf':'SD-TG','tui-nu':'SD-TN',sandals:'SD-DD','watch-straps':'SD-DH','phone-cases':'SD-OP'};const SKU_CATEGORY_ALIASES={sneaker:'sneakers',sneakers:'sneakers','giay-the-thao':'sneakers','giay-luoi':'loafers',loafers:'loafers','giay-tay':'dress-shoes','dress-shoes':'dress-shoes','that-lung':'belts',belts:'belts','vi-da':'vi-nam',wallets:'vi-nam','vi-nam':'vi-nam','vi-cam-tay':'vi-cam-tay','cap-tab-laptop':'cap-tab-laptop',clutch:'clutch',mu:'mu','tui-deo-cheo':'tui-deo-cheo','tui-golf':'tui-golf','tui-nu':'tui-nu',dep:'sandals',sandals:'sandals','day-dong-ho':'watch-straps','watch-straps':'watch-straps','op-dien-thoai':'phone-cases','phone-cases':'phone-cases'};function skuCategory(value){const key=String(value||'').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return SKU_CATEGORY_ALIASES[key]||null}function nextSkuForCategory(value){const key=skuCategory(value),prefix=key&&SKU_RULES[key];if(!prefix)return '';let max=0;for(const p of products){const sku=String(p.sku||'').toUpperCase();if(!sku.startsWith(prefix))continue;const suffix=sku.slice(prefix.length);if(/^\d+$/.test(suffix))max=Math.max(max,Number(suffix)||0)}return prefix+String(max+1).padStart(3,'0')}let products=[],paymentQrSettings={active:false,pending:false,activeImageUrl:'',pendingImageUrl:''},settings={showPrices:false,watermarkEnabled:true,watermarkLogoUrl:'/watermark.webp',watermarkPosition:'bottom-right',watermarkSize:16,watermarkOpacity:68},orders=[],customers=[],claims=[],issuedWarranties=[],auditLogs=[],auditLogLoadError=false,customersLoadError=false,warrantyLoadError=false,selectedOrderId=new URLSearchParams(location.search).get('orderId')||'',view=(()=>{const params=new URLSearchParams(location.search),v=params.get('view');return ['dashboard','products','orders','customers','warranties','settings','backup','activity'].includes(v)||(v==='order-detail'&&params.get('orderId'))?v:'dashboard'})(),search='',category='all',fulfillmentFilter='all',publishedFilter='all',page=1,customerSearch='',orderSearch='',orderStatusFilter='all',orderPaymentFilter='all',warrantySearch='',warrantyClaimFilter='all',activitySearch='',activityActionFilter='all',activityEntityFilter='all',activityActorFilter='all',activityDateFrom='',activityDateTo='',activityFiltersExpanded=false,activityTab='log',editing=null,gallery=[],busy=false,resetBusy=false,autoSkuValue='',timer=0;
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function applyAdminTheme(mode){const dark=mode==='dark'||(mode==='auto'&&!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches));document.documentElement.dataset.adminTheme=dark?'dark':'light';const themeColor=$('#adminThemeColor');if(themeColor)themeColor.setAttribute('content',dark?'#09131d':'#eaf3fb');const b=$('#adminThemeToggle');if(b){b.textContent=dark?'☀ Giao diện sáng':'☾ Giao diện tối';b.setAttribute('aria-pressed',String(dark))}}function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');clearTimeout(timer);timer=setTimeout(()=>$('#toast').classList.remove('show'),3500)}function err(el,s){el.textContent=s||'';el.classList.toggle('hidden',!s)}
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function applyAdminTheme(mode){const dark=mode==='dark'||(mode==='auto'&&!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches));document.documentElement.dataset.adminTheme=dark?'dark':'light';const themeColor=$('#adminThemeColor');if(themeColor)themeColor.setAttribute('content',dark?'#061522':'#eaf3fb');const b=$('#adminThemeToggle');if(b){b.textContent=dark?'☀ Giao diện sáng':'☾ Giao diện tối';b.setAttribute('aria-pressed',String(dark))}}function toast(s){$('#toast').textContent=s;$('#toast').classList.add('show');clearTimeout(timer);timer=setTimeout(()=>$('#toast').classList.remove('show'),3500)}function err(el,s){el.textContent=s||'';el.classList.toggle('hidden',!s)}
 async function api(url,opt={}){let r;try{r=await fetch(url,{credentials:'same-origin',cache:'no-store',...opt,headers:{...(opt.body instanceof FormData?{}:{'Content-Type':'application/json'}),...(opt.headers||{})}})}catch{throw Error('Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.')}let d;try{d=(r.headers.get('content-type')||'').includes('application/json')?await r.json():{error:'Máy chủ trả dữ liệu không hợp lệ.'}}catch{d={error:'Không đọc được phản hồi máy chủ.'}}if(!r.ok){if(r.status===401)showLogin();throw Error(d.error||`Lỗi máy chủ ${r.status}`)}return d}
 function showLogin(){$('#appView').classList.add('hidden');$('#loginView').classList.remove('hidden');$('#logout').hidden=true;clearTimeout(inactivityTimer)}function showApp(){$('#loginView').classList.add('hidden');$('#appView').classList.remove('hidden');$('#logout').hidden=false;$('#conn').textContent='Đã kết nối máy chủ';try{window.SDAdminDevice?.postMessage('ready')}catch{}if(!history.state?.sdAdminRoot&&!history.state?.sdAdminGuard){history.replaceState({sdAdminRoot:true,view},'',location.href);history.pushState({sdAdminGuard:true,view},'',location.href)}resetInactivity();renderNotifications();render()}let inactivityTimer=0,lastUserActivity=Date.now();function resetInactivity(){lastUserActivity=Date.now();clearTimeout(inactivityTimer);if($('#appView').classList.contains('hidden'))return;if(navigator.userAgent.includes('SinDarealestAdminAndroid/2'))return;inactivityTimer=setTimeout(()=>logout(true),600000)}async function loadData(){const d=await api('/api/admin/products');products=d.products||[];refreshCategoryOptions();const loaded=await Promise.allSettled([api('/api/admin/settings'),api('/api/admin/payment-qr')]);if(loaded[0].status==='fulfilled')settings=loaded[0].value;if(loaded[1].status==='fulfilled')paymentQrSettings=loaded[1].value;const optional=await Promise.allSettled([api('/api/admin/orders'),api('/api/admin/customers'),api('/api/admin/warranties'),api('/api/admin/audit-logs')]);orders=optional[0].status==='fulfilled'?(optional[0].value.orders||[]):[];customersLoadError=optional[1].status!=='fulfilled'||!Array.isArray(optional[1].value.customers);customers=customersLoadError?[]:optional[1].value.customers;warrantyLoadError=optional[2].status!=='fulfilled'||!Array.isArray(optional[2].value.claims)||!Array.isArray(optional[2].value.warranties);claims=warrantyLoadError?[]:optional[2].value.claims;issuedWarranties=warrantyLoadError?[]:optional[2].value.warranties;auditLogLoadError=optional[3].status!=='fulfilled';auditLogs=optional[3].status==='fulfilled'?(optional[3].value.logs||[]):[];renderNotifications()}
 async function retryCustomers(){try{const data=await api('/api/admin/customers');if(!Array.isArray(data.customers))throw new Error('Phản hồi danh sách khách hàng không hợp lệ.');customers=data.customers;customersLoadError=false;render();toast('Đã tải lại danh sách khách hàng.')}catch(error){customersLoadError=true;render();toast('Không thể tải danh sách khách hàng: '+error.message)}}

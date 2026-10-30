@@ -156,7 +156,7 @@ test('captures the real ADMIN source login across mobile, tablet, desktop and bo
         metadata.screenshots.push(filename);
 
         expect(metrics.lang, 'ADMIN should declare Vietnamese').toBe('vi');
-        expect(metrics.backgroundToken, `Theme token matches ${theme} mode`).toBe(theme === 'dark' ? '#09131d' : '#eaf3fb');
+        expect(metrics.backgroundToken, `Theme token matches ${theme} mode`).toBe(theme === 'dark' ? '#061522' : '#eaf3fb');
         expect(metrics.horizontalOverflow, `No horizontal overflow at ${viewport.width}px in ${theme} mode`).toBe(false);
       }
     }
@@ -845,7 +845,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await captureView('dashboard', 'dashboard', null, true);
     // Capture the dashboard at the reference phone's usable app height without
     // multiplying that slower viewport across every route in the QA matrix.
-    const referenceDashboardVariant = { viewport: { width: 430, height: 720 }, theme: 'light' };
+    const referenceDashboardVariant = { viewport: { width: 390, height: 650 }, theme: 'light' };
     await page.setViewportSize(referenceDashboardVariant.viewport);
     await chooseTheme(referenceDashboardVariant.theme);
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -1042,7 +1042,6 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
     }
 
-    console.info('[ADMIN_STATIC_STAGE] product reference matrix passed');
     // Compact mobile cards show price and publication status; inventory stays in product details.
     await page.setViewportSize(mobile);
     await chooseTheme('light');
