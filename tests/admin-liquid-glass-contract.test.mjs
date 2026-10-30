@@ -348,7 +348,7 @@ has('#productEditorTabs{position:sticky;top:0;height:48px;min-height:48px;max-he
 has('.product-editor-tabs{position:sticky;top:0;z-index:3;', 'desktop editor tabs stick at the top of their own scroll viewport without covering gallery headings');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
-const repeatedGlassRule = adminHtml.match(/#main \.mobilecards tbody tr,\.activity-log-card,#main \.sd-order-card,\.order-detail-item\s*\{([^}]*)\}/)?.[1] || '';
+const repeatedGlassRule = adminHtml.match(/#main \.mobilecards tbody tr[^{}]*\.order-detail-item\s*\{([^}]*)\}/)?.[1] || '';
 assert.match(repeatedGlassRule, /glass-shell-shadow/, 'repeated glass rows keep their shared shell and contact shadow');
 assert.doesNotMatch(repeatedGlassRule, /backdrop-filter/, 'repeated rows avoid stacking expensive blur layers on long lists');
 const productListMarkup = adminHtml.match(/function productList\(\)\{[\s\S]*?\nfunction orderProductImageMarkup/)?.[0] || '';
