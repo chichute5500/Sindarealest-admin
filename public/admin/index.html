@@ -1121,7 +1121,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(148%);
 }
 /* Repeated list rows keep the same glass shell without a separate blur layer per item. */
-#main .mobilecards tbody tr,#main .product-table tbody tr,#main .customer-mobile-summary,.activity-log-card,#main .sd-order-card,.order-detail-item,.order-management-details,.warranty-issue-disclosure,.activity-view-tabs {
+#main .mobilecards tbody tr,#main .customer-mobile-summary,.activity-log-card,#main .sd-order-card,.order-detail-item,.order-management-details,.warranty-issue-disclosure,.activity-view-tabs {
   border:1px solid transparent;
   background:linear-gradient(148deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;
   box-shadow:var(--glass-shell-shadow);
@@ -1177,11 +1177,11 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   .topbar {
     min-height:56px;width:calc(100% - 24px);margin:8px 12px 0;padding:6px 11px;
     border:1px solid var(--reference-border);border-radius:999px;
-    background:linear-gradient(135deg,rgba(255,255,255,.91),rgba(226,241,251,.78));
-    box-shadow:0 9px 22px rgba(37,88,127,.08),inset 0 1px 0 rgba(255,255,255,.95);
+    background:linear-gradient(135deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;
+    box-shadow:var(--glass-shell-shadow);
   }
   #adminMenuToggle{display:inline-flex}
-  :root[data-admin-theme="dark"] .topbar{background:linear-gradient(135deg,rgba(31,57,76,.94),rgba(13,34,51,.91));border-color:var(--reference-border)}
+  :root[data-admin-theme="dark"] .topbar{border-color:transparent;background:linear-gradient(135deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;box-shadow:var(--glass-shell-shadow)}
   .layout{padding:12px 12px calc(93px + 2 * env(safe-area-inset-bottom))}
   #main .pagehead{margin-bottom:8px}
   #main .pagehead h2{font-size:clamp(28px,7.4vw,34px);line-height:1.08}
@@ -1219,21 +1219,21 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
     backdrop-filter:blur(var(--glass-blur)) saturate(150%);
     -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(150%);
   }
-  :root[data-admin-theme="dark"] .mobiletabs{background:linear-gradient(145deg,rgba(31,57,76,.96),rgba(13,34,51,.94))}
+  :root[data-admin-theme="dark"] .mobiletabs{background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box}
  .mobiletabs .nav{border:1px solid var(--reference-border)!important;min-height:46px;padding:3px 2px;border-radius:999px;font-size:10px;line-height:1.25;background:linear-gradient(145deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;box-shadow:0 4px 10px rgba(37,91,132,.08),inset 0 1px 0 var(--glass-inner-highlight)}
   .mobiletabs .nav span:first-child svg{width:19px;height:19px}
   .mobiletabs .nav.active{
-    background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(216,239,253,.88))!important;color:var(--reference-navy)!important;
+    background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(216,239,253,.88)) padding-box,var(--glass-edge) border-box!important;color:var(--reference-navy)!important;
     border-color:rgba(136,190,222,.36)!important;
     box-shadow:0 5px 14px rgba(49,121,187,.16),inset 0 1px 0 rgba(255,255,255,.98);
   }
-  :root[data-admin-theme="dark"] .mobiletabs .nav.active{background:linear-gradient(145deg,rgba(59,99,127,.82),rgba(27,57,78,.9))!important;border-color:rgba(142,188,224,.30)!important;color:#eaf3fb!important}
+  :root[data-admin-theme="dark"] .mobiletabs .nav.active{background:linear-gradient(145deg,rgba(59,99,127,.82),rgba(27,57,78,.9)) padding-box,var(--glass-edge) border-box!important;border-color:rgba(142,188,224,.30)!important;color:#eaf3fb!important}
   .mobile-more-panel{bottom:calc(70px + env(safe-area-inset-bottom))}
   /* Keep the alert above the navigation at narrow 320px Android widths (>=8px gap). */
   .toast{bottom:calc(90px + env(safe-area-inset-bottom))}
   /* Product cards mirror the reference's image-left / information-right rhythm. */
   #main .product-table tbody{gap:7px;padding:8px 0 10px}
-  #main .product-table tbody tr{border-radius:13px;padding:7px 10px}
+  #main .product-table tbody tr{border:1px solid transparent;border-radius:13px;padding:7px 10px;background:linear-gradient(148deg,var(--glass-surface-start),var(--glass-surface-end)) padding-box,var(--glass-edge) border-box;box-shadow:0 8px 18px rgba(37,91,132,.09),inset 0 1px 0 var(--glass-inner-highlight)}
   #main .product-table tbody tr td:first-child{padding:3px 0}
   #main .product-table .rowprod{gap:10px;align-items:center}
   #main .product-table .thumb{width:62px;height:62px;flex:0 0 62px;border-radius:9px}
@@ -1266,6 +1266,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 }
 /* Preserve usable controls at 320/360px; do not overflow the five-tab footer. */
 @media(max-width:390px) {
+  #main .activity-view-tabs .warranty-filter-button,#main .activity-category-chip{min-height:38px}
   .topbar .brand-logo{width:40px;height:40px;flex-basis:40px}
   .topbar .brand h1{font-size:15px;letter-spacing:0}
   .topbar .brand p{font-size:8px;letter-spacing:.06em}
@@ -1274,8 +1275,8 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   }
   .topright #notificationToggle .bell-icon{width:17px;height:17px}
   .layout{padding-inline:10px;padding-bottom:calc(88px + 2 * env(safe-area-inset-bottom))}
-  #main .pagehead h2{font-size:21px}
-  #main .pagehead .btn{min-height:34px}
+  #main .pagehead h2{font-size:clamp(24px,7vw,28px)}
+  #main .pagehead .btn{min-height:42px}
   #main .stat .value{font-size:21px}
   #main .product-table .thumb{width:58px;height:58px;flex-basis:58px}
   #main .product-table .rowprod{gap:8px}
@@ -1291,11 +1292,11 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   .topright #adminThemeToggle,.topright #notificationToggle,.topright #logout{width:34px;min-width:34px;min-height:34px;flex-basis:34px}
   .mobiletabs{padding-inline:4px}
   .mobiletabs .nav{font-size:9px;min-width:0}
-  #main .pagehead h2{font-size:20px}
+  #main .pagehead h2{font-size:24px}
   #main .product-table .thumb{width:52px;height:52px;flex-basis:52px}
   #main .product-table .prodname{font-size:11px}
   #main .product-table .product-mobile-inline-metric>span{font-size:8px}
-  #main .activity-log-reference-filters{gap:5px}
+  #main .activity-log-reference-filters{gap:5px;flex-wrap:wrap}
 }
 
 /* SD_ADMIN_412PX_HEADER_FLEX_FIX: reference widths 390/412 must not
