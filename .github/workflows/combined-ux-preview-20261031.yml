@@ -49,7 +49,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN"
           test -n "$CLOUDFLARE_ACCOUNT_ID"
 
-      - run: npm ci --no-fund
+      - run: npm install --no-fund
 
       - name: Check source, migrations, CSS and asset safety
         run: npm run check
