@@ -1522,7 +1522,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 /* sd-admin-ux-audit-motion-20261031 */
 
 /* Animation-only Admin pass, preserving all existing materials, sizes and actions. */
-:root{--sd-audit-motion-ease:cubic-bezier(.22,1,.36,1)}
+html{--sd-audit-motion-ease:cubic-bezier(.22,1,.36,1)}
 .backdrop:not(.hidden){animation:sd-admin-audit-fade 240ms var(--sd-audit-motion-ease) both}
 .backdrop:not(.hidden) .editor{animation:sd-admin-audit-editor 340ms var(--sd-audit-motion-ease) both}
 .notification-panel:not(.hidden),.mobile-more-panel:not(.hidden){animation:sd-admin-audit-pop 300ms var(--sd-audit-motion-ease) both}
