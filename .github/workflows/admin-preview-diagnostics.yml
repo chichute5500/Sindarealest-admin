@@ -101,7 +101,12 @@ jobs:
 
       - name: Capture real source screenshots across responsive and theme matrix
         id: baseline
-        run: npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --reporter=line,html
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --reporter=line,html
+          else
+            npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --grep "captures the real ADMIN source login|reference-comparable Admin products" --reporter=line,html
+          fi
 
       - name: Diagnose configured deployed Admin Preview (read-only)
         id: preview
