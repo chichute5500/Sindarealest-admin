@@ -2518,4 +2518,24 @@ async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcome
 }
 async function restoreBackup(e){const f=e.target.files?.[0];e.target.value='';if(!f)return;if(f.size>20*1024*1024){toast('Tệp sao lưu vượt 20 MB.');return}try{const backup=JSON.parse(await f.text()),v2=backup?.format==='sindarealest-backup-v2';const message=v2?'Khôi phục v2 sẽ thay thế danh mục, đơn hàng, khách hàng, bảo hành và nhật ký hiện tại. Tệp JSON không chứa tệp ảnh trong R2; các object ảnh phải còn trong bucket. Bạn đã tải bản sao lưu mới nhất và muốn tiếp tục?':'Bản sao lưu cũ chỉ khôi phục danh mục và cài đặt, không thay thế dữ liệu vận hành. Tệp JSON không chứa tệp ảnh trong R2. Bạn muốn tiếp tục?';if(!confirm(message))return;const restorePassword=await requestRestorePassword();if(!restorePassword)return;const d=await api('/api/admin/restore',{method:'POST',headers:{'X-SD-Restore-Password':restorePassword},body:JSON.stringify(backup)});await loadData();render();toast(d.message)}catch(ex){toast(ex.message||'Không đọc được tệp sao lưu.')}}
 (async()=>{try{await start()}catch(e){showLogin();$('#conn').textContent='Chưa kết nối';err($('#loginError'),e.message)}})();})();
-</script></body></html>
+</script><style id="sd-admin-ux-audit-motion-20261031">
+/* Animation-only Admin pass, preserving all existing materials, sizes and actions. */
+:root{--sd-audit-motion-ease:cubic-bezier(.22,1,.36,1)}
+.backdrop:not(.hidden){animation:sd-admin-audit-fade 240ms var(--sd-audit-motion-ease) both}
+.backdrop:not(.hidden) .editor{animation:sd-admin-audit-editor 340ms var(--sd-audit-motion-ease) both}
+.notification-panel:not(.hidden),.mobile-more-panel:not(.hidden){animation:sd-admin-audit-pop 300ms var(--sd-audit-motion-ease) both}
+.toast{transition:opacity 270ms var(--sd-audit-motion-ease),transform 270ms var(--sd-audit-motion-ease)}
+.btn,.nav{transition-timing-function:var(--sd-audit-motion-ease)}
+@keyframes sd-admin-audit-fade{from{opacity:0}to{opacity:1}}
+@keyframes sd-admin-audit-editor{from{opacity:0;transform:translate3d(22px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes sd-admin-audit-pop{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@media(max-width:820px){
+ .backdrop:not(.hidden) .editor{animation-name:sd-admin-audit-editor-mobile}
+ @keyframes sd-admin-audit-editor-mobile{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+}
+@media(prefers-reduced-motion:reduce){
+ .backdrop:not(.hidden),.backdrop:not(.hidden) .editor,.notification-panel:not(.hidden),.mobile-more-panel:not(.hidden){animation:none!important}
+ .toast,.btn,.nav{transition:none!important}
+}
+</style>
+</body></html>
