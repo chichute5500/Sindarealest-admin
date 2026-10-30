@@ -32,6 +32,7 @@
 <link rel="preload" href="/fonts/NotoSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
+<link rel="stylesheet" href="/mobile-ordering-motion.css?v=20261031">
 <link rel="stylesheet" href="/customer-auth.css?v=account-liquid-20261029">
 <script type="module" src="/customer-auth-ui.js?v=account-liquid-20261029"></script>
 <script type="module" src="/customer-email-otp-ui.js?v=email-recovery-20261029"></script>
@@ -801,6 +802,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 }
 </style>
 <script src="/material-gallery.js" defer></script>
+<script src="/mobile-ordering-motion.js?v=20261031" defer></script>
 
 <style id="sd-checkout-steps-source-backed-2026-10-27">
 /* Source-backed checkout additions: inherit the real glass, light/dark tokens
@@ -2462,7 +2464,9 @@ async function sdCheckoutLoadQuote(){
  sdCheckoutQuote=data;sdCheckoutChoice='deposit';sdCheckoutRenderQuote();
 }
 function sdCheckoutSetStep(step){
+ const previousStep=sdCheckoutStep;
  sdCheckoutStep=Math.max(1,Math.min(3,Number(step)||1));
+ const sheet=$('#checkoutDrawer');if(sheet)sheet.dataset.sdCheckoutDirection=sdCheckoutStep>previousStep?'forward':sdCheckoutStep<previousStep?'back':'none';
  const productionNote=$('#sdOrderProductionCaution');if(productionNote)productionNote.hidden=!sdCheckoutItems().some(({id})=>productFulfillmentType(findProductByKey(id))==='made_to_order');
  const captions=[['Thông tin liên hệ và địa chỉ nhận hàng','Điền thông tin nhận hàng để tiếp tục chọn hình thức thanh toán.'],['Chọn hình thức thanh toán','Chọn đặt cọc hoặc thanh toán toàn bộ.'],['Kiểm tra và gửi đơn','Gửi đơn để Shop đối chiếu và xác nhận giao dịch.']];
  $('#sdCheckoutStepTitle').textContent=captions[sdCheckoutStep-1][0];$('#sdCheckoutStepSubtitle').textContent=captions[sdCheckoutStep-1][1];
@@ -2491,7 +2495,7 @@ function openCheckout(){
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
- sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='deposit';$('#checkoutSubmit').disabled=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();sdCheckoutSetStep(1);
+ sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='deposit';$('#checkoutSubmit').disabled=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();sdCheckoutSetStep(1);panel.dataset.sdCheckoutDirection='none';
  prefillCheckoutFromLocalAddress();
  const first=panel.querySelector('input[name="fullName"]');
  if(first) setTimeout(()=>first.focus({preventScroll:true}),100);
