@@ -1,0 +1,98 @@
+/* SinDarealest mobile order interaction, 2026-10-31.
+   Presentation only: no palette, product, cart, pricing, QR or backend changes.
+   Scoped to existing #checkoutDrawer and the Owner-approved option chips. */
+
+@media (max-width:760px) {
+  /* Override legacy right-side slide and inset full-height sheet only for checkout.
+     Keep existing CSS color/glass tokens and the approved bottom navigation. */
+  #checkoutDrawer.checkout-drawer {
+    top:auto!important;
+    right:7px!important;
+    bottom:calc(78px + env(safe-area-inset-bottom))!important;
+    left:7px!important;
+    width:auto!important;
+    height:min(78dvh, calc(100dvh - 108px - env(safe-area-inset-top) - env(safe-area-inset-bottom)))!important;
+    min-height:0!important;
+    max-height:min(78dvh, calc(100dvh - 108px - env(safe-area-inset-top) - env(safe-area-inset-bottom)))!important;
+    border-radius:25px 25px 20px 20px;
+    padding:15px 13px 10px;
+    transform:translate3d(0,calc(100% + 108px),0);
+    transition:transform 360ms cubic-bezier(.22,.75,.23,1),visibility 0s linear 360ms;
+    contain:layout;
+  }
+  #checkoutDrawer.checkout-drawer.open {
+    transform:translate3d(0,var(--sd-checkout-pull,0px),0);
+    transition:transform 360ms cubic-bezier(.22,.75,.23,1),visibility 0s;
+  }
+  #checkoutDrawer .checkout-header {
+    position:relative;
+    padding-top:11px;
+    touch-action:none;
+  }
+  #checkoutDrawer .checkout-header::before {
+    content:"";
+    display:block;
+    position:absolute;
+    top:0;
+    left:50%;
+    width:38px;
+    height:4px;
+    border-radius:999px;
+    background:var(--line);
+    transform:translateX(-50%);
+    pointer-events:none;
+  }
+  #checkoutDrawer .checkout-form {
+    min-height:0;
+    overscroll-behavior:contain;
+    scroll-padding-block:12px 22px;
+  }
+  #checkoutDrawer .sd-checkout-footer {
+    padding-bottom:2px;
+  }
+
+  /* Progressive panel transition without remounting the form or losing values. */
+  #checkoutDrawer[data-sd-checkout-direction="forward"] .sd-checkout-panel:not([hidden]) {
+    animation:sd-mobile-order-panel-forward 245ms cubic-bezier(.2,.78,.3,1) both;
+  }
+  #checkoutDrawer[data-sd-checkout-direction="back"] .sd-checkout-panel:not([hidden]) {
+    animation:sd-mobile-order-panel-back 245ms cubic-bezier(.2,.78,.3,1) both;
+  }
+  @keyframes sd-mobile-order-panel-forward {
+    from{opacity:.4;transform:translate3d(12px,0,0)}
+    to{opacity:1;transform:translate3d(0,0,0)}
+  }
+  @keyframes sd-mobile-order-panel-back {
+    from{opacity:.4;transform:translate3d(-12px,0,0)}
+    to{opacity:1;transform:translate3d(0,0,0)}
+  }
+  #checkoutDrawer .sd-checkout-option {
+    transition:transform 165ms ease,box-shadow 195ms ease,border-color 195ms ease;
+  }
+  #checkoutDrawer .sd-checkout-option.selected {
+    transform:translateY(-1px);
+  }
+  #checkoutDrawer .sd-checkout-option:active {
+    transform:translateY(1px) scale(.997);
+  }
+
+  /* Retain the existing 3D glass material, colors, geometry and option rules. */
+  #productOverlay .sd-product-option-chip.is-selected {
+    animation:sd-mobile-size-picked 195ms cubic-bezier(.2,.8,.3,1);
+  }
+  @keyframes sd-mobile-size-picked {
+    0%{transform:translateY(0) scale(1)}
+    55%{transform:translateY(-2px) scale(1.035)}
+    100%{transform:translateY(0) scale(1)}
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  #checkoutDrawer.checkout-drawer,
+  #checkoutDrawer.checkout-drawer.open,
+  #checkoutDrawer .sd-checkout-panel:not([hidden]),
+  #checkoutDrawer .sd-checkout-option,
+  #productOverlay .sd-product-option-chip.is-selected {
+    animation:none!important;
+    transition:none!important;
+  }
+}
