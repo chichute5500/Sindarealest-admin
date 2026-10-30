@@ -32,7 +32,7 @@ assert.equal((markup.match(/class="service-text"/g) || []).length, 6,
   'Each commitment must have one shrink-safe text wrapper.');
 for (const label of [
   'Bảo hành 1 năm', 'Bảo dưỡng trọn đời', 'Da cá sấu cao cấp',
-  'Hoàn thiện thủ công', 'Tỉ mỉ từng chi tiết', 'Đa dạng mẫu mã',
+  'Hoàn thiện thủ công', 'Tỉ mỉ từng chi tiết', 'Tuyển chọn thiết kế',
 ]) {
   assert.ok(markup.includes('<strong>' + label + '</strong>'), 'Missing separate brand commitment: ' + label);
 }
