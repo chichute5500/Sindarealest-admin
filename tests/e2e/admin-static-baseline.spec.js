@@ -1316,7 +1316,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(surface.background, 'Mobile product editor should use an opaque theme surface').toBe(surface.expectedBackground);
         const editorBottom = await page.locator('#backdrop>.editor').evaluate(el => Math.round(el.getBoundingClientRect().bottom));
         const mobileNavTop = await page.locator('.mobiletabs').evaluate(el => Math.round(el.getBoundingClientRect().top));
-        expect(editorBottom, 'Mobile editor must stop before the fixed bottom navigation').toBeLessThanOrEqual(mobileNavTop);
+        expect(editorBottom, 'Mobile editor must leave at least 8px of breathing room above the fixed bottom navigation')
+          .toBeLessThanOrEqual(mobileNavTop - 8);
       }
       await saveScreenshot('product-editor', variant, { dialog: true });
       if (variant.viewport.width === mobile.width && variant.theme === 'light') {
