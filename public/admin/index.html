@@ -1663,7 +1663,15 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 #productPanelDetails .product-fulfillment-toggle:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 :root[data-admin-theme="dark"] #productPanelDetails .product-fulfillment-toggle{background:rgba(190,141,64,.19);border-color:#b79760}
 :root[data-admin-theme="dark"] #productPanelDetails .product-fulfillment-toggle[data-fulfillment="in_stock"]{background:rgba(49,141,98,.2);border-color:#6dbb96}
-#productPanelDetails .product-category-duo .product-category-input-row #pCategory,#productPanelDetails .product-fulfillment-toggle{height:48px;min-height:48px;max-height:48px;box-sizing:border-bo/* Owner mobile corrections — follow the public Storefront glass material. */
+#productPanelDetails .product-category-duo .product-category-input-row #pCategory,#productPanelDetails .product-fulfillment-toggle{height:48px;min-height:48px;max-height:48px;box-sizing:border-box}
+@media(max-width:430px){
+ #productPanelDetails .product-category-duo{column-gap:7px}
+
+ #productPanelDetails .product-category-duo .product-category-input-row #pCategory{font-size:11px}
+ #productPanelDetails .product-fulfillment-toggle{font-size:11px;padding:8px}
+}
+
+/* Owner mobile corrections — follow the public Storefront glass material. */
 .topbar{
   border:1px solid transparent;
   border-radius:999px;
@@ -1846,19 +1854,6 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   body:not(:has(#loginView:not(.hidden))) .topright #adminThemeToggle,
   body:not(:has(#loginView:not(.hidden))) .topright #notificationToggle,
   body:not(:has(#loginView:not(.hidden))) .topright #logout,
-  body:not(:has(#loginView:not(.hidden))) #adminMenuToggle{
-    width:32px;
-    min-width:32px;
-    max-width:32px;
-    height:32px;
-    min-height:32px;
-    flex-basis:32px;
-  }
-  .mobiletabs{min-height:58px;padding-inline:5px}
-  .mobiletabs .nav{font-size:8px}
-}
-
-t,
   body:not(:has(#loginView:not(.hidden))) #adminMenuToggle{
     width:32px;
     min-width:32px;
