@@ -33,6 +33,11 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install --no-fund
+      - name: Generate small logo UI asset (read-only source)
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 scripts/build-logo-asset.py
+          test -s public/logo-ui.webp
       - name: Validate before deploy
         run: |
           npm run check
@@ -58,6 +63,12 @@ jobs:
             assert.ok(html.includes('rel="canonical"'),path+' missing canonical');
             console.log('PASS: no-JS SSR visible,',path,'HTTP',r.status);
           }
+
+          const image=await fetch(base+'/logo-ui.webp',{signal:AbortSignal.timeout(12000)});
+          assert.equal(image.status,200,'Compressed original logo image must exist');
+          assert.match(image.headers.get('content-type')||'',/image\/webp/);
+          assert.ok(Number(image.headers.get('content-length')||0)<140000,'Mobile UI brand image exceeds 140kB');
+          console.log('PASS: optimized brand logo exists on live Preview');
           const unknown=await fetch(base+'/qa-unknown-route-20261031',{signal:AbortSignal.timeout(12000)});
           assert.equal(unknown.status,404,'Unknown URLs must not serve home HTML');
           console.log('PASS: genuine HTTP 404, no customer/private API requests executed');
