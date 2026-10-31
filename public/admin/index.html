@@ -2110,6 +2110,75 @@ body:not(:has(#loginView:not(.hidden))){
   background-attachment:fixed;
 }
 
+
+
+/* SD_ADMIN_OVERVIEW_REFERENCE_SPACING_2026_10_31
+   Restore the airy mobile dashboard proportions from the supplied reference.
+   Visual-only overrides; live counts, routes, and business logic stay untouched. */
+@media (min-width:390px) and (max-width:520px){
+  #main>.pagehead{margin-bottom:10px}
+  #main>.pagehead h2{font-size:clamp(27px,6.4vw,30px);line-height:1.08}
+  #main .statgrid{gap:8px;margin-bottom:12px}
+  #main .stat{
+    min-height:clamp(88px,22vw,96px);
+    padding:11px 13px;
+    border:1px solid transparent;
+    border-radius:20px;
+    background:var(--glass-face) padding-box,var(--glass-edge) border-box;
+    box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
+  }
+  #main .stat .label{font-size:11px;line-height:1.25}
+  #main .stat-icon{flex-basis:36px;width:36px;height:36px}
+  #main .stat-icon svg{width:19px;height:19px}
+  #main .stat .value{font-size:clamp(24px,6vw,27px);line-height:1.05;margin:7px 0 3px}
+  #main .stat .hint{font-size:10px;line-height:1.35}
+
+  #main .dashboard-quick-panel,
+  #main .dashboard-revenue{
+    border:1px solid transparent;
+    border-radius:24px;
+    background:var(--glass-face) padding-box,var(--glass-edge) border-box;
+    box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
+  }
+  #main .dashboard-quick-panel{margin-bottom:12px!important}
+  #main .dashboard-quick-panel .panelhead{padding:13px 16px 8px}
+  #main .dashboard-quick-panel .panelhead h3,
+  #main .dashboard-revenue .panelhead h3{font-size:17px;line-height:1.2}
+  #main .dashboard-shortcuts{gap:7px}
+  #main .dashboard-shortcut{
+    min-height:clamp(76px,20vw,86px);
+    padding:8px 4px;
+    gap:6px;
+    border:1px solid transparent;
+    border-radius:18px;
+    background:var(--glass-face) padding-box,var(--glass-edge) border-box;
+    box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight);
+  }
+  #main .dashboard-shortcut .shortcut-icon{flex-basis:38px;width:38px;height:38px}
+  #main .dashboard-shortcut .shortcut-icon svg{width:20px;height:20px}
+  #main .dashboard-shortcut .shortcut-copy b{font-size:10.5px;line-height:1.2}
+
+  #main .dashboard-revenue{margin-bottom:12px}
+  #main .dashboard-revenue .panelhead{padding:13px 16px 8px;gap:8px}
+  #main .dashboard-revenue .panelhead .tiny{font-size:10.5px;line-height:1.4}
+  #main .dashboard-revenue-empty{
+    min-height:clamp(84px,22vw,96px);
+    padding:11px 13px;
+    gap:9px;
+    border:1px solid transparent;
+    border-radius:20px;
+    background:var(--glass-face) padding-box,var(--glass-edge) border-box;
+    box-shadow:inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
+  }
+  #main .dashboard-revenue-copy strong{font-size:11.5px;line-height:1.3}
+  #main .dashboard-revenue-copy p{font-size:9.5px;line-height:1.4}
+  #main .dashboard-revenue-visual{width:46px;height:46px;border-radius:15px}
+  #main .dashboard-revenue-visual svg{width:25px;height:25px}
+}
+@media(max-width:389px){
+  #main .stat{min-height:82px}
+  #main .dashboard-shortcut{min-height:66px}
+}
 </style>
 
 
