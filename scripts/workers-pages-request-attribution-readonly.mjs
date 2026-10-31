@@ -39,9 +39,12 @@ for(const name of ['sindarealest-admin-preview','sindarealest2']){
  * Cloudflare's Pages Functions dataset has no branch/deployment dimension,
  * so NEVER label any branch as the cause based on this count alone.
  */
-report.previewDeployments={totalFetched:0,branches:[],warnings:[]};
+report.previewDeployments={totalFetched:0,branches:[],peakHours:[],warnings:[]};
 try{
  const grouped=new Map();
+ const peakHours=new Map();
+ // Clock hours are UTC; 2026-10-31 14:00Z = 21:00 in Vietnam.
+ const inspectedHours=new Set(['2026-10-31T14:00:00Z','2026-10-31T19:00:00Z']);
  for(let page=1;page<=10;page++){
   const response=await api(root+'/pages/projects/sindarealest-admin-preview/deployments?env=preview&page='+page+'&per_page=20');
   const deployments=Array.isArray(response.result)?response.result:[];
@@ -50,6 +53,15 @@ try{
    const time=d.created_on||d.created_at||'';
    if(!time || new Date(time)<start || new Date(time)>end)continue;
    const branch=String(d.deployment_trigger?.metadata?.branch||d.deployment_trigger?.metadata?.branch_name||'(unknown)').slice(0,110);
+   const hour=new Date(time).toISOString().slice(0,13)+':00:00Z';
+   if(inspectedHours.has(hour)){
+    const key=hour+'|'+branch;
+    const entry=peakHours.get(key)||{hourUtc:hour,branch,deployments:0,firstUtc:time,lastUtc:time};
+    entry.deployments++;
+    if(time<entry.firstUtc)entry.firstUtc=time;
+    if(time>entry.lastUtc)entry.lastUtc=time;
+    peakHours.set(key,entry);
+   }
    const item=grouped.get(branch)||{branch,count:0,firstUtc:time,lastUtc:time};
    item.count++;
    if(time<item.firstUtc)item.firstUtc=time;
@@ -59,6 +71,7 @@ try{
   if(deployments.length<20)break;
  }
  report.previewDeployments.branches=[...grouped.values()].sort((a,b)=>b.count-a.count).slice(0,40);
+ report.previewDeployments.peakHours=[...peakHours.values()].sort((a,b)=>a.hourUtc.localeCompare(b.hourUtc)||b.deployments-a.deployments);
 }catch(e){report.previewDeployments.warnings.push(smallError(e));}
 
 async function gqlField(fieldSelection,alias){
