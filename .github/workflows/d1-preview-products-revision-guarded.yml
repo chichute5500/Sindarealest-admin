@@ -6,6 +6,9 @@ on:
       - perf/d1-rows-read-safe-2026-10-30
     paths:
       - '.github/workflows/d1-preview-products-revision-guarded.yml'
+      - 'scripts/d1-preview-products-revision-guarded.mjs'
+      - 'migrations/0016_admin_products_revision.sql'
+      - 'tests/admin-products-revision.test.mjs'
   workflow_dispatch:
 
 permissions:
