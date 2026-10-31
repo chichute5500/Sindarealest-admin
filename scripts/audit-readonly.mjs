@@ -33,9 +33,13 @@ async function loadGridImagesForScreenshot(page,section){
  // Screenshots are full-page; native lazy loading does not fetch the final
  // below-the-fold cards unless we request them. This affects QA only.
  return page.evaluate(async section=>{
-   const grid=document.querySelector(section==='home'?'#featuredGrid':'#catalogGrid');
-   if(!grid)return {requested:0,loaded:0,broken:0};
-   const images=[...grid.querySelectorAll('article img')];
+   // Full-page screenshots include both the featured carousel and the
+   // below-the-fold catalog on Home. Eager-load both sets for QA only,
+   // otherwise screenshots show empty lazy thumbnails unrelated to the UI.
+   const grids=(section==='home'?['#featuredGrid','#catalogGrid']:['#catalogGrid'])
+     .map(selector=>document.querySelector(selector)).filter(Boolean);
+   if(!grids.length)return {requested:0,loaded:0,broken:0};
+   const images=grids.flatMap(grid=>[...grid.querySelectorAll('article img')]);
    for(const img of images){
      if(img.dataset.src&&!img.getAttribute('src'))img.src=img.dataset.src;
      img.loading='eager';
