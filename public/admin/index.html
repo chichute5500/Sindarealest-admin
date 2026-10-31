@@ -2189,9 +2189,9 @@ body:not(:has(#loginView:not(.hidden))){
 /* Dashboard glass: translucent functional surface, a thin pink/cyan rim,
    and raised icon controls. Keep the same palette in light and dark modes. */
 body:has(#main .statgrid){
-  --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.76),rgba(239,249,255,.56) 54%,rgba(220,239,251,.43));
-  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(240,158,211,.62),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(100,167,232,.46),transparent 85%),radial-gradient(ellipse 100% 30% at 60% 110%,rgba(108,184,222,.045),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.97),rgba(221,240,252,.58) 46%,rgba(190,222,242,.28) 72%,rgba(226,240,251,.72));
-  --sd-dashboard-shadow:0 17px 38px rgba(35,80,113,.21),0 3px 8px rgba(43,89,119,.13),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 4px rgba(83,137,171,.15);
+  --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.83),rgba(239,249,255,.63) 54%,rgba(220,239,251,.48));
+  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(240,158,211,.68),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(100,167,232,.56),transparent 85%),radial-gradient(ellipse 100% 30% at 60% 110%,rgba(108,184,222,.045),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.97),rgba(221,240,252,.58) 46%,rgba(190,222,242,.28) 72%,rgba(226,240,251,.72));
+  --sd-dashboard-shadow:0 17px 38px rgba(35,80,113,.22),0 3px 8px rgba(43,89,119,.14),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 4px rgba(83,137,171,.15);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(40,76,101,.57),rgba(20,47,68,.49) 56%,rgba(15,39,58,.55));
@@ -2222,7 +2222,7 @@ body:has(#main .statgrid) #main :is(.dashboard-shortcut,.stat-icon,.dashboard-sh
 body:has(#main .statgrid) .topbar,
 body:has(#main .statgrid) .mobiletabs{
   border:1.5px solid transparent;
-  background:radial-gradient(ellipse 90% 120% at 12% 0%,rgba(255,255,255,.72),transparent 82%) padding-box,var(--sd-glass-shell-strong) padding-box,var(--sd-dashboard-rim) border-box;
+  background:radial-gradient(ellipse 90% 120% at 12% 0%,rgba(255,255,255,.84),transparent 82%) padding-box,var(--sd-glass-shell-strong) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:var(--sd-glass-panel-shadow),inset 0 1px 0 rgba(255,255,255,.96);
   -webkit-backdrop-filter:blur(26px) saturate(155%);
   backdrop-filter:blur(26px) saturate(155%);
@@ -2239,6 +2239,7 @@ body:has(#main .statgrid) .mobiletabs .nav.active{
   box-shadow:0 11px 22px rgba(49,121,187,.30),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 4px rgba(72,141,173,.15)!important;
 }
 body:has(#main .statgrid) #main .pagehead .btn.primary{
+  font-size:14px;
   border:1.5px solid transparent;
   background:linear-gradient(155deg,rgba(255,255,255,.44) 0%,rgba(255,255,255,.18) 34%,transparent 62%) padding-box,radial-gradient(ellipse 110% 82% at 30% 0%,rgba(255,255,255,.94),transparent 74%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.16),transparent 80%) padding-box,linear-gradient(180deg,#66b8ff 0%,#218fe8 48%,#0879d2 100%) padding-box,radial-gradient(ellipse 86% 115% at 0% 0%,rgba(250,184,231,.80),transparent 77%) border-box,radial-gradient(ellipse 74% 110% at 100% 100%,rgba(140,218,255,.90),transparent 76%) border-box,linear-gradient(180deg,rgba(255,255,255,.96),rgba(115,177,227,.66)) border-box;
   box-shadow:0 0 0 1px rgba(241,190,230,.62),0 11px 25px rgba(38,132,198,.34),0 3px 7px rgba(35,91,136,.16),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 5px rgba(19,94,157,.22);
