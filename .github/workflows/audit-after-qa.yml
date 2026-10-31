@@ -7,6 +7,7 @@ on:
       - scripts/audit-readonly.mjs
       - scripts/audit-cls-probe.mjs
       - scripts/audit-lcp-probe.mjs
+      - scripts/qa-ssr-hydration.mjs
       - scripts/audit-layout-ab.mjs
       - scripts/qa-material-network.mjs
       - public/material-gallery.js
@@ -76,6 +77,10 @@ jobs:
           AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
           AUDIT_OUTPUT: audit/after
         run: node scripts/audit-cls-probe.mjs
+      - name: Verify stable SSR-to-CSR order and retained first image at 360/390px
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+        run: node scripts/qa-ssr-hydration.mjs
       - name: Record repeated mobile LCP candidates and resource contention (GET only)
         env:
           AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev

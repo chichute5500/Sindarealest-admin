@@ -42,7 +42,7 @@ async function loadGridImagesForScreenshot(page,section){
    const images=grids.flatMap(grid=>[...grid.querySelectorAll('article img')]);
    // Full-page capture alone doesn't load below-fold editorial artwork.
    // Warm only this read-only browser screenshot, not real visitors.
-   if(section==='home')images.push(...document.querySelectorAll('#artSlide,#materialTile img.mosaic-photo'));
+   if(section==='home')images.push(...document.querySelectorAll('#artSlide,#craftTileImage,#materialTile img.mosaic-photo'));
    for(const img of images){
      if(img.dataset.src&&!img.getAttribute('src'))img.src=img.dataset.src;
      img.loading='eager';

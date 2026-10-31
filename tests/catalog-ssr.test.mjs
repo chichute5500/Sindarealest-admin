@@ -58,4 +58,8 @@ assert.match(storefront,/artSlideObserver\.observe\(slide\)/);
 assert.match(storefront,/bindReveal\(document\);initArtSlideshowWhenVisible\(\);setupNavSpy\(\)/);
 assert.match(storefront,/if\(!active\)initArtSlideshowWhenVisible\(\)/);
 assert.match(storefront,/document\.documentElement\.classList\.contains\('sd-catalog-route'\)\)return;const rect=/);
+// SQL and hydrated list must use the same deterministic tiebreak for
+// products created in the same batch. This prevents LCP-image replacement.
+assert.match(storefront,/const dateOrder=timestamp\(b\)\.localeCompare\(timestamp\(a\)\)/);
+assert.match(storefront,/return left<right\?1:left>right\?-1:0;/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");
