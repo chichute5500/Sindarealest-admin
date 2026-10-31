@@ -2490,7 +2490,7 @@ function renderCart(){
   return `<div class="cart-row"><img src="${escapeHtml(allImages(p)[0])}" alt="${escapeHtml(p.title)}"><div class="cart-row-copy"><strong>${productTitleWithVip(p.title,false)}</strong><small>Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}</small>${optionMarkup}<small class="cart-row-price">${priceText}</small><div class="qty-controls"><button class="tap-target" data-qty="-1" data-id="${escapeHtml(id)}" aria-label="Giảm số lượng">−</button><span>${q}</span><button class="tap-target" data-qty="1" data-id="${escapeHtml(id)}" aria-label="Tăng số lượng">+</button></div></div><button class="remove-item tap-target" data-remove="${escapeHtml(id)}" aria-label="Xóa sản phẩm">Xóa</button></div>`;
  }).join('');
 }
-function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
+function openCart(event){if(activeCartFlight){activeCartFlight.cancel();activeCartFlight=null}cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
 function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';const target=cartReturnFocus;cartReturnFocus=null;if(restoreFocus&&wasOpen)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';const fallback=$('#cartOpen')||$('#mobileCartNav');(available?target:fallback)?.focus({preventScroll:true})},0)}
 
 let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="deposit",sdCheckoutSuccess=false;
@@ -2568,6 +2568,7 @@ function sdCheckoutSetStep(step){
 function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected();return selected?{paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total,transferReference:sdCheckoutQuote.transferReference}:{}}
 
 function openCheckout(){
+ if(activeCartFlight){activeCartFlight.cancel();activeCartFlight=null}
  dismissToast();
  renderCart();
  if(!cartEntries().length){showToast('Hãy thêm sản phẩm vào giỏ trước khi đặt hàng.');return}
@@ -2600,7 +2601,7 @@ function closeCheckout(restoreFocus=true){
   },0);
  }
 }
-function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
+function openAccount(){if(activeCartFlight){activeCartFlight.cancel();activeCartFlight=null}dismissToast();accountReturnFocus=document.activeElement;
  closeCheckout(false);closeCart(false);closeDetail(false,false);
  if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('account');
  const panel=$('#accountDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
