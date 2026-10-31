@@ -196,8 +196,10 @@ try{
      return message?.textContent.includes("Thử tải lại")&&retry&&!retry.hidden;
    },null,{timeout:12000});
    assert.equal(await retryPage.locator("#checkoutProvince").isDisabled(),true);
-   assert.match(await retryPage.locator("#checkoutAddressMessage").innerText(),/Thử tải lại/);
    await retryPage.screenshot({path:join(evidenceDir,"06-address-offline-390x844.png"),animations:"disabled"});
+   assert.match((await retryPage.locator("#checkoutAddressMessage").textContent())||"",/Thử tải lại/);
+   assert.equal(await retryPage.locator("#checkoutAddressRetry").isVisible(),true,
+     "Offline state must expose a visible retry button");
    await retryPage.locator("#checkoutAddressRetry").click();
    await retryPage.waitForFunction(()=>document.querySelector("#checkoutProvince")?.options.length>1);
    assert.equal(await retryPage.locator("#checkoutAddressRetry").isVisible(),false);
