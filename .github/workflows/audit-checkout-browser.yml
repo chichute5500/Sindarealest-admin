@@ -27,8 +27,9 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Generate production-equivalent optimized UI brand image
         run: |
-          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 -m pip install --quiet --break-system-packages Pillow fonttools brotli
           python3 scripts/build-logo-asset.py
+          python3 scripts/build-font-assets.py
       - name: Start local Pages with no remote bindings
         shell: bash
         run: |
