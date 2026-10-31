@@ -37,9 +37,13 @@
     host.replaceChildren(...layers);
     tile.classList.add('has-real-material-gallery');
     if(loaded.length<2)return;
-    let index=0,front=0;
-    window.setInterval(()=>{
-      if(document.hidden)return;
+    let index=0,front=0,onscreen=true;
+    const observer='IntersectionObserver' in window
+      ?new IntersectionObserver(entries=>{onscreen=entries.some(entry=>entry.isIntersecting)},{threshold:0})
+      :null;
+    observer?.observe(tile);
+    const intervalId=window.setInterval(()=>{
+      if(document.hidden||!onscreen)return;
       const nextIndex=(index+1)%loaded.length;
       const back=1-front;
       layers[back].src=loaded[nextIndex];
@@ -47,6 +51,11 @@
       layers[front].classList.remove('is-visible');
       index=nextIndex;front=back;
     },1500);
+    // Pause work for off-screen galleries and release the timer on navigation.
+    window.addEventListener('pagehide',()=>{
+      window.clearInterval(intervalId);
+      observer?.disconnect();
+    },{once:true});
   }
   start().catch(()=>{}); // A missing manifest must never break the storefront.
 })();

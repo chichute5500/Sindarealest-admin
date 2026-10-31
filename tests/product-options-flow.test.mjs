@@ -57,7 +57,7 @@ for(let i=0;i<categories.length;i++){
    .run('opt-'+i,'opt-'+i,'OPT-'+i,title,category,title,'made_to_order');
 }
 const env={DB,ADMIN_PASSWORD:'FAKE_QA_PASSWORD_NOT_REAL',SESSION_SECRET:'QA-NONPRODUCTION-ONLY-SESSION-SECRET-123456'};
-const body={fullName:'KHACH HANG GIA LAP',phone:'0000000808',address:'Địa chỉ QA giả lập, không giao hàng',items:[]};
+const body={fullName:'KHACH HANG GIA LAP',phone:'0900000000',address:'Địa chỉ QA giả lập, không giao hàng',items:[]};
 const endpoint='https://qa.invalid/api/orders';
 const invoke=async items=>createOrder({env,request:new Request(endpoint,{method:'POST',headers:{Origin:'https://qa.invalid','Content-Type':'application/json','CF-Connecting-IP':'203.0.113.88'},body:JSON.stringify({...body,items})})});
 const quote=async items=>quoteCheckout({env,request:new Request('https://qa.invalid/api/checkout-quote',{method:'POST',headers:{Origin:'https://qa.invalid','Content-Type':'application/json'},body:JSON.stringify({items,phone:body.phone})})});

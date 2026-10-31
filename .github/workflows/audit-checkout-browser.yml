@@ -1,0 +1,44 @@
+name: Audit mobile checkout — isolated mocked Playwright
+on:
+  push:
+    branches: [fix/audit-2026-10]
+    paths:
+      - 'scripts/qa-audit-local-checkout.mjs'
+      - 'public/index.html'
+      - 'functions/_catalog-ssr.js'
+      - 'functions/api/orders.js'
+      - 'functions/api/checkout-quote.js'
+      - '.github/workflows/audit-checkout-browser.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  disposable-checkout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install local-only Chromium and project tools
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Start local Pages with no remote bindings
+        shell: bash
+        run: |
+          nohup npx wrangler pages dev public --ip 127.0.0.1 --port 8788 > /tmp/pages-audit-mock.log 2>&1 &
+          echo $! > /tmp/pages-audit-mock.pid
+          for i in $(seq 1 60); do
+            if curl --silent --fail http://127.0.0.1:8788/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo "Local Pages did not start"
+          exit 1
+      - name: Execute UI checkout with 100% mocked POST and sample data
+        run: node scripts/qa-audit-local-checkout.mjs
+      - name: Cleanup local server
+        if: always()
+        run: |
+          if test -f /tmp/pages-audit-mock.pid; then kill "$(cat /tmp/pages-audit-mock.pid)" || true; fi

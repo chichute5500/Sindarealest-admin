@@ -1,0 +1,68 @@
+name: Audit — isolated Cloudflare storefront preview
+on:
+  push:
+    branches:
+      - fix/audit-2026-10
+    paths:
+      - 'functions/**'
+      - 'public/**'
+      - 'scripts/verify-audit-preview.mjs'
+      - 'tests/**'
+      - 'audit/**'
+      - '.github/workflows/audit-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: audit-storefront-preview-2026-10
+  cancel-in-progress: false
+jobs:
+  safe-preview:
+    if: github.ref == 'refs/heads/fix/audit-2026-10'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Checkout audit branch only
+        uses: actions/checkout@v4
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-fund
+      - name: Validate before deploy
+        run: |
+          npm run check
+          npm test
+      - name: Read-only verify separate Preview Pages, D1 and R2
+        run: node scripts/verify-audit-preview.mjs
+      - name: Deploy to separate Cloudflare Pages Preview project (NEVER storefront Production)
+        run: >
+          npx wrangler pages deploy public
+          --project-name sindarealest-admin-preview
+          --branch fix/audit-2026-10
+      - name: Verify deployed no-JS catalog SSR, metadata and real 404 (GET only)
+        run: |
+          node --input-type=module - <<'JS'
+          import assert from 'node:assert/strict';
+          const base='https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev';
+          for(const path of ['/','/sanpham']){
+            const r=await fetch(base+path,{signal:AbortSignal.timeout(20000)});
+            assert.equal(r.status,200,path);
+            const html=await r.text();
+            assert.ok(html.includes('sd-server-rendered'),path+' no server-rendered products');
+            assert.ok(html.includes('"@type":"ItemList"'),path+' missing product list schema');
+            assert.ok(html.includes('rel="canonical"'),path+' missing canonical');
+            console.log('PASS: no-JS SSR visible,',path,'HTTP',r.status);
+          }
+          const unknown=await fetch(base+'/qa-unknown-route-20261031',{signal:AbortSignal.timeout(12000)});
+          assert.equal(unknown.status,404,'Unknown URLs must not serve home HTML');
+          console.log('PASS: genuine HTTP 404, no customer/private API requests executed');
+          JS
+      - name: Record preview gate result
+        run: |
+          echo 'Audit-only branch deployed to separate Preview Pages project.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No production deployment, database migrations or data writes were executed.' >> "$GITHUB_STEP_SUMMARY"

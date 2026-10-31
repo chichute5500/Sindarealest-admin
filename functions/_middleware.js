@@ -1,5 +1,6 @@
 import { createSession, sessionCookie, verifySession } from "./_lib.js";
 import { sendAdminPush } from "./_notifications.js";
+import { renderPublicCatalog } from "./_catalog-ssr.js";
 import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
@@ -107,14 +108,17 @@ export async function onRequest(context) {
     // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
     // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
     html = meta(html, "og:image", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
-    html = meta(html, "og:image:alt", "SinDarealest — " + categoryName, true);
+    html = meta(html, "og:image:alt", categorySlug ? "SinDarealest — " + categoryName : "SinDarealest — Toàn bộ sản phẩm da cá sấu", true);
     html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
+    html = meta(html, "twitter:title", catalogTitle);
+    html = meta(html, "twitter:description", catalogDescription);
     html = meta(html, "twitter:image", url.origin + "/og-sindarealest-crisp-20261028.jpg");
     html = meta(html, "twitter:card", "summary_large_image");
     const canonicalTag = '<link rel="canonical" href="' + escapeHtml(url.origin + canonicalPath) + '">';
     html = /<link\s+rel=["']canonical["']/i.test(html)
       ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
       : html.replace("</head>", "  " + canonicalTag + "\n</head>");
+    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug});
     const headers = new Headers(response.headers);
     headers.set("Content-Type","text/html; charset=utf-8");
     headers.set("Cache-Control","public, max-age=60, s-maxage=300");
@@ -125,14 +129,39 @@ export async function onRequest(context) {
   const modernMatch = url.pathname.match(/^\/sanpham\/([a-z0-9][a-z0-9-]{0,99})\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   if (!legacyMatch && !modernMatch) {
     const response = await context.next();
-    if (!response.ok || !["/", "/index.html"].includes(url.pathname) || !(response.headers.get("content-type") || "").includes("text/html")) return response;
+    if (!response.ok || !(response.headers.get("content-type") || "").includes("text/html")) return response;
+    // _redirects has an SPA fallback, so a nonexistent URL otherwise returns
+    // homepage HTML with HTTP 200. Keep documented static/legal/admin pages.
+    const staticHtml = new Set(["/", "/index.html", "/data-deletion.html", "/privacy-policy.html", "/terms-of-service.html", "/admin", "/admin/", "/admin/index.html"]);
+    if (!staticHtml.has(url.pathname)) {
+      return new Response("Không tìm thấy trang.", {
+        status: 404,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-store",
+          "X-Robots-Tag": "noindex, nofollow",
+          "X-Content-Type-Options": "nosniff"
+        }
+      });
+    }
+    if (!["/", "/index.html"].includes(url.pathname)) return response;
     let html = await response.text();
     html = meta(html, "og:url", `${url.origin}/`, true);
     html = meta(html, "og:image", `${url.origin}/og-sindarealest-crisp-20261028.jpg`, true);
     html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest-crisp-20261028.jpg`, true);
     html = meta(html, "twitter:image", `${url.origin}/og-sindarealest-crisp-20261028.jpg`);
+    // Structured organization identity is available to crawlers without JS.
+    const organizationSchema = JSON.stringify({
+      "@context": "https://schema.org", "@type": "Organization",
+      name: "SinDarealest", url: `${url.origin}/`,
+      logo: `${url.origin}/images/brand-emblem.png`
+    });
+    if (!html.includes('"@type":"Organization"')) {
+      html = html.replace("</head>", `  <script type="application/ld+json">${organizationSchema}</script>\n</head>`);
+    }
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
+    html = await renderPublicCatalog(html,context.env,url.origin,{home:true});
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
     return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
   }
