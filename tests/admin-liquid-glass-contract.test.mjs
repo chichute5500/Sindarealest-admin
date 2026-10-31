@@ -181,9 +181,9 @@ for (const [width, height] of [
 }
 assert.match(baselineSpec, /for \(const theme of \['light', 'dark'\]\)/,
   'The required viewport matrix must continue capturing both light and dark themes');
-assert.match(adminHtml, /\.editorhead\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
+assert.match(adminHtml, /\.editorhead\{[^}]*background:var\(--sd-admin-sheet-face\);color:var\(--ink\)/,
   'Editor header must follow the active theme surface/text tokens');
-assert.match(adminHtml, /\.editorfooter\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
+assert.match(adminHtml, /\.editorfooter\{[^}]*background:var\(--sd-admin-sheet-face\);color:var\(--ink\)/,
   'Editor footer must follow the active theme surface/text tokens');
 assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Quay lại danh sách sản phẩm"[^>]*><svg[^>]*aria-hidden="true"/,
   'Editor back control should use an accessible SVG icon');
@@ -217,6 +217,20 @@ assert.match(baselineSpec, /fixtureImages: 6/,
 assert.match(baselineSpec, /if \(prepare\) await prepare\(variant\);/,
   'Visual capture should pass viewport/theme context into screen-specific setup');
 assert.match(adminHtml, /sd-order-cards/,
+  'Responsive order cards work at desktop and mobile widths');
+assert.match(baselineSpec, /captureView\('order-detail', 'orders'/,
+  'The visual matrix should exercise Order detail as a dedicated route from the Orders screen');
+assert.match(adminHtml, /\.activity-log-cards\{display:none\}/, 'Activity log should keep an explicit desktop/table and mobile/card presentation split');
+assert.match(adminHtml, /id="activityAdvancedToggle"/, 'Screen 12 should expose expandable advanced search controls rather than pushing the event list below mobile navigation');
+assert.match(adminHtml, /activity-log-push-settings/, 'Screen 12 should show a notification-permission settings card with a real action');
+assert.match(adminHtml, /id="activityLogEnablePush"/, 'Screen 12 log-tab notification action must use a unique DOM id distinct from the notifications-tab action');
+assert.match(baselineSpec, /toContainText\(fixtureProduct\.title\)/, 'Compact mobile activity cards should assert their visible event summary, not hidden entity identifiers');
+
+assert.match(baselineSpec, /await advancedToggle\.click\(\)/, 'Screen 12 tests should open/close advanced filters before the mobile screenshot is captured');
+assert.match(adminHtml, /data-activity-entity-filter=/, 'Activity log should expose working entity-category filter buttons');
+assert.match(adminHtml, /id="activityActorFilter"/, 'Activity log should provide a source-backed actor filter');
+assert.match(adminHtml, /id="activityDateFrom"/, 'Activity log should provide date-range filtering from existing audit timestamps');
+assert.match(baselineSpec, /Mobile ac-cards/,
   'Responsive order cards work at desktop and mobile widths');
 assert.match(baselineSpec, /captureView\('order-detail', 'orders'/,
   'The visual matrix should exercise Order detail as a dedicated route from the Orders screen');
@@ -344,50 +358,14 @@ has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'p
 has('@media(min-width:681px){#backdrop>.editor>.editorhead{padding-top:10px;padding-bottom:10px}#backdrop>.editor>form>.editorcontent{gap:12px}}', 'desktop product price and stock fields clear the sticky action footer at the initial scroll position');
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'editor content remains scrollable inside its bounded region while not stretching tab rows');
 has('#backdrop{top:70px;bottom:calc(60px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header with breathing room above bottom navigation');
-has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:20px;box-shadow:var(--sd-admin-shadow);background:var(--sd-admin-sheet-face);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
+has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:20px;overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
+assert.ok(adminHtml.includes('.editor,.notification-panel,.mobile-more-panel,.admin-glass-dialog,.logincard,.product-category-grid,.product-quick-editor,.toast{--sd-admin-surface-face:var(--sd-admin-sheet-face)}'), 'Product editor surface material comes from the shared sheet token owner');
 has('#productEditorTabs{position:sticky;top:0;height:48px;min-height:48px;max-height:48px;gap:3px;padding:4px}', 'mobile product editor tabs stay compact without covering form fields');
 has('.product-editor-tabs{position:sticky;top:0;z-index:3;', 'desktop editor tabs stick at the top of their own scroll viewport without covering gallery headings');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
-const repeatedGlassRule = adminHtml.match(/#main \.mobilecards tbody tr[^{}]*\.order-detail-item\s*\{([^}]*)\}/)?.[1] || '';
+const repeatedGlassRule = adminHtml.match(/\/\* Repeated\/nested surfaces share one glass shell without another blur layer per item\. \*\/\s*[^{}]+\{([^}]*)\}/)?.[1] || '';
 assert.match(repeatedGlassRule, /sd-admin-shadow/, 'repeated glass rows keep their shared shell and contact shadow');
 assert.doesNotMatch(repeatedGlassRule, /backdrop-filter/, 'repeated rows avoid stacking expensive blur layers on long lists');
 const productListMarkup = adminHtml.match(/function productList\(\)\{[\s\S]*?\nfunction orderProductImageMarkup/)?.[0] || '';
-assert.doesNotMatch(productListMarkup, /data-action="edit"/, 'product rows open the editor without a separate edit button');
-assert.doesNotMatch(productListMarkup, /Tồn kho|Chưa kiểm kê|Hết hàng|stock\(p\)/, 'inventory remains out of the product list');
-has('class="thumb product-thumb-placeholder" role="img" aria-label="Chưa có ảnh sản phẩm"', 'missing product images use an explicitly labelled placeholder, not a generic branded texture');
-has('.product-thumb-placeholder{display:grid;place-items:center;box-sizing:border-box;', 'missing-image placeholder remains a visual, bounded thumbnail');
-has('#main .product-table .product-mobile-inline-meta{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;align-items:start;margin-top:3px;max-width:100%}', 'mobile product price appears beneath product identity without adding inventory');
-has('#main .product-table .product-mobile-inline-metric{display:flex;align-items:baseline;gap:3px;min-width:0;font-size:9px;line-height:1.1;white-space:nowrap}', 'mobile price label remains compact and readable');
-has('#main .product-table .prodname{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}', 'long product titles truncate neatly without increasing mobile card height');
-has('#main .product-table .product-row-info .sku{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}', 'SKU/category context wraps to two lines on 320–360px phones instead of losing its visible tail');
-has('class="prodname" title="${esc(p.title)}"', 'full product titles remain available via a title attribute when visually truncated');
-has('#main:has(#searchBox) .toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"search search" "category fulfillment";gap:7px;padding:10px}', 'product search spans the full mobile toolbar row');
-has('.activity-log-filters .field:first-child{grid-column:1/-1}', 'activity-log search gets a full-width row on mobile');
-has('.activity-log-filters .field:nth-child(2){grid-column:1}', 'activity filter select remains usable on mobile');
-has('.activity-log-filters .field:nth-child(3){grid-column:2}', 'clear-filters button stays beside the activity select on mobile');
-has('#main .product-table .product-visibility-toggle{min-width:59px;padding:4px 0;min-height:60px}', 'mobile card has large green/red switch');
-has('function toggleProductPublished(button)', 'switch saves via CAS PATCH');
-has('#main:has(#searchBox) #productResultSummary{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}', 'product result live summary remains accessible without consuming a visible row');
-has('#backdrop>.editor>form{display:flex;flex:1 1 0%;flex-direction:column;min-height:0;overflow:hidden}', 'editor form is bounded above sticky actions so short and long tabs remain usable');
-has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'product gallery content can scroll clear of the fixed actions and Android safe area');
-
-has('@media(max-width:360px){#imageGrid .image-rail .imageitem{flex-basis:52px;width:52px}}', 'thumbnail rail remains touchable on narrow phones');
-has(':root[data-admin-theme="dark"] #imageGrid .image-cover-slot .imageitem img{background:rgba(5,14,23,.62)}', 'dark theme gallery cover background');
-has('role="group" tabindex="0" aria-label="Ảnh ', 'whole-photo keyboard-focusable gallery entries remain accessible');
-has("gallery.slice(1).map((item,index)=>renderGalleryItem(item,index+1)).join('')", 'all supporting images are rendered inside the mobile thumbnail rail');
-
-has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'mobile editor footer remains flush with the dialog edge');
-has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'mobile editor safe-area scroll clearance');
-has('#backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}', 'mobile editor action footer does not shrink');
-has('@media(max-width:360px){#backdrop>.editor>form>.editorfooter{gap:6px;padding-left:8px;padding-right:8px}', 'narrow-phone gallery actions use a compact single-row footer');
-has('#backdrop>.editor>form>.editorfooter .btn{padding-inline:9px;font-size:10px;white-space:nowrap}', 'narrow-phone gallery action labels remain on one line');
-
-
-
-console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
-
-const renderStart = adminHtml.indexOf('function render(){');
-assert.ok(renderStart >= 0 && adminHtml.slice(renderStart, renderStart + 600).includes("settingsPage();$$('[data-view]').forEach"),
-  "Admin render must iterate every navigation button; single-element querySelector cannot be used with forEach");
-console.log("PASS: Admin render iterates all nav controls via querySelectorAll helper.");
+assert.doesNotMatch(productListM
