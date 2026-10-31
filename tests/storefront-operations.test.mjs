@@ -28,6 +28,11 @@ assert.ok(!warrantyClaimSource.includes('warranty_verifications') && warrantyCla
 assert.ok(warrantyClaimSource.includes('w.starts_at'), 'Warranty claim validation must fetch the warranty start date');
 assert.ok(uploadSource.includes('w.starts_at'), 'Warranty photo upload validation must fetch the warranty start date');
 const warrantyLookupSource = readFileSync(new URL('../functions/api/warranty-lookup.js', import.meta.url), 'utf8');
+const customerFacingHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
+for (const privateDiagnostic of ['Mailjet Stats', 'Delivered/Bounced/Blocked', 'Email trên Preview']) {
+  assert.ok(!customerFacingHtml.includes(privateDiagnostic), 'Customer login must not expose email provider or staging diagnostics: ' + privateDiagnostic);
+}
+assert.ok(!/Hãy kiểm tra các migration\s+\d/i.test(warrantyLookupSource), 'Public warranty errors must not expose internal database migrations');
 assert.ok(warrantyLookupSource.includes('maskedWarrantyCode') && warrantyLookupSource.includes('claimToken') && !warrantyLookupSource.includes('warrantyCode: code') && warrantyLookupSource.includes('maskedPhone') && warrantyLookupSource.includes('maskedAddress'), 'Public warranty lookup must return masked data and a short-lived action token');
 const adminWarrantiesSource = readFileSync(new URL('../functions/api/admin/warranties.js', import.meta.url), 'utf8');
 const sharedLibSource = readFileSync(new URL('../functions/_lib.js', import.meta.url), 'utf8');
