@@ -45,6 +45,8 @@ jobs:
           npm test
       - name: Read-only verify separate Preview Pages, D1 and R2
         run: node scripts/verify-audit-preview.mjs
+      - name: Stamp source revision in isolated Preview output only
+        run: printf '%s\n' "$GITHUB_SHA" > public/audit-source-revision.txt
       - name: Deploy to separate Cloudflare Pages Preview project (NEVER storefront Production)
         run: >
           npx wrangler pages deploy public
