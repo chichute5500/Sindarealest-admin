@@ -75,6 +75,13 @@ for (const {width,height,theme} of matrix) {
         const visible=await page.locator(container).isVisible();
         if(!visible){report.screens.push({screen:name,status:'UNAVAILABLE_NOT_ACCEPTED',reason:'container not visible'});return;}
         await page.waitForTimeout(220);
+        await page.evaluate(async()=>{
+          await document.fonts.ready;
+          const images=[...document.images].filter(img=>{
+            const r=img.getBoundingClientRect();return r.width>0&&r.height>0&&r.top<innerHeight&&r.bottom>0;
+          });
+          await Promise.race([Promise.all(images.map(img=>img.decode().catch(()=>{}))),new Promise(resolve=>setTimeout(resolve,4000))]);
+        });
         const m=await page.evaluate(captureContainer=>{
           const de=document.documentElement;
           const target=document.querySelector(captureContainer==='#backdrop' ? '#backdrop' : captureContainer==='#loginView' ? '#loginView' : '#main');
