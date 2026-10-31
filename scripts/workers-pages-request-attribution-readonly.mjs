@@ -105,8 +105,8 @@ try{
     :null;
  if(!bounds)throw Error('Pages dataset time filters unrecognized; do not perform unbounded query');
  const order=groupBy.includes('datetimeHour')?',orderBy:[datetimeHour_ASC]':'';
- const sub=['count',selects.length?'dimensions { '+selects.join(' ')+' }':'',metrics.length?'sum { '+metrics.join(' ')+' }':''].filter(Boolean).join(' ');
- const query='query PagesInvocations($account:string!, '+bounds.vars.slice(1)+') { viewer { accounts(filter:{accountTag:$account}) { pagesFunctionsInvocationsAdaptiveGroups(limit:1000, filter:{'+bounds.sql+'}'+order+') { '+sub+' } } } }';
+ const sub=[groups.includes('count')?'count':'',selects.length?'dimensions { '+selects.join(' ')+' }':'',metrics.length?'sum { '+metrics.join(' ')+' }':''].filter(Boolean).join(' ');
+ const query='query PagesInvocations($account:string!, '+bounds.vars+') { viewer { accounts(filter:{accountTag:$account}) { pagesFunctionsInvocationsAdaptiveGroups(limit:1000, filter:{'+bounds.sql+'}'+order+') { '+sub+' } } } }';
  const d=await api('https://api.cloudflare.com/client/v4/graphql','POST',{query,variables:{account,...bounds.values}});
  if(d.errors?.length)throw Error('Pages analytics: '+d.errors.map(e=>e.message).join('; ').slice(0,250));
  const accounts=d.data?.viewer?.accounts||[];
