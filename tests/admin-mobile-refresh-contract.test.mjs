@@ -18,7 +18,9 @@ assert.match(html, /lastAdminFullSync>=45000/, 'Full background refresh must be 
 assert.match(html, /document\.addEventListener\('visibilitychange'/, 'Refresh after returning to foreground');
 assert.match(html, /window\.addEventListener\('online'/, 'Recover after network resumes');
 assert.match(html, /if\(adminSyncPromise\)\{if\(!full\)return adminSyncPromise/, 'Pull-to-refresh must not settle for an incomplete active polling cycle');
-assert.match(html, /Promise\.allSettled\(names\.map\(name=>api\(adminLivePaths\[name\]\)\)\)/, 'Fetch current Admin data without full WebView reload');
+assert.match(html, /Promise\.allSettled\(names\.map\(name=>api\(name==='products'&&productsRevision!==null/, 'Poll changes without re-reading unchanged catalog');
+assert.match(html, /data\.unchanged===true&&data\.revision===productsRevision/, 'An unchanged product revision must leave rendered data intact');
+assert.match(html, /productsRevision=typeof d\.revision==='string'\?d\.revision:null/, 'Initial product load must retain the revision token');
 assert.match(html, /if\(navigator\.userAgent\.includes\('SinDarealestAdminAndroid\/2'\)\)return/, 'Keep existing APK-only inactivity exception');
 assert.ok(!html.includes('auditLogPolling'), 'Do not duplicate the older polling loop');
 
