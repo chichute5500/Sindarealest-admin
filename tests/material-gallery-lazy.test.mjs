@@ -23,6 +23,7 @@ const document={
  createElement:()=>({classList:fakeClasses(),setAttribute(){},set src(x){this._src=x},get src(){return this._src}})
 };
 const window={
+ IntersectionObserver:Observer,
  setInterval(callback,ms){assert.equal(ms,1500);interval=callback;return 4},
  clearInterval(){},addEventListener(){}
 };
