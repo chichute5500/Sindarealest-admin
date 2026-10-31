@@ -104,6 +104,16 @@ try{
  // This runs on local mock data and never invokes checkout after reload.
  await page.reload({waitUntil:"domcontentloaded",timeout:30000});
  await page.locator('#catalogGrid article[data-product]').first().waitFor({timeout:25000});
+ // Screenshot only after first catalog thumbnail decodes; loading an article
+ // does not mean its image has reached the compositor on a cold Android reload.
+ await page.waitForFunction(()=>{
+   const image=document.querySelector('#catalogGrid article[data-product] .product-photo img');
+   return image?.complete&&image.naturalWidth>0&&getComputedStyle(image).visibility==='visible';
+ },{},{timeout:20000});
+ await page.locator('#catalogGrid article[data-product] .product-photo img').first().evaluate(async image=>{
+   try{await image.decode()}catch{}
+ });
+ await page.waitForTimeout(300);
  const navState=async()=>page.evaluate(()=>{
    const nav=document.querySelector('#mobileBottomNav');
    if(!nav)return {count:0};
