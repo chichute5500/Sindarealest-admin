@@ -16,6 +16,10 @@ const cases=[
  {route:"/",width:390,name:"no-theme-layer",css:".theme-bg{display:none!important}"},
  {route:"/sanpham",width:390,name:"baseline"},
  {route:"/sanpham",width:390,name:"no-theme-layer",css:".theme-bg{display:none!important}"},
+ {route:"/sanpham",width:390,name:"contain-paint",css:".theme-bg{contain:paint!important}"},
+ {route:"/sanpham",width:390,name:"contain-layout-paint",css:".theme-bg{contain:layout paint!important}"},
+ {route:"/sanpham",width:390,name:"contain-strict",css:".theme-bg{contain:strict!important}"},
+ {route:"/sanpham",width:390,name:"promote-composite",css:".theme-bg{will-change:opacity!important;backface-visibility:hidden!important}"},
  {route:"/sanpham",width:390,name:"no-hydration",blockProducts:true}
 ];
 const results=[];
