@@ -2347,10 +2347,19 @@ function toggleFavorite(key){if(accountSyncMode==='loading'||accountSyncMode==='
 function normalizeFavorites(){const valid=[...new Set(favorites.map(key=>{const product=findProductByKey(key);return product?favoriteKey(product):''}).filter(Boolean))];const changed=valid.length!==favorites.length||valid.some((key,index)=>key!==favorites[index]);favorites=valid;if(changed&&accountSyncMode==='guest')try{localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))}catch(e){}updateFavoriteControls();renderFavoriteList()}
 function loadLocalShippingAddress(){if(accountSyncMode!=='guest'){updateAccountAddressSummary();return localShippingAddress}try{const saved=JSON.parse(localStorage.getItem(LOCAL_ADDRESS_KEY)||'null');localShippingAddress=saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:null}catch(e){localShippingAddress=null}updateAccountAddressSummary();return localShippingAddress}
 function updateAccountAddressSummary(){const node=$('#accountAddressSummary');if(!node)return;const a=localShippingAddress;if(!a||!a.fullName||!a.phone||!a.province||!a.ward||!a.streetAddress){node.textContent='Chưa lưu địa chỉ nhận hàng';return}node.textContent=String(a.fullName)+' · '+String(a.ward)+', '+String(a.province)}
+function updateAccountAddressPrivacy(){
+ const note=$('#accountAddressPrivacy'),save=$('#accountAddressSave');
+ if(note)note.textContent=accountSyncMode==='cloud'
+  ?'Thông tin giao hàng được đồng bộ an toàn với tài khoản của bạn.'
+  :accountSyncMode==='guest'
+  ?'Khi chưa đăng nhập, thông tin giao hàng chỉ được lưu trên trình duyệt của thiết bị hiện tại.'
+  :'Đang kiểm tra trạng thái đồng bộ. Vui lòng thử lại khi tài khoản sẵn sàng.';
+ if(save)save.textContent=accountSyncMode==='cloud'?'Lưu và đồng bộ địa chỉ':'Lưu địa chỉ trên thiết bị';
+}
 function setAccountAddressMessage(message,state=''){const node=$('#accountAddressMessage');if(!node)return;node.textContent=message;node.dataset.state=state}
 async function loadAccountAddressProvinces(savedAddress=null){const select=$('#accountAddressProvince'),ward=$('#accountAddressWard');if(!select||!ward)return;select.disabled=true;ward.disabled=true;select.innerHTML='<option value="">Đang tải tỉnh/thành…</option>';ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';try{const response=await fetch(ADMIN_DIVISIONS_API+'/p/',{cache:'force-cache'});if(!response.ok)throw Error('HTTP '+response.status);const rows=await response.json();if(!Array.isArray(rows)||!rows.length)throw Error('Danh mục không hợp lệ');select.innerHTML='<option value="">Chọn tỉnh/thành phố *</option>'+rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi')).map(p=>'<option value="'+escapeHtml(p.name)+'" data-code="'+escapeHtml(p.code)+'">'+escapeHtml(p.name)+'</option>').join('');select.disabled=false;if(savedAddress){let option=[...select.options].find(o=>(savedAddress.provinceCode&&o.dataset.code===String(savedAddress.provinceCode))||o.value===String(savedAddress.province||''));if(option){select.value=option.value;await loadAccountAddressWards(savedAddress.wardCode,savedAddress.ward)}}}catch{select.innerHTML='<option value="">Không tải được tỉnh/thành</option>';select.disabled=true;ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';ward.disabled=true;setAccountAddressMessage('Không tải được danh mục hành chính. Kiểm tra kết nối rồi thử lại.','error')}}
 async function loadAccountAddressWards(preferredCode='',preferredName=''){const select=$('#accountAddressProvince'),ward=$('#accountAddressWard');if(!select||!ward)return;const code=select.selectedOptions[0]?.dataset.code||'',requestId=++accountAddressWardRequest;ward.disabled=true;ward.innerHTML='<option value="">Đang tải xã/phường…</option>';if(!code){ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';return}try{const response=await fetch(ADMIN_DIVISIONS_API+'/p/'+encodeURIComponent(code)+'?depth=2',{cache:'force-cache'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(requestId!==accountAddressWardRequest)return;const rows=Array.isArray(data.wards)?data.wards:[];if(!rows.length)throw Error('Không có xã/phường');ward.innerHTML='<option value="">Chọn xã/phường *</option>'+rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi')).map(w=>'<option value="'+escapeHtml(w.name)+'" data-code="'+escapeHtml(w.code)+'">'+escapeHtml(w.name)+'</option>').join('');ward.disabled=false;const option=[...ward.options].find(o=>(preferredCode&&o.dataset.code===String(preferredCode))||o.value===String(preferredName||''));if(option)ward.value=option.value;setAccountAddressMessage('')}catch{if(requestId!==accountAddressWardRequest)return;ward.innerHTML='<option value="">Không tải được xã/phường</option>';ward.disabled=true;setAccountAddressMessage('Không tải được xã/phường. Chọn lại tỉnh/thành hoặc thử lại khi có mạng.','error')}}
-async function loadAccountAddressView(){const form=$('#accountAddressForm');if(!form)return;const saved=loadLocalShippingAddress()||{};$('#accountAddressFullName').value=String(saved.fullName||'');$('#accountAddressPhone').value=String(saved.phone||'');$('#accountAddressEmail').value=String(saved.email||'');$('#accountAddressStreet').value=String(saved.streetAddress||'');setAccountAddressMessage('');await loadAccountAddressProvinces(saved)}
+async function loadAccountAddressView(){const form=$('#accountAddressForm');if(!form)return;updateAccountAddressPrivacy();const saved=loadLocalShippingAddress()||{};$('#accountAddressFullName').value=String(saved.fullName||'');$('#accountAddressPhone').value=String(saved.phone||'');$('#accountAddressEmail').value=String(saved.email||'');$('#accountAddressStreet').value=String(saved.streetAddress||'');setAccountAddressMessage('');await loadAccountAddressProvinces(saved)}
 async function saveAccountAddress(event){event.preventDefault();const form=event.currentTarget;if(!form.checkValidity()){form.reportValidity();setAccountAddressMessage('Kiểm tra các trường bắt buộc trước khi lưu.','error');return}const province=$('#accountAddressProvince'),ward=$('#accountAddressWard'),provinceOption=province.selectedOptions[0],wardOption=ward.selectedOptions[0];if(!provinceOption?.dataset.code||!wardOption?.dataset.code){setAccountAddressMessage('Chọn tỉnh/thành và xã/phường từ danh mục.','error');return}const next={fullName:$('#accountAddressFullName').value.trim(),phone:$('#accountAddressPhone').value.trim(),email:$('#accountAddressEmail').value.trim(),province:province.value,provinceCode:provinceOption.dataset.code,ward:ward.value,wardCode:wardOption.dataset.code,streetAddress:$('#accountAddressStreet').value.trim(),savedAt:new Date().toISOString()};try{
  if(accountSyncMode==='cloud'){
   const response=await fetch('/api/customer/profile',{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'address',address:next})});
@@ -2813,13 +2822,13 @@ async function accountCloudFetchOrders(epoch){
 async function accountCloudOnAuth(active){
  const epoch=++cloudSyncEpoch;
  if(!active){
-  accountSyncMode='guest';cloudOrderHistory=[];
+  accountSyncMode='guest';cloudOrderHistory=[];updateAccountAddressPrivacy();
   loadFavorites();loadLocalShippingAddress();updateDetailFavoriteButton();
   renderFavoriteList();renderOrderHistory();
   accountCloudMessage('Đăng nhập Google để đồng bộ dữ liệu giữa các thiết bị.');accountCloudImportVisibility();
   return;
  }
- accountSyncMode='loading';accountCloudMessage('Đang đồng bộ tài khoản Google…');
+ accountSyncMode='loading';updateAccountAddressPrivacy();accountCloudMessage('Đang đồng bộ tài khoản Google…');
  try{
   const res=await fetch('/api/customer/profile',{cache:'no-store',credentials:'same-origin'});
   if(!res.ok)throw Error('Không tải được hồ sơ trên máy chủ.');
@@ -2827,13 +2836,13 @@ async function accountCloudOnAuth(active){
   if(epoch!==cloudSyncEpoch)return;
   favorites=Array.isArray(data.favorites)?data.favorites.filter(v=>typeof v==='string'):[];
   localShippingAddress=data.address||null;
-  accountSyncMode='cloud';
+  accountSyncMode='cloud';updateAccountAddressPrivacy();
   updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();
   accountCloudMessage('Đã kết nối Google. Yêu thích, địa chỉ và đơn hàng được lưu theo tài khoản.');accountCloudImportVisibility();
   await accountCloudFetchOrders(epoch);
  }catch(e){
   if(epoch!==cloudSyncEpoch)return;
-  accountSyncMode='error';favorites=[];localShippingAddress=null;cloudOrderHistory=[];
+  accountSyncMode='error';updateAccountAddressPrivacy();favorites=[];localShippingAddress=null;cloudOrderHistory=[];
   updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();renderOrderHistory();
   accountCloudMessage(e.message||'Không thể đồng bộ. Vui lòng tải lại trang.');accountCloudImportVisibility();
  }
