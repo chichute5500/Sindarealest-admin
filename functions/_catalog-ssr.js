@@ -65,15 +65,6 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
       .filter(p=>p&&validTitle(p.title)&&canonicalProductPath(p)).slice(0,8);
     if(!rows.length)return html; // Never output invented/stale products if D1 is unavailable.
     const cards=productCards(rows,origin,{eager:!home});
-    // Preload only the first real, validated SSR catalog photograph. Product
-    // cards sit after a large inline stylesheet, so waiting until the parser
-    // reaches the first <img> delays its initial request on slow mobile links.
-    // The URL is exactly the first SSR <img> URL (no resize bill, no R2 write).
-    // Do not preload Home cards: they are below the initial viewport.
-    if(!home){
-      const firstMedia=imageFor(rows[0]);
-      html=html.replace("<head>","<head>\n<link rel=\"preload\" as=\"image\" href=\""+h(firstMedia)+"\" fetchpriority=\"high\">");
-    }
     html=html.replace('<div class="catalog-grid" id="catalogGrid"></div>',
       '<div class="catalog-grid" id="catalogGrid">'+cards+'</div>');
     if(home)html=html.replace('<div class="featured-grid" id="featuredGrid"></div>',

@@ -90,6 +90,36 @@ try{
   globalThis.caches={default:{match:async()=>{throw Error("cache offline")},put:fakeCache.put.bind(fakeCache)}};
   await readCatalog();
   assert.equal(catalogReads,4,"Cache outage must transparently fall back to live D1");
+
+  // Pages waitUntil must decouple slow edge-cache writes from public JSON
+  // delivery. The write remains tracked and contains only sanitized data.
+  let finishCacheWrite;
+  let startedCacheWrite=false;
+  const pendingWrites=[];
+  globalThis.caches={default:{
+    async match(){return null},
+    async put(key,body){
+      startedCacheWrite=true;
+      assert.match(body.headers.get("Cache-Control")||"",/max-age=15/);
+      await new Promise(resolve=>{finishCacheWrite=resolve});
+      const publicBody=await body.clone().json();
+      assert.equal(publicBody[0].price,null,"Background cache must not reveal a hidden price");
+    }
+  }};
+  const quickResponse=await Promise.race([
+    publicProductsGet({
+      request:new Request("https://shop.example/api/products"),
+      env,waitUntil:task=>pendingWrites.push(task)
+    }),
+    new Promise((_,reject)=>setTimeout(()=>reject(Error("Public response waited for edge cache put")),1200))
+  ]);
+  assert.equal(quickResponse.status,200);
+  assert.equal(startedCacheWrite,true);
+  assert.equal(pendingWrites.length,1,"waitUntil should track one cache write");
+  assert.equal((await quickResponse.json())[0].price,null);
+  assert.equal(typeof finishCacheWrite,"function","Cache write has started");
+  finishCacheWrite();
+  await Promise.all(pendingWrites);
 }finally{
   if(priorCache===undefined)delete globalThis.caches;
   else globalThis.caches=priorCache;

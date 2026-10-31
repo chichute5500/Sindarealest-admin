@@ -73,7 +73,19 @@ try{
     hydration:document.documentElement.dataset.catalogHydration||"",
     candidates:window.__lcpCandidates||[],
     longTasks:(window.__lcpLongTasks||[]).slice(0,20),
-    totalBytes:performance.getEntriesByType("resource")
+    // Capture per-resource phases so a 10s LCP can be attributed to the
+    // network, R2 response or late layout/paint rather than guessing from
+    // a single Lighthouse score. No request bodies, cookies or customer data.
+    resources:performance.getEntriesByType("resource")
+     .filter(e=>["img","link","css","fetch"].includes(e.initiatorType))
+     .slice(0,45).map(e=>{
+      let path="";
+      try{path=new URL(e.name).pathname}catch{}
+      return {path,kind:e.initiatorType,start:Math.round(e.startTime),
+       responseStart:Math.round(e.responseStart),end:Math.round(e.responseEnd),
+       duration:Math.round(e.duration),bytes:e.transferSize||0};
+     }),
+    totalImages:performance.getEntriesByType("resource")
      .filter(e=>e.initiatorType==="img").length,
     visibleProducts:[...document.querySelectorAll("#catalogGrid article[data-product]")]
      .filter(el=>{const r=el.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0}).length

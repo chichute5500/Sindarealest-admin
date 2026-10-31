@@ -32,10 +32,6 @@ assert.ok(category.includes('id="catalogGrid"><article'));
 assert.match(category,/id="catalogGrid"><article[^]*?loading="eager"/,
   "Direct catalog entry should eagerly load the first visible product image");
 assert.ok(category.includes('id="featuredGrid"></div>'),'Category route must not populate hidden home sections');
-assert.ok(category.includes('<link rel="preload" as="image" href="/images/test-image.webp" fetchpriority="high">'),
-  "Direct catalog must request first validated SSR photo before the inline stylesheet");
-assert.ok(!full.includes('<link rel="preload" as="image"'),
-  "Home SSR cards below the fold must not compete for startup bandwidth");
 assert.equal(await renderPublicCatalog(shell,{DB},origin,{categorySlug:"not-a-category"}),shell);
 assert.equal(await renderPublicCatalog(shell,{},origin,{home:true}),shell);
 assert.equal(await renderPublicCatalog(shell,{DB:{prepare(){throw Error("DB offline")}}},origin,{home:true}),shell);

@@ -34,7 +34,7 @@ async function storeCachedCatalog(cache, key, response) {
   } catch { /* Cache API may be unavailable in local Pages/dev; query still works. */ }
 }
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
   const unavailable = dbOrFail(env);
   if (unavailable) return unavailable;
   try {
@@ -58,7 +58,15 @@ export async function onRequestGet({ request, env }) {
       const skuVerified = isExplicitlyVerifiedSku(row);
       return { ...product, sku: skuVerified ? product.sku : null, skuVerified };
     }));
-    if (cacheKey) await storeCachedCatalog(cache,cacheKey,response);
+    if (cacheKey) {
+      // Cache API writes may consume the whole serialized catalog. In Pages,
+      // waitUntil keeps that work alive without making the customer wait for it.
+      // Standalone callers without a request context still await it, preserving
+      // the deterministic fallback and existing cache/price-gate tests.
+      const cacheWrite = storeCachedCatalog(cache,cacheKey,response);
+      if (typeof waitUntil === "function") waitUntil(cacheWrite);
+      else await cacheWrite;
+    }
     return response;
   } catch {
     return fail("Danh mục đang tạm thời gián đoạn. Vui lòng thử lại sau.", 503);
