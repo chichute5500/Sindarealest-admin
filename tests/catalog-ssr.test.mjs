@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
 import {renderPublicCatalog} from "../functions/_catalog-ssr.js";
 import {onRequest as middleware} from "../functions/_middleware.js";
 const origin="https://shop.example";
@@ -42,4 +43,13 @@ const ctx={
 const response=await middleware(ctx);
 assert.equal(response.status,200);
 assert.ok((await response.text()).includes('id="catalogGrid"><article'),'Middleware must compose SSR into catalog');
+// Protect the initial catalog hydration path against double render and
+// lost first-viewport SSR image nodes. Browser-level Lighthouse remains the
+// authority for LCP/CLS; these tests lock the source-level regression.
+const storefront=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+assert.match(storefront,/const initialCatalogListing=catalogCategoryFromLocation\(\)!==null;/);
+assert.match(storefront,/if\(!initialCatalogListing\)\{renderFeatured\(\);renderFilters\(\);renderCatalog\(\)\}/);
+assert.match(storefront,/const ssrCards=grid\.querySelectorAll\('article\[data-ssr-product\]'\)/);
+assert.match(storefront,/grid\.replaceChildren\(template\.content\)/);
+assert.match(storefront,/if\(!document\.querySelector\('#featuredGrid \[data-featured-card\]'\)\)renderFeatured\(\)/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");

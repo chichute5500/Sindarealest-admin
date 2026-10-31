@@ -1845,6 +1845,8 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
  if(location.pathname+location.hash!==destination)
   history.pushState({sdStorefrontHome:true},'',destination);
  setCatalogLandingMode(false);
+ // A direct catalog visit defers offscreen featured image fetches until Home is actually opened.
+ if(!document.querySelector('#featuredGrid [data-featured-card]'))renderFeatured();
  setActiveNav(section.id==='home'?'home':section.id);
  setMobileMenu(false);
  requestAnimationFrame(()=>section.scrollIntoView({behavior:'instant',block:'start'}));
@@ -1973,7 +1975,29 @@ function getFiltered(){
  const timestamp=p=>String(p.createdAt||p.created_at||'');
  return matches.sort((a,b)=>timestamp(b).localeCompare(timestamp(a)));
 }
-function renderCatalog(){unbindReveal($('#catalogGrid'));filtered=getFiltered();const maxPage=Math.max(1,Math.ceil(filtered.length/perPage));page=Math.min(page,maxPage);const start=(page-1)*perPage;const items=filtered.slice(start,start+perPage);$('#catalogGrid').innerHTML=items.map((p,i)=>productCard(p,(p.categoryLabel||'SELECTED').toUpperCase(),i)).join('');activateCatalogImages();$('#pageSummary').textContent=filtered.length?`Hiển thị ${start+1}–${Math.min(start+perPage,filtered.length)} trong ${filtered.length} sản phẩm`:'Không tìm thấy sản phẩm phù hợp.';const nums=[];let from=Math.max(1,page-2),to=Math.min(maxPage,page+2);if(from>1)nums.push(1,'…');for(let i=from;i<=to;i++)nums.push(i);if(to<maxPage)nums.push('…',maxPage);$('#pagination').innerHTML=filtered.length?`<button type="button" class="page-btn page-arrow tap-target" data-page="prev" ${page===1?'disabled':''} aria-label="Trang trước">${arrowIcon('left')}</button>${nums.map(n=>n==='…'?'<span class="page-summary">…</span>':`<button class="page-btn tap-target ${n===page?'active':''}" data-page="${n}" ${n===page?'aria-current="page"':''}>${n}</button>`).join('')}<button type="button" class="page-btn page-arrow tap-target" data-page="next" ${page===maxPage?'disabled':''} aria-label="Trang sau">${arrowIcon('right')}</button>`:'';bindReveal($('#catalogGrid'))}
+function renderCatalog(){unbindReveal($('#catalogGrid'));filtered=getFiltered();const maxPage=Math.max(1,Math.ceil(filtered.length/perPage));page=Math.min(page,maxPage);const start=(page-1)*perPage;const items=filtered.slice(start,start+perPage);const grid=$('#catalogGrid');const markup=items.map((p,i)=>productCard(p,(p.categoryLabel||'SELECTED').toUpperCase(),i)).join('');
+ // On the initial SSR -> CSR pass, keep in-flight/decoded image nodes for the
+ // SAME published product and URL. Replacing them triggers fresh image decode
+ // and can make the mobile catalog LCP wait for another paint.
+ const ssrCards=grid.querySelectorAll('article[data-ssr-product]');
+ if(ssrCards.length){
+  const imageByProduct=new Map([...ssrCards].map(card=>[card.dataset.ssrProduct,card.querySelector('.product-photo img')]));
+  const template=document.createElement('template');template.innerHTML=markup;
+  for(const card of template.content.querySelectorAll('article[data-product]')){
+   const current=imageByProduct.get(card.dataset.product);
+   const next=card.querySelector('.product-photo img');
+   if(!current||!next||next.loading!=='eager')continue;
+   const oldSrc=current.getAttribute('src'),newSrc=next.getAttribute('src');
+   if(!oldSrc||!newSrc)continue;
+   try{
+    if(new URL(oldSrc,document.baseURI).href!==new URL(newSrc,document.baseURI).href)continue;
+   }catch{continue}
+   current.alt=next.alt;current.loading=next.loading;current.fetchPriority=next.fetchPriority;
+   next.replaceWith(current);
+  }
+  grid.replaceChildren(template.content);
+ }else grid.innerHTML=markup;
+ activateCatalogImages();$('#pageSummary').textContent=filtered.length?`Hiển thị ${start+1}–${Math.min(start+perPage,filtered.length)} trong ${filtered.length} sản phẩm`:'Không tìm thấy sản phẩm phù hợp.';const nums=[];let from=Math.max(1,page-2),to=Math.min(maxPage,page+2);if(from>1)nums.push(1,'…');for(let i=from;i<=to;i++)nums.push(i);if(to<maxPage)nums.push('…',maxPage);$('#pagination').innerHTML=filtered.length?`<button type="button" class="page-btn page-arrow tap-target" data-page="prev" ${page===1?'disabled':''} aria-label="Trang trước">${arrowIcon('left')}</button>${nums.map(n=>n==='…'?'<span class="page-summary">…</span>':`<button class="page-btn tap-target ${n===page?'active':''}" data-page="${n}" ${n===page?'aria-current="page"':''}>${n}</button>`).join('')}<button type="button" class="page-btn page-arrow tap-target" data-page="next" ${page===maxPage?'disabled':''} aria-label="Trang sau">${arrowIcon('right')}</button>`:'';bindReveal($('#catalogGrid'))}
 function scheduleDetailAutoplay(){clearTimeout(detailTimer);if(!currentProduct||detailImages.length<2||!$('#productOverlay').classList.contains('open')||$('#sdFullscreenViewer').classList.contains('open')||document.hidden)return;if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;detailTimer=setTimeout(()=>changeDetailImage((detailIndex+1)%detailImages.length,false),2000)}
 function fullscreenImages(){return [$('#sdFullscreenImage'),$('#sdFullscreenImageNext')].filter(Boolean)}
 function activeFullscreenImage(){return $('#sdFullscreenImage'+(fullscreenActiveLayer?'Next':''))}
@@ -2899,7 +2923,13 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
   return;
  }
  document.documentElement.dataset.catalogHydration='ready';
- renderFeatured();renderFilters();renderCatalog();renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
+ // Direct /sanpham routes must not first render the unrelated ALL catalog and
+ // then replace it with the selected category (two layout shifts and image churn).
+ // The route sync below owns the one initial category render. On Home we still
+ // render featured + catalog as before; Home can be opened later without reload.
+ const initialCatalogListing=catalogCategoryFromLocation()!==null;
+ if(!initialCatalogListing){renderFeatured();renderFilters();renderCatalog()}
+ renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
 }
 
 let accountSyncMode='guest',cloudOrderHistory=[],cloudSyncEpoch=0,cloudFavoriteQueue=Promise.resolve();
