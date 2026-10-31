@@ -122,6 +122,11 @@ try{
    await page.locator(accountTrigger).click({timeout:13000});
    await page.waitForFunction(()=>document.getElementById("accountDrawer").classList.contains("open"),{timeout:5000});
    assert.equal(await page.locator("body").evaluate(el=>el.classList.contains("has-open-overlay")),true);
+   if(c.mobile){
+    assert.equal(await page.locator("#mobileBottomNav").evaluate(el=>getComputedStyle(el).display),"none",
+      "Mobile nav must disappear when Account drawer is open");
+   }
+   await page.screenshot({path:OUTPUT+"/"+c.name+"-account-open.png",animations:"disabled"});
    await page.locator("#accountFavoritesAction").click({timeout:12000});
    // setAccountView intentionally starts entry animation on the next rAF.
    // Read the material state only after the browser has committed that frame.
@@ -141,6 +146,8 @@ try{
    await page.locator("#accountClose").click({timeout:12000});
    await page.waitForFunction(()=>!document.getElementById("accountDrawer").classList.contains("open"),{timeout:5000});
    await page.waitForFunction(()=>!document.body.classList.contains("has-open-overlay"),{timeout:5000});
+   if(c.mobile)assert.notEqual(await page.locator("#mobileBottomNav").evaluate(el=>getComputedStyle(el).display),"none",
+     "Mobile nav must reappear when every drawer has closed");
    checkpoint("overlay cleanup");
 
    // Exercise the actual checkout buttons, never call the application's
@@ -152,6 +159,17 @@ try{
    await page.locator("#cartCheckout").click({timeout:12000});
    await page.waitForFunction(()=>document.getElementById("checkoutDrawer").classList.contains("open"),null,{timeout:6000});
    assert.equal(await page.locator("body").evaluate(el=>el.classList.contains("has-open-overlay")),true);
+   if(c.mobile)assert.equal(await page.locator("#mobileBottomNav").evaluate(el=>getComputedStyle(el).display),"none");
+   const initialCheckout=await page.evaluate(()=>({
+    cartVisible:getComputedStyle(document.getElementById("cartDrawer")).visibility,
+    accountVisible:getComputedStyle(document.getElementById("accountDrawer")).visibility,
+    checkoutVisible:getComputedStyle(document.getElementById("checkoutDrawer")).visibility,
+    navVisible:getComputedStyle(document.getElementById("mobileBottomNav")).display
+   }));
+   assert.equal(initialCheckout.checkoutVisible,"visible");
+   assert.equal(initialCheckout.cartVisible,"hidden","Cart cannot peek out underneath Checkout");
+   assert.equal(initialCheckout.accountVisible,"hidden","Account cannot peek out underneath Checkout");
+   await page.screenshot({path:OUTPUT+"/"+c.name+"-checkout-open.png",animations:"disabled"});
    await page.locator('#checkoutForm input[name="fullName"]').fill("Khách kiểm thử");
    await page.locator('#checkoutForm input[name="phone"]').fill("0900000000");
    await page.locator("#checkoutStreet").fill("01 Đường QA");
@@ -175,6 +193,44 @@ try{
    await page.locator("#sdCheckoutPrev").click({timeout:12000});
    await page.waitForFunction(()=>!document.getElementById("sdCheckoutShippingStep").hidden,null,{timeout:5000});
    checkpoint("checkout back navigation and 3-step reset");
+
+   // Regression from owner's mobile screenshots: force a fast overlay switch
+   // and confirm that the outgoing checkout becomes visually hidden at once.
+   // This simulated click targets the actual header action even if an older
+   // browser session left the navigation inaccessible under a dialog.
+   await page.locator("#accountOpen").evaluate(el=>el.click());
+   await page.waitForFunction(()=>document.getElementById("accountDrawer").classList.contains("open"),null,{timeout:5000});
+   const switched=await page.evaluate(()=>{
+    const state=id=>({open:document.getElementById(id).classList.contains("open"),
+      visibility:getComputedStyle(document.getElementById(id)).visibility});
+    return {account:state("accountDrawer"),cart:state("cartDrawer"),
+      checkout:state("checkoutDrawer"),
+      nav:getComputedStyle(document.getElementById("mobileBottomNav")).display};
+   });
+   assert.equal(switched.account.open,true);
+   assert.equal(switched.account.visibility,"visible");
+   for(const name of ["cart","checkout"]){
+    assert.equal(switched[name].open,false,"Only one drawer can be logically active");
+    assert.equal(switched[name].visibility,"hidden","Outgoing drawer must not be visible behind Account");
+   }
+   if(c.mobile)assert.equal(switched.nav,"none");
+   await page.screenshot({path:OUTPUT+"/"+c.name+"-switch-account.png",animations:"disabled"});
+   checkpoint("rapid Checkout→Account replacement without stacked drawers");
+
+   await page.reload({waitUntil:"domcontentloaded"});
+   await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:14000});
+   const refreshed=await page.evaluate(()=>{
+    const ids=["cartDrawer","accountDrawer","checkoutDrawer"];
+    return {open:ids.filter(id=>document.getElementById(id).classList.contains("open")),
+      visible:ids.filter(id=>getComputedStyle(document.getElementById(id)).visibility==="visible"),
+      nav:getComputedStyle(document.getElementById("mobileBottomNav")).display};
+   });
+   assert.ok(refreshed.open.length<=1,"Reload cannot restore several open drawers");
+   assert.ok(refreshed.visible.length<=1,"Reload cannot show several drawers");
+   if(!refreshed.open.length&&c.mobile)assert.notEqual(refreshed.nav,"none");
+   await page.screenshot({path:OUTPUT+"/"+c.name+"-after-reload.png",animations:"disabled"});
+   checkpoint("reload after overlay switch never stacks cart / checkout / account");
+
    await page.screenshot({path:OUTPUT+"/"+c.name+".png",animations:"disabled"});
    assert.deepEqual(errors,[],"No uncaught browser exceptions");
    assert.deepEqual(blockedWrites.filter(x=>!x.endsWith("/api/checkout-quote")),[],
