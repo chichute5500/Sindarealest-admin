@@ -20,13 +20,22 @@ function productCards(rows,origin){
     const label=typeLabels[p.fulfillment_type]||typeLabels.unclassified;
     const image=imageFor(p),title=String(p.title).trim();
     const sku=Number(p.sku_verified)===1 ? String(p.sku||"") : "";
+    const type=Object.hasOwn(typeLabels,p.fulfillment_type)?p.fulfillment_type:"unclassified";
+    // Reserve the same media, information and 28px cart-footer geometry as
+    // client productCard(). A shorter SSR-only layout causes a measurable
+    // vertical shift when the real /api/products cards replace these cards.
+    // Prices and cart operations remain completely absent until verified
+    // client data arrives; never invent a price or a working action in SSR.
     return '<article class="product-card sd-server-rendered" data-ssr-product="'+h(p.id)+'">'+
      '<a class="product-open" href="'+h(href)+'" aria-label="Xem chi tiết '+h(title)+'">'+
-     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(i<2?"eager":"lazy")+'" '+(i===0?'fetchpriority="high" ':'')+'decoding="async"></span>'+
-     '<div class="product-info"><span class="sd-card-status-row"><span class="fulfillment-badge">'+h(label)+'</span>'+
-     (sku?'<span class="product-sku">Mã SKU: '+h(sku)+'</span>':"")+'</span>'+
-     (p.fulfillment_type==="made_to_order"?'<small class="sd-card-making-time">Làm hàng 5–20 ngày</small>':"")+
-     '<h3 class="product-title">'+h(title)+'</h3></div></a></article>';
+     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(i<2?"eager":"lazy")+'" '+(i===0?'fetchpriority="high" ':'')+'decoding="async"><span class="photo-shade"></span></span>'+
+     '<div class="product-info"><div class="sd-card-status-row"><span class="fulfillment-badge fulfillment-'+type+'" data-fulfillment-type="'+type+'">'+h(label)+'</span>'+
+     '<span class="product-sku">Mã SKU: '+h(sku||"Chưa được cung cấp")+'</span></div>'+
+     (type==="made_to_order"?'<small class="sd-card-making-time">⏱ Làm hàng 5–20 ngày</small>':"")+
+     '<h3 class="product-title">'+h(title)+'</h3></div></a>'+
+     '<div class="product-card-footer" aria-hidden="true" style="visibility:hidden">'+
+     '<div class="product-card-bottom"><span class="product-price"></span><span class="mini-add"></span></div></div>'+
+     '</article>';
   }).join("");
 }
 function catalogSchema(rows,origin){
