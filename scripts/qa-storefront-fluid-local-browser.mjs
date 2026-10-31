@@ -122,14 +122,20 @@ try{
    assert.ok(catalog.overlap<5,"Active glass pill must align with selected category");
    assert.ok(catalog.cardStagger!==undefined,"Catalog cards have stagger token");
    checkpoint("category transition and sliding glass pill");
+   assert.equal(new URL(page.url()).pathname,"/sanpham/vinam",
+     "Selected category must have an official deep URL");
 
    const accountTrigger=c.mobile?"#mobileAccountNav":"#accountOpen";
    await page.locator(accountTrigger).click({timeout:13000});
+   assert.equal(new URL(page.url()).pathname,"/sanpham/vinam",
+     "Opening Account must never rewrite category route");
    await page.waitForFunction(()=>document.getElementById("accountDrawer").classList.contains("open"),{timeout:5000});
    assert.equal(await page.locator("body").evaluate(el=>el.classList.contains("has-open-overlay")),true);
    if(c.mobile){
     assert.equal(await page.locator("#mobileBottomNav").evaluate(el=>getComputedStyle(el).display),"none",
       "Mobile nav must disappear when Account drawer is open");
+    assert.equal(await page.locator("#catalogGrid").evaluate(el=>getComputedStyle(el).visibility),"hidden",
+      "Product tiles must not paint above an active Account glass sheet");
    }
    await page.screenshot({path:OUTPUT+"/"+c.name+"-account-open.png",animations:"disabled"});
    await page.locator("#accountFavoritesAction").click({timeout:12000});
@@ -160,6 +166,8 @@ try{
    // A request for the quote is fulfilled locally with no payment-ready QR.
    await page.locator("#catalogGrid .mini-add").first().click({timeout:12000});
    await page.locator(c.mobile?"#mobileCartNav":"#cartOpen").click({timeout:12000});
+   assert.equal(new URL(page.url()).pathname,"/sanpham/vinam",
+     "Opening Cart must never overwrite an active catalog URL");
    await page.locator("#cartCheckout").waitFor({state:"visible",timeout:10000});
    await page.waitForFunction(()=>document.body.classList.contains("has-open-overlay"),null,{timeout:2500});
    const cartGeometry=await page.evaluate(()=>{
@@ -174,6 +182,8 @@ try{
       "Product fly-to-cart snapshot must never float above open Cart");
    if(c.mobile){
     assert.equal(cartGeometry.nav,"none","Bottom nav must not float over the cart");
+    assert.equal(await page.locator("#catalogGrid").evaluate(el=>getComputedStyle(el).visibility),"hidden",
+      "Product tiles must not paint through an active Cart sheet");
     assert.ok(cartGeometry.bottom>=cartGeometry.viewport-44,
       "Populated cart cannot stop 96px above the viewport: "+JSON.stringify(cartGeometry));
     assert.ok(cartGeometry.top<=32,"Cart must use only a narrow safe-area top inset");
@@ -243,9 +253,13 @@ try{
    await page.screenshot({path:OUTPUT+"/"+c.name+"-switch-account.png",animations:"disabled"});
    checkpoint("rapid Checkout→Account replacement without stacked drawers");
 
+   assert.equal(new URL(page.url()).pathname,"/sanpham/vinam",
+     "Opening and switching drawers must preserve valid category deep links");
    await page.reload({waitUntil:"load"});
    await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:14000});
    await page.waitForFunction(()=>!document.getElementById("welcomeSplash"),null,{timeout:6000});
+   assert.equal(new URL(page.url()).pathname,"/sanpham/vinam",
+     "Cloudflare Pages direct reload must retain valid category slug");
    const refreshed=await page.evaluate(()=>{
     const ids=["cartDrawer","accountDrawer","checkoutDrawer","productOverlay","sdFullscreenViewer"];
     const opened=ids.filter(id=>document.getElementById(id).classList.contains("open"));
