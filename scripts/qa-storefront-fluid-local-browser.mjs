@@ -156,6 +156,23 @@ try{
    await page.locator("#catalogGrid .mini-add").first().click({timeout:12000});
    await page.locator(c.mobile?"#mobileCartNav":"#cartOpen").click({timeout:12000});
    await page.locator("#cartCheckout").waitFor({state:"visible",timeout:10000});
+   await page.waitForFunction(()=>document.body.classList.contains("has-open-overlay"),null,{timeout:2500});
+   const cartGeometry=await page.evaluate(()=>{
+    const rect=document.getElementById("cartDrawer").getBoundingClientRect();
+    const nav=document.getElementById("mobileBottomNav");
+    return {top:rect.top,bottom:rect.bottom,viewport:innerHeight,
+      nav:getComputedStyle(nav).display,
+      open:document.getElementById("cartDrawer").classList.contains("open")};
+   });
+   assert.equal(cartGeometry.open,true);
+   if(c.mobile){
+    assert.equal(cartGeometry.nav,"none","Bottom nav must not float over the cart");
+    assert.ok(cartGeometry.bottom>=cartGeometry.viewport-44,
+      "Populated cart cannot stop 96px above the viewport: "+JSON.stringify(cartGeometry));
+    assert.ok(cartGeometry.top<=32,"Cart must use only a narrow safe-area top inset");
+   }
+   await page.screenshot({path:OUTPUT+"/"+c.name+"-cart-open.png",animations:"disabled"});
+   checkpoint("full-height cart without bottom navigation bleed-through");
    await page.locator("#cartCheckout").click({timeout:12000});
    await page.waitForFunction(()=>document.getElementById("checkoutDrawer").classList.contains("open"),null,{timeout:6000});
    assert.equal(await page.locator("body").evaluate(el=>el.classList.contains("has-open-overlay")),true);
