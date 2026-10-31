@@ -112,11 +112,21 @@ try{
    try{
     await page.goto(target+path,{waitUntil:'domcontentloaded',timeout:45000});
     const renderedProducts=await waitForCatalogPaint(page,name);
+    const chipLayout=await page.evaluate(()=>{
+      const chips=document.querySelector('#categoryFilters');
+      if(!chips)return null;
+      const style=getComputedStyle(chips);
+      return {count:chips.querySelectorAll('.filter-pill').length,flexWrap:style.flexWrap,
+        overflowX:style.overflowX,scrollWidth:chips.scrollWidth,clientWidth:chips.clientWidth};
+    });
+    if(width<=390&&chipLayout?.count>3&&
+       (chipLayout.flexWrap!=='nowrap'||chipLayout.overflowX!=='auto'))
+      throw Error('Mobile catalog chips must stay in one horizontally scrollable row: '+JSON.stringify(chipLayout));
     const images=await loadGridImagesForScreenshot(page,name);
     if(images.broken)throw Error('Image delivery failures in '+name+': '+JSON.stringify(images));
     const filename=name+'-'+colorScheme+'-'+width+'.png';
     await page.screenshot({path:join(folder,'screenshots',filename),fullPage:true,animations:'disabled',timeout:25000});
-    report.screenshots.push({filename,route:name,colorScheme,width,renderedProducts,images,ready:true});
+    report.screenshots.push({filename,route:name,colorScheme,width,renderedProducts,chipLayout,images,ready:true});
    }catch(error){report.errors.push({screen:name,colorScheme,width,error:sanitize(error)})}
    await context.close();
  }
