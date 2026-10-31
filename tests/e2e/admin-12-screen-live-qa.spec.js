@@ -48,11 +48,11 @@ for (const {width,height,theme} of matrix) {
       page.on('pageerror',error=>report.pageErrors.push(error.message));
       page.on('console',message=>{
         if(message.type()!=='error')return;
-        const entry={message:message.text(),url:message.location().url||'',phase:report.authenticatedAt?'authenticated':'login'};
+        const entry={message:message.text(),url:message.location().url||'',phase:report.logoutVerificationAt?'logout-verification':report.authenticatedAt?'authenticated':'login'};
         let path='';try{path=new URL(entry.url).pathname}catch{}
         // The first anonymous session check is expected to be denied. Keep it
-        // as evidence; any 401 after login remains an error.
-        if(entry.phase==='login' && path==='/api/admin/session' && /status of 401/.test(entry.message))report.expectedInitialSessionResponses.push(entry);
+        // as evidence; any 401 during the authenticated UI remains an error.
+        if(['login','logout-verification'].includes(entry.phase) && path==='/api/admin/session' && /status of 401/.test(entry.message))report.expectedInitialSessionResponses.push(entry);
         else report.consoleErrors.push(entry);
       });
       page.on('request',request=>{
@@ -209,12 +209,21 @@ for (const {width,height,theme} of matrix) {
       if(width===432 && theme==='light'){
         const logoutResponse=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/logout' && r.request().method()==='POST');
         await page.locator('#logout').tap();
-        expect((await logoutResponse).ok(),'Logout must succeed at the server').toBe(true);
+        const logoutResult=await logoutResponse;
+        expect(logoutResult.ok(),'Logout must succeed at the server').toBe(true);
+        await logoutResult.finished();
         await expect(page.locator('#loginView')).toBeVisible();
-        const sessionResponse=await context.request.get(origin+'/api/admin/session');
-        const session=await sessionResponse.json();
-        expect([401,403],'Logged-out session must be denied').toContain(sessionResponse.status());
-        expect(session.authenticated,'Logout must revoke this test session').not.toBe(true);
+        // Verify the browser cookie and a fresh browser boot request rather
+        // than relying on a separate test-transport request.
+        await expect.poll(async()=> (await context.cookies(origin+'/api/admin/session')).some(c=>c.name==='sd_admin_session'),{timeout:5000,message:'Logout must clear the browser session cookie'}).toBe(false);
+        report.logoutVerificationAt=new Date().toISOString();
+        const bootSession=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/session' && r.request().method()==='GET');
+        await page.reload({waitUntil:'domcontentloaded'});
+        const sessionResponse=await bootSession;
+        expect([401,403],'Fresh browser boot must be denied after logout').toContain(sessionResponse.status());
+        await expect(page.locator('#loginView')).toBeVisible();
+        report.logoutBrowserSessionStatus=sessionResponse.status();
+        report.logoutCookieCleared=true;
         report.logoutVerified=true;
       }
       expect(report.pageErrors,'No uncaught application errors').toEqual([]);
