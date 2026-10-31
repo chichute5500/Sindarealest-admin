@@ -1,0 +1,55 @@
+name: D1 product revision — PREVIEW only (guarded)
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/d1-preview-products-revision-guarded.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: d1-preview-products-revision-guarded
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Validate and apply revision triggers only to isolated Preview D1
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify branch, repo and immutable HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          remote="$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test "$remote" = "$GITHUB_SHA"
+      - name: Validate local schema and secure catalog endpoint first
+        run: |
+          npm install --no-fund
+          node tests/admin-products-revision.test.mjs
+          npm run check
+      - name: Bookmark, apply schema and prove Preview SQL parity
+        run: node scripts/d1-preview-products-revision-guarded.mjs
+      - name: Save sanitized evidence and recovery bookmark
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d1-preview-products-checkpoint
+          path: artifacts/d1-preview-products/checkpoint.json
+          if-no-files-found: ignore
+          retention-days: 7
