@@ -71,7 +71,8 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(css,/html\.theme-transitioning,html\.theme-transitioning body\{[\s\S]*?transition:none!important;/);
  assert.match(page,/document\.querySelectorAll\('meta\[name="theme-color"\]'\)/);
  assert.ok(page.includes("function syncThemeMeta(){const dark="));
- assert.ok(page.includes("$('meta[name=\\"theme-color\\"]').forEach"));
+ assert.match(page,/function syncThemeMeta\\(\\)\\{const dark=/);
+ assert.match(page,/meta\\[name="theme-color"\\]/);
  assert.match(page,/<meta name="theme-color" media="\(prefers-color-scheme: light\)"/);
  assert.match(page,/<meta name="theme-color" media="\(prefers-color-scheme: dark\)"/);
  assert.doesNotMatch(page,/transition:background-color 1\.15s/,'Stale slow theme CSS must not reappear');
