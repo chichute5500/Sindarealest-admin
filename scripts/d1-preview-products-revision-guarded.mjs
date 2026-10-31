@@ -97,12 +97,23 @@ const schemaObjects = (await query(
 )).results.map(row => row.name);
 for (const expected of ['idx_products_sort_sku','trg_products_revision_insert','trg_products_revision_update','trg_products_revision_delete'])
   assert.ok(schemaObjects.includes(expected), 'Missing ' + expected);
+const triggerDefinitions = (await query(
+  "SELECT name, sql FROM sqlite_master WHERE type='trigger' AND name LIKE 'trg_products_revision_%'"
+)).results;
+for (const action of ['insert', 'update', 'delete']) {
+  const trigger = triggerDefinitions.find(row => row.name === 'trg_products_revision_' + action);
+  assert.ok(trigger, 'Missing trigger body for ' + action);
+  assert.match(String(trigger.sql || ''), /WHERE\s+key\s*=\s*'products_revision'/i,
+    'Existing trigger does not actually increment the version');
+}
 const revision = await query("SELECT value FROM settings WHERE key='products_revision' LIMIT 1");
 assert.match(String(revision.results[0]?.value ?? ''), /^\d{1,19}$/, 'Invalid product revision token');
 const after = await query(listing);
 assert.equal(JSON.stringify(after.results), JSON.stringify(before.results), 'Product order or content changed during rollout');
 const plan = await query('EXPLAIN QUERY PLAN ' + listing);
 checkpoint.queryPlan = plan.results.map(row => row.detail).join(' | ').slice(0,500);
+assert.match(checkpoint.queryPlan, /idx_products_sort_sku/,
+  'Preview query planner did not use the Admin sort index');
 checkpoint.afterFullRowsRead = after.meta?.rows_read ?? null;
 checkpoint.revisionRowsRead = revision.meta?.rows_read ?? null;
 checkpoint.schemaApplied = true;
