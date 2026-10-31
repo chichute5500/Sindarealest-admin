@@ -7,6 +7,8 @@ on:
     paths:
       - '.github/workflows/qa-storefront-fluid-local-browser.yml'
       - 'scripts/qa-storefront-fluid-local-browser.mjs'
+      - 'public/index.html'
+      - 'public/storefront-fluid-unified.css'
   workflow_dispatch:
 
 permissions:
