@@ -60,10 +60,12 @@ assert.match(html, /\.activity-log-card,#main \.sd-order-card,\.order-detail-ite
   'Repeated rows must use the shared inset glass variant');
 assert.match(html, /\.order-detail-page-actions\{[^}]*--sd-admin-surface-face:var\(--sd-admin-sheet-face\)/,
   'Order detail actions must use the shared sheet material');
-assert.match(html, /#main \.order-table \.order-management-summary\{--sd-admin-surface-face:var\(--sd-admin-inset-face\);--sd-admin-shadow:var\(--sd-admin-input-shadow\)\}/,
-  'Order management summary must use the shared inset material tokens');
-assert.equal((repeatedSurfaceOwner[1].match(/#main \.order-table \.order-management-summary/g) || []).length, 1,
-  'Order management summary must have exactly one authoritative repeated-surface material owner');
+assert.match(html, /#main \.order-table \.order-management-summary\{--sd-admin-surface-face:var\(--sd-admin-tile-face\);--sd-admin-shadow:var\(--sd-admin-tile-shadow\);--sd-admin-rim:var\(--sd-admin-tile-rim\)/,
+  'Order management summary must be the single raised nested glass control');
+assert.doesNotMatch(repeatedSurfaceOwner[1], /order-management-(?:details|summary)/,
+  'Order management disclosure must not stack an outer detail frame around its summary control');
+assert.equal((repeatedSurfaceOwner[1].match(/#main \.order-table \.order-management-summary/g) || []).length, 0,
+  'Order management summary must have one dedicated material owner rather than two glass layers');
 assert.doesNotMatch(html, /#main \.activity-log-card-avatar\{background:rgba\(/,
   'Mobile activity avatars must not override the shared light/dark glass face');
 assert.doesNotMatch(html, /#main:has\(#searchBox\) \.product-publish-filter-row \.warranty-filter-button\[aria-pressed="true"\]\{/,

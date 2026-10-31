@@ -186,4 +186,278 @@ for (const {width,height,theme} of matrix) {
                 for(const selector of splitSelectors(rule.selectorText)){
                   const pseudoMatch=selector.match(/(::?before|::?after)$/i),pseudo=pseudoMatch?(pseudoMatch[1].toLowerCase().includes('before')?'before':'after'):null;
                   materialRules.push({selector,baseSelector:pseudoMatch?selector.slice(0,-pseudoMatch[1].length):selector,
-                    selectorSpecificity:specificity(selector),pseudo,sheetIndex,sheetHref,ruleOrder:currentOrder,rule
+                    selectorSpecificity:specificity(selector),pseudo,sheetIndex,sheetHref,ruleOrder:currentOrder,rulePath:currentPath,conditions,declarations});
+                }
+              }
+            };
+            for(let sheetIndex=0;sheetIndex<document.styleSheets.length;sheetIndex++){
+              const sheet=document.styleSheets[sheetIndex];try{visit(sheet.cssRules,[],sheetIndex,sheet.href||'<inline stylesheet>')}catch{}
+            }
+          }
+          function matchedMaterialRules(element,pseudo=''){
+            if(!includeMatchedRules)return undefined;
+            const matched=[],chain=[];for(let node=element,depth=0;node&&depth<16;node=node.parentElement,depth++)chain.push({node,depth});
+            // Include directly matched declarations and inherited design-token declarations from ancestors.
+            for(const {node,depth} of chain){
+              for(const rule of materialRules){
+                if(depth===0){if(pseudo?(rule.pseudo&&rule.pseudo!==pseudo):rule.pseudo)continue;}
+                else if(rule.pseudo)continue;
+                let applies=false;try{applies=node.matches(rule.baseSelector)}catch{}
+                if(!applies)continue;
+                const declarations=Object.fromEntries(Object.entries(rule.declarations).filter(([property])=>{
+                  if(depth>0)return property.startsWith('--');
+                  if(pseudo)return property.startsWith('--')||rule.pseudo===pseudo;
+                  return true;
+                }));
+                if(Object.keys(declarations).length)matched.push({...rule,ancestorDepth:depth||undefined,declarations});
+              }
+              if(node.style?.length){
+                const declarations={};
+                for(let i=0;i<node.style.length;i++){const property=node.style[i];if(glassProperties.has(property)||trackedCustomProperties.test(property))declarations[property]={value:node.style.getPropertyValue(property).trim(),important:node.style.getPropertyPriority(property)==='important'};}
+                const inherited=depth>0||pseudo?Object.fromEntries(Object.entries(declarations).filter(([property])=>property.startsWith('--'))):declarations;
+                if(Object.keys(inherited).length)matched.push({selector:'<inline style>',selectorSpecificity:null,pseudo:pseudo||null,origin:'inline',ancestorDepth:depth||undefined,declarations:inherited});
+              }
+            }
+            return matched;
+          }
+          const components=Object.fromEntries(componentSelectors.map(selector=>[selector,[...document.querySelectorAll(selector)].slice(0,6).map(el=>{
+            const computed=getComputedStyle(el),css=Object.fromEntries(cssProperties.map(k=>[k,computed[k]]));
+            for(const token of ['--sd-admin-surface-face','--sd-admin-face','--sd-admin-inset-face','--sd-admin-sheet-face','--sd-admin-icon-face','--sd-admin-tile-face','--sd-admin-shadow','--sd-admin-inset-shadow','--sd-admin-rim','--sd-admin-inset-rim','--sd-admin-tile-rim','--glass-blur','--ink','--paper','--muted','--line','--accent','--reference-blue'])
+              css[token]=computed.getPropertyValue(token).trim();
+            const pseudoStyle=pseudo=>{const style=getComputedStyle(el,'::'+pseudo);return {content:style.content,position:style.position,inset:[style.top,style.right,style.bottom,style.left],size:[style.width,style.height],background:style.background,border:style.border,borderRadius:style.borderRadius,boxShadow:style.boxShadow,opacity:style.opacity,filter:style.filter,transform:style.transform,zIndex:style.zIndex,pointerEvents:style.pointerEvents,mixBlendMode:style.mixBlendMode};};
+            const before=pseudoStyle('before'),after=pseudoStyle('after');
+            return {box:el.getBoundingClientRect().toJSON(),css,pseudo:{before,after},...(includeMatchedRules?{matchedRules:matchedMaterialRules(el),matchedPseudoRules:{before:matchedMaterialRules(el,'before'),after:matchedMaterialRules(el,'after')}}:{})};
+          })]));
+          const masks=[...document.querySelectorAll('.stat .value,.notif-count,.nav-notif-count')].filter(el=>el.getClientRects().length).map(el=>{
+            const range=document.createRange();range.selectNodeContents(el);
+            const r=el.matches('.stat .value')?range.getBoundingClientRect():el.getBoundingClientRect();
+            return {x:r.x-2,y:r.y-2,right:r.right+2,bottom:r.bottom+2,width:r.width+4,height:r.height+4};
+          });
+          return {components,masks,documentWidth:de.scrollWidth,viewportWidth:innerWidth,horizontalOverflow:de.scrollWidth>innerWidth+2,
+            modalNavGapPx,
+            unlabeledInteractive:interactive.filter(el=>{
+              if(el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return false;
+              if(el.labels?.length||el.getAttribute('title')||el.textContent?.trim())return false;
+              return el.getClientRects().length>0;
+            }).length,heading:target?.querySelector('h1,h2')?.textContent?.trim().slice(0,90)||null};
+        },{captureContainer:container,includeMatchedRules:width===432&&height===744});
+        if(width<=820 && container==='#appView'){
+          for(const nav of m.components['.mobiletabs .nav'])expect(nav.css.whiteSpace,'Dock labels must remain on one line').toBe('nowrap');
+        }
+        expect(m.horizontalOverflow,'No screenshot may pass with document horizontal overflow: '+name+' at '+width+'px').toBe(false);
+        expect(m.unlabeledInteractive,'Visible controls must have accessible names: '+name+' at '+width+'px '+theme).toBe(0);
+        if(m.modalNavGapPx!==null)expect(m.modalNavGapPx,
+          'Deployed mobile editor/gallery must meet navigation without exposing product rows: '+name+' '+theme)
+          .toBeLessThanOrEqual(2);
+        const nameFile=name+'.png';
+        // Capture the nominated CSS viewport with its declared physical pixel ratio.
+        // TARGET uses432CSSpx atDPR2; comparison normalizes both sides to CSS pixels.
+        const screenshot=await page.screenshot({path:join(folder,nameFile),fullPage:false,animations:'disabled'});
+        const measuredWidth=screenshot.readUInt32BE(16),measuredHeight=screenshot.readUInt32BE(20);
+        expect(measuredWidth,'Screenshot pixels must match CSS viewport times declared DPR: '+name).toBe(width*dpr);
+        expect(measuredHeight,'Screenshot pixels must match CSS viewport times declared DPR: '+name).toBe(height*dpr);
+        report.screens.push({screen:name,status:'CAPTURED_NOT_ACCEPTED',file:nameFile,
+          sha256:createHash('sha256').update(screenshot).digest('hex'),pixelDimensions:{width:measuredWidth,height:measuredHeight},metrics:m});
+      }
+      if((await page.evaluate(()=>document.documentElement.dataset.adminTheme))!==theme)
+        await page.locator('#adminThemeToggle').click();
+      await shot('01_login','#loginView');
+      await page.locator('#password').fill(testPassword);
+      await page.locator('#loginForm button[type=submit]').click();
+      await expect(page.locator('#appView')).toBeVisible({timeout:30000});
+      report.authenticatedAt=new Date().toISOString();
+      if(width===432&&theme==='light'){
+        await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="dashboard"]')).toBeVisible({timeout:500});
+        const expected={products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',dashboard:'Tổng quan'};
+        const sequence=[
+          ['products','slide-forward'],['orders','slide-forward'],['customers','slide-forward'],
+          ['orders','slide-back'],['products','slide-back'],['dashboard','slide-back']
+        ];
+        for(const [target,direction] of sequence){
+          const dock=await page.locator('.mobiletabs').boundingBox();
+          const started=await page.evaluate(()=>performance.now());
+          await page.locator('.mobiletabs [data-view="'+target+'"]').tap();
+          await expect(page.locator('#main .pagehead h2').first()).toHaveText(expected[target],{timeout:500});
+          await expect(page.locator('#main')).toHaveAttribute('data-admin-transition',direction,{timeout:250});
+          const elapsedMs=await page.evaluate(start=>performance.now()-start,started);
+          const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
+          const dockAfter=await page.locator('.mobiletabs').boundingBox();
+          expect(elapsedMs,'Tab '+target+' shell must paint under 500ms while its data request is deliberately delayed').toBeLessThan(500);
+          expect(timing.duration,'Tab transition duration must be 250–300ms').toBeGreaterThanOrEqual(250);
+          expect(timing.duration,'Tab transition duration must be 250–300ms').toBeLessThanOrEqual(300);
+          expect(timing.transition).toBe(direction);
+          expect(timing.from,'Tab '+target+' must enter from the '+direction+' side').toContain(direction==='slide-forward'?'22px':'-22px');
+          expect(Math.abs(dockAfter.x-dock.x)).toBeLessThanOrEqual(.5);
+          expect(Math.abs(dockAfter.y-dock.y)).toBeLessThanOrEqual(.5);
+          if(target==='orders'||target==='customers')await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="'+target+'"]')).toBeVisible();
+          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockStationary:true,skeletonVisible:target==='orders'||target==='customers'});
+        }
+        expect(delayedRouteCounts.orders,'Rapid navigation must share one pending Orders GET').toBe(1);
+        expect(delayedRouteCounts.customers,'Rapid navigation must share one pending Customers GET').toBe(1);
+        await expect.poll(async()=>await page.locator('#main .admin-loading-grid').count(),{timeout:5000,intervals:[100,200,300,500]}).toBe(0);
+        for(const name of ['orders','customers'])await page.unroute('**/api/admin/'+name+'*',delayedRouteHandlers[name]);
+        await page.locator('.mobiletabs [data-view="orders"]').tap();
+        await expect(page.locator('#orderResultSummary')).toHaveText(/^Hiển thị \d+ \/ \d+ đơn hàng$/,{timeout:500});
+        await page.locator('.mobiletabs [data-view="customers"]').tap();
+        await expect(page.locator('#customerSearchStatus')).toHaveText(/^(Hiển thị \d+ \/ \d+ hồ sơ đã tải \(tối đa 2\.000\)\.|Không thể tải danh sách khách hàng từ máy chủ\.)$/,{timeout:500});
+      }
+      // Hide the transient login toast before recording reference-comparison screenshots.
+      await expect(page.locator('#toast')).not.toHaveClass(/show/,{timeout:7000});
+      if(width===432 && theme==='light'){
+        await page.locator('#adminMenuToggle').tap();
+        await expect(page.locator('#mobileMorePanel')).toBeVisible();
+        await expect(page.locator('#mobileMorePanel')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await shot('13_mobile_menu');
+        await page.locator('#adminMenuToggle').tap();
+        await expect(page.locator('#mobileMorePanel')).toBeHidden();
+        await page.locator('#notificationToggle').tap();
+        await expect(page.locator('#notificationPanel')).toBeVisible();
+        await expect(page.locator('#notificationPanel')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await shot('14_notifications');
+        await page.locator('#notificationToggle').tap();
+        await expect(page.locator('#notificationPanel')).toBeHidden();
+        await page.locator('.mobiletabs [data-view="dashboard"]').tap();
+        await expect(page.locator('#main .pagehead h2').first()).toHaveText('Tổng quan',{timeout:500});
+        await page.locator('#main .pagehead [data-action="add"]').tap();
+        await expect(page.locator('#backdrop')).toBeVisible();
+        await expect(page.locator('#backdrop .editor')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await shot('15_add_product','#backdrop');
+        await page.locator('#productCategoryToggle').tap();
+        await expect(page.locator('#productCategoryGrid')).toBeVisible();
+        await expect(page.locator('#productCategoryGrid')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await page.locator('#productCategoryToggle').tap();
+        await page.locator('#editorClose').tap();
+        await expect(page.locator('#backdrop')).toBeHidden();
+        // Record a real browser touch hold/release on the CTA, without completing a click.
+        const cdp=await context.newCDPSession(page);
+        const box=await page.locator('#main .pagehead [data-action="add"]').boundingBox();
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});
+        report.touchPressed=await page.locator('#main .pagehead [data-action="add"]').evaluate(e=>({press:e.dataset.sdGlassPress||null,transform:getComputedStyle(e).transform,shadow:getComputedStyle(e).boxShadow}));
+        expect(report.touchPressed.press).toBe('true');
+        expect(report.touchPressed.transform).not.toBe('none');
+        await page.screenshot({path:join(folder,'16_cta_pressed.png'),fullPage:false,animations:'disabled'});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+        await expect(page.locator('#main .pagehead [data-action="add"]')).not.toHaveAttribute('data-sd-glass-press','true');
+        await page.keyboard.press('Tab');
+        report.keyboardFocus=await page.evaluate(()=>({tag:document.activeElement.tagName,visible:document.activeElement.matches(':focus-visible'),outline:getComputedStyle(document.activeElement).outlineStyle}));
+        expect(report.keyboardFocus.visible).toBe(true);
+        expect(report.keyboardFocus.outline).not.toBe('none');
+        await page.locator('#main .eyebrow').tap();
+      }
+      const expectedHeadings={
+        dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',
+        warranties:'Bảo hành / Yêu cầu hỗ trợ',settings:'Cài đặt website',
+        backup:'Sao lưu / Khôi phục',activity:'Nhật ký hoạt động'
+      };
+      for(const [screen,view] of screens){
+        await page.evaluate(v=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view===v);if(!nav)throw new Error('Missing Admin navigation button '+v);nav.click()},view);
+        // Navigation awaits a backend read for operational views. A fixed 500ms delay
+        // previously captured Orders again under the Customers filename.
+        await expect(page.locator('#main .pagehead h2').first(),
+          'Capture must show the intended module, not the previous page').toHaveText(expectedHeadings[view],{timeout:20000});
+        if(view==='orders')await expect(page.locator('#orderResultSummary')).toHaveText(/^Hiển thị \d+ \/ \d+ đơn hàng$/,{timeout:20000});
+        if(view==='customers')await expect(page.locator('#customerSearchStatus')).toHaveText(/^(Hiển thị \d+ \/ \d+ hồ sơ đã tải \(tối đa 2\.000\)\.|Không thể tải danh sách khách hàng từ máy chủ\.)$/,{timeout:20000});
+        await shot(screen);
+      }
+      if(width===432 && theme==='light'){
+        await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='customers');if(!nav)throw Error('Customer view navigation missing');nav.click()});
+        await expect(page.locator('#main .customer-pagehead h2').first()).toHaveText('Danh sách khách hàng',{timeout:20000});
+        const contactSummary=page.locator('#main .customer-mobile-details > summary:visible').first();
+        if(await contactSummary.count()){
+          await contactSummary.click();
+          await expect(page.locator('#main .customer-mobile-details[open]')).toBeVisible();
+          await expect(page.locator('#main .customer-mobile-extra')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+          await shot('17_customer_contact_expanded');
+        } else report.screens.push({screen:'17_customer_contact_expanded',status:'UNAVAILABLE_NOT_ACCEPTED',reason:'No live customer detail to expand'});
+      }
+      await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='products');if(!nav)throw new Error('Products navigation missing');nav.click()});
+      await expect(page.locator('#main .pagehead h2').first()).toHaveText('Sản phẩm',{timeout:20000});
+      const row=page.locator('.tablewrap table tbody tr[data-product-row]:visible').first();
+      if(await row.count()){
+        await row.locator('.prodname').click();
+        await expect(page.locator('#backdrop')).toBeVisible();
+        await shot('04_product_editor','#backdrop');
+        await page.locator('#productTabGallery').click();
+        await expect(page.locator('#productPanelGallery')).toBeVisible();
+        await shot('05_product_gallery','#backdrop');
+        const galleryImage=page.locator('#imageGrid [data-image-index]:visible').first();
+        if(await galleryImage.count()){
+          await galleryImage.scrollIntoViewIfNeeded();
+          await galleryImage.hover();
+          await page.mouse.down();
+          await expect(page.locator('.gallery-held-preview')).toBeVisible({timeout:1200});
+          await expect(page.locator('.gallery-held-preview')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+          await page.mouse.up();
+          await expect(page.locator('.gallery-held-preview')).toHaveCount(0);
+        }
+        await page.locator('#editorClose').click();
+      } else for(const name of ['04_product_editor','05_product_gallery'])
+        report.screens.push({screen:name,status:'UNAVAILABLE_NOT_ACCEPTED',reason:'No editable product UI row'});
+      await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='orders');if(!nav)throw Error('Order view navigation missing');nav.click()});
+      await expect(page.locator('#main .pagehead h2').first()).toHaveText('Đơn hàng',{timeout:20000});
+      await expect(page.locator('#orderResultSummary')).toHaveText(/^Hiển thị \d+ \/ \d+ đơn hàng$/,{timeout:20000});
+      const statusFilter=page.locator('#orderStatusFilter');
+      if(await statusFilter.count()&&await statusFilter.locator('option').count()>1){
+        await statusFilter.selectOption({index:1});
+        await expect(page.locator('#main')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await page.locator('#orderStatusFilter').selectOption({index:0});
+      }
+      const requiredQaOrder=(process.env.QA_EXPECT_ORDER_ID||'').trim();
+      if(requiredQaOrder&&!/^qa_[0-9]{8,16}_order$/.test(requiredQaOrder))throw Error('Invalid QA-owned order identity');
+      const detail=requiredQaOrder
+        ? page.locator('.sd-order-card[data-order-open="'+requiredQaOrder+'"]:visible').first()
+        : page.locator('.sd-order-card[data-order-open]:visible').first();
+      if(requiredQaOrder) await expect(detail,'Must find the run-owned isolated QA order before marking 12-screen acceptance PASS').toBeVisible({timeout:15000});
+      if(await detail.count()){
+        await detail.click();
+        await expect(page.locator('.order-detail-page')).toBeVisible();
+        await expect(page.locator('#main')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await shot('07_order_detail');
+        const advancedOpen=page.locator('#main [data-action="open-order-advanced"]');
+        if(await advancedOpen.count()){
+          await advancedOpen.click();
+          await expect(page.locator('#sdOrderAdvanced')).toHaveAttribute('open','');
+          await expect(page.locator('#sdOrderAdvanced > :not(summary)')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        }
+      } else {
+        report.screens.push({screen:'07_order_detail',status:'NO_REAL_ORDER_NOT_ACCEPTED',reason:'No live business record; no order fabricated'});
+      }
+      if(width===432 && theme==='light'){
+        const logoutResponse=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/logout' && r.request().method()==='POST');
+        await page.locator('#logout').tap();
+        const logoutResult=await logoutResponse;
+        expect(logoutResult.ok(),'Logout must succeed at the server').toBe(true);
+        await logoutResult.finished();
+        await expect(page.locator('#loginView')).toBeVisible();
+        // Verify the browser cookie and a fresh browser boot request rather
+        // than relying on a separate test-transport request.
+        await expect.poll(async()=> (await context.cookies(origin+'/api/admin/session')).some(c=>c.name==='sd_admin_session'),{timeout:5000,message:'Logout must clear the browser session cookie'}).toBe(false);
+        report.logoutVerificationAt=new Date().toISOString();
+        const bootSession=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/session' && r.request().method()==='GET');
+        await page.reload({waitUntil:'domcontentloaded'});
+        const sessionResponse=await bootSession;
+        expect([401,403],'Fresh browser boot must be denied after logout').toContain(sessionResponse.status());
+        await expect(page.locator('#loginView')).toBeVisible();
+        report.logoutBrowserSessionStatus=sessionResponse.status();
+        report.logoutCookieCleared=true;
+        report.logoutVerified=true;
+      }
+      expect(report.pageErrors,'No uncaught application errors').toEqual([]);
+      expect(report.consoleErrors,'No application console errors').toEqual([]);
+      expect(report.nonAuthMutationRequests,'Read-only QA must not make business writes').toEqual([]);
+      const captures=report.screens.filter(s=>s.status==='CAPTURED_NOT_ACCEPTED');
+      const byHash=new Map();
+      for(const capture of captures){
+        const previous=byHash.get(capture.sha256);
+        expect(previous,'Duplicate screenshot: '+capture.screen+' repeats '+previous+
+          '; a mislabeled route must not count as a captured distinct screen').toBeUndefined();
+        byHash.set(capture.sha256,capture.screen);
+      }
+      if(process.env.QA_EXPECT_ORDER_ID)expect(captures.filter(s=>/^(0[1-9]|1[0-2])_/.test(s.screen)).length,'All 12 real Admin screens must be captured whenever isolated QA order fixtures are present').toBe(12);
+      else expect(captures.length,'At least 10 real screens should be available without synthetic data').toBeGreaterThanOrEqual(10);
+    } finally {
+      writeFileSync(join(folder,'manifest.json'),JSON.stringify(report,null,2)+'\n');
+      await context.close();
+    }
+  });
+}

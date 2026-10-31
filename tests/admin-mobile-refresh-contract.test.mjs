@@ -21,10 +21,13 @@ assert.match(html, /if\(adminSyncPromise\)\{if\(!full\)return adminSyncPromise/,
 assert.match(html, /Promise\.allSettled\(names\.map\(name=>loadAdminResource\(name/, 'Fetch Admin resources concurrently through the shared resource loader');
 assert.match(html, /adminResourceInflight\.get\(name\)/, 'Join an in-flight request when route switches or sync cycles overlap');
 assert.match(html, /if\(!reloadAfterFlight\)return running/, 'Avoid duplicate API reads while an equivalent resource request is pending');
+assert.match(html, /if\(repaint\)state\.repaintWhenLoaded=true/, 'A route joining a background request must subscribe to its eventual render');
+assert.match(html, /const shouldRepaint=repaint\|\|state\.repaintWhenLoaded/, 'Clear first-load skeletons even when an empty response contains no changed rows');
 assert.match(html, /function adminResourcesForView\(targetView\)/, 'Scope background route reads to the resource needed by each view');
 assert.match(html, /if\(targetView==='orders'\)return \['orders'\]/, 'Orders must not wait for product, settings, warranty or customer reads');
 assert.match(html, /if\(targetView==='customers'\)return \['customers'\]/, 'Customers must not wait for unrelated Admin reads');
-assert.match(html, /function setView\(v,updateUrl=true,motion=null\)[\s\S]*?loadAdminViewData\(v\);\s*render\(/, 'Render a route shell immediately while its resource loads in the background');
+assert.match(html, /function loadAdminViewData\(targetView\)\{\s*return Promise\.allSettled\(/, 'Allow detail callers to await route data without blocking the initial route shell');
+assert.match(html, /function setView\(v,updateUrl=true,motion=null\)[\s\S]*?const routeData=loadAdminViewData\(v\);\s*render\([\s\S]*?return routeData;/, 'Render a route shell immediately while returning a completion promise for focus/scroll restoration');
 assert.match(html, /function adminViewHasPendingData\(targetView\)/, 'Render a route skeleton while first data is pending');
 assert.match(html, /const ADMIN_PRIMARY_VIEWS=\['dashboard','products','orders','customers'\]/, 'Limit directional transitions to the four main dock routes');
 assert.match(html, /duration:280,easing:'cubic-bezier\(\.22,\.72,\.22,1\)'/, 'Keep route and reveal motion within the requested 250–300ms range');
