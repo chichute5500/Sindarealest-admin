@@ -2119,7 +2119,7 @@ body:not(:has(#loginView:not(.hidden))){
 @media (min-width:390px) and (max-width:520px){
   #main>.pagehead{margin-bottom:8px;align-items:center}
   body:not(:has(#loginView:not(.hidden))):has(#main .statgrid) .layout{padding-top:0}
-  #main>.pagehead .btn.primary{min-width:158px}
+  #main>.pagehead .btn.primary{width:160px;min-width:160px;flex:0 0 160px;position:relative;top:3px;margin-right:-8px}
   #main>.pagehead h2{font-size:clamp(27px,6.4vw,30px);line-height:1.08}
   #main .statgrid{gap:8px;margin-bottom:8px}
   #main .stat{
@@ -2227,6 +2227,8 @@ body:has(#main .statgrid) .mobiletabs{
   -webkit-backdrop-filter:blur(26px) saturate(155%);
   backdrop-filter:blur(26px) saturate(155%);
 }
+body:has(#main .statgrid) .topbar .brand-logo{width:40px;height:40px;flex:0 0 40px}
+body:has(#main .statgrid) .topbar .brand h1{font-size:16px;letter-spacing:0}
 body:has(#main .statgrid) .topbar .topright .btn,
 body:has(#main .statgrid) #adminMenuToggle,
 body:has(#main .statgrid) .mobiletabs .nav{
