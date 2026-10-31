@@ -34,6 +34,33 @@ for(const name of ['sindarealest-admin-preview','sindarealest2']){
   });
  }catch(e){report.warnings.push('Cannot read Pages project '+name+': '+smallError(e));}
 }
+
+/* Preview deployment frequency is context only: a deployment is not a request.
+ * Cloudflare's Pages Functions dataset has no branch/deployment dimension,
+ * so NEVER label any branch as the cause based on this count alone.
+ */
+report.previewDeployments={totalFetched:0,branches:[],warnings:[]};
+try{
+ const grouped=new Map();
+ for(let page=1;page<=3;page++){
+  const response=await api(root+'/pages/projects/sindarealest-admin-preview/deployments?env=preview&page='+page+'&per_page=100');
+  const deployments=Array.isArray(response.result)?response.result:[];
+  report.previewDeployments.totalFetched+=deployments.length;
+  for(const d of deployments){
+   const time=d.created_on||d.created_at||'';
+   if(!time || new Date(time)<start || new Date(time)>end)continue;
+   const branch=String(d.deployment_trigger?.metadata?.branch||d.deployment_trigger?.metadata?.branch_name||'(unknown)').slice(0,110);
+   const item=grouped.get(branch)||{branch,count:0,firstUtc:time,lastUtc:time};
+   item.count++;
+   if(time<item.firstUtc)item.firstUtc=time;
+   if(time>item.lastUtc)item.lastUtc=time;
+   grouped.set(branch,item);
+  }
+  if(deployments.length<100)break;
+ }
+ report.previewDeployments.branches=[...grouped.values()].sort((a,b)=>b.count-a.count).slice(0,40);
+}catch(e){report.previewDeployments.warnings.push(smallError(e));}
+
 async function gqlField(fieldSelection,alias){
  const query='query WorkersReadOnly($account: string!, $start: Time!, $end: Time!) { viewer { accounts(filter:{accountTag:$account}) {'+alias+': '+fieldSelection+' } } }';
  const d=await api('https://api.cloudflare.com/client/v4/graphql','POST',{
