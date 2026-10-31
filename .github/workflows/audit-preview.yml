@@ -1,0 +1,50 @@
+name: Audit — isolated Cloudflare storefront preview
+on:
+  push:
+    branches:
+      - fix/audit-2026-10
+    paths:
+      - 'functions/**'
+      - 'public/**'
+      - 'scripts/verify-audit-preview.mjs'
+      - 'tests/**'
+      - 'audit/**'
+      - '.github/workflows/audit-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: audit-storefront-preview-2026-10
+  cancel-in-progress: false
+jobs:
+  safe-preview:
+    if: github.ref == 'refs/heads/fix/audit-2026-10'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Checkout audit branch only
+        uses: actions/checkout@v4
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-fund
+      - name: Validate before deploy
+        run: |
+          npm run check
+          npm test
+      - name: Read-only verify separate Preview Pages, D1 and R2
+        run: node scripts/verify-audit-preview.mjs
+      - name: Deploy to separate Cloudflare Pages Preview project (NEVER storefront Production)
+        run: >
+          npx wrangler pages deploy public
+          --project-name sindarealest-admin-preview
+          --branch fix/audit-2026-10
+      - name: Record preview gate result
+        run: |
+          echo 'Audit-only branch deployed to separate Preview Pages project.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No production deployment, database migrations or data writes were executed.' >> "$GITHUB_STEP_SUMMARY"
