@@ -164,6 +164,56 @@ try{
  await page.waitForTimeout(180);
  const scrolledNav=await navState();
  assert.ok(Math.abs(scrolledNav.top-beforeNav.top)<3,'Mobile navigation must not move during content scrolling');
+ // A separate fake-data browser tests external address-service failure and retry.
+ // No production credentials, phone verification, or real orders are used.
+ const retryContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:"reduce"});
+ const retryPage=await retryContext.newPage();
+ let provinceFailures=0;
+ await retryPage.route("**/*",async route=>{
+   const req=route.request(),url=new URL(req.url()),path=url.pathname;
+   if(path==="/api/products")return route.fulfill(json(sample));
+   if(path==="/api/settings")return route.fulfill(json({welcomeEnabled:false}));
+   if(path==="/api/customer/session")return route.fulfill(json({active:false}));
+   if(url.hostname==="provinces.open-api.vn"&&path==="/api/v2/p/"){
+     provinceFailures++;
+     return route.fulfill(provinceFailures===1?json({error:"offline"},503):json([{code:79,name:"TP Hồ Chí Minh"}]));
+   }
+   if(url.hostname==="provinces.open-api.vn"&&path.startsWith("/api/v2/p/"))
+     return route.fulfill(json({wards:[{code:27123,name:"Phường Bến Nghé"}]}));
+   if(req.method()!=="GET"&&req.method()!=="HEAD")return route.abort("blockedbyclient");
+   return route.continue();
+ });
+ await retryPage.addInitScript(()=>{try{sessionStorage.setItem("sd-welcome-seen-in-tab","1")}catch{}});
+ try{
+   await retryPage.goto(origin+"/sanpham",{waitUntil:"domcontentloaded",timeout:35000});
+   await retryPage.locator('#catalogGrid [data-add="qa-wallet"]').waitFor();
+   await retryPage.locator('#catalogGrid [data-add="qa-wallet"]').click();
+   await retryPage.evaluate(()=>document.querySelector("#cartOpen").click());
+   await retryPage.locator("#cartCheckout").click();
+   await retryPage.waitForFunction(()=>!document.querySelector("#checkoutAddressRetry").hidden);
+   assert.equal(await retryPage.locator("#checkoutProvince").isDisabled(),true);
+   assert.match(await retryPage.locator("#checkoutAddressMessage").innerText(),/Thử tải lại/);
+   await retryPage.screenshot({path:join(evidenceDir,"06-address-offline-390x844.png"),animations:"disabled"});
+   await retryPage.locator("#checkoutAddressRetry").click();
+   await retryPage.waitForFunction(()=>document.querySelector("#checkoutProvince")?.options.length>1);
+   assert.equal(await retryPage.locator("#checkoutAddressRetry").isVisible(),false);
+   assert.equal(provinceFailures,2,"Address API should retry only after the visitor asks");
+   console.log("PASS: offline province lookup shows a clear retry; customer can retry without reloading/losing checkout.");
+ }finally{await retryContext.close()}
+ // Repeated drawer visits must release scroll locks and must never clone mobile tabs.
+ for(let cycle=0;cycle<20;cycle++){
+   await page.locator("#mobileAccountNav").click();
+   await page.locator("#accountDrawer.open").waitFor();
+   await page.locator("#accountClose").click();
+   await page.waitForFunction(()=>!document.querySelector("#accountDrawer").classList.contains("open"));
+ }
+ const afterCycles=await page.evaluate(()=>({
+   navCount:document.querySelectorAll("#mobileBottomNav").length,
+   bodyOverflow:document.body.style.overflow,
+   accounts:document.querySelectorAll("#accountDrawer").length
+ }));
+ assert.deepEqual(afterCycles,{navCount:1,bodyOverflow:"",accounts:1});
+ console.log("PASS: 20 guest account drawer open/close cycles without duplicated nav or retained body scroll lock.");
  console.log("PASS: single four-tab mobile bottom navigation remains fixed and contained after reload and scroll.");
  console.log("PASS: browser-mocked checkout: mixed cart requires quote (no deposit/QR); priced-only cart validates deposit and 3 steps, Back persistence, Esc, no duplicate submission; 0 real writes.");
 }finally{await context.close();await browser.close()}
