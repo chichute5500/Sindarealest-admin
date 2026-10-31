@@ -35,6 +35,7 @@
 <link rel="stylesheet" href="/material-gallery.css">
 <link rel="stylesheet" href="/customer-auth.css?v=account-liquid-20261029">
 <script type="module" src="/customer-auth-ui.js?v=account-liquid-20261029"></script>
+<script defer src="/lookup-turnstile-ui.js"></script>
 <script type="module" src="/customer-email-otp-ui.js?v=email-recovery-20261029"></script>
 <title>SinDarealest — Da cá sấu thật · Phong cách sống thật</title>
 <script>(()=>{const root=document.documentElement;
@@ -642,6 +643,10 @@ html{transition:background-color .25s ease,color .25s ease}
   .mosaic-compact .mosaic-card.art-main .slide-controls button{width:32px;height:32px}
   .footer-contacts .contact-grid .contact-icon--zalo{font-size:9px;letter-spacing:-.45px}
 }
+/* Only the verification challenge for phone lookups may open an external frame. */
+.sd-phone-challenge[hidden]{display:none!important}
+.sd-phone-challenge{margin:8px 0}
+.sd-phone-challenge-hint{font-size:12px;line-height:1.5;color:var(--muted);margin:4px 0 8px}
 /* Retry actions are hidden until an administrative API request fails. */
 #accountAddressRetry[hidden],#checkoutAddressRetry[hidden]{display:none!important}
 /* Explicit hidden state beats custom display styles on gallery controls. */
@@ -2684,28 +2689,34 @@ function bindEvents(){
  $('#themeToggle').addEventListener('click',toggleTheme);loadCheckoutProvinces();$('#cartOpen').addEventListener('click',()=>toggleStorefrontModal('cart'));$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart));$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBack').addEventListener('click',()=>{if(sdCheckoutStep>1){sdCheckoutSetStep(sdCheckoutStep-1);return}requestStorefrontModalClose('checkout',()=>{closeCheckout(false);openCart();setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0)})});$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'));$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount));$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',navigateAccountContact);$('#accountFavoritesAction')?.addEventListener('click',()=>setAccountView('favorites'));$('#accountFavoritesBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountOrdersAction')?.addEventListener('click',()=>setAccountView('orders'));$('#accountOrdersBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressAction')?.addEventListener('click',()=>setAccountView('address'));$('#accountAddressBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressForm')?.addEventListener('submit',saveAccountAddress);$('#accountAddressProvince')?.addEventListener('change',()=>loadAccountAddressWards());$('#detailFavorite')?.addEventListener('click',()=>{if(currentProduct)toggleFavorite(favoriteKey(currentProduct))});$('#accountFavoritesList')?.addEventListener('click',event=>{const remove=event.target.closest('[data-favorite-remove]');if(remove){toggleFavorite(remove.dataset.favoriteRemove);return}const open=event.target.closest('[data-favorite-open]');if(open){const key=open.dataset.favoriteOpen;closeAccount(false);openDetail(key)}});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});$('#cartZalo').addEventListener('click',consultCart);document.addEventListener('keydown',e=>{if(e.key==='Tab'){if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}if($('#sdFullscreenViewer').classList.contains('open')){trapFullscreenTab(e);return}if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}if($('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if($('#accountDrawer').classList.contains('open')){trapAccountTab(e);return}}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))requestStorefrontModalClose('checkout',closeCheckout);else if($('#cartDrawer').classList.contains('open'))requestStorefrontModalClose('cart',closeCart);else if($('#accountDrawer').classList.contains('open'))requestStorefrontModalClose('account',closeAccount)});
 $('#sdTrackForm').addEventListener('submit',async ev=>{
  ev.preventDefault();const button=$('#sdTrackSubmit'),msg=$('#sdTrackMessage'),lookup=$('#sdTrackInput').value.trim();
+ const phoneLookup=/^[+0-9().\\s/-]+$/.test(lookup)&&/^\\d{9,12}$/.test(lookup.replace(/\\D/g,''));
+ if(phoneLookup&&!window.sdPhoneLookupVerified?.('order_lookup')){msg.textContent='Vui lòng hoàn thành xác minh hoặc sử dụng mã đơn hàng.';return}
+ if(button.disabled)return;
  button.disabled=true;button.textContent='Đang tra cứu…';msg.textContent='';$('#sdTrackResults').hidden=true;$('#sdTrackResults').innerHTML='';
  try{
-  const r=await fetch('/api/order-tracking',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify({lookup})});
+  const r=await fetch('/api/order-tracking',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify({lookup,turnstileToken:phoneLookup?(window.sdPhoneLookupToken?.('order_lookup')||''):''})});
   let data={};try{data=await r.json()}catch{}
   if(!r.ok)throw Error(data.error||'Không tìm thấy đơn hàng.');
   const orders=Array.isArray(data.orders)?data.orders:[];
   sdTrackRender(orders);msg.textContent=orders.length?'Đã tìm thấy '+orders.length+' đơn hàng.':'Không tìm thấy đơn phù hợp.';
  }catch(e){msg.textContent=e.message||'Không thể tra cứu đơn hàng.'}
- finally{button.disabled=false;button.textContent='Tra cứu đơn'}
+ finally{button.disabled=false;button.textContent='Tra cứu đơn';if(phoneLookup)window.sdResetPhoneLookupProof?.('order_lookup')}
 });
 $('#warrantyLookupForm').addEventListener('submit',async e=>{
  e.preventDefault();
  const b=$('#warrantyLookupSubmit'),m=$('#warrantyMessage'),lookup=$('#warrantyLookupValue').value.trim();
+ const phoneLookup=/^[+0-9().\\s/-]+$/.test(lookup)&&/^\\d{9,12}$/.test(lookup.replace(/\\D/g,''));
+ if(phoneLookup&&!window.sdPhoneLookupVerified?.('warranty_lookup')){m.textContent='Vui lòng hoàn thành xác minh hoặc sử dụng mã bảo hành.';return}
+ if(b.disabled)return;
  b.disabled=true;b.textContent='Đang tra cứu…';m.textContent='';$('#warrantyResults').hidden=true;$('#warrantyClaimForm').hidden=true;
  try{
-  const r=await fetch('/api/warranty-lookup',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({lookup})});
+  const r=await fetch('/api/warranty-lookup',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({lookup,turnstileToken:phoneLookup?(window.sdPhoneLookupToken?.('warranty_lookup')||''):''})});
   let j={};try{j=await r.json()}catch{}
   if(!r.ok)throw Error(j.error||'Không tìm thấy thông tin bảo hành.');
   const records=Array.isArray(j.warranties)?j.warranties:(j.warranty?[j.warranty]:[]);
   showWarrantyRecords(records);m.textContent='Đã tra cứu xong. Thông tin cá nhân được che để bảo vệ riêng tư.';
  }catch(err){m.textContent=err.message||'Không thể tra cứu bảo hành.'}
- finally{b.disabled=false;b.textContent='Tra cứu bảo hành'}
+ finally{b.disabled=false;b.textContent='Tra cứu bảo hành';if(phoneLookup)window.sdResetPhoneLookupProof?.('warranty_lookup')}
 });
 function showWarrantyRecords(records){
  const list=Array.isArray(records)?records:[],container=$('#warrantyRecords'),eligible=list.filter(w=>w.eligible),claimForm=$('#warrantyClaimForm');
