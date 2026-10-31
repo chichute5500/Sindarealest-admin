@@ -2473,6 +2473,11 @@ function sdCheckoutRenderQuote(){
  if(safe){const img=$('#sdCheckoutQrImage');img.onerror=()=>{qrBox.hidden=true;notice.textContent='Không tải được QR. Chưa chuyển tiền; hãy gửi yêu cầu để Shop xác nhận.';sdCheckoutQuote.paymentReady=false;sdCheckoutRefreshChoice()};img.src=path;$('#sdCheckoutBankName').textContent=q.bankName||'';$('#sdCheckoutAccountName').textContent=q.accountName||'';$('#sdCheckoutAccountNumber').textContent=q.accountNumber||'';
  $('#sdCheckoutTransferContent').textContent=q.transferReference||'';
  $('#sdCheckoutBankFeedback').textContent='Nhấn vào từng ô để sao chép thông tin chuyển khoản.'}
+ if(sdCheckoutStep===2&&!ready){
+  $('#sdCheckoutStepTitle').textContent='Chờ Shop xác nhận giá';
+  $('#sdCheckoutStepSubtitle').textContent='Chưa cần chuyển khoản. Shop sẽ liên hệ xác nhận giá và hình thức thanh toán.';
+  $('#checkoutSubmit').textContent='Tiếp tục gửi yêu cầu →';
+ }
  sdCheckoutSummary('#sdCheckoutPaymentSummary');sdCheckoutRefreshChoice();
 }
 async function sdCheckoutLoadQuote(){
@@ -2488,7 +2493,16 @@ function sdCheckoutSetStep(step){
  $('#sdCheckoutStepTitle').textContent=captions[sdCheckoutStep-1][0];$('#sdCheckoutStepSubtitle').textContent=captions[sdCheckoutStep-1][1];
  [[1,'#sdCheckoutShippingStep'],[2,'#sdCheckoutPaymentStep'],[3,'#sdCheckoutReviewStep']].forEach(([n,id])=>$(id).hidden=n!==sdCheckoutStep);
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
- $('#checkoutSubmit').textContent=sdCheckoutStep===1?'Tiếp tục chọn thanh toán →':sdCheckoutStep===2?'Tiếp tục →':'Gửi đơn hàng';
+ const needsQuote=sdCheckoutQuote?.paymentReady===false;
+ if(needsQuote&&sdCheckoutStep===2){
+  $('#sdCheckoutStepTitle').textContent='Chờ Shop xác nhận giá';
+  $('#sdCheckoutStepSubtitle').textContent='Chưa cần chuyển khoản. Shop sẽ liên hệ xác nhận giá và hình thức thanh toán.';
+ }
+ if(needsQuote&&sdCheckoutStep===3){
+  $('#sdCheckoutStepTitle').textContent='Kiểm tra và gửi yêu cầu';
+  $('#sdCheckoutStepSubtitle').textContent='Shop sẽ liên hệ xác nhận giá trước khi yêu cầu thanh toán.';
+ }
+ $('#checkoutSubmit').textContent=sdCheckoutStep===1?'Tiếp tục chọn thanh toán →':sdCheckoutStep===2?(needsQuote?'Tiếp tục gửi yêu cầu →':'Tiếp tục →'):(needsQuote?'Gửi yêu cầu':'Gửi đơn hàng');
  $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;
  if(sdCheckoutStep===1)sdCheckoutSummary('#sdCheckoutItemSummary');
  if(sdCheckoutStep===3){
