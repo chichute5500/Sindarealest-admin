@@ -111,7 +111,7 @@ if(root){
         facebook=q("[data-auth-facebook]");
       if(google){
         google.disabled=!data.providers?.google;
-        google.querySelector("[data-auth-provider-label]").textContent=data.providers?.google?"Tiếp tục với Google":"Google (chưa cấu hình)";
+        google.querySelector("[data-auth-provider-label]").textContent=data.providers?.google?"Đăng nhập nhanh bằng Google":"Google (chưa cấu hình)";
         google.title=data.providers?.google?"":"Cần tạo Google OAuth Client ID và Secret trong Google Cloud";
       }
       if(zalo){
