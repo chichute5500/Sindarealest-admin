@@ -5,8 +5,21 @@ export async function onRequestGet(context) {
   const auth = await requireAdmin(context);
   if (auth.response) return auth.response;
   try {
+    // A missing revision (older Preview schema) deliberately falls back to the
+    // original full query. A revision is available only after all DB triggers
+    // have been installed; those triggers cover insert/update/delete and restore.
+    const revisionRow = await context.env.DB.prepare(
+      "SELECT value FROM settings WHERE key = 'products_revision' LIMIT 1"
+    ).first();
+    const revision = typeof revisionRow?.value === "string" && /^\\d{1,19}$/.test(revisionRow.value)
+      ? revisionRow.value : null;
+    const knownRevision = new URL(context.request.url).searchParams.get("revision");
+    if (revision !== null && knownRevision === revision) {
+      return json({ unchanged: true, revision });
+    }
     const result = await context.env.DB.prepare("SELECT * FROM products ORDER BY sort_order ASC, sku ASC LIMIT 2000").all();
-    return json({ products: (result.results || []).map((row) => fromRow(row)) });
+    return json({ products: (result.results || []).map((row) => fromRow(row)),
+      ...(revision !== null ? { revision } : {}) });
   } catch (error) { return genericDbError(error); }
 }
 
