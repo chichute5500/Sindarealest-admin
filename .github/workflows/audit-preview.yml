@@ -35,8 +35,9 @@ jobs:
         run: npm install --no-fund
       - name: Generate small logo UI asset (read-only source)
         run: |
-          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 -m pip install --quiet --break-system-packages Pillow fonttools brotli
           python3 scripts/build-logo-asset.py
+          python3 scripts/build-font-assets.py
           test -s public/logo-ui.webp
       - name: Validate before deploy
         run: |
