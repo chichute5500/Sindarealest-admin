@@ -12,6 +12,10 @@ const DB={prepare(sql){statements.push(sql);return {
 const full=await renderPublicCatalog(shell,{DB},origin,{home:true});
 assert.ok(full.includes('id="featuredGrid"><article'),'Home featured visible in raw HTML');
 assert.ok(full.includes('id="catalogGrid"><article'),'Catalog visible with JS disabled');
+assert.ok(full.includes('class="product-card-footer" aria-hidden="true"'),'SSR must reserve the same product-card footer height before catalog hydration');
+assert.ok(full.includes('class="product-card-bottom"'),'SSR footer must follow hydrated product-card layout');
+assert.ok(full.includes('class="photo-shade"'),'SSR photo should share hydrated image overlay geometry');
+assert.ok(!full.includes('data-add='),'SSR placeholder cannot pretend a cart button works without hydrated product data');
 assert.ok(full.includes('"@type":"ItemList"'),'JSON-LD includes real product URLs');
 assert.ok(full.includes('images/test-image.webp'));
 assert.ok(!full.includes('https://evil.example'),'No remote image host may be injected');
