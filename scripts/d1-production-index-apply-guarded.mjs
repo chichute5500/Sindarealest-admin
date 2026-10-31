@@ -129,7 +129,7 @@ assert.match(details,/idx_audit_entity_action_created/);
 const afterBaseline=await rowsQuery(baseline,"original_after_index");
 const afterOptimized=await rowsQuery(optimized,"optimized_after_index");
 assert.deepEqual(afterOptimized.rows,afterBaseline.rows,
-  "Live Preview SQL parity mismatch: columns, values or row order changed");
+  "Live Production SQL parity mismatch: columns, values or row order changed");
 // Live customers may legitimately place orders during Production migration.
 // Always require same-time original/optimized equality; do not reject valid new
 // orders solely because the pre-index and post-index snapshots differ.
