@@ -133,6 +133,11 @@ try{
       throw Error('Mobile catalog chips must stay in one horizontally scrollable row: '+JSON.stringify(chipLayout));
     const images=await loadGridImagesForScreenshot(page,name);
     if(images.broken||!images.craftLoaded)throw Error('Image delivery failures in '+name+': '+JSON.stringify(images));
+    // Previously missing nav emblem left a broken icon in every mobile shot.
+    await page.locator('.brand-symbol').evaluate(async img=>{
+      if(!img.complete||!img.naturalWidth)await img.decode();
+      if(!img.naturalWidth)throw Error('Navigation brand image is broken');
+    });
     const filename=name+'-'+colorScheme+'-'+width+'.png';
     await page.screenshot({path:join(folder,'screenshots',filename),fullPage:true,animations:'disabled',timeout:25000});
     report.screenshots.push({filename,route:name,colorScheme,width,renderedProducts,chipLayout,images,ready:true});
