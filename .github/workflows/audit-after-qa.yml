@@ -4,6 +4,7 @@ on:
     branches: [fix/audit-2026-10]
     paths:
       - .github/workflows/audit-after-qa.yml
+      - scripts/audit-readonly.mjs
   workflow_dispatch:
 permissions:
   contents: read
