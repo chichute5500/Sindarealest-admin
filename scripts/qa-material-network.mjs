@@ -23,13 +23,20 @@ async function check(path,scroll){
   assert.equal(media.length,0,path+" downloaded high-resolution material photos before scroll");
   const images=await page.evaluate(()=>{
     const cards=[...document.querySelectorAll("#catalogGrid article[data-product] .product-photo img")];
-    return {total:cards.length,unloaded:cards.filter(img=>img.hasAttribute("data-src")).length};
+    const far=cards.filter(img=>img.getBoundingClientRect().top>innerHeight+450);
+    return {
+      total:cards.length,
+      deferred:cards.filter(img=>img.hasAttribute("data-src")).length,
+      distant:far.length,
+      distantFetched:far.filter(img=>img.hasAttribute("src")).length,
+      visibleWithSource:cards.filter(img=>img.getBoundingClientRect().top<innerHeight&&img.getAttribute("src")).length
+    };
   });
-  if(images.total>=8){
-    assert.ok(images.unloaded>=2,
-      path+" must defer at least two far-offscreen full-resolution R2 images: "+JSON.stringify(images));
-  }
-  console.log("PASS:",path,"viewport-aware product images",images);
+  assert.ok(images.total>0&&images.visibleWithSource>0,
+    path+" must provide an image URL for visible product cards: "+JSON.stringify(images));
+  assert.equal(images.distantFetched,0,
+    path+" should not fetch images more than 450px outside viewport: "+JSON.stringify(images));
+  console.log("PASS:",path,"viewport-aware product photos",images);
   if(scroll){
    await page.locator("#materialTile").scrollIntoViewIfNeeded();
    await page.waitForTimeout(2300);
