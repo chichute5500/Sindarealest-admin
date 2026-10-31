@@ -11,7 +11,7 @@ export async function onRequestGet(context) {
     const revisionRow = await context.env.DB.prepare(
       "SELECT value FROM settings WHERE key = 'products_revision' LIMIT 1"
     ).first();
-    const revision = typeof revisionRow?.value === "string" && /^\\d{1,19}$/.test(revisionRow.value)
+    const revision = typeof revisionRow?.value === "string" && /^\d{1,19}$/.test(revisionRow.value)
       ? revisionRow.value : null;
     const knownRevision = new URL(context.request.url).searchParams.get("revision");
     if (revision !== null && knownRevision === revision) {
