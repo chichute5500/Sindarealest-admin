@@ -44,6 +44,24 @@ jobs:
           npx wrangler pages deploy public
           --project-name sindarealest-admin-preview
           --branch fix/audit-2026-10
+      - name: Verify deployed no-JS catalog SSR, metadata and real 404 (GET only)
+        run: |
+          node --input-type=module - <<'JS'
+          import assert from 'node:assert/strict';
+          const base='https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev';
+          for(const path of ['/','/sanpham']){
+            const r=await fetch(base+path,{signal:AbortSignal.timeout(20000)});
+            assert.equal(r.status,200,path);
+            const html=await r.text();
+            assert.ok(html.includes('sd-server-rendered'),path+' no server-rendered products');
+            assert.ok(html.includes('"@type":"ItemList"'),path+' missing product list schema');
+            assert.ok(html.includes('rel="canonical"'),path+' missing canonical');
+            console.log('PASS: no-JS SSR visible,',path,'HTTP',r.status);
+          }
+          const unknown=await fetch(base+'/qa-unknown-route-20261031',{signal:AbortSignal.timeout(12000)});
+          assert.equal(unknown.status,404,'Unknown URLs must not serve home HTML');
+          console.log('PASS: genuine HTTP 404, no customer/private API requests executed');
+          JS
       - name: Record preview gate result
         run: |
           echo 'Audit-only branch deployed to separate Preview Pages project.' >> "$GITHUB_STEP_SUMMARY"
