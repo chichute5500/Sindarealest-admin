@@ -2118,9 +2118,9 @@ body:not(:has(#loginView:not(.hidden))){
 @media (min-width:390px) and (max-width:520px){
   #main>.pagehead{margin-bottom:10px}
   #main>.pagehead h2{font-size:clamp(27px,6.4vw,30px);line-height:1.08}
-  #main .statgrid{gap:8px;margin-bottom:12px}
+  #main .statgrid{gap:8px;margin-bottom:11px}
   #main .stat{
-    min-height:clamp(88px,22vw,96px);
+    min-height:clamp(88px,22vw,95px);
     padding:11px 13px;
     border:1px solid transparent;
     border-radius:20px;
@@ -2140,13 +2140,14 @@ body:not(:has(#loginView:not(.hidden))){
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
   }
-  #main .dashboard-quick-panel{margin-bottom:12px!important}
-  #main .dashboard-quick-panel .panelhead{padding:13px 16px 8px}
+  #main .dashboard-quick-panel{margin-bottom:11px!important}
+  #main .dashboard-quick-panel .panelhead{padding:11px 16px 6px}
+  #main .dashboard-quick-panel .panelbody{padding-bottom:10px}
   #main .dashboard-quick-panel .panelhead h3,
   #main .dashboard-revenue .panelhead h3{font-size:17px;line-height:1.2}
   #main .dashboard-shortcuts{gap:7px}
   #main .dashboard-shortcut{
-    min-height:clamp(76px,20vw,86px);
+    min-height:clamp(76px,19.5vw,84px);
     padding:8px 4px;
     gap:6px;
     border:1px solid transparent;
@@ -2158,11 +2159,12 @@ body:not(:has(#loginView:not(.hidden))){
   #main .dashboard-shortcut .shortcut-icon svg{width:20px;height:20px}
   #main .dashboard-shortcut .shortcut-copy b{font-size:10.5px;line-height:1.2}
 
-  #main .dashboard-revenue{margin-bottom:12px}
-  #main .dashboard-revenue .panelhead{padding:13px 16px 8px;gap:8px}
+  #main .dashboard-revenue{margin-bottom:11px}
+  #main .dashboard-revenue .panelbody{padding-bottom:9px}
+  #main .dashboard-revenue .panelhead{padding:11px 16px 6px;gap:8px}
   #main .dashboard-revenue .panelhead .tiny{font-size:10.5px;line-height:1.4}
   #main .dashboard-revenue-empty{
-    min-height:clamp(84px,22vw,96px);
+    min-height:clamp(84px,21.3vw,92px);
     padding:11px 13px;
     gap:9px;
     border:1px solid transparent;
