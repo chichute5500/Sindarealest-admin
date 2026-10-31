@@ -1,0 +1,122 @@
+/* SinDarealest fluid UX layer, append-only. Material tokens are isolated from
+   the Owner-approved base CSS so existing Luxury Glass optical rims survive. */
+:root{
+  --sd-surface-glass:rgba(250,253,255,.62);
+  --sd-surface-border:rgba(255,255,255,.78);
+  --sd-surface-shadow:0 10px 32px rgba(29,69,99,.10),inset 0 1px 0 rgba(255,255,255,.75);
+  --sd-nav-glass:rgba(245,251,255,.65);
+  --sd-nav-border:rgba(255,255,255,.72);
+  --sd-overlay-glass:rgba(250,252,255,.88);
+  --sd-overlay-glow:inset 0 1px 0 rgba(255,255,255,.78),0 15px 55px rgba(17,48,78,.18);
+  --sd-fluid-duration:230ms;
+  --sd-fluid-ease:cubic-bezier(.22,1,.36,1);
+  --sd-gold-accent:rgba(212,175,55,.18);
+}
+html.dark,html[data-theme="dark"]{
+  --sd-surface-glass:rgba(22,29,34,.70);
+  --sd-surface-border:rgba(212,175,55,.18);
+  --sd-surface-shadow:0 12px 32px rgba(0,0,0,.26),inset 0 1px 0 rgba(212,175,55,.18);
+  --sd-nav-glass:rgba(17,25,34,.78);
+  --sd-nav-border:rgba(212,175,55,.24);
+  --sd-overlay-glass:rgba(12,20,27,.94);
+  --sd-overlay-glow:inset 0 1px 0 rgba(212,175,55,.25),0 18px 55px rgba(0,0,0,.44);
+}
+/* Layer 1: keep distinctive product-card frames while harmonizing exposed
+   supporting surfaces. */
+:where(.glass-soft,.sd-track-panel,.warranty-help,#order .order-step){
+  border-color:var(--sd-surface-border);
+  box-shadow:var(--sd-surface-shadow);
+  -webkit-backdrop-filter:blur(12px) saturate(160%);
+  backdrop-filter:blur(12px) saturate(160%);
+}
+/* Layer 2: navigation remains transparent enough to reveal leather textures. */
+:where(.nav,.mobile-bottom-nav){
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
+}
+/* Layer 3: preserve controls and forms inside every elevated overlay. */
+:where(.cart-drawer,.account-drawer,.checkout-drawer,.detail-modal){
+  border-color:var(--sd-nav-border);
+  box-shadow:var(--sd-overlay-glow);
+}
+:where(.cart-drawer,.account-drawer,.checkout-drawer){
+  background:var(--sd-overlay-glass);
+}
+body.has-open-overlay :where(.nav,.mobile-bottom-nav,.product-card,.glass-soft,.glass,.warranty-help,.sd-track-panel){
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+#products #catalogHeading{
+  text-align:center;
+  font-weight:700;
+  scroll-margin-top:90px;
+}
+#products{scroll-margin-top:90px}
+#products #categoryFilters{position:relative;isolation:isolate}
+#categoryFilters .filter-pill{position:relative;z-index:1}
+#categoryFilters .filter-pill.active{
+  background:transparent;
+  transition:color var(--sd-fluid-duration) var(--sd-fluid-ease),transform var(--sd-fluid-duration) var(--sd-fluid-ease);
+}
+#categoryFilters .sd-filter-active-glider{
+  position:absolute;z-index:0;top:0;left:0;width:0;height:0;
+  border-radius:999px;pointer-events:none;
+  background:var(--sd-surface-glass);
+  border:1px solid var(--sd-surface-border);
+  box-shadow:var(--sd-surface-shadow);
+  -webkit-backdrop-filter:blur(12px) saturate(160%);
+  backdrop-filter:blur(12px) saturate(160%);
+  transform:translate3d(var(--sd-filter-x,0px),var(--sd-filter-y,0px),0);
+  transition:transform var(--sd-fluid-duration) var(--sd-fluid-ease),width var(--sd-fluid-duration) var(--sd-fluid-ease),height var(--sd-fluid-duration) var(--sd-fluid-ease);
+}
+@keyframes sdCatalogCascade{
+  from{opacity:0;transform:translate3d(0,12px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+#catalogGrid.sd-catalog-enter .product-card{
+  animation:sdCatalogCascade 340ms var(--sd-fluid-ease) both;
+  animation-delay:min(var(--sd-stagger,0ms),385ms);
+}
+#catalogGrid{contain:layout;}
+/* Entry motion does not delay forms becoming keyboard accessible. */
+@keyframes sdAccountEnter{
+  from{opacity:0;transform:translate3d(10px,0,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes sdCheckoutForwardEnter{
+  from{opacity:0;transform:translate3d(18px,0,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes sdCheckoutBackEnter{
+  from{opacity:0;transform:translate3d(-18px,0,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+#accountDrawer .sd-fluid-account-enter{animation:sdAccountEnter var(--sd-fluid-duration) var(--sd-fluid-ease) both}
+#checkoutDrawer[data-step-direction="forward"] .sd-checkout-panel.sd-fluid-checkout-enter{
+  animation:sdCheckoutForwardEnter var(--sd-fluid-duration) var(--sd-fluid-ease) both;
+}
+#checkoutDrawer[data-step-direction="backward"] .sd-checkout-panel.sd-fluid-checkout-enter{
+  animation:sdCheckoutBackEnter var(--sd-fluid-duration) var(--sd-fluid-ease) both;
+}
+#sdCheckoutStepper>i{position:relative;overflow:hidden;isolation:isolate}
+#sdCheckoutStepper>i::after{
+  content:"";position:absolute;inset:0;background:linear-gradient(90deg,#c69c31,#f4d884);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform 320ms var(--sd-fluid-ease);
+}
+#sdCheckoutStepper>i.is-complete::after{transform:scaleX(1)}
+/* Only root page transitions animate across full document navigations;
+   same-document SPA navigation is handled by native API where supported. */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){
+  animation-duration:230ms;
+  animation-timing-function:var(--sd-fluid-ease);
+}
+@media(prefers-reduced-motion:reduce){
+ #categoryFilters .sd-filter-active-glider{transition:none}
+ #catalogGrid.sd-catalog-enter .product-card,
+ #accountDrawer .sd-fluid-account-enter,
+ #checkoutDrawer .sd-fluid-checkout-enter{animation:none!important}
+ #sdCheckoutStepper>i::after{transition:none}
+ ::view-transition-old(root),::view-transition-new(root){animation-duration:0s!important}
+}
