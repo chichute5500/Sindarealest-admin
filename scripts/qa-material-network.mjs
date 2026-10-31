@@ -18,8 +18,18 @@ async function check(path,scroll){
  try{
   const response=await page.goto(origin+path,{waitUntil:"domcontentloaded",timeout:45000});
   assert.equal(response.status(),200);
-  await page.waitForTimeout(2300);
+  await page.waitForFunction(()=>document.documentElement.dataset.catalogHydration==="ready",null,{timeout:25000});
+  await page.waitForTimeout(500);
   assert.equal(media.length,0,path+" downloaded high-resolution material photos before scroll");
+  const images=await page.evaluate(()=>{
+    const cards=[...document.querySelectorAll("#catalogGrid article[data-product] .product-photo img")];
+    return {total:cards.length,unloaded:cards.filter(img=>img.hasAttribute("data-src")).length};
+  });
+  if(images.total>=8){
+    assert.ok(images.unloaded>=2,
+      path+" must defer at least two far-offscreen full-resolution R2 images: "+JSON.stringify(images));
+  }
+  console.log("PASS:",path,"viewport-aware product images",images);
   if(scroll){
    await page.locator("#materialTile").scrollIntoViewIfNeeded();
    await page.waitForTimeout(2300);
