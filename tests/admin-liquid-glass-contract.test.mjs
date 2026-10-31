@@ -9,7 +9,8 @@ function has(value, label) {
 
 // Approved ADMIN visual tokens and both theme surfaces.
 has('--bg:#eaf3fb;', 'ice-blue light background token');
-has('--ink:#142a3c;', 'navy light text token');
+has('--ink:var(--sd-admin-ink);', 'one shared Admin foreground token');
+has('--sd-admin-ink:#091632;', 'reference navy light text token');
 has('--gold:#5c91b9;', 'blue accent token');
 has('--bg:#061522;', 'dark background token aligned with Storefront');
 has('--ink:#edf7ff;', 'dark text token aligned with Storefront');

@@ -32,7 +32,7 @@ for(const token of ['--sd-3d-ink','--sd-3d-shadow','--sd-3d-depressed','--sd-3d-
   const values=source=>Array.from(source.matchAll(new RegExp(`${token}:([^;]+);`,'g')),match=>match[1]);
   const storefrontValues=values(storefront),adminValues=values(html);
   assert.ok(storefrontValues.length,`Storefront must define ${token}`);
-  const adminTunedTokens=new Set(['--sd-3d-rim','--sd-3d-face','--sd-glass-shell-strong','--sd-glass-panel-shadow']);
+  const adminTunedTokens=new Set(['--sd-3d-ink','--sd-3d-rim','--sd-3d-face','--sd-glass-shell-strong','--sd-glass-panel-shadow']);
   if(adminTunedTokens.has(token)) {
     assert.equal(adminValues.length,storefrontValues.length,`Admin light/dark definitions for ${token} must remain paired`);
     assert.ok(adminValues.some((value,index)=>value!==storefrontValues[index]),`Admin reference tuning for ${token} must be deliberate`);
@@ -40,6 +40,7 @@ for(const token of ['--sd-3d-ink','--sd-3d-shadow','--sd-3d-depressed','--sd-3d-
 }
 assert.ok(packageJson.scripts.test.includes('tests/admin-liquid-glass-2-contract.test.mjs'),
   'Liquid Glass 2 contract must run in the standard test suite');
+assert.ok(html.includes('--sd-3d-ink:var(--sd-admin-ink);'), 'Common chrome must use the same measured Admin navy as component text');
 assert.ok(!html.includes('SD_ADMIN_FAKE_PRICES'),'Design cannot fabricate live dashboard statistics');
 assert.doesNotMatch(html,/#main \.mobilecards tbody tr,#main \.customer-mobile-summary/, 'customer mobile cards should use the outer row shell once');
 assert.ok(html.includes('--sd-dock-height:61px;--sd-dock-bottom:18px'), 'Dock dimensions must follow the measured reference');

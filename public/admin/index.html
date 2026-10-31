@@ -95,7 +95,7 @@ body{color:var(--ink);transition:background-color .25s ease,color .25s ease}
   color:var(--ink);
   --bg:#eaf3fb;
   --paper:rgba(255,255,255,.78);
-  --ink:#142a3c;
+  --ink:var(--sd-admin-ink);
   --muted:#5b7488;
   --line:rgba(235,247,255,.88);
   --gold:#5c91b9;
@@ -619,7 +619,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .dashboard-revenue{margin-bottom:16px}
 .dashboard-revenue .panelhead{position:relative;z-index:2;isolation:isolate;padding-right:112px}
 .dashboard-revenue .panelhead::before,.dashboard-revenue .panelhead::after{content:"";position:absolute;pointer-events:none;z-index:-1}
-.dashboard-revenue .panelhead::before{right:8px;top:30px;width:105px;height:28px;border:1px solid rgba(255,255,255,.82);border-bottom-color:rgba(154,201,237,.55);border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(179,215,247,.09));box-shadow:0 6px 0 -1px rgba(205,228,249,.46),0 9px 0 -1px rgba(232,245,255,.42),0 12px 0 -1px rgba(155,196,234,.14),inset 0 1px 2px rgba(255,255,255,.8)}
+.dashboard-revenue .panelhead::before{right:8px;top:30px;width:105px;height:28px;border:1px solid rgba(255,255,255,.82);border-bottom-color:rgba(154,201,237,.55);border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(179,215,247,.09));box-shadow:0 5px 0 -1px rgba(205,228,249,.46),inset 0 1px 2px rgba(255,255,255,.8)}
 .dashboard-revenue .panelhead::after{right:14px;top:16px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 27% 21%,rgba(251,246,253,1) 0 12%,rgba(198,219,255,.95) 25%,rgba(166,202,254,.94) 48%,rgba(139,185,239,.85) 78%,rgba(111,162,219,.78));box-shadow:0 10px 20px rgba(37,91,132,.23),inset -4px -6px 11px rgba(95,157,194,.24),inset 4px 3px 10px rgba(255,255,255,.8)}
 .dashboard-revenue .panelhead{align-items:flex-start;gap:12px}
 .dashboard-revenue .revenue-period{font-size:12px;color:var(--ink);font-weight:700;white-space:normal;grid-column:1/-1}
@@ -1035,7 +1035,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 /* Based on the supplied 12-screen 1024×1536 mobile reference. Structural changes
    are confined to Admin skin; APIs, auth, D1, image metadata and unknown values remain intact. */
 :root {
-  /* Keep Admin on the Storefront's canonical Liquid Glass 2.0 optical tokens. */
+  /* Shared Liquid Glass interaction tokens; Admin optics are measured against its reference. */
  --sd-admin-face:linear-gradient(135deg,rgba(211,230,236,.22),rgba(205,226,235,.16));
  --sd-admin-stat-face:linear-gradient(180deg,transparent 15%,rgba(255,255,255,.28) 28%,transparent 60%,rgba(145,215,252,.10) 85%,transparent 95%),var(--sd-admin-face);
  --sd-admin-sheet-face:linear-gradient(135deg,rgba(241,249,255,.94),rgba(220,237,251,.90));
@@ -1043,12 +1043,13 @@ body:has(#loginView:not(.hidden)) .loginwrap{
  --sd-admin-tile-face:linear-gradient(135deg,rgba(255,247,246,.45),rgba(218,235,249,.18));
  --sd-admin-rim:linear-gradient(130deg,rgba(255,216,239,.72),rgba(255,255,255,.96) 20%,rgba(218,238,255,.38) 55%,rgba(158,222,242,.64) 94%,rgba(255,255,255,.92));
  --sd-admin-shadow:0 9px 17px rgba(44,103,145,.16),0 2px 4px rgba(45,96,137,.06),inset 0 2px 3px rgba(255,255,255,.66),inset 0 -2px 2px rgba(214,250,255,.64);
- --sd-admin-nav-active:linear-gradient(145deg,rgba(215,230,243,.46),rgba(146,207,244,.60));
+ --sd-admin-nav-active:linear-gradient(145deg,rgba(229,240,251,.52),rgba(169,217,248,.55));
  --sd-admin-dock-face:linear-gradient(135deg,rgba(228,242,254,.86),rgba(205,228,248,.78));
- --sd-admin-ink:#10263e;
+ --sd-admin-ink:#091632;
  --sd-admin-muted:#5c748a;
+ --sd-admin-ambient-rim:rgba(255,255,255,.24);
 
-  --sd-3d-ink:#193449;
+  --sd-3d-ink:var(--sd-admin-ink);
   --sd-3d-shadow:0 2px 4px rgba(48,84,117,.12),0 10px 22px rgba(49,86,119,.14);
   --sd-3d-depressed:0 1px 2px rgba(47,85,120,.035),inset 1px 2px 4px rgba(80,114,145,.22),inset -1px -1px 3px rgba(255,255,255,.16);
   --sd-3d-selected:0 1px 2px rgba(51,85,120,.06),inset 1px 2px 4px rgba(83,118,150,.17),inset -1px -1px 3px rgba(255,255,255,.13);
@@ -1091,6 +1092,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
  --sd-admin-dock-face:linear-gradient(135deg,rgba(19,42,62,.94),rgba(14,32,49,.88));
  --sd-admin-ink:#dceefc;
  --sd-admin-muted:#a5bed2;
+ --sd-admin-ambient-rim:rgba(189,220,243,.055);
 
   --sd-3d-ink:#edf7ff;
   --sd-3d-shadow:0 2px 4px rgba(0,5,15,.22),0 10px 22px rgba(0,7,19,.26);
@@ -2021,7 +2023,7 @@ body:not(:has(#loginView:not(.hidden))){
 
 body:has(#appView:not(.hidden)) #appView{
  min-height:calc(100dvh - 64px);
- background-image:radial-gradient(circle at 82.5% 3.4%,rgba(135,193,236,.045) 0 163px,rgba(255,255,255,.32) 164px 165px,transparent 167px),radial-gradient(ellipse at 4% 24%,rgba(243,205,229,.035),transparent 44%),radial-gradient(ellipse at 100% 45%,rgba(147,191,230,.04),transparent 50%);
+ background-image:radial-gradient(circle at 82.5% 3.4%,rgba(135,193,236,.045) 0 163px,var(--sd-admin-ambient-rim) 164px 165px,transparent 167px),radial-gradient(ellipse at 4% 24%,rgba(243,205,229,.035),transparent 44%),radial-gradient(ellipse at 100% 45%,rgba(147,191,230,.04),transparent 50%);
  background-attachment:fixed;
 }
 /* Only rim pseudo-elements use this gradient. All content surfaces retain alpha. */
@@ -2049,12 +2051,12 @@ body:has(#appView:not(.hidden)) :where(.topbar,.mobiletabs,.mobiletabs .nav)::af
 #main :is(.stat-icon,.shortcut-icon) svg{width:21px;height:21px}
 #main .stat .value{color:var(--sd-admin-ink);font-family:Georgia,"Times New Roman",serif;font-weight:600}
 #main :is(.dashboard-quick-panel .panelhead h3,.dashboard-revenue .panelhead h3){font-family:Georgia,"Times New Roman",serif;font-size:16.5px;line-height:1.2;font-weight:400;color:var(--sd-admin-ink)}
-#main .dashboard-revenue-empty{grid-template-columns:minmax(0,1fr) 42px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.40),rgba(217,237,253,.26));margin:0 10px 10px}
+#main .dashboard-revenue-empty{grid-template-columns:minmax(0,1fr) 42px;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,.57),rgba(228,242,254,.38));margin:0 10px 10px}
 :root[data-admin-theme="dark"] #main .dashboard-revenue-empty{background:var(--sd-admin-face)}
 #main .dashboard-revenue-visual{width:42px;height:42px;border-radius:13px;background:var(--sd-admin-icon-face)}
 #main .dashboard-revenue-copy strong{font-weight:500}
 #main .dashboard-revenue-copy p{color:var(--sd-admin-muted);line-height:1.4}
-#main .dashboard-revenue-empty .revenue-period{font-weight:600}
+#main .dashboard-revenue-empty .revenue-period{font-weight:500}
 
 body:has(#appView:not(.hidden)) .topbar :is(#adminMenuToggle,.topright #adminThemeToggle,.topright #notificationToggle,.topright #logout){position:relative;border:1px solid rgba(255,255,255,.65);border-radius:50%;background:var(--sd-admin-icon-face);box-shadow:var(--sd-admin-shadow)}
 body:has(#appView:not(.hidden)) .topbar :is(#adminMenuToggle,.topright #adminThemeToggle,.topright #notificationToggle,.topright #logout):disabled{opacity:.45;transform:none;box-shadow:none}
@@ -2082,32 +2084,32 @@ body:has(#main .statgrid) #main .pagehead .btn.primary:disabled{opacity:.45;tran
  #main:has(.statgrid)>.pagehead{padding:0 6px;margin-bottom:12px;align-items:center;gap:6px;min-height:60px}
  #main:has(.statgrid)>.pagehead .eyebrow{font-size:9px;line-height:1.2;letter-spacing:.16em;margin:0}
  #main:has(.statgrid)>.pagehead h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:30px;line-height:1;letter-spacing:.4px;-webkit-text-stroke:.16px currentColor;margin:4px 0 0}
- #main:has(.statgrid)>.pagehead p{font-size:13px;line-height:1.15;white-space:nowrap}
- #main:has(.statgrid)>.pagehead .btn.primary{flex:0 0 42%;width:42%;min-width:0;min-height:47px;padding:8px 5px;font-size:13px;margin-right:-7px;margin-top:8px}
+ #main:has(.statgrid)>.pagehead p{font-size:12.2px;line-height:14.95px;white-space:nowrap}
+ #main:has(.statgrid)>.pagehead .btn.primary{flex:0 0 42%;width:42%;min-width:0;min-height:47px;padding:8px 5px;font-size:12px;margin-right:-7px;margin-top:8px}
  #main .statgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}
  #main .stat{min-height:95px;padding:16px 18px 5px}
- #main .stat .label{display:block;min-height:0;font-size:12px;line-height:1.3;color:var(--sd-admin-ink);padding-right:20px}
+ #main .stat .label{display:block;min-height:0;font-size:11.3px;line-height:15.6px;color:var(--sd-admin-ink);padding-right:20px}
  #main .stat-icon{position:absolute;right:10px;top:11px}
  #main .stat .value{font-size:26px;line-height:1.05;margin:6px 0 2px}
- #main .stat .hint{font-size:11px;line-height:1.25;white-space:nowrap}
+ #main .stat .hint{font-size:10.2px;line-height:13.75px;white-space:nowrap}
  #main .dashboard-quick-panel .panelhead{padding:10px 14px 6px}
  #main .dashboard-quick-panel .panelhead h3{letter-spacing:.32px;-webkit-text-stroke:.14px currentColor}
  #main .dashboard-quick-panel .panelbody{padding:0 10px 10px}
  #main .dashboard-shortcuts{gap:6px}
  #main .dashboard-shortcut{min-height:85px;flex-direction:column;align-items:center;justify-content:flex-start;padding:7px 3px 5px;gap:6px;text-align:center}
- #main .dashboard-shortcut .shortcut-copy{width:100%;flex:0 1 auto}
+ #main .dashboard-shortcut .shortcut-copy{display:grid;align-items:center;width:100%;min-height:27.6px;flex:0 1 auto}
  #main .dashboard-shortcut .shortcut-copy b{margin:0;font-family:Georgia,"Times New Roman",serif;font-weight:600;font-size:12px;line-height:1.15;overflow-wrap:normal}
  #main .dashboard-shortcut .shortcut-copy small{display:none}
  #main .dashboard-revenue{margin-bottom:12px}
  #main .dashboard-revenue .panelhead{padding:12px 17px 4px 18px;gap:0;min-height:56px}
  #main .dashboard-revenue .panelhead h3{font-size:16px;line-height:1.1;letter-spacing:.2px;-webkit-text-stroke:.2px currentColor}
- #main .dashboard-revenue .panelhead .tiny{font-size:11px;line-height:1.3;max-width:100%;font-weight:400}
- #main .dashboard-revenue .panelhead::before{width:105px;height:28px;right:8px;top:30px}
+ #main .dashboard-revenue .panelhead .tiny{font-size:10.25px;line-height:14.3px;max-width:100%;font-weight:400}
+ #main .dashboard-revenue .panelhead::before{width:105px;height:25px;right:8px;top:27px}
  #main .dashboard-revenue .panelhead::after{right:18px;top:12px;width:44px;height:44px}
- #main .dashboard-revenue-empty{min-height:93px;padding:7px 15px;gap:7px}
- #main .dashboard-revenue-empty .revenue-period{font-size:12px;line-height:1.3}
- #main .dashboard-revenue-copy strong{font-size:11px;line-height:1.3;margin-bottom:2px}
- #main .dashboard-revenue-copy p{font-size:9.5px;line-height:1.35}
+ #main .dashboard-revenue-empty{min-height:93px;padding:9px 15px 7px;gap:7px}
+ #main .dashboard-revenue-empty .revenue-period{font-size:11px;line-height:14.95px}
+ #main .dashboard-revenue-copy strong{font-size:10.5px;line-height:14.3px;margin-bottom:2px}
+ #main .dashboard-revenue-copy p{font-size:9px;line-height:12.825px}
  #main .dashboard-revenue-visual svg{width:26px;height:26px}
  .mobiletabs{position:fixed;display:grid;z-index:7;left:0;right:0;bottom:calc(var(--sd-dock-bottom,18px) + env(safe-area-inset-bottom));width:min(calc(100% - 28px),520px);height:var(--sd-dock-height,61px);min-height:var(--sd-dock-height,61px);margin:0 auto;padding:5px;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;border-radius:30px}
  body:has(#appView:not(.hidden)) .mobiletabs{background:var(--sd-admin-dock-face);-webkit-backdrop-filter:blur(30px) saturate(125%);backdrop-filter:blur(30px) saturate(125%)}
