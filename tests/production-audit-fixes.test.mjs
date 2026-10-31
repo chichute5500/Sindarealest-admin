@@ -16,6 +16,10 @@ assert.doesNotMatch(store,/<style id="sd-catalog-liquid-glass-reference-2026-10-
 assert.match(store,/Removed historical nested style token and the invalid first :root rule/);
 assert.equal([...store.matchAll(/\.welcome-content>\*\{animation:none!important\}/g)].length,2,
   'Only the base and reduced-motion Welcome motion guards should remain');
+assert.doesNotMatch(store,/class="theme-watermark"/,
+  'An invisible full-screen decorative watermark must not steal LCP or network bandwidth');
+assert.doesNotMatch(store,/@keyframes sdLiquidGlassDrift/,
+  'Do not animate a full-viewport background transform: Lighthouse attributed CLS 1.0 to it');
 const admin=read('public/admin/index.html');
 assert.match(admin,/expectedProduct:JSON\.parse\(JSON\.stringify\(editing\)\)/,
   'Full Admin edit must send original immutable snapshot');
