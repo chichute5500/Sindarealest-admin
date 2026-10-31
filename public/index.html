@@ -653,6 +653,11 @@ html{transition:background-color .25s ease,color .25s ease}
 /* In-app navigation must never re-display Welcome; hide before first paint. */
 html.sd-welcome-nav-bypass #welcomeSplash{display:none!important}
 /* Parsed in <head>: the initial body flag must gate storefront chrome before first paint; :has() remains a secondary safeguard. */
+/* While the opaque Welcome owns the viewport, background products and tracking
+   can still populate as HTML streams and fonts load. Keep those off-screen
+   geometry changes out of visual CLS; reveal the already-laid-out main BEFORE
+   the welcome splash fades. Scope to JS: no-JS catalog markup stays visible. */
+html.js-enabled body.welcome-active main{visibility:hidden!important}
 .welcome-splash{z-index:2147483000!important}
 body.welcome-active .welcome-splash{z-index:2147483000!important}
 /* Keep the mobile bar mounted beneath the welcome layer so the splash fade reveals it in the same transition. */
