@@ -4,7 +4,9 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 test.use({ serviceWorkers: 'block' });
-const origin = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev';
+const adminPreviewUrl = new URL(process.env.ADMIN_TEST_URL || 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/');
+const origin = adminPreviewUrl.origin;
+const adminPath = adminPreviewUrl.pathname || '/admin/';
 const testPassword = process.env.ADMIN_TEST_PASSWORD;
 const runSha = process.env.GITHUB_SHA || 'unknown';
 // A screenshot test cannot independently verify Cloudflare's deployed application SHA.
@@ -50,7 +52,7 @@ for (const {width,height,theme} of matrix) {
           }
         } catch {}
       });
-      const response=await page.goto(origin+'/admin/',{waitUntil:'domcontentloaded',timeout:30000});
+      const response=await page.goto(origin+adminPath,{waitUntil:'domcontentloaded',timeout:30000});
       expect(response?.status()).toBe(200);
       await expect(page.locator('#loginView')).toBeVisible({timeout:12000});
       await expect(page.locator('#password')).toHaveAttribute('type','password');
