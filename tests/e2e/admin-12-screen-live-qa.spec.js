@@ -98,7 +98,7 @@ for (const {width,height,theme} of matrix) {
             '#main .warranty-issue-disclosure','#main .activity-view-tabs','#main .activity-log-card','#main .dashboard-activity-table tbody tr',
             '.order-detail-page-actions','.order-detail-page','.mobile-more-panel','.mobile-more-item','.notification-panel','.editor','.editorhead','.editorfooter','.product-quick-editor','.admin-glass-dialog',
             '#backdrop .control','#backdrop .btn:not(.primary)','#backdrop .editor-tab','#backdrop .editor-tab-panel','#backdrop .product-category-grid','#backdrop #productPanelDetails .product-fulfillment-toggle','#backdrop .product-visibility-row'];
-          const cssProperties=['background','backgroundColor','backgroundImage','border','borderColor','borderWidth','borderRadius','boxShadow','fontSize','fontFamily','lineHeight','padding','whiteSpace','backdropFilter','opacity','filter','outlineStyle','outlineWidth','transform'];
+          const cssProperties=['background','backgroundColor','backgroundImage','border','borderColor','borderWidth','borderStyle','borderRadius','boxShadow','fontSize','fontFamily','lineHeight','padding','whiteSpace','backdropFilter','opacity','filter','outline','outlineColor','outlineStyle','outlineWidth','outlineOffset','transform','transition'];
           const glassProperties=new Set(['background','background-color','background-image','border','border-color','border-width','border-style','border-radius','box-shadow','backdrop-filter','-webkit-backdrop-filter','filter','opacity','outline','outline-color','outline-style','outline-width','transform','transition']);
           const trackedCustomProperties=/^--(?:sd-admin-|glass-|reference-|accent$|ink$|line$|paper$|muted$)/;
           const splitSelectors=selectorText=>{
@@ -116,19 +116,22 @@ for (const {width,height,theme} of matrix) {
             selectors.push(selectorText.slice(start).trim());return selectors.filter(Boolean);
           };
           const specificity=selector=>{
-            const result=[0,0,0];let i=0;
+            const result=[0,0,0];let i=0,compoundStart=true;
             const identEnd=start=>{let j=start;while(j<selector.length){if(selector[j]==='\\'){j+=2;continue;}if(/[\w-]/.test(selector[j])||selector.charCodeAt(j)>=128){j++;continue;}break;}return j;};
             const closeParen=start=>{let depth=1,quote='',escaped=false;for(let j=start+1;j<selector.length;j++){const char=selector[j];if(escaped){escaped=false;continue;}if(char==='\\'){escaped=true;continue;}if(quote){if(char===quote)quote='';continue;}if(char==='"'||char==="'"){quote=char;continue;}if(char==='(')depth++;else if(char===')'&&!--depth)return j;}return selector.length-1;};
             const maxSpecificity=text=>splitSelectors(text).map(part=>specificity(part)).sort((a,b)=>b[0]-a[0]||b[1]-a[1]||b[2]-a[2])[0]||[0,0,0];
             while(i<selector.length){
               const char=selector[i];
-              if(char==='#'){result[0]++;i=identEnd(i+1);continue;}
-              if(char==='.' ){result[1]++;i=identEnd(i+1);continue;}
-              if(char==='['){result[1]++;let depth=1,j=i+1,quote='',escaped=false;for(;j<selector.length&&depth;j++){const c=selector[j];if(escaped){escaped=false;continue;}if(c==='\\'){escaped=true;continue;}if(quote){if(c===quote)quote='';continue;}if(c==='"'||c==="'"){quote=c;continue;}if(c==='[')depth++;else if(c===']')depth--;}i=j;continue;}
+              if(/\s/.test(char)){compoundStart=true;i++;continue;}
+              if(/[>+~,]/.test(char)){compoundStart=true;i++;continue;}
+              if(char==='#'){compoundStart=false;result[0]++;i=identEnd(i+1);continue;}
+              if(char==='.' ){compoundStart=false;result[1]++;i=identEnd(i+1);continue;}
+              if(char==='['){compoundStart=false;result[1]++;let depth=1,j=i+1,quote='',escaped=false;for(;j<selector.length&&depth;j++){const c=selector[j];if(escaped){escaped=false;continue;}if(c==='\\'){escaped=true;continue;}if(quote){if(c===quote)quote='';continue;}if(c==='"'||c==="'"){quote=c;continue;}if(c==='[')depth++;else if(c===']')depth--;}i=j;continue;}
               if(char===':'){
                 const pseudoElement=selector[i+1]===':';i+=pseudoElement?2:1;const start=i;i=identEnd(i);const name=selector.slice(start,i).toLowerCase();
                 const legacyElement=!pseudoElement&&['before','after','first-line','first-letter'].includes(name);
                 if(pseudoElement||legacyElement)result[2]++;else result[1]++;
+                compoundStart=false;
                 if(selector[i]==='('){const end=closeParen(i),argument=selector.slice(i+1,end);
                   if(name==='is'||name==='not'||name==='has'||name==='matches'||name==='any'){const max=maxSpecificity(argument);for(let k=0;k<3;k++)result[k]+=max[k];result[1]--;}
                   else if(name==='where')result[1]--;
@@ -141,15 +144,17 @@ for (const {width,height,theme} of matrix) {
               if(char==='\\'){i+=2;continue;}
               if(/[\w-]/.test(char)||char.charCodeAt(0)>=128){
                 const start=i;i=identEnd(i);const name=selector.slice(start,i);
-                // A type selector is only counted at the start of a compound or after a namespace separator.
-                let previous=start-1;while(previous>=0&&/\s/.test(selector[previous]))previous--;
-                if(previous<0||/[>+~,(|]/.test(selector[previous])){if(name!=='*')result[2]++;}
+                if(compoundStart&&name!=='*')result[2]++;
+                compoundStart=false;
                 continue;
               }
+              if(char==='*'){compoundStart=false;i++;continue;}
               i++;
             }
             return result;
           };
+          const specificityChecks=[['body span',[0,0,2]],['#main .panel::after',[1,1,1]],[':where(.glass)',[0,0,0]],['.btn:is(.primary,#strong)',[1,1,0]]];
+          for(const [selector,expected] of specificityChecks)if(JSON.stringify(specificity(selector))!==JSON.stringify(expected))throw new Error('Material QA specificity parser failed for '+selector);
           const materialRules=[];
           if(includeMatchedRules){
             let ruleOrder=0;
@@ -181,12 +186,5 @@ for (const {width,height,theme} of matrix) {
           }
           function matchedMaterialRules(element,pseudo=''){
             if(!includeMatchedRules)return undefined;
-            const matched=[],chain=[];for(let node=element,depth=0;node&&depth<8;node=node.parentElement,depth++)chain.push({node,depth});
-            // Include directly matched declarations and inherited design-token declarations from ancestors.
-            for(const {node,depth} of chain){
-              for(const rule of materialRules){
-                if((rule.pseudo||'')!==pseudo)continue;
-                let applies=false;try{applies=node.matches(rule.baseSelector)}catch{}
-                if(!applies)continue;
-                const declarations=Object.fromEntries(Object.entries(rule.declarations).filter(([property])=>depth===0||property.startsWith('--')));
-                if(Object.keys(declarations).length)matched.push({...rule,a
+            const matched=[],chain=[];for(let node=element,depth=0;node&&depth<16;node=node.parentElement,depth++)chain.push({node,depth});
+            // Include directly matched declarations and inherited des
