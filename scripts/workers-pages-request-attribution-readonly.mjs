@@ -42,8 +42,8 @@ for(const name of ['sindarealest-admin-preview','sindarealest2']){
 report.previewDeployments={totalFetched:0,branches:[],warnings:[]};
 try{
  const grouped=new Map();
- for(let page=1;page<=3;page++){
-  const response=await api(root+'/pages/projects/sindarealest-admin-preview/deployments?env=preview&page='+page+'&per_page=100');
+ for(let page=1;page<=10;page++){
+  const response=await api(root+'/pages/projects/sindarealest-admin-preview/deployments?env=preview&page='+page+'&per_page=20');
   const deployments=Array.isArray(response.result)?response.result:[];
   report.previewDeployments.totalFetched+=deployments.length;
   for(const d of deployments){
@@ -56,7 +56,7 @@ try{
    if(time>item.lastUtc)item.lastUtc=time;
    grouped.set(branch,item);
   }
-  if(deployments.length<100)break;
+  if(deployments.length<20)break;
  }
  report.previewDeployments.branches=[...grouped.values()].sort((a,b)=>b.count-a.count).slice(0,40);
 }catch(e){report.previewDeployments.warnings.push(smallError(e));}
