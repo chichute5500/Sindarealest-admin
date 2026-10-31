@@ -2122,10 +2122,7 @@ body:not(:has(#loginView:not(.hidden))){
   #main>.pagehead .btn.primary{width:164px;min-width:164px;flex:0 0 164px;position:relative;top:3px;margin-right:-8px}
   #main>.pagehead h2{font-size:clamp(27px,6.4vw,30px);line-height:1.08}
   #main .statgrid{gap:8px;margin-bottom:8px}
-  #main .stat{
-    min-height:clamp(82px,20vw,88px);
-    padding:6px 11px;
-    border:1.75px solid transparent;
+  #main .stat{\n     min-height:clamp(82px,20vw,88px);\n     padding:6px 15px;\n     border:2px solid transparent;
     border-radius:20px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-dashboard-shadow);
@@ -2136,9 +2133,7 @@ body:not(:has(#loginView:not(.hidden))){
   #main .stat .value{font-size:clamp(25px,5.9vw,26px);line-height:1;margin:2px 0 0}
   #main .stat .hint{font-size:10.5px;line-height:1.25}
 
-  #main .dashboard-quick-panel,
-  #main .dashboard-revenue{
-    border:1.75px solid transparent;
+  #main .dashboard-quick-panel,\n   #main .dashboard-revenue{\n     border:2px solid transparent;
     border-radius:24px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
@@ -2149,14 +2144,7 @@ body:not(:has(#loginView:not(.hidden))){
   #main .dashboard-quick-panel .panelhead h3,
   #main .dashboard-revenue .panelhead h3{font-size:17px;line-height:1.2}
   #main .dashboard-shortcuts{gap:7px}
-  #main .dashboard-shortcut{
-    min-height:clamp(72px,18vw,78px);
-    padding:6px 4px;
-    gap:5px;
-    border:1.75px solid transparent;
-    border-radius:18px;
-    background:var(--glass-face) padding-box,var(--glass-edge) border-box;
-    box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight);
+  #main .dashboard-shortcut{\n     min-height:clamp(72px,18vw,78px);\n     padding:6px 4px;\n     gap:5px;\n     border:2px solid transparent;\n     border-radius:18px;\n     background:var(--glass-face) padding-box,var(--glass-edge) border-box;\n     box-shadow:0 10px 22px rgba(44,98,133,.23),0 2px 5px rgba(43,89,119,.10),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 4px rgba(72,141,173,.13);
   }
   #main .dashboard-shortcut .shortcut-icon{flex-basis:40px;width:40px;height:40px}
   #main .dashboard-shortcut .shortcut-icon svg{width:21px;height:21px}
@@ -2191,7 +2179,7 @@ body:not(:has(#loginView:not(.hidden))){
 body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.88),rgba(239,249,255,.66) 54%,rgba(220,239,251,.49));
   --sd-dashboard-rim:radial-gradient(ellipse 74% 96% at 1% 0%,rgba(245,164,216,.88),transparent 80%),radial-gradient(ellipse 58% 110% at 100% 36%,rgba(103,171,235,.74),transparent 82%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.50) 48%,rgba(190,222,242,.20) 76%,rgba(210,229,245,.54));
-  --sd-dashboard-shadow:0 18px 38px rgba(35,80,113,.23),0 4px 10px rgba(43,89,119,.15),inset 0 2px 2px rgba(255,255,255,.98),inset 0 -2px 5px rgba(73,121,157,.14);
+  --sd-dashboard-shadow:0 19px 40px rgba(35,80,113,.30),0 4px 11px rgba(43,89,119,.18),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 5px rgba(73,121,157,.15);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(40,76,101,.57),rgba(20,47,68,.49) 56%,rgba(15,39,58,.55));
@@ -2237,14 +2225,14 @@ body:has(#main .statgrid) .mobiletabs .nav{
   box-shadow:0 7px 17px rgba(44,98,133,.16),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(72,141,173,.10);
 }
 body:has(#main .statgrid) .mobiletabs .nav.active{
-  background:radial-gradient(ellipse 92% 72% at 18% 0%,rgba(255,255,255,.99),transparent 80%) padding-box,linear-gradient(145deg,rgba(244,250,255,.98),rgba(177,218,250,.92)) padding-box,var(--sd-dashboard-rim) border-box!important;
-  box-shadow:0 11px 22px rgba(49,121,187,.28),0 0 10px rgba(101,185,245,.16),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 5px rgba(61,118,157,.14)!important;
+  background:radial-gradient(ellipse 92% 72% at 18% 0%,rgba(255,255,255,.99),transparent 80%) padding-box,linear-gradient(145deg,rgba(245,251,255,.99),rgba(165,213,250,.97)) padding-box,var(--sd-dashboard-rim) border-box!important;
+  box-shadow:0 11px 22px rgba(49,121,187,.31),0 0 11px rgba(101,185,245,.20),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 5px rgba(61,118,157,.14)!important;
 }
 body:has(#main .statgrid) #main .pagehead .btn.primary{
   font-size:13px;white-space:nowrap;line-height:1.2;padding-inline:8px;
   border:1.75px solid transparent;
-  background:linear-gradient(155deg,rgba(255,255,255,.44) 0%,rgba(255,255,255,.18) 34%,transparent 62%) padding-box,radial-gradient(ellipse 110% 82% at 30% 0%,rgba(255,255,255,.94),transparent 74%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.16),transparent 80%) padding-box,linear-gradient(180deg,#66b8ff 0%,#218fe8 48%,#0879d2 100%) padding-box,radial-gradient(ellipse 86% 115% at 0% 0%,rgba(250,184,231,.80),transparent 77%) border-box,radial-gradient(ellipse 74% 110% at 100% 100%,rgba(140,218,255,.90),transparent 76%) border-box,linear-gradient(180deg,rgba(255,255,255,.96),rgba(115,177,227,.66)) border-box;
-  box-shadow:0 0 0 1px rgba(241,190,230,.62),0 11px 25px rgba(38,132,198,.34),0 3px 7px rgba(35,91,136,.16),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 5px rgba(19,94,157,.22);
+  background:linear-gradient(155deg,rgba(255,255,255,.44) 0%,rgba(255,255,255,.18) 34%,transparent 62%) padding-box,radial-gradient(ellipse 110% 82% at 30% 0%,rgba(255,255,255,1),transparent 72%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.16),transparent 80%) padding-box,linear-gradient(180deg,#66b8ff 0%,#218fe8 48%,#0879d2 100%) padding-box,radial-gradient(ellipse 86% 115% at 0% 0%,rgba(250,184,231,.80),transparent 77%) border-box,radial-gradient(ellipse 74% 110% at 100% 100%,rgba(140,218,255,.90),transparent 76%) border-box,linear-gradient(180deg,rgba(255,255,255,.96),rgba(115,177,227,.66)) border-box;
+  box-shadow:0 0 0 1px rgba(241,190,230,.72),0 11px 26px rgba(38,132,198,.36),0 3px 7px rgba(35,91,136,.16),inset 0 2px 2px rgba(255,255,255,1),inset 0 -2px 5px rgba(19,94,157,.22);
 }
 body:has(#main .statgrid) :is(.topbar .btn,.mobiletabs .nav,#main .btn,#main .dashboard-shortcut){
   transition:transform .24s var(--sd-3d-ease),box-shadow .24s var(--sd-3d-ease),background-color .24s var(--sd-3d-ease),border-color .24s var(--sd-3d-ease);
