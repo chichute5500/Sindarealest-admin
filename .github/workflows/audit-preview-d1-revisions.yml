@@ -1,0 +1,34 @@
+name: Audit — isolated Preview D1 revisions 0016/0017
+on:
+  push:
+    branches: [fix/audit-2026-10]
+    paths:
+      - '.github/workflows/audit-preview-d1-revisions.yml'
+      - 'scripts/audit-preview-d1-revisions.mjs'
+      - 'tests/audit-preview-d1-revisions.test.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: audit-preview-d1-revisions-2026-11-01
+  cancel-in-progress: false
+jobs:
+  migrate-preview-d1:
+    if: github.ref == 'refs/heads/fix/audit-2026-10'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-fund
+      - name: Test SQL and isolation before migration
+        run: |
+          node tests/audit-preview-d1-revisions.test.mjs
+          node tests/admin-products-revision.test.mjs
+          node tests/admin-audit-revision.test.mjs
+      - name: Guard identity, apply and verify on Preview D1
+        run: node scripts/audit-preview-d1-revisions.mjs
