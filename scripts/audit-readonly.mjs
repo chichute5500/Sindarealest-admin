@@ -7,23 +7,23 @@
 import {chromium} from 'playwright';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
-const target=(process.env.AUDIT_TARGET_URL||'https://sindarealest2.pages.dev').replace(/\\/$/,'');
+const target=(process.env.AUDIT_TARGET_URL||'https://sindarealest2.pages.dev').replace(/\/$/,'');
 const folder=process.env.AUDIT_OUTPUT||'audit/before';
 const screens=[360,390,768,1280,1920];
 const routes=[['home','/'],['catalog','/sanpham']];
 await mkdir(join(folder,'screenshots'),{recursive:true});
 const report={target,generatedAt:new Date().toISOString(),note:'Read-only public GETs, unprivileged fresh browser context. All failing/unavailable metrics remain null.',routes:{},screenshots:[],errors:[]};
-function sanitize(error){return String(error?.message||error||'Unknown error').replace(/https?:\\/\\/[^\\s]+/g,'[URL]').slice(0,240)}
+function sanitize(error){return String(error?.message||error||'Unknown error').replace(/https?:\/\/[^\s]+/g,'[URL]').slice(0,240)}
 async function documentSource(path){
  try{
   const response=await fetch(target+path,{redirect:'manual',signal:AbortSignal.timeout(16000)});
   const html=await response.text();
   const match=(re)=>html.match(re)?.[1]||null;
   return {status:response.status,contentType:response.headers.get('content-type'),
-   title:match(/<title>([^<]*)<\\/title>/i),
-   canonical:match(/<link\\s+rel=["']canonical["']\\s+href=["']([^"']+)/i),
-   ogTitle:match(/<meta\\s+property=["']og:title["']\\s+content=["']([^"']+)/i),
-   twitterTitle:match(/<meta\\s+name=["']twitter:title["']\\s+content=["']([^"']+)/i),
+   title:match(/<title>([^<]*)<\/title>/i),
+   canonical:match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)/i),
+   ogTitle:match(/<meta\s+property=["']og:title["']\s+content=["']([^"']+)/i),
+   twitterTitle:match(/<meta\s+name=["']twitter:title["']\s+content=["']([^"']+)/i),
    organizationLD:html.includes('"@type":"Organization"'),
    productLD:html.includes('"@type":"Product"'),
    productCardsStatic:(html.match(/class=["'][^"']*product-card/g)||[]).length
