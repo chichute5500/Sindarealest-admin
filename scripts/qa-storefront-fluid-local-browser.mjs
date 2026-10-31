@@ -107,6 +107,12 @@ try{
    await page.waitForFunction(()=>document.getElementById("accountDrawer").classList.contains("open"),{timeout:5000});
    assert.equal(await page.locator("body").evaluate(el=>el.classList.contains("has-open-overlay")),true);
    await page.locator("#accountFavoritesAction").click({timeout:12000});
+   // setAccountView intentionally starts entry animation on the next rAF.
+   // Read the material state only after the browser has committed that frame.
+   await page.waitForFunction(()=>
+     document.getElementById("accountFavoritesView").classList.contains("sd-fluid-account-enter"),
+     null,{timeout:3000}
+   );
    const account=await page.evaluate(()=>({
     visible:!document.getElementById("accountFavoritesView").hidden,
     animated:document.getElementById("accountFavoritesView").classList.contains("sd-fluid-account-enter"),
