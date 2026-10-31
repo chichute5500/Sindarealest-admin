@@ -8,15 +8,18 @@ export async function onRequestGet(context) {
   try {
     // Limit parent orders first, then join all their items in one read. This
     // avoids one D1 request per order when the admin screen loads up to 1,000.
+    // Resolve the latest order-created audit once per order; the same JSON
+    // snapshot populates all payment labels and the deposit milestone.
+    // Keep the public/Admin response shape and milestone semantics unchanged.
     const result = await context.env.DB.prepare(
       "WITH recent_orders AS (" +
       " SELECT o.id,o.customer_id AS customerId,o.order_number,o.status,o.payment_status,o.subtotal,o.total,o.price_confirmation_required," +
       " o.customer_note,o.payment_terms_confirmed_at,o.payment_terms_confirmed_by,o.payment_terms_note,o.created_at,o.updated_at,COALESCE(oc.full_name,c.full_name) AS full_name," +
-      " (SELECT json_extract(details_json,'$.selectedPaymentOption') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_option," +
-      " (SELECT json_extract(details_json,'$.selectedPaymentAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_amount," +
-      " (SELECT json_extract(details_json,'$.selectedRemainingAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_remaining_amount," +
-      " (SELECT json_extract(details_json,'$.selectedDiscountAmount') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_payment_discount_amount," +
-      " (SELECT json_extract(details_json,'$.transferReference') FROM audit_logs WHERE entity_type='order' AND entity_id=o.id AND action='order_created' ORDER BY created_at DESC LIMIT 1) AS customer_transfer_reference," +
+      " json_extract(ac.details_json,'$.selectedPaymentOption') AS customer_payment_option," +
+      " json_extract(ac.details_json,'$.selectedPaymentAmount') AS customer_payment_amount," +
+      " json_extract(ac.details_json,'$.selectedRemainingAmount') AS customer_payment_remaining_amount," +
+      " json_extract(ac.details_json,'$.selectedDiscountAmount') AS customer_payment_discount_amount," +
+      " json_extract(ac.details_json,'$.transferReference') AS customer_transfer_reference," +
       // Original, audit-backed milestone dates. Never fabricate a date from
       // order.updated_at (which changes during unrelated admin edits).
       " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='confirmed') AS timeline_confirmed_at," +
@@ -28,7 +31,7 @@ export async function onRequestGet(context) {
       " (SELECT MIN(pt.verified_at) FROM order_payment_transactions pt WHERE pt.order_id=o.id AND pt.direction='received' AND pt.actor<>'admin_cod_completion'" +
       " AND (SELECT COALESCE(SUM(tx.amount),0) FROM order_payment_transactions tx WHERE tx.order_id=o.id AND tx.direction='received' AND tx.actor<>'admin_cod_completion'" +
       " AND (tx.verified_at < pt.verified_at OR (tx.verified_at=pt.verified_at AND tx.rowid<=pt.rowid))) >=" +
-      " COALESCE((SELECT json_extract(a.details_json,'$.selectedPaymentAmount') FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_created' ORDER BY a.created_at DESC LIMIT 1),o.total)) AS timeline_payment_at," +
+      " COALESCE(json_extract(ac.details_json,'$.selectedPaymentAmount'),o.total)) AS timeline_payment_at," +
       " COALESCE(oc.phone,c.phone) AS phone,COALESCE(oc.email,c.email) AS email," +
       " COALESCE(sa.full_address,c.address) AS address" +
       " ,(SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=o.id) AS received_amount" +
@@ -41,6 +44,7 @@ export async function onRequestGet(context) {
       " FROM orders o JOIN customers c ON c.id=o.customer_id" +
       " LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id" +
       " LEFT JOIN order_contact_details oc ON oc.order_id=o.id" +
+      " LEFT JOIN audit_logs ac ON ac.id=(SELECT a.id FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_created' ORDER BY a.created_at DESC LIMIT 1)" +
       " ORDER BY o.created_at DESC LIMIT 1000" +
       ") " +
       "SELECT ro.*,oi.id AS itemId,oi.product_id AS itemProductId,oi.sku AS itemSku,oi.sku_verified AS itemSkuVerified," +
