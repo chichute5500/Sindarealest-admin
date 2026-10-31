@@ -633,8 +633,8 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .dashboard-revenue{margin-bottom:16px}
 .dashboard-revenue .panelhead{position:relative;z-index:2;isolation:isolate;padding-right:112px}
 .dashboard-revenue .panelhead::before,.dashboard-revenue .panelhead::after{content:"";position:absolute;pointer-events:none;z-index:-1}
-.dashboard-revenue .panelhead::before{right:5px;top:45px;width:110px;height:40px;border:2px solid rgba(255,255,255,1);border-bottom-color:rgba(78,151,199,.98);border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(220,240,251,.06));box-shadow:0 13px 24px rgba(55,116,155,.20),inset 0 2px 3px rgba(255,255,255,1)}
-.dashboard-revenue .panelhead::after{right:14px;top:20px;width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 27% 21%,rgba(255,255,255,1) 0 12%,rgba(248,214,238,.88) 25%,rgba(218,236,251,.94) 48%,rgba(132,190,230,.78) 78%,rgba(103,166,216,.62));box-shadow:0 10px 20px rgba(37,91,132,.23),inset -4px -6px 11px rgba(95,157,194,.24),inset 4px 3px 10px rgba(255,255,255,1)}
+.dashboard-revenue .panelhead::before{right:9px;top:45px;width:100px;height:36px;border:2px solid rgba(255,255,255,1);border-bottom-color:rgba(78,151,199,.98);border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(220,240,251,.06));box-shadow:0 13px 24px rgba(55,116,155,.20),inset 0 2px 3px rgba(255,255,255,1)}
+.dashboard-revenue .panelhead::after{right:20px;top:22px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 27% 21%,rgba(255,255,255,1) 0 12%,rgba(248,214,238,.88) 25%,rgba(218,236,251,.94) 48%,rgba(132,190,230,.78) 78%,rgba(103,166,216,.62));box-shadow:0 10px 20px rgba(37,91,132,.23),inset -4px -6px 11px rgba(95,157,194,.24),inset 4px 3px 10px rgba(255,255,255,1)}
 .dashboard-revenue .panelhead{align-items:flex-start;gap:12px}
 .dashboard-revenue .revenue-period{font-size:12px;color:var(--ink);font-weight:700;white-space:normal;grid-column:1/-1}
 .dashboard-revenue-empty{display:grid;grid-template-columns:minmax(0,1fr) 64px;align-items:center;gap:14px;min-height:94px;padding:12px 16px;border:1px solid transparent;border-radius:18px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:0 7px 18px rgba(39,91,126,.13),inset 0 2px 3px rgba(255,255,255,.98),inset 0 -2px 5px rgba(73,121,157,.12)}
@@ -2190,8 +2190,8 @@ body:not(:has(#loginView:not(.hidden))){
    and raised icon controls. Keep the same palette in light and dark modes. */
 body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.88),rgba(239,249,255,.66) 54%,rgba(220,239,251,.49));
-  --sd-dashboard-rim:radial-gradient(ellipse 74% 96% at 1% 0%,rgba(245,164,216,.94),transparent 80%),radial-gradient(ellipse 58% 110% at 100% 36%,rgba(103,171,235,.82),transparent 82%),radial-gradient(ellipse 100% 22% at 58% 110%,rgba(112,189,220,.03),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.50) 48%,rgba(190,222,242,.13) 76%,rgba(210,229,245,.40));
-  --sd-dashboard-shadow:0 11px 25px rgba(35,80,113,.12),0 2px 5px rgba(43,89,119,.075),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 3px rgba(73,121,157,.055);
+  --sd-dashboard-rim:radial-gradient(ellipse 62% 82% at 1% 0%,rgba(245,164,216,.58),transparent 80%),radial-gradient(ellipse 48% 92% at 100% 36%,rgba(103,171,235,.46),transparent 82%),radial-gradient(ellipse 100% 22% at 58% 110%,rgba(112,189,220,.02),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.48) 48%,rgba(190,222,242,.11) 76%,rgba(210,229,245,.38));
+  --sd-dashboard-shadow:0 9px 23px rgba(35,80,113,.09),0 2px 5px rgba(43,89,119,.06),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 3px rgba(73,121,157,.04);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(40,76,101,.57),rgba(20,47,68,.49) 56%,rgba(15,39,58,.55));
@@ -2208,24 +2208,30 @@ body:has(#appView:not(.hidden)) #appView{
   background-attachment:fixed;
 }
 body:has(#main .statgrid) #main :is(.stat,.dashboard-quick-panel,.dashboard-revenue,.dashboard-revenue-empty){
-  border:1.75px solid transparent;
+  border:1px solid transparent;
   background:radial-gradient(ellipse 72% 48% at 2% 0%,rgba(255,255,255,.99),transparent 80%) padding-box,radial-gradient(ellipse 48% 58% at 100% 96%,rgba(100,167,232,.045),transparent 84%) padding-box,var(--sd-dashboard-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:var(--sd-dashboard-shadow);
   -webkit-backdrop-filter:blur(20px) saturate(145%);
   backdrop-filter:blur(20px) saturate(145%);
 }
 body:has(#main .statgrid) #main :is(.dashboard-shortcut,.stat-icon,.dashboard-shortcut .shortcut-icon,.dashboard-revenue-visual){
-  border:1.75px solid transparent;
+  border:1px solid transparent;
   background:radial-gradient(ellipse 88% 72% at 16% -2%,rgba(255,255,255,1),transparent 80%) padding-box,linear-gradient(145deg,rgba(255,255,255,.94),rgba(226,242,252,.57)) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 5px 13px rgba(44,98,133,.10),0 1px 4px rgba(43,89,119,.06),inset 0 2px 2px rgba(255,255,255,1),inset 0 -1px 3px rgba(72,141,173,.055);
 }
-body:has(#main .statgrid) .topbar,
-body:has(#main .statgrid) .mobiletabs{
-  border:1.75px solid transparent;
+body:has(#main .statgrid) .topbar{
+  border:1px solid transparent;
   background:radial-gradient(ellipse 90% 120% at 12% 0%,rgba(255,255,255,.94),transparent 82%) padding-box,var(--sd-glass-shell-strong) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:var(--sd-glass-panel-shadow),inset 0 1px 0 rgba(255,255,255,.96);
   -webkit-backdrop-filter:blur(26px) saturate(155%);
   backdrop-filter:blur(26px) saturate(155%);
+}
+body:has(#main .statgrid) .mobiletabs{
+  border:1px solid transparent;
+  background:linear-gradient(145deg,rgba(250,253,255,.97),rgba(232,244,252,.95)) padding-box,var(--sd-dashboard-rim) border-box;
+  box-shadow:0 8px 24px rgba(35,80,113,.15),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 3px rgba(73,121,157,.05);
+  -webkit-backdrop-filter:blur(24px) saturate(145%);
+  backdrop-filter:blur(24px) saturate(145%);
 }
 body:has(#main .statgrid) .topbar .brand-logo{width:42px;height:42px;flex:0 0 42px}
 body:has(#main .statgrid) .topbar .brand h1{font-size:17px;letter-spacing:0}
@@ -2238,7 +2244,7 @@ body:has(#main .statgrid) .mobiletabs .nav{
 }
 body:has(#main .statgrid) .mobiletabs .nav.active{
   background:radial-gradient(ellipse 92% 72% at 18% 0%,rgba(255,255,255,.99),transparent 80%) padding-box,linear-gradient(145deg,rgba(245,251,255,.99),rgba(165,213,250,.97)) padding-box,var(--sd-dashboard-rim) border-box!important;
-  box-shadow:0 8px 18px rgba(49,121,187,.20),0 0 8px rgba(101,185,245,.14),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 4px rgba(61,118,157,.09)!important;
+  box-shadow:0 6px 14px rgba(49,121,187,.14),0 0 6px rgba(101,185,245,.09),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 4px rgba(61,118,157,.07)!important;
 }
 body:has(#main .statgrid) #main .pagehead .btn.primary{
   font-size:13px;white-space:nowrap;line-height:1.2;padding-inline:8px;
