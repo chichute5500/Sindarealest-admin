@@ -1846,13 +1846,15 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
   history.pushState({sdStorefrontHome:true},'',destination);
  setCatalogLandingMode(false);
  // A direct catalog visit defers offscreen featured image fetches until Home is actually opened.
- if(!document.querySelector('#featuredGrid [data-featured-card]'))renderFeatured();
  setActiveNav(section.id==='home'?'home':section.id);
  setMobileMenu(false);
  requestAnimationFrame(()=>section.scrollIntoView({behavior:'instant',block:'start'}));
 },true);
 function setCatalogLandingMode(active){
  if(typeof document!=='undefined')document.documentElement?.classList.toggle('sd-catalog-route',Boolean(active));
+ // On Back/Forward to Home, recover featured cards deferred on direct catalog entry.
+ const featured=$('#featuredGrid');
+ if(!active&&products.length&&featured&&!featured.querySelector('[data-featured-card]'))renderFeatured();
 }
 function syncCatalogFromLocation(){
  const value=catalogCategoryFromLocation();

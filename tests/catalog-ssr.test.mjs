@@ -51,5 +51,5 @@ assert.match(storefront,/const initialCatalogListing=catalogCategoryFromLocation
 assert.match(storefront,/if\(!initialCatalogListing\)\{renderFeatured\(\);renderFilters\(\);renderCatalog\(\)\}/);
 assert.match(storefront,/const ssrCards=grid\.querySelectorAll\('article\[data-ssr-product\]'\)/);
 assert.match(storefront,/grid\.replaceChildren\(template\.content\)/);
-assert.match(storefront,/if\(!document\.querySelector\('#featuredGrid \[data-featured-card\]'\)\)renderFeatured\(\)/);
+assert.match(storefront,/if\(!active&&products\.length&&featured&&!featured\.querySelector\('\[data-featured-card\]'\)\)renderFeatured\(\)/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");
