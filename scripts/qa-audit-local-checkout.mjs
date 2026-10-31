@@ -88,6 +88,8 @@ try{
  await page.locator("#checkoutSubmit").click();
  await page.waitForFunction(()=>!document.querySelector("#sdCheckoutPaymentStep").hidden);
  assert.match(await page.locator("#sdCheckoutQuoteNotice").innerText(),/chưa có giá xác nhận/);
+ assert.match(await page.locator("#sdCheckoutStepSubtitle").innerText(),/Chưa cần chuyển khoản/);
+ assert.match(await page.locator("#checkoutSubmit").innerText(),/gửi yêu cầu/);
  assert.equal(await page.locator("#sdCheckoutOptions .sd-checkout-option").count(),0,"Unpriced products must not offer false deposits");
  assert.equal(await page.locator("#sdCheckoutQrWrap").isVisible(),false,"Unpriced products must not show banking QR");
  await screenshot("03a-checkout-unpriced-no-payment-390x844.png");
