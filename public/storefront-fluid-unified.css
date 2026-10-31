@@ -46,6 +46,19 @@ body.has-open-overlay :where(.nav,.mobile-bottom-nav,.product-card,.glass-soft,.
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
 }
+/* The catalog uses its own composited reveal/transition layers. Suppress those
+   behind an open transactional sheet so no product tile can paint above its
+   glass surface or intercept touches (observed in owner & Chromium screenshots).
+   Home imagery outside the catalog remains as the subtle blur backdrop. */
+body:has(#cartDrawer.open,#checkoutDrawer.open,#accountDrawer.open)
+  :where(#catalogGrid,#featuredGrid,.featured-grid,.catalog-grid){
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+/* Consistent overlay plane above legacy bottom-nav z-index 1300. */
+#cartDrawer.open,#checkoutDrawer.open,#accountDrawer.open{z-index:1450!important}
+#checkoutBackdrop.open{z-index:1440!important}
+
 #products #catalogHeading{
   text-align:center;
   font-weight:700;
