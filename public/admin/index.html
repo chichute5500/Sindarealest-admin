@@ -1053,7 +1053,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
  --sd-admin-sheet-face:linear-gradient(135deg,rgba(241,249,255,.94),rgba(220,237,251,.90));
  --sd-admin-icon-face:linear-gradient(140deg,rgba(255,255,255,.74),rgba(205,231,251,.36));
  --sd-admin-rim:linear-gradient(130deg,rgba(255,216,239,.72),rgba(255,255,255,.96) 20%,rgba(218,238,255,.38) 55%,rgba(158,222,242,.64) 94%,rgba(255,255,255,.92));
- --sd-admin-shadow:0 9px 17px rgba(44,103,145,.16),0 2px 4px rgba(45,96,137,.06),inset 0 1px 2px rgba(255,255,255,.96),inset 0 -2px 3px rgba(84,163,204,.12);
+ --sd-admin-shadow:0 9px 17px rgba(44,103,145,.16),0 2px 4px rgba(45,96,137,.06),inset 0 2px 3px rgba(255,255,255,.96),inset 0 -1px 2px rgba(255,255,255,.65),inset 0 -2px 3px rgba(84,163,204,.12);
  --sd-admin-nav-active:linear-gradient(145deg,rgba(244,251,255,.75),rgba(146,207,250,.48));
  --sd-admin-dock-face:linear-gradient(135deg,rgba(228,242,254,.86),rgba(205,228,248,.78));
  --sd-admin-ink:#10263e;
@@ -2083,22 +2083,23 @@ body:has(#main .statgrid) #main .pagehead .btn.primary:disabled{opacity:.45;tran
  body:has(#appView:not(.hidden)) .topbar .brand-logo{width:38px;height:38px;flex:0 0 38px;object-fit:contain}
  body:has(#appView:not(.hidden)) .topbar .brand h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(15px,4.4vw,19px);letter-spacing:-.025em}
  body:has(#appView:not(.hidden)) .topbar .brand p{font-size:8px;letter-spacing:.055em;margin-top:2px}
- body:has(#appView:not(.hidden)) .topbar .brand>div{position:relative;top:2px;margin-left:2px}
+ body:has(#appView:not(.hidden)) .topbar .brand>div{position:relative;top:1px;margin-left:2px}
  body:has(#appView:not(.hidden)) .topbar :is(#adminMenuToggle,.topright #adminThemeToggle,.topright #notificationToggle,.topright #logout){width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;flex:0 0 36px}
  body:has(#appView:not(.hidden)) .layout{padding-bottom:calc(var(--sd-dock-height) + var(--sd-dock-bottom) + 20px + env(safe-area-inset-bottom))}
  body:has(#main .statgrid) .layout{padding-top:12px;padding-inline:clamp(18px,4.6vw,20px)}
- #main:has(.statgrid)>.pagehead{padding:0 5px;margin-bottom:12px;align-items:center;gap:6px;min-height:60px}
+ #main:has(.statgrid)>.pagehead{padding:0 6px;margin-bottom:12px;align-items:center;gap:6px;min-height:60px}
  #main:has(.statgrid)>.pagehead .eyebrow{font-size:9px;line-height:1.2;letter-spacing:.16em;margin:0}
- #main:has(.statgrid)>.pagehead h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:30px;line-height:1;margin:3px 0 1px}
+ #main:has(.statgrid)>.pagehead h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:30px;line-height:1;letter-spacing:0;-webkit-text-stroke:.12px currentColor;margin:3px 0 1px}
  #main:has(.statgrid)>.pagehead p{font-size:13px;line-height:1.15;white-space:nowrap}
- #main:has(.statgrid)>.pagehead .btn.primary{flex:0 0 42%;width:42%;min-width:0;min-height:47px;padding:8px 5px;font-size:13px;margin-right:-5px;margin-top:8px}
+ #main:has(.statgrid)>.pagehead .btn.primary{flex:0 0 42%;width:42%;min-width:0;min-height:47px;padding:8px 5px;font-size:13px;margin-right:-7px;margin-top:8px}
  #main .statgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}
  #main .stat{min-height:95px;padding:16px 18px 5px}
  #main .stat .label{display:block;min-height:0;font-size:12px;line-height:1.3;color:var(--sd-admin-ink);padding-right:20px}
  #main .stat-icon{position:absolute;right:10px;top:11px}
  #main .stat .value{font-size:26px;line-height:1.05;margin:6px 0 2px}
  #main .stat .hint{font-size:11px;line-height:1.25;white-space:nowrap}
- #main .dashboard-quick-panel .panelhead{padding:10px 14px 6px}
+ #main .dashboard-quick-panel .panelhead{padding:11px 14px 5px}
+ #main .dashboard-quick-panel .panelhead h3{letter-spacing:.25px;-webkit-text-stroke:.1px currentColor}
  #main .dashboard-quick-panel .panelbody{padding:0 10px 10px}
  #main .dashboard-shortcuts{gap:6px}
  #main .dashboard-shortcut{min-height:85px;flex-direction:column;align-items:center;justify-content:flex-start;padding:7px 3px 5px;gap:6px;text-align:center}
@@ -2106,7 +2107,8 @@ body:has(#main .statgrid) #main .pagehead .btn.primary:disabled{opacity:.45;tran
  #main .dashboard-shortcut .shortcut-copy b{margin:0;font-family:Georgia,"Times New Roman",serif;font-weight:600;font-size:12px;line-height:1.15;overflow-wrap:normal}
  #main .dashboard-shortcut .shortcut-copy small{display:none}
  #main .dashboard-revenue{margin-bottom:12px}
- #main .dashboard-revenue .panelhead{padding:12px 17px 4px;gap:0;min-height:56px}
+ #main .dashboard-revenue .panelhead{padding:11px 17px 5px;gap:0;min-height:56px}
+ #main .dashboard-revenue .panelhead h3{font-size:16px;line-height:1.1;letter-spacing:.15px;-webkit-text-stroke:.15px currentColor}
  #main .dashboard-revenue .panelhead .tiny{font-size:11px;line-height:1.3;max-width:100%;font-weight:400}
  #main .dashboard-revenue .panelhead::before{width:105px;height:28px;right:8px;top:30px}
  #main .dashboard-revenue .panelhead::after{right:18px;top:12px;width:44px;height:44px}

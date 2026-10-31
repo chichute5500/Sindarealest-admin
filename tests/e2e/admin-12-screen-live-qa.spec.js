@@ -38,14 +38,22 @@ for (const {width,height,theme} of matrix) {
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
     const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},theme,
-      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],observedAtUtc:new Date().toISOString()};
+      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],observedAtUtc:new Date().toISOString()};
     const context=await browser.newContext({viewport:{width,height},colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:'reduce'});
     const page=await context.newPage();
     try {
       if(process.env.CF_ACCESS_CLIENT_ID && process.env.CF_ACCESS_CLIENT_SECRET)
         await page.setExtraHTTPHeaders({'CF-Access-Client-Id':process.env.CF_ACCESS_CLIENT_ID,'CF-Access-Client-Secret':process.env.CF_ACCESS_CLIENT_SECRET});
       page.on('pageerror',error=>report.pageErrors.push(error.message));
-      page.on('console',message=>{if(message.type()==='error')report.consoleErrors.push(message.text())});
+      page.on('console',message=>{
+        if(message.type()!=='error')return;
+        const entry={message:message.text(),url:message.location().url||'',phase:report.authenticatedAt?'authenticated':'login'};
+        let path='';try{path=new URL(entry.url).pathname}catch{}
+        // The first anonymous session check is expected to be denied. Keep it
+        // as evidence; any 401 after login remains an error.
+        if(entry.phase==='login' && path==='/api/admin/session' && /status of 401/.test(entry.message))report.expectedInitialSessionResponses.push(entry);
+        else report.consoleErrors.push(entry);
+      });
       page.on('request',request=>{
         try {
           const url=new URL(request.url());
@@ -75,7 +83,7 @@ for (const {width,height,theme} of matrix) {
             ? Math.abs(document.querySelector('#backdrop').getBoundingClientRect().bottom-
                 document.querySelector('.mobiletabs').getBoundingClientRect().top)
             : null;
-          const componentSelectors=['.topbar','.layout','.pagehead','.statgrid','.stat','.stat-icon','.dashboard-quick-panel','.dashboard-shortcut','.shortcut-icon','.dashboard-revenue','.dashboard-revenue-empty','.dashboard-revenue-visual','.mobiletabs','.mobiletabs .nav'];
+          const componentSelectors=['.topbar','.layout','.pagehead','.pagehead .btn.primary','.statgrid','.stat','.stat-icon','.dashboard-quick-panel','.dashboard-shortcut','.shortcut-icon','.dashboard-revenue','.dashboard-revenue-empty','.dashboard-revenue-visual','.mobiletabs','.mobiletabs .nav'];
           const components=Object.fromEntries(componentSelectors.map(selector=>[selector,[...document.querySelectorAll(selector)].map(el=>({box:el.getBoundingClientRect().toJSON(),css:Object.fromEntries(['background','border','borderRadius','boxShadow','fontSize','fontFamily','lineHeight','padding','whiteSpace','backdropFilter'].map(k=>[k,getComputedStyle(el)[k]]))}))]));
           const masks=[...document.querySelectorAll('.stat .value,.notif-count,.nav-notif-count')].filter(el=>el.getClientRects().length).map(el=>{
             const range=document.createRange();range.selectNodeContents(el);
@@ -114,6 +122,7 @@ for (const {width,height,theme} of matrix) {
       await page.locator('#password').fill(testPassword);
       await page.locator('#loginForm button[type=submit]').click();
       await expect(page.locator('#appView')).toBeVisible({timeout:30000});
+      report.authenticatedAt=new Date().toISOString();
       // Hide the transient login toast before recording reference-comparison screenshots.
       await expect(page.locator('#toast')).not.toHaveClass(/show/,{timeout:7000});
       if(width===432 && theme==='light'){
@@ -146,6 +155,7 @@ for (const {width,height,theme} of matrix) {
         report.keyboardFocus=await page.evaluate(()=>({tag:document.activeElement.tagName,visible:document.activeElement.matches(':focus-visible'),outline:getComputedStyle(document.activeElement).outlineStyle}));
         expect(report.keyboardFocus.visible).toBe(true);
         expect(report.keyboardFocus.outline).not.toBe('none');
+        await page.locator('#main .eyebrow').tap();
       }
       const expectedHeadings={
         dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',
