@@ -29,5 +29,6 @@ jobs:
           npm run check
           npm test
           node tests/d1-production-identity.test.mjs
+          node --check scripts/d1-production-only-0016-0017.mjs
       - name: Back up and apply only 0016 and 0017 on verified Production DB
         run: node scripts/d1-production-only-0016-0017.mjs
