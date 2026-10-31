@@ -29,6 +29,25 @@ async function waitForCatalogPaint(page,section){
  await page.waitForTimeout(350);
  return await page.locator(selector).count();
 }
+async function loadGridImagesForScreenshot(page,section){
+ // Screenshots are full-page; native lazy loading does not fetch the final
+ // below-the-fold cards unless we request them. This affects QA only.
+ return page.evaluate(async section=>{
+   const grid=document.querySelector(section==='home'?'#featuredGrid':'#catalogGrid');
+   if(!grid)return {requested:0,loaded:0,broken:0};
+   const images=[...grid.querySelectorAll('article img')];
+   for(const img of images){
+     if(img.dataset.src&&!img.getAttribute('src'))img.src=img.dataset.src;
+     img.loading='eager';
+   }
+   await Promise.race([
+     Promise.allSettled(images.map(img=>img.decode().catch(()=>null))),
+     new Promise(resolve=>setTimeout(resolve,10000))
+   ]);
+   const loaded=images.filter(img=>img.complete&&img.naturalWidth>0).length;
+   return {requested:images.length,loaded,broken:images.filter(img=>img.complete&&img.naturalWidth===0).length};
+ },section);
+}
 async function documentSource(path){
  try{
   const response=await fetch(target+path,{redirect:'manual',signal:AbortSignal.timeout(16000)});
@@ -93,9 +112,11 @@ try{
    try{
     await page.goto(target+path,{waitUntil:'domcontentloaded',timeout:45000});
     const renderedProducts=await waitForCatalogPaint(page,name);
+    const images=await loadGridImagesForScreenshot(page,name);
+    if(images.broken)throw Error('Image delivery failures in '+name+': '+JSON.stringify(images));
     const filename=name+'-'+colorScheme+'-'+width+'.png';
     await page.screenshot({path:join(folder,'screenshots',filename),fullPage:true,animations:'disabled',timeout:25000});
-    report.screenshots.push({filename,route:name,colorScheme,width,renderedProducts,ready:true});
+    report.screenshots.push({filename,route:name,colorScheme,width,renderedProducts,images,ready:true});
    }catch(error){report.errors.push({screen:name,colorScheme,width,error:sanitize(error)})}
    await context.close();
  }
