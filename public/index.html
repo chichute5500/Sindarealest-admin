@@ -802,6 +802,9 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
   #welcomeSplash{padding:8px!important}
   #welcomeSplash .welcome-content{
     width:min(94vw,420px)!important;max-width:420px!important;
+    /* A/B on the unchanged Preview: fixed centered viewport box reduced
+       Welcome CLS 0.1139 to 0.0407 without moving the actual centered copy. */
+    height:min(700px,calc(100dvh - 16px))!important;
     max-height:calc(100dvh - 16px)!important;
     overflow-y:auto!important;padding:12px 11px!important;
   }
