@@ -43,11 +43,27 @@ try{
   });
   const page=await ctx.newPage();
   const errors=[],blockedWrites=[];
+  let mockedQuotes=0;
   page.on("pageerror",e=>errors.push(String(e.message).slice(0,240)));
   page.on("request",req=>{if(!["GET","HEAD"].includes(req.method()))blockedWrites.push(req.method()+" "+new URL(req.url()).pathname)});
   await page.route("**/*",route=>{
    const req=route.request(),url=new URL(req.url());
+   if(req.method()==="POST"&&url.origin===new URL(ROOT).origin&&url.pathname==="/api/checkout-quote"){
+    ++mockedQuotes;
+    return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({
+     ok:true,paymentReady:false,reason:"QA: Không sử dụng QR hoặc tài khoản ngân hàng thật.",
+     options:[],total:2500000
+    })});
+   }
    if(req.method()!=="GET"&&req.method()!=="HEAD")return route.abort("blockedbyclient");
+   if(url.hostname==="provinces.open-api.vn"&&url.pathname==="/api/v2/p/"){
+    return route.fulfill({status:200,contentType:"application/json",
+     body:JSON.stringify([{code:"79",name:"Hồ Chí Minh"}])});
+   }
+   if(url.hostname==="provinces.open-api.vn"&&url.pathname==="/api/v2/p/79"){
+    return route.fulfill({status:200,contentType:"application/json",
+     body:JSON.stringify({wards:[{code:"QA-001",name:"Phường QA"}]})});
+   }
    if(url.pathname==="/api/products")
     return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({products})});
    if(url.pathname.startsWith("/api/"))
@@ -127,31 +143,43 @@ try{
    await page.waitForFunction(()=>!document.body.classList.contains("has-open-overlay"),{timeout:5000});
    checkpoint("overlay cleanup");
 
-   // Invoke only visual step transitions: do not submit an order or request QR.
-   const checkout=await page.evaluate(()=>{
-    sdCheckoutSetStep(2);
-    const pay=document.getElementById("sdCheckoutPaymentStep");
-    const stepper=document.getElementById("sdCheckoutStepper");
-    const forward=document.getElementById("checkoutDrawer").dataset.stepDirection;
-    sdCheckoutSetStep(3);
-    const review=document.getElementById("sdCheckoutReviewStep");
-    const connectors=[...stepper.querySelectorAll(":scope > i")].map(x=>x.classList.contains("is-complete"));
-    sdCheckoutSetStep(2);
-    const backward=document.getElementById("checkoutDrawer").dataset.stepDirection;
-    sdCheckoutSetStep(1);
-    return {paymentUnhidden:!pay.hidden,reviewUnhidden:!review.hidden,
-      forward,backward,connectors,reset:!document.getElementById("sdCheckoutShippingStep").hidden};
-   });
-   // paymentUnhidden/reviewUnhidden are inspected before switching back by
-   // checking direction/connector/reset. Step 1 must be restored for shopping.
-   assert.equal(checkout.forward,"forward");
-   assert.equal(checkout.backward,"backward");
-   assert.deepEqual(checkout.connectors,[true,true]);
-   assert.equal(checkout.reset,true);
-   checkpoint("checkout 3-step motion and safe return");
+   // Exercise the actual checkout buttons, never call the application's
+   // private step function (it lives in a closure and is not window-global).
+   // A request for the quote is fulfilled locally with no payment-ready QR.
+   await page.locator("#catalogGrid .mini-add").first().click({timeout:12000});
+   await page.locator(c.mobile?"#mobileCartNav":"#cartOpen").click({timeout:12000});
+   await page.locator("#cartCheckout").waitFor({state:"visible",timeout:10000});
+   await page.locator("#cartCheckout").click({timeout:12000});
+   await page.waitForFunction(()=>document.getElementById("checkoutDrawer").classList.contains("open"),null,{timeout:6000});
+   assert.equal(await page.locator("body").evaluate(el=>el.classList.contains("has-open-overlay")),true);
+   await page.locator('#checkoutForm input[name="fullName"]').fill("Khách kiểm thử");
+   await page.locator('#checkoutForm input[name="phone"]').fill("0900000000");
+   await page.locator("#checkoutStreet").fill("01 Đường QA");
+   await page.waitForFunction(()=>document.getElementById("checkoutProvince").options.length>1,null,{timeout:7000});
+   await page.locator("#checkoutProvince").selectOption({label:"Hồ Chí Minh"});
+   await page.waitForFunction(()=>!document.getElementById("checkoutWard").disabled,null,{timeout:7000});
+   await page.locator("#checkoutWard").selectOption({label:"Phường QA"});
+   await page.locator("#checkoutSubmit").click({timeout:13000});
+   await page.waitForFunction(()=>!document.getElementById("sdCheckoutPaymentStep").hidden,null,{timeout:7000});
+   assert.equal(await page.locator("#checkoutDrawer").getAttribute("data-step-direction"),"forward");
+   assert.equal(mockedQuotes,1,"Exactly one local-only quote request is allowed");
+   checkpoint("real checkout form -> locally mocked quote -> step 2");
+   await page.locator("#checkoutSubmit").click({timeout:12000});
+   await page.waitForFunction(()=>!document.getElementById("sdCheckoutReviewStep").hidden,null,{timeout:5000});
+   assert.deepEqual(await page.locator("#sdCheckoutStepper>i").evaluateAll(
+     els=>els.map(x=>x.classList.contains("is-complete"))),[true,true]);
+   checkpoint("checkout step 3 and golden connectors");
+   await page.locator("#sdCheckoutPrev").click({timeout:12000});
+   await page.waitForFunction(()=>!document.getElementById("sdCheckoutPaymentStep").hidden,null,{timeout:5000});
+   assert.equal(await page.locator("#checkoutDrawer").getAttribute("data-step-direction"),"backward");
+   await page.locator("#sdCheckoutPrev").click({timeout:12000});
+   await page.waitForFunction(()=>!document.getElementById("sdCheckoutShippingStep").hidden,null,{timeout:5000});
+   checkpoint("checkout back navigation and 3-step reset");
    await page.screenshot({path:OUTPUT+"/"+c.name+".png",animations:"disabled"});
    assert.deepEqual(errors,[],"No uncaught browser exceptions");
-   assert.deepEqual(blockedWrites,[],"No backend writes during QA");
+   assert.deepEqual(blockedWrites.filter(x=>!x.endsWith("/api/checkout-quote")),[],
+     "No order/payment/backend writes during QA");
+   assert.equal(mockedQuotes,1,"One mocked quote is the only permitted POST");
    result.passed=true;
   }catch(e){
    result.error=String(e.stack||e).slice(0,1300);
