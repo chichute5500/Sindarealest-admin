@@ -18,8 +18,9 @@ jobs:
           persist-credentials: true
       - name: Generate asset without editing source
         run: |
-          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 -m pip install --quiet --break-system-packages Pillow fonttools brotli
           python3 scripts/build-logo-asset.py
+          python3 scripts/build-font-assets.py
           test -s public/logo-ui.webp
       - name: Commit generated binary only to the audit branch
         shell: bash
@@ -28,11 +29,17 @@ jobs:
           test "$GITHUB_REF_NAME" = 'fix/audit-2026-10'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f public/logo-ui.webp
+          git add -f public/logo-ui.webp public/fonts/*.woff2
           if git diff --cached --quiet; then
             echo 'Brand asset already matches audited original'
             exit 0
           fi
-          git diff --cached --name-only | grep -qx 'public/logo-ui.webp'
+          if git diff --cached --name-only | grep -Ev '^(public/logo-ui\\.webp|public/fonts/Noto(Sans|Serif)-(Regular|Bold)\\.woff2)
+          git commit -m 'perf(assets): retain compressed mobile brand logo for all deployment modes'
+          git push origin HEAD:fix/audit-2026-10
+; then
+            echo 'Unexpected staged file; refusing auto-commit'
+            exit 1
+          fi
           git commit -m 'perf(assets): retain compressed mobile brand logo for all deployment modes'
           git push origin HEAD:fix/audit-2026-10
