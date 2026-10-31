@@ -48,6 +48,6 @@ const restore=read('functions/api/admin/restore.js');
 assert.match(restore,/constantTimeTextEqual\(reauth, context\.env\.ADMIN_PASSWORD\)/);
 assert.match(restore,/return fail\("Cần xác thực lại mật khẩu quản trị/);
 assert.match(store,/<img class="mosaic-photo" id="craftTileImage"[^>]*loading="lazy"/);
-assert.ok(!store.includes('src="images/brand-emblem.png"'),'Hidden gallery cannot eagerly load heavyweight original logo');
+assert.ok(store.includes('src="images/brand-emblem.png"'),'Retain owner-approved gallery emblem');
 assert.match(read('scripts/audit-readonly.mjs'),/#artSlide,#craftTileImage/);
 console.log('PASS: production deployment is D1 read-only, editor PUT uses CAS, CSS nested markup repaired, Restore requires fresh password.');
