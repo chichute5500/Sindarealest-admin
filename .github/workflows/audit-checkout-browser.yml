@@ -43,6 +43,14 @@ jobs:
           exit 1
       - name: Execute UI checkout with 100% mocked POST and sample data
         run: node scripts/qa-audit-local-checkout.mjs
+      - name: Archive screenshot evidence from mocked 390px checkout
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storefront-checkout-mocked-mobile
+          path: audit/checkout-mocked/*.png
+          if-no-files-found: warn
+          retention-days: 7
       - name: Cleanup local server
         if: always()
         run: |
