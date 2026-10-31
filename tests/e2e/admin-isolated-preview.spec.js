@@ -310,12 +310,13 @@ test.describe('SinDarealest2 Admin Preview', () => {
       await expect.poll(async () => Number((await page.locator('#main .stat .value').first().textContent())?.trim()), {
         timeout: 15_000
       }).toBeGreaterThan(0);
-      await page.setViewportSize({ width: 430, height: 720 });
+      await page.setViewportSize({ width: 432, height: 720 });
       await page.evaluate(() => window.scrollTo(0, 0));
       await expect(page.locator('.mobiletabs')).toBeVisible();
+      await expect(page.locator('.toast.show')).toBeHidden({ timeout: 6_000 });
       mkdirSync(evidenceDir, { recursive: true });
       await page.screenshot({
-        path: join(evidenceDir, 'dashboard-live-430x720.png'),
+        path: join(evidenceDir, 'dashboard-live-432x720.png'),
         fullPage: false,
         animations: 'disabled'
       });
