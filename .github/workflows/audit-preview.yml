@@ -1,19 +1,7 @@
 name: Audit — isolated Cloudflare storefront preview
 on:
-  push:
-    branches:
-      - fix/audit-2026-10
-    paths:
-      - 'functions/**'
-      - 'public/**'
-      - 'scripts/verify-audit-preview.mjs'
-      - 'tests/**'
-      - 'audit/**'
-      - '.github/workflows/audit-preview.yml'
-      - '.github/workflows/audit-after-qa.yml'
-      - 'scripts/audit-*.mjs'
-      - 'scripts/qa-material-network.mjs'
-      - 'scripts/build-material-thumbnails.py'
+  # Full remote QA / deployment only for a pinned, intentionally selected candidate SHA.
+  # Local source checks still run per commit; no Cloudflare requests for intermediate edits.
   workflow_dispatch:
 permissions:
   contents: read

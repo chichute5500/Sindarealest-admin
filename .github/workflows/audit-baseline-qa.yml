@@ -1,13 +1,13 @@
 name: Audit baseline — read-only browser and Lighthouse
 on:
-  push:
-    branches: [fix/audit-2026-10]
-    paths:
-      - .github/workflows/audit-baseline-qa.yml
-      - scripts/audit-readonly.mjs
+  # Full remote QA / deployment only for a pinned, intentionally selected candidate SHA.
+  # Local source checks still run per commit; no Cloudflare requests for intermediate edits.
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: audit-baseline-2026-10
+  cancel-in-progress: true
 jobs:
   baseline:
     if: github.ref == 'refs/heads/fix/audit-2026-10'

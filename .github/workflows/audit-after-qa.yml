@@ -1,21 +1,7 @@
 name: Audit after — isolated Preview read-only browser and Lighthouse
 on:
-  push:
-    branches: [fix/audit-2026-10]
-    paths:
-      - .github/workflows/audit-after-qa.yml
-      - scripts/audit-readonly.mjs
-      - scripts/audit-cls-probe.mjs
-      - scripts/audit-lcp-probe.mjs
-      - scripts/qa-ssr-hydration.mjs
-      - scripts/audit-layout-ab.mjs
-      - scripts/qa-material-network.mjs
-      - public/material-gallery.js
-      - scripts/build-logo-asset.py
-      - scripts/build-material-thumbnails.py
-      - 'public/**'
-      - 'functions/**'
-      - 'tests/**'
+  # Full remote QA / deployment only for a pinned, intentionally selected candidate SHA.
+  # Local source checks still run per commit; no Cloudflare requests for intermediate edits.
   workflow_dispatch:
 permissions:
   contents: read
