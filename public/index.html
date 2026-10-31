@@ -2786,8 +2786,16 @@ $('#sdCheckoutPrev').addEventListener('click',()=>{if(sdCheckoutStep>1)sdCheckou
 $('#sdCheckoutOptions').addEventListener('click',e=>{const b=e.target.closest('[data-sd-payment-option]');if(!b||!sdCheckoutQuote?.paymentReady)return;sdCheckoutChoice=b.dataset.sdPaymentOption;sdCheckoutRefreshChoice()});
 document.querySelectorAll('[data-sd-review-step]').forEach(b=>b.addEventListener('click',()=>sdCheckoutSetStep(b.dataset.sdReviewStep)));
 $('#checkoutForm').addEventListener('submit',async e=>{e.preventDefault();const form=e.currentTarget,button=$('#checkoutSubmit'),message=$('#checkoutMessage');
-if(sdCheckoutSuccess)return;
+if(sdCheckoutSuccess||button.disabled)return;
 if(sdCheckoutStep===1){
+ const name=String(form.elements.fullName?.value||'').trim();
+ const rawPhone=String(form.elements.phone?.value||'').trim();
+ let digits=rawPhone.replace(/[() .-]/g,'');
+ if(digits.startsWith('+84'))digits='0'+digits.slice(3);
+ else if(digits.startsWith('84'))digits='0'+digits.slice(2);
+ if(name.length<2){message.textContent='Vui lòng nhập họ tên đầy đủ.';form.elements.fullName.focus();return}
+ if(!/^0[35789][0-9]{8}$/.test(digits)){message.textContent='Vui lòng nhập số di động Việt Nam hợp lệ.';form.elements.phone.focus();return}
+
  if(!form.reportValidity())return;
  if(!$('#checkoutProvince').selectedOptions[0]?.dataset.code||!$('#checkoutWard').selectedOptions[0]?.dataset.code){message.textContent='Hãy chọn tỉnh/thành và xã/phường hợp lệ.';return}
  button.disabled=true;button.textContent='Đang kiểm tra…';message.textContent='';
