@@ -1,0 +1,64 @@
+name: Storefront fluid UI browser QA — local only, zero D1/R2 writes
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/qa-storefront-fluid-local-browser.yml'
+      - 'scripts/qa-storefront-fluid-local-browser.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sd-storefront-fluid-local-browser
+  cancel-in-progress: true
+
+jobs:
+  browser-matrix:
+    name: Chromium PC/mobile × Light/Dark — no remote writes, no deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Refuse any branch outside unified PR #155
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+      - name: Set up Chromium for local-only browser QA
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --only-shell chromium
+          node --input-type=module -e "import('playwright').then(async({chromium})=>{const b=await chromium.launch({headless:true});await b.close()})" || {
+            npx playwright install-deps chromium
+          }
+      - name: Serve exact source locally — intercept all /api and external URLs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory public > "$RUNNER_TEMP/storefront-local-browser.log" 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:4173/index.html >/dev/null; then break; fi
+            sleep .25
+          done
+          curl -fsS http://127.0.0.1:4173/index.html >/dev/null
+          SD_BROWSER_QA_URL=http://127.0.0.1:4173/ node scripts/qa-storefront-fluid-local-browser.mjs
+      - name: Save real screenshots and sanitized QA results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storefront-fluid-browser-${{ github.sha }}
+          path: artifacts/storefront-fluid-browser/
+          if-no-files-found: warn
+          retention-days: 14
