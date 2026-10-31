@@ -32,4 +32,8 @@ if(!d1||!productionD1||d1===productionD1)
 const r2=p?.r2_buckets||{};
 if(!r2.IMAGES?.name||!r2.ORIGINALS?.name||r2.IMAGES.name===r2.ORIGINALS.name)
   throw new Error("Preview image/original buckets could not be verified");
+const vars=p.env_vars||{};
+const hasPublicSiteKey=Boolean(vars.TURNSTILE_SITE_KEY?.value);
+const hasEncryptedSecret=vars.TURNSTILE_SECRET_KEY?.type==="secret_text";
+console.log("Phone lookup Turnstile configuration:",hasPublicSiteKey&&hasEncryptedSecret?"READY":"NOT CONFIGURED (phone-only lookup fails closed)");
 console.log("PASS: independent audit preview Pages project, D1 and R2 bindings verified (read-only)");
