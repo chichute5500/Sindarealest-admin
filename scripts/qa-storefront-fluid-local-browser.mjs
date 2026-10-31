@@ -69,6 +69,11 @@ try{
    if(url.pathname.startsWith("/api/"))
     return route.fulfill({status:401,contentType:"application/json",body:JSON.stringify({authenticated:false})});
    if(url.origin!==new URL(ROOT).origin)return route.abort("blockedbyclient");
+   // Cloudflare Pages serves the SPA entrypoint for /sanpham; the local
+   // python static server cannot. Preserve this deployed routing behavior
+   // during reload rather than reporting a false modal regression.
+   if(req.isNavigationRequest() && /^\\/sanpham(?:\\/|$)/.test(url.pathname))
+    return route.continue({url:ROOT+"index.html"});
    return route.continue();
   });
   const result={name:c.name,passed:false,steps:[],pageErrors:errors};
