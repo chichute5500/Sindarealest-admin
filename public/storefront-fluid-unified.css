@@ -210,3 +210,20 @@ body:has(#cartDrawer.open) #accountDrawer:not(.open){
   #checkoutDrawer.open{overflow:hidden!important}
   #accountDrawer.open{overflow-y:auto!important;overscroll-behavior:contain}
 }
+
+
+/* Background product tiles remain visible through the old 68%-opaque
+ * drawer surfaces despite backdrop blur: use readable glass, not an
+ * optically transparent sheet, while preserving specular rim and shadow. */
+#cartDrawer.open,
+#accountDrawer.open,
+#checkoutDrawer.open{
+  background:rgba(246,251,255,.96)!important;
+  -webkit-backdrop-filter:blur(20px) saturate(145%);
+  backdrop-filter:blur(20px) saturate(145%);
+}
+html.dark #cartDrawer.open,
+html.dark #accountDrawer.open,
+html.dark #checkoutDrawer.open{
+  background:rgba(12,25,38,.96)!important;
+}
