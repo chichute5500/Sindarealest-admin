@@ -1,5 +1,6 @@
 import { createSession, sessionCookie, verifySession } from "./_lib.js";
 import { sendAdminPush } from "./_notifications.js";
+import { renderPublicCatalog } from "./_catalog-ssr.js";
 import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
@@ -117,6 +118,7 @@ export async function onRequest(context) {
     html = /<link\s+rel=["']canonical["']/i.test(html)
       ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
       : html.replace("</head>", "  " + canonicalTag + "\n</head>");
+    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug});
     const headers = new Headers(response.headers);
     headers.set("Content-Type","text/html; charset=utf-8");
     headers.set("Cache-Control","public, max-age=60, s-maxage=300");
@@ -159,6 +161,7 @@ export async function onRequest(context) {
     }
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
+    html = await renderPublicCatalog(html,context.env,url.origin,{home:true});
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
     return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
   }
