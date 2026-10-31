@@ -72,7 +72,7 @@ try{
    // Cloudflare Pages serves the SPA entrypoint for /sanpham; the local
    // python static server cannot. Preserve this deployed routing behavior
    // during reload rather than reporting a false modal regression.
-   if(req.isNavigationRequest() && /^\\/sanpham(?:\\/|$)/.test(url.pathname))
+   if(req.isNavigationRequest() && (url.pathname==="/sanpham" || url.pathname.startsWith("/sanpham/")))
     return route.continue({url:ROOT+"index.html"});
    return route.continue();
   });
