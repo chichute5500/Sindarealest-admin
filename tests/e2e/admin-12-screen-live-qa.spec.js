@@ -38,12 +38,14 @@ for (const {width,height,theme} of matrix) {
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
     const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},theme,
-      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],observedAtUtc:new Date().toISOString()};
+      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],observedAtUtc:new Date().toISOString()};
     const context=await browser.newContext({viewport:{width,height},colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:'reduce'});
     const page=await context.newPage();
     try {
       if(process.env.CF_ACCESS_CLIENT_ID && process.env.CF_ACCESS_CLIENT_SECRET)
         await page.setExtraHTTPHeaders({'CF-Access-Client-Id':process.env.CF_ACCESS_CLIENT_ID,'CF-Access-Client-Secret':process.env.CF_ACCESS_CLIENT_SECRET});
+      page.on('pageerror',error=>report.pageErrors.push(error.message));
+      page.on('console',message=>{if(message.type()==='error')report.consoleErrors.push(message.text())});
       page.on('request',request=>{
         try {
           const url=new URL(request.url());
@@ -75,7 +77,11 @@ for (const {width,height,theme} of matrix) {
             : null;
           const componentSelectors=['.topbar','.layout','.pagehead','.statgrid','.stat','.stat-icon','.dashboard-quick-panel','.dashboard-shortcut','.shortcut-icon','.dashboard-revenue','.dashboard-revenue-empty','.dashboard-revenue-visual','.mobiletabs','.mobiletabs .nav'];
           const components=Object.fromEntries(componentSelectors.map(selector=>[selector,[...document.querySelectorAll(selector)].map(el=>({box:el.getBoundingClientRect().toJSON(),css:Object.fromEntries(['background','border','borderRadius','boxShadow','fontSize','fontFamily','lineHeight','padding','whiteSpace','backdropFilter'].map(k=>[k,getComputedStyle(el)[k]]))}))]));
-          const masks=[...document.querySelectorAll('.stat .value,.notif-count,.nav-notif-count,.dashboard-activity-table')].filter(el=>el.getClientRects().length).map(el=>el.getBoundingClientRect().toJSON());
+          const masks=[...document.querySelectorAll('.stat .value,.notif-count,.nav-notif-count')].filter(el=>el.getClientRects().length).map(el=>{
+            const range=document.createRange();range.selectNodeContents(el);
+            const r=el.matches('.stat .value')?range.getBoundingClientRect():el.getBoundingClientRect();
+            return {x:r.x-2,y:r.y-2,right:r.right+2,bottom:r.bottom+2,width:r.width+4,height:r.height+4};
+          });
           return {components,masks,documentWidth:de.scrollWidth,viewportWidth:innerWidth,horizontalOverflow:de.scrollWidth>innerWidth+2,
             modalNavGapPx,
             unlabeledInteractive:interactive.filter(el=>{
@@ -131,12 +137,15 @@ for (const {width,height,theme} of matrix) {
         const box=await page.locator('#main .pagehead [data-action="add"]').boundingBox();
         await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});
         report.touchPressed=await page.locator('#main .pagehead [data-action="add"]').evaluate(e=>({press:e.dataset.sdGlassPress||null,transform:getComputedStyle(e).transform,shadow:getComputedStyle(e).boxShadow}));
+        expect(report.touchPressed.press).toBe('true');
+        expect(report.touchPressed.transform).not.toBe('none');
         await page.screenshot({path:join(folder,'16_cta_pressed.png'),fullPage:false,animations:'disabled'});
         await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
         await expect(page.locator('#main .pagehead [data-action="add"]')).not.toHaveAttribute('data-sd-glass-press','true');
         await page.keyboard.press('Tab');
         report.keyboardFocus=await page.evaluate(()=>({tag:document.activeElement.tagName,visible:document.activeElement.matches(':focus-visible'),outline:getComputedStyle(document.activeElement).outlineStyle}));
         expect(report.keyboardFocus.visible).toBe(true);
+        expect(report.keyboardFocus.outline).not.toBe('none');
       }
       const expectedHeadings={
         dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',
@@ -180,10 +189,18 @@ for (const {width,height,theme} of matrix) {
         report.screens.push({screen:'07_order_detail',status:'NO_REAL_ORDER_NOT_ACCEPTED',reason:'No live business record; no order fabricated'});
       }
       if(width===432 && theme==='light'){
+        const logoutResponse=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/logout' && r.request().method()==='POST');
         await page.locator('#logout').tap();
+        expect((await logoutResponse).ok(),'Logout must succeed at the server').toBe(true);
         await expect(page.locator('#loginView')).toBeVisible();
+        const sessionResponse=await context.request.get(origin+'/api/admin/session');
+        const session=await sessionResponse.json();
+        expect([401,403],'Logged-out session must be denied').toContain(sessionResponse.status());
+        expect(session.authenticated,'Logout must revoke this test session').not.toBe(true);
         report.logoutVerified=true;
       }
+      expect(report.pageErrors,'No uncaught application errors').toEqual([]);
+      expect(report.consoleErrors,'No application console errors').toEqual([]);
       expect(report.nonAuthMutationRequests,'Read-only QA must not make business writes').toEqual([]);
       const captures=report.screens.filter(s=>s.status==='CAPTURED_NOT_ACCEPTED');
       const byHash=new Map();
@@ -193,7 +210,7 @@ for (const {width,height,theme} of matrix) {
           '; a mislabeled route must not count as a captured distinct screen').toBeUndefined();
         byHash.set(capture.sha256,capture.screen);
       }
-      if(process.env.QA_EXPECT_ORDER_ID)expect(captures.length,'All 12 real Admin screens must be captured whenever isolated QA order fixtures are present').toBe(12);
+      if(process.env.QA_EXPECT_ORDER_ID)expect(captures.filter(s=>/^(0[1-9]|1[0-2])_/.test(s.screen)).length,'All 12 real Admin screens must be captured whenever isolated QA order fixtures are present').toBe(12);
       else expect(captures.length,'At least 10 real screens should be available without synthetic data').toBeGreaterThanOrEqual(10);
     } finally {
       writeFileSync(join(folder,'manifest.json'),JSON.stringify(report,null,2)+'\n');
