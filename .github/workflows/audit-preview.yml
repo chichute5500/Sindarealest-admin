@@ -10,6 +10,9 @@ on:
       - 'tests/**'
       - 'audit/**'
       - '.github/workflows/audit-preview.yml'
+      - '.github/workflows/audit-after-qa.yml'
+      - 'scripts/audit-*.mjs'
+      - 'scripts/qa-material-network.mjs'
   workflow_dispatch:
 permissions:
   contents: read
