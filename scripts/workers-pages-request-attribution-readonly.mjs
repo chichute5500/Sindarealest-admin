@@ -5,6 +5,9 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 const token=process.env.CLOUDFLARE_API_TOKEN||'';
+// Prefer a separate, read-only Account Analytics token. Never expand the
+// existing deployment token's permissions solely for diagnostics.
+const analyticsToken=process.env.CLOUDFLARE_ANALYTICS_TOKEN||token;
 const account=process.env.CLOUDFLARE_ACCOUNT_ID||'';
 if(!token||!/^[a-f0-9]{32}$/i.test(account))throw Error('Missing/invalid Cloudflare credentials');
 const root='https://api.cloudflare.com/client/v4/accounts/'+account;
@@ -12,7 +15,7 @@ const end=new Date(),start=new Date(end.getTime()-40*60*60*1000);
 const window={startUtc:start.toISOString(),endUtc:end.toISOString()};
 const report={generatedAt:end.toISOString(),window,projectMetadata:[],workerTotals:[],previewHourly:[],previewScriptVersions:[],warnings:[]};
 async function api(path,method='GET',body){
- const res=await fetch(path,{method,headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},
+ const res=await fetch(path,{method,headers:{Authorization:'Bearer '+(path==='https://api.cloudflare.com/client/v4/graphql'?analyticsToken:token),...(body?{'Content-Type':'application/json'}:{})},
  ...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(25000)});
  if(!res.ok)throw Error('Cloudflare API HTTP '+res.status);
  const json=await res.json();
