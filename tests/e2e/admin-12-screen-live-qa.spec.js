@@ -83,7 +83,7 @@ for (const {width,height,theme} of matrix) {
           });
           await Promise.race([Promise.all(images.map(img=>img.decode().catch(()=>{}))),new Promise(resolve=>setTimeout(resolve,4000))]);
         });
-        const m=await page.evaluate(captureContainer=>{
+        const m=await page.evaluate(({captureContainer,includeMatchedRules})=>{
           const de=document.documentElement;
           const target=document.querySelector(captureContainer==='#backdrop' ? '#backdrop' : captureContainer==='#loginView' ? '#loginView' : '#main');
           const interactive=target?[...target.querySelectorAll('button,input,select,textarea,a[href]')]:[];
@@ -91,157 +91,102 @@ for (const {width,height,theme} of matrix) {
             ? Math.abs(document.querySelector('#backdrop').getBoundingClientRect().bottom-
                 document.querySelector('.mobiletabs').getBoundingClientRect().top)
             : null;
-          const componentSelectors=['.topbar','.layout','.pagehead','.pagehead .btn.primary','.statgrid','.stat','.stat-icon','.dashboard-quick-panel','.dashboard-shortcut','.shortcut-icon','.dashboard-revenue','.dashboard-revenue-empty','.dashboard-revenue-visual','.mobiletabs','.mobiletabs .nav'];
-          const components=Object.fromEntries(componentSelectors.map(selector=>[selector,[...document.querySelectorAll(selector)].map(el=>({box:el.getBoundingClientRect().toJSON(),css:Object.fromEntries(['background','border','borderRadius','boxShadow','fontSize','fontFamily','lineHeight','padding','whiteSpace','backdropFilter'].map(k=>[k,getComputedStyle(el)[k]]))}))]));
-          const masks=[...document.querySelectorAll('.stat .value,.notif-count,.nav-notif-count')].filter(el=>el.getClientRects().length).map(el=>{
-            const range=document.createRange();range.selectNodeContents(el);
-            const r=el.matches('.stat .value')?range.getBoundingClientRect():el.getBoundingClientRect();
-            return {x:r.x-2,y:r.y-2,right:r.right+2,bottom:r.bottom+2,width:r.width+4,height:r.height+4};
-          });
-          return {components,masks,documentWidth:de.scrollWidth,viewportWidth:innerWidth,horizontalOverflow:de.scrollWidth>innerWidth+2,
-            modalNavGapPx,
-            unlabeledInteractive:interactive.filter(el=>{
-              if(el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return false;
-              if(el.labels?.length||el.getAttribute('title')||el.textContent?.trim())return false;
-              return el.getClientRects().length>0;
-            }).length,heading:target?.querySelector('h1,h2')?.textContent?.trim().slice(0,90)||null};
-        },container);
-        if(width<=820 && container==='#appView'){
-          for(const nav of m.components['.mobiletabs .nav'])expect(nav.css.whiteSpace,'Dock labels must remain on one line').toBe('nowrap');
-        }
-        expect(m.horizontalOverflow,'No screenshot may pass with document horizontal overflow: '+name+' at '+width+'px').toBe(false);
-        expect(m.unlabeledInteractive,'Visible controls must have accessible names: '+name+' at '+width+'px '+theme).toBe(0);
-        if(m.modalNavGapPx!==null)expect(m.modalNavGapPx,
-          'Deployed mobile editor/gallery must meet navigation without exposing product rows: '+name+' '+theme)
-          .toBeLessThanOrEqual(2);
-        const nameFile=name+'.png';
-        // Capture the nominated CSS viewport with its declared physical pixel ratio.
-        // TARGET uses432CSSpx atDPR2; comparison normalizes both sides to CSS pixels.
-        const screenshot=await page.screenshot({path:join(folder,nameFile),fullPage:false,animations:'disabled'});
-        const measuredWidth=screenshot.readUInt32BE(16),measuredHeight=screenshot.readUInt32BE(20);
-        expect(measuredWidth,'Screenshot pixels must match CSS viewport times declared DPR: '+name).toBe(width*dpr);
-        expect(measuredHeight,'Screenshot pixels must match CSS viewport times declared DPR: '+name).toBe(height*dpr);
-        report.screens.push({screen:name,status:'CAPTURED_NOT_ACCEPTED',file:nameFile,
-          sha256:createHash('sha256').update(screenshot).digest('hex'),pixelDimensions:{width:measuredWidth,height:measuredHeight},metrics:m});
-      }
-      if((await page.evaluate(()=>document.documentElement.dataset.adminTheme))!==theme)
-        await page.locator('#adminThemeToggle').click();
-      await shot('01_login','#loginView');
-      await page.locator('#password').fill(testPassword);
-      await page.locator('#loginForm button[type=submit]').click();
-      await expect(page.locator('#appView')).toBeVisible({timeout:30000});
-      report.authenticatedAt=new Date().toISOString();
-      // Hide the transient login toast before recording reference-comparison screenshots.
-      await expect(page.locator('#toast')).not.toHaveClass(/show/,{timeout:7000});
-      if(width===432 && theme==='light'){
-        await page.locator('#adminMenuToggle').tap();
-        await expect(page.locator('#mobileMorePanel')).toBeVisible();
-        await shot('13_mobile_menu');
-        await page.locator('#adminMenuToggle').tap();
-        await expect(page.locator('#mobileMorePanel')).toBeHidden();
-        await page.locator('#notificationToggle').tap();
-        await expect(page.locator('#notificationPanel')).toBeVisible();
-        await shot('14_notifications');
-        await page.locator('#notificationToggle').tap();
-        await expect(page.locator('#notificationPanel')).toBeHidden();
-        await page.locator('#main .pagehead [data-action="add"]').tap();
-        await expect(page.locator('#backdrop')).toBeVisible();
-        await shot('15_add_product','#backdrop');
-        await page.locator('#editorClose').tap();
-        await expect(page.locator('#backdrop')).toBeHidden();
-        // Record a real browser touch hold/release on the CTA, without completing a click.
-        const cdp=await context.newCDPSession(page);
-        const box=await page.locator('#main .pagehead [data-action="add"]').boundingBox();
-        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});
-        report.touchPressed=await page.locator('#main .pagehead [data-action="add"]').evaluate(e=>({press:e.dataset.sdGlassPress||null,transform:getComputedStyle(e).transform,shadow:getComputedStyle(e).boxShadow}));
-        expect(report.touchPressed.press).toBe('true');
-        expect(report.touchPressed.transform).not.toBe('none');
-        await page.screenshot({path:join(folder,'16_cta_pressed.png'),fullPage:false,animations:'disabled'});
-        await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
-        await expect(page.locator('#main .pagehead [data-action="add"]')).not.toHaveAttribute('data-sd-glass-press','true');
-        await page.keyboard.press('Tab');
-        report.keyboardFocus=await page.evaluate(()=>({tag:document.activeElement.tagName,visible:document.activeElement.matches(':focus-visible'),outline:getComputedStyle(document.activeElement).outlineStyle}));
-        expect(report.keyboardFocus.visible).toBe(true);
-        expect(report.keyboardFocus.outline).not.toBe('none');
-        await page.locator('#main .eyebrow').tap();
-      }
-      const expectedHeadings={
-        dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',
-        warranties:'Bảo hành / Yêu cầu hỗ trợ',settings:'Cài đặt website',
-        backup:'Sao lưu / Khôi phục',activity:'Nhật ký hoạt động'
-      };
-      for(const [screen,view] of screens){
-        await page.evaluate(v=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view===v);if(!nav)throw new Error('Missing Admin navigation button '+v);nav.click()},view);
-        // Navigation awaits a backend read for operational views. A fixed 500ms delay
-        // previously captured Orders again under the Customers filename.
-        await expect(page.locator('#main .pagehead h2').first(),
-          'Capture must show the intended module, not the previous page').toHaveText(expectedHeadings[view],{timeout:20000});
-        await shot(screen);
-      }
-      await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='products');if(!nav)throw new Error('Products navigation missing');nav.click()});
-      await page.waitForTimeout(400);
-      const row=page.locator('.tablewrap table tbody tr[data-product-row]:visible').first();
-      if(await row.count()){
-        await row.locator('.prodname').click();
-        await expect(page.locator('#backdrop')).toBeVisible();
-        await shot('04_product_editor','#backdrop');
-        await page.locator('#productTabGallery').click();
-        await expect(page.locator('#productPanelGallery')).toBeVisible();
-        await shot('05_product_gallery','#backdrop');
-        await page.locator('#editorClose').click();
-      } else for(const name of ['04_product_editor','05_product_gallery'])
-        report.screens.push({screen:name,status:'UNAVAILABLE_NOT_ACCEPTED',reason:'No editable product UI row'});
-      await page.evaluate(()=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view==='orders');if(!nav)throw Error('Order view navigation missing');nav.click()});
-      await page.waitForTimeout(500);
-      const requiredQaOrder=(process.env.QA_EXPECT_ORDER_ID||'').trim();
-      if(requiredQaOrder&&!/^qa_[0-9]{8,16}_order$/.test(requiredQaOrder))throw Error('Invalid QA-owned order identity');
-      const detail=requiredQaOrder
-        ? page.locator('[data-action="view-order-details"][data-id="'+requiredQaOrder+'"]:visible').first()
-        : page.locator('[data-action="view-order-details"]:visible').first();
-      if(requiredQaOrder) await expect(detail,'Must find the run-owned isolated QA order before marking 12-screen acceptance PASS').toBeVisible({timeout:15000});
-      if(await detail.count()){
-        await detail.click();
-        await expect(page.locator('.order-detail-page')).toBeVisible();
-        await shot('07_order_detail');
-      } else {
-        report.screens.push({screen:'07_order_detail',status:'NO_REAL_ORDER_NOT_ACCEPTED',reason:'No live business record; no order fabricated'});
-      }
-      if(width===432 && theme==='light'){
-        const logoutResponse=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/logout' && r.request().method()==='POST');
-        await page.locator('#logout').tap();
-        const logoutResult=await logoutResponse;
-        expect(logoutResult.ok(),'Logout must succeed at the server').toBe(true);
-        await logoutResult.finished();
-        await expect(page.locator('#loginView')).toBeVisible();
-        // Verify the browser cookie and a fresh browser boot request rather
-        // than relying on a separate test-transport request.
-        await expect.poll(async()=> (await context.cookies(origin+'/api/admin/session')).some(c=>c.name==='sd_admin_session'),{timeout:5000,message:'Logout must clear the browser session cookie'}).toBe(false);
-        report.logoutVerificationAt=new Date().toISOString();
-        const bootSession=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/admin/session' && r.request().method()==='GET');
-        await page.reload({waitUntil:'domcontentloaded'});
-        const sessionResponse=await bootSession;
-        expect([401,403],'Fresh browser boot must be denied after logout').toContain(sessionResponse.status());
-        await expect(page.locator('#loginView')).toBeVisible();
-        report.logoutBrowserSessionStatus=sessionResponse.status();
-        report.logoutCookieCleared=true;
-        report.logoutVerified=true;
-      }
-      expect(report.pageErrors,'No uncaught application errors').toEqual([]);
-      expect(report.consoleErrors,'No application console errors').toEqual([]);
-      expect(report.nonAuthMutationRequests,'Read-only QA must not make business writes').toEqual([]);
-      const captures=report.screens.filter(s=>s.status==='CAPTURED_NOT_ACCEPTED');
-      const byHash=new Map();
-      for(const capture of captures){
-        const previous=byHash.get(capture.sha256);
-        expect(previous,'Duplicate screenshot: '+capture.screen+' repeats '+previous+
-          '; a mislabeled route must not count as a captured distinct screen').toBeUndefined();
-        byHash.set(capture.sha256,capture.screen);
-      }
-      if(process.env.QA_EXPECT_ORDER_ID)expect(captures.filter(s=>/^(0[1-9]|1[0-2])_/.test(s.screen)).length,'All 12 real Admin screens must be captured whenever isolated QA order fixtures are present').toBe(12);
-      else expect(captures.length,'At least 10 real screens should be available without synthetic data').toBeGreaterThanOrEqual(10);
-    } finally {
-      writeFileSync(join(folder,'manifest.json'),JSON.stringify(report,null,2)+'\n');
-      await context.close();
-    }
-  });
-}
+          const componentSelectors=['.topbar','.layout','.pagehead','.pagehead .btn.primary','.statgrid','.stat','.stat-icon','.dashboard-quick-panel','.dashboard-shortcut','.shortcut-icon','.dashboard-revenue','.dashboard-revenue-empty','.dashboard-revenue-visual','.mobiletabs','.mobiletabs .nav',
+            '#main .panel','#main .setting','#main .control','#main .btn:not(.primary)','#main .switch .slider','#main .product-publish-filter-row','#main .product-results-summary','#main .product-visibility-row','#main .product-visibility-track','#main .product-fulfillment-toggle','#main .product-fulfillment-chip','#main .product-quick-trigger',
+            '#main .customer-toolbar','#main .customer-list','#main .customer-card','#main .customer-table tbody tr','#main .customer-mobile-avatar','#main .customer-avatar','#main .customer-mobile-details','#main .customer-mobile-summary','#main .customer-mobile-last-order','#main .customer-mobile-meta',
+            '#main .order-toolbar','#main .sd-order-card','#main .order-management-details','#main .order-table .order-management-summary','#main .sd-order-payment-money','#main .sd-order-next-note',
+            '#main .warranty-issue-disclosure','#main .activity-view-tabs','#main .activity-log-card','#main .dashboard-activity-table tbody tr',
+            '.order-detail-page-actions','.order-detail-page','.mobile-more-panel','.mobile-more-item','.notification-panel','.editor','.editorhead','.editorfooter','.product-quick-editor','.admin-glass-dialog',
+            '#backdrop .control','#backdrop .btn:not(.primary)','#backdrop .editor-tab','#backdrop .editor-tab-panel','#backdrop .product-category-grid','#backdrop #productPanelDetails .product-fulfillment-toggle','#backdrop .product-visibility-row'];
+          const cssProperties=['background','backgroundColor','backgroundImage','border','borderColor','borderWidth','borderRadius','boxShadow','fontSize','fontFamily','lineHeight','padding','whiteSpace','backdropFilter','opacity','filter','outlineStyle','outlineWidth','transform'];
+          const glassProperties=new Set(['background','background-color','background-image','border','border-color','border-width','border-style','border-radius','box-shadow','backdrop-filter','-webkit-backdrop-filter','filter','opacity','outline','outline-color','outline-style','outline-width','transform','transition']);
+          const trackedCustomProperties=/^--(?:sd-admin-|glass-|reference-|accent$|ink$|line$|paper$|muted$)/;
+          const splitSelectors=selectorText=>{
+            const selectors=[];let start=0,depth=0,quote='',escaped=false;
+            for(let i=0;i<selectorText.length;i++){
+              const char=selectorText[i];
+              if(escaped){escaped=false;continue;}
+              if(char==='\\'){escaped=true;continue;}
+              if(quote){if(char===quote)quote='';continue;}
+              if(char==='"'||char==="'"){quote=char;continue;}
+              if(char==='('||char==='[')depth++;
+              else if(char===')'||char===']')depth=Math.max(0,depth-1);
+              else if(char===','&&depth===0){selectors.push(selectorText.slice(start,i).trim());start=i+1;}
+            }
+            selectors.push(selectorText.slice(start).trim());return selectors.filter(Boolean);
+          };
+          const specificity=selector=>{
+            const result=[0,0,0];let i=0;
+            const identEnd=start=>{let j=start;while(j<selector.length){if(selector[j]==='\\'){j+=2;continue;}if(/[\w-]/.test(selector[j])||selector.charCodeAt(j)>=128){j++;continue;}break;}return j;};
+            const closeParen=start=>{let depth=1,quote='',escaped=false;for(let j=start+1;j<selector.length;j++){const char=selector[j];if(escaped){escaped=false;continue;}if(char==='\\'){escaped=true;continue;}if(quote){if(char===quote)quote='';continue;}if(char==='"'||char==="'"){quote=char;continue;}if(char==='(')depth++;else if(char===')'&&!--depth)return j;}return selector.length-1;};
+            const maxSpecificity=text=>splitSelectors(text).map(part=>specificity(part)).sort((a,b)=>b[0]-a[0]||b[1]-a[1]||b[2]-a[2])[0]||[0,0,0];
+            while(i<selector.length){
+              const char=selector[i];
+              if(char==='#'){result[0]++;i=identEnd(i+1);continue;}
+              if(char==='.' ){result[1]++;i=identEnd(i+1);continue;}
+              if(char==='['){result[1]++;let depth=1,j=i+1,quote='',escaped=false;for(;j<selector.length&&depth;j++){const c=selector[j];if(escaped){escaped=false;continue;}if(c==='\\'){escaped=true;continue;}if(quote){if(c===quote)quote='';continue;}if(c==='"'||c==="'"){quote=c;continue;}if(c==='[')depth++;else if(c===']')depth--;}i=j;continue;}
+              if(char===':'){
+                const pseudoElement=selector[i+1]===':';i+=pseudoElement?2:1;const start=i;i=identEnd(i);const name=selector.slice(start,i).toLowerCase();
+                const legacyElement=!pseudoElement&&['before','after','first-line','first-letter'].includes(name);
+                if(pseudoElement||legacyElement)result[2]++;else result[1]++;
+                if(selector[i]==='('){const end=closeParen(i),argument=selector.slice(i+1,end);
+                  if(name==='is'||name==='not'||name==='has'||name==='matches'||name==='any'){const max=maxSpecificity(argument);for(let k=0;k<3;k++)result[k]+=max[k];result[1]--;}
+                  else if(name==='where')result[1]--;
+                  else if(name==='nth-child'||name==='nth-last-child'){const of=argument.match(/\bof\b([\s\S]*)/i);if(of){const max=maxSpecificity(of[1]);for(let k=0;k<3;k++)result[k]+=max[k];}}
+                  else if(name==='slotted'){const max=maxSpecificity(argument);for(let k=0;k<3;k++)result[k]+=max[k];}
+                  i=end+1;
+                }
+                continue;
+              }
+              if(char==='\\'){i+=2;continue;}
+              if(/[\w-]/.test(char)||char.charCodeAt(0)>=128){
+                const start=i;i=identEnd(i);const name=selector.slice(start,i);
+                // A type selector is only counted at the start of a compound or after a namespace separator.
+                let previous=start-1;while(previous>=0&&/\s/.test(selector[previous]))previous--;
+                if(previous<0||/[>+~,(|]/.test(selector[previous])){if(name!=='*')result[2]++;}
+                continue;
+              }
+              i++;
+            }
+            return result;
+          };
+          const materialRules=[];
+          if(includeMatchedRules){
+            let ruleOrder=0;
+            const visit=(rules,conditions=[],sheetIndex=0,sheetHref='',path=[])=>{
+              let childIndex=0;
+              for(const rule of rules||[]){
+                const currentOrder=ruleOrder++,currentPath=[...path,childIndex++];
+                if(rule.type===CSSRule.MEDIA_RULE){const condition='@media '+rule.conditionText;if(matchMedia(rule.conditionText).matches)visit(rule.cssRules,[...conditions,condition],sheetIndex,sheetHref,currentPath);continue;}
+                if(rule.type===CSSRule.SUPPORTS_RULE){const condition='@supports '+rule.conditionText;if(CSS.supports(rule.conditionText))visit(rule.cssRules,[...conditions,condition],sheetIndex,sheetHref,currentPath);continue;}
+                if(rule.cssRules){visit(rule.cssRules,conditions,sheetIndex,sheetHref,currentPath);continue;}
+                if(!rule.selectorText||!rule.style)continue;
+                const declarations={};
+                for(let i=0;i<rule.style.length;i++){
+                  const property=rule.style[i];
+                  if(glassProperties.has(property)||trackedCustomProperties.test(property))
+                    declarations[property]={value:rule.style.getPropertyValue(property).trim(),important:rule.style.getPropertyPriority(property)==='important'};
+                }
+                if(!Object.keys(declarations).length)continue;
+                for(const selector of splitSelectors(rule.selectorText)){
+                  const pseudoMatch=selector.match(/(::?before|::?after)$/i),pseudo=pseudoMatch?(pseudoMatch[1].toLowerCase().includes('before')?'before':'after'):null;
+                  materialRules.push({selector,baseSelector:pseudoMatch?selector.slice(0,-pseudoMatch[1].length):selector,
+                    selectorSpecificity:specificity(selector),pseudo,sheetIndex,sheetHref,ruleOrder:currentOrder,rulePath:currentPath,conditions,declarations});
+                }
+              }
+            };
+            for(let sheetIndex=0;sheetIndex<document.styleSheets.length;sheetIndex++){
+              const sheet=document.styleSheets[sheetIndex];try{visit(sheet.cssRules,[],sheetIndex,sheet.href||'<inline stylesheet>')}catch{}
+            }
+          }
+          function matchedMaterialRules(element,pseudo=''){
+            if(!includeMatchedRules)return undefined;
+            const matched=[],chain=[];for(let node=element,depth=0;node&&depth<8;node=node.parentElement,depth++)chain.push({node,depth});
+            // Include directly matched declarations and inherited design-token declarations from ancestors.
+            for(const {node,depth} of chain){
+              for(const rule of materialRules){
+                if((rule.pseudo||'')!==pseudo)continue;
+                let applies=false;try{applies=node.matches(rule.baseSelector)}catch{}
+                if(!applies)continue;
+                const declarations=Object.fromEntries(Object.entries(rule.declarations).filter(([property])=>depth===0||property.startsWith('--')));
+                if(Object.keys(declarations).length)matched.push({...rule,a
