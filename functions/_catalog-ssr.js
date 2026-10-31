@@ -22,7 +22,7 @@ function productCards(rows,origin){
     const sku=Number(p.sku_verified)===1 ? String(p.sku||"") : "";
     return '<article class="product-card sd-server-rendered" data-ssr-product="'+h(p.id)+'">'+
      '<a class="product-open" href="'+h(href)+'" aria-label="Xem chi tiết '+h(title)+'">'+
-     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(i===0?"eager":"lazy")+'" decoding="async"></span>'+
+     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(i<2?"eager":"lazy")+'" '+(i===0?'fetchpriority="high" ':'')+'decoding="async"></span>'+
      '<div class="product-info"><span class="sd-card-status-row"><span class="fulfillment-badge">'+h(label)+'</span>'+
      (sku?'<span class="product-sku">Mã SKU: '+h(sku)+'</span>':"")+'</span>'+
      (p.fulfillment_type==="made_to_order"?'<small class="sd-card-making-time">Làm hàng 5–20 ngày</small>':"")+
