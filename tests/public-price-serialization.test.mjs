@@ -107,10 +107,16 @@ try{
     }
   }};
   const quickResponse=await Promise.race([
-    publicProductsGet({
-      request:new Request("https://shop.example/api/products"),
-      env,waitUntil:task=>pendingWrites.push(task)
-    }),
+    publicProductsGet((()=>{
+      const context={
+        request:new Request("https://shop.example/api/products"),env,
+        waitUntil(task){
+          assert.equal(this,context,"Cloudflare waitUntil must retain its context receiver");
+          pendingWrites.push(task);
+        }
+      };
+      return context;
+    })()),
     new Promise((_,reject)=>setTimeout(()=>reject(Error("Public response waited for edge cache put")),1200))
   ]);
   assert.equal(quickResponse.status,200);

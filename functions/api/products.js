@@ -34,7 +34,8 @@ async function storeCachedCatalog(cache, key, response) {
   } catch { /* Cache API may be unavailable in local Pages/dev; query still works. */ }
 }
 
-export async function onRequestGet({ request, env, waitUntil }) {
+export async function onRequestGet(context) {
+  const { request, env } = context;
   const unavailable = dbOrFail(env);
   if (unavailable) return unavailable;
   try {
@@ -64,7 +65,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
       // Standalone callers without a request context still await it, preserving
       // the deterministic fallback and existing cache/price-gate tests.
       const cacheWrite = storeCachedCatalog(cache,cacheKey,response);
-      if (typeof waitUntil === "function") waitUntil(cacheWrite);
+      if (typeof context.waitUntil === "function") context.waitUntil(cacheWrite);
       else await cacheWrite;
     }
     return response;
