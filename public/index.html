@@ -66,7 +66,10 @@
  const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
  root.dataset.themeMode=mode;
  root.classList.toggle('dark',mode==='dark'||(mode==='auto'&&systemDark));
- document.querySelectorAll('meta[name="theme-color"]').forEach(meta=>{meta.content=root.classList.contains('dark')?'#061522':'#eaf3fb'});
+ const initialThemeMetas=typeof document.querySelectorAll==='function'
+  ?document.querySelectorAll('meta[name="theme-color"]')
+  :[document.querySelector('meta[name="theme-color"]')].filter(Boolean);
+ initialThemeMetas.forEach(meta=>{meta.content=root.classList.contains('dark')?'#061522':'#eaf3fb'});
 })();</script>
 <style>
 /* Avoid Android's blue tap flash without disabling text selection or keyboard focus. */
