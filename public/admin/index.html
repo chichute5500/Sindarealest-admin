@@ -2122,7 +2122,10 @@ body:not(:has(#loginView:not(.hidden))){
   #main>.pagehead .btn.primary{width:164px;min-width:164px;flex:0 0 164px;position:relative;top:3px;margin-right:-8px}
   #main>.pagehead h2{font-size:clamp(27px,6.4vw,30px);line-height:1.08}
   #main .statgrid{gap:8px;margin-bottom:8px}
-  #main .stat{\n     min-height:clamp(82px,20vw,88px);\n     padding:6px 15px;\n     border:2px solid transparent;
+  #main .stat{
+     min-height:clamp(82px,20vw,88px);
+     padding:6px 15px;
+     border:2px solid transparent;
     border-radius:20px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-dashboard-shadow);
@@ -2133,7 +2136,9 @@ body:not(:has(#loginView:not(.hidden))){
   #main .stat .value{font-size:clamp(25px,5.9vw,26px);line-height:1;margin:2px 0 0}
   #main .stat .hint{font-size:10.5px;line-height:1.25}
 
-  #main .dashboard-quick-panel,\n   #main .dashboard-revenue{\n     border:2px solid transparent;
+  #main .dashboard-quick-panel,
+   #main .dashboard-revenue{
+     border:2px solid transparent;
     border-radius:24px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
@@ -2144,7 +2149,14 @@ body:not(:has(#loginView:not(.hidden))){
   #main .dashboard-quick-panel .panelhead h3,
   #main .dashboard-revenue .panelhead h3{font-size:17px;line-height:1.2}
   #main .dashboard-shortcuts{gap:7px}
-  #main .dashboard-shortcut{\n     min-height:clamp(72px,18vw,78px);\n     padding:6px 4px;\n     gap:5px;\n     border:2px solid transparent;\n     border-radius:18px;\n     background:var(--glass-face) padding-box,var(--glass-edge) border-box;\n     box-shadow:0 10px 22px rgba(44,98,133,.23),0 2px 5px rgba(43,89,119,.10),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 4px rgba(72,141,173,.13);
+  #main .dashboard-shortcut{
+     min-height:clamp(72px,18vw,78px);
+     padding:6px 4px;
+     gap:5px;
+     border:2px solid transparent;
+     border-radius:18px;
+     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
+     box-shadow:0 10px 22px rgba(44,98,133,.23),0 2px 5px rgba(43,89,119,.10),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 4px rgba(72,141,173,.13);
   }
   #main .dashboard-shortcut .shortcut-icon{flex-basis:40px;width:40px;height:40px}
   #main .dashboard-shortcut .shortcut-icon svg{width:21px;height:21px}
