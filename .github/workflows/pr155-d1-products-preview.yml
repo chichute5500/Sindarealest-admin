@@ -1,0 +1,74 @@
+name: PR155 D1 catalog Admin Preview — isolated, verified
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/pr155-d1-products-preview.yml'
+      - 'scripts/d1-preview-products-readonly-validation.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr155-d1-products-preview
+  cancel-in-progress: false
+
+jobs:
+  validate_and_deploy:
+    name: Validate Preview D1, then publish one isolated Admin preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard repo, branch, Preview alias, and immutable HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          test "$GITHUB_SHA" = "$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Run real SQLite and Admin contract tests
+        run: |
+          npm install --no-fund
+          node tests/admin-products-revision.test.mjs
+          node tests/admin-mobile-refresh-contract.test.mjs
+          npm run check
+      - name: Verify isolated Preview D1 migration and measure Rows Read (read-only)
+        run: node scripts/d1-preview-products-readonly-validation.mjs
+      - name: Deploy distinct D1 Admin Preview alias, never Main
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name sindarealest-admin-preview --branch d1-products-155 --commit-hash "$GITHUB_SHA" --commit-message "PR155 D1 catalog QA $GITHUB_SHA"
+      - name: Smoke-test deployed Admin page and blocked anonymous product API
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://d1-products-155.sindarealest-admin-preview.pages.dev"
+          curl --fail --silent --show-error --retry 3 --retry-delay 5 "$url/admin/" | grep -q "Quản trị SinDarealest"
+          code="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "$url/api/admin/products")"
+          test "$code" = "401"
+          echo "PASS: isolated Admin Preview $url/admin/; API rejects anonymous request"
+          echo "Production and main unchanged."
+      - name: Save sanitized metrics only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d1-preview-products-readonly-metrics
+          path: artifacts/d1-preview-products/readonly-metrics.json
+          if-no-files-found: ignore
+          retention-days: 7
