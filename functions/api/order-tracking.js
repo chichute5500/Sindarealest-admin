@@ -1,4 +1,5 @@
 import { dbOrFail, fail, json, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
+import {verifyLookupChallenge} from "../_lookup-challenge.js";
 
 // Public tracking deliberately returns only order-stage progress, never
 // customer identity, items, amounts, references or the Admin audit details.
@@ -86,6 +87,12 @@ export async function onRequestPost({request,env}) {
  const phone=couldBePhone?normalizePhone(value):"";
  const byPhone=couldBePhone&&/^\d{9,12}$/.test(phone);
  if(!byPhone&&!/^[A-Za-z0-9-]{5,64}$/.test(value))return fail("Vui lòng nhập mã đơn hoặc số điện thoại hợp lệ.",400);
+ if(byPhone){
+  const proof=await verifyLookupChallenge(request,env,body.value.turnstileToken,"order_lookup");
+  if(!proof.ok)return fail(proof.status===503?
+    "Tra cứu theo số điện thoại tạm chưa sẵn sàng. Vui lòng dùng mã đơn hàng.":
+    "Vui lòng hoàn thành xác minh trước khi tra cứu.",proof.status);
+ }
  const conditions=byPhone?
  "WHERE ("+phoneExpression+"=? OR (substr("+phoneExpression+",1,2)='84' AND '0'||substr("+phoneExpression+",3)=?) OR (substr("+phoneExpression+",1,4)='0084' AND '0'||substr("+phoneExpression+",5)=?))":
  "WHERE upper(o.order_number)=?";
