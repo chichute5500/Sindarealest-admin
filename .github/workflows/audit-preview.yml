@@ -80,6 +80,11 @@ jobs:
           assert.match(image.headers.get('content-type')||'',/image\/webp/);
           assert.ok(Number(image.headers.get('content-length')||0)<140000,'Mobile UI brand image exceeds 140kB');
           console.log('PASS: optimized brand logo exists on live Preview');
+          const navIcon=await fetch(base+'/images/brand-emblem-nav.webp',{signal:AbortSignal.timeout(12000)});
+          assert.equal(navIcon.status,200,'Mobile navigation brand symbol must exist');
+          assert.match(navIcon.headers.get('content-type')||'',/image\/webp/);
+          assert.ok(Number(navIcon.headers.get('content-length')||0)<20000,'Nav icon is oversized');
+          console.log('PASS: official nav emblem exists, preventing the broken image seen in mobile screenshots');
           for(const name of ['theme-croc-dark-tile.webp','theme-croc-albino-tile.webp']){
             const texture=await fetch(base+'/images/'+name,{signal:AbortSignal.timeout(12000)});
             assert.equal(texture.status,200,'Optimized material texture missing: '+name);
