@@ -65,9 +65,9 @@ try{
  await page.locator('#checkoutForm [name="fullName"]').fill("Nguyễn Văn QA");
  await page.locator('#checkoutForm [name="phone"]').fill("123456");
  await page.locator('#checkoutForm [name="streetAddress"]').fill("01 Đường Thử Nghiệm");
- await page.locator("#checkoutProvince option").nth(1).waitFor();
+ await page.waitForFunction(()=>document.querySelector("#checkoutProvince")?.options.length>1);
  await page.locator("#checkoutProvince").selectOption("TP Hồ Chí Minh");
- await page.locator("#checkoutWard option").nth(1).waitFor();
+ await page.waitForFunction(()=>document.querySelector("#checkoutWard")?.options.length>1);
  await page.locator("#checkoutWard").selectOption("Phường Bến Nghé");
  await page.locator("#checkoutSubmit").click();
  assert.match(await page.locator("#checkoutMessage").innerText(),/số di động Việt Nam hợp lệ/);
