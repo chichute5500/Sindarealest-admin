@@ -13,7 +13,7 @@ function imageFor(row){
   const image=Array.isArray(items)?items.find(validImage):"";
   return image ? (image.startsWith("/")?image:"/"+image) : "/images/theme-croc-dark.webp";
 }
-function productCards(rows,origin){
+function productCards(rows,origin,{eager=false}={}){
   return rows.map((p,i)=>{
     const href=canonicalProductPath(p);
     if(!href)return "";
@@ -28,7 +28,7 @@ function productCards(rows,origin){
     // client data arrives; never invent a price or a working action in SSR.
     return '<article class="product-card sd-server-rendered" data-ssr-product="'+h(p.id)+'">'+
      '<a class="product-open" href="'+h(href)+'" aria-label="Xem chi tiết '+h(title)+'">'+
-     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(i<2?"eager":"lazy")+'" '+(i===0?'fetchpriority="high" ':'')+'decoding="async"><span class="photo-shade"></span></span>'+
+     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(eager&&i<2?"eager":"lazy")+'" '+(i===0?'fetchpriority="high" ':'')+'decoding="async"><span class="photo-shade"></span></span>'+
      '<div class="product-info"><div class="sd-card-status-row"><span class="fulfillment-badge fulfillment-'+type+'" data-fulfillment-type="'+type+'">'+h(label)+'</span>'+
      '<span class="product-sku">Mã SKU: '+h(sku||"Chưa được cung cấp")+'</span></div>'+
      (type==="made_to_order"?'<small class="sd-card-making-time">⏱ Làm hàng 5–20 ngày</small>':"")+
@@ -64,11 +64,11 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     const rows=(Array.isArray(result?.results)?result.results:[])
       .filter(p=>p&&validTitle(p.title)&&canonicalProductPath(p)).slice(0,8);
     if(!rows.length)return html; // Never output invented/stale products if D1 is unavailable.
-    const cards=productCards(rows,origin);
+    const cards=productCards(rows,origin,{eager:!home});
     html=html.replace('<div class="catalog-grid" id="catalogGrid"></div>',
       '<div class="catalog-grid" id="catalogGrid">'+cards+'</div>');
     if(home)html=html.replace('<div class="featured-grid" id="featuredGrid"></div>',
-      '<div class="featured-grid" id="featuredGrid">'+productCards(rows.slice(0,4),origin)+'</div>');
+      '<div class="featured-grid" id="featuredGrid">'+productCards(rows.slice(0,4),origin,{eager:false})+'</div>');
     // HTML in source and no-JS has real product descriptions; JS replaces cards from /api/products.
     html=html.replace('</head>','<script type="application/ld+json">'+catalogSchema(rows,origin)+'</script>\n</head>');
     return html;
