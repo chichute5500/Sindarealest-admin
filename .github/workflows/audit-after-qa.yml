@@ -5,6 +5,9 @@ on:
     paths:
       - .github/workflows/audit-after-qa.yml
       - scripts/audit-readonly.mjs
+      - scripts/qa-material-network.mjs
+      - public/material-gallery.js
+      - scripts/build-logo-asset.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -40,6 +43,10 @@ jobs:
           AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
           AUDIT_OUTPUT: audit/after
         run: node scripts/audit-readonly.mjs
+      - name: Assert material images load only near the viewport (GET-only)
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+        run: node scripts/qa-material-network.mjs
       - name: Lighthouse Preview home and catalog mobile/desktop
         shell: bash
         run: |
