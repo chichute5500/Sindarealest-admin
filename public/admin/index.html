@@ -2124,20 +2124,20 @@ body:not(:has(#loginView:not(.hidden))){
   #main .stat{
     min-height:clamp(88px,22vw,95px);
     padding:8px 12px;
-    border:1px solid transparent;
+    border:1.5px solid transparent;
     border-radius:20px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
-    box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
+    box-shadow:var(--sd-dashboard-shadow);
   }
   #main .stat .label{font-size:11px;line-height:1.25}
-  #main .stat-icon{flex-basis:36px;width:36px;height:36px}
+  #main .stat-icon{flex-basis:40px;width:40px;height:40px}
   #main .stat-icon svg{width:19px;height:19px}
   #main .stat .value{font-size:clamp(24px,5.7vw,25px);line-height:1.05;margin:3px 0 1px}
   #main .stat .hint{font-size:10px;line-height:1.35}
 
   #main .dashboard-quick-panel,
   #main .dashboard-revenue{
-    border:1px solid transparent;
+    border:1.5px solid transparent;
     border-radius:24px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
@@ -2152,27 +2152,27 @@ body:not(:has(#loginView:not(.hidden))){
     min-height:clamp(76px,19.5vw,84px);
     padding:8px 4px;
     gap:6px;
-    border:1px solid transparent;
+    border:1.5px solid transparent;
     border-radius:18px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight);
   }
-  #main .dashboard-shortcut .shortcut-icon{flex-basis:38px;width:38px;height:38px}
+  #main .dashboard-shortcut .shortcut-icon{flex-basis:40px;width:40px;height:40px}
   #main .dashboard-shortcut .shortcut-icon svg{width:20px;height:20px}
   #main .dashboard-shortcut .shortcut-copy b{font-size:10.5px;line-height:1.2}
 
   #main .dashboard-revenue{margin-bottom:11px}
   #main .dashboard-revenue .panelbody{padding-bottom:9px}
-  #main .dashboard-revenue .panelhead{padding:11px 16px 6px;gap:8px}
+  #main .dashboard-revenue .panelhead{padding:11px 18px 6px;gap:8px}
   #main .dashboard-revenue .panelhead .tiny{font-size:10.5px;line-height:1.4}
   #main .dashboard-revenue-empty{
     min-height:clamp(84px,21.3vw,92px);
     padding:11px 13px;
     gap:9px;
-    border:1px solid transparent;
+    border:1.5px solid transparent;
     border-radius:20px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
-    box-shadow:inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
+    box-shadow:var(--sd-dashboard-shadow);
   }
   #main .dashboard-revenue-copy strong{font-size:11.5px;line-height:1.3}
   #main .dashboard-revenue-copy p{font-size:9.5px;line-height:1.4}
@@ -2188,31 +2188,31 @@ body:not(:has(#loginView:not(.hidden))){
 /* Dashboard glass: translucent functional surface, a thin pink/cyan rim,
    and raised icon controls. Keep the same palette in light and dark modes. */
 body:has(#main .statgrid){
-  --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.50),rgba(224,243,253,.32) 54%,rgba(209,236,248,.26));
-  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(240,158,211,.48),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(100,167,232,.34),transparent 85%),radial-gradient(ellipse 100% 47% at 60% 110%,rgba(102,224,206,.50),transparent 82%),linear-gradient(180deg,rgba(255,255,255,.96),rgba(221,244,255,.54) 46%,rgba(190,222,242,.34) 72%,rgba(233,255,249,.86));
-  --sd-dashboard-shadow:0 13px 30px rgba(35,80,113,.17),0 2px 5px rgba(43,89,119,.09),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -1px 2px rgba(102,224,206,.20);
+  --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.76),rgba(239,249,255,.56) 54%,rgba(220,239,251,.43));
+  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(240,158,211,.43),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(100,167,232,.34),transparent 85%),radial-gradient(ellipse 100% 30% at 60% 110%,rgba(108,184,222,.045),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.97),rgba(221,240,252,.58) 46%,rgba(190,222,242,.28) 72%,rgba(226,240,251,.72));
+  --sd-dashboard-shadow:0 15px 34px rgba(35,80,113,.17),0 3px 7px rgba(43,89,119,.10),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(83,137,171,.12);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(40,76,101,.57),rgba(20,47,68,.49) 56%,rgba(15,39,58,.55));
-  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(218,149,201,.34),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(112,172,234,.36),transparent 85%),radial-gradient(ellipse 100% 47% at 60% 110%,rgba(106,212,199,.38),transparent 82%),linear-gradient(180deg,rgba(190,231,255,.70),rgba(94,158,208,.36) 46%,rgba(60,122,175,.25) 72%,rgba(167,230,222,.60));
+  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(218,149,201,.30),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(112,172,234,.34),transparent 85%),radial-gradient(ellipse 100% 30% at 60% 110%,rgba(106,212,199,.10),transparent 84%),linear-gradient(180deg,rgba(190,231,255,.70),rgba(94,158,208,.36) 46%,rgba(60,122,175,.25) 72%,rgba(167,230,222,.38));
   --sd-dashboard-shadow:0 15px 34px rgba(0,5,15,.28),0 2px 5px rgba(0,7,19,.22),inset 0 1px 0 rgba(219,241,255,.35),inset 0 -1px 2px rgba(106,212,199,.19);
 }
 body:has(#main .statgrid) #main :is(.stat,.dashboard-quick-panel,.dashboard-revenue,.dashboard-revenue-empty){
-  border:1px solid transparent;
-  background:radial-gradient(ellipse 72% 48% at 2% 0%,rgba(255,255,255,.42),transparent 80%) padding-box,radial-gradient(ellipse 46% 58% at 100% 100%,rgba(102,224,206,.10),transparent 84%) padding-box,var(--sd-dashboard-face) padding-box,var(--sd-dashboard-rim) border-box;
+  border:1.5px solid transparent;
+  background:radial-gradient(ellipse 72% 48% at 2% 0%,rgba(255,255,255,.68),transparent 80%) padding-box,radial-gradient(ellipse 46% 58% at 100% 100%,rgba(100,167,232,.08),transparent 84%) padding-box,var(--sd-dashboard-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:var(--sd-dashboard-shadow);
   -webkit-backdrop-filter:blur(20px) saturate(145%);
   backdrop-filter:blur(20px) saturate(145%);
 }
 body:has(#main .statgrid) #main :is(.dashboard-shortcut,.stat-icon,.dashboard-shortcut .shortcut-icon,.dashboard-revenue-visual){
-  border:1px solid transparent;
-  background:radial-gradient(ellipse 78% 65% at 18% 0%,rgba(255,255,255,.75),transparent 82%) padding-box,linear-gradient(145deg,rgba(255,255,255,.70),rgba(221,242,253,.43)) padding-box,var(--sd-dashboard-rim) border-box;
+  border:1.5px solid transparent;
+  background:radial-gradient(ellipse 78% 65% at 18% 0%,rgba(255,255,255,.88),transparent 82%) padding-box,linear-gradient(145deg,rgba(255,255,255,.80),rgba(226,242,252,.52)) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 8px 18px rgba(44,98,133,.18),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(72,141,173,.14);
 }
 body:has(#main .statgrid) .topbar,
 body:has(#main .statgrid) .mobiletabs{
-  border:1px solid transparent;
-  background:radial-gradient(ellipse 90% 120% at 12% 0%,rgba(255,255,255,.50),transparent 82%) padding-box,var(--sd-glass-shell-strong) padding-box,var(--sd-dashboard-rim) border-box;
+  border:1.5px solid transparent;
+  background:radial-gradient(ellipse 90% 120% at 12% 0%,rgba(255,255,255,.72),transparent 82%) padding-box,var(--sd-glass-shell-strong) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:var(--sd-glass-panel-shadow),inset 0 1px 0 rgba(255,255,255,.96);
   -webkit-backdrop-filter:blur(26px) saturate(155%);
   backdrop-filter:blur(26px) saturate(155%);
@@ -2220,8 +2220,8 @@ body:has(#main .statgrid) .mobiletabs{
 body:has(#main .statgrid) .topbar .topright .btn,
 body:has(#main .statgrid) #adminMenuToggle,
 body:has(#main .statgrid) .mobiletabs .nav{
-  border:1px solid transparent;
-  background:radial-gradient(ellipse 80% 65% at 20% 0%,rgba(255,255,255,.80),transparent 82%) padding-box,linear-gradient(145deg,rgba(255,255,255,.76),rgba(220,241,252,.45)) padding-box,var(--sd-dashboard-rim) border-box;
+  border:1.5px solid transparent;
+  background:radial-gradient(ellipse 80% 65% at 20% 0%,rgba(255,255,255,.90),transparent 82%) padding-box,linear-gradient(145deg,rgba(255,255,255,.82),rgba(220,241,252,.54)) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 7px 17px rgba(44,98,133,.16),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(72,141,173,.10);
 }
 body:has(#main .statgrid) .mobiletabs .nav.active{
@@ -2229,9 +2229,9 @@ body:has(#main .statgrid) .mobiletabs .nav.active{
   box-shadow:0 9px 20px rgba(49,121,187,.23),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(72,141,173,.12)!important;
 }
 body:has(#main .statgrid) #main .pagehead .btn.primary{
-  border:1px solid transparent;
-  background:linear-gradient(145deg,#71c4f2,#288fdc) padding-box,var(--sd-dashboard-rim) border-box;
-  box-shadow:0 11px 23px rgba(38,132,198,.28),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -2px 5px rgba(19,94,157,.17);
+  border:1.5px solid transparent;
+  background:radial-gradient(ellipse 110% 78% at 32% 0%,rgba(255,255,255,.76),transparent 74%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.14),transparent 80%) padding-box,linear-gradient(180deg,#59a9f3 0%,#1988e0 55%,#0875ce 100%) padding-box,var(--sd-dashboard-rim) border-box;
+  box-shadow:0 12px 25px rgba(38,132,198,.27),0 3px 7px rgba(35,91,136,.14),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 5px rgba(19,94,157,.20);
 }
 body:has(#main .statgrid) :is(.topbar .btn,.mobiletabs .nav,#main .btn,#main .dashboard-shortcut){
   transition:transform .24s var(--sd-3d-ease),box-shadow .24s var(--sd-3d-ease),background-color .24s var(--sd-3d-ease),border-color .24s var(--sd-3d-ease);
