@@ -87,7 +87,9 @@ checkpoint.productCount = before.results.length;
 save();
 // Seed the revision row last. If a trigger creation fails, the Admin API will
 // stay on its safe full-read fallback rather than advertise stale revisions.
-for (let i = 0; i < statements.length; i++) {
+// Apply only index and trigger definitions first. Verify actual stored SQL
+// before publishing a revision that could be used to skip catalog reads.
+for (let i = 0; i < statements.length - 1; i++) {
   await query(statements[i]);
   checkpoint.lastAppliedStep = i + 1;
   save();
@@ -106,6 +108,10 @@ for (const action of ['insert', 'update', 'delete']) {
   assert.match(String(trigger.sql || ''), /WHERE\s+key\s*=\s*'products_revision'/i,
     'Existing trigger does not actually increment the version');
 }
+// Only now make conditional reads eligible for clients.
+await query(statements[4]);
+checkpoint.lastAppliedStep = 5;
+save();
 const revision = await query("SELECT value FROM settings WHERE key='products_revision' LIMIT 1");
 assert.match(String(revision.results[0]?.value ?? ''), /^\d{1,19}$/, 'Invalid product revision token');
 const after = await query(listing);
