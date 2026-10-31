@@ -1616,6 +1616,9 @@ function applyThemeMode(mode,animate=true){
   const reduced=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const targetDark=mode==='dark'||(mode==='auto'&&!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches));
   const overlay=$('#sdThemeSwitchOverlay');
+  let shownInSession=false;
+  try{shownInSession=sessionStorage.getItem('sd-theme-overlay-seen')==='1'}catch{}
+  if(shownInSession)animate=false;
   const hadPending=typeof window.__sdCancelThemeStage==='function';
   if(hadPending)window.__sdCancelThemeStage();
   clearTimeout(window.__sdThemeTimer);
@@ -1630,7 +1633,8 @@ function applyThemeMode(mode,animate=true){
   }
   const started=performance.now();
   const mobileThemeGuard=!!(window.matchMedia&&window.matchMedia('(max-width:760px)').matches);
-  const durationMs=mobileThemeGuard?1180:700,minimumCoveredAfterCommitMs=mobileThemeGuard?580:320;
+  const durationMs=200,minimumCoveredAfterCommitMs=0;
+  try{sessionStorage.setItem('sd-theme-overlay-seen','1')}catch{}
   let finished=false,committed=false,coverStarted=false;
   let rafOne=0,rafTwo=0,rafThree=0,rafFour=0,rafFive=0,rafSix=0,rafSeven=0,rafEight=0,coverFallback=0,exitTimer=0,restoreTimer=0;
   window.__sdThemeTargetDark=targetDark;
@@ -1656,7 +1660,7 @@ function applyThemeMode(mode,animate=true){
     overlay.classList.add('is-dismissing');
     overlay.classList.remove('is-visible');
     overlay.setAttribute('aria-hidden','true');
-    exitTimer=setTimeout(()=>{if(finished)return;finished=true;cleanup()},320);
+    exitTimer=setTimeout(()=>{if(finished)return;finished=true;cleanup()},110);
   };
   const commit=()=>{
     if(finished||committed)return;
@@ -1683,7 +1687,7 @@ function applyThemeMode(mode,animate=true){
             0,durationMs-(performance.now()-started),minimumCoveredAfterCommitMs
           ));
         })});
-      },170);
+      },0);
     })});
   };
   const coverComplete=()=>{
@@ -1704,7 +1708,7 @@ function applyThemeMode(mode,animate=true){
     rafTwo=requestAnimationFrame(()=>{
       if(finished)return;
       overlay.classList.add('is-visible');
-      coverFallback=setTimeout(coverComplete,360);
+      coverFallback=setTimeout(coverComplete,130);
     });
   });
 }
