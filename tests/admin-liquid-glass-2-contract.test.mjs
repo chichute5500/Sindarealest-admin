@@ -42,7 +42,8 @@ assert.ok(packageJson.scripts.test.includes('tests/admin-liquid-glass-2-contract
   'Liquid Glass 2 contract must run in the standard test suite');
 assert.ok(!html.includes('SD_ADMIN_FAKE_PRICES'),'Design cannot fabricate live dashboard statistics');
 assert.doesNotMatch(html,/#main \.mobilecards tbody tr,#main \.customer-mobile-summary/, 'customer mobile cards should use the outer row shell once');
-assert.match(html,/\.mobiletabs\{[\s\S]{0,400}?height:56px;min-height:56px/, 'Admin mobile navigation should keep the slim target dock height');
-assert.match(html,/\.mobiletabs \.nav\.active\{[\s\S]{0,350}?0 5px 12px rgba\(49,121,187,\.15\)/, 'selected Admin tab should remain visibly raised');
-assert.match(html,/@media\(max-width:820px\) and \(max-height:700px\)\{[\s\S]{0,900}?#main \.dashboard-revenue-empty\{min-height:64px/, 'short phone dashboard should compact enough to clear the fixed navigation');
+assert.ok(html.includes('--sd-dock-height:61px;--sd-dock-bottom:18px'), 'Dock dimensions must follow the measured reference');
+assert.ok(html.includes('var(--sd-dock-height) + var(--sd-dock-bottom) + 20px + env(safe-area-inset-bottom)'), 'Content must clear the entire dock footprint and safe area');
+assert.doesNotMatch(html,/\.mobiletabs[^{}]*\{[^{}]*white-space:normal/, 'Dock labels must not wrap');
+assert.doesNotMatch(html,/\.mobiletabs[^{}]*\{[^{}]*(?:height|padding|background|font-size):[^;}]*!important/, 'Dock geometry and material must not be locked by old important rules');
 console.log('PASS: Admin Liquid Glass 2 preserves live UI semantics and defines a unified optical glass interaction contract.');

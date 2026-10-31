@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 test.use({ serviceWorkers: 'block' });
@@ -25,6 +25,8 @@ const matrix = [
   {width:360,height:800,theme:'light'}, {width:360,height:800,theme:'dark'},
   {width:375,height:812,theme:'light'}, {width:375,height:812,theme:'dark'},
   {width:390,height:844,theme:'light'}, {width:390,height:844,theme:'dark'},
+  {width:430,height:932,theme:'light'}, {width:430,height:932,theme:'dark'},
+  {width:432,height:744,theme:'light'}, {width:432,height:744,theme:'dark'},
   {width:412,height:915,theme:'light'}, {width:412,height:915,theme:'dark'},
   {width:1280,height:800,theme:'light'}, {width:1280,height:800,theme:'dark'},
   {width:1440,height:900,theme:'light'}, {width:1440,height:900,theme:'dark'}
@@ -52,6 +54,9 @@ for (const {width,height,theme} of matrix) {
           }
         } catch {}
       });
+      // Reject stale alias HTML before authenticating or collecting evidence.
+      const expectedHtml=readFileSync('public/admin/index.html','utf8');
+      await expect.poll(async()=>{const r=await context.request.get(origin+adminPath,{headers:{'Cache-Control':'no-cache'}});return createHash('sha256').update(await r.text()).digest('hex')},{timeout:300000,intervals:[5000,10000,15000],message:'Preview must serve the exact tested Admin HTML'}).toBe(createHash('sha256').update(expectedHtml).digest('hex'));
       const response=await page.goto(origin+adminPath,{waitUntil:'domcontentloaded',timeout:30000});
       expect(response?.status()).toBe(200);
       await expect(page.locator('#loginView')).toBeVisible({timeout:12000});
@@ -68,7 +73,10 @@ for (const {width,height,theme} of matrix) {
             ? Math.abs(document.querySelector('#backdrop').getBoundingClientRect().bottom-
                 document.querySelector('.mobiletabs').getBoundingClientRect().top)
             : null;
-          return {documentWidth:de.scrollWidth,viewportWidth:innerWidth,horizontalOverflow:de.scrollWidth>innerWidth+2,
+          const componentSelectors=['.topbar','.layout','.pagehead','.statgrid','.stat','.stat-icon','.dashboard-quick-panel','.dashboard-shortcut','.shortcut-icon','.dashboard-revenue','.dashboard-revenue-empty','.dashboard-revenue-visual','.mobiletabs','.mobiletabs .nav'];
+          const components=Object.fromEntries(componentSelectors.map(selector=>[selector,[...document.querySelectorAll(selector)].map(el=>({box:el.getBoundingClientRect().toJSON(),css:Object.fromEntries(['background','border','borderRadius','boxShadow','fontSize','fontFamily','lineHeight','padding','whiteSpace','backdropFilter'].map(k=>[k,getComputedStyle(el)[k]]))}))]));
+          const masks=[...document.querySelectorAll('.stat .value,.notif-count,.nav-notif-count,.dashboard-activity-table')].filter(el=>el.getClientRects().length).map(el=>el.getBoundingClientRect().toJSON());
+          return {components,masks,documentWidth:de.scrollWidth,viewportWidth:innerWidth,horizontalOverflow:de.scrollWidth>innerWidth+2,
             modalNavGapPx,
             unlabeledInteractive:interactive.filter(el=>{
               if(el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return false;
@@ -76,6 +84,9 @@ for (const {width,height,theme} of matrix) {
               return el.getClientRects().length>0;
             }).length,heading:target?.querySelector('h1,h2')?.textContent?.trim().slice(0,90)||null};
         },container);
+        if(width<=820 && container==='#appView'){
+          for(const nav of m.components['.mobiletabs .nav'])expect(nav.css.whiteSpace,'Dock labels must remain on one line').toBe('nowrap');
+        }
         expect(m.horizontalOverflow,'No screenshot may pass with document horizontal overflow: '+name+' at '+width+'px').toBe(false);
         expect(m.unlabeledInteractive,'Visible controls must have accessible names: '+name+' at '+width+'px '+theme).toBe(0);
         if(m.modalNavGapPx!==null)expect(m.modalNavGapPx,
