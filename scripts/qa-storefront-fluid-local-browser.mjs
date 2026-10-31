@@ -170,6 +170,8 @@ try{
       open:document.getElementById("cartDrawer").classList.contains("open")};
    });
    assert.equal(cartGeometry.open,true);
+   assert.equal(await page.locator(".sd-fly-to-cart-clone:visible").count(),0,
+      "Product fly-to-cart snapshot must never float above open Cart");
    if(c.mobile){
     assert.equal(cartGeometry.nav,"none","Bottom nav must not float over the cart");
     assert.ok(cartGeometry.bottom>=cartGeometry.viewport-44,
@@ -189,6 +191,8 @@ try{
     navVisible:getComputedStyle(document.getElementById("mobileBottomNav")).display
    }));
    assert.equal(initialCheckout.checkoutVisible,"visible");
+   assert.equal(await page.locator(".sd-fly-to-cart-clone:visible").count(),0,
+      "Product fly-to-cart snapshot must never cover Checkout form");
    assert.equal(initialCheckout.cartVisible,"hidden","Cart cannot peek out underneath Checkout");
    assert.equal(initialCheckout.accountVisible,"hidden","Account cannot peek out underneath Checkout");
    await page.screenshot({path:OUTPUT+"/"+c.name+"-checkout-open.png",animations:"disabled"});
@@ -246,13 +250,20 @@ try{
     const ids=["cartDrawer","accountDrawer","checkoutDrawer","productOverlay","sdFullscreenViewer"];
     const opened=ids.filter(id=>document.getElementById(id).classList.contains("open"));
     const visible=ids.filter(id=>getComputedStyle(document.getElementById(id)).visibility==="visible");
-    return {url:location.href,
+    return {url:location.href,route:location.pathname,
+      bodyDisplay:getComputedStyle(document.body).display,
+      catalogDisplay:document.getElementById("products")?getComputedStyle(document.getElementById("products")).display:"missing",
+      notFound:!!document.getElementById("notFoundPage"),
+      notFoundRoute:document.body.classList.contains("sd-not-found-route"),
+      welcome:!!document.getElementById("welcomeSplash"),
       open:opened,visible,
       nav:getComputedStyle(document.getElementById("mobileBottomNav")).display,
       bodyClass:document.body.className,htmlClass:document.documentElement.className,
       modalBudget:document.body.classList.contains("has-open-overlay"),
       viewport:window.innerWidth,navBounds:document.getElementById("mobileBottomNav").getBoundingClientRect().toJSON()};
    });
+   result.afterReload=refreshed;
+   console.log("RELOAD_DIAG "+c.name+" "+JSON.stringify(refreshed));
    assert.ok(refreshed.open.length<=1,"Reload cannot restore several open overlays: "+JSON.stringify(refreshed));
    assert.ok(refreshed.visible.length<=1,"Reload cannot show several overlays: "+JSON.stringify(refreshed));
    if(c.mobile){
