@@ -2198,6 +2198,15 @@ body:has(#main .statgrid){
   --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(218,149,201,.30),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(112,172,234,.34),transparent 85%),radial-gradient(ellipse 100% 30% at 60% 110%,rgba(106,212,199,.10),transparent 84%),linear-gradient(180deg,rgba(190,231,255,.70),rgba(94,158,208,.36) 46%,rgba(60,122,175,.25) 72%,rgba(167,230,222,.38));
   --sd-dashboard-shadow:0 15px 34px rgba(0,5,15,.28),0 2px 5px rgba(0,7,19,.22),inset 0 1px 0 rgba(219,241,255,.35),inset 0 -1px 2px rgba(106,212,199,.19);
 }
+/* Shared atmospheric light behind Admin glass surfaces; subtle enough to preserve form contrast. */
+body:has(#appView:not(.hidden)) #appView{
+  background-image:radial-gradient(circle at 92% 8%,transparent 0 132px,rgba(255,255,255,.42) 133px 134px,transparent 136px),radial-gradient(ellipse 46% 34% at 2% 22%,rgba(241,184,221,.13),transparent 82%),radial-gradient(ellipse 42% 36% at 100% 45%,rgba(100,167,232,.13),transparent 82%),radial-gradient(ellipse 58% 25% at 55% 100%,rgba(108,184,222,.035),transparent 84%);
+  background-attachment:fixed;
+}
+:root[data-admin-theme="dark"] body:has(#appView:not(.hidden)) #appView{
+  background-image:radial-gradient(circle at 92% 8%,transparent 0 132px,rgba(170,213,246,.20) 133px 134px,transparent 136px),radial-gradient(ellipse 46% 34% at 2% 22%,rgba(210,148,203,.08),transparent 82%),radial-gradient(ellipse 42% 36% at 100% 45%,rgba(100,167,232,.10),transparent 82%),radial-gradient(ellipse 58% 25% at 55% 100%,rgba(108,184,222,.025),transparent 84%);
+  background-attachment:fixed;
+}
 body:has(#main .statgrid) #main :is(.stat,.dashboard-quick-panel,.dashboard-revenue,.dashboard-revenue-empty){
   border:1.5px solid transparent;
   background:radial-gradient(ellipse 72% 48% at 2% 0%,rgba(255,255,255,.82),transparent 80%) padding-box,radial-gradient(ellipse 46% 58% at 100% 100%,rgba(100,167,232,.08),transparent 84%) padding-box,var(--sd-dashboard-face) padding-box,var(--sd-dashboard-rim) border-box;
