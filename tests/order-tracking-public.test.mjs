@@ -6,6 +6,11 @@ import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
 import { onRequestPost as lookup, onRequestGet, publicOrderProgress } from "../functions/api/order-tracking.js";
+const realFetch=globalThis.fetch;
+globalThis.fetch=async (url)=> {
+ assert.match(String(url),/challenges.cloudflare.com\\/turnstile\\/v0\\/siteverify/);
+ return new Response(JSON.stringify({success:true,hostname:"sindarealest.test",action:"order_lookup"}),{headers:{"Content-Type":"application/json"}});
+};
 
 const storefront=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const orderSection=storefront.indexOf('id="order"');
@@ -76,8 +81,8 @@ async function search(term,ip="198.51.100.23",headers={}){
  return lookup({request:new Request("https://sindarealest.test/api/order-tracking",{
   method:"POST",
   headers:{"Content-Type":"application/json","Origin":"https://sindarealest.test","CF-Connecting-IP":ip,...headers},
-  body:JSON.stringify({lookup:term})
- }),env:{DB,SESSION_SECRET:"test-session-secret-long-enough-1234567890"}});
+  body:JSON.stringify({lookup:term,turnstileToken:'qa-test-proof-order-1'})
+ }),env:{DB,SESSION_SECRET:"test-session-secret-long-enough-1234567890",TURNSTILE_SITE_KEY:"qa-public-site",TURNSTILE_SECRET_KEY:"qa-private-test"}});
 }
 function validateSafe(order,{masked=false}={}){
  assert.equal(order.steps.length,6,"Exactly six public steps");
