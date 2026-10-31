@@ -84,3 +84,38 @@ The workflow also confirmed HTTP 401 for an unauthenticated Admin products API r
 **Interpretation:** On each logged-in Admin periodic catalog check with unchanged products, the product query cost drops from 453 rows read to 1 row read. A first/full reload or an actual mutation still reads all 453 products (by design). An index does not reduce the full SELECT's own rows_read: the savings come from skipping unchanged full reads. This is not yet evidence of an identical 99.78% reduction in account-wide D1 quota, because orders, audit logs, public catalog, login and other endpoints contribute to the aggregate.
 
 **Next release gates:** Compare Cloudflare D1 Insights total Rows Read under representative Preview traffic, confirm real edit/create/delete sync on authorized Preview test data if safe, review any PR #154/#159 overlapping changes, and require Owner acceptance before integration into Production. Do not re-run unnecessary writes on the live D1 merely to confirm metrics.
+
+## Verified Admin audit-log polling optimization — 1 November 2026
+
+**Preview D1 evidence:** https://github.com/chichute5500/Sindarealest-admin/actions/runs/41232964715  
+**Source SHA tested:** `4c2372d95a24a3223731df31dadfe23dee07f8ed`.
+
+The `scripts/d1-preview-admin-polling-readonly.mjs` workflow first measured the exact live Admin GET SQL on Preview D1 (read-only run https://github.com/chichute5500/Sindarealest-admin/actions/runs/41232739210):
+
+| Endpoint | Before: Rows Read per call | After: Rows Read per call when unchanged |
+| --- | ---: | ---: |
+| Products | 453 | **1** |
+| Audit logs | 401 | **1** |
+| Orders | 58 | 58 (unchanged by this follow-up) |
+
+**New change:** `migrations/0017_admin_audit_revision.sql` adds a `(created_at DESC,id DESC)` sort index and INSERT/UPDATE/DELETE audit-log revision triggers. The Admin GET audit endpoint now accepts an optional revision token, like products. Active 10-second order/log polling stays intact, but audit history is only reloaded after an actual log mutation. Missing revision seed falls back to the full original list.
+
+The **guarded remote migration and deployed Preview both PASSED**:
+- Before index: 401 Rows Read to return 200 audit entries.
+- After index, full audit query: **200 Rows Read**, identical content and order.
+- Unchanged revision check: **1 Rows Read**: **99.75% lower per idle audit poll** than the original full query.
+- Schema: all three triggers and the index were verified on `sindarealest-admin-preview-db`; Time Travel bookmark saved.
+- Isolated deployed QA: https://d1-audit-155.sindarealest-admin-preview.pages.dev/admin/
+- HTTP 401 on anonymous Admin audit API: PASS.
+- `tests/admin-audit-revision.test.mjs` covers 50 idle polls, real in-memory SQLite triggers, update/delete, restore, Admin authentication, index selection and old-schema fallback. `npm run check`, `npm test`, and Admin Preview Playwright: PASS.
+
+**Interpretation and limits:** The two 99% figures are actual reductions **per unchanged Admin poll**, not a claim of 99% account-level savings. An initial load or real mutation still reads all relevant products/logs. Orders continue reading 58 rows per request in this measured Preview dataset and 10-second cadence. Other endpoints and Production traffic contribute to Cloudflare's total Rows Read.
+
+**Release decision:** D1 query/performance and isolated Admin Preview QA for products + audit logs = **PASS**; Production roll-out and account-level quota comparison = **NOT YET PASS**. PR #155 contains additional Storefront changes unrelated to these optimizations; it overlaps PR #154 in `package.json` and `public/admin/index.html`, and PR #159 in `package.json`, `public/index.html`, and `tests/order-trust-layout.test.mjs`. Do not merge PR #155 wholesale without resolving these conflicts and preserving Owner-approved Liquid Glass. Do not modify Production until approved.
+
+### Safe handoff
+
+- Branch: `perf/d1-rows-read-safe-2026-10-30`, PR #155 (draft, unmerged).
+- Preserve `migrations/0015_d1_rows_read_indexes.sql`, `0016_admin_products_revision.sql` and `0017_admin_audit_revision.sql`, their API and Admin polling changes, and regressions when integrating.
+- Do not rerun remote migration to claim additional savings; it is already applied and verified on Preview D1.
+- For a Production release: resolve PR conflicts, review Production D1 backup/binding, obtain Owner approval, then perform a separate guarded Production rollout with comparable-traffic monitoring. No customer or payment writes are needed for performance measurement.
