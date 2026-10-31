@@ -4340,7 +4340,7 @@ html.dark .detail-gallery-arrow:active,html.dark .sd-fullscreen-arrow:active{
   const productRoute = /^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path)
     || /^\/san-pham\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path);
   if (path !== '/' && path !== '/index.html' && !catalogRoute && !productRoute) {
-    const template=document.getElementById('sdNotFoundTemplate');
+    const template=document.getElementById?.('sdNotFoundTemplate');
     if(template?.content&&!document.getElementById('notFoundPage'))
       document.body.appendChild(template.content.cloneNode(true));
     document.body.classList.add('sd-not-found-route');
