@@ -32,7 +32,7 @@ for(const token of ['--sd-3d-ink','--sd-3d-shadow','--sd-3d-depressed','--sd-3d-
   const values=source=>Array.from(source.matchAll(new RegExp(`${token}:([^;]+);`,'g')),match=>match[1]);
   const storefrontValues=values(storefront),adminValues=values(html);
   assert.ok(storefrontValues.length,`Storefront must define ${token}`);
-  const adminTunedTokens=new Set(['--sd-3d-rim','--sd-3d-face','--sd-glass-panel-shadow']);
+  const adminTunedTokens=new Set(['--sd-3d-rim','--sd-3d-face','--sd-glass-shell-strong','--sd-glass-panel-shadow']);
   if(adminTunedTokens.has(token)) {
     assert.equal(adminValues.length,storefrontValues.length,`Admin light/dark definitions for ${token} must remain paired`);
     assert.ok(adminValues.some((value,index)=>value!==storefrontValues[index]),`Admin reference tuning for ${token} must be deliberate`);
