@@ -35,11 +35,12 @@ for (const {width,height,theme} of matrix) {
   test('isolated live Admin: 12 screens, read-only '+width+'x'+height+' '+theme, async ({browser}) => {
     test.setTimeout(240_000);
     if (!testPassword) throw new Error('ADMIN_TEST_PASSWORD missing; do not bypass Access');
+    const dpr=width===432?2:1;
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
-    const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},theme,
+    const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},deviceScaleFactor:dpr,theme,
       evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],observedAtUtc:new Date().toISOString()};
-    const context=await browser.newContext({viewport:{width,height},colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:'reduce'});
+    const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:'reduce'});
     const page=await context.newPage();
     try {
       if(process.env.CF_ACCESS_CLIENT_ID && process.env.CF_ACCESS_CLIENT_SECRET)
@@ -114,12 +115,12 @@ for (const {width,height,theme} of matrix) {
           'Deployed mobile editor/gallery must meet navigation without exposing product rows: '+name+' '+theme)
           .toBeLessThanOrEqual(2);
         const nameFile=name+'.png';
-        // Capture exactly the nominated viewport, not the entire scrollable page.
-        // Only equal-sized PNGs can be directly aligned with a reference viewport.
+        // Capture the nominated CSS viewport with its declared physical pixel ratio.
+        // TARGET uses432CSSpx atDPR2; comparison normalizes both sides to CSS pixels.
         const screenshot=await page.screenshot({path:join(folder,nameFile),fullPage:false,animations:'disabled'});
         const measuredWidth=screenshot.readUInt32BE(16),measuredHeight=screenshot.readUInt32BE(20);
-        expect(measuredWidth,'Screenshot pixel width must match intended viewport: '+name).toBe(width);
-        expect(measuredHeight,'Screenshot pixel height must match intended viewport: '+name).toBe(height);
+        expect(measuredWidth,'Screenshot pixels must match CSS viewport times declared DPR: '+name).toBe(width*dpr);
+        expect(measuredHeight,'Screenshot pixels must match CSS viewport times declared DPR: '+name).toBe(height*dpr);
         report.screens.push({screen:name,status:'CAPTURED_NOT_ACCEPTED',file:nameFile,
           sha256:createHash('sha256').update(screenshot).digest('hex'),pixelDimensions:{width:measuredWidth,height:measuredHeight},metrics:m});
       }
