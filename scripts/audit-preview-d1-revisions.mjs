@@ -59,6 +59,10 @@ async function main() {
       {encoding:"utf8",timeout:150000,maxBuffer:10*1024*1024,
         env:{...process.env,CLOUDFLARE_SEND_METRICS:"false"}});
     if(r.error||r.status!==0)throw Error(label+" failed: "+(r.error?.message||r.stderr||r.status).toString().slice(0,300));
+    // Wrangler remote --file uses a multi-statement import and emits a human-readable
+    // success log even with --json. Trust the process exit code here, then verify
+    // every index, trigger, revision marker and protected record count via JSON SQL.
+    if(args[0]==="--file")return [];
     let j;try{j=JSON.parse(r.stdout)}catch{throw Error(label+" returned non-JSON output");}
     assert.ok(!(Array.isArray(j)?j:[j]).some(x=>x?.success===false),label+" SQL failed");
     return rows(j);
