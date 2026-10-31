@@ -263,7 +263,14 @@ try{
    const refreshed=await page.evaluate(()=>{
     const ids=["cartDrawer","accountDrawer","checkoutDrawer","productOverlay","sdFullscreenViewer"];
     const opened=ids.filter(id=>document.getElementById(id).classList.contains("open"));
-    const visible=ids.filter(id=>getComputedStyle(document.getElementById(id)).visibility==="visible");
+    // Closed panels intentionally stay in the DOM, but can be inert or
+    // translated offscreen. Neither should count as a visible modal.
+    const visible=ids.filter(id=>{
+      const el=document.getElementById(id),style=getComputedStyle(el),rect=el.getBoundingClientRect();
+      return !el.hasAttribute('inert') && style.visibility!=='hidden' &&
+        style.display!=='none' && rect.right>0 && rect.left<innerWidth &&
+        rect.bottom>0 && rect.top<innerHeight;
+    });
     return {url:location.href,route:location.pathname,
       bodyDisplay:getComputedStyle(document.body).display,
       catalogDisplay:document.getElementById("products")?getComputedStyle(document.getElementById("products")).display:"missing",
