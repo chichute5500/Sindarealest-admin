@@ -1,0 +1,86 @@
+name: Diagnose Workers request spikes — READ ONLY
+
+on:
+  push:
+    branches: [perf/d1-rows-read-safe-2026-10-30]
+    paths:
+      - '.github/workflows/workers-pages-request-attribution-readonly.yml'
+      - 'scripts/workers-pages-request-attribution-readonly.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: workers-pages-readonly-diagnosis
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    name: Attribute Workers requests with read-only Cloudflare Analytics
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard repository, diagnostic branch, immutable HEAD, and credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          test "$GITHUB_SHA" = "$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Fetch account Worker script metrics and Preview metadata — no site traffic
+        run: node scripts/workers-pages-request-attribution-readonly.mjs
+      - name: Post sanitized findings on PR 155
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE' > "$RUNNER_TEMP/workers-report.md"
+          import { readFileSync } from 'node:fs';
+          const r=JSON.parse(readFileSync('artifacts/workers-attribution/report.json','utf8'));
+          const lines=[
+            '### Read-only Cloudflare Workers request attribution — 1 Nov 2026',
+            'GitHub run: https://github.com/'+process.env.GITHUB_REPOSITORY+'/actions/runs/'+process.env.GITHUB_RUN_ID,
+            'Source SHA: `'+process.env.GITHUB_SHA+'`',
+            'UTC range: '+r.window.startUtc+' to '+r.window.endUtc,
+            '',
+            '#### Confirmed Pages project script names',
+            '| Project | Preview script | Production script |',
+            '| --- | --- | --- |'
+          ];
+          for(const p of r.projectMetadata)
+            lines.push('| '+p.project+' | '+(p.previewScriptName||'unknown')+' | '+(p.productionScriptName||'unknown')+' |');
+          lines.push('','#### Workers invocation counts by script','| Worker script | Requests | Subrequests | Errors |','| --- | ---: | ---: | ---: |');
+          for(const m of r.workerTotals.slice(0,25))
+            lines.push('| '+m.script+' | '+m.requests+' | '+m.subrequests+' | '+m.errors+' |');
+          lines.push('','#### Preview hourly spikes','| UTC hour | Requests | Subrequests |','| --- | ---: | ---: |');
+          for(const m of r.previewHourly)lines.push('| '+m.hour+' | '+m.requests+' | '+m.subrequests+' |');
+          lines.push('','#### Preview script versions (cannot automatically map to branch)','| Script version | Requests |','| --- | ---: |');
+          for(const m of r.previewScriptVersions.slice(0,30))lines.push('| '+m.version+' | '+m.requests+' |');
+          if(r.warnings.length)lines.push('','Data limitations: '+r.warnings.join('; '));
+          lines.push('','**Important:** these aggregates are by Workers script/version and cannot prove which Pages branch or request path generated the traffic. Do not attribute a branch without hostname/log evidence. No SQL, deploys, database writes, site requests, or Production changes performed.');
+          process.stdout.write(lines.join('\n')+'\n');
+          NODE
+          gh api "repos/$GITHUB_REPOSITORY/issues/155/comments" -f body="$(cat "$RUNNER_TEMP/workers-report.md")" >/dev/null
+      - name: Save sanitized diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workers-request-attribution-readonly
+          path: artifacts/workers-attribution/report.json
+          if-no-files-found: ignore
+          retention-days: 3

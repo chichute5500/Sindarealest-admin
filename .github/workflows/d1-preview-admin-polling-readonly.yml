@@ -1,0 +1,79 @@
+name: D1 Preview Admin polling metrics — READ ONLY
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/d1-preview-admin-polling-readonly.yml'
+      - 'scripts/d1-preview-admin-polling-readonly.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: d1-preview-admin-polling-metrics
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    name: Measure source-exact Admin queries on Preview D1, zero writes
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard repo, branch, and immutable SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          test "$GITHUB_SHA" = "$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Measure only SELECTs from the exact Admin endpoint sources
+        run: node scripts/d1-preview-admin-polling-readonly.mjs
+      - name: Publish sanitized read-only metrics on PR #155
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE' > "$RUNNER_TEMP/polling-result.txt"
+          import {readFileSync} from 'node:fs';
+          const report=JSON.parse(readFileSync('artifacts/d1-preview-polling/metrics.json','utf8'));
+          const rows=[
+            '### Preview Admin polling — actual D1 Rows Read',
+            'Source: `'+process.env.GITHUB_SHA+'`',
+            'Read-only run: https://github.com/'+process.env.GITHUB_REPOSITORY+'/actions/runs/'+process.env.GITHUB_RUN_ID,
+            'Database: `sindarealest-admin-preview-db`',
+            '',
+            '| API query | Rows Read / call | Returned rows |',
+            '| --- | ---: | ---: |'
+          ];
+          for(const [key,metric] of Object.entries(report.queries)){
+            rows.push('| '+key+' | '+metric.rowsRead+' | '+metric.resultCount+' |');
+          }
+          rows.push('No business rows logged. This is **per-call**, not account-wide usage. Production/Main untouched.');
+          process.stdout.write(rows.join('\n')+'\n');
+          NODE
+          gh api "repos/$GITHUB_REPOSITORY/issues/155/comments" -f body="$(cat "$RUNNER_TEMP/polling-result.txt")" > /dev/null
+      - name: Save sanitized result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d1-preview-admin-polling-readonly
+          path: artifacts/d1-preview-polling/metrics.json
+          if-no-files-found: ignore
+          retention-days: 7

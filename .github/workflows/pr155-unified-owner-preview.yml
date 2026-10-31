@@ -1,0 +1,90 @@
+name: Unified PR155 Storefront owner Preview — isolated only
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/pr155-unified-owner-preview.yml'
+      - 'public/index.html'
+      - 'public/storefront-fluid-unified.css'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr155-single-owner-preview
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Validate and deploy SAME PR #155 to one isolated Pages preview alias
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_ALIAS: unified-storefront-155
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Refuse Production deploy and stale PR heads
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          test "$CF_TARGET" = "sindarealest-admin-preview"
+          test "$CF_ALIAS" = "unified-storefront-155"
+          test "$CF_ALIAS" != main
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          remote="$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test "$remote" = "$GITHUB_SHA" || { echo "::error::PR HEAD changed, refuse stale Preview deployment"; exit 1; }
+      - name: Audit source and run complete local regression suite
+        run: |
+          npm install --no-fund
+          npm run check
+          npm test
+      - name: Prove isolated Preview D1 and R2 differ from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/pr155-admin-preview.json"
+          curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$base/sindarealest2" > "$RUNNER_TEMP/pr155-production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/pr155-admin-preview.json" "$RUNNER_TEMP/pr155-production.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const root=process.env.RUNNER_TEMP;
+          const preview=JSON.parse(readFileSync(root+'/pr155-admin-preview.json','utf8')).result;
+          const production=JSON.parse(readFileSync(root+'/pr155-production.json','utf8')).result;
+          const p=preview?.deployment_configs?.preview;
+          const live=production?.deployment_configs?.production;
+          const db=x=>x?.d1_databases?.DB?.id||x?.d1_databases?.DB?.database_id||'';
+          const bucket=(x,k)=>x?.r2_buckets?.[k]?.name||x?.r2_buckets?.[k]?.bucket_name||'';
+          if(preview.name!=='sindarealest-admin-preview'||production.name!=='sindarealest2'||production.production_branch!=='main')
+            throw Error('Unexpected Pages project identity or Production branch');
+          if(!db(p)||db(p)===db(live))throw Error('Preview and Production D1 identity not isolated');
+          for(const k of ['IMAGES','ORIGINALS']){
+           if(!bucket(p,k)||!bucket(live,k)||bucket(p,k)===bucket(live,k))
+             throw Error('Preview R2 '+k+' must exist and differ from Production');
+          }
+          console.log('PASS: Preview D1/R2 isolated; Production untouched.');
+          NODE
+      - name: Publish only the one PR155 Pages Preview alias (NO Main)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_ALIAS" --commit-hash "$GITHUB_SHA" --commit-message "PR155 unified owner review $GITHUB_SHA"
+          echo "Owner Preview alias: https://unified-storefront-155.sindarealest-admin-preview.pages.dev/"
+          echo "Source SHA: $GITHUB_SHA"
+          echo "PR remains DRAFT; no merge and no Production deploy."

@@ -1,0 +1,106 @@
+name: D1 Preview audit log optimization — guarded
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/d1-preview-audit-revision-guarded.yml'
+      - 'scripts/d1-preview-audit-revision-guarded.mjs'
+      - 'migrations/0017_admin_audit_revision.sql'
+      - 'tests/admin-audit-revision.test.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: d1-preview-audit-revision-guarded
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Run tests, verify Preview D1, measure then deploy isolated Admin
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Guard exact repository, branch, and current HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          test "$GITHUB_SHA" = "$(git rev-parse HEAD)"
+          test "$GITHUB_SHA" = "$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Test both conditional Admin reads and all project checks
+        run: |
+          npm install --no-fund
+          node tests/admin-audit-revision.test.mjs
+          node tests/admin-products-revision.test.mjs
+          node tests/admin-mobile-refresh-contract.test.mjs
+          npm run check
+      - name: Guarded Preview D1 schema and SQL parity
+        run: node scripts/d1-preview-audit-revision-guarded.mjs
+      - name: Report actual Preview Rows Read on PR 155
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE' > "$RUNNER_TEMP/d1-audit-report.txt"
+          import {readFileSync} from 'node:fs';
+          const result=JSON.parse(readFileSync('artifacts/d1-preview-audit/checkpoint.json','utf8'));
+          if(!result.schemaApplied)throw Error('Missing verified migration');
+          const b=Number(result.beforeAuditRowsRead),a=Number(result.afterAuditRowsRead),r=Number(result.revisionRowsRead);
+          if(![b,a,r].every(Number.isFinite))throw Error('Missing D1 Rows Read metrics');
+          const delta=b>0?((1-r/b)*100).toFixed(2):'N/A';
+          const lines=[
+            '### Preview D1 audit logs — verified Rows Read optimization',
+            'Commit: `'+process.env.GITHUB_SHA+'`',
+            'Workflow: https://github.com/'+process.env.GITHUB_REPOSITORY+'/actions/runs/'+process.env.GITHUB_RUN_ID,
+            'Database: `sindarealest-admin-preview-db`',
+            '- Full audit query before index: **'+b+' Rows Read**',
+            '- Full audit query after index: **'+a+' Rows Read**',
+            '- Unchanged audit revision lookup: **'+r+' Rows Read**',
+            '- Saved per unchanged 10-second poll: **'+delta+'%** versus original full log query',
+            '- Logs returned and compared: '+result.auditRows,
+            '- Three trigger definitions, index query plan and unchanged JSON ordering: PASS',
+            '- No Production/Main changes; aggregate account quota not yet independently verified.'
+          ];
+          process.stdout.write(lines.join('\n')+'\n');
+          NODE
+          gh api "repos/$GITHUB_REPOSITORY/issues/155/comments" -f body="$(cat "$RUNNER_TEMP/d1-audit-report.txt")" > /dev/null
+      - name: Deploy only the isolated audit Admin Preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name sindarealest-admin-preview --branch d1-audit-155 --commit-hash "$GITHUB_SHA" --commit-message "PR155 D1 Audit QA $GITHUB_SHA"
+      - name: Verify deployed Preview and unauthenticated API is blocked
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://d1-audit-155.sindarealest-admin-preview.pages.dev"
+          curl --fail --silent --show-error --retry 3 --retry-delay 5 "$url/admin/" -o "$RUNNER_TEMP/admin.html"
+          grep -q "Quản trị SinDarealest" "$RUNNER_TEMP/admin.html"
+          test "$(curl --silent --show-error -o /dev/null -w '%{http_code}' "$url/api/admin/audit-logs")" = "401"
+          echo "PASS: audited Preview deployment, Production untouched."
+      - name: Save scrubbed metrics and Time Travel bookmark
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d1-preview-audit-guarded-checkpoint
+          path: artifacts/d1-preview-audit/checkpoint.json
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,0 +1,110 @@
+name: D1 product revision — PREVIEW only (guarded)
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/d1-preview-products-revision-guarded.yml'
+      - 'scripts/d1-preview-products-revision-guarded.mjs'
+      - 'migrations/0016_admin_products_revision.sql'
+      - 'tests/admin-products-revision.test.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: d1-preview-products-revision-guarded
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Validate and apply revision triggers only to isolated Preview D1
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify branch, repo and immutable HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          remote="$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test "$remote" = "$GITHUB_SHA"
+      - name: Validate local schema and secure catalog endpoint first
+        run: |
+          npm install --no-fund
+          node tests/admin-products-revision.test.mjs
+          npm run check
+      - name: Bookmark, apply schema and prove Preview SQL parity
+        run: node scripts/d1-preview-products-revision-guarded.mjs
+      - name: Measure Preview query rows and confirm migrated schema (read-only)
+        run: node scripts/d1-preview-products-readonly-validation.mjs
+      - name: Report verified Preview D1 Rows Read on PR 155
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE' > "$RUNNER_TEMP/d1-preview-result.txt"
+          import { readFileSync } from 'node:fs';
+          const metrics = JSON.parse(readFileSync('artifacts/d1-preview-products/readonly-metrics.json', 'utf8'));
+          const checkpoint = JSON.parse(readFileSync('artifacts/d1-preview-products/checkpoint.json', 'utf8'));
+          if (!metrics.passed || !checkpoint.schemaApplied) throw Error('Missing verified schema/results');
+          const before = Number(checkpoint.beforeFullRowsRead);
+          const after = Number(metrics.fullProductRowsRead);
+          const revision = Number(metrics.revisionRowsRead);
+          if (![before,after,revision].every(Number.isFinite)) throw Error('Missing Rows Read measurements');
+          const ratio = after > 0 ? ((1 - revision / after) * 100).toFixed(2) : 'N/A';
+          const lines = [
+            '### Preview D1 product Rows Read — verified workflow result',
+            '- Database: \`sindarealest-admin-preview-db\` (Preview only)',
+            '- Commit: \`' + process.env.GITHUB_SHA + '\`',
+            '- GitHub Actions: https://github.com/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID,
+            '- Full product query before index: **' + before + ' Rows Read**',
+            '- Full product query after index: **' + after + ' Rows Read**',
+            '- Unchanged revision lookup: **' + revision + ' Rows Read**',
+            '- Relative reduction per unchanged product check vs full query: **' + ratio + '%**',
+            '- Product count: ' + Number(metrics.productCount),
+            '- SQL order/data parity, trigger verification, and indexed query plan: PASS',
+            '- This is **per-query** evidence; total account quota needs traffic-matched follow-up. Production/Main unchanged.'
+          ];
+          process.stdout.write(lines.join('\\n') + '\\n');
+          NODE
+          gh api "repos/$GITHUB_REPOSITORY/issues/155/comments" -f body="$(cat "$RUNNER_TEMP/d1-preview-result.txt")" > /dev/null
+          echo "Preview Rows Read evidence published on PR #155; values not printed to public job log."
+      - name: Deploy isolated Admin QA Preview only (never Main)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name sindarealest-admin-preview --branch d1-products-155 --commit-hash "$GITHUB_SHA" --commit-message "PR155 D1 Admin QA $GITHUB_SHA"
+      - name: Verify isolated Admin Preview and anonymous API denial
+        shell: bash
+        run: |
+          set -euo pipefail
+          site="https://d1-products-155.sindarealest-admin-preview.pages.dev"
+          curl --fail --silent --show-error --retry 3 --retry-delay 5 "$site/admin/" -o "$RUNNER_TEMP/d1-admin.html"
+          grep -q "Quản trị SinDarealest" "$RUNNER_TEMP/d1-admin.html"
+          test "$(curl --silent --show-error -o /dev/null -w '%{http_code}' "$site/api/admin/products")" = "401"
+          echo "PASS: $site/admin/ (isolated D1 Preview), Production untouched."
+      - name: Save sanitized evidence and recovery bookmark
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d1-preview-products-checkpoint
+          path: |
+            artifacts/d1-preview-products/checkpoint.json
+            artifacts/d1-preview-products/readonly-metrics.json
+          if-no-files-found: ignore
+          retention-days: 7

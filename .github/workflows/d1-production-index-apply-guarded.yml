@@ -1,0 +1,61 @@
+name: D1 index optimization — PRODUCTION only (guarded)
+
+on:
+  push:
+    branches:
+      - perf/d1-rows-read-safe-2026-10-30
+    paths:
+      - '.github/workflows/d1-production-index-apply-guarded.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: d1-production-index-guarded
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Index exact Production D1 after Preview evidence, restore bookmark and SQL parity gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Guard exact repository, D1 optimization branch and secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/perf/d1-rows-read-safe-2026-10-30"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Guard immutable HEAD; abort on concurrent branch change
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="$(git ls-remote origin refs/heads/perf/d1-rows-read-safe-2026-10-30 | awk '{print $1}')"
+          test "$remote" = "$GITHUB_SHA" || { echo "::error::D1 branch HEAD changed, refusing Production DDL"; exit 1; }
+      - name: Verify local test/migration and live order parity implementation
+        run: |
+          npm install --no-fund
+          npm run check
+          node tests/d1-rows-read-regression.test.mjs
+      - name: Verify Preview index and Production binding; apply ONLY additive indexes
+        run: node scripts/d1-production-index-apply-guarded.mjs
+      - name: Store Production rollback bookmark and sanitized Rows read evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: d1-production-index-checkpoint
+          path: artifacts/d1-production-index/checkpoint.json
+          if-no-files-found: ignore
+          retention-days: 7
