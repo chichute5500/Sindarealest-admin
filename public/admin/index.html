@@ -2116,12 +2116,14 @@ body:not(:has(#loginView:not(.hidden))){
    Restore the airy mobile dashboard proportions from the supplied reference.
    Visual-only overrides; live counts, routes, and business logic stay untouched. */
 @media (min-width:390px) and (max-width:520px){
-  #main>.pagehead{margin-bottom:10px}
+  #main>.pagehead{margin-bottom:10px;align-items:center}
+  body:not(:has(#loginView:not(.hidden))):has(#main .statgrid) .layout{padding-top:0}
+  #main>.pagehead .btn.primary{min-width:158px}
   #main>.pagehead h2{font-size:clamp(27px,6.4vw,30px);line-height:1.08}
   #main .statgrid{gap:8px;margin-bottom:11px}
   #main .stat{
     min-height:clamp(88px,22vw,95px);
-    padding:11px 13px;
+    padding:8px 12px;
     border:1px solid transparent;
     border-radius:20px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
@@ -2130,7 +2132,7 @@ body:not(:has(#loginView:not(.hidden))){
   #main .stat .label{font-size:11px;line-height:1.25}
   #main .stat-icon{flex-basis:36px;width:36px;height:36px}
   #main .stat-icon svg{width:19px;height:19px}
-  #main .stat .value{font-size:clamp(24px,6vw,27px);line-height:1.05;margin:7px 0 3px}
+  #main .stat .value{font-size:clamp(24px,5.7vw,25px);line-height:1.05;margin:3px 0 1px}
   #main .stat .hint{font-size:10px;line-height:1.35}
 
   #main .dashboard-quick-panel,
