@@ -20,7 +20,7 @@ No Production per-query measurements have been provided; **do not assume that th
 1. `migrations/0015_d1_rows_read_indexes.sql`: additive indexes on `audit_logs`, `products`, and `order_items`. No `DELETE`, `UPDATE`, `DROP` or business data reformatting.
 2. `functions/api/admin/orders.js`: read the latest `order_created` audit once per order and reuse it for original payment fields and deposit timestamp logic. Original response fields, milestones, pricing and COD handling unchanged.
 3. Local SQLite test: `tests/d1-rows-read-regression.test.mjs` + exact original query fixture. Verifies `EXPLAIN QUERY PLAN` index selection, original-vs-new result-row equality, payment history, public/Admin-compatible fields and null behavior.
-4. **No frontend edits; Admin still refreshes every 10 seconds**.
+4. **Updated 2026-11-01:** Existing 10-second order/log polling remains unchanged. Every ~45 seconds Admin requests a lightweight product revision; a full product SELECT runs only if products changed. An initial login, explicit refresh before receiving a revision, or a Preview without migration 0016 still loads the full list (safe fallback).
 5. Integration caution: separate open PR #154 (Admin Liquid Glass 2.0) modifies `package.json` as well; reconcile test-script addition during merging. PR #154 does **not** modify the D1 SQL route or the migration in this PR as of review.
 
 ## Rollout gates (keep main and D1 untouched until all pass)
@@ -39,3 +39,15 @@ No Production per-query measurements have been provided; **do not assume that th
 - Restoring a previous code version does not remove an index; the additive index remains compatible. Rollback of SQL runtime code is straightforward; dropping indexes should only be considered after verifying query plans, and is not required to restore functionality.
 - Never delete orders, products, audit logs, or customer data merely to reduce Rows read.
 - This file is a **runbook**, not an assertion that database migration or Production deploy has occurred.
+
+## Addendum: Preview products query (2026-11-01)
+- Branch/PR: `perf/d1-rows-read-safe-2026-10-30` / #155 (DRAFT). The new schema is `migrations/0016_admin_products_revision.sql`.
+- Confirmed source of the normalized D1 Insights query `SELECT * FROM products ORDER BY sort_order ASC, sku ASC LIMIT ?`: `functions/api/admin/products.js` (`LIMIT 2000` in source).
+- Old Admin periodically re-read all products at the broad sync interval (~45 seconds); this was independent of the 10-second orders/log polling.
+- Migration 0016: new `(sort_order, sku)` index and AFTER INSERT/UPDATE/DELETE triggers incrementing the single indexed `settings.products_revision` value. Trigger seed row is inserted **last**, so partial migrations cannot advertise an untracked revision. This does not modify existing product rows.
+- API: optional `?revision=N` returns `{unchanged:true,revision:N}` (no products read) when equal. Otherwise full products JSON retains original order and fields, with a new `revision` property. Missing version row falls back to full results and no token.
+- Mobile/Admin UI: preserves editing guards, manual refresh, forced refresh, 10-second order/log updates, 45-second broad sync, login, and all glass/CSS styles. It only sends a version token when previously received.
+- Validation: `node tests/admin-products-revision.test.mjs` tests real disposable SQLite triggers and indexed plan, authenticated GET, hidden products, order, inserts/updates/deletes and pre-migration fallback. Existing Admin refresh contract test updated.
+- Preview DB-only guarded rollout: `.github/workflows/d1-preview-products-revision-guarded.yml` and `scripts/d1-preview-products-revision-guarded.mjs`. Requires exact Preview binding, Time Travel bookmark, 0015 predecessor index, focused tests and safe row equality. Production D1 is validated by identity only, never written.
+- **Important:** Source changes/CI PASS are not proof of a successful remote schema rollout or an observed account-level D1 quota reduction. Check the guarded workflow's result and artifacts, Preview Pages deployment revision and D1 Insights before declaring effectiveness.
+- Full catalog requests remain necessary on first load and on every real product change; a revision check adds a very small indexed SELECT. Triggers add one settings-row write per product mutation.
