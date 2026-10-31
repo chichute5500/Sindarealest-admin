@@ -5,6 +5,10 @@
 import assert from 'node:assert/strict';
 import { generateShortWarrantyCode, isWarrantyCode, isWarrantyCodeCollisionError } from '../functions/_warranty-policy.js';
 import { onRequestPost as lookup } from '../functions/api/warranty-lookup.js';
+globalThis.fetch=async url=>{
+ assert.match(String(url),/challenges.cloudflare.com\\/turnstile\\/v0\\/siteverify/);
+ return new Response(JSON.stringify({success:true,hostname:"shop.example",action:"warranty_lookup"}),{headers:{"Content-Type":"application/json"}});
+};
 
 for (let i=0;i<512;i++){
  const code=generateShortWarrantyCode();
@@ -58,7 +62,7 @@ const DB={
 async function search(lookupValue,ip){
  return lookup({request:new Request('https://shop.example/api/warranty-lookup',{method:'POST',headers:{
   Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':ip
- },body:JSON.stringify({lookup:lookupValue})}),env:{DB}});
+ },body:JSON.stringify({lookup:lookupValue,turnstileToken:'qa-test-proof-warranty-1'})}),env:{DB,TURNSTILE_SITE_KEY:"qa-public-site",TURNSTILE_SECRET_KEY:"qa-private-test"}});
 }
 const byCode=await search('sdw-k7m2','198.51.100.155');
 assert.equal(byCode.status,200,'short code must work on public lookup');
