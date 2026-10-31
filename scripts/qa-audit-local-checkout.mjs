@@ -190,7 +190,11 @@ try{
    await retryPage.locator('#catalogGrid [data-add="qa-wallet"]').click();
    await retryPage.evaluate(()=>document.querySelector("#cartOpen").click());
    await retryPage.locator("#cartCheckout").click();
-   await retryPage.waitForFunction(()=>!document.querySelector("#checkoutAddressRetry").hidden);
+   await retryPage.waitForFunction(()=>{
+     const message=document.querySelector("#checkoutAddressMessage");
+     const retry=document.querySelector("#checkoutAddressRetry");
+     return message?.textContent.includes("Thử tải lại")&&retry&&!retry.hidden;
+   },null,{timeout:12000});
    assert.equal(await retryPage.locator("#checkoutProvince").isDisabled(),true);
    assert.match(await retryPage.locator("#checkoutAddressMessage").innerText(),/Thử tải lại/);
    await retryPage.screenshot({path:join(evidenceDir,"06-address-offline-390x844.png"),animations:"disabled"});
