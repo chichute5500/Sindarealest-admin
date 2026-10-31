@@ -342,14 +342,14 @@ has('#imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-alig
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
 has('@media(min-width:681px){#backdrop>.editor>.editorhead{padding-top:10px;padding-bottom:10px}#backdrop>.editor>form>.editorcontent{gap:12px}}', 'desktop product price and stock fields clear the sticky action footer at the initial scroll position');
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'editor content remains scrollable inside its bounded region while not stretching tab rows');
-has('#backdrop{top:70px;bottom:calc(60px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header with breathing room above bottom navigation');
-has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--bg);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
+has('#backdrop{top:70px;bottom:calc(60px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header with breathing room above bottom navigation');
+has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:20px;box-shadow:var(--sd-admin-shadow);background:var(--sd-admin-face);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
 has('#productEditorTabs{position:sticky;top:0;height:48px;min-height:48px;max-height:48px;gap:3px;padding:4px}', 'mobile product editor tabs stay compact without covering form fields');
 has('.product-editor-tabs{position:sticky;top:0;z-index:3;', 'desktop editor tabs stick at the top of their own scroll viewport without covering gallery headings');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
 const repeatedGlassRule = adminHtml.match(/#main \.mobilecards tbody tr[^{}]*\.order-detail-item\s*\{([^}]*)\}/)?.[1] || '';
-assert.match(repeatedGlassRule, /glass-shell-shadow/, 'repeated glass rows keep their shared shell and contact shadow');
+assert.match(repeatedGlassRule, /sd-admin-shadow/, 'repeated glass rows keep their shared shell and contact shadow');
 assert.doesNotMatch(repeatedGlassRule, /backdrop-filter/, 'repeated rows avoid stacking expensive blur layers on long lists');
 const productListMarkup = adminHtml.match(/function productList\(\)\{[\s\S]*?\nfunction orderProductImageMarkup/)?.[0] || '';
 assert.doesNotMatch(productListMarkup, /data-action="edit"/, 'product rows open the editor without a separate edit button');

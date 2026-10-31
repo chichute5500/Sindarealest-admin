@@ -39,7 +39,7 @@ for (const {width,height,theme} of matrix) {
     mkdirSync(folder,{recursive:true});
     const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},theme,
       evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],observedAtUtc:new Date().toISOString()};
-    const context=await browser.newContext({viewport:{width,height},colorScheme:theme,serviceWorkers:'block',reducedMotion:'reduce'});
+    const context=await browser.newContext({viewport:{width,height},colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:'reduce'});
     const page=await context.newPage();
     try {
       if(process.env.CF_ACCESS_CLIENT_ID && process.env.CF_ACCESS_CLIENT_SECRET)
@@ -49,7 +49,7 @@ for (const {width,height,theme} of matrix) {
           const url=new URL(request.url());
           if(url.origin===origin && url.pathname.startsWith('/api/') &&
               !['GET','HEAD','OPTIONS'].includes(request.method()) &&
-              !(url.pathname==='/api/admin/login' && request.method()==='POST')) {
+              !(['/api/admin/login','/api/admin/logout'].includes(url.pathname) && request.method()==='POST')) {
             report.nonAuthMutationRequests.push({method:request.method(),path:url.pathname});
           }
         } catch {}
@@ -110,6 +110,34 @@ for (const {width,height,theme} of matrix) {
       await expect(page.locator('#appView')).toBeVisible({timeout:30000});
       // Hide the transient login toast before recording reference-comparison screenshots.
       await expect(page.locator('#toast')).not.toHaveClass(/show/,{timeout:7000});
+      if(width===432 && theme==='light'){
+        await page.locator('#adminMenuToggle').tap();
+        await expect(page.locator('#mobileMorePanel')).toBeVisible();
+        await shot('13_mobile_menu');
+        await page.locator('#adminMenuToggle').tap();
+        await expect(page.locator('#mobileMorePanel')).toBeHidden();
+        await page.locator('#notificationToggle').tap();
+        await expect(page.locator('#notificationPanel')).toBeVisible();
+        await shot('14_notifications');
+        await page.locator('#notificationToggle').tap();
+        await expect(page.locator('#notificationPanel')).toBeHidden();
+        await page.locator('#main .pagehead [data-action="add"]').tap();
+        await expect(page.locator('#backdrop')).toBeVisible();
+        await shot('15_add_product','#backdrop');
+        await page.locator('#editorClose').tap();
+        await expect(page.locator('#backdrop')).toBeHidden();
+        // Record a real browser touch hold/release on the CTA, without completing a click.
+        const cdp=await context.newCDPSession(page);
+        const box=await page.locator('#main .pagehead [data-action="add"]').boundingBox();
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:box.x+box.width/2,y:box.y+box.height/2}]});
+        report.touchPressed=await page.locator('#main .pagehead [data-action="add"]').evaluate(e=>({press:e.dataset.sdGlassPress||null,transform:getComputedStyle(e).transform,shadow:getComputedStyle(e).boxShadow}));
+        await page.screenshot({path:join(folder,'16_cta_pressed.png'),fullPage:false,animations:'disabled'});
+        await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+        await expect(page.locator('#main .pagehead [data-action="add"]')).not.toHaveAttribute('data-sd-glass-press','true');
+        await page.keyboard.press('Tab');
+        report.keyboardFocus=await page.evaluate(()=>({tag:document.activeElement.tagName,visible:document.activeElement.matches(':focus-visible'),outline:getComputedStyle(document.activeElement).outlineStyle}));
+        expect(report.keyboardFocus.visible).toBe(true);
+      }
       const expectedHeadings={
         dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',
         warranties:'Bảo hành / Yêu cầu hỗ trợ',settings:'Cài đặt website',
@@ -150,6 +178,11 @@ for (const {width,height,theme} of matrix) {
         await shot('07_order_detail');
       } else {
         report.screens.push({screen:'07_order_detail',status:'NO_REAL_ORDER_NOT_ACCEPTED',reason:'No live business record; no order fabricated'});
+      }
+      if(width===432 && theme==='light'){
+        await page.locator('#logout').tap();
+        await expect(page.locator('#loginView')).toBeVisible();
+        report.logoutVerified=true;
       }
       expect(report.nonAuthMutationRequests,'Read-only QA must not make business writes').toEqual([]);
       const captures=report.screens.filter(s=>s.status==='CAPTURED_NOT_ACCEPTED');
