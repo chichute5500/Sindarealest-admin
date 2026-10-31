@@ -29,11 +29,12 @@ async function check(path,scroll){
       deferred:cards.filter(img=>img.hasAttribute("data-src")).length,
       distant:far.length,
       distantFetched:far.filter(img=>img.hasAttribute("src")).length,
-      visibleWithSource:cards.filter(img=>img.getBoundingClientRect().top<innerHeight&&img.getAttribute("src")).length
+      visibleCount:cards.filter(img=>img.getBoundingClientRect().top<innerHeight&&img.getBoundingClientRect().bottom>0).length,
+      visibleWithSource:cards.filter(img=>img.getBoundingClientRect().top<innerHeight&&img.getBoundingClientRect().bottom>0&&img.getAttribute("src")).length
     };
   });
-  assert.ok(images.total>0&&images.visibleWithSource>0,
-    path+" must provide an image URL for visible product cards: "+JSON.stringify(images));
+  assert.ok(images.total>0&&(images.visibleCount===0||images.visibleWithSource===images.visibleCount),
+    path+" must provide image URLs for every currently visible product card: "+JSON.stringify(images));
   assert.equal(images.distantFetched,0,
     path+" should not fetch images more than 450px outside viewport: "+JSON.stringify(images));
   console.log("PASS:",path,"viewport-aware product photos",images);
