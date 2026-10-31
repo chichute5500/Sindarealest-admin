@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { generateShortWarrantyCode, isWarrantyCode, isWarrantyCodeCollisionError } from '../functions/_warranty-policy.js';
 import { onRequestPost as lookup } from '../functions/api/warranty-lookup.js';
 globalThis.fetch=async url=>{
- assert.match(String(url),/challenges.cloudflare.com\\/turnstile\\/v0\\/siteverify/);
+ assert.ok(String(url).startsWith("https://challenges.cloudflare.com/turnstile/v0/siteverify"));
  return new Response(JSON.stringify({success:true,hostname:"shop.example",action:"warranty_lookup"}),{headers:{"Content-Type":"application/json"}});
 };
 
