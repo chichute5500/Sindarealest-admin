@@ -20,6 +20,9 @@ assert.doesNotMatch(store,/class="theme-watermark"/,
   'An invisible full-screen decorative watermark must not steal LCP or network bandwidth');
 assert.doesNotMatch(store,/@keyframes sdLiquidGlassDrift/,
   'Do not animate a full-viewport background transform: Lighthouse attributed CLS 1.0 to it');
+assert.match(store,/html\.js-enabled body\.welcome-active main\{visibility:hidden!important\}/,
+  'Background storefront layout must stay visually hidden under the opaque Welcome splash');
+
 assert.match(store,/<img class="brand-symbol" src="images\/brand-emblem-nav\.webp"/,
   'The mobile nav must reference the approved compact emblem');
 assert.match(read('scripts/build-logo-asset.py'),/nav_dst=Path\("public\/images\/brand-emblem-nav\.webp"\)/,
