@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: d1-preview-products-revision-guarded
@@ -50,6 +51,39 @@ jobs:
         run: node scripts/d1-preview-products-revision-guarded.mjs
       - name: Measure Preview query rows and confirm migrated schema (read-only)
         run: node scripts/d1-preview-products-readonly-validation.mjs
+      - name: Report verified Preview D1 Rows Read on PR 155
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE' > "$RUNNER_TEMP/d1-preview-result.txt"
+          import { readFileSync } from 'node:fs';
+          const metrics = JSON.parse(readFileSync('artifacts/d1-preview-products/readonly-metrics.json', 'utf8'));
+          const checkpoint = JSON.parse(readFileSync('artifacts/d1-preview-products/checkpoint.json', 'utf8'));
+          if (!metrics.passed || !checkpoint.schemaApplied) throw Error('Missing verified schema/results');
+          const before = Number(checkpoint.beforeFullRowsRead);
+          const after = Number(metrics.fullProductRowsRead);
+          const revision = Number(metrics.revisionRowsRead);
+          if (![before,after,revision].every(Number.isFinite)) throw Error('Missing Rows Read measurements');
+          const ratio = after > 0 ? ((1 - revision / after) * 100).toFixed(2) : 'N/A';
+          const lines = [
+            '### Preview D1 product Rows Read — verified workflow result',
+            '- Database: \`sindarealest-admin-preview-db\` (Preview only)',
+            '- Commit: \`' + process.env.GITHUB_SHA + '\`',
+            '- GitHub Actions: https://github.com/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID,
+            '- Full product query before index: **' + before + ' Rows Read**',
+            '- Full product query after index: **' + after + ' Rows Read**',
+            '- Unchanged revision lookup: **' + revision + ' Rows Read**',
+            '- Relative reduction per unchanged product check vs full query: **' + ratio + '%**',
+            '- Product count: ' + Number(metrics.productCount),
+            '- SQL order/data parity, trigger verification, and indexed query plan: PASS',
+            '- This is **per-query** evidence; total account quota needs traffic-matched follow-up. Production/Main unchanged.'
+          ];
+          process.stdout.write(lines.join('\\n') + '\\n');
+          NODE
+          gh api "repos/$GITHUB_REPOSITORY/issues/155/comments" -f body="$(cat "$RUNNER_TEMP/d1-preview-result.txt")" > /dev/null
+          echo "Preview Rows Read evidence published on PR #155; values not printed to public job log."
       - name: Deploy isolated Admin QA Preview only (never Main)
         shell: bash
         run: |
