@@ -65,15 +65,41 @@ jobs:
           node --input-type=module - <<'JS'
           import assert from 'node:assert/strict';
           const base='https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev';
-          for(const path of ['/','/sanpham']){
-            const r=await fetch(base+path,{signal:AbortSignal.timeout(20000)});
-            assert.equal(r.status,200,path);
-            const html=await r.text();
-            assert.ok(html.includes('sd-server-rendered'),path+' no server-rendered products');
-            assert.ok(html.includes('"@type":"ItemList"'),path+' missing product list schema');
-            assert.ok(html.includes('rel="canonical"'),path+' missing canonical');
-            console.log('PASS: no-JS SSR visible,',path,'HTTP',r.status);
+          // Pages may briefly return a 500 while the just-uploaded Functions
+          // bundle propagates. Accept ONLY the exact audited SHA, verify the
+          // full SSR/schema/canonical contract, and fail after bounded retries.
+          const expected=process.env.GITHUB_SHA;
+          async function verifyCatalog(path){
+            let lastError;
+            for(let attempt=1;attempt<=12;attempt++){
+              try{
+                const stamp=await fetch(base+'/audit-source-revision.txt?sha='+expected,{
+                  headers:{'Cache-Control':'no-cache'},signal:AbortSignal.timeout(12000)
+                });
+                assert.equal(stamp.status,200,'Preview SHA marker missing');
+                assert.equal((await stamp.text()).trim(),expected,'Preview does not match the audited commit');
+                const r=await fetch(base+path,{headers:{'Cache-Control':'no-cache'},
+                  signal:AbortSignal.timeout(20000)});
+                if(r.status!==200){
+                  if(![500,502,503,504].includes(r.status))
+                    assert.equal(r.status,200,path+' returned permanent HTTP error');
+                  throw Error(path+' transient Pages HTTP '+r.status);
+                }
+                const html=await r.text();
+                assert.ok(html.includes('sd-server-rendered'),path+' no server-rendered products');
+                assert.ok(html.includes('"@type":"ItemList"'),path+' missing product list schema');
+                assert.ok(html.includes('rel="canonical"'),path+' missing canonical');
+                console.log('PASS: no-JS SSR visible,',path,'HTTP',r.status,'attempt',attempt);
+                return;
+              }catch(error){
+                lastError=error;
+                console.log('Preview verification attempt',attempt,path,String(error.message||error));
+                if(attempt<12)await new Promise(resolve=>setTimeout(resolve,3000));
+              }
+            }
+            throw lastError;
           }
+          for(const path of ['/','/sanpham'])await verifyCatalog(path);
 
           const image=await fetch(base+'/logo-ui.webp',{signal:AbortSignal.timeout(12000)});
           assert.equal(image.status,200,'Compressed original logo image must exist');
