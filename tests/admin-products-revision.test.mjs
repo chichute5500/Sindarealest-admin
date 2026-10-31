@@ -71,6 +71,13 @@ assert.equal(result.status, 200);
 assert.deepEqual(result.body, { unchanged: true, revision: '2' });
 assert.equal(fullReads, 1, 'Unchanged requests must skip the large products SELECT');
 assert.equal(revisionReads, 2, 'Unchanged checks use the single settings-key query');
+// Simulate prolonged Android Admin usage without product mutations.
+for (let i = 0; i < 50; i++) {
+  const idlePoll = await getProductList('2');
+  assert.equal(idlePoll.body.unchanged, true);
+}
+assert.equal(fullReads, 1, 'Fifty idle polls must not issue 50 catalog scans');
+assert.equal(revisionReads, 52, 'Fifty idle polls must use only 50 indexed revision lookups');
 
 sql.prepare("UPDATE products SET title='Updated',sort_order=0 WHERE id='a'").run();
 assert.equal(revision(), '3', 'Update trigger must bump revision even without updated_at change');
