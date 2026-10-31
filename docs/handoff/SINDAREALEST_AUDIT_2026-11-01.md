@@ -65,7 +65,35 @@ Giữ branch fix/audit-2026-10, không merge Main.
 - Đúng thông tin thanh toán, không rò rỉ giá ẩn/riêng tư, no Production writes.
 - Nếu chưa đạt phải sửa tiếp và báo CHƯA PASS; yêu cầu Owner PASS trước Production.
 
+## CHECKPOINT SAU TIẾP TỤC AUDIT — 2026-11-01 (source SHA e49ae966)
+
+**Chỉ trên nhánh audit.** PR #159 vẫn OPEN/DRAFT. Main, Production Pages, D1/R2 và secrets không thay đổi. Checkout QA dùng dữ liệu giả/POST mock, GET-only cho Preview; không đăng nhập Google thật hoặc thanh toán thật.
+
+### Code đã thay đổi
+- `c274c664b3`: giữ lại nút ảnh DOM SSR đang tải khi catalog hydration sang CSR; bỏ lần render danh mục `all` thừa khi mở trực tiếp `/sanpham`.
+- `bb611ac268`: sửa điều hướng History về Home để featured media khởi tạo lại sau khi bị trì hoãn trên route Catalog.
+- `67268ef863`: lazy-init slideshow tác phẩm trên Home khi đến gần vùng nhìn, không tự chuyển ảnh khi offscreen hoặc đang ở Catalog; thêm `scripts/audit-lcp-probe.mjs` (GET-only/CPU4x/150ms/1.6Mbps).
+- `be18cb2a1f`: đồng bộ sắp xếp `created_at DESC,id DESC` giữa SQL SSR và danh mục CSR; `craftTileImage` tải lazy; chụp ảnh QA chủ động decode ảnh; thêm `scripts/qa-ssr-hydration.mjs` để giữ thứ tự/ảnh đầu tại 360/390px.
+- `859a7123fe`: khôi phục logo gallery PNG gốc do test Owner-approved `tests/product-card-liquid-glass.test.mjs` yêu cầu đúng asset. Commit `be18cb` đã từng FAIL vì đổi asset này; đã sửa và tests PASS, không được lặp lại.
+- `e49ae966f8afd771558bfdea09990264c0d2b943`: ẩn ngay HTML panel Tài khoản đang đóng để ngăn nội dung account-note lọt vào LCP trước khi CSS đến; khi mở panel xóa inline visibility để CSS/animation hiện hữu điều khiển. LCP probe bổ sung assertion `closedAccountPaint=false`.
+
+### CI / QA đã xác minh
+- `859a7123`: Preview deploy + source tests + mocked checkout + GET-only audit-after **PASS**; run audit-after `41229952355`. 20 screenshots 360/390/768/1280/1920 Light/Dark, không lỗi. SSR→CSR 360/390px order + first image DOM node **PASS**.
+- `e49ae966`: Preview deploy `41230553727` **SUCCESS**, source/tests `41230553788` **SUCCESS**, checkout mock `41230553706` **SUCCESS**, audit-after run `41230553737` **SUCCESS** với 20 screenshots/errors=0, LCP probe 4 trường hợp đều `closedAccountPaint=false`.
+- Lighthouse `859a7123`: Home mobile **59 / LCP 6939ms / CLS 0 / TBT 611ms**; Catalog mobile **70 / LCP 12317ms / CLS 0 / TBT 54ms**; Home desktop **100 / LCP 392ms / CLS 0.027**; Catalog desktop **84 / LCP 2886ms / CLS 0.027**.
+- Lighthouse `e49ae966`: Home mobile **42 / LCP 7407ms / CLS 0 / TBT 2181ms**; Catalog mobile **74 / LCP 13409ms / CLS 0.0361 / TBT 35ms**; Home desktop **96 / LCP 383ms / CLS 0.1236**; Catalog desktop **84 / LCP 2883ms / CLS 0.0267**.
+- **Quan trọng:** Đây là các mẫu Lighthouse đơn lẻ, có dao động lớn do môi trường mạng/CPU/CI. Không kết luận `e49ae` tự gây ra Home TBT +1570ms; cần đo lặp có kiểm soát ở cùng SHA, cùng điều kiện. KHÔNG công bố Performance PASS.
+- GET-only LCP probe Catalog 390px `859a` ≈10.39–10.44s; `e49ae` ≈10.44–10.52s. Trước đó `67268` ≈11.29–11.32s. Kết quả khác Lighthouse và không được thay thế số đo Lighthouse.
+- A/B `theme-bg` vẫn dao động; không xóa nền kính hoặc xếp chồng CSS. Screenshot QA có thể xem trong artifacts của run 41230553737.
+
+### Việc còn tồn đọng — KHÔNG tự công bố PASS
+1. **Mobile Catalog LCP 12–14s, Home TBT không ổn định.** Lighthouse `image-delivery-insight` ước tính tiết kiệm khoảng 1.6MB ảnh; một ảnh 1350×1193 WebP ~569KB chỉ hiển thị ~187px. Cần nghiên cứu thumbnail responsive hiệu quả nhưng KHÔNG ghi đè R2 Production và KHÔNG tự bật Cloudflare image resizing có thể tính phí. Fonts Noto WOFF2 được xây không subset/glyph nguyên bản; không tự đổi phông.
+2. A/B có kiểm soát CLS / Welcome / SSR→CSR trên mobile; không kết luận từ từng run riêng lẻ.
+3. Đối chiếu hình tham chiếu Owner 360/390px Light/Dark, nav/cart/checkout/account/order/warranty; mock Playwright không bằng Android Xiaomi 15 Ultra thật; chưa tự công bố visual parity >95%.
+4. Google OAuth thật, xác minh chủ SĐT (Turnstile chỉ chống bot), thanh toán sandbox E2E vẫn CHƯA PASS. Không thực hiện giao dịch thật hoặc truy cập Production.
+5. PR giữ DRAFT, Main chưa merge. Chỉ chủ động đề nghị Owner PASS sau khi visual/performance thực sự đạt; không đưa Production trước Owner duyệt.
+
 ## PROMPT CHO CHAT SAU
 Bạn là Principal Frontend/QA/Performance Engineer tiếp tục **trực tiếp** SinDarealest Storefront trong repo chichute5500/Sindarealest-admin, branch fix/audit-2026-10, PR #159 OPEN/DRAFT. ĐỌC FILE NÀY trước; không hỏi lại lịch sử, không làm lại các mục Owner PASS, không làm demo/ZIP, không merge Main, không chạm D1/R2 Production hoặc giao dịch thật.
 
-**YÊU CẦU ĐA LUỒNG VÀ TRÁNH THỜI GIAN CHỜ VÔ ÍCH:** kiểm tra PR HEAD, kết quả CI 41226800786 (SUCCESS, số liệu ghi phía trên), Preview source revision, ảnh chụp và mã nguồn **đồng thời**; chia luồng độc lập A (Welcome/theme-bg CLS), B (SSR catalog/LCP/R2), C (Mobile Light/Dark visual/checkout), D (QA/security/CI). Dùng parallel tools/processes thật, không giả vờ có subagents; khóa ghi vào một file và tích hợp bằng commit có trình tự. Khi CI chờ, xử lý vấn đề khác; không liên tục push khiến CI bị cancel. Sửa đúng nguyên nhân, bảo toàn kính Liquid Glass đã duyệt; đo A/B và tự chụp đối chiếu. Tự test và commit trên branch, chạy một vòng final Preview/Lighthouse, báo SHA, số điểm, PASS/FAIL và tồn đọng. Đừng gọi hoàn tất khi chưa có bằng chứng; chỉ xin Owner PASS trước merge.
+**YÊU CẦU ĐA LUỒNG VÀ TRÁNH THỜI GIAN CHỜ VÔ ÍCH:** kiểm tra PR HEAD mới nhất (source checkpoint e49ae966; docs commit có thể mới hơn), CI 41230553737 (SUCCESS, số liệu ghi phía trên), Preview source revision, ảnh chụp và mã nguồn **đồng thời**; chia luồng độc lập A (Welcome/theme-bg CLS), B (SSR catalog/LCP/R2), C (Mobile Light/Dark visual/checkout), D (QA/security/CI). Dùng parallel tools/processes thật, không giả vờ có subagents; khóa ghi vào một file và tích hợp bằng commit có trình tự. Khi CI chờ, xử lý vấn đề khác; không liên tục push khiến CI bị cancel. Sửa đúng nguyên nhân, bảo toàn kính Liquid Glass đã duyệt; đo A/B và tự chụp đối chiếu. Tự test và commit trên branch, chạy một vòng final Preview/Lighthouse, báo SHA, số điểm, PASS/FAIL và tồn đọng. Đừng gọi hoàn tất khi chưa có bằng chứng; chỉ xin Owner PASS trước merge.
