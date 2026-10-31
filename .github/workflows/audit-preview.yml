@@ -70,6 +70,13 @@ jobs:
           assert.match(image.headers.get('content-type')||'',/image\/webp/);
           assert.ok(Number(image.headers.get('content-length')||0)<140000,'Mobile UI brand image exceeds 140kB');
           console.log('PASS: optimized brand logo exists on live Preview');
+          for (const name of ['NotoSans-Regular','NotoSans-Bold','NotoSerif-Regular','NotoSerif-Bold']) {
+            const font=await fetch(base+'/fonts/'+name+'.woff2',{signal:AbortSignal.timeout(12000)});
+            assert.equal(font.status,200,'Lossless web font must exist: '+name);
+            assert.match(font.headers.get('content-type')||'',/font\/woff2|application\/font-woff|application\/octet-stream/);
+            assert.ok(Number(font.headers.get('content-length')||0)<220000,'Unexpectedly large WOFF2 font: '+name);
+          }
+          console.log('PASS: all four original-glyph WOFF2 fonts available on live Preview');
           const unknown=await fetch(base+'/qa-unknown-route-20261031',{signal:AbortSignal.timeout(12000)});
           assert.equal(unknown.status,404,'Unknown URLs must not serve home HTML');
           console.log('PASS: genuine HTTP 404, no customer/private API requests executed');
