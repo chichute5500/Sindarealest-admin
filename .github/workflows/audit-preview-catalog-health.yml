@@ -1,0 +1,38 @@
+name: Audit preview public-catalog health — GET only
+on:
+  push:
+    branches: [fix/audit-2026-10]
+    paths:
+      - .github/workflows/audit-preview-catalog-health.yml
+permissions:
+  contents: read
+jobs:
+  read-only-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check public product feeds without reading customer or order data
+        shell: bash
+        run: |
+          node --input-type=module - <<'JS'
+          for(const [label,base] of [
+            ['production-public','https://sindarealest2.pages.dev'],
+            ['isolated-preview','https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev']
+          ]){
+            for(const path of ['/api/products','/sanpham','/not-a-real-page-20261031']){
+              try{
+                const r=await fetch(base+path,{method:'GET',signal:AbortSignal.timeout(14000)});
+                const type=r.headers.get('content-type')||'';
+                let count=null;
+                if(path==='/api/products'&&r.ok&&type.includes('json')){
+                  const data=await r.json();count=Array.isArray(data)?data.length:null;
+                }else{await r.arrayBuffer()}
+                console.log(label,path,'HTTP',r.status,'publishedProductCount',count);
+              }catch(e){console.log(label,path,'UNVERIFIED',e.name)}
+            }
+          }
+          JS
