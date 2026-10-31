@@ -72,8 +72,25 @@ jobs:
           for(const m of r.previewHourly)lines.push('| '+m.hour+' | '+m.requests+' | '+m.subrequests+' |');
           lines.push('','#### Preview script versions (cannot automatically map to branch)','| Script version | Requests |','| --- | ---: |');
           for(const m of r.previewScriptVersions.slice(0,30))lines.push('| '+m.version+' | '+m.requests+' |');
+          lines.push('','#### Pages Functions invocations (correct dataset)','| Pages script | Requests | Subrequests |','| --- | ---: | ---: |');
+          for(const m of r.pagesFunctions?.totalsByProject||[])
+            lines.push('| '+m.name+' | '+m.requests+' | '+m.subrequests+' |');
+          const previewScript=r.projectMetadata.find(x=>x.project==='sindarealest-admin-preview')?.previewScriptName;
+          const hourMap=new Map();
+          for(const record of r.pagesFunctions?.rows||[]){
+            if(record.dimensions?.scriptName!==previewScript)continue;
+            const hour=record.dimensions?.datetimeHour||record.dimensions?.date||'unknown';
+            hourMap.set(hour,(hourMap.get(hour)||0)+(record.sum?.requests||0));
+          }
+          lines.push('','#### Top hourly request spikes for Admin Preview (UTC)','| Hour | Requests |','| --- | ---: |');
+          for(const [hour,count] of [...hourMap].sort((a,b)=>b[1]-a[1]).slice(0,12))
+            lines.push('| '+hour+' | '+count+' |');
+          lines.push('','#### Preview deployments created in measurement window (NOT attributed traffic)','| Branch | Deployments |','| --- | ---: |');
+          for(const d of r.previewDeployments?.branches||[])lines.push('| '+d.branch+' | '+d.count+' |');
+          if(r.pagesFunctions?.warnings?.length)lines.push('','Pages limitations: '+r.pagesFunctions.warnings.join('; '));
+          if(r.previewDeployments?.warnings?.length)lines.push('','Deployments limitations: '+r.previewDeployments.warnings.join('; '));
           if(r.warnings.length)lines.push('','Data limitations: '+r.warnings.join('; '));
-          lines.push('','**Important:** these aggregates are by Workers script/version and cannot prove which Pages branch or request path generated the traffic. Do not attribute a branch without hostname/log evidence. No SQL, deploys, database writes, site requests, or Production changes performed.');
+          lines.push('','**Important:** Pages Functions metrics are grouped by project script, not branch/deployment. Deployment counts do not measure requests. Identifying a high-traffic branch requires per-deployment traffic logs; do not assume the most recently deployed branch caused spikes. Read-only: no SQL, deploys, database writes, site requests, or Production changes.');
           process.stdout.write(lines.join('\n')+'\n');
           NODE
           gh api "repos/$GITHUB_REPOSITORY/issues/155/comments" -f body="$(cat "$RUNNER_TEMP/workers-report.md")" >/dev/null
