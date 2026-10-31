@@ -1197,7 +1197,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .editor-tab:focus-visible,.activity-category-chip:focus-visible {
   outline:2px solid #3179bb;outline-offset:2px;
 }
-.btn.primary{min-height:48px;padding-inline:19px;border-radius:999px;border:1.5px solid transparent;background:radial-gradient(ellipse 110% 78% at 32% 0%,rgba(255,255,255,.70),transparent 74%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.16),transparent 80%) padding-box,linear-gradient(180deg,#59a9f3 0%,#1988e0 55%,#0875ce 100%) padding-box,var(--glass-edge) border-box;box-shadow:0 12px 25px rgba(52,127,184,.26),0 3px 7px rgba(35,91,136,.14),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -2px 4px rgba(8,72,128,.20)}
+.btn.primary{min-height:48px;padding-inline:19px;border-radius:999px;border:1.5px solid transparent;background:radial-gradient(ellipse 110% 78% at 32% 0%,rgba(255,255,255,.70),transparent 74%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.16),transparent 80%) padding-box,linear-gradient(180deg,#66b8ff 0%,#218fe8 48%,#0879d2 100%) padding-box,var(--glass-edge) border-box;box-shadow:0 12px 25px rgba(52,127,184,.26),0 3px 7px rgba(35,91,136,.14),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -2px 4px rgba(8,72,128,.20)}
 :root[data-admin-theme="dark"] .btn.primary{color:#0b263d;background:linear-gradient(180deg,#add9f6,#82bce3) padding-box,var(--glass-edge) border-box}
 #main .pagehead h2{color:var(--reference-navy);font:500 clamp(28px,5.6vw,38px)/1.08 "SD Serif",Georgia,"Times New Roman",serif;letter-spacing:-.035em}
 #main .pagehead p{line-height:1.45}
@@ -1253,7 +1253,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   #main .dashboard-quick-panel .panelhead{padding:9px 12px 6px}#main .dashboard-quick-panel .panelbody{padding:0 10px 10px}
   #main .dashboard-shortcuts{gap:6px}
   #main .dashboard-shortcut{min-height:78px;padding:8px 5px;gap:6px;border-radius:20px}
-  #main .dashboard-shortcut .shortcut-icon{flex-basis:40px;width:40px;height:40px}
+  #main .dashboard-shortcut .shortcut-icon{flex-basis:44px;width:44px;height:44px}
   #main .dashboard-revenue{margin-bottom:8px}
   #main .dashboard-revenue .panelhead{padding:10px 14px 8px}
   #main .dashboard-revenue-empty{min-height:90px;padding:10px 12px;gap:8px}
@@ -2158,8 +2158,8 @@ body:not(:has(#loginView:not(.hidden))){
     box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight);
   }
   #main .dashboard-shortcut .shortcut-icon{flex-basis:40px;width:40px;height:40px}
-  #main .dashboard-shortcut .shortcut-icon svg{width:20px;height:20px}
-  #main .dashboard-shortcut .shortcut-copy b{font-size:11px;line-height:1.2}
+  #main .dashboard-shortcut .shortcut-icon svg{width:21px;height:21px}
+  #main .dashboard-shortcut .shortcut-copy b{font-size:12px;line-height:1.15}
 
   #main .dashboard-revenue{margin-bottom:11px}
   #main .dashboard-revenue .panelbody{padding-bottom:9px}
@@ -2189,8 +2189,8 @@ body:not(:has(#loginView:not(.hidden))){
    and raised icon controls. Keep the same palette in light and dark modes. */
 body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.76),rgba(239,249,255,.56) 54%,rgba(220,239,251,.43));
-  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(240,158,211,.43),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(100,167,232,.34),transparent 85%),radial-gradient(ellipse 100% 30% at 60% 110%,rgba(108,184,222,.045),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.97),rgba(221,240,252,.58) 46%,rgba(190,222,242,.28) 72%,rgba(226,240,251,.72));
-  --sd-dashboard-shadow:0 15px 34px rgba(35,80,113,.17),0 3px 7px rgba(43,89,119,.10),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(83,137,171,.12);
+  --sd-dashboard-rim:radial-gradient(ellipse 70% 92% at 1% 0%,rgba(240,158,211,.56),transparent 82%),radial-gradient(ellipse 53% 108% at 100% 36%,rgba(100,167,232,.40),transparent 85%),radial-gradient(ellipse 100% 30% at 60% 110%,rgba(108,184,222,.045),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.97),rgba(221,240,252,.58) 46%,rgba(190,222,242,.28) 72%,rgba(226,240,251,.72));
+  --sd-dashboard-shadow:0 16px 36px rgba(35,80,113,.19),0 3px 8px rgba(43,89,119,.12),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 4px rgba(83,137,171,.14);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(40,76,101,.57),rgba(20,47,68,.49) 56%,rgba(15,39,58,.55));
@@ -2207,7 +2207,7 @@ body:has(#main .statgrid) #main :is(.stat,.dashboard-quick-panel,.dashboard-reve
 body:has(#main .statgrid) #main :is(.dashboard-shortcut,.stat-icon,.dashboard-shortcut .shortcut-icon,.dashboard-revenue-visual){
   border:1.5px solid transparent;
   background:radial-gradient(ellipse 78% 65% at 18% 0%,rgba(255,255,255,.88),transparent 82%) padding-box,linear-gradient(145deg,rgba(255,255,255,.80),rgba(226,242,252,.52)) padding-box,var(--sd-dashboard-rim) border-box;
-  box-shadow:0 8px 18px rgba(44,98,133,.18),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(72,141,173,.14);
+  box-shadow:0 9px 20px rgba(44,98,133,.20),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 4px rgba(72,141,173,.16);
 }
 body:has(#main .statgrid) .topbar,
 body:has(#main .statgrid) .mobiletabs{
@@ -2226,11 +2226,11 @@ body:has(#main .statgrid) .mobiletabs .nav{
 }
 body:has(#main .statgrid) .mobiletabs .nav.active{
   background:radial-gradient(ellipse 90% 70% at 18% 0%,rgba(255,255,255,.92),transparent 82%) padding-box,var(--glass-selected-face) padding-box,var(--sd-dashboard-rim) border-box!important;
-  box-shadow:0 9px 20px rgba(49,121,187,.23),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 4px rgba(72,141,173,.12)!important;
+  box-shadow:0 10px 21px rgba(49,121,187,.27),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -2px 4px rgba(72,141,173,.14)!important;
 }
 body:has(#main .statgrid) #main .pagehead .btn.primary{
   border:1.5px solid transparent;
-  background:radial-gradient(ellipse 110% 78% at 32% 0%,rgba(255,255,255,.76),transparent 74%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.14),transparent 80%) padding-box,linear-gradient(180deg,#59a9f3 0%,#1988e0 55%,#0875ce 100%) padding-box,var(--sd-dashboard-rim) border-box;
+  background:radial-gradient(ellipse 110% 82% at 30% 0%,rgba(255,255,255,.92),transparent 74%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.14),transparent 80%) padding-box,linear-gradient(180deg,#59a9f3 0%,#1988e0 55%,#0875ce 100%) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 12px 25px rgba(38,132,198,.27),0 3px 7px rgba(35,91,136,.14),inset 0 1px 0 rgba(255,255,255,.98),inset 0 -2px 5px rgba(19,94,157,.20);
 }
 body:has(#main .statgrid) :is(.topbar .btn,.mobiletabs .nav,#main .btn,#main .dashboard-shortcut){
