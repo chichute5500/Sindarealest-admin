@@ -78,7 +78,7 @@ export async function onRequestPost({ request, env }) {
     let rows = [];
     if (isCode) {
       const row = await env.DB.prepare(selectSql + " WHERE upper(w.warranty_code)=? LIMIT 1").bind(raw.toUpperCase()).first();
-      if (!row) return fail("Không tìm thấy mã bảo hành. Hãy kiểm tra lại mã được cấp.", 404);
+      if (!row) return fail("Không tìm thấy thông tin phù hợp. Hãy kiểm tra lại mã hoặc số điện thoại.", 404);
       rows = [row];
     } else {
       if (!/^[+0-9().\s/-]+$/.test(raw)) return fail("Nhập mã bảo hành hợp lệ hoặc số điện thoại đã dùng khi mua hàng.");
@@ -91,7 +91,7 @@ export async function onRequestPost({ request, env }) {
       const sql = selectSql + " WHERE " + phoneSql + "=? OR (substr(" + phoneSql + ",1,2)='84' AND '0'||substr(" + phoneSql + ",3)=?) OR (substr(" + phoneSql + ",1,4)='0084' AND '0'||substr(" + phoneSql + ",5)=?) ORDER BY o.created_at DESC LIMIT 25";
       const result = await env.DB.prepare(sql).bind(phone, phone, phone).all();
       rows = result.results || [];
-      if (!rows.length) return fail("Không tìm thấy bảo hành theo số điện thoại này. Hãy kiểm tra lại số đã dùng khi mua hàng.", 404);
+      if (!rows.length) return fail("Không tìm thấy thông tin phù hợp. Hãy kiểm tra lại mã hoặc số điện thoại.", 404);
     }
     const tokenRows = rows.map(row => ({ ...row, claimToken: crypto.randomUUID().replaceAll("-", "") }));
     const statements = [env.DB.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%' AND julianday(updated_at)<julianday('now','-15 minutes')")];
