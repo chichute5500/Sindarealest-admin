@@ -6,6 +6,8 @@ on:
       - perf/d1-rows-read-safe-2026-10-30
     paths:
       - '.github/workflows/pr155-unified-owner-preview.yml'
+      - 'public/index.html'
+      - 'public/storefront-fluid-unified.css'
   workflow_dispatch:
 
 permissions:
