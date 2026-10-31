@@ -39,10 +39,20 @@ for (const {width,height,theme} of matrix) {
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
     const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},deviceScaleFactor:dpr,theme,
-      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],observedAtUtc:new Date().toISOString()};
-    const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:'reduce'});
+      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],navigationLatencyChecks:[],observedAtUtc:new Date().toISOString()};
+    const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:width===432&&theme==='light'?'no-preference':'reduce'});
     const page=await context.newPage();
+    const delayedRouteCounts={orders:0,customers:0};
+    const delayedRouteHandlers={};
     try {
+      if(width===432&&theme==='light'){
+        // Test-only latency injection against the real, authenticated Preview GETs.
+        // It proves route shells paint without waiting for live business data.
+        for(const name of ['orders','customers']){
+          delayedRouteHandlers[name]=async route=>{delayedRouteCounts[name]++;await new Promise(resolve=>setTimeout(resolve,2200));await route.continue()};
+          await page.route('**/api/admin/'+name+'*',delayedRouteHandlers[name]);
+        }
+      }
       if(process.env.CF_ACCESS_CLIENT_ID && process.env.CF_ACCESS_CLIENT_SECRET)
         await page.setExtraHTTPHeaders({'CF-Access-Client-Id':process.env.CF_ACCESS_CLIENT_ID,'CF-Access-Client-Secret':process.env.CF_ACCESS_CLIENT_SECRET});
       page.on('pageerror',error=>report.pageErrors.push(error.message));
@@ -176,15 +186,4 @@ for (const {width,height,theme} of matrix) {
                 for(const selector of splitSelectors(rule.selectorText)){
                   const pseudoMatch=selector.match(/(::?before|::?after)$/i),pseudo=pseudoMatch?(pseudoMatch[1].toLowerCase().includes('before')?'before':'after'):null;
                   materialRules.push({selector,baseSelector:pseudoMatch?selector.slice(0,-pseudoMatch[1].length):selector,
-                    selectorSpecificity:specificity(selector),pseudo,sheetIndex,sheetHref,ruleOrder:currentOrder,rulePath:currentPath,conditions,declarations});
-                }
-              }
-            };
-            for(let sheetIndex=0;sheetIndex<document.styleSheets.length;sheetIndex++){
-              const sheet=document.styleSheets[sheetIndex];try{visit(sheet.cssRules,[],sheetIndex,sheet.href||'<inline stylesheet>')}catch{}
-            }
-          }
-          function matchedMaterialRules(element,pseudo=''){
-            if(!includeMatchedRules)return undefined;
-            const matched=[],chain=[];for(let node=element,depth=0;node&&depth<16;node=node.parentElement,depth++)chain.push({node,depth});
-            // Include directly matched declarations and inherited des
+                    selectorSpecificity:specificity(selector),pseudo,sheetIndex,sheetHref,ruleOrder:currentOrder,rule
