@@ -22,6 +22,19 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright lighthouse
           npx playwright install --with-deps chromium
+      - name: Verify latest published Preview still has server-rendered catalog
+        shell: bash
+        run: |
+          node --input-type=module - <<'JS'
+          import assert from 'node:assert/strict';
+          for(const route of ['/','/sanpham']){
+            const r=await fetch('https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev'+route,{signal:AbortSignal.timeout(16000)});
+            const html=await r.text();
+            assert.equal(r.status,200);
+            assert.ok(html.includes('sd-server-rendered'),'Missing real SSR products on '+route);
+            console.log('Ready: no-JS SSR on '+route);
+          }
+          JS
       - name: Preview GET-only screenshots, source and FPS diagnostics
         env:
           AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
