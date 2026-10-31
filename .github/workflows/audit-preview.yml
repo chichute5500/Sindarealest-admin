@@ -44,6 +44,7 @@ jobs:
           python3 scripts/build-font-assets.py
           python3 scripts/build-material-thumbnails.py
           test -s public/logo-ui.webp
+          test -s public/images/brand-emblem-nav.webp
           test -s public/images/theme-croc-dark-tile.webp
           test -s public/images/theme-croc-albino-tile.webp
       - name: Validate before deploy
