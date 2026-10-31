@@ -1,0 +1,30 @@
+name: Audit baseline tag (create once)
+on:
+  push:
+    branches: [fix/audit-2026-10]
+    paths:
+      - .github/workflows/audit-baseline-tag.yml
+permissions:
+  contents: write
+jobs:
+  tag-baseline:
+    if: github.ref == 'refs/heads/fix/audit-2026-10'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch history without checkout to production
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create immutable before-audit tag at baseline SHA, if absent
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASELINE=cca1ff9be2ab7de4d89702f6dabf80d9bf3c7657
+          git cat-file -e "${BASELINE}^{commit}"
+          if git ls-remote --exit-code --tags origin refs/tags/before-audit >/dev/null 2>&1; then
+            echo "before-audit tag exists; no changes made."
+            exit 0
+          fi
+          git tag before-audit "$BASELINE"
+          git push origin refs/tags/before-audit
+          echo "Created before-audit tag at original main baseline."
