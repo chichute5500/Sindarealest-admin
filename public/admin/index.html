@@ -2190,6 +2190,7 @@ body:not(:has(#loginView:not(.hidden))){
 body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.72),rgba(235,245,255,.45));
   --sd-dashboard-border:rgba(255,255,255,.92);
+  --sd-dashboard-rim:radial-gradient(ellipse 70% 100% at 0% 0%,rgba(245,164,216,.68),transparent 82%),radial-gradient(ellipse 62% 100% at 100% 100%,rgba(104,177,237,.58),transparent 82%),linear-gradient(150deg,rgba(255,255,255,.98),rgba(222,239,253,.72));
   --sd-dashboard-shadow:0 10px 24px -6px rgba(30,64,120,.08),0 2px 6px rgba(30,64,120,.04),inset 0 2px 4px rgba(255,255,255,.98),inset 0 -3px 6px rgba(175,205,238,.4),inset 0 0 0 3.5px rgba(255,255,255,.38);
   --sd-dashboard-tile-face:rgba(232,243,255,.65);
   --sd-dashboard-icon-face:rgba(255,255,255,.85);
@@ -2200,6 +2201,7 @@ body:has(#main .statgrid){
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(35,62,82,.86),rgba(19,42,61,.78));
   --sd-dashboard-border:rgba(206,231,249,.38);
+  --sd-dashboard-rim:radial-gradient(ellipse 70% 100% at 0% 0%,rgba(218,149,201,.35),transparent 82%),radial-gradient(ellipse 62% 100% at 100% 100%,rgba(112,172,234,.38),transparent 84%),linear-gradient(150deg,rgba(190,231,255,.42),rgba(70,126,171,.28));
   --sd-dashboard-shadow:0 12px 28px -6px rgba(0,4,14,.34),0 2px 7px rgba(0,5,18,.24),inset 0 2px 4px rgba(220,241,255,.20),inset 0 -3px 6px rgba(0,8,18,.24),inset 0 0 0 3px rgba(200,226,246,.10);
   --sd-dashboard-tile-face:rgba(30,57,78,.80);
   --sd-dashboard-icon-face:rgba(223,240,252,.20);
@@ -2218,8 +2220,8 @@ body:has(#appView:not(.hidden)) #appView{
 }
 /* Large panels and compact statistic cards share the exact double-bevel glass recipe. */
 body:has(#main .statgrid) #main :is(.stat,.dashboard-quick-panel,.dashboard-revenue,.dashboard-revenue-empty){
-  border:1.5px solid var(--sd-dashboard-border);
-  background:var(--sd-dashboard-face);
+  border:1.5px solid transparent;
+  background:var(--sd-dashboard-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:var(--sd-dashboard-shadow);
   -webkit-backdrop-filter:blur(18px) saturate(170%);
   backdrop-filter:blur(18px) saturate(170%);
@@ -2229,9 +2231,9 @@ body:has(#main .statgrid) #main :is(.dashboard-quick-panel,.dashboard-revenue){b
 body:has(#main .statgrid) #main .dashboard-revenue-empty{border-radius:20px}
 /* Quick action tiles are separate ice-glass surfaces. */
 body:has(#main .statgrid) #main .dashboard-shortcut{
-  border:1.5px solid rgba(255,255,255,.9);
+  border:1.5px solid transparent;
   border-radius:18px;
-  background:linear-gradient(145deg,rgba(232,243,255,.65),rgba(255,255,255,.48));
+  background:linear-gradient(145deg,rgba(232,243,255,.65),rgba(255,255,255,.48)) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 6px 16px rgba(30,64,120,.08),inset 0 2px 4px rgba(255,255,255,.98),inset 0 -2px 5px rgba(175,205,238,.24),inset 0 0 0 3px rgba(255,255,255,.45);
   -webkit-backdrop-filter:blur(18px) saturate(165%);
   backdrop-filter:blur(18px) saturate(165%);
@@ -2249,8 +2251,8 @@ body:has(#main .statgrid) #main .dashboard-shortcut .shortcut-icon{
   width:44px;
   height:44px;
   border-radius:50%;
-  border:1.5px solid rgba(255,255,255,.96);
-  background:var(--sd-dashboard-icon-face);
+  border:1.5px solid transparent;
+  background:var(--sd-dashboard-icon-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 4px 10px rgba(30,64,120,.08),inset 0 2px 3px rgba(255,255,255,1),inset 0 -1px 2px rgba(175,205,238,.26);
   color:var(--ink);
 }
@@ -2259,8 +2261,8 @@ body:has(#main .statgrid) #main .stat-icon{
   width:44px;
   height:44px;
   border-radius:50%;
-  border:1.5px solid rgba(255,255,255,.96);
-  background:var(--sd-dashboard-icon-face);
+  border:1.5px solid transparent;
+  background:var(--sd-dashboard-icon-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 5px 12px rgba(30,64,120,.10),inset 0 2px 3px rgba(255,255,255,1),inset 0 -1px 2px rgba(175,205,238,.26);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid) #main :is(.dashboard-shortcut .shortcut-icon,.stat-icon){
@@ -2269,8 +2271,8 @@ body:has(#main .statgrid) #main .stat-icon{
 }
 /* Header shell and the four raised round controls. */
 body:has(#main .statgrid) .topbar{
-  border:1.5px solid rgba(255,255,255,.86);
-  background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(235,245,255,.43));
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(235,245,255,.43)) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 9px 22px rgba(30,64,120,.10),inset 0 2px 4px rgba(255,255,255,.96),inset 0 -2px 5px rgba(175,205,238,.18);
   -webkit-backdrop-filter:blur(22px) saturate(165%);
   backdrop-filter:blur(22px) saturate(165%);
@@ -2278,8 +2280,8 @@ body:has(#main .statgrid) .topbar{
 body:has(#main .statgrid) .topbar .brand-logo{width:42px;height:42px;flex:0 0 42px}
 body:has(#main .statgrid) .topbar .brand h1{font-size:17px;letter-spacing:0}
 body:has(#main .statgrid) .topbar :is(#adminMenuToggle,.topright #adminThemeToggle,.topright #notificationToggle,.topright #logout){
-  background:rgba(255,255,255,.78);
-  border:1.5px solid #fff;
+  background:rgba(255,255,255,.78) padding-box,var(--sd-dashboard-rim) border-box;
+  border:1.5px solid transparent;
   border-radius:50%;
   box-shadow:0 4px 12px rgba(20,50,100,.10),inset 0 2px 3px #fff;
 }
@@ -2301,7 +2303,7 @@ body:has(#main .statgrid) .mobiletabs{
   padding:7px 10px calc(7px + env(safe-area-inset-bottom));
   border:1.5px solid rgba(255,255,255,.9);
   border-radius:30px;
-  background:var(--sd-dashboard-dock-face);
+  background:var(--sd-dashboard-dock-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 10px 26px rgba(30,64,120,.12),inset 0 2px 4px rgba(255,255,255,.98),inset 0 -2px 5px rgba(175,205,238,.24);
   -webkit-backdrop-filter:blur(24px) saturate(165%);
   backdrop-filter:blur(24px) saturate(165%);
@@ -2309,14 +2311,14 @@ body:has(#main .statgrid) .mobiletabs{
 body:has(#main .statgrid) .mobiletabs .nav{
   min-height:56px;
   padding:6px 2px;
-  border:1.5px solid rgba(255,255,255,.88);
+  border:1.5px solid transparent;
   border-radius:18px;
-  background:var(--sd-dashboard-nav-face);
+  background:var(--sd-dashboard-nav-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 4px 10px rgba(30,64,120,.06),inset 0 2px 4px rgba(255,255,255,1);
 }
 body:has(#main .statgrid) .mobiletabs .nav.active{
-  border-color:rgba(255,255,255,.98);
-  background:var(--sd-dashboard-nav-active)!important;
+  border-color:transparent;
+  background:var(--sd-dashboard-nav-active) padding-box,var(--sd-dashboard-rim) border-box!important;
   color:#142a3c;
   box-shadow:0 5px 14px rgba(37,99,235,.16),0 5px 13px rgba(54,130,205,.13),inset 0 2px 4px rgba(255,255,255,1),inset 0 -2px 4px rgba(84,151,212,.12)!important;
 }
@@ -2337,16 +2339,16 @@ body:has(#main .statgrid) .mobiletabs .nav.active span:first-child{color:#205b84
 body:has(#main .statgrid) #main .dashboard-revenue-empty{
   grid-template-columns:minmax(0,1fr) 44px;
   border-radius:20px;
-  border:1.5px solid rgba(255,255,255,.9);
-  background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(235,245,255,.50));
+  border:1.5px solid transparent;
+  background:linear-gradient(145deg,rgba(255,255,255,.72),rgba(235,245,255,.50)) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 8px 18px rgba(30,64,120,.10),inset 0 2px 4px rgba(255,255,255,.98),inset 0 -2px 5px rgba(175,205,238,.28),inset 0 0 0 3px rgba(255,255,255,.34);
 }
 body:has(#main .statgrid) #main .dashboard-revenue-visual{
   width:44px;
   height:44px;
   border-radius:14px;
-  border:1.5px solid rgba(255,255,255,.96);
-  background:rgba(255,255,255,.84);
+  border:1.5px solid transparent;
+  background:rgba(255,255,255,.84) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 4px 10px rgba(30,64,120,.10),inset 0 2px 3px rgba(255,255,255,1);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid) #main .dashboard-revenue-empty{
@@ -2388,7 +2390,7 @@ body:has(#main .statgrid) #main .pagehead .btn.primary{
   border:1.5px solid rgba(255,255,255,.92);
   border-radius:999px;
   color:#fff;
-  background:linear-gradient(180deg,#60a5fa 0%,#3b82f6 50%,#2563eb 100%);
+  background:linear-gradient(155deg,rgba(255,255,255,.38) 0%,rgba(255,255,255,.08) 35%,transparent 58%) padding-box,linear-gradient(180deg,#60a5fa 0%,#3b82f6 50%,#2563eb 100%) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:0 0 0 3.5px rgba(255,255,255,.55),0 8px 20px rgba(37,99,235,.28),inset 0 2px 4px rgba(255,255,255,.8);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid) #main .pagehead .btn.primary{
