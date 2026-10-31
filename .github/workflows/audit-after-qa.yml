@@ -9,6 +9,7 @@ on:
       - scripts/qa-material-network.mjs
       - public/material-gallery.js
       - scripts/build-logo-asset.py
+      - scripts/build-material-thumbnails.py
       - 'public/**'
       - 'functions/**'
       - 'tests/**'
