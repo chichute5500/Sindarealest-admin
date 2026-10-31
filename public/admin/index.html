@@ -2120,7 +2120,7 @@ body:not(:has(#loginView:not(.hidden))){
   #main>.pagehead{margin-bottom:4px;align-items:center}
   body:not(:has(#loginView:not(.hidden))):has(#main .statgrid) .layout{padding-top:0}
   #main>.pagehead .btn.primary{width:164px;min-width:164px;flex:0 0 164px;position:relative;top:3px;margin-right:-8px}
-  #main>.pagehead h2{font-size:clamp(30px,7vw,32px);line-height:1.08}
+  #main>.pagehead h2{font-size:clamp(29px,6.8vw,31px);line-height:1.08}
   #main .statgrid{gap:8px;margin-bottom:8px}
   #main .stat{
      min-height:clamp(82px,20vw,88px);
@@ -2190,7 +2190,7 @@ body:not(:has(#loginView:not(.hidden))){
    and raised icon controls. Keep the same palette in light and dark modes. */
 body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.88),rgba(239,249,255,.66) 54%,rgba(220,239,251,.49));
-  --sd-dashboard-rim:radial-gradient(ellipse 74% 96% at 1% 0%,rgba(245,164,216,.88),transparent 80%),radial-gradient(ellipse 58% 110% at 100% 36%,rgba(103,171,235,.74),transparent 82%),radial-gradient(ellipse 100% 22% at 58% 110%,rgba(112,189,220,.03),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.50) 48%,rgba(190,222,242,.20) 76%,rgba(210,229,245,.54));
+  --sd-dashboard-rim:radial-gradient(ellipse 74% 96% at 1% 0%,rgba(245,164,216,.94),transparent 80%),radial-gradient(ellipse 58% 110% at 100% 36%,rgba(103,171,235,.82),transparent 82%),radial-gradient(ellipse 100% 22% at 58% 110%,rgba(112,189,220,.03),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.50) 48%,rgba(190,222,242,.20) 76%,rgba(210,229,245,.54));
   --sd-dashboard-shadow:0 19px 40px rgba(35,80,113,.30),0 4px 11px rgba(43,89,119,.18),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 5px rgba(73,121,157,.15);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
@@ -2209,7 +2209,7 @@ body:has(#appView:not(.hidden)) #appView{
 }
 body:has(#main .statgrid) #main :is(.stat,.dashboard-quick-panel,.dashboard-revenue,.dashboard-revenue-empty){
   border:1.75px solid transparent;
-  background:radial-gradient(ellipse 72% 48% at 2% 0%,rgba(255,255,255,.94),transparent 80%) padding-box,radial-gradient(ellipse 48% 58% at 100% 96%,rgba(100,167,232,.045),transparent 84%) padding-box,var(--sd-dashboard-face) padding-box,var(--sd-dashboard-rim) border-box;
+  background:radial-gradient(ellipse 72% 48% at 2% 0%,rgba(255,255,255,.99),transparent 80%) padding-box,radial-gradient(ellipse 48% 58% at 100% 96%,rgba(100,167,232,.045),transparent 84%) padding-box,var(--sd-dashboard-face) padding-box,var(--sd-dashboard-rim) border-box;
   box-shadow:var(--sd-dashboard-shadow);
   -webkit-backdrop-filter:blur(20px) saturate(145%);
   backdrop-filter:blur(20px) saturate(145%);
