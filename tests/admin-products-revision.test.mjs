@@ -91,11 +91,29 @@ result = await getProductList('4', false);
 assert.equal(result.status, 401, 'Unauthenticated clients must never read the Admin catalog');
 assert.equal(fullReads, readsBeforeUnauthorized);
 
+// Backup restore uses DELETE + INSERT in a transaction, not the normal CRUD path.
+// Both mutations must be tracked even when the SKU is reused.
+const beforeRestore = Number(revision());
+sql.exec('BEGIN');
+try {
+  sql.prepare('DELETE FROM products').run();
+  add('restored', 'QA-RESTORED', 10, 0);
+  sql.exec('COMMIT');
+} catch (error) { sql.exec('ROLLBACK'); throw error; }
+assert.equal(Number(revision()), beforeRestore + 2,
+  'Restore-style product replacement must invalidate old revision tokens');
+result = await getProductList(String(beforeRestore));
+assert.deepEqual(result.body.products.map(p => p.sku), ['QA-RESTORED']);
+assert.equal(fullReads, 4, 'Restored catalog must be loaded exactly once');
+result = await getProductList(String(beforeRestore + 2));
+assert.deepEqual(result.body, {unchanged: true, revision: String(beforeRestore + 2)});
+assert.equal(fullReads, 4, 'A follow-up should not re-read an unchanged restored catalog');
+
 // Missing migration / absent version row: always load products (safe fallback).
 sql.prepare("DELETE FROM settings WHERE key='products_revision'").run();
 result = await getProductList('4');
 assert.equal(result.status, 200);
 assert.ok(Array.isArray(result.body.products));
 assert.equal(Object.hasOwn(result.body, 'revision'), false);
-assert.equal(fullReads, 4);
-console.log('PASS: Admin products revision triggers, index, secure conditional reads, and schema fallback.');
+assert.equal(fullReads, 5);
+console.log('PASS: Admin products revision triggers, index, secure conditional reads, Restore invalidation, and schema fallback.');
