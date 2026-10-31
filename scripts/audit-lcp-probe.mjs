@@ -79,6 +79,7 @@ try{
      .filter(el=>{const r=el.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0}).length
    }));
    const record={...trial,status:response.status(),...observation,network:network.slice(0,60)};
+   record.closedAccountPaint=record.candidates.some(c=>c.selector==='p.account-note');
    results.push(record);
    const last=record.candidates[record.candidates.length-1]||null;
    console.log("LCP_PROBE "+JSON.stringify({...trial,status:record.status,
@@ -92,5 +93,5 @@ try{
 }finally{await browser.close()}
 await mkdir(output,{recursive:true});
 await writeFile(join(output,"lcp-probe.json"),JSON.stringify({origin,results},null,2));
-if(results.some(x=>x.error||x.status!==200||x.hydration!=="ready"))
+if(results.some(x=>x.error||x.status!==200||x.hydration!=="ready"||x.closedAccountPaint))
  process.exitCode=1;

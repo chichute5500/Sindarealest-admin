@@ -50,4 +50,8 @@ assert.match(restore,/return fail\("Cần xác thực lại mật khẩu quản 
 assert.match(store,/<img class="mosaic-photo" id="craftTileImage"[^>]*loading="lazy"/);
 assert.ok(store.includes('src="images/brand-emblem.png"'),'Retain owner-approved gallery emblem');
 assert.match(read('scripts/audit-readonly.mjs'),/#artSlide,#craftTileImage/);
+// Closed account overlay appears before later material CSS and must never
+// compete for Largest Contentful Paint on catalog entry.
+assert.match(store,/<aside class="account-drawer glass" id="accountDrawer" style="visibility:hidden"/);
+assert.match(store,/panel\.style\.visibility='';panel\.removeAttribute\('inert'\)/);
 console.log('PASS: production deployment is D1 read-only, editor PUT uses CAS, CSS nested markup repaired, Restore requires fresh password.');

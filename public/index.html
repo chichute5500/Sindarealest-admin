@@ -1354,7 +1354,7 @@ html.sd-catalog-route #products .filter-pill{
   <div class="sd-fullscreen-thumbs" id="sdFullscreenThumbs" aria-label="Ảnh sản phẩm"></div>
   <div class="sd-fullscreen-brand-footer" aria-hidden="true"><img src="images/brand-emblem.png" alt=""><span class="sd-fullscreen-brand-copy"><strong>SinDarealest</strong><small>Thời Trang Da Cá Sấu</small></span></div>
 </div>
-<aside class="account-drawer glass" id="accountDrawer" role="dialog" aria-modal="true" aria-label="Tài khoản" aria-hidden="true" tabindex="-1" inert>
+<aside class="account-drawer glass" id="accountDrawer" style="visibility:hidden" role="dialog" aria-modal="true" aria-label="Tài khoản" aria-hidden="true" tabindex="-1" inert>
   <div class="cart-header sd-account-header"><h2 id="accountDrawerTitle" class="sd-account-visually-hidden">Tài khoản</h2><button class="icon-btn tap-target" id="accountClose" aria-label="Đóng tài khoản">×</button></div>
   <p class="sd-account-toast" id="sdAccountToast" role="status" aria-live="polite" hidden></p>
   <div class="account-panel-content">
@@ -2609,7 +2609,7 @@ function closeCheckout(restoreFocus=true){
 function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
  closeCheckout(false);closeCart(false);closeDetail(false,false);
  if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('account');
- const panel=$('#accountDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+ const panel=$('#accountDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
  const close=$('#accountClose');
  const focusClose=()=>{if(!close||!panel.classList.contains('open')||panel.hasAttribute('inert'))return;close.focus({preventScroll:true})};
  // Retry after layout/visibility transitions so opening the drawer cannot leave focus on the bottom-nav trigger.
