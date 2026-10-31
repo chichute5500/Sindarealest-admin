@@ -3335,16 +3335,12 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 }
 
 
-@keyframes sdLiquidGlassDrift{
-  0%{transform:translate3d(-.35%,-.2%,0) scale(1.025)}
-  100%{transform:translate3d(.35%,.25%,0) scale(1.035)}
-}
+/* Full-viewport background drift produced CLS=1 in Lighthouse desktop.
+   Preserve the approved static satin artwork and glass materials, but never
+   translate or scale the entire page backdrop during normal browsing. */
 .theme-bg--light::after,.theme-bg--dark::after{
-  animation:sdLiquidGlassDrift 32s ease-in-out infinite alternate;
-  transform-origin:center;
-}
-@media(prefers-reduced-motion:reduce){
-  .theme-bg--light::after,.theme-bg--dark::after{animation:none!important;transform:none!important}
+  animation:none;
+  transform:none;
 }
 /* Mobile proportions tuned against the reference home screen, excluding its native OS status bar. */
 @media(max-width:760px){
