@@ -15,6 +15,9 @@ assert.ok(full.includes('id="catalogGrid"><article'),'Catalog visible with JS di
 assert.ok(full.includes('class="product-card-footer" aria-hidden="true"'),'SSR must reserve the same product-card footer height before catalog hydration');
 assert.ok(full.includes('class="product-card-bottom"'),'SSR footer must follow hydrated product-card layout');
 assert.ok(full.includes('class="photo-shade"'),'SSR photo should share hydrated image overlay geometry');
+assert.match(full,/id="catalogGrid"><article[^]*?loading="lazy"/,
+  "Homepage catalog below the fold must not eagerly fetch product photographs");
+
 assert.ok(!full.includes('data-add='),'SSR placeholder cannot pretend a cart button works without hydrated product data');
 assert.ok(full.includes('"@type":"ItemList"'),'JSON-LD includes real product URLs');
 assert.ok(full.includes('images/test-image.webp'));
@@ -25,6 +28,8 @@ assert.ok(!full.includes('"price"'),'Never expose unverified price');
 assert.ok(statements.every(sql=>sql.startsWith("SELECT ")&&sql.includes("LIMIT 8")),'SSR must use bounded read-only SQL');
 const category=await renderPublicCatalog(shell,{DB},origin,{categorySlug:"sneaker"});
 assert.ok(category.includes('id="catalogGrid"><article'));
+assert.match(category,/id="catalogGrid"><article[^]*?loading="eager"/,
+  "Direct catalog entry should eagerly load the first visible product image");
 assert.ok(category.includes('id="featuredGrid"></div>'),'Category route must not populate hidden home sections');
 assert.equal(await renderPublicCatalog(shell,{DB},origin,{categorySlug:"not-a-category"}),shell);
 assert.equal(await renderPublicCatalog(shell,{},origin,{home:true}),shell);
