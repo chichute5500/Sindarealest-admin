@@ -14,6 +14,21 @@ const routes=[['home','/'],['catalog','/sanpham']];
 await mkdir(join(folder,'screenshots'),{recursive:true});
 const report={target,generatedAt:new Date().toISOString(),note:'Read-only public GETs, unprivileged fresh browser context. All failing/unavailable metrics remain null.',routes:{},screenshots:[],errors:[]};
 function sanitize(error){return String(error?.message||error||'Unknown error').replace(/https?:\/\/[^\s]+/g,'[URL]').slice(0,240)}
+// A screenshot is valid only after real hydrated product cards AND at least
+// one decoded image are present. Static headings / SSR placeholders alone do
+// not establish that the interactive storefront finished loading.
+async function waitForCatalogPaint(page,section){
+ const selector=section==='home'?'#featuredGrid article[data-product]':'#catalogGrid article[data-product]';
+ await page.waitForFunction((selector)=>{
+   if(document.documentElement.dataset.catalogHydration==='failed')throw new Error('Catalog API hydration failed');
+   const cards=[...document.querySelectorAll(selector)];
+   return cards.length>0&&cards.some(card=>[...card.querySelectorAll('img')].some(img=>img.complete&&img.naturalWidth>0));
+ },selector,{timeout:35000,polling:250});
+ // Await visual stabilization after first image paint, not a fixed delay
+ // from DOMContentLoaded (which previously produced empty catalog screenshots).
+ await page.waitForTimeout(350);
+ return await page.locator(selector).count();
+}
 async function documentSource(path){
  try{
   const response=await fetch(target+path,{redirect:'manual',signal:AbortSignal.timeout(16000)});
@@ -55,10 +70,7 @@ try{
    await client.send('Network.enable');
    await client.send('Network.emulateNetworkConditions',{offline:false,latency:150,downloadThroughput:200000,uploadThroughput:90000});
    const response=await page.goto(target+path,{waitUntil:'domcontentloaded',timeout:45000});
-   const cardSelector=name==='home'?'#featuredGrid article[data-product]':'#catalogGrid article[data-product]';
-   await page.waitForSelector(cardSelector,{state:'attached',timeout:20000}).catch(()=>{});
-   await page.waitForTimeout(500);
-   const renderedProducts=await page.locator(cardSelector).count();
+   const renderedProducts=await waitForCatalogPaint(page,name);
    // Test scrolling and browser interaction. No public API writes.
    const framePromise=page.evaluate(()=>new Promise(resolve=>{
      const deltas=[];let previous=0;const until=performance.now()+2600;
@@ -80,15 +92,16 @@ try{
    await page.addInitScript(()=>{try{sessionStorage.setItem('sd-welcome-seen-in-tab','1')}catch{}});
    try{
     await page.goto(target+path,{waitUntil:'domcontentloaded',timeout:45000});
-    const cardSelector=name==='home'?'#featuredGrid article[data-product]':'#catalogGrid article[data-product]';
-    await page.waitForSelector(cardSelector,{state:'attached',timeout:20000}).catch(()=>{});
-    await page.waitForTimeout(650);
+    const renderedProducts=await waitForCatalogPaint(page,name);
     const filename=name+'-'+colorScheme+'-'+width+'.png';
     await page.screenshot({path:join(folder,'screenshots',filename),fullPage:true,animations:'disabled',timeout:25000});
-    report.screenshots.push(filename);
+    report.screenshots.push({filename,route:name,colorScheme,width,renderedProducts,ready:true});
    }catch(error){report.errors.push({screen:name,colorScheme,width,error:sanitize(error)})}
    await context.close();
  }
 }finally{await browser.close()}
 await writeFile(join(folder,'public-readonly-metrics.json'),JSON.stringify(report,null,2));
+if(report.errors.length||routes.some(([name])=>report.routes[name].runtime?.error)){
+ throw new Error('Audit incomplete: '+report.errors.length+' unready screenshots and '+routes.filter(([name])=>report.routes[name].runtime?.error).map(([name])=>name).join(',')+' runtime failures. Inspect public-readonly-metrics.json; do not use blank or unhydrated screenshots for visual parity.');
+}
 console.log('Public read-only audit complete: '+folder+'; screenshots '+report.screenshots.length+'; no private data accessed.');
