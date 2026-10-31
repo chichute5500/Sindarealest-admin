@@ -48,11 +48,29 @@ jobs:
           npm run check
       - name: Bookmark, apply schema and prove Preview SQL parity
         run: node scripts/d1-preview-products-revision-guarded.mjs
+      - name: Measure Preview query rows and confirm migrated schema (read-only)
+        run: node scripts/d1-preview-products-readonly-validation.mjs
+      - name: Deploy isolated Admin QA Preview only (never Main)
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name sindarealest-admin-preview --branch d1-products-155 --commit-hash "$GITHUB_SHA" --commit-message "PR155 D1 Admin QA $GITHUB_SHA"
+      - name: Verify isolated Admin Preview and anonymous API denial
+        shell: bash
+        run: |
+          set -euo pipefail
+          site="https://d1-products-155.sindarealest-admin-preview.pages.dev"
+          curl --fail --silent --show-error --retry 3 --retry-delay 5 "$site/admin/" -o "$RUNNER_TEMP/d1-admin.html"
+          grep -q "Quản trị SinDarealest" "$RUNNER_TEMP/d1-admin.html"
+          test "$(curl --silent --show-error -o /dev/null -w '%{http_code}' "$site/api/admin/products")" = "401"
+          echo "PASS: $site/admin/ (isolated D1 Preview), Production untouched."
       - name: Save sanitized evidence and recovery bookmark
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: d1-preview-products-checkpoint
-          path: artifacts/d1-preview-products/checkpoint.json
+          path: |
+            artifacts/d1-preview-products/checkpoint.json
+            artifacts/d1-preview-products/readonly-metrics.json
           if-no-files-found: ignore
           retention-days: 7
