@@ -1,0 +1,35 @@
+name: SinDarealest — QA resource policy guard (local only)
+on:
+  push:
+    paths:
+      - 'AGENTS.md'
+      - '.github/copilot-instructions.md'
+      - 'docs/QA_RESOURCE_POLICY.md'
+      - 'scripts/qa-resource-guard.mjs'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - '.github/copilot-instructions.md'
+      - 'docs/QA_RESOURCE_POLICY.md'
+      - 'scripts/qa-resource-guard.mjs'
+      - '.github/workflows/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: qa-policy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check mandatory AI rules + prevent new expensive automated QA
+        run: node scripts/qa-resource-guard.mjs
