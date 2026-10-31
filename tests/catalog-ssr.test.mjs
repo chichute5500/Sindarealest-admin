@@ -52,4 +52,10 @@ assert.match(storefront,/if\(!initialCatalogListing\)\{renderFeatured\(\);render
 assert.match(storefront,/const ssrCards=grid\.querySelectorAll\('article\[data-ssr-product\]'\)/);
 assert.match(storefront,/grid\.replaceChildren\(template\.content\)/);
 assert.match(storefront,/if\(!active&&products\.length&&featured&&!featured\.querySelector\('\[data-featured-card\]'\)\)renderFeatured\(\)/);
+// Offscreen Home material artwork must not load/rotate on direct /sanpham.
+assert.match(storefront,/function initArtSlideshowWhenVisible\(\)/);
+assert.match(storefront,/artSlideObserver\.observe\(slide\)/);
+assert.match(storefront,/bindReveal\(document\);initArtSlideshowWhenVisible\(\);setupNavSpy\(\)/);
+assert.match(storefront,/if\(!active\)initArtSlideshowWhenVisible\(\)/);
+assert.match(storefront,/document\.documentElement\.classList\.contains\('sd-catalog-route'\)\)return;const rect=/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");

@@ -1855,6 +1855,7 @@ function setCatalogLandingMode(active){
  // On Back/Forward to Home, recover featured cards deferred on direct catalog entry.
  const featured=$('#featuredGrid');
  if(!active&&products.length&&featured&&!featured.querySelector('[data-featured-card]'))renderFeatured();
+ if(!active)initArtSlideshowWhenVisible();
 }
 function syncCatalogFromLocation(){
  const value=catalogCategoryFromLocation();
@@ -2652,6 +2653,22 @@ function trapFullscreenTab(event){trapTabWithin($('#sdFullscreenViewer'),event)}
 async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true}}catch(e){}try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
 async function consultProduct(id){const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id)||currentProduct;if(!p)return;const confirmedSku=visibleSku(p);const sku=confirmedSku?` (SKU: ${confirmedSku})`:' (mã SKU chưa được cung cấp)';const title=p.title||'Sản phẩm SinDarealest';const message=`Chào SinDarealest, tôi muốn tư vấn/đặt hàng sản phẩm ${title}${sku}`;const ok=await copyText(message);showToast(ok?'Đã sao chép lời nhắn tư vấn/đặt hàng. Đang mở Zalo…':'Không thể tự sao chép. Đang mở Zalo để bạn tiếp tục tư vấn.',ZALO);setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast(ok?'Nội dung tư vấn đã được sao chép. Bạn có thể dán vào Zalo.':'Hãy gửi lời nhắn tư vấn khi Zalo mở.',ZALO)},1000)}
 async function consultCart(){const items=cartEntries();if(!items.length){showToast('Bạn chưa chọn sản phẩm.');return}const msg=items.map(x=>(visibleSku(x.p)||x.p.title)+(x.option?' · '+productOptionLabel(x.p,x.option):'')+' × '+x.q).join('\n');const copied=await copyText(msg);showToast(copied?'Đã sao chép danh sách sản phẩm. Đang mở Zalo…':'Không thể tự sao chép danh sách sản phẩm. Đang mở Zalo để bạn tiếp tục gửi thủ công.',ZALO);setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast(copied?'Trình duyệt chặn tự mở Zalo. Danh sách sản phẩm đã được sao chép.':'Trình duyệt chặn tự mở Zalo. Hãy dán hoặc gửi danh sách sản phẩm thủ công.',ZALO)},1000)}
+// The handcrafted carousel is on Home only. Do not load/rotate full-resolution
+// photographs while opening /sanpham or while its section is far offscreen.
+let artSlideshowInitialized=false,artSlideObserver=null;
+function initArtSlideshowWhenVisible(){
+ if(artSlideshowInitialized)return;
+ const slide=$('#artSlide');if(!slide)return;
+ if(typeof IntersectionObserver==='function'){
+  if(artSlideObserver)return;
+  artSlideObserver=new IntersectionObserver(entries=>{
+   if(!entries.some(entry=>entry.isIntersecting)||document.documentElement.classList.contains('sd-catalog-route'))return;
+   artSlideObserver.disconnect();artSlideObserver=null;
+   setupArtSlideshow();
+  },{rootMargin:'450px 0px'});
+  artSlideObserver.observe(slide);
+ }else if(!document.documentElement.classList.contains('sd-catalog-route'))setupArtSlideshow();
+}
 function setupArtSlideshow(){
  const sneakerProducts=products.filter(p=>p.category==='sneakers');
  const imgs=uniqueImages(sneakerProducts);
@@ -2664,6 +2681,7 @@ function setupArtSlideshow(){
  const previousButton=$('#artPrev');
  const nextButton=$('#artNext');
  if(!pauseButton||!previousButton||!nextButton)return;
+ artSlideshowInitialized=true;
  const reduceMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
  let pool=imgs.slice();
  if(!reduceMotion)pool.sort(()=>Math.random()-.5);
@@ -2682,7 +2700,7 @@ function setupArtSlideshow(){
    :'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
  }
  function stopAutoAdvance(){if(artTimer){clearInterval(artTimer);artTimer=null}}
- function startAutoAdvance(){stopAutoAdvance();if(reduceMotion||paused||pool.length<=1)return;artTimer=setInterval(()=>{if(!document.hidden)nextRandom()},3000)}
+ function startAutoAdvance(){stopAutoAdvance();if(reduceMotion||paused||pool.length<=1)return;artTimer=setInterval(()=>{if(document.hidden||document.documentElement.classList.contains('sd-catalog-route'))return;const rect=$('#artSlide')?.getBoundingClientRect();if(!rect||rect.bottom<0||rect.top>innerHeight)return;nextRandom()},3000)}
  function setPaused(next){if(reduceMotion)return;paused=!!next;updatePauseButton();if(paused)stopAutoAdvance();else startAutoAdvance()}
  function show(index){artIndex=(index+pool.length)%pool.length;const src=pool[artIndex];const img=$('#artSlide');const commit=()=>{img.style.opacity='.08';img.style.transform='scale(1.025)';setTimeout(()=>{img.onload=()=>{img.style.opacity='1';img.style.transform='scale(1)'};img.onerror=()=>{img.style.opacity='1';img.style.transform='scale(1)'};img.src=src;$('#artSlideCount').textContent=String(artIndex+1).padStart(2,'0')+' / '+imgs.length},260)};if(src===img.getAttribute('src')){nextRandom();return}const preload=new Image();preload.onload=commit;preload.onerror=commit;preload.src=src}
  function nextRandom(){if(document.hidden||pool.length<=1)return;let n=Math.floor(Math.random()*pool.length);if(n===artIndex)n=(n+1+Math.floor(Math.random()*(pool.length-1)))%pool.length;const src=pool[n];const img=new Image();img.onload=()=>show(n);img.onerror=()=>show(n);img.src=src}
@@ -2931,7 +2949,7 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
  // render featured + catalog as before; Home can be opened later without reload.
  const initialCatalogListing=catalogCategoryFromLocation()!==null;
  if(!initialCatalogListing){renderFeatured();renderFilters();renderCatalog()}
- renderCart();bindReveal(document);setupArtSlideshow();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
+ renderCart();bindReveal(document);initArtSlideshowWhenVisible();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
 }
 
 let accountSyncMode='guest',cloudOrderHistory=[],cloudSyncEpoch=0,cloudFavoriteQueue=Promise.resolve();
