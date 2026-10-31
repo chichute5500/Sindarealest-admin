@@ -162,11 +162,17 @@ assert.ok(!JSON.stringify(lookupPayload).includes(demoWarrantyCode),'Raw warrant
 const codeActionToken = lookupPayload.warranty.claimToken;
 assert.match(codeActionToken,/^[0-9a-f]{32}$/);
 assert.ok(!JSON.stringify(lookupPayload).includes('Nguyễn Văn An'),'Full customer name must not be returned');
+const originalSiteverifyFetch=globalThis.fetch;
+globalThis.fetch=async url=>{
+ assert.ok(String(url).startsWith("https://challenges.cloudflare.com/turnstile/v0/siteverify"));
+ return new Response(JSON.stringify({success:true,hostname:"shop.example",action:"warranty_lookup"}),{status:200});
+};
 const phoneLookup = await lookupWarranty({
-  request:new Request('https://shop.example/api/warranty-lookup',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.12'},body:JSON.stringify({lookup:'090 123 4567'})}),
-  env:{DB:warrantyDBInstance}
+  request:new Request('https://shop.example/api/warranty-lookup',{method:'POST',headers:{Origin:'https://shop.example','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.12'},body:JSON.stringify({lookup:'090 123 4567',turnstileToken:'qa-valid-proof-2026'})}),
+  env:{DB:warrantyDBInstance,TURNSTILE_SITE_KEY:"qa-site",TURNSTILE_SECRET_KEY:"qa-secret"}
 });
-assert.equal(phoneLookup.status,200,'Phone lookup should return warranty records without OTP');
+globalThis.fetch=originalSiteverifyFetch;
+assert.equal(phoneLookup.status,200,'Phone lookup should verify Turnstile without OTP');
 lookupPayload = await phoneLookup.json();
 assert.equal(lookupPayload.warranties.length,1);
 assert.equal(lookupPayload.warranties[0].maskedWarrantyCode,'••••AAAA');
