@@ -40,6 +40,9 @@ async function loadGridImagesForScreenshot(page,section){
      .map(selector=>document.querySelector(selector)).filter(Boolean);
    if(!grids.length)return {requested:0,loaded:0,broken:0};
    const images=grids.flatMap(grid=>[...grid.querySelectorAll('article img')]);
+   // Full-page capture alone doesn't load below-fold editorial artwork.
+   // Warm only this read-only browser screenshot, not real visitors.
+   if(section==='home')images.push(...document.querySelectorAll('#artSlide,#materialTile img.mosaic-photo'));
    for(const img of images){
      if(img.dataset.src&&!img.getAttribute('src'))img.src=img.dataset.src;
      img.loading='eager';
@@ -49,7 +52,9 @@ async function loadGridImagesForScreenshot(page,section){
      new Promise(resolve=>setTimeout(resolve,10000))
    ]);
    const loaded=images.filter(img=>img.complete&&img.naturalWidth>0).length;
-   return {requested:images.length,loaded,broken:images.filter(img=>img.complete&&img.naturalWidth===0).length};
+   const craft=document.getElementById('artSlide');
+   return {requested:images.length,loaded,broken:images.filter(img=>img.complete&&img.naturalWidth===0).length,
+     craftLoaded:section!=='home'||Boolean(craft&&craft.complete&&craft.naturalWidth>0)};
  },section);
 }
 async function documentSource(path){
@@ -127,7 +132,7 @@ try{
        (chipLayout.flexWrap!=='nowrap'||chipLayout.overflowX!=='auto'))
       throw Error('Mobile catalog chips must stay in one horizontally scrollable row: '+JSON.stringify(chipLayout));
     const images=await loadGridImagesForScreenshot(page,name);
-    if(images.broken)throw Error('Image delivery failures in '+name+': '+JSON.stringify(images));
+    if(images.broken||!images.craftLoaded)throw Error('Image delivery failures in '+name+': '+JSON.stringify(images));
     const filename=name+'-'+colorScheme+'-'+width+'.png';
     await page.screenshot({path:join(folder,'screenshots',filename),fullPage:true,animations:'disabled',timeout:25000});
     report.screenshots.push({filename,route:name,colorScheme,width,renderedProducts,chipLayout,images,ready:true});
