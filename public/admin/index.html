@@ -1058,7 +1058,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   --sd-3d-rim:radial-gradient(ellipse 72% 94% at 1% 0%,rgba(242,165,216,.68),transparent 80%),radial-gradient(ellipse 58% 108% at 100% 36%,rgba(100,167,232,.50),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(224,240,251,.55) 48%,rgba(189,218,239,.20) 76%,rgba(222,236,248,.48));
   --sd-3d-face:radial-gradient(ellipse 110% 80% at 18% -18%,rgba(255,255,255,.96),rgba(255,255,255,.30) 48%,transparent 78%),radial-gradient(ellipse 76% 100% at 105% 56%,rgba(159,202,233,.09),transparent 78%),linear-gradient(142deg,rgba(252,254,255,.69) 0%,rgba(238,248,255,.54) 52%,rgba(222,239,250,.43) 100%);
   --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(255,255,255,.88),rgba(231,245,254,.68) 57%,rgba(226,240,251,.58) 100%);
-  --sd-glass-panel-shadow:0 13px 29px rgba(35,80,113,.15),0 2px 6px rgba(43,89,119,.09),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 4px rgba(92,137,169,.075);
+  --sd-glass-panel-shadow:0 11px 25px rgba(35,80,113,.12),0 2px 5px rgba(43,89,119,.075),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 3px rgba(92,137,169,.055);
   --sd-glass-input-shadow:0 3px 9px rgba(45,87,118,.075),inset 1px 2px 4px rgba(93,139,167,.14);
   --sd-glass-input-edge:rgba(147,191,225,.38);
   --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.45),rgba(211,235,250,.26) 65%,rgba(189,224,246,.16) 100%);
@@ -2191,7 +2191,7 @@ body:not(:has(#loginView:not(.hidden))){
 body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.88),rgba(239,249,255,.66) 54%,rgba(220,239,251,.49));
   --sd-dashboard-rim:radial-gradient(ellipse 74% 96% at 1% 0%,rgba(245,164,216,.94),transparent 80%),radial-gradient(ellipse 58% 110% at 100% 36%,rgba(103,171,235,.82),transparent 82%),radial-gradient(ellipse 100% 22% at 58% 110%,rgba(112,189,220,.03),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.50) 48%,rgba(190,222,242,.13) 76%,rgba(210,229,245,.40));
-  --sd-dashboard-shadow:0 14px 30px rgba(35,80,113,.17),0 3px 7px rgba(43,89,119,.10),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 4px rgba(73,121,157,.08);
+  --sd-dashboard-shadow:0 11px 25px rgba(35,80,113,.12),0 2px 5px rgba(43,89,119,.075),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -1px 3px rgba(73,121,157,.055);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(40,76,101,.57),rgba(20,47,68,.49) 56%,rgba(15,39,58,.55));
@@ -2217,7 +2217,7 @@ body:has(#main .statgrid) #main :is(.stat,.dashboard-quick-panel,.dashboard-reve
 body:has(#main .statgrid) #main :is(.dashboard-shortcut,.stat-icon,.dashboard-shortcut .shortcut-icon,.dashboard-revenue-visual){
   border:1.75px solid transparent;
   background:radial-gradient(ellipse 88% 72% at 16% -2%,rgba(255,255,255,1),transparent 80%) padding-box,linear-gradient(145deg,rgba(255,255,255,.94),rgba(226,242,252,.57)) padding-box,var(--sd-dashboard-rim) border-box;
-  box-shadow:0 7px 16px rgba(44,98,133,.14),0 2px 4px rgba(43,89,119,.07),inset 0 2px 2px rgba(255,255,255,1),inset 0 -1px 3px rgba(72,141,173,.08);
+  box-shadow:0 5px 13px rgba(44,98,133,.10),0 1px 4px rgba(43,89,119,.06),inset 0 2px 2px rgba(255,255,255,1),inset 0 -1px 3px rgba(72,141,173,.055);
 }
 body:has(#main .statgrid) .topbar,
 body:has(#main .statgrid) .mobiletabs{
@@ -2234,7 +2234,7 @@ body:has(#main .statgrid) #adminMenuToggle,
 body:has(#main .statgrid) .mobiletabs .nav{
   border:1.75px solid transparent;
   background:radial-gradient(ellipse 82% 68% at 18% 0%,rgba(255,255,255,.98),transparent 80%) padding-box,linear-gradient(145deg,rgba(255,255,255,.88),rgba(220,241,252,.54)) padding-box,var(--sd-dashboard-rim) border-box;
-  box-shadow:0 5px 12px rgba(44,98,133,.12),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -1px 3px rgba(72,141,173,.07);
+  box-shadow:0 4px 10px rgba(44,98,133,.09),inset 0 1px 0 rgba(255,255,255,.99),inset 0 -1px 3px rgba(72,141,173,.05);
 }
 body:has(#main .statgrid) .mobiletabs .nav.active{
   background:radial-gradient(ellipse 92% 72% at 18% 0%,rgba(255,255,255,.99),transparent 80%) padding-box,linear-gradient(145deg,rgba(245,251,255,.99),rgba(165,213,250,.97)) padding-box,var(--sd-dashboard-rim) border-box!important;
