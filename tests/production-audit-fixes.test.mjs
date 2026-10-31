@@ -20,6 +20,15 @@ assert.doesNotMatch(store,/class="theme-watermark"/,
   'An invisible full-screen decorative watermark must not steal LCP or network bandwidth');
 assert.doesNotMatch(store,/@keyframes sdLiquidGlassDrift/,
   'Do not animate a full-viewport background transform: Lighthouse attributed CLS 1.0 to it');
+assert.match(store,/<img class="brand-symbol" src="images\/brand-emblem-nav\.webp"/,
+  'The mobile nav must reference the approved compact emblem');
+assert.match(read('scripts/build-logo-asset.py'),/nav_dst=Path\("public\/images\/brand-emblem-nav\.webp"\)/,
+  'Every build must generate the nav emblem to avoid a broken image');
+assert.match(read('.github/workflows/audit-preview.yml'),/test -s public\/images\/brand-emblem-nav\.webp/,
+  'Isolated Preview must verify that the nav emblem was built');
+assert.match(deploy,/test -s public\/images\/brand-emblem-nav\.webp/,
+  'Production deploy must generate the nav emblem before release');
+
 const admin=read('public/admin/index.html');
 assert.match(admin,/expectedProduct:JSON\.parse\(JSON\.stringify\(editing\)\)/,
   'Full Admin edit must send original immutable snapshot');
