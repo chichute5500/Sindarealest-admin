@@ -43,6 +43,25 @@ jobs:
                 || printf '%s\n' "Lighthouse failed: $route $preset (unverified)"
             done
           done
+      - name: Print verifiable Lighthouse summary
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path('audit/after/lighthouse')
+          for name in ('home-mobile','home-desktop','catalog-mobile','catalog-desktop'):
+              path=root/(name+'.json')
+              if not path.exists():
+                  print(name+': CHƯA ĐO (missing report)')
+                  continue
+              r=json.loads(path.read_text())
+              cat={k:round(v['score']*100) if v['score'] is not None else None for k,v in r['categories'].items()}
+              audits=r['audits']
+              metric=lambda k:round(audits[k]['numericValue'],2) if audits.get(k,{}).get('numericValue') is not None else None
+              print(name,cat,'LCP_ms',metric('largest-contentful-paint'),'CLS',metric('cumulative-layout-shift'),'TBT_ms',metric('total-blocking-time'))
+          PY
       - name: Archive Preview metrics, never customer data
         uses: actions/upload-artifact@v4
         if: always()
