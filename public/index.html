@@ -45,9 +45,8 @@
  // Only full page loads from another store page may bypass Welcome. Refresh
  // (navigation=reload), fresh external entry and new tab entry still show it.
  try{
-  const seen=sessionStorage.getItem('sd-welcome-seen-in-tab')==='1';
-  if(navigation!=='reload'&&sameSiteEntry&&seen)root.classList.add('sd-welcome-nav-bypass');
-  sessionStorage.setItem('sd-welcome-seen-in-tab','1');
+  const seen=sessionStorage.getItem('sindarealest_welcomed')==='true';
+  if(seen)root.classList.add('sd-welcome-nav-bypass');
  }catch(e){}
  // OS preference owns each new entry/reload. Manual website choice is scoped
  // to this tab's same-origin navigation, never a stale localStorage override.
@@ -1136,6 +1135,7 @@ html.sd-catalog-route #products .filter-pill{
       return;
     }
     closed=true;
+    try{sessionStorage.setItem('sindarealest_welcomed','true')}catch(e){}
     document.removeEventListener('keydown',keepFocus,true);
     document.removeEventListener('focusin',keepFocusInside,true);
     // Release the locked page geometry BEFORE fading the still-opaque splash.
@@ -1230,8 +1230,8 @@ html.sd-catalog-route #products .filter-pill{
 
 
   <section class="section wrap" id="order" aria-labelledby="order-title">
-    <div class="order-cta order-cta--compact" data-reveal><button type="button" class="pill-btn primary tap-target" id="orderDetailsToggle" aria-expanded="false" aria-controls="orderDetailsPanel"><svg class="order-cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="order-cta-label" id="order-title">Đặt hàng an tâm</span><span class="arrow" aria-hidden="true">→</span></button></div>
-    <div id="orderDetailsPanel" class="order-details-panel" hidden>
+    <div class="order-cta order-cta--compact" data-reveal><button type="button" class="pill-btn primary tap-target" id="orderDetailsToggle" aria-expanded="true" aria-controls="orderDetailsPanel"><svg class="order-cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="order-cta-label" id="order-title">Thu gọn quy trình</span><span class="arrow" aria-hidden="true">→</span></button></div>
+    <div id="orderDetailsPanel" class="order-details-panel">
     <div class="section-head" data-reveal><div><div class="eyebrow">A clear process, a considered result</div><h2 class="section-title">Đặt hàng từng bước rõ ràng</h2></div><p class="section-note">Bốn bước rõ ràng; mọi điều kiện quan trọng được xác nhận trước khi đặt cọc.</p></div>
     <div class="order-steps" role="list" aria-label="Quy trình đặt hàng gồm bốn bước">
       <article class="order-step glass" role="listitem" data-reveal><div class="order-step-top"><span class="order-number" aria-label="Bước 1">01</span><span class="order-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="product" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2"/></svg></span></div><h3>Chọn sản phẩm</h3><p>Chọn mẫu yêu thích và ghi lại tên mẫu để được tư vấn nhanh.</p></article>
@@ -1302,7 +1302,7 @@ html.sd-catalog-route #products .filter-pill{
     <div class="contact-grid">
      <div class="contact-link contact-link--zalo-phone" role="group" aria-label="Zalo và điện thoại">
       <span class="contact-icon contact-icon--zalo" aria-hidden="true">Zalo</span>
-      <span class="contact-copy"><strong>Zalo / Điện thoại</strong><small class="contact-phone-actions"><a href="https://zalo.me/0827049192" target="_blank" rel="noopener noreferrer" aria-label="Mở Zalo để nhắn tin tới 0827 049 192">0827 049 192</a><span aria-hidden="true">·</span><a href="tel:+84827049192" aria-label="Gọi điện tới 0827 049 192">Gọi điện</a></small></span>
+      <span class="contact-copy"><strong>Zalo / Điện thoại</strong><small class="contact-phone-actions"><a href="https://zalo.me/0827049192" target="_blank" rel="noopener noreferrer" aria-label="Mở Zalo để nhắn tin tới 0827 049 192">0827 049 192</a><span aria-hidden="true">·</span><a href="tel:0827049192" aria-label="Gọi điện tới 0827 049 192">Gọi điện</a></small></span>
      </div>
      <a class="contact-link tap-target" href="https://www.facebook.com/ThoiTrangDaCaSau" target="_blank" rel="noopener noreferrer"><span class="contact-icon" aria-hidden="true">f</span><span><strong>Facebook</strong><small>Thời Trang Da Cá Sấu</small></span></a>
      <a class="contact-link tap-target" href="https://m.me/ThoiTrangDaCaSau" target="_blank" rel="noopener noreferrer"><span class="contact-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.2C6.9 3.2 3 6.6 3 11c0 2.4 1.1 4.4 3 5.8V21l4.1-2.1c.6.2 1.3.3 1.9.3 5.1 0 9-3.4 9-8.2s-3.9-7.8-9-7.8Z" fill="currentColor" stroke="none"/><path d="m6.2 13.5 4.2-4.4 2.6 2.4 4.8-2.8-4.2 4.5-2.7-2.4-4.7 2.7Z" fill="#fff" stroke="none"/></svg></span><span><strong>Messenger</strong><small>Nhắn tin trực tiếp</small></span></a>
@@ -1357,9 +1357,9 @@ html.sd-catalog-route #products .filter-pill{
       <p class="sd-auth-message" data-auth-message role="status" aria-live="polite" hidden></p>
       <div data-auth-options>
         <p class="sd-auth-heading">Đăng nhập tài khoản</p>
-        <p class="sd-auth-caption">Đăng nhập Google để lưu yêu thích, địa chỉ nhận hàng và xem lại đơn đã gắn tài khoản trên mọi thiết bị. Không bắt buộc đăng nhập để mua hàng.</p>
+        <p class="sd-auth-caption"><strong>Không bắt buộc đăng nhập để đặt hàng.</strong> Đăng nhập Google để đồng bộ yêu thích, địa chỉ nhận hàng và đơn đã liên kết giữa các thiết bị.</p>
         <button type="button" class="sd-auth-provider sd-auth-zalo tap-target" data-auth-zalo hidden disabled>Tiếp tục với Zalo</button>
-        <button type="button" class="sd-auth-provider sd-auth-google tap-target" data-auth-google aria-label="Tiếp tục với Google"><span class="sd-auth-provider-icon sd-auth-google-mark" aria-hidden="true"><svg viewBox="0 0 18 18" focusable="false" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2045c0-.638-.0573-1.2523-.1636-1.8409H9v3.4818h4.8445a4.14 4.14 0 0 1-1.7964 2.7182v2.2582h2.9091c1.7018-1.5664 2.6836-3.8727 2.6836-6.6173z"/><path fill="#34A853" d="M9 18c2.43 0 4.4673-.805 5.9564-2.1782l-2.9091-2.2582c-.805.54-1.8341.8591-3.0473.8591-2.3441 0-4.33-1.5832-5.04-3.71H.9573v2.3309A8.998 8.998 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.7127A5.409 5.409 0 0 1 3.6773 9c0-.5945.1036-1.1718.2827-1.7127V4.9564H.9573A8.998 8.998 0 0 0 0 9c0 1.4536.3482 2.8273.9573 4.0436l3.0027-2.3309z"/><path fill="#EA4335" d="M9 3.5773c1.3214 0 2.5073.4541 3.44 1.3473l2.58-2.58C13.4636.8918 11.4273 0 9 0A8.998 8.998 0 0 0 .9573 4.9564L3.96 7.2873c.71-2.1268 2.6959-3.71 5.04-3.71z"/></svg></span><span class="sd-auth-provider-label" data-auth-provider-label>Tiếp tục với Google</span></button>
+        <button type="button" class="sd-auth-provider sd-auth-google tap-target" data-auth-google aria-label="Tiếp tục với Google"><span class="sd-auth-provider-icon sd-auth-google-mark" aria-hidden="true"><svg viewBox="0 0 18 18" focusable="false" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2045c0-.638-.0573-1.2523-.1636-1.8409H9v3.4818h4.8445a4.14 4.14 0 0 1-1.7964 2.7182v2.2582h2.9091c1.7018-1.5664 2.6836-3.8727 2.6836-6.6173z"/><path fill="#34A853" d="M9 18c2.43 0 4.4673-.805 5.9564-2.1782l-2.9091-2.2582c-.805.54-1.8341.8591-3.0473.8591-2.3441 0-4.33-1.5832-5.04-3.71H.9573v2.3309A8.998 8.998 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.96 10.7127A5.409 5.409 0 0 1 3.6773 9c0-.5945.1036-1.1718.2827-1.7127V4.9564H.9573A8.998 8.998 0 0 0 0 9c0 1.4536.3482 2.8273.9573 4.0436l3.0027-2.3309z"/><path fill="#EA4335" d="M9 3.5773c1.3214 0 2.5073.4541 3.44 1.3473l2.58-2.58C13.4636.8918 11.4273 0 9 0A8.998 8.998 0 0 0 .9573 4.9564L3.96 7.2873c.71-2.1268 2.6959-3.71 5.04-3.71z"/></svg></span><span class="sd-auth-provider-label" data-auth-provider-label>Đăng nhập nhanh bằng Google</span></button>
         <button type="button" class="sd-auth-provider sd-auth-email tap-target" data-auth-email aria-expanded="false" aria-controls="sdAuthEmailFields" hidden disabled><span class="sd-auth-provider-icon sd-auth-email-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></span><span class="sd-auth-provider-label" data-auth-provider-label>Tiếp tục với Email</span></button>
         <button type="button" class="sd-auth-provider sd-auth-facebook tap-target" data-auth-facebook hidden disabled>Tiếp tục với Facebook</button>
         <form id="sdAuthEmailFields" class="sd-auth-email-fields" data-mode="login" autocomplete="on" hidden>
@@ -1372,7 +1372,7 @@ html.sd-catalog-route #products .filter-pill{
         <button type="button" class="sd-auth-text-button tap-target" data-auth-toggle>Chưa có tài khoản? Đăng ký</button>
         <button type="button" class="sd-auth-text-button tap-target" data-auth-forgot hidden>Quên mật khẩu?</button>
         <div class="sd-auth-flow" id="sdAuthVerify" hidden>
-          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư và Spam. Nếu không nhận được, xem trạng thái Delivered/Bounced/Blocked trong Mailjet Stats; Mailjet tiếp nhận yêu cầu không đồng nghĩa thư đã được giao. Nhập OTP 6 số hoặc mở liên kết xác minh trong 5 phút.</p>
+          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư và Spam. Vui lòng kiểm tra hộp thư đến hoặc thư mục Spam. Mã xác minh có hiệu lực trong 5 phút.</p>
           <form id="sdAuthVerifyForm">
             <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
             <label>Mã OTP<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
@@ -1399,7 +1399,7 @@ html.sd-catalog-route #products .filter-pill{
           </form>
           <button type="button" class="sd-auth-text-button tap-target" data-auth-return>Quay lại</button>
         </div>
-        <p class="sd-auth-caption" data-auth-unverified-caption>Email trên Preview phải xác minh bằng OTP hoặc liên kết trước khi đăng nhập. Không tự gắn đơn cũ bằng email.</p>
+        <p class="sd-auth-caption" data-auth-unverified-caption>Vui lòng xác minh email để bảo mật tài khoản và đồng bộ thông tin đơn hàng.</p>
         <p class="sd-auth-caption" data-auth-email-note hidden>Đăng nhập Email sẽ được mở sau khi hoàn thiện xác minh email và khôi phục mật khẩu.</p>
       </div>
     </section>
@@ -1423,7 +1423,7 @@ html.sd-catalog-route #products .filter-pill{
     </div>
     <div id="accountAddressView" class="account-address-view" hidden>
       <div class="orders-view-heading"><button type="button" class="favorites-back tap-target" id="accountAddressBack">← Tài khoản</button><span>Thông tin giao hàng</span></div>
-      <p class="orders-local-note" id="accountAddressPrivacy">Thông tin bạn lưu dưới đây chỉ nằm trong bộ nhớ trình duyệt trên thiết bị hiện tại. Khi gửi yêu cầu đặt hàng, các trường cần thiết sẽ được gửi để cửa hàng tiếp nhận. Không có đồng bộ tài khoản.</p>
+      <p class="orders-local-note" id="accountAddressPrivacy">Khi chưa đăng nhập, thông tin giao hàng chỉ được lưu trên trình duyệt của thiết bị hiện tại.</p>
       <form id="accountAddressForm" class="account-address-form">
         <label class="address-field"><span>Họ tên *</span><input id="accountAddressFullName" name="fullName" maxlength="120" required autocomplete="name"></label>
         <label class="address-field"><span>Số điện thoại *</span><input id="accountAddressPhone" name="phone" maxlength="24" required autocomplete="tel" inputmode="tel"></label>
@@ -1444,7 +1444,7 @@ html.sd-catalog-route #products .filter-pill{
     <div class="cart-summary"><span>Tạm tính</span><strong id="cartSubtotal">—</strong></div>
     <p class="cart-note">Giá trị được tính theo giá đang công khai. Sản phẩm chưa có giá công khai sẽ được cửa hàng xác nhận trước khi đặt hàng.</p>
     <button class="pill-btn primary tap-target" id="cartCheckout" type="button" disabled>Tiếp tục đặt hàng <span class="arrow">→</span></button>
-    <button class="pill-btn tap-target" id="cartZalo" type="button" disabled>Tư vấn/đặt hàng qua Zalo ↗</button>
+    <button class="pill-btn tap-target" id="cartZalo" type="button" disabled>Tư vấn/đặt hàng qua Zalo ↗</button><p id="cartClipboardToast" class="checkout-message" role="status" aria-live="polite" hidden></p>
   </div>
 </div>
 <button type="button" class="checkout-backdrop" id="checkoutBackdrop" aria-label="Đóng biểu mẫu đặt hàng" tabindex="-1"></button>
@@ -1592,7 +1592,7 @@ const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","giay-the-th
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const imgPath=x=>String(x||'').replace(/^\.\//,'');
 function dismissToast(){const t=$('#toast');if(t)t.classList.remove('show','toast-detail-context');clearTimeout(toastTimer)}
-function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDrawer','#checkoutDrawer','#accountDrawer'].some(selector=>$(selector)?.classList.contains('open'));if(panelOpen){dismissToast();return}t.classList.toggle('toast-detail-context',Boolean($('#productOverlay')?.classList.contains('open')));t.replaceChildren(document.createTextNode(msg));if(link){const a=document.createElement('a');a.href=link;a.target='_blank';a.rel='noopener';a.textContent='Mở Zalo ↗';t.appendChild(a)}t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3200)}
+function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDrawer','#checkoutDrawer','#accountDrawer'].some(selector=>$(selector)?.classList.contains('open'));if(panelOpen){dismissToast();return}t.classList.toggle('toast-detail-context',Boolean($('#productOverlay')?.classList.contains('open')));t.replaceChildren(document.createTextNode(msg));if(link){const a=document.createElement('a');a.href=link;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Mở Zalo ↗';t.appendChild(a)}t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3200)}
 function iconBag(){return '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>'}
 function setThemeIcon(){const dark=document.documentElement.classList.contains('dark');$('#themeIcon').innerHTML=dark?'<path d="M20.2 15.4A8 8 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42-1.42m11.3-11.3 1.42-1.42"/>';const mode=document.documentElement.dataset.themeMode||'auto';$('#themeToggle').setAttribute('aria-label',mode==='auto'?'Đang theo giao diện thiết bị. Nhấn để đổi chế độ thủ công':dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối');$('#themeToggle').title=mode==='auto'?'Theo giao diện thiết bị':`Chế độ ${dark?'tối':'sáng'} (thủ công)`}
 function syncThemeMeta(){const dark=document.documentElement.classList.contains('dark');const meta=$('meta[name="theme-color"]');if(meta)meta.content=dark?'#061522':'#eaf3fb'}
@@ -2347,10 +2347,19 @@ function toggleFavorite(key){if(accountSyncMode==='loading'||accountSyncMode==='
 function normalizeFavorites(){const valid=[...new Set(favorites.map(key=>{const product=findProductByKey(key);return product?favoriteKey(product):''}).filter(Boolean))];const changed=valid.length!==favorites.length||valid.some((key,index)=>key!==favorites[index]);favorites=valid;if(changed&&accountSyncMode==='guest')try{localStorage.setItem(FAVORITES_STORAGE_KEY,JSON.stringify(favorites))}catch(e){}updateFavoriteControls();renderFavoriteList()}
 function loadLocalShippingAddress(){if(accountSyncMode!=='guest'){updateAccountAddressSummary();return localShippingAddress}try{const saved=JSON.parse(localStorage.getItem(LOCAL_ADDRESS_KEY)||'null');localShippingAddress=saved&&typeof saved==='object'&&!Array.isArray(saved)?saved:null}catch(e){localShippingAddress=null}updateAccountAddressSummary();return localShippingAddress}
 function updateAccountAddressSummary(){const node=$('#accountAddressSummary');if(!node)return;const a=localShippingAddress;if(!a||!a.fullName||!a.phone||!a.province||!a.ward||!a.streetAddress){node.textContent='Chưa lưu địa chỉ nhận hàng';return}node.textContent=String(a.fullName)+' · '+String(a.ward)+', '+String(a.province)}
+function updateAccountAddressPrivacy(){
+ const note=$('#accountAddressPrivacy'),save=$('#accountAddressSave');
+ if(note)note.textContent=accountSyncMode==='cloud'
+  ?'Thông tin giao hàng được đồng bộ an toàn với tài khoản của bạn.'
+  :accountSyncMode==='guest'
+  ?'Khi chưa đăng nhập, thông tin giao hàng chỉ được lưu trên trình duyệt của thiết bị hiện tại.'
+  :'Đang kiểm tra trạng thái đồng bộ. Vui lòng thử lại khi tài khoản sẵn sàng.';
+ if(save)save.textContent=accountSyncMode==='cloud'?'Lưu và đồng bộ địa chỉ':'Lưu địa chỉ trên thiết bị';
+}
 function setAccountAddressMessage(message,state=''){const node=$('#accountAddressMessage');if(!node)return;node.textContent=message;node.dataset.state=state}
 async function loadAccountAddressProvinces(savedAddress=null){const select=$('#accountAddressProvince'),ward=$('#accountAddressWard');if(!select||!ward)return;select.disabled=true;ward.disabled=true;select.innerHTML='<option value="">Đang tải tỉnh/thành…</option>';ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';try{const response=await fetch(ADMIN_DIVISIONS_API+'/p/',{cache:'force-cache'});if(!response.ok)throw Error('HTTP '+response.status);const rows=await response.json();if(!Array.isArray(rows)||!rows.length)throw Error('Danh mục không hợp lệ');select.innerHTML='<option value="">Chọn tỉnh/thành phố *</option>'+rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi')).map(p=>'<option value="'+escapeHtml(p.name)+'" data-code="'+escapeHtml(p.code)+'">'+escapeHtml(p.name)+'</option>').join('');select.disabled=false;if(savedAddress){let option=[...select.options].find(o=>(savedAddress.provinceCode&&o.dataset.code===String(savedAddress.provinceCode))||o.value===String(savedAddress.province||''));if(option){select.value=option.value;await loadAccountAddressWards(savedAddress.wardCode,savedAddress.ward)}}}catch{select.innerHTML='<option value="">Không tải được tỉnh/thành</option>';select.disabled=true;ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';ward.disabled=true;setAccountAddressMessage('Không tải được danh mục hành chính. Kiểm tra kết nối rồi thử lại.','error')}}
 async function loadAccountAddressWards(preferredCode='',preferredName=''){const select=$('#accountAddressProvince'),ward=$('#accountAddressWard');if(!select||!ward)return;const code=select.selectedOptions[0]?.dataset.code||'',requestId=++accountAddressWardRequest;ward.disabled=true;ward.innerHTML='<option value="">Đang tải xã/phường…</option>';if(!code){ward.innerHTML='<option value="">Chọn tỉnh/thành trước</option>';return}try{const response=await fetch(ADMIN_DIVISIONS_API+'/p/'+encodeURIComponent(code)+'?depth=2',{cache:'force-cache'});if(!response.ok)throw Error('HTTP '+response.status);const data=await response.json();if(requestId!==accountAddressWardRequest)return;const rows=Array.isArray(data.wards)?data.wards:[];if(!rows.length)throw Error('Không có xã/phường');ward.innerHTML='<option value="">Chọn xã/phường *</option>'+rows.sort((a,b)=>String(a.name).localeCompare(String(b.name),'vi')).map(w=>'<option value="'+escapeHtml(w.name)+'" data-code="'+escapeHtml(w.code)+'">'+escapeHtml(w.name)+'</option>').join('');ward.disabled=false;const option=[...ward.options].find(o=>(preferredCode&&o.dataset.code===String(preferredCode))||o.value===String(preferredName||''));if(option)ward.value=option.value;setAccountAddressMessage('')}catch{if(requestId!==accountAddressWardRequest)return;ward.innerHTML='<option value="">Không tải được xã/phường</option>';ward.disabled=true;setAccountAddressMessage('Không tải được xã/phường. Chọn lại tỉnh/thành hoặc thử lại khi có mạng.','error')}}
-async function loadAccountAddressView(){const form=$('#accountAddressForm');if(!form)return;const saved=loadLocalShippingAddress()||{};$('#accountAddressFullName').value=String(saved.fullName||'');$('#accountAddressPhone').value=String(saved.phone||'');$('#accountAddressEmail').value=String(saved.email||'');$('#accountAddressStreet').value=String(saved.streetAddress||'');setAccountAddressMessage('');await loadAccountAddressProvinces(saved)}
+async function loadAccountAddressView(){const form=$('#accountAddressForm');if(!form)return;updateAccountAddressPrivacy();const saved=loadLocalShippingAddress()||{};$('#accountAddressFullName').value=String(saved.fullName||'');$('#accountAddressPhone').value=String(saved.phone||'');$('#accountAddressEmail').value=String(saved.email||'');$('#accountAddressStreet').value=String(saved.streetAddress||'');setAccountAddressMessage('');await loadAccountAddressProvinces(saved)}
 async function saveAccountAddress(event){event.preventDefault();const form=event.currentTarget;if(!form.checkValidity()){form.reportValidity();setAccountAddressMessage('Kiểm tra các trường bắt buộc trước khi lưu.','error');return}const province=$('#accountAddressProvince'),ward=$('#accountAddressWard'),provinceOption=province.selectedOptions[0],wardOption=ward.selectedOptions[0];if(!provinceOption?.dataset.code||!wardOption?.dataset.code){setAccountAddressMessage('Chọn tỉnh/thành và xã/phường từ danh mục.','error');return}const next={fullName:$('#accountAddressFullName').value.trim(),phone:$('#accountAddressPhone').value.trim(),email:$('#accountAddressEmail').value.trim(),province:province.value,provinceCode:provinceOption.dataset.code,ward:ward.value,wardCode:wardOption.dataset.code,streetAddress:$('#accountAddressStreet').value.trim(),savedAt:new Date().toISOString()};try{
  if(accountSyncMode==='cloud'){
   const response=await fetch('/api/customer/profile',{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'address',address:next})});
@@ -2405,10 +2414,10 @@ function renderCart(){
  }
  const allPriced=entries.every(({p})=>hasConfirmedPublicPrice(p));
  const subtotal=entries.reduce((sum,{p,q})=>sum+(hasConfirmedPublicPrice(p)?Number(p.price)*q:0),0);
- $('#cartSubtotal').textContent=allPriced?formatVnd(subtotal):'Chờ xác nhận giá';
+ $('#cartSubtotal').textContent=allPriced?formatVnd(subtotal):subtotal>0?formatVnd(subtotal)+' + Báo giá theo yêu cầu chế tác':'Báo giá theo yêu cầu chế tác';
  $('#cartList').innerHTML=entries.map(({p,q,key,option})=>{
   const id=key;
-  const priceText=hasConfirmedPublicPrice(p)?formatVnd(p.price):'Giá sẽ được xác nhận';
+  const priceText=hasConfirmedPublicPrice(p)?formatVnd(p.price):'Báo giá theo yêu cầu chế tác';
   const optionMarkup=productOptionKind(p)?option?'<small class="sd-cart-option">'+escapeHtml(productOptionLabel(p,option))+'</small>':'<button type="button" class="sd-cart-select" data-cart-select="'+escapeHtml(p.id||p.slug)+'">Chọn '+(productOptionKind(p)==='shoe'?'size':productOptionKind(p)==='belt'?'bản dây':'dòng điện thoại')+' trước khi đặt hàng</button>':'';
   return `<div class="cart-row"><img src="${escapeHtml(allImages(p)[0])}" alt="${escapeHtml(p.title)}"><div class="cart-row-copy"><strong>${productTitleWithVip(p.title,false)}</strong><small>Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}</small>${optionMarkup}<small class="cart-row-price">${priceText}</small><div class="qty-controls"><button class="tap-target" data-qty="-1" data-id="${escapeHtml(id)}" aria-label="Giảm số lượng">−</button><span>${q}</span><button class="tap-target" data-qty="1" data-id="${escapeHtml(id)}" aria-label="Tăng số lượng">+</button></div></div><button class="remove-item tap-target" data-remove="${escapeHtml(id)}" aria-label="Xóa sản phẩm">Xóa</button></div>`;
  }).join('');
@@ -2566,8 +2575,44 @@ function trapAccountTab(event){trapTabWithin($('#accountDrawer'),event)} functio
 function trapProductTab(event){trapTabWithin($('#productOverlay'),event)}
 function trapFullscreenTab(event){trapTabWithin($('#sdFullscreenViewer'),event)}
 async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true}}catch(e){}try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
-async function consultProduct(id){const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id)||currentProduct;if(!p)return;const confirmedSku=visibleSku(p);const sku=confirmedSku?` (SKU: ${confirmedSku})`:' (mã SKU chưa được cung cấp)';const title=p.title||'Sản phẩm SinDarealest';const message=`Chào SinDarealest, tôi muốn tư vấn/đặt hàng sản phẩm ${title}${sku}`;const ok=await copyText(message);showToast(ok?'Đã sao chép lời nhắn tư vấn/đặt hàng. Đang mở Zalo…':'Không thể tự sao chép. Đang mở Zalo để bạn tiếp tục tư vấn.',ZALO);setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast(ok?'Nội dung tư vấn đã được sao chép. Bạn có thể dán vào Zalo.':'Hãy gửi lời nhắn tư vấn khi Zalo mở.',ZALO)},1000)}
-async function consultCart(){const items=cartEntries();if(!items.length){showToast('Bạn chưa chọn sản phẩm.');return}const msg=items.map(x=>(visibleSku(x.p)||x.p.title)+(x.option?' · '+productOptionLabel(x.p,x.option):'')+' × '+x.q).join('\n');const copied=await copyText(msg);showToast(copied?'Đã sao chép danh sách sản phẩm. Đang mở Zalo…':'Không thể tự sao chép danh sách sản phẩm. Đang mở Zalo để bạn tiếp tục gửi thủ công.',ZALO);setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast(copied?'Trình duyệt chặn tự mở Zalo. Danh sách sản phẩm đã được sao chép.':'Trình duyệt chặn tự mở Zalo. Hãy dán hoặc gửi danh sách sản phẩm thủ công.',ZALO)},1000)}
+function productZaloMessage(product,option='',quantity=1){
+ const sku=visibleSku(product)||'Chưa có mã SKU';
+ const title=String(product?.title||'Sản phẩm SinDarealest');
+ const selected=option?productOptionLabel(product,option):'Chưa chọn tùy chọn';
+ return 'Mã sản phẩm: '+sku+'\nTên sản phẩm: '+title+'\nTùy chọn: '+selected+'\nSố lượng: '+quantity;
+}
+function showCartClipboardToast(message){
+ const node=$('#cartClipboardToast');if(!node)return;
+ node.textContent=message;
+ const link=document.createElement('a');
+ link.href=ZALO;link.target='_blank';link.rel='noopener noreferrer';
+ link.textContent=' Mở Zalo ↗';
+ node.appendChild(link);
+ node.hidden=false;
+ clearTimeout(showCartClipboardToast.timer);
+ showCartClipboardToast.timer=setTimeout(()=>{node.hidden=true;node.textContent=''},4800);
+}
+async function consultProduct(id){
+ const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id)||currentProduct;
+ if(!p)return;
+ const selected=p===currentProduct?selectedDetailOption(p):'';
+ const message=productZaloMessage(p,selected===null?'':selected);
+ // Both clipboard and window.open start in the direct user gesture. Awaiting
+ // clipboard first may trigger popup blocking in mobile Chrome/Safari.
+ const copying=copyText(message);
+ window.open(ZALO,'_blank','noopener,noreferrer');
+ const copied=await copying;
+ showToast(copied?'Đã sao chép thông tin sản phẩm, vui lòng dán vào khung chat Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.',ZALO);
+}
+async function consultCart(){
+ const items=cartEntries();
+ if(!items.length){showCartClipboardToast('Bạn chưa chọn sản phẩm.');return}
+ const message=items.map(x=>productZaloMessage(x.p,x.option,x.q)).join('\n\n');
+ const copying=copyText(message);
+ window.open(ZALO,'_blank','noopener,noreferrer');
+ const copied=await copying;
+ showCartClipboardToast(copied?'Đã sao chép thông tin sản phẩm, vui lòng dán vào khung chat Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.');
+}
 function setupArtSlideshow(){
  const sneakerProducts=products.filter(p=>p.category==='sneakers');
  const imgs=uniqueImages(sneakerProducts);
@@ -2635,8 +2680,32 @@ function sdTrackRender(orders){
 function bindEvents(){
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
  $('#themeToggle').addEventListener('click',toggleTheme);loadCheckoutProvinces();$('#cartOpen').addEventListener('click',()=>toggleStorefrontModal('cart'));$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart));$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBack').addEventListener('click',()=>{if(sdCheckoutStep>1){sdCheckoutSetStep(sdCheckoutStep-1);return}requestStorefrontModalClose('checkout',()=>{closeCheckout(false);openCart();setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0)})});$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'));$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount));$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',navigateAccountContact);$('#accountFavoritesAction')?.addEventListener('click',()=>setAccountView('favorites'));$('#accountFavoritesBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountOrdersAction')?.addEventListener('click',()=>setAccountView('orders'));$('#accountOrdersBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressAction')?.addEventListener('click',()=>setAccountView('address'));$('#accountAddressBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressForm')?.addEventListener('submit',saveAccountAddress);$('#accountAddressProvince')?.addEventListener('change',()=>loadAccountAddressWards());$('#detailFavorite')?.addEventListener('click',()=>{if(currentProduct)toggleFavorite(favoriteKey(currentProduct))});$('#accountFavoritesList')?.addEventListener('click',event=>{const remove=event.target.closest('[data-favorite-remove]');if(remove){toggleFavorite(remove.dataset.favoriteRemove);return}const open=event.target.closest('[data-favorite-open]');if(open){const key=open.dataset.favoriteOpen;closeAccount(false);openDetail(key)}});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});$('#cartZalo').addEventListener('click',consultCart);document.addEventListener('keydown',e=>{if(e.key==='Tab'){if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}if($('#sdFullscreenViewer').classList.contains('open')){trapFullscreenTab(e);return}if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}if($('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if($('#accountDrawer').classList.contains('open')){trapAccountTab(e);return}}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))requestStorefrontModalClose('checkout',closeCheckout);else if($('#cartDrawer').classList.contains('open'))requestStorefrontModalClose('cart',closeCart);else if($('#accountDrawer').classList.contains('open'))requestStorefrontModalClose('account',closeAccount)});
+const lookupNextAt={order:0,warranty:0};
+function safeLookup(raw,max=100){
+ return String(raw||'').normalize('NFKC').replace(/[^A-Za-z0-9-]/g,'').slice(0,max);
+}
+function canLookup(kind,message){
+ const now=Date.now();
+ if(now<lookupNextAt[kind]){
+  message.textContent='Vui lòng đợi vài giây trước khi tra cứu lại.';
+  return false;
+ }
+ lookupNextAt[kind]=now+2500;
+ return true;
+}
+for(const id of ['sdTrackInput','warrantyLookupValue']){
+ const input=$('#'+id);
+ input?.addEventListener('input',()=>{
+  const next=safeLookup(input.value,id==='sdTrackInput'?64:100);
+  if(next!==input.value)input.value=next;
+ });
+}
 $('#sdTrackForm').addEventListener('submit',async ev=>{
- ev.preventDefault();const button=$('#sdTrackSubmit'),msg=$('#sdTrackMessage'),lookup=$('#sdTrackInput').value.trim();
+ ev.preventDefault();
+ const button=$('#sdTrackSubmit'),msg=$('#sdTrackMessage'),input=$('#sdTrackInput'),lookup=safeLookup(input.value,64);
+ input.value=lookup;
+ if(!lookup){msg.textContent='Vui lòng nhập mã đơn hoặc số điện thoại hợp lệ.';return}
+ if(!canLookup('order',msg))return;
  button.disabled=true;button.textContent='Đang tra cứu…';msg.textContent='';$('#sdTrackResults').hidden=true;$('#sdTrackResults').innerHTML='';
  try{
   const r=await fetch('/api/order-tracking',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify({lookup})});
@@ -2649,7 +2718,10 @@ $('#sdTrackForm').addEventListener('submit',async ev=>{
 });
 $('#warrantyLookupForm').addEventListener('submit',async e=>{
  e.preventDefault();
- const b=$('#warrantyLookupSubmit'),m=$('#warrantyMessage'),lookup=$('#warrantyLookupValue').value.trim();
+ const b=$('#warrantyLookupSubmit'),m=$('#warrantyMessage'),input=$('#warrantyLookupValue'),lookup=safeLookup(input.value);
+ input.value=lookup;
+ if(!lookup){m.textContent='Vui lòng nhập mã bảo hành hoặc số điện thoại hợp lệ.';return}
+ if(!canLookup('warranty',m))return;
  b.disabled=true;b.textContent='Đang tra cứu…';m.textContent='';$('#warrantyResults').hidden=true;$('#warrantyClaimForm').hidden=true;
  try{
   const r=await fetch('/api/warranty-lookup',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({lookup})});
@@ -2813,13 +2885,13 @@ async function accountCloudFetchOrders(epoch){
 async function accountCloudOnAuth(active){
  const epoch=++cloudSyncEpoch;
  if(!active){
-  accountSyncMode='guest';cloudOrderHistory=[];
+  accountSyncMode='guest';cloudOrderHistory=[];updateAccountAddressPrivacy();
   loadFavorites();loadLocalShippingAddress();updateDetailFavoriteButton();
   renderFavoriteList();renderOrderHistory();
   accountCloudMessage('Đăng nhập Google để đồng bộ dữ liệu giữa các thiết bị.');accountCloudImportVisibility();
   return;
  }
- accountSyncMode='loading';accountCloudMessage('Đang đồng bộ tài khoản Google…');
+ accountSyncMode='loading';updateAccountAddressPrivacy();accountCloudMessage('Đang đồng bộ tài khoản Google…');
  try{
   const res=await fetch('/api/customer/profile',{cache:'no-store',credentials:'same-origin'});
   if(!res.ok)throw Error('Không tải được hồ sơ trên máy chủ.');
@@ -2827,13 +2899,13 @@ async function accountCloudOnAuth(active){
   if(epoch!==cloudSyncEpoch)return;
   favorites=Array.isArray(data.favorites)?data.favorites.filter(v=>typeof v==='string'):[];
   localShippingAddress=data.address||null;
-  accountSyncMode='cloud';
+  accountSyncMode='cloud';updateAccountAddressPrivacy();
   updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();
   accountCloudMessage('Đã kết nối Google. Yêu thích, địa chỉ và đơn hàng được lưu theo tài khoản.');accountCloudImportVisibility();
   await accountCloudFetchOrders(epoch);
  }catch(e){
   if(epoch!==cloudSyncEpoch)return;
-  accountSyncMode='error';favorites=[];localShippingAddress=null;cloudOrderHistory=[];
+  accountSyncMode='error';updateAccountAddressPrivacy();favorites=[];localShippingAddress=null;cloudOrderHistory=[];
   updateAccountAddressSummary();updateDetailFavoriteButton();renderFavoriteList();renderOrderHistory();
   accountCloudMessage(e.message||'Không thể đồng bộ. Vui lòng tải lại trang.');accountCloudImportVisibility();
  }
@@ -4213,7 +4285,7 @@ html.dark .detail-gallery-arrow:active,html.dark .sd-fullscreen-arrow:active{
 </style>
 
 
-<main id="notFoundPage" class="not-found-page" aria-labelledby="notFoundTitle"><section class="not-found-card"><p class="not-found-eyebrow">SINDAREALEST · THỜI TRANG DA CÁ SẤU</p><h1 id="notFoundTitle">404</h1><h2>Không tìm thấy trang</h2><p>Đường dẫn này không tồn tại hoặc nội dung đã được chuyển đi.</p><a class="not-found-home" href="/">Về trang chủ <span aria-hidden="true">→</span></a></section></main>
+<template id="sdNotFoundTemplate"><main id="notFoundPage" class="not-found-page" aria-labelledby="notFoundTitle"><section class="not-found-card"><p class="not-found-eyebrow">SINDAREALEST · THỜI TRANG DA CÁ SẤU</p><h1 id="notFoundTitle">404</h1><h2>Không tìm thấy trang</h2><p>Đường dẫn này không tồn tại hoặc nội dung đã được chuyển đi.</p><a class="not-found-home" href="/">Về trang chủ <span aria-hidden="true">→</span></a></section></main></template>
 <script id="sd-not-found-route-init">
 (() => {
   const rawPath = location.pathname;
@@ -4225,8 +4297,12 @@ html.dark .detail-gallery-arrow:active,html.dark .sd-fullscreen-arrow:active{
   const catalogRoute = /^\/sanpham(?:\/[a-z0-9][a-z0-9-]{0,99})?$/i.test(path);
   const productRoute = /^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path)
     || /^\/san-pham\/[a-z0-9][a-z0-9._-]{0,119}$/i.test(path);
-  if (path !== '/' && path !== '/index.html' && !catalogRoute && !productRoute)
+  if (path !== '/' && path !== '/index.html' && !catalogRoute && !productRoute) {
+    const template=document.getElementById('sdNotFoundTemplate');
+    if(template?.content&&!document.getElementById('notFoundPage'))
+      document.body.appendChild(template.content.cloneNode(true));
     document.body.classList.add('sd-not-found-route');
+  }
 })();
 </script>
 <style id="sd-not-found-route-styles">
