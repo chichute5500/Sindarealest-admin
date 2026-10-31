@@ -21,6 +21,6 @@ export async function onRequestGet({ request, env }) {
       return { ...product, sku: skuVerified ? product.sku : null, skuVerified };
     }));
   } catch {
-    return fail("Không thể tải dữ liệu sản phẩm từ D1. Vui lòng thử lại sau; dữ liệu tĩnh dự phòng đã được tắt để tránh hiển thị sản phẩm cũ.", 503);
+    return fail("Danh mục đang tạm thời gián đoạn. Vui lòng thử lại sau.", 503);
   }
 }
