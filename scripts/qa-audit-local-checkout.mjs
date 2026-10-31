@@ -90,5 +90,31 @@ try{
  await page.waitForTimeout(1000);
  assert.equal(sentOrders,1,"Duplicate checkout must remain blocked while sending");
  assert.equal(allRequests.length,0,"Never send unmocked POST to any server");
+ // Regression: Android-style reload must not duplicate or detach bottom nav.
+ // This runs on local mock data and never invokes checkout after reload.
+ await page.reload({waitUntil:"domcontentloaded",timeout:30000});
+ await page.locator('#catalogGrid article[data-product]').first().waitFor({timeout:25000});
+ const navState=async()=>page.evaluate(()=>{
+   const nav=document.querySelector('#mobileBottomNav');
+   if(!nav)return {count:0};
+   const rect=nav.getBoundingClientRect(),cs=getComputedStyle(nav);
+   const tabs=[...nav.querySelectorAll('[data-mobile-tab]')];
+   return {count:document.querySelectorAll('#mobileBottomNav').length,
+     position:cs.position,top:rect.top,bottom:rect.bottom,width:rect.width,
+     viewportWidth:innerWidth,viewportHeight:innerHeight,tabs:tabs.length,
+     outside:tabs.some(t=>{const r=t.getBoundingClientRect();return r.left<rect.left-3||r.right>rect.right+3})};
+ });
+ const beforeNav=await navState();
+ assert.equal(beforeNav.count,1,'Reload must not duplicate the mobile bottom navigation');
+ assert.equal(beforeNav.position,'fixed','Mobile navigation must stay fixed after reload');
+ assert.equal(beforeNav.tabs,4,'Keep exactly four approved mobile destinations');
+ assert.ok(!beforeNav.outside&&beforeNav.width<=beforeNav.viewportWidth-8,'Nav/tabs must not stretch beyond mobile viewport');
+ assert.ok(beforeNav.bottom<=beforeNav.viewportHeight+3&&
+           beforeNav.viewportHeight-beforeNav.bottom<38,'Nav must remain anchored to bottom safe-area');
+ await page.evaluate(()=>window.scrollTo(0,1100));
+ await page.waitForTimeout(180);
+ const scrolledNav=await navState();
+ assert.ok(Math.abs(scrolledNav.top-beforeNav.top)<3,'Mobile navigation must not move during content scrolling');
+ console.log("PASS: single four-tab mobile bottom navigation remains fixed and contained after reload and scroll.");
  console.log("PASS: browser-mocked checkout: mixed prices, phone validation, 3 steps, Back persistence, Esc, deposit and no duplicate submission; 0 real writes.");
 }finally{await context.close();await browser.close()}
