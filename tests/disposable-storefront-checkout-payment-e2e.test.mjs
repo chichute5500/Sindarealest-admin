@@ -86,7 +86,7 @@ try {
   assert.equal(catalog[0].skuVerified,true);
 
   const checkout={
-    fullName:'KHACH HANG QA (KHONG CO THAT)',phone:'0000000102',
+    fullName:'KHACH HANG QA (KHONG CO THAT)',phone:'0900000000',
     address:'Dia chi thu nghiem, KHONG GIAO HANG',
     note:'DISPOSABLE QA ONLY — khong xu ly thuc te',
     items:[{id:productId,quantity:1}]
