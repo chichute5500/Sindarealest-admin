@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - feature/admin-isolated-handoff-2026-10-20
+      - feat/admin-liquid-glass-2-2026-10-30
     paths:
       - "public/admin/**"
       - "functions/**"
@@ -29,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      ADMIN_TEST_URL: "https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/"
+      ADMIN_TEST_URL: ${{ github.ref_name == 'feature/admin-isolated-handoff-2026-10-20' && 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/' || 'https://admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev/admin/' }}
       ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
       CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
@@ -39,10 +40,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = "refs/heads/feature/admin-isolated-handoff-2026-10-20" || {
-            echo "::error::This diagnostic workflow may only run from the ADMIN feature branch."
-            exit 1
-          }
+          case "$GITHUB_REF" in
+            refs/heads/feature/admin-isolated-handoff-2026-10-20|refs/heads/feat/admin-liquid-glass-2-2026-10-30) ;;
+            *) echo "::error::This diagnostic workflow may only run from an approved ADMIN feature branch."; exit 1 ;;
+          esac
 
       - name: Check out the exact tested commit
         uses: actions/checkout@v7
@@ -68,6 +69,21 @@ jobs:
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium
 
+      - name: Wait for the exact branch Preview alias
+        if: ${{ env.ADMIN_TEST_URL != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            status="$(curl --silent --output /dev/null --max-time 15 --write-out '%{http_code}' "$ADMIN_TEST_URL" || true)"
+            case "$status" in
+              2??|3??|401|403) echo "Branch Preview responded with HTTP $status."; exit 0 ;;
+            esac
+            sleep 10
+          done
+          echo "::error::The configured isolated Admin Preview alias did not become available."
+          exit 1
+
       - name: Start local read-only static ADMIN preview
         shell: bash
         run: |
@@ -85,7 +101,16 @@ jobs:
 
       - name: Capture real source screenshots across responsive and theme matrix
         id: baseline
-        run: npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --reporter=line,html
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --reporter=line,html
+          else
+            npx playwright test tests/e2e/admin-static-baseline.spec.js tests/e2e/admin-reference-same-data-qa.spec.js --grep "captures the real ADMIN source login|reference-comparable Admin products" --reporter=line,html
+          fi
+
+      - name: Capture authenticated mobile and desktop Admin screens (read-only)
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+        run: npx playwright test tests/e2e/admin-12-screen-live-qa.spec.js --grep "360x800 light|375x812 light|390x844 light|390x844 dark|412x915 light|430x932 light|432x744 light|1280x800 light|1280x800 dark" --reporter=line,html
 
       - name: Diagnose configured deployed Admin Preview (read-only)
         id: preview
@@ -97,7 +122,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          remote_sha="$(git ls-remote origin "refs/heads/feature/admin-isolated-handoff-2026-10-20" | awk '{print $1}')"
+          remote_sha="$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | awk '{print $1}')"
           echo "Tested SHA: $GITHUB_SHA"
           echo "Current branch SHA: $remote_sha"
           test -n "$remote_sha"
@@ -115,6 +140,7 @@ jobs:
           path: |
             artifacts/admin-preview-evidence/
             artifacts/admin-reference-same-data/
+            artifacts/admin-12-screen-live/
             test-results/
             playwright-report/
             docs/admin-ui-reference/admin-mobile-reference.png
