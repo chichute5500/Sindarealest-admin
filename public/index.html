@@ -6,7 +6,8 @@
 <meta name="google-site-verification" content="6GC_01bvUrkBiD79vdoKU9wJ3A5PGNdqibCT_FkgG7o">
 <meta name="zalo-platform-site-verification" content="ND-i0etBVJXBtjWydTfIEtJGmZIOfXblC3Op">
 <base href="/">
-<meta name="theme-color" content="#061522">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#eaf3fb">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#061522">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v=20261027">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=20261027">
@@ -35,7 +36,7 @@
 <link rel="stylesheet" href="/customer-auth.css?v=account-liquid-20261029">
 <script type="module" src="/customer-auth-ui.js?v=account-liquid-20261029"></script>
 <script type="module" src="/customer-email-otp-ui.js?v=email-recovery-20261029"></script>
-<title>SinDarealest — Premium Crocodile Leather Fashion</title>
+<title>SinDarealest — Da cá sấu thật · Phong cách sống thật</title>
 <script>(()=>{const root=document.documentElement;
  root.classList.add('js-enabled');
  root.classList.toggle('sd-catalog-route',/^\/sanpham(?:\/[a-z0-9][a-z0-9-]{0,99})?\/?$/i.test(location.pathname));
@@ -46,7 +47,9 @@
  // (navigation=reload), fresh external entry and new tab entry still show it.
  try{
   const seen=sessionStorage.getItem('sd-welcome-seen-in-tab')==='1';
-  if(navigation!=='reload'&&sameSiteEntry&&seen)root.classList.add('sd-welcome-nav-bypass');
+  const deepLink=Boolean(location.hash)||!['/','/index.html'].includes(location.pathname);
+  const reducedMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if(seen||deepLink||reducedMotion)root.classList.add('sd-welcome-nav-bypass');
   sessionStorage.setItem('sd-welcome-seen-in-tab','1');
  }catch(e){}
  // OS preference owns each new entry/reload. Manual website choice is scoped
@@ -63,8 +66,7 @@
  const systemDark=!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
  root.dataset.themeMode=mode;
  root.classList.toggle('dark',mode==='dark'||(mode==='auto'&&systemDark));
- const themeMeta=document.querySelector('meta[name="theme-color"]');
- if(themeMeta)themeMeta.content=root.classList.contains('dark')?'#061522':'#eaf3fb';
+ document.querySelectorAll('meta[name="theme-color"]').forEach(meta=>{meta.content=root.classList.contains('dark')?'#061522':'#eaf3fb'});
 })();</script>
 <style>
 /* Avoid Android's blue tap flash without disabling text selection or keyboard focus. */
@@ -637,6 +639,8 @@ html{transition:background-color .25s ease,color .25s ease}
   .mosaic-compact .mosaic-card.art-main .slide-controls button{width:32px;height:32px}
   .footer-contacts .contact-grid .contact-icon--zalo{font-size:9px;letter-spacing:-.45px}
 }
+/* Explicit hidden state beats custom display styles on gallery controls. */
+#artSlideControls[hidden],#artSlideCount[hidden],#detailImageCount[hidden]{display:none!important}
 </style>
 
 <!-- sd-welcome-first-paint-guard-2026-10-22 -->
@@ -1248,13 +1252,13 @@ html.sd-catalog-route #products .filter-pill{
 
   <section class="sd-track section wrap" id="orderTracking" aria-labelledby="sdTrackTitle">
    <div class="sd-track-panel glass-soft">
-    <div class="sd-track-intro"><div class="eyebrow">Order progress · Theo dõi đơn hàng</div><h2 id="sdTrackTitle">Tra cứu đơn hàng</h2></div>
+    <div class="sd-track-intro"><div class="eyebrow">Theo dõi tiến trình đơn hàng</div><h2 id="sdTrackTitle">Tra cứu đơn hàng</h2></div>
     <form id="sdTrackForm" class="sd-track-form"><label for="sdTrackInput">Mã đơn hàng hoặc số điện thoại</label><div class="sd-track-controls"><input id="sdTrackInput" required maxlength="64" autocomplete="off" placeholder="Mã đơn hàng hoặc 09xxxxxxxx"><button id="sdTrackSubmit" type="submit" class="pill-btn primary tap-target">Tra cứu đơn</button></div><p id="sdTrackMessage" class="checkout-message" role="status" aria-live="polite"></p></form>
     <div id="sdTrackResults" class="sd-track-results" hidden aria-live="polite"></div>
    </div>
   </section>
   <section class="section wrap" id="featured">
-    <div class="section-head" data-reveal><div><div class="eyebrow">Curated selection</div><h2 class="section-title">Sản phẩm nổi bật</h2></div><div class="featured-header-actions"><button type="button" class="icon-btn tap-target" id="featuredAutoplayToggle" aria-label="Tạm dừng tự động chuyển ảnh" aria-pressed="false" title="Tạm dừng tự động chuyển ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14"/></svg></button><a class="text-link tap-target" href="/sanpham">Xem tất cả <span class="arrow">→</span></a></div></div>
+    <div class="section-head" data-reveal><div><div class="eyebrow">Tuyển chọn nổi bật</div><h2 class="section-title">Sản phẩm nổi bật</h2></div><div class="featured-header-actions"><button type="button" class="icon-btn tap-target" id="featuredAutoplayToggle" aria-label="Tạm dừng tự động chuyển ảnh" aria-pressed="false" title="Tạm dừng tự động chuyển ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14"/></svg></button><a class="text-link tap-target" href="/sanpham">Xem tất cả <span class="arrow">→</span></a></div></div>
     <div class="featured-grid" id="featuredGrid"></div>
   </section>
 
@@ -1262,13 +1266,13 @@ html.sd-catalog-route #products .filter-pill{
        Avoid repeating the same claims after featured products; keep the editorial flow compact. -->
 
   <section class="section wrap" id="collections">
-    <div class="section-head" data-reveal><div><div class="eyebrow">Made to leave a mark</div><h2 class="section-title">The art of…</h2></div><p class="section-note">Chất liệu được tuyển chọn, đường nét được chăm chút, giá trị đến từ những chi tiết có chủ đích.</p></div>
+    <div class="section-head" data-reveal><div><div class="eyebrow">Dấu ấn thủ công</div><h2 class="section-title">Tinh hoa nghệ thuật da cá sấu</h2></div><p class="section-note">Chất liệu được tuyển chọn, đường nét được chăm chút, giá trị đến từ những chi tiết có chủ đích.</p></div>
     <div class="mosaic mosaic-compact">
       <article class="mosaic-card art-main" data-reveal>
         <img class="mosaic-photo" id="artSlide" src="images/5151ab24330c6931.webp" alt="Sản phẩm sneaker da cá sấu trong bộ sưu tập SinDarealest">
-        <span class="slide-count" id="artSlideCount">01 / 01</span>
+        <span class="slide-count" id="artSlideCount" hidden>01 / 01</span>
         <div class="mosaic-content"><div class="mosaic-kicker">The Art of Crocodile Leather</div><h3 class="mosaic-title">Tinh hoa da cá sấu<br>trong từng sản phẩm</h3><p class="mosaic-sub">Vân da độc đáo gặp gỡ phom dáng hiện đại, tạo nên dấu ấn riêng cho từng thiết kế.</p><a class="text-link tap-target" href="/sanpham">Khám phá sản phẩm <span>→</span></a></div>
-        <div class="slide-controls"><button type="button" class="tap-target" id="artPrev" aria-label="Ảnh trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="tap-target" id="artPause" aria-label="Tạm dừng tự động chuyển ảnh" aria-pressed="false" title="Tạm dừng tự động chuyển ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><button type="button" class="tap-target" id="artNext" aria-label="Ảnh tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <div class="slide-controls" id="artSlideControls" hidden><button type="button" class="tap-target" id="artPrev" aria-label="Ảnh trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="tap-target" id="artPause" aria-label="Tạm dừng tự động chuyển ảnh" aria-pressed="false" title="Tạm dừng tự động chuyển ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><button type="button" class="tap-target" id="artNext" aria-label="Ảnh tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       </article>
       <article class="mosaic-card small" data-reveal style="--reveal-delay:100ms"><img class="mosaic-photo" id="craftTileImage" src="images/2c341b173eff94f1.webp" alt="Thắt lưng da cá sấu trong không gian bàn chế tác"><div class="mosaic-content"><div class="mosaic-kicker">Craft & finish</div><h3 class="mosaic-title">Hoàn thiện thủ công</h3><p class="mosaic-sub">Chăm chút đường nét, bề mặt và từng điểm chạm trước khi bàn giao.</p><a class="text-link tap-target" href="#about">Tìm hiểu thêm →</a></div></article>
       <article class="mosaic-card small material-tile" id="materialTile" data-reveal style="--reveal-delay:180ms"><img class="mosaic-photo material-photo material-photo--dark" src="images/theme-croc-dark.webp?v=20261017-1" alt="Cận cảnh vân da cá sấu tông đen"><img class="mosaic-photo material-photo material-photo--light" src="images/theme-croc-albino.webp?v=20261017-1" alt="Cận cảnh vân da cá sấu tông trắng ngà"><div class="sd-material-gallery" id="materialGallery" aria-hidden="true"></div><div class="mosaic-content"><div class="mosaic-kicker">Material study</div><h3 class="mosaic-title">Chất liệu cao cấp</h3><p class="mosaic-sub">Tôn trọng cấu trúc vân tự nhiên, để mỗi bề mặt giữ được nét riêng.</p></div></article>
@@ -1276,7 +1280,7 @@ html.sd-catalog-route #products .filter-pill{
   </section>
 
   <section class="section wrap" id="products">
-    <div class="section-head" data-reveal><div><div class="eyebrow">Explore the collection</div><h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2></div><p class="section-note">Khám phá các thiết kế theo danh mục. Liên hệ để được tư vấn biến thể và thông tin sản phẩm.</p></div>
+    <div class="section-head" data-reveal><div><div class="eyebrow">Khám phá bộ sưu tập</div><h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2></div><p class="section-note">Khám phá các thiết kế theo danh mục. Liên hệ để được tư vấn biến thể và thông tin sản phẩm.</p></div>
     <div class="catalog-tools" data-reveal><label class="search-field"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.2 4.2"/></svg><input id="catalogSearch" type="search" aria-label="Tìm theo tên sản phẩm hoặc mã SKU" placeholder="Tìm sản phẩm hoặc mã SKU…" autocomplete="off"></label><div class="filter-pills" id="categoryFilters" role="group" aria-label="Lọc theo danh mục"></div></div>
     <div class="catalog-grid" id="catalogGrid"></div><nav class="pagination" id="pagination" aria-label="Phân trang sản phẩm"></nav><div class="page-summary" id="pageSummary" role="status" aria-live="polite" aria-atomic="true"></div>
   </section>
@@ -1295,10 +1299,10 @@ html.sd-catalog-route #products .filter-pill{
     </div>
     <p>SinDarealest trân trọng vẻ đẹp tự nhiên của da cá sấu và giá trị của đôi tay người thợ. Từ lựa chọn chất liệu đến từng đường cắt, đường may và công đoạn hoàn thiện, mỗi chi tiết đều được chăm chút với sự kiên nhẫn và tỉ mỉ.</p>
     <p>Chúng tôi tin rằng sự sang trọng đích thực không nằm ở sự phô trương, mà ở chất liệu, kỹ nghệ thủ công và dấu ấn riêng bền vững theo thời gian.</p>
-    <a class="footer-story-link" href="/sanpham">Khám phá bộ sưu tập <span>→</span></a>
+    <a class="footer-story-link" href="/#collections">Khám phá bộ sưu tập <span>→</span></a>
    </section>
    <section class="footer-contacts" id="contact" aria-labelledby="footer-contact-title">
-    <div class="eyebrow">Stay connected</div><h2 id="footer-contact-title">Kết nối cùng chúng tôi</h2>
+    <div class="eyebrow">Kết nối cùng SinDarealest</div><h2 id="footer-contact-title">Kết nối cùng chúng tôi</h2>
     <div class="contact-grid">
      <div class="contact-link contact-link--zalo-phone" role="group" aria-label="Zalo và điện thoại">
       <span class="contact-icon contact-icon--zalo" aria-hidden="true">Zalo</span>
@@ -1312,7 +1316,7 @@ html.sd-catalog-route #products .filter-pill{
     </div>
       </section>
   </div>
-  <div class="warranty-help glass-soft" aria-labelledby="warrantyHelpTitle"><div><div class="eyebrow">After-sales support</div><h3 id="warrantyHelpTitle">Kiểm tra bảo hành</h3><p>Nhập mã bảo hành được cấp để xem trạng thái và thời hạn. Chỉ thông tin sản phẩm và thời hạn bảo hành được hiển thị.</p></div><form id="warrantyLookupForm" class="warranty-form"><label for="warrantyLookupValue">Mã bảo hành hoặc số điện thoại mua hàng</label><input id="warrantyLookupValue" name="lookup" required maxlength="100" autocomplete="off" placeholder="SDW-K7M2 hoặc 09xxxxxxxx" aria-label="Mã bảo hành hoặc số điện thoại" inputmode="text"><button class="pill-btn primary tap-target" type="submit" id="warrantyLookupSubmit">Tra cứu bảo hành</button><p class="checkout-message" id="warrantyMessage" role="status" aria-live="polite"></p></form><div id="warrantyResults" hidden><div id="warrantyRecords" class="warranty-records"></div><form id="warrantyClaimForm" class="warranty-form" hidden><input id="claimWarrantyCode" name="warrantyCode" type="hidden"><p>Mã bảo hành: <strong id="claimWarrantyCodeLabel"></strong></p><label for="claimIssueType">Loại vấn đề *</label><select id="claimIssueType" name="issueType" required><option value="">Chọn loại vấn đề</option><option value="defect">Lỗi sản phẩm</option><option value="seam">Đường may / hoàn thiện</option><option value="material">Chất liệu</option><option value="other">Vấn đề khác</option></select><label for="claimContactPhone">Số điện thoại liên hệ (không bắt buộc)</label><input id="claimContactPhone" name="contactPhone" inputmode="tel" maxlength="24" placeholder="Số liên hệ (không bắt buộc)" aria-label="Số điện thoại liên hệ"><textarea id="claimWarrantyMessage" name="message" required minlength="8" maxlength="1600" rows="3" placeholder="Mô tả vấn đề cần hỗ trợ *" aria-label="Mô tả vấn đề cần hỗ trợ"></textarea><label for="warrantyPhoto">Ảnh lỗi (không bắt buộc)</label><input id="warrantyPhoto" type="file" accept="image/*" capture="environment" aria-label="Chọn hoặc chụp ảnh lỗi"><button class="pill-btn primary tap-target" type="submit" id="warrantySubmit">Gửi yêu cầu bảo hành</button><p class="checkout-message" id="warrantyClaimMessage" role="status" aria-live="polite"></p></form></div></div>
+  <div class="warranty-help glass-soft" aria-labelledby="warrantyHelpTitle"><div><div class="eyebrow">Chăm sóc sau mua hàng</div><h3 id="warrantyHelpTitle">Kiểm tra bảo hành</h3><p>Nhập mã bảo hành được cấp để xem trạng thái và thời hạn. Chỉ thông tin sản phẩm và thời hạn bảo hành được hiển thị.</p></div><form id="warrantyLookupForm" class="warranty-form"><label for="warrantyLookupValue">Mã bảo hành hoặc số điện thoại mua hàng</label><input id="warrantyLookupValue" name="lookup" required maxlength="100" autocomplete="off" placeholder="SDW-K7M2 hoặc 09xxxxxxxx" aria-label="Mã bảo hành hoặc số điện thoại" inputmode="text"><button class="pill-btn primary tap-target" type="submit" id="warrantyLookupSubmit">Tra cứu bảo hành</button><p class="checkout-message" id="warrantyMessage" role="status" aria-live="polite"></p></form><div id="warrantyResults" hidden><div id="warrantyRecords" class="warranty-records"></div><form id="warrantyClaimForm" class="warranty-form" hidden><input id="claimWarrantyCode" name="warrantyCode" type="hidden"><p>Mã bảo hành: <strong id="claimWarrantyCodeLabel"></strong></p><label for="claimIssueType">Loại vấn đề *</label><select id="claimIssueType" name="issueType" required><option value="">Chọn loại vấn đề</option><option value="defect">Lỗi sản phẩm</option><option value="seam">Đường may / hoàn thiện</option><option value="material">Chất liệu</option><option value="other">Vấn đề khác</option></select><label for="claimContactPhone">Số điện thoại liên hệ (không bắt buộc)</label><input id="claimContactPhone" name="contactPhone" inputmode="tel" maxlength="24" placeholder="Số liên hệ (không bắt buộc)" aria-label="Số điện thoại liên hệ"><textarea id="claimWarrantyMessage" name="message" required minlength="8" maxlength="1600" rows="3" placeholder="Mô tả vấn đề cần hỗ trợ *" aria-label="Mô tả vấn đề cần hỗ trợ"></textarea><label for="warrantyPhoto">Ảnh lỗi (không bắt buộc)</label><input id="warrantyPhoto" type="file" accept="image/*" capture="environment" aria-label="Chọn hoặc chụp ảnh lỗi"><button class="pill-btn primary tap-target" type="submit" id="warrantySubmit">Gửi yêu cầu bảo hành</button><p class="checkout-message" id="warrantyClaimMessage" role="status" aria-live="polite"></p></form></div></div>
   <nav class="sd-legal-links" aria-label="Chính sách và điều khoản" style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding:12px 10px;font-size:12px"><a href="/privacy-policy.html">Chính sách quyền riêng tư</a><a href="/terms-of-service.html">Điều khoản sử dụng</a><a href="/data-deletion.html">Xóa dữ liệu người dùng</a></nav>
   <div class="footer-bottom"><span>© <span id="year"></span> SinDarealest. All rights reserved.</span><span>Premium Crocodile Leather Fashion · Made to leave a mark.</span></div>
  </div>
@@ -1406,7 +1410,7 @@ html.sd-catalog-route #products .filter-pill{
       <p id="accountCloudStatus" class="sd-auth-caption" role="status" aria-live="polite">Đăng nhập Google để đồng bộ dữ liệu.</p>
       <button id="accountImportLocal" type="button" class="pill-btn tap-target" hidden>Chuyển dữ liệu trên thiết bị vào tài khoản</button>
       <button type="button" class="account-action tap-target" id="accountAddressAction" aria-controls="accountAddressView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="address" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><strong>Địa chỉ giao hàng</strong><small id="accountAddressSummary">Chưa lưu địa chỉ trên thiết bị này</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
-      <button type="button" class="account-action tap-target" id="accountOrdersAction" aria-controls="accountOrdersView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="orders" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3.5h12v17l-3-1.8-3 1.8-3-1.8-3 1.8v-17Z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span><span><strong>Đơn hàng của tôi</strong><small><span id="accountOrderCount">0</span> yêu cầu</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
+      <button type="button" class="account-action tap-target" id="accountOrdersAction" aria-controls="accountOrdersView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="orders" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3.5h12v17l-3-1.8-3 1.8-3-1.8-3 1.8v-17Z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span><span><strong>Đơn hàng của tôi</strong><small><span id="accountOrderCount">0</span> đơn hàng</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <button type="button" class="account-action tap-target" id="accountFavoritesAction" aria-controls="accountFavoritesView"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="favorites" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.6 8.8c0 4.4-8.6 10.1-8.6 10.1S3.4 13.2 3.4 8.8A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.6 2.6Z"/></svg></span><span><strong>Sản phẩm yêu thích</strong><small><span id="accountFavoriteCount">0</span> sản phẩm yêu thích</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <button type="button" class="account-action tap-target" id="accountThemeAction"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="theme" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2.5 12h2m15 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span><span><strong>Chế độ hiển thị</strong><small>Chuyển giữa giao diện sáng và tối</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></button>
       <a class="account-action tap-target" href="#contact" id="accountContactAction"><span class="account-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="contact" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 2 1-4A7.5 7.5 0 1 1 20 11.5Z"/><path d="M8.5 10h7M8.5 13.5h4"/></svg></span><span><strong>Liên hệ hỗ trợ</strong><small>Zalo, Messenger và các kênh liên hệ</small></span><span class="account-action-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" data-account-icon="chevron" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg></span></a>
@@ -1423,7 +1427,7 @@ html.sd-catalog-route #products .filter-pill{
     </div>
     <div id="accountAddressView" class="account-address-view" hidden>
       <div class="orders-view-heading"><button type="button" class="favorites-back tap-target" id="accountAddressBack">← Tài khoản</button><span>Thông tin giao hàng</span></div>
-      <p class="orders-local-note" id="accountAddressPrivacy">Thông tin bạn lưu dưới đây chỉ nằm trong bộ nhớ trình duyệt trên thiết bị hiện tại. Khi gửi yêu cầu đặt hàng, các trường cần thiết sẽ được gửi để cửa hàng tiếp nhận. Không có đồng bộ tài khoản.</p>
+      <p class="orders-local-note" id="accountAddressPrivacy">Khi chưa đăng nhập, thông tin được lưu trên thiết bị này. Đăng nhập Google để lưu và đồng bộ địa chỉ giữa các thiết bị.</p>
       <form id="accountAddressForm" class="account-address-form">
         <label class="address-field"><span>Họ tên *</span><input id="accountAddressFullName" name="fullName" maxlength="120" required autocomplete="name"></label>
         <label class="address-field"><span>Số điện thoại *</span><input id="accountAddressPhone" name="phone" maxlength="24" required autocomplete="tel" inputmode="tel"></label>
@@ -1595,7 +1599,7 @@ function dismissToast(){const t=$('#toast');if(t)t.classList.remove('show','toas
 function showToast(msg,link=null){const t=$('#toast');const panelOpen=['#cartDrawer','#checkoutDrawer','#accountDrawer'].some(selector=>$(selector)?.classList.contains('open'));if(panelOpen){dismissToast();return}t.classList.toggle('toast-detail-context',Boolean($('#productOverlay')?.classList.contains('open')));t.replaceChildren(document.createTextNode(msg));if(link){const a=document.createElement('a');a.href=link;a.target='_blank';a.rel='noopener';a.textContent='Mở Zalo ↗';t.appendChild(a)}t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3200)}
 function iconBag(){return '<svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>'}
 function setThemeIcon(){const dark=document.documentElement.classList.contains('dark');$('#themeIcon').innerHTML=dark?'<path d="M20.2 15.4A8 8 0 0 1 8.6 3.8 8.5 8.5 0 1 0 20.2 15.4Z"/>':'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42-1.42m11.3-11.3 1.42-1.42"/>';const mode=document.documentElement.dataset.themeMode||'auto';$('#themeToggle').setAttribute('aria-label',mode==='auto'?'Đang theo giao diện thiết bị. Nhấn để đổi chế độ thủ công':dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối');$('#themeToggle').title=mode==='auto'?'Theo giao diện thiết bị':`Chế độ ${dark?'tối':'sáng'} (thủ công)`}
-function syncThemeMeta(){const dark=document.documentElement.classList.contains('dark');const meta=$('meta[name="theme-color"]');if(meta)meta.content=dark?'#061522':'#eaf3fb'}
+function syncThemeMeta(){const dark=document.documentElement.classList.contains('dark');$('meta[name="theme-color"]').forEach(meta=>{meta.content=dark?'#061522':'#eaf3fb'})}
 // Android WebView safe theme handoff: no full-viewport clip-path, no mask
 // animation over frosted glass. Fade in a SOLID outgoing-colour sheet, change
 // the palette ONLY while its opacity is 1, then fade it out. The small central
@@ -2152,7 +2156,7 @@ function changeDetailImage(index,resetTimer=true,direction){
  clearTimeout(detailAnimationTimer);
  img.onload=null;img.onerror=null;
  img.classList.remove('sd-slide-out-left','sd-slide-out-right','sd-slide-in-left','sd-slide-in-right','is-changing');
- $('#detailImageCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
+ $('#detailImageCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');$('#detailImageCount').hidden=detailImages.length<=1;
  thumbs.forEach((thumb,j)=>{const active=j===detailIndex;thumb.classList.toggle('active',active);if(active&&resetTimer)thumb.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})});
  if($('#sdFullscreenViewer').classList.contains('open')){
   $('#sdFullscreenCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
@@ -2187,7 +2191,7 @@ function changeDetailImage(index,resetTimer=true,direction){
  scheduleDetailAutoplay();
 }
 let sdDetailReturnUrl='';
-function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fromUrl?null:document.activeElement;clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;updateDetailFavoriteButton(p);document.title=displayProductName(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){sdDetailReturnUrl=location.pathname+location.search+location.hash;history.pushState({productId:p.id},'',`/sanpham/${routeSlug(p.category)}/${encodeURIComponent(p.skuVerified===true&&String(p.sku||'').trim()?(p.sku):(p.id||p.slug))}`)}else if(fromUrl){sdDetailReturnUrl=''}detailImages=allImages(p);detailIndex=0;const images=detailImages;const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1');img.alt=displayProductName(p.title||'Sản phẩm SinDarealest');$('#detailSku').textContent='Mã SKU: '+(visibleSku(p)||'Chưa được cung cấp');$('#detailTitle').innerHTML=productTitleWithVip(p.title||'Sản phẩm tuyển chọn');const detailPrice=customerPriceLabel(p);$('#detailPrice').textContent=detailPrice?'Giá: '+detailPrice:'';$('#detailPrice').hidden=!detailPrice;$('#detailDescription').textContent=p.description||'Liên hệ SinDarealest để được tư vấn chi tiết về sản phẩm, biến thể và tình trạng hiện có.';$('#detailFulfillment').innerHTML=fulfillmentBadge(p,true);$('#sdDetailProduction').hidden=productFulfillmentType(p)!=='made_to_order';renderProductOptions(p);$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(p.title)} — ảnh ${i+1}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailBuyNow').dataset.buy=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').removeAttribute('inert');$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();$('#detailClose').focus({preventScroll:true})}
+function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fromUrl?null:document.activeElement;clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;updateDetailFavoriteButton(p);document.title=displayProductName(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){sdDetailReturnUrl=location.pathname+location.search+location.hash;history.pushState({productId:p.id},'',`/sanpham/${routeSlug(p.category)}/${encodeURIComponent(p.skuVerified===true&&String(p.sku||'').trim()?(p.sku):(p.id||p.slug))}`)}else if(fromUrl){sdDetailReturnUrl=''}detailImages=allImages(p);detailIndex=0;const images=detailImages;const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1');img.alt=displayProductName(p.title||'Sản phẩm SinDarealest');$('#detailSku').textContent='Mã SKU: '+(visibleSku(p)||'Chưa được cung cấp');$('#detailTitle').innerHTML=productTitleWithVip(p.title||'Sản phẩm tuyển chọn');const detailPrice=customerPriceLabel(p);$('#detailPrice').textContent=detailPrice?'Giá: '+detailPrice:'';$('#detailPrice').hidden=!detailPrice;$('#detailDescription').textContent=p.description||'Liên hệ SinDarealest để được tư vấn chi tiết về sản phẩm, biến thể và tình trạng hiện có.';$('#detailFulfillment').innerHTML=fulfillmentBadge(p,true);$('#sdDetailProduction').hidden=productFulfillmentType(p)!=='made_to_order';renderProductOptions(p);$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(p.title)} — ảnh ${i+1}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailImageCount').hidden=images.length<=1;$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailBuyNow').dataset.buy=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').removeAttribute('inert');$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();$('#detailClose').focus({preventScroll:true})}
 function closeDetail(fromUrl=false,restoreFocus=true){
  document.title='SinDarealest — Premium Crocodile Leather Fashion';
  clearTimeout(detailTimer);clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);
@@ -2405,7 +2409,7 @@ function renderCart(){
  }
  const allPriced=entries.every(({p})=>hasConfirmedPublicPrice(p));
  const subtotal=entries.reduce((sum,{p,q})=>sum+(hasConfirmedPublicPrice(p)?Number(p.price)*q:0),0);
- $('#cartSubtotal').textContent=allPriced?formatVnd(subtotal):'Chờ xác nhận giá';
+ $('#cartSubtotal').textContent=allPriced?formatVnd(subtotal):entries.some(({p})=>hasConfirmedPublicPrice(p))?formatVnd(subtotal)+' (chưa gồm sản phẩm chờ báo giá)':'Chờ báo giá';
  $('#cartList').innerHTML=entries.map(({p,q,key,option})=>{
   const id=key;
   const priceText=hasConfirmedPublicPrice(p)?formatVnd(p.price):'Giá sẽ được xác nhận';
@@ -2571,6 +2575,10 @@ async function consultCart(){const items=cartEntries();if(!items.length){showToa
 function setupArtSlideshow(){
  const sneakerProducts=products.filter(p=>p.category==='sneakers');
  const imgs=uniqueImages(sneakerProducts);
+ const hasMultiple=imgs.length>1;
+ const countNode=$('#artSlideCount'),controlsNode=$('#artSlideControls');
+ if(countNode)countNode.hidden=!hasMultiple;
+ if(controlsNode)controlsNode.hidden=!hasMultiple;
  if(!imgs.length)return;
  const pauseButton=$('#artPause');
  const previousButton=$('#artPrev');
@@ -2801,6 +2809,14 @@ function accountCloudImportVisibility(){
 }
 function accountCloudMessage(message){
  const node=$('#accountCloudStatus');if(node)node.textContent=message;
+ const note=$('#accountAddressPrivacy');
+ if(note)note.textContent=accountSyncMode==='cloud'
+  ?'Địa chỉ được lưu theo tài khoản Google và đồng bộ khi đăng nhập trên thiết bị khác.'
+  :accountSyncMode==='loading'
+   ?'Đang kiểm tra trạng thái đồng bộ. Vui lòng đợi xác nhận.'
+   :accountSyncMode==='error'
+    ?'Chưa xác minh được phiên đăng nhập. Không thể bảo đảm đồng bộ; hãy đăng nhập lại.'
+    :'Khi chưa đăng nhập, thông tin được lưu trên thiết bị này. Đăng nhập Google để lưu và đồng bộ địa chỉ giữa các thiết bị.';
 }
 async function accountCloudFetchOrders(epoch){
  const res=await fetch('/api/customer/orders',{credentials:'same-origin',cache:'no-store'});
