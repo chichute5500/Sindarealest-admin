@@ -42,6 +42,7 @@ jobs:
         env:
           AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
           AUDIT_OUTPUT: audit/after
+          AUDIT_STRICT_VISUAL: '1'
         run: node scripts/audit-readonly.mjs
       - name: Assert material images load only near the viewport (GET-only)
         env:
