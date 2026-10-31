@@ -6,6 +6,7 @@ on:
       - .github/workflows/audit-after-qa.yml
       - scripts/audit-readonly.mjs
       - scripts/audit-cls-probe.mjs
+      - scripts/audit-layout-ab.mjs
       - scripts/qa-material-network.mjs
       - public/material-gallery.js
       - scripts/build-logo-asset.py
@@ -74,6 +75,11 @@ jobs:
           AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
           AUDIT_OUTPUT: audit/after
         run: node scripts/audit-cls-probe.mjs
+      - name: Diagnose Welcome, Theme, SSR layout shifts with isolated A/B (GET only)
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+          AUDIT_OUTPUT: audit/after
+        run: node scripts/audit-layout-ab.mjs
       - name: Lighthouse Preview home and catalog mobile/desktop
         shell: bash
         run: |
