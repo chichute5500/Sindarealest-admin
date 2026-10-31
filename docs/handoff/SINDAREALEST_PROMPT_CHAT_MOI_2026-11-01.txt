@@ -1,0 +1,15 @@
+TIẾP TỤC SINDAREALEST — KIỂM TRA TỒN ĐỌNG THEO % VÀ ĐỢI TÔI GIAO VIỆC
+
+REPO: chichute5500/Sindarealest-admin.
+BẮT BUỘC ĐỌC: docs/handoff/SINDAREALEST_MASTER_HANDOFF_2026-11-01.md trên branch fix/audit-2026-10, hoặc file .md tôi đính kèm. Đây là dự án đang làm dở, không làm lại Owner PASS.
+
+VIỆC ĐẦU TIÊN: CHỈ ĐIỀU TRA/BÁO CÁO, CHƯA SỬA CODE.
+- Kiểm tra lại main HEAD, Production deploy, PR #154/#155/#158/#159/#137/#139/#119/#120 và CI mới nhất đúng SHA. Các nhánh khác có thể đang thay đổi, không lấy số cũ làm mới.
+- D1 Production sindarealest-db đã PASS 0015–0017, PR #160 MERGED và Cloudflare Production deployment SUCCESS. Không làm lại D1; chỉ còn giám sát Rows Read/Written sau deploy theo traffic.
+- Đưa một bảng TOÀN DIỆN gồm: HẠNG MỤC | % HOÀN THÀNH | % CÒN LẠI | ĐÃ PASS | CÒN TỒN ĐỌNG | MỨC ƯU TIÊN | PR/NHÁNH. % phải có căn cứ; thiếu bằng chứng ghi chưa định lượng được.
+- Phân biệt code test PASS, Owner visual PASS và kiểm thử thực tế trên Xiaomi 15 Ultra. Không bịa visual parity >=95%; không nhầm trùng D1 trên PR #155/#159.
+- Đề xuất thứ tự công việc, sau đó DỪNG CHỜ TÔI GIAO ĐẦU VIỆC. Không commit/merge/deploy/thay database khi chỉ được yêu cầu đánh giá.
+
+SAU KHI TÔI GIAO: làm trực tiếp trên nhánh/PR hiện hữu, đa luồng các tác vụ độc lập khi có công cụ thật, không chồng CSS, tự chụp CURRENT/TARGET, QA đúng SHA, không đụng Production chưa phê duyệt.
+
+TRẢ LỜI TIẾNG VIỆT, NGẮN GỌN, RÕ RÀNG. Tôi sẽ chọn phần tiếp theo sau khi xem bảng %.
