@@ -239,17 +239,26 @@ try{
    await page.screenshot({path:OUTPUT+"/"+c.name+"-switch-account.png",animations:"disabled"});
    checkpoint("rapid Checkout→Account replacement without stacked drawers");
 
-   await page.reload({waitUntil:"domcontentloaded"});
+   await page.reload({waitUntil:"load"});
    await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:14000});
+   await page.waitForFunction(()=>!document.getElementById("welcomeSplash"),null,{timeout:6000});
    const refreshed=await page.evaluate(()=>{
-    const ids=["cartDrawer","accountDrawer","checkoutDrawer"];
-    return {open:ids.filter(id=>document.getElementById(id).classList.contains("open")),
-      visible:ids.filter(id=>getComputedStyle(document.getElementById(id)).visibility==="visible"),
-      nav:getComputedStyle(document.getElementById("mobileBottomNav")).display};
+    const ids=["cartDrawer","accountDrawer","checkoutDrawer","productOverlay","sdFullscreenViewer"];
+    const opened=ids.filter(id=>document.getElementById(id).classList.contains("open"));
+    const visible=ids.filter(id=>getComputedStyle(document.getElementById(id)).visibility==="visible");
+    return {url:location.href,
+      open:opened,visible,
+      nav:getComputedStyle(document.getElementById("mobileBottomNav")).display,
+      bodyClass:document.body.className,htmlClass:document.documentElement.className,
+      modalBudget:document.body.classList.contains("has-open-overlay"),
+      viewport:window.innerWidth,navBounds:document.getElementById("mobileBottomNav").getBoundingClientRect().toJSON()};
    });
-   assert.ok(refreshed.open.length<=1,"Reload cannot restore several open drawers");
-   assert.ok(refreshed.visible.length<=1,"Reload cannot show several drawers");
-   if(!refreshed.open.length&&c.mobile)assert.notEqual(refreshed.nav,"none");
+   assert.ok(refreshed.open.length<=1,"Reload cannot restore several open overlays: "+JSON.stringify(refreshed));
+   assert.ok(refreshed.visible.length<=1,"Reload cannot show several overlays: "+JSON.stringify(refreshed));
+   if(c.mobile){
+    if(refreshed.open.length)assert.equal(refreshed.nav,"none","Modal open => mobile nav hidden");
+    else assert.notEqual(refreshed.nav,"none","No modal => mobile nav visible: "+JSON.stringify(refreshed));
+   }
    await page.screenshot({path:OUTPUT+"/"+c.name+"-after-reload.png",animations:"disabled"});
    checkpoint("reload after overlay switch never stacks cart / checkout / account");
 
