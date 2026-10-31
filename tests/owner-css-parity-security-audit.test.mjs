@@ -26,10 +26,15 @@ test('Admin has exactly one approved blue palette for each theme, not obsolete b
 });
 
 test('Admin and Storefront share the approved light-blue identity without forcing same layouts or dark palettes',()=>{
- for(const token of ['--ink:#142a3c','--gold:#5c91b9']){
+ for(const token of ['--gold:#5c91b9']){
   assert.ok(css.includes(token),'Admin missing shared token '+token);
   assert.ok(web.includes(token),'Storefront missing shared token '+token);
  }
+ // Admin's measured reference uses a deeper navy; Storefront keeps its
+ // existing Owner-approved text color and independent theme palette.
+ assert.ok(css.includes('--ink:var(--sd-admin-ink);'));
+ assert.ok(css.includes('--sd-admin-ink:#091632;'));
+ assert.ok(web.includes('--ink:#142a3c;'));
  assert.ok(css.includes('--bg:#eaf3fb;'));
  assert.ok(web.includes('--page:#eaf3fb;'));
  assert.ok(web.includes(':root{color-scheme:only light;'));
