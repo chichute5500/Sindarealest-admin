@@ -107,7 +107,7 @@ export async function onRequest(context) {
     // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
     // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
     html = meta(html, "og:image", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
-    html = meta(html, "og:image:alt", "SinDarealest — " + categoryName, true);
+    html = meta(html, "og:image:alt", categorySlug ? "SinDarealest — " + categoryName : "SinDarealest — Toàn bộ sản phẩm da cá sấu", true);
     html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
     html = meta(html, "twitter:title", catalogTitle);
     html = meta(html, "twitter:description", catalogDescription);
