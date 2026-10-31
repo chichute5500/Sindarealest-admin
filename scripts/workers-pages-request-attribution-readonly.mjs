@@ -13,7 +13,7 @@ if(!token||!/^[a-f0-9]{32}$/i.test(account))throw Error('Missing/invalid Cloudfl
 const root='https://api.cloudflare.com/client/v4/accounts/'+account;
 const end=new Date(),start=new Date(end.getTime()-40*60*60*1000);
 const window={startUtc:start.toISOString(),endUtc:end.toISOString()};
-const report={generatedAt:end.toISOString(),window,projectMetadata:[],workerTotals:[],previewHourly:[],previewScriptVersions:[],warnings:[]};
+const report={generatedAt:end.toISOString(),window,analyticsAccountCount:null,graphqlRowsSeen:0,projectMetadata:[],workerTotals:[],previewHourly:[],previewScriptVersions:[],warnings:[]};
 async function api(path,method='GET',body){
  const res=await fetch(path,{method,headers:{Authorization:'Bearer '+(path==='https://api.cloudflare.com/client/v4/graphql'?analyticsToken:token),...(body?{'Content-Type':'application/json'}:{})},
  ...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(25000)});
@@ -42,7 +42,11 @@ async function gqlField(fieldSelection,alias){
  if(d.errors?.length)throw Error('GraphQL: '+d.errors.map(x=>x.message).join('; ').slice(0,300));
  const accounts=d.data?.viewer?.accounts;
  if(!Array.isArray(accounts))throw Error('Unexpected GraphQL analytics payload');
- return accounts.flatMap(x=>x?.[alias]||[]);
+ report.analyticsAccountCount=accounts.length;
+ if(accounts.length===0)throw Error('GraphQL token has NO accessible account for CLOUDFLARE_ACCOUNT_ID; verify token Account Resources scope and Account ID');
+ const values=accounts.flatMap(x=>x?.[alias]||[]);
+ report.graphqlRowsSeen+=values.length;
+ return values;
 }
 try{
  const totals=await gqlField('workersInvocationsAdaptive(limit: 2000, filter:{datetime_geq:$start,datetime_leq:$end}, orderBy:[sum_requests_DESC]) { dimensions { scriptName } sum { requests errors subrequests } }','totals');
@@ -54,6 +58,7 @@ try{
   grouped.set(script,old);
  }
  report.workerTotals=[...grouped.values()].sort((a,b)=>b.requests-a.requests).slice(0,50);
+ if(report.workerTotals.length===0)report.warnings.push('No Workers invocations in selected UTC range even though API access succeeded; check Cloudflare analytics retention, selected Account ID and sampling.');
 }catch(e){report.warnings.push('Worker totals unavailable: '+smallError(e));}
 const preview=report.projectMetadata.find(x=>x.project==='sindarealest-admin-preview')?.previewScriptName;
 if(preview && /^[A-Za-z0-9_.-]+$/.test(preview)){
