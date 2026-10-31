@@ -55,7 +55,10 @@ try{
    await client.send('Network.enable');
    await client.send('Network.emulateNetworkConditions',{offline:false,latency:150,downloadThroughput:200000,uploadThroughput:90000});
    const response=await page.goto(target+path,{waitUntil:'domcontentloaded',timeout:45000});
-   await page.waitForTimeout(1800);
+   const cardSelector=name==='home'?'#featuredGrid article[data-product]':'#catalogGrid article[data-product]';
+   await page.waitForSelector(cardSelector,{state:'attached',timeout:20000}).catch(()=>{});
+   await page.waitForTimeout(500);
+   const renderedProducts=await page.locator(cardSelector).count();
    // Test scrolling and browser interaction. No public API writes.
    const framePromise=page.evaluate(()=>new Promise(resolve=>{
      const deltas=[];let previous=0;const until=performance.now()+2600;
@@ -66,7 +69,7 @@ try{
    const intervals=await framePromise;
    const fps=intervals.filter(x=>x>0).map(x=>Math.min(60,1000/x));
    const vitals=await page.evaluate(()=>window.__auditVitals||{});
-   report.routes[name].runtime={httpStatus:response?.status()??null,viewport:390,cpuThrottle:4,network:'150ms RTT, 1.6Mbps download',fpsMin:fps.length?Math.round(Math.min(...fps)*10)/10:null,fpsAvg:fps.length?Math.round(fps.reduce((a,b)=>a+b,0)/fps.length*10)/10:null,lcpMs:vitals.lcp??null,cls:vitals.cls??null,longTaskCount:(vitals.longTasks||[]).length,longTaskMaxMs:(vitals.longTasks||[]).length?Math.round(Math.max(...vitals.longTasks)):0};
+   report.routes[name].runtime={httpStatus:response?.status()??null,renderedProducts,viewport:390,cpuThrottle:4,network:'150ms RTT, 1.6Mbps download',fpsMin:fps.length?Math.round(Math.min(...fps)*10)/10:null,fpsAvg:fps.length?Math.round(fps.reduce((a,b)=>a+b,0)/fps.length*10)/10:null,lcpMs:vitals.lcp??null,cls:vitals.cls??null,longTaskCount:(vitals.longTasks||[]).length,longTaskMaxMs:(vitals.longTasks||[]).length?Math.round(Math.max(...vitals.longTasks)):0};
   }catch(error){report.routes[name].runtime={error:sanitize(error)}}
   await context.close();
  }
@@ -77,7 +80,9 @@ try{
    await page.addInitScript(()=>{try{sessionStorage.setItem('sd-welcome-seen-in-tab','1')}catch{}});
    try{
     await page.goto(target+path,{waitUntil:'domcontentloaded',timeout:45000});
-    await page.waitForTimeout(1500);
+    const cardSelector=name==='home'?'#featuredGrid article[data-product]':'#catalogGrid article[data-product]';
+    await page.waitForSelector(cardSelector,{state:'attached',timeout:20000}).catch(()=>{});
+    await page.waitForTimeout(650);
     const filename=name+'-'+colorScheme+'-'+width+'.png';
     await page.screenshot({path:join(folder,'screenshots',filename),fullPage:true,animations:'disabled',timeout:25000});
     report.screenshots.push(filename);
