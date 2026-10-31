@@ -1,0 +1,7 @@
+---
+description: SinDarealest permanent AI QA and Cloudflare resource policy
+globs:
+alwaysApply: true
+---
+
+Before every task read `AGENTS.md` and `docs/QA_RESOURCE_POLICY.md`. Follow local-first QA, avoid redundant live requests, retain Owner PASS, and never alter Main/Production without explicit permission. Verify real screenshots before claiming visual-parity PASS.
