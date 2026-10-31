@@ -62,7 +62,6 @@
 <link rel="preload" href="/fonts/NotoSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="/fonts/NotoSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="/material-gallery.css">
-<link rel="stylesheet" href="/storefront-fluid-unified.css?v=20261031">
 <link rel="stylesheet" href="/customer-auth.css?v=account-liquid-20261029">
 <script type="module" src="/customer-auth-ui.js?v=account-liquid-20261029"></script>
 <script type="module" src="/customer-email-otp-ui.js?v=email-recovery-20261029"></script>
@@ -1052,6 +1051,7 @@ button,a,[role="button"]{touch-action:manipulation}
   ::view-transition-old(root),::view-transition-new(root){animation-duration:0s!important}
 }
 </style>
+<link rel="stylesheet" href="/storefront-fluid-unified.css?v=20261031">
 </head>
 <body class="welcome-active">
 <div class="theme-watermark" aria-hidden="true"><img src="/watermark.webp" alt="" draggable="false"></div>
@@ -1400,7 +1400,7 @@ button,a,[role="button"]{touch-action:manipulation}
         <button type="button" class="sd-auth-text-button tap-target" data-auth-toggle>Chưa có tài khoản? Đăng ký</button>
         <button type="button" class="sd-auth-text-button tap-target" data-auth-forgot hidden>Quên mật khẩu?</button>
         <div class="sd-auth-flow" id="sdAuthVerify" hidden>
-          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư và Spam. Vui lòng kiểm tra hộp thư đến hoặc thư mục Spam. Mã xác minh có hiệu lực trong 5 phút.</p>
+          <p class="sd-auth-heading">Xác minh Email</p><p class="sd-auth-caption">Kiểm tra hộp thư và Spam. Vui lòng kiểm tra hộp thư đến hoặc thư mục Spam. Mã xác minh gồm 6 chữ số có hiệu lực trong 5 phút.</p>
           <form id="sdAuthVerifyForm">
             <label>Email<input type="email" name="email" autocomplete="email" maxlength="254" required></label>
             <label>Mã OTP<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
@@ -1427,7 +1427,7 @@ button,a,[role="button"]{touch-action:manipulation}
           </form>
           <button type="button" class="sd-auth-text-button tap-target" data-auth-return>Quay lại</button>
         </div>
-        <p class="sd-auth-caption" data-auth-unverified-caption>Vui lòng xác minh email để bảo mật tài khoản và đồng bộ thông tin đơn hàng.</p>
+        <p class="sd-auth-caption" data-auth-unverified-caption>Xác minh email giúp bảo mật tài khoản và đồng bộ lịch sử đơn hàng của bạn.</p>
         <p class="sd-auth-caption" data-auth-email-note hidden>Đăng nhập Email sẽ được mở sau khi hoàn thiện xác minh email và khôi phục mật khẩu.</p>
       </div>
     </section>
@@ -1451,7 +1451,7 @@ button,a,[role="button"]{touch-action:manipulation}
     </div>
     <div id="accountAddressView" class="account-address-view" hidden>
       <div class="orders-view-heading"><button type="button" class="favorites-back tap-target" id="accountAddressBack">← Tài khoản</button><span>Thông tin giao hàng</span></div>
-      <p class="orders-local-note" id="accountAddressPrivacy">Khi chưa đăng nhập, thông tin giao hàng chỉ được lưu trên trình duyệt của thiết bị hiện tại.</p>
+      <p class="orders-local-note" id="accountAddressPrivacy">Thông tin được lưu nhanh trên trình duyệt này. Đăng nhập Google nếu bạn muốn đồng bộ sang thiết bị khác.</p>
       <form id="accountAddressForm" class="account-address-form">
         <label class="address-field"><span>Họ tên *</span><input id="accountAddressFullName" name="fullName" maxlength="120" required autocomplete="name"></label>
         <label class="address-field"><span>Số điện thoại *</span><input id="accountAddressPhone" name="phone" maxlength="24" required autocomplete="tel" inputmode="tel"></label>
@@ -2420,7 +2420,7 @@ function updateAccountAddressPrivacy(){
  if(note)note.textContent=accountSyncMode==='cloud'
   ?'Thông tin giao hàng được đồng bộ an toàn với tài khoản của bạn.'
   :accountSyncMode==='guest'
-  ?'Khi chưa đăng nhập, thông tin giao hàng chỉ được lưu trên trình duyệt của thiết bị hiện tại.'
+  ?'Thông tin được lưu nhanh trên trình duyệt này. Đăng nhập Google nếu bạn muốn đồng bộ sang thiết bị khác.'
   :'Đang kiểm tra trạng thái đồng bộ. Vui lòng thử lại khi tài khoản sẵn sàng.';
  if(save)save.textContent=accountSyncMode==='cloud'?'Lưu và đồng bộ địa chỉ':'Lưu địa chỉ trên thiết bị';
 }
@@ -2680,7 +2680,7 @@ async function consultProduct(id){
  const copying=copyText(message);
  window.open(ZALO,'_blank','noopener,noreferrer');
  const copied=await copying;
- showToast(copied?'Đã sao chép thông tin sản phẩm, vui lòng dán vào khung chat Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.',ZALO);
+ showToast(copied?'Đã sao chép mã & thông tin sản phẩm, hãy dán vào Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.',ZALO);
 }
 async function consultCart(){
  const items=cartEntries();
@@ -2689,7 +2689,7 @@ async function consultCart(){
  const copying=copyText(message);
  window.open(ZALO,'_blank','noopener,noreferrer');
  const copied=await copying;
- showCartClipboardToast(copied?'Đã sao chép thông tin sản phẩm, vui lòng dán vào khung chat Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.');
+ showCartClipboardToast(copied?'Đã sao chép mã & thông tin sản phẩm, hãy dán vào Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.');
 }
 function setupArtSlideshow(){
  const sneakerProducts=products.filter(p=>p.category==='sneakers');
