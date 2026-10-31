@@ -60,3 +60,27 @@ Three independent validation tracks now run without touching main:
 3. **Read-only Preview verification and isolated UI:** `scripts/d1-preview-products-readonly-validation.mjs` measures one original full query plus an indexed revision lookup and emits **metadata only** to `artifacts/d1-preview-products/readonly-metrics.json`. `.github/workflows/pr155-d1-products-preview.yml` gates an isolated deployment to `https://d1-products-155.sindarealest-admin-preview.pages.dev/admin/` on successful remote schema verification. This alias is distinct from the Storefront owner Preview. It must not be described as deployed until its workflow succeeds.
 
 **Release gates still open:** Verify the actual GitHub Actions push-workflow results and remote artifact, then confirm deployed Preview source SHA, no anonymous API access, exact Preview D1 rows-read delta, and all Admin actions in read-only/fake-data QA. A green local CI does **not** prove Preview migration or a reduced account-wide quota. Production/Main remain out of scope until Owner PASS. Do not repeat remote index creation if schema is already verified.
+
+
+## Verified remote Preview D1 results — 2026-11-01
+
+**Source SHA tested:** `23e9304c7b6e2a7c40bdaa8ae61112c0685b2475`.
+**GitHub Actions:** https://github.com/chichute5500/Sindarealest-admin/actions/runs/41232156793
+**Sanitized evidence:** GitHub Actions artifact `d1-preview-products-checkpoint`, artifact ID `13054116244` (temporary retention), plus the PR #155 comment by `github-actions[bot]`.
+
+| Query / check | Actual Preview D1 rows_read |
+| --- | ---: |
+| Full `SELECT * FROM products ORDER BY sort_order ASC, sku ASC LIMIT 2000` before index | **453** |
+| Full product query after index | **453** |
+| Indexed `SELECT value FROM settings WHERE key='products_revision' LIMIT 1` | **1** |
+| Preview product count | **453 products** |
+| Per unchanged catalog check reduction | **99.78%** |
+
+Workflow result **SUCCESS**. Guarded migration created and verified `idx_products_sort_sku` and the three products-revision triggers, inserted revision seed only after validation, confirmed full product order/value parity, reported unchanged-read metric, and deployed **only** isolated Preview alias:
+https://d1-products-155.sindarealest-admin-preview.pages.dev/admin/
+
+The workflow also confirmed HTTP 401 for an unauthenticated Admin products API request and that the Preview Admin page rendered. GitHub source/automation CI and Admin Preview Playwright were successful at this version. **No Main merge and no Production D1 or Production Pages writes**.
+
+**Interpretation:** On each logged-in Admin periodic catalog check with unchanged products, the product query cost drops from 453 rows read to 1 row read. A first/full reload or an actual mutation still reads all 453 products (by design). An index does not reduce the full SELECT's own rows_read: the savings come from skipping unchanged full reads. This is not yet evidence of an identical 99.78% reduction in account-wide D1 quota, because orders, audit logs, public catalog, login and other endpoints contribute to the aggregate.
+
+**Next release gates:** Compare Cloudflare D1 Insights total Rows Read under representative Preview traffic, confirm real edit/create/delete sync on authorized Preview test data if safe, review any PR #154/#159 overlapping changes, and require Owner acceptance before integration into Production. Do not re-run unnecessary writes on the live D1 merely to confirm metrics.
