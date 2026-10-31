@@ -4,6 +4,10 @@ on:
     branches: [fix/audit-2026-10]
     paths:
       - 'scripts/qa-audit-local-checkout.mjs'
+      - 'public/index.html'
+      - 'functions/_catalog-ssr.js'
+      - 'functions/api/orders.js'
+      - 'functions/api/checkout-quote.js'
       - '.github/workflows/audit-checkout-browser.yml'
   workflow_dispatch:
 permissions:
