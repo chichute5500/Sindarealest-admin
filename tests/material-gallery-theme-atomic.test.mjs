@@ -28,9 +28,11 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(browserQA,/const strictCycles=process\.env\.SD_THEME_DIAGNOSTIC_VARIANTS==='1'\?1:3/);
  assert.match(browserQA,/for\(let cycle=0;cycle<strictCycles;cycle\+\+\)/);
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
+ assert.ok(page.includes("sessionStorage.getItem('sd-theme-overlay-seen')==='1'"));
+ assert.ok(page.includes("if(shownInSession)animate=false"));
  assert.match(page,/id="sdThemeSwitchOverlay"/);
  assert.match(page,/Đang đổi giao diện/);
- assert.match(page,/const durationMs=mobileThemeGuard\?1180:700,minimumCoveredAfterCommitMs=mobileThemeGuard\?580:320/);
+ assert.match(page,/const durationMs=200,minimumCoveredAfterCommitMs=0/);
  assert.match(page,/root\.classList\.remove\('sd-theme-repaint-isolated'\)/);
  assert.match(page,/if\(mobileThemeGuard\)root\.classList\.add\('sd-theme-repaint-isolated'\)/);
  assert.match(page,/typeof window\.__sdCancelThemeStage==='function'\)return/);
@@ -39,8 +41,8 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(page,/window\.__sdThemeTimer=setTimeout\(reveal,/);
  assert.match(css,/#sdThemeSwitchOverlay\.is-visible/);
  assert.doesNotMatch(css,/clip-path:circle/);
- assert.match(css,/#sdThemeSwitchOverlay\.is-visible\{[\s\S]*?opacity:1;transition:opacity \.18s/);
- assert.match(css,/#sdThemeSwitchOverlay\.is-dismissing\{[\s\S]*?transition:opacity \.28s/);
+ assert.match(css,/#sdThemeSwitchOverlay\.is-visible\{[\s\S]*?opacity:1;transition:opacity \.08s/);
+ assert.match(css,/#sdThemeSwitchOverlay\.is-dismissing\{[\s\S]*?transition:opacity \.10s/);
  assert.doesNotMatch(css,/contain:layout paint style/);
  assert.match(css,/html\.sd-theme-overlay-active,\s*html\.sd-theme-overlay-active body\{[\s\S]*?transition:none!important;/);
  assert.doesNotMatch(css,/transition:clip-path/);
