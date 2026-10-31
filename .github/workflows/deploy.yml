@@ -78,6 +78,10 @@ jobs:
       # NEVER run a mutating D1 cutover from the routine production deploy.
       # Restore/migrations/catalog changes need a separately reviewed manual run.
 
+      - name: Build lightweight material tile images without touching originals
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 scripts/build-material-thumbnails.py
       - name: Deploy to verified Cloudflare Pages project
         if: success()
         env:
