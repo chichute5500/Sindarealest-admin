@@ -8,7 +8,7 @@ import { readFileSync } from "node:fs";
 import { onRequestPost as lookup, onRequestGet, publicOrderProgress } from "../functions/api/order-tracking.js";
 const realFetch=globalThis.fetch;
 globalThis.fetch=async (url)=> {
- assert.match(String(url),/challenges.cloudflare.com\\/turnstile\\/v0\\/siteverify/);
+ assert.ok(String(url).startsWith("https://challenges.cloudflare.com/turnstile/v0/siteverify"));
  return new Response(JSON.stringify({success:true,hostname:"sindarealest.test",action:"order_lookup"}),{headers:{"Content-Type":"application/json"}});
 };
 
