@@ -153,7 +153,7 @@ export async function onRequest(context) {
       "@context": "https://schema.org", "@type": "Organization",
       name: "SinDarealest", url: `${url.origin}/`,
       logo: `${url.origin}/images/brand-emblem.png`
-    }).replace(/<\\//g, "<\\\\/");
+    });
     if (!html.includes('"@type":"Organization"')) {
       html = html.replace("</head>", `  <script type="application/ld+json">${organizationSchema}</script>\n</head>`);
     }
