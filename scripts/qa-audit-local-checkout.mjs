@@ -4,10 +4,16 @@
  */
 import assert from "node:assert/strict";
 import {chromium} from "playwright";
+import {mkdir} from "node:fs/promises";
+import {join} from "node:path";
 const origin=process.env.AUDIT_LOCAL_URL||"http://127.0.0.1:8788";
+const evidenceDir=process.env.AUDIT_CHECKOUT_EVIDENCE||"audit/checkout-mocked";
+await mkdir(evidenceDir,{recursive:true});
 const browser=await chromium.launch({headless:true,args:["--no-sandbox"]});
 const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:"reduce",colorScheme:"light"});
 const page=await context.newPage();
+// CI evidence contains invented products and a dummy phone only; never real customer data.
+const screenshot=async file=>page.screenshot({path:join(evidenceDir,file),animations:"disabled",timeout:30000});
 const sample=[
  {id:"qa-wallet",slug:"qa-wallet",sku:"SD-VN-QA",skuVerified:true,title:"Ví nam da cá sấu QA",category:"wallets",categoryLabel:"Ví nam",images:["images/theme-croc-dark.webp"],price:3000000,sourcePriceConfirmed:true,fulfillmentType:"made_to_order",published:true},
  {id:"qa-clutch",slug:"qa-clutch",sku:"SD-CL-QA",skuVerified:true,title:"Clutch thử nghiệm QA",category:"clutch",categoryLabel:"Clutch",images:["images/theme-croc-dark.webp"],price:null,sourcePriceConfirmed:false,fulfillmentType:"made_to_order",published:true}
@@ -56,12 +62,14 @@ try{
  await page.locator('#catalogGrid [data-add="qa-clutch"]').click();
  await page.evaluate(()=>document.querySelector("#cartOpen").click());
  await page.locator("#cartDrawer.open").waitFor();
+ await screenshot("01-cart-mixed-price-390x844.png");
  assert.match(await page.locator("#cartSubtotal").innerText(),/chưa gồm sản phẩm chờ báo giá/);
  await page.keyboard.press("Escape");
  await page.waitForFunction(()=>!document.querySelector("#cartDrawer").classList.contains("open"));
  await page.evaluate(()=>document.querySelector("#cartOpen").click());
  await page.locator("#cartCheckout").click();
  await page.locator("#checkoutDrawer.open").waitFor();
+ await screenshot("02-checkout-shipping-390x844.png");
  await page.locator('#checkoutForm [name="fullName"]').fill("Nguyễn Văn QA");
  await page.locator('#checkoutForm [name="phone"]').fill("123456");
  await page.locator('#checkoutForm [name="streetAddress"]').fill("01 Đường Thử Nghiệm");
@@ -74,9 +82,11 @@ try{
  await page.locator('#checkoutForm [name="phone"]').fill("0900000000");
  await page.locator("#checkoutSubmit").click();
  await page.waitForFunction(()=>!document.querySelector("#sdCheckoutPaymentStep").hidden);
+ await screenshot("03-checkout-payment-390x844.png");
  assert.match(await page.locator("#sdCheckoutAmount").innerText(),/900/);
  await page.locator("#checkoutSubmit").click();
  await page.waitForFunction(()=>!document.querySelector("#sdCheckoutReviewStep").hidden);
+ await screenshot("04-checkout-review-390x844.png");
  await page.locator("#sdCheckoutPrev").click();
  await page.locator("#sdCheckoutPrev").click();
  assert.equal(await page.locator('#checkoutForm [name="phone"]').inputValue(),"0900000000");
@@ -111,6 +121,7 @@ try{
  assert.ok(!beforeNav.outside&&beforeNav.width<=beforeNav.viewportWidth-8,'Nav/tabs must not stretch beyond mobile viewport');
  assert.ok(beforeNav.bottom<=beforeNav.viewportHeight+3&&
            beforeNav.viewportHeight-beforeNav.bottom<38,'Nav must remain anchored to bottom safe-area');
+ await screenshot("05-mobile-nav-after-reload-390x844.png");
  await page.evaluate(()=>window.scrollTo(0,1100));
  await page.waitForTimeout(180);
  const scrolledNav=await navState();
