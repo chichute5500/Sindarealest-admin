@@ -633,11 +633,11 @@ body:has(#loginView:not(.hidden)) .loginwrap{
 .dashboard-revenue{margin-bottom:16px}
 .dashboard-revenue .panelhead{position:relative;isolation:isolate;padding-right:112px}
 .dashboard-revenue .panelhead::before,.dashboard-revenue .panelhead::after{content:"";position:absolute;pointer-events:none;z-index:-1}
-.dashboard-revenue .panelhead::before{right:5px;top:45px;width:132px;height:34px;border:1px solid rgba(255,255,255,.88);border-bottom-color:rgba(111,164,197,.48);border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(220,240,251,.08));box-shadow:0 9px 18px rgba(55,116,155,.11),inset 0 1px 0 rgba(255,255,255,.98)}
-.dashboard-revenue .panelhead::after{right:43px;top:24px;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.99),rgba(211,235,249,.86) 49%,rgba(132,190,226,.55));box-shadow:0 8px 17px rgba(37,91,132,.18),inset -4px -6px 11px rgba(95,157,194,.22),inset 4px 3px 9px rgba(255,255,255,.92)}
+.dashboard-revenue .panelhead::before{right:5px;top:45px;width:136px;height:38px;border:1px solid rgba(255,255,255,.98);border-bottom-color:rgba(90,145,183,.62);border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.46),rgba(220,240,251,.06));box-shadow:0 10px 20px rgba(55,116,155,.15),inset 0 2px 2px rgba(255,255,255,.99)}
+.dashboard-revenue .panelhead::after{right:42px;top:22px;width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 28% 22%,rgba(255,255,255,1),rgba(218,239,251,.90) 45%,rgba(132,190,226,.56));box-shadow:0 9px 18px rgba(37,91,132,.21),inset -4px -6px 11px rgba(95,157,194,.22),inset 4px 3px 10px rgba(255,255,255,.98)}
 .dashboard-revenue .panelhead{align-items:flex-start;gap:12px}
 .dashboard-revenue .revenue-period{font-size:12px;color:var(--ink);font-weight:700;white-space:normal;grid-column:1/-1}
-.dashboard-revenue-empty{display:grid;grid-template-columns:minmax(0,1fr) 64px;align-items:center;gap:14px;min-height:94px;padding:12px 16px;border:1px solid transparent;border-radius:18px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(112,166,200,.18),inset 0 5px 12px rgba(255,255,255,.12)}
+.dashboard-revenue-empty{display:grid;grid-template-columns:minmax(0,1fr) 64px;align-items:center;gap:14px;min-height:94px;padding:12px 16px;border:1px solid transparent;border-radius:18px;background:var(--glass-face) padding-box,var(--glass-edge) border-box;box-shadow:0 7px 18px rgba(39,91,126,.13),inset 0 2px 3px rgba(255,255,255,.98),inset 0 -2px 5px rgba(73,121,157,.12)}
 .dashboard-revenue-copy{min-width:0}
 .dashboard-revenue-copy strong{display:block;margin-bottom:4px;color:var(--ink);font-size:12px}
 .dashboard-revenue-copy p{max-width:620px;margin:0;color:var(--muted);font-size:10px;line-height:1.5}
@@ -1058,7 +1058,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   --sd-3d-rim:radial-gradient(ellipse 72% 94% at 1% 0%,rgba(242,165,216,.68),transparent 80%),radial-gradient(ellipse 58% 108% at 100% 36%,rgba(100,167,232,.50),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(224,240,251,.55) 48%,rgba(189,218,239,.20) 76%,rgba(222,236,248,.48));
   --sd-3d-face:radial-gradient(ellipse 110% 80% at 18% -18%,rgba(255,255,255,.96),rgba(255,255,255,.30) 48%,transparent 78%),radial-gradient(ellipse 76% 100% at 105% 56%,rgba(159,202,233,.09),transparent 78%),linear-gradient(142deg,rgba(252,254,255,.69) 0%,rgba(238,248,255,.54) 52%,rgba(222,239,250,.43) 100%);
   --sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%,rgba(255,255,255,.88),rgba(231,245,254,.68) 57%,rgba(226,240,251,.58) 100%);
-  --sd-glass-panel-shadow:0 15px 34px rgba(35,80,113,.17),0 3px 7px rgba(43,89,119,.10),inset 0 1px 0 rgba(255,255,255,.96),inset 0 -2px 5px rgba(92,137,169,.11);
+  --sd-glass-panel-shadow:0 17px 37px rgba(35,80,113,.21),0 3px 8px rgba(43,89,119,.13),inset 0 2px 2px rgba(255,255,255,.98),inset 0 -2px 5px rgba(92,137,169,.11);
   --sd-glass-input-shadow:0 3px 9px rgba(45,87,118,.075),inset 1px 2px 4px rgba(93,139,167,.14);
   --sd-glass-input-edge:rgba(147,191,225,.38);
   --sd-glass-selected:radial-gradient(ellipse 100% 120% at 40% 14%,rgba(177,216,250,.45),rgba(211,235,250,.26) 65%,rgba(189,224,246,.16) 100%);
@@ -2190,7 +2190,7 @@ body:not(:has(#loginView:not(.hidden))){
    and raised icon controls. Keep the same palette in light and dark modes. */
 body:has(#main .statgrid){
   --sd-dashboard-face:linear-gradient(145deg,rgba(255,255,255,.88),rgba(239,249,255,.66) 54%,rgba(220,239,251,.49));
-  --sd-dashboard-rim:radial-gradient(ellipse 74% 96% at 1% 0%,rgba(245,164,216,.88),transparent 80%),radial-gradient(ellipse 58% 110% at 100% 36%,rgba(103,171,235,.74),transparent 82%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.50) 48%,rgba(190,222,242,.20) 76%,rgba(210,229,245,.54));
+  --sd-dashboard-rim:radial-gradient(ellipse 74% 96% at 1% 0%,rgba(245,164,216,.88),transparent 80%),radial-gradient(ellipse 58% 110% at 100% 36%,rgba(103,171,235,.74),transparent 82%),radial-gradient(ellipse 100% 22% at 58% 110%,rgba(112,189,220,.03),transparent 84%),linear-gradient(180deg,rgba(255,255,255,.99),rgba(221,240,252,.50) 48%,rgba(190,222,242,.20) 76%,rgba(210,229,245,.54));
   --sd-dashboard-shadow:0 19px 40px rgba(35,80,113,.30),0 4px 11px rgba(43,89,119,.18),inset 0 2px 2px rgba(255,255,255,.99),inset 0 -2px 5px rgba(73,121,157,.15);
 }
 :root[data-admin-theme="dark"] body:has(#main .statgrid){
@@ -2244,7 +2244,7 @@ body:has(#main .statgrid) #main .pagehead .btn.primary{
   font-size:13px;white-space:nowrap;line-height:1.2;padding-inline:8px;
   border:1.75px solid transparent;
   background:linear-gradient(155deg,rgba(255,255,255,.44) 0%,rgba(255,255,255,.18) 34%,transparent 62%) padding-box,radial-gradient(ellipse 110% 82% at 30% 0%,rgba(255,255,255,1),transparent 72%) padding-box,radial-gradient(ellipse 85% 50% at 100% 100%,rgba(53,138,201,.16),transparent 80%) padding-box,linear-gradient(180deg,#66b8ff 0%,#218fe8 48%,#0879d2 100%) padding-box,radial-gradient(ellipse 86% 115% at 0% 0%,rgba(250,184,231,.80),transparent 77%) border-box,radial-gradient(ellipse 74% 110% at 100% 100%,rgba(140,218,255,.90),transparent 76%) border-box,linear-gradient(180deg,rgba(255,255,255,.96),rgba(115,177,227,.66)) border-box;
-  box-shadow:0 0 0 1px rgba(241,190,230,.72),0 11px 26px rgba(38,132,198,.36),0 3px 7px rgba(35,91,136,.16),inset 0 2px 2px rgba(255,255,255,1),inset 0 -2px 5px rgba(19,94,157,.22);
+  box-shadow:0 0 0 1.5px rgba(241,190,230,.72),0 0 12px rgba(125,196,247,.22),0 11px 26px rgba(38,132,198,.36),0 3px 7px rgba(35,91,136,.16),inset 0 2px 2px rgba(255,255,255,1),inset 0 -2px 5px rgba(19,94,157,.22);
 }
 body:has(#main .statgrid) :is(.topbar .btn,.mobiletabs .nav,#main .btn,#main .dashboard-shortcut){
   transition:transform .24s var(--sd-3d-ease),box-shadow .24s var(--sd-3d-ease),background-color .24s var(--sd-3d-ease),border-color .24s var(--sd-3d-ease);
