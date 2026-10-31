@@ -4472,8 +4472,8 @@ html.dark #products .filter-pill[data-sd-glass-press="true"]:not(:disabled){
 @media(max-width:760px){
  #products .catalog-tools{gap:10px;margin-bottom:15px}
  #products .search-field{min-height:52px;padding:0 15px;gap:10px}
- #products .catalog-tools .filter-pills{gap:8px;padding:2px 2px 5px}
- #products .filter-pill{min-height:40px;padding:7px 12px;font-size:13.5px}
+ #products .catalog-tools .filter-pills{gap:8px;padding:2px 2px 8px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+ #products .filter-pill{min-height:40px;padding:7px 12px;font-size:13.5px;flex:0 0 auto;width:max-content;max-width:none;white-space:nowrap;scroll-snap-align:start}
 }
 @media(max-width:390px){
  #products .search-field{min-height:50px;padding:0 13px}
