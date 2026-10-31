@@ -1229,7 +1229,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   .topbar .topright{flex:0 0 auto;gap:6px}
   .topbar .topright .btn{width:40px;height:40px;max-width:40px;min-width:40px;min-height:40px;flex:0 0 40px;padding:0}
   .topbar {
-    min-height:58px;width:calc(100% - 24px);margin:6px 12px 0;padding:6px 12px;
+    min-height:58px;width:calc(100% - 30px);margin:0 15px 0;padding:6px 12px;
     border:1.5px solid transparent;border-radius:999px;
     background:var(--sd-glass-shell-strong) padding-box,var(--sd-3d-rim) border-box;
     box-shadow:var(--sd-glass-panel-shadow);
@@ -1268,7 +1268,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
   :root[data-admin-theme="dark"] #main .toolbar,
   :root[data-admin-theme="dark"] #main .order-toolbar{background:rgba(23,47,66,.84)}
   .mobiletabs{
-    left:15px;right:15px;bottom:calc(5px + env(safe-area-inset-bottom));
+    left:15px;right:15px;bottom:max(5px,env(safe-area-inset-bottom));
     gap:4px;height:56px;min-height:56px;padding:4px 7px;
     border:1.5px solid transparent;border-radius:28px;
     background:var(--sd-glass-shell-strong) padding-box,var(--sd-3d-rim) border-box;
@@ -2116,13 +2116,13 @@ body:not(:has(#loginView:not(.hidden))){
    Restore the airy mobile dashboard proportions from the supplied reference.
    Visual-only overrides; live counts, routes, and business logic stay untouched. */
 @media (min-width:390px) and (max-width:520px){
-  #main>.pagehead{margin-bottom:10px;align-items:center}
+  #main>.pagehead{margin-bottom:8px;align-items:center}
   body:not(:has(#loginView:not(.hidden))):has(#main .statgrid) .layout{padding-top:0}
   #main>.pagehead .btn.primary{min-width:158px}
   #main>.pagehead h2{font-size:clamp(27px,6.4vw,30px);line-height:1.08}
-  #main .statgrid{gap:8px;margin-bottom:11px}
+  #main .statgrid{gap:8px;margin-bottom:8px}
   #main .stat{
-    min-height:clamp(88px,22vw,95px);
+    min-height:clamp(84px,21vw,91px);
     padding:8px 12px;
     border:1.5px solid transparent;
     border-radius:20px;
@@ -2142,14 +2142,14 @@ body:not(:has(#loginView:not(.hidden))){
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-3d-shadow),inset 0 1px 0 var(--glass-inner-highlight),inset 0 -1px 0 rgba(112,166,200,.16);
   }
-  #main .dashboard-quick-panel{margin-bottom:11px!important}
+  #main .dashboard-quick-panel{margin-bottom:8px!important}
   #main .dashboard-quick-panel .panelhead{padding:11px 16px 6px}
   #main .dashboard-quick-panel .panelbody{padding-bottom:10px}
   #main .dashboard-quick-panel .panelhead h3,
   #main .dashboard-revenue .panelhead h3{font-size:17px;line-height:1.2}
   #main .dashboard-shortcuts{gap:7px}
   #main .dashboard-shortcut{
-    min-height:clamp(76px,19.5vw,84px);
+    min-height:clamp(72px,18.5vw,80px);
     padding:8px 4px;
     gap:6px;
     border:1.5px solid transparent;
@@ -2166,17 +2166,17 @@ body:not(:has(#loginView:not(.hidden))){
   #main .dashboard-revenue .panelhead{padding:11px 18px 6px;gap:8px}
   #main .dashboard-revenue .panelhead .tiny{font-size:10.5px;line-height:1.4}
   #main .dashboard-revenue-empty{
-    min-height:clamp(84px,21.3vw,92px);
-    padding:11px 13px;
-    gap:9px;
+    min-height:clamp(78px,19.5vw,84px);
+    padding:9px 11px;
+    gap:6px;
     border:1.5px solid transparent;
     border-radius:20px;
     background:var(--glass-face) padding-box,var(--glass-edge) border-box;
     box-shadow:var(--sd-dashboard-shadow);
   }
-  #main .dashboard-revenue-copy strong{font-size:11.5px;line-height:1.3}
-  #main .dashboard-revenue-copy p{font-size:9.5px;line-height:1.4}
-  #main .dashboard-revenue-visual{width:46px;height:46px;border-radius:15px}
+  #main .dashboard-revenue-copy strong{font-size:10.5px;line-height:1.3}
+  #main .dashboard-revenue-copy p{font-size:8.5px;line-height:1.35}
+  #main .dashboard-revenue-visual{width:42px;height:42px;border-radius:14px}
   #main .dashboard-revenue-visual svg{width:25px;height:25px}
 }
 @media(max-width:389px){
