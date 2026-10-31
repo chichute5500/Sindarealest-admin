@@ -2575,8 +2575,44 @@ function trapAccountTab(event){trapTabWithin($('#accountDrawer'),event)} functio
 function trapProductTab(event){trapTabWithin($('#productOverlay'),event)}
 function trapFullscreenTab(event){trapTabWithin($('#sdFullscreenViewer'),event)}
 async function copyText(text){try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);return true}}catch(e){}try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok}catch(e){return false}}
-async function consultProduct(id){const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id)||currentProduct;if(!p)return;const confirmedSku=visibleSku(p);const sku=confirmedSku?` (SKU: ${confirmedSku})`:' (mã SKU chưa được cung cấp)';const title=p.title||'Sản phẩm SinDarealest';const message=`Chào SinDarealest, tôi muốn tư vấn/đặt hàng sản phẩm ${title}${sku}`;const ok=await copyText(message);showToast(ok?'Đã sao chép lời nhắn tư vấn/đặt hàng. Đang mở Zalo…':'Không thể tự sao chép. Đang mở Zalo để bạn tiếp tục tư vấn.',ZALO);setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast(ok?'Nội dung tư vấn đã được sao chép. Bạn có thể dán vào Zalo.':'Hãy gửi lời nhắn tư vấn khi Zalo mở.',ZALO)},1000)}
-async function consultCart(){const items=cartEntries();if(!items.length){showToast('Bạn chưa chọn sản phẩm.');return}const msg=items.map(x=>(visibleSku(x.p)||x.p.title)+(x.option?' · '+productOptionLabel(x.p,x.option):'')+' × '+x.q).join('\n');const copied=await copyText(msg);showToast(copied?'Đã sao chép danh sách sản phẩm. Đang mở Zalo…':'Không thể tự sao chép danh sách sản phẩm. Đang mở Zalo để bạn tiếp tục gửi thủ công.',ZALO);setTimeout(()=>{const w=window.open(ZALO,'_blank');if(w){try{w.opener=null}catch(e){}}if(!w||w.closed)showToast(copied?'Trình duyệt chặn tự mở Zalo. Danh sách sản phẩm đã được sao chép.':'Trình duyệt chặn tự mở Zalo. Hãy dán hoặc gửi danh sách sản phẩm thủ công.',ZALO)},1000)}
+function productZaloMessage(product,option='',quantity=1){
+ const sku=visibleSku(product)||'Chưa có mã SKU';
+ const title=String(product?.title||'Sản phẩm SinDarealest');
+ const selected=option?productOptionLabel(product,option):'Chưa chọn tùy chọn';
+ return 'Mã sản phẩm: '+sku+'\nTên sản phẩm: '+title+'\nTùy chọn: '+selected+'\nSố lượng: '+quantity;
+}
+function showCartClipboardToast(message){
+ const node=$('#cartClipboardToast');if(!node)return;
+ node.textContent=message;
+ const link=document.createElement('a');
+ link.href=ZALO;link.target='_blank';link.rel='noopener noreferrer';
+ link.textContent=' Mở Zalo ↗';
+ node.appendChild(link);
+ node.hidden=false;
+ clearTimeout(showCartClipboardToast.timer);
+ showCartClipboardToast.timer=setTimeout(()=>{node.hidden=true;node.textContent=''},4800);
+}
+async function consultProduct(id){
+ const p=products.find(x=>(x.id||x.slug)===id)||products.find(x=>x.sku===id)||currentProduct;
+ if(!p)return;
+ const selected=p===currentProduct?selectedDetailOption(p):'';
+ const message=productZaloMessage(p,selected===null?'':selected);
+ // Both clipboard and window.open start in the direct user gesture. Awaiting
+ // clipboard first may trigger popup blocking in mobile Chrome/Safari.
+ const copying=copyText(message);
+ window.open(ZALO,'_blank','noopener,noreferrer');
+ const copied=await copying;
+ showToast(copied?'Đã sao chép thông tin sản phẩm, vui lòng dán vào khung chat Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.',ZALO);
+}
+async function consultCart(){
+ const items=cartEntries();
+ if(!items.length){showCartClipboardToast('Bạn chưa chọn sản phẩm.');return}
+ const message=items.map(x=>productZaloMessage(x.p,x.option,x.q)).join('\n\n');
+ const copying=copyText(message);
+ window.open(ZALO,'_blank','noopener,noreferrer');
+ const copied=await copying;
+ showCartClipboardToast(copied?'Đã sao chép thông tin sản phẩm, vui lòng dán vào khung chat Zalo':'Không thể tự sao chép. Vui lòng gửi thông tin sản phẩm trong Zalo.');
+}
 function setupArtSlideshow(){
  const sneakerProducts=products.filter(p=>p.category==='sneakers');
  const imgs=uniqueImages(sneakerProducts);
@@ -2644,8 +2680,32 @@ function sdTrackRender(orders){
 function bindEvents(){
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
  $('#themeToggle').addEventListener('click',toggleTheme);loadCheckoutProvinces();$('#cartOpen').addEventListener('click',()=>toggleStorefrontModal('cart'));$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart));$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBack').addEventListener('click',()=>{if(sdCheckoutStep>1){sdCheckoutSetStep(sdCheckoutStep-1);return}requestStorefrontModalClose('checkout',()=>{closeCheckout(false);openCart();setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0)})});$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'));$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount));$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',navigateAccountContact);$('#accountFavoritesAction')?.addEventListener('click',()=>setAccountView('favorites'));$('#accountFavoritesBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountOrdersAction')?.addEventListener('click',()=>setAccountView('orders'));$('#accountOrdersBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressAction')?.addEventListener('click',()=>setAccountView('address'));$('#accountAddressBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressForm')?.addEventListener('submit',saveAccountAddress);$('#accountAddressProvince')?.addEventListener('change',()=>loadAccountAddressWards());$('#detailFavorite')?.addEventListener('click',()=>{if(currentProduct)toggleFavorite(favoriteKey(currentProduct))});$('#accountFavoritesList')?.addEventListener('click',event=>{const remove=event.target.closest('[data-favorite-remove]');if(remove){toggleFavorite(remove.dataset.favoriteRemove);return}const open=event.target.closest('[data-favorite-open]');if(open){const key=open.dataset.favoriteOpen;closeAccount(false);openDetail(key)}});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});$('#cartZalo').addEventListener('click',consultCart);document.addEventListener('keydown',e=>{if(e.key==='Tab'){if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}if($('#sdFullscreenViewer').classList.contains('open')){trapFullscreenTab(e);return}if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}if($('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if($('#accountDrawer').classList.contains('open')){trapAccountTab(e);return}}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))requestStorefrontModalClose('checkout',closeCheckout);else if($('#cartDrawer').classList.contains('open'))requestStorefrontModalClose('cart',closeCart);else if($('#accountDrawer').classList.contains('open'))requestStorefrontModalClose('account',closeAccount)});
+const lookupNextAt={order:0,warranty:0};
+function safeLookup(raw,max=100){
+ return String(raw||'').normalize('NFKC').replace(/[^A-Za-z0-9-]/g,'').slice(0,max);
+}
+function canLookup(kind,message){
+ const now=Date.now();
+ if(now<lookupNextAt[kind]){
+  message.textContent='Vui lòng đợi vài giây trước khi tra cứu lại.';
+  return false;
+ }
+ lookupNextAt[kind]=now+2500;
+ return true;
+}
+for(const id of ['sdTrackInput','warrantyLookupValue']){
+ const input=$('#'+id);
+ input?.addEventListener('input',()=>{
+  const next=safeLookup(input.value,id==='sdTrackInput'?64:100);
+  if(next!==input.value)input.value=next;
+ });
+}
 $('#sdTrackForm').addEventListener('submit',async ev=>{
- ev.preventDefault();const button=$('#sdTrackSubmit'),msg=$('#sdTrackMessage'),lookup=$('#sdTrackInput').value.trim();
+ ev.preventDefault();
+ const button=$('#sdTrackSubmit'),msg=$('#sdTrackMessage'),input=$('#sdTrackInput'),lookup=safeLookup(input.value,64);
+ input.value=lookup;
+ if(!lookup){msg.textContent='Vui lòng nhập mã đơn hoặc số điện thoại hợp lệ.';return}
+ if(!canLookup('order',msg))return;
  button.disabled=true;button.textContent='Đang tra cứu…';msg.textContent='';$('#sdTrackResults').hidden=true;$('#sdTrackResults').innerHTML='';
  try{
   const r=await fetch('/api/order-tracking',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',cache:'no-store',body:JSON.stringify({lookup})});
@@ -2658,7 +2718,10 @@ $('#sdTrackForm').addEventListener('submit',async ev=>{
 });
 $('#warrantyLookupForm').addEventListener('submit',async e=>{
  e.preventDefault();
- const b=$('#warrantyLookupSubmit'),m=$('#warrantyMessage'),lookup=$('#warrantyLookupValue').value.trim();
+ const b=$('#warrantyLookupSubmit'),m=$('#warrantyMessage'),input=$('#warrantyLookupValue'),lookup=safeLookup(input.value);
+ input.value=lookup;
+ if(!lookup){m.textContent='Vui lòng nhập mã bảo hành hoặc số điện thoại hợp lệ.';return}
+ if(!canLookup('warranty',m))return;
  b.disabled=true;b.textContent='Đang tra cứu…';m.textContent='';$('#warrantyResults').hidden=true;$('#warrantyClaimForm').hidden=true;
  try{
   const r=await fetch('/api/warranty-lookup',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({lookup})});
