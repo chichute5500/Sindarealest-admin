@@ -240,3 +240,12 @@ html.dark #accountDrawer.open,
 html.dark #checkoutDrawer.open{
   background:rgba(12,25,38,.96)!important;
 }
+
+
+/* The fly-to-cart card is an intentionally short (900ms) top-level snapshot
+ * with maximum z-index. Suppress it whenever real content is opened so it
+ * can never paint over an active drawer, account or product detail panel. */
+body.has-open-overlay > .sd-fly-to-cart-clone,
+body:has(#cartDrawer.open,#checkoutDrawer.open,#accountDrawer.open,#productOverlay.open) > .sd-fly-to-cart-clone{
+  display:none!important;
+}
