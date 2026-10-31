@@ -16,7 +16,7 @@ const checks=[
   ['Storefront shared panel shadow','--glass-shell-shadow:var(--sd-glass-panel-shadow);'],
   ['Storefront translucent shell token','--sd-glass-shell-strong:radial-gradient(ellipse 120% 140% at 25% -40%'],
   ['inner glass highlight token','--glass-inner-highlight:'],
-  ['optical glass surface','var(--glass-face) padding-box,var(--glass-edge) border-box'],
+  ['optical edge without opaque face','mask-composite:exclude'],
   ['inner surface inset','inset 0 1px 0 var(--glass-inner-highlight)'],
   ['pressed state','.btn:not(:disabled):active'],
   ['Storefront touch press state','data-sd-glass-press="true"'],
