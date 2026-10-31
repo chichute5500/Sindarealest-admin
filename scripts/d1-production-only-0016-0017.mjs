@@ -61,7 +61,7 @@ async function main(){
   assert.ok(countsBefore&&Number.isInteger(countsBefore.p)&&Number.isInteger(countsBefore.a),"Business tables missing");
   const bookmark=String((await cf("/d1/database/"+target.id+"/time_travel/bookmark"))?.bookmark||"");
   assert.ok(bookmark.length>12,"No Time Travel recovery bookmark");
-  run(["export",target.name,"--remote","--yes","--output",backup],"Private full SQL backup",180000);
+  run(["export",target.name,"--remote","--skip-confirmation","--output",backup],"Private full SQL backup",180000);
   assert.ok(statSync(backup).size>1024,"Backup export empty");
   console.log("PASS: Production Time Travel bookmark and private SQL export captured; no records logged.");
   for(const name of ["0016_admin_products_revision.sql","0017_admin_audit_revision.sql"]){
