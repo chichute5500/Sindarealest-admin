@@ -18,9 +18,15 @@ assert.match(html, /lastAdminFullSync>=45000/, 'Full background refresh must be 
 assert.match(html, /document\.addEventListener\('visibilitychange'/, 'Refresh after returning to foreground');
 assert.match(html, /window\.addEventListener\('online'/, 'Recover after network resumes');
 assert.match(html, /if\(adminSyncPromise\)\{if\(!full\)return adminSyncPromise/, 'Pull-to-refresh must not settle for an incomplete active polling cycle');
-assert.match(html, /Promise\.allSettled\(names\.map\(name=>api\(adminLivePaths\[name\]\)\)\)/, 'Fetch current Admin data without full WebView reload');
+assert.match(html, /Promise\.allSettled\(names\.map\(name=>api\(name==='products'&&productsRevision!==null/, 'Fetch Admin data without full reload using product revision checks');
 assert.match(html, /if\(navigator\.userAgent\.includes\('SinDarealestAdminAndroid\/2'\)\)return/, 'Keep existing APK-only inactivity exception');
 assert.ok(!html.includes('auditLogPolling'), 'Do not duplicate the older polling loop');
+
+assert.match(html, /productsRevision=typeof d\.revision==='string'\?d\.revision:null/, 'Initial products revision token retained');
+assert.match(html, /auditLogsRevision=optional\[3\]\.status==='fulfilled'/, 'Initial audit revision token retained');
+assert.match(html, /name==='logs'&&auditLogsRevision!==null/, 'Audit polling should skip repeated full reads');
+assert.match(html, /data\.unchanged===true&&data\.revision===auditLogsRevision/, 'Audit unchanged response must preserve notifications');
+assert.match(html, /data\.unchanged===true&&data\.revision===productsRevision/, 'Products unchanged response must preserve current edit state');
 
 for (const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
   new vm.Script(match[1], {filename:'public/admin/index.html'});
