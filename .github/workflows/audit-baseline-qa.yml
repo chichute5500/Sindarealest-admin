@@ -1,0 +1,53 @@
+name: Audit baseline — read-only browser and Lighthouse
+on:
+  push:
+    branches: [fix/audit-2026-10]
+    paths:
+      - .github/workflows/audit-baseline-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  baseline:
+    if: github.ref == 'refs/heads/fix/audit-2026-10'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install audit-only browser dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright lighthouse
+          npx playwright install --with-deps chromium
+      - name: Public GET-only screenshots, source and FPS diagnostics
+        env:
+          AUDIT_TARGET_URL: https://sindarealest2.pages.dev
+          AUDIT_OUTPUT: audit/before
+        run: node scripts/audit-readonly.mjs
+      - name: Lighthouse public home and catalog mobile/desktop
+        shell: bash
+        run: |
+          mkdir -p audit/before/lighthouse
+          for route in home catalog; do
+            if [[ "$route" == home ]]; then path=/; else path=/sanpham; fi
+            for preset in mobile desktop; do
+              args=()
+              if [[ "$preset" == desktop ]]; then args+=(--preset=desktop); fi
+              npx lighthouse "https://sindarealest2.pages.dev$path" \
+                "${args[@]}" \
+                --chrome-flags="--headless --no-sandbox --disable-gpu" \
+                --only-categories=performance,accessibility,best-practices,seo \
+                --output=json --output-path="audit/before/lighthouse/$route-$preset.json" --quiet \
+                || printf '%s\n' "Lighthouse failed: $route $preset (unverified)"
+            done
+          done
+      - name: Archive original baseline, never customer data
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: storefront-audit-before
+          path: audit/before
+          if-no-files-found: warn
+          retention-days: 7
