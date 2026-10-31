@@ -30,6 +30,11 @@ await page.route("**/*",async route=>{
  if(url.hostname==="provinces.open-api.vn"&&path.startsWith("/api/v2/p/"))return route.fulfill(json({wards:[{code:27123,name:"Phường Bến Nghé"}]}));
  if(path==="/api/checkout-quote"){
    assert.equal(req.method(),"POST");
+   const quoteItems=JSON.parse(req.postData()||"{}").items||[];
+   if(quoteItems.some(i=>i.id==="qa-clutch")){
+     return route.fulfill(json({ok:true,paymentReady:false,fulfillmentType:"made_to_order",reason:"Sản phẩm chưa có giá xác nhận. Shop sẽ liên hệ tư vấn.",options:[]}));
+   }
+   assert.deepEqual(quoteItems.map(i=>i.id),["qa-wallet"],"Deposits only quoted after unpriced item is removed");
    return route.fulfill(json({ok:true,paymentReady:true,fulfillmentType:"made_to_order",total:3000000,
       options:[{value:"deposit",label:"Đặt cọc 30%",amount:900000,remainingAmount:2100000,discountAmount:0},
                {value:"full",label:"Thanh toán toàn bộ",amount:2850000,remainingAmount:0,discountAmount:150000}],
@@ -40,11 +45,11 @@ await page.route("**/*",async route=>{
    sentOrders++;
    const payload=JSON.parse(req.postData()||"{}");
    assert.equal(payload.phone,"0900000000");
-   assert.equal(payload.items.length,2);
+   assert.equal(payload.items.length,1,"Deposit order must contain only the priced item");
    assert.equal(payload.paymentOption,"deposit");
    await new Promise(resolve=>setTimeout(resolve,300));
    return route.fulfill(json({ok:true,orderNumber:"QA-NO-DB-ORDER",orderAccessToken:"mock",
-     status:"pending_confirmation",priceConfirmationRequired:true,total:null,message:"Đã ghi nhận đơn thử nghiệm trong trình duyệt.",
+     status:"pending_confirmation",priceConfirmationRequired:false,total:3000000,message:"Đã ghi nhận đơn thử nghiệm trong trình duyệt.",
      selectedPaymentOption:"deposit",selectedPaymentAmount:900000,selectedRemainingAmount:2100000,
      selectedDiscountAmount:0,transferReference:"QA-STATIC-ONLY"},201));
  }
@@ -80,6 +85,27 @@ try{
  await page.locator("#checkoutSubmit").click();
  assert.match(await page.locator("#checkoutMessage").innerText(),/số di động Việt Nam hợp lệ/);
  await page.locator('#checkoutForm [name="phone"]').fill("0900000000");
+ await page.locator("#checkoutSubmit").click();
+ await page.waitForFunction(()=>!document.querySelector("#sdCheckoutPaymentStep").hidden);
+ assert.match(await page.locator("#sdCheckoutQuoteNotice").innerText(),/chưa có giá xác nhận/);
+ assert.equal(await page.locator("#sdCheckoutOptions .sd-checkout-option").count(),0,"Unpriced products must not offer false deposits");
+ assert.equal(await page.locator("#sdCheckoutQrWrap").isVisible(),false,"Unpriced products must not show banking QR");
+ await screenshot("03a-checkout-unpriced-no-payment-390x844.png");
+ // Go back to the cart and remove the unquoted item before running the real deposit path.
+ await page.locator("#sdCheckoutPrev").click();
+ await page.locator("#sdCheckoutPrev").click();
+ await page.locator("#cartDrawer.open").waitFor();
+ await page.locator('#cartDrawer [data-remove="qa-clutch"]').click();
+ assert.equal(await page.locator('#cartDrawer [data-remove="qa-clutch"]').count(),0);
+ await page.locator("#cartCheckout").click();
+ await page.locator("#checkoutDrawer.open").waitFor();
+ await page.locator('#checkoutForm [name="fullName"]').fill("Nguyễn Văn QA");
+ await page.locator('#checkoutForm [name="phone"]').fill("0900000000");
+ await page.locator('#checkoutForm [name="streetAddress"]').fill("01 Đường Thử Nghiệm");
+ await page.waitForFunction(()=>document.querySelector("#checkoutProvince")?.options.length>1);
+ await page.locator("#checkoutProvince").selectOption("TP Hồ Chí Minh");
+ await page.waitForFunction(()=>document.querySelector("#checkoutWard")?.options.length>1);
+ await page.locator("#checkoutWard").selectOption("Phường Bến Nghé");
  await page.locator("#checkoutSubmit").click();
  await page.waitForFunction(()=>!document.querySelector("#sdCheckoutPaymentStep").hidden);
  await screenshot("03-checkout-payment-390x844.png");
@@ -137,5 +163,5 @@ try{
  const scrolledNav=await navState();
  assert.ok(Math.abs(scrolledNav.top-beforeNav.top)<3,'Mobile navigation must not move during content scrolling');
  console.log("PASS: single four-tab mobile bottom navigation remains fixed and contained after reload and scroll.");
- console.log("PASS: browser-mocked checkout: mixed prices, phone validation, 3 steps, Back persistence, Esc, deposit and no duplicate submission; 0 real writes.");
+ console.log("PASS: browser-mocked checkout: mixed cart requires quote (no deposit/QR); priced-only cart validates deposit and 3 steps, Back persistence, Esc, no duplicate submission; 0 real writes.");
 }finally{await context.close();await browser.close()}
