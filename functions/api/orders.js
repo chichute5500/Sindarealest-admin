@@ -1,5 +1,5 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
-import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment, validPublicQrImageKey } from "../_payments.js";
+import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment, validPublicQrImageKey, checkoutTransferSku, checkoutTransferReferenceMatches } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
 import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
 
@@ -94,6 +94,10 @@ export async function onRequestPost({ request, env }) {
     // verified money to the payment ledger.
     const paymentTermsConfirmed = Boolean(priceKnown && choice);
     const paymentTermsConfirmedAt = paymentTermsConfirmed ? new Date().toISOString() : null;
+    const transferSku=checkoutTransferSku(items.map(item=>({sku:item.sku})));
+    const requestedTransferReference=clean(body?.transferReference,100);
+    if(requestedTransferReference&&(!selectedPaymentOption||!checkoutTransferReferenceMatches(requestedTransferReference,phone,transferSku)))
+      return fail("Nội dung chuyển khoản đã thay đổi. Vui lòng tải lại QR trước khi tiếp tục.",409);
     let qrSnapshot = null;
     if (paymentTermsConfirmed) try {
       const key = await getSetting(env.DB, "payment_qr_active_key", "");
@@ -110,13 +114,17 @@ export async function onRequestPost({ request, env }) {
         }
       }
     } catch { qrSnapshot = null; }
+    if(requestedTransferReference&&(!qrSnapshot||qrSnapshot.key!==clean(body?.paymentQrImageKey,100)||
+      qrSnapshot.bankName!==clean(body?.paymentBankName,120)||qrSnapshot.accountName!==clean(body?.paymentAccountName,120)||
+      qrSnapshot.accountNumber!==clean(body?.paymentAccountNumber,40)))
+      return fail("Thông tin QR đã thay đổi hoặc không còn hoạt động. Chưa tạo đơn; vui lòng tải lại QR trước khi tiếp tục.",409);
     const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
     // The transfer memo is the server-issued order number. It can be shown
     // before bank details are activated and cannot be authored by the browser.
-    const transferReference = selectedPaymentOption ? orderNumber : "";
+    const transferReference = selectedPaymentOption ? (requestedTransferReference||orderNumber) : "";
     const statements = [];
 
     // The customer row is a long-lived profile, not an order form. Never

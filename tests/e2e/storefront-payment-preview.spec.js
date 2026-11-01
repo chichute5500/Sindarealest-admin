@@ -32,7 +32,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  }
  const errors=[],writes=[],createdOrders=[];let paymentRefreshReads=0;
  page.on('pageerror',error=>errors.push(error.message));
- page.on('request',request=>{const path=new URL(request.url()).pathname;if(path==='/api/order-payment'&&request.method()==='GET')paymentRefreshReads++;if(path==='/api/orders'&&request.method()==='POST')createdOrders.push(request.postDataJSON());if(request.url().includes('/api/')&&!['GET','HEAD'].includes(request.method()))writes.push(request.method()+' '+path)});
+ page.on('request',request=>{const path=new URL(request.url()).pathname;if(path==='/api/order-payment'&&request.method()==='GET')paymentRefreshReads++;if(path==='/api/orders'&&request.method()==='POST')createdOrders.push(request.postDataJSON());if(request.url().includes('/api/')&&!['GET','HEAD'].includes(request.method())&&path!=='/api/checkout-quote')writes.push(request.method()+' '+path)});
  await page.addInitScript(()=>localStorage.setItem('sd-shipping-address',JSON.stringify({fullName:'Khách kiểm tra Preview',phone:'0900000000',email:'',province:'Thành phố Hồ Chí Minh',provinceCode:'79',ward:'Phường Bà Rịa',wardCode:'26560',streetAddress:'Địa chỉ thử nghiệm Preview'})));
  // Keep address selection deterministic in the isolated Preview browser run; the payment/order API remains real.
  let divisionRequests=0;
@@ -140,9 +140,11 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await assertVerifiedQr();
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-qr-step.png'),fullPage:false,animations:'disabled'});
+ expect(createdOrders).toHaveLength(0);
  const writesBeforeDepositSwipe=writes.length;
  await swipeToConfirmPayment(page);
- expect(writes).toHaveLength(writesBeforeDepositSwipe);
+ expect(writes).toHaveLength(writesBeforeDepositSwipe+1);
+ expect(writes.at(-1)).toBe('POST /api/orders');
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('MÃ ĐƠN HÀNG');
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
@@ -221,9 +223,12 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
  await assertVerifiedQr();
  await page.screenshot({path:join(output,'390x844-cart-full-qr-step.png'),fullPage:false,animations:'disabled'});
+ const createdBeforeFullSwipe=createdOrders.length;
  const writesBeforeFullSwipe=writes.length;
  await swipeToConfirmPayment(page);
- expect(writes).toHaveLength(writesBeforeFullSwipe);
+ expect(writes).toHaveLength(writesBeforeFullSwipe+1);
+ expect(createdOrders).toHaveLength(createdBeforeFullSwipe+1);
+ expect(writes.at(-1)).toBe('POST /api/orders');
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
  const cartFullOrderNumber=(await page.locator('#paymentInstructions .sd-order-reference strong').innerText()).trim();

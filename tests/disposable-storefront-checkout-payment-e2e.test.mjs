@@ -11,6 +11,7 @@ import { createSession } from '../functions/_lib.js';
 import { hashOrderAccessToken } from '../functions/_payments.js';
 import { onRequestGet as productsGet } from '../functions/api/products.js';
 import { onRequestPost as ordersPost } from '../functions/api/orders.js';
+import { onRequestPost as checkoutQuotePost } from '../functions/api/checkout-quote.js';
 import { onRequestGet as adminOrdersGet, onRequestPatch as adminOrdersPatch } from '../functions/api/admin/orders.js';
 import { onRequestGet as orderPaymentGet } from '../functions/api/order-payment.js';
 import { onRequestGet as adminPaymentGet, onRequestPost as paymentRequestPost, onRequestPatch as paymentRequestPatch } from '../functions/api/admin/payment-requests.js';
@@ -152,11 +153,24 @@ try {
   assert.equal(publicPending.freeShipping,false);
   assert.match(publicPending.qrImageUrl,/^\/payment-qr\/qr-/);
   const checkoutWithActiveQr={...checkout,phone:'0900000103'};
-  const direct=await (await expectStatus('Checkout creates a QR request from the active verified Shop QR',await invoke(ordersPost,'/api/orders','POST',checkoutWithActiveQr),201)).json();
+  const ordersBeforeQr=one('SELECT COUNT(*) AS n FROM orders').n;
+  const quoteBeforeOrder=await (await expectStatus('Verified QR quote is read-only before an order exists',await invoke(checkoutQuotePost,'/api/checkout-quote','POST',{
+    items:checkoutWithActiveQr.items,phone:checkoutWithActiveQr.phone,paymentOption:checkoutWithActiveQr.paymentOption,quotedTotal:checkoutWithActiveQr.quotedTotal
+  }),200)).json();
+  assert.equal(quoteBeforeOrder.paymentReady,true);
+  assert.equal(quoteBeforeOrder.paymentInstructions.amount,142500);
+  assert.match(quoteBeforeOrder.transferReference,/^SD-[A-Z2-9]{8}$/);
+  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,ordersBeforeQr,'Showing the QR does not create an order');
+  const selectedInstructions=quoteBeforeOrder.paymentInstructions;
+  const checkoutWithPreparedQr={...checkoutWithActiveQr,transferReference:quoteBeforeOrder.transferReference,paymentQrImageKey:quoteBeforeOrder.paymentQrImageKey,
+    paymentBankName:selectedInstructions.bankName,paymentAccountName:selectedInstructions.accountName,paymentAccountNumber:selectedInstructions.accountNumber};
+  await expectStatus('Changed QR snapshot cannot finalize a paid-reference order',await invoke(ordersPost,'/api/orders','POST',{...checkoutWithPreparedQr,paymentBankName:'CHANGED BANK'}),409);
+  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,ordersBeforeQr,'A stale QR snapshot must not create an order');
+  const direct=await (await expectStatus('Finalize creates a QR request only after order-code confirmation',await invoke(ordersPost,'/api/orders','POST',checkoutWithPreparedQr),201)).json();
   assert.equal(direct.paymentReady,true);
   assert.equal(direct.paymentTermsConfirmed,true);
   assert.equal(direct.paymentInstructions.amount,142500);
-  assert.equal(direct.paymentInstructions.transferContent,direct.orderNumber);
+  assert.equal(direct.paymentInstructions.transferContent,quoteBeforeOrder.transferReference,'The transfer content shown before finalization must remain stable on the order');
   const directRecord=one('SELECT id FROM orders WHERE order_number=?',direct.orderNumber);
   assert.equal(one("SELECT created_by AS actor FROM order_payment_requests WHERE order_id=? AND status='pending'",directRecord.id).actor,'customer_checkout');
   assert.equal(one("SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?",directRecord.id).n,0,'Creating a QR request must never record money as received');

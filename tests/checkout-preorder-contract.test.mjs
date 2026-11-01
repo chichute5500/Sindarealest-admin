@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { calculateCheckoutQuote } from "../functions/_payments.js";
+import { calculateCheckoutQuote, makeCheckoutTransferReference, checkoutTransferReferenceMatches } from "../functions/_payments.js";
 
 const item=(type,unitPrice,quantity=1)=>({fulfillmentType:type,unitPrice,quantity});
 const stock=calculateCheckoutQuote([item("in_stock",4500000)]);
@@ -21,6 +21,10 @@ assert.equal(calculateCheckoutQuote([item("unclassified",4500000)]).eligible,tru
 assert.equal(calculateCheckoutQuote([item("made_to_order",null)]).eligible,false,"unconfirmed price must never be inferred");
 assert.equal(calculateCheckoutQuote([item("in_stock",Number.MAX_SAFE_INTEGER)]).eligible,false);
 assert.equal(calculateCheckoutQuote([]).eligible,false);
+const transferReference=makeCheckoutTransferReference("0900000000","QA-WALLET-001");
+assert.match(transferReference,/^SD-[A-Z2-9]{8}$/);
+assert.equal(checkoutTransferReferenceMatches(transferReference,"0900000000","QA-WALLET-001"),true);
+assert.equal(checkoutTransferReferenceMatches("SD-INVALID","0900000000","QA-WALLET-001"),false);
 
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const quote=readFileSync(new URL("../functions/api/checkout-quote.js",import.meta.url),"utf8");
@@ -45,7 +49,7 @@ assert.match(quote,/paymentReady:false/,"Selecting a method must not mean Shop h
 assert.match(quote,/validPublicQrImageKey/,"Only a verified active Shop QR can make the quote payment-ready");
 assert.match(quote,/env\.IMAGES\.head/,"The configured QR object must exist before it is considered ready");
 assert.match(quote,/makeCheckoutTransferReference/,"The server derives transfer reference readiness from the customer phone and catalog SKU");
-assert.doesNotMatch(quote,/qrImageUrl:configured|transferReference:configured|bankName:configured|accountNumber:configured/,"The pre-submit quote must not return QR or bank transfer details");
+assert.match(quote,/selectedOption\?\{paymentOption:selectedOption,selectedPaymentAmount:selected\.amount,paymentInstructions:paymentDetails,transferReference:configured\?transferReference:"",paymentQrImageKey:configured\?key:""\}/,"QR details are returned only after the customer selects a payment option");
 assert.doesNotMatch(quote,/order_payment_transactions|payment_status\s*=/,"Quote must not verify or mutate bank transactions");
 assert.match(create,/calculateCheckoutQuote\(items\.map/,"Submit re-evaluates amount from server DB");
 assert.match(create,/quotedTotal !== serverQuote\.total/,"Stale quote must fail closed");
@@ -54,13 +58,23 @@ assert.match(html,/sdCheckoutRemaining/);
 assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
 assert.doesNotMatch(html,/sdCheckoutOpenBank|Mở ứng dụng ngân hàng/,'Checkout no longer offers a bank-app launch action');
-assert.match(html,/id="sdCheckoutConfirmRange" type="range" min="0" max="100"/,'The transfer confirmation is a swipe slider');
+assert.match(html,/id="sdCheckoutConfirmRange" type="range" min="0" max="100" step="1"/,'The transfer confirmation is a continuous swipe slider');
+assert.match(glass,/--progress:0%/,'The slider track starts empty');
+assert.match(glass,/linear-gradient\(90deg,#4a88b4 0 var\(--progress\),transparent var\(--progress\) 100%\)/,'The blue track follows the slider progress');
+assert.match(html,/sdCheckoutConfirmWrap'\)\.style\.setProperty\('--progress',progress\+'%'\)/,'Slider fill updates continuously while moving');
 assert.match(html,/Xác nhận đã thanh toán/,'The slider uses the owner-requested confirmation copy');
 assert.match(html,/Tiến hành thanh toán →/,'The payment step uses a clear payment action label');
-assert.match(html,/function sdCheckoutAdvanceToOrderCode\(\)/,'Customer confirmation only advances the local order-code stage');
+assert.match(html,/function sdCheckoutAdvanceToOrderCode\(\)/,'The finalized order reveals its order-code stage');
 const confirmFlow=html.match(/function sdCheckoutAdvanceToOrderCode\(\)\{([\s\S]*?)\n\}/)?.[1]||'';
 assert.doesNotMatch(confirmFlow,/\bfetch\s*\(/,'The slider cannot write or refresh a payment receipt');
 assert.doesNotMatch(confirmFlow,/paymentSummary|netReceivedAmount|payment_status|payment-transactions/,'The slider cannot mutate payment truth');
+assert.match(html,/async function sdCheckoutFinalizeOrder\(\)[\s\S]*fetch\('\/api\/orders'/,'Only the completed slider creates the order');
+const checkoutSubmit=html.match(/\$\('#checkoutForm'\)\.addEventListener\('submit',[\s\S]*?(?=\$\('#detailOrderLink')/)?.[0]||'';
+assert.match(checkoutSubmit,/sdCheckoutLoadPaymentInstructions/,'The payment step prepares a read-only QR quote');
+assert.doesNotMatch(checkoutSubmit,/fetch\('\/api\/orders'/,'Opening the QR does not create an order');
+assert.match(create,/requestedTransferReference&&\(!qrSnapshot/,'Finalization refuses a stale or changed QR snapshot');
+assert.match(html,/progress>=100\?'Đang lấy mã đơn'/,'The slider changes to the requested loading label at completion');
+assert.match(html,/sdCheckoutOrderCreated\)return/,'The code stage cannot appear before order creation succeeds');
 assert.match(html,/button\.dataset\.detailPaymentOption=choice\.value/,'Product detail renders selectable deposit and full payment choices');
 assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displays the full-payment discount');
 assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice into checkout');
@@ -71,7 +85,7 @@ assert.match(html,/\.checkout-drawer \[hidden\]\{display:none!important\}/,'Hidd
 assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number explains how to copy it');
 assert.match(html,/Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng\./,'Deposit overpayment is explained in plain language');
 assert.match(html,/Số tiền thanh toán khi nhận hàng '\+formatVnd\(choice\.codExpected\)/,'Payment choices use clear delivery-payment wording');
-assert.match(html,/id="sdCheckoutDone"[^>]*>Đóng/,'The final button performs a real close action, not a disabled sent action');
+assert.match(html,/id="sdCheckoutDone"[^>]*>Lấy mã đơn/,'When QR is unavailable, order creation still happens only on explicit action');
 assert.match(html,/sd-checkout-success \.sd-checkout-actions\{grid-template-columns:minmax\(0,1fr\)\}/,'Success actions use the full footer width instead of the former narrow left column');
 assert.doesNotMatch(html,/Lưu mã đơn bên dưới để tra cứu|Đã gửi đơn\. Thông tin và mã đơn|Chọn phương thức hoặc gửi đơn không đồng nghĩa|COD còn phải thu/,'Old confusing confirmation copy is removed');
 assert.match(create,/paymentRequestWriteIndex[\s\S]*customer_checkout/,'Checkout creates a payment request from the Shop QR without writing a receipt');

@@ -271,14 +271,15 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  });
  await page.route('**/api/checkout-quote',async route=>{
   const body=route.request().postDataJSON();quoteBodies.push(body);
-  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,quoteReady:true,paymentReady:false,total:100000,options:[{value:'deposit',label:'Đặt cọc 30%',amount:100000,discountAmount:0,codExpected:0},{value:'full',label:'Thanh toán toàn bộ, giảm 5%',amount:95000,discountAmount:5000,codExpected:0}]})});
+  const prepared=Boolean(body.paymentOption),ref='0000-QA-WALLET-001-ABCD';
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,quoteReady:true,paymentReady:prepared,total:100000,options:[{value:'deposit',label:'Đặt cọc 30%',amount:100000,discountAmount:0,codExpected:0},{value:'full',label:'Thanh toán toàn bộ, giảm 5%',amount:95000,discountAmount:5000,codExpected:0}],...(prepared?{paymentOption:body.paymentOption,selectedPaymentAmount:body.paymentOption==='full'?95000:100000,transferReference:ref,paymentInstructions:{status:'ready',qrImageUrl:'/test-qr.svg',amount:body.paymentOption==='full'?95000:100000,qrIncludesAmount:false,bankName:'VIB',accountName:'KHACH KIEM THU',accountNumber:'477884',transferContent:ref}}:{})})});
  });
  let paymentRefreshRequests=0;
  await page.route('**/api/order-payment?*',async route=>{paymentRefreshRequests++;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',paymentReady:false,paymentTermsConfirmed:true,priceConfirmationRequired:false,total:100000,paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false}})})});
  await page.route('**/test-qr.svg',route=>route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="white"/><path d="M8 8h20v20H8zm28 0h20v20H36zM8 36h20v20H8zm28 0h8v8h-8zm12 8h8v12H48z" fill="black"/></svg>'}));
  await page.route('**/api/orders',async route=>{
   orderBodies.push(route.request().postDataJSON());
-  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:'preview-access-token-1234567890123456789012345678901234567890',status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentReady:true,paymentTermsConfirmed:true,paymentInstructions:{status:'ready',qrImageUrl:'/test-qr.svg',amount:100000,qrIncludesAmount:false,bankName:'VIB',accountName:'KHACH KIEM THU',accountNumber:'477884',transferContent:'SD-TEST-001'},message:'Shop sẽ xác nhận đơn.',paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false}})});
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:'preview-access-token-1234567890123456789012345678901234567890',status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentReady:true,paymentTermsConfirmed:true,paymentInstructions:{status:'ready',qrImageUrl:'/test-qr.svg',amount:100000,qrIncludesAmount:false,bankName:'VIB',accountName:'KHACH KIEM THU',accountNumber:'477884',transferContent:'0000-QA-WALLET-001-ABCD'},message:'Shop sẽ xác nhận đơn.',paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false}})});
  });
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
@@ -306,9 +307,9 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutOpenBank')).toHaveCount(0);
  await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
  await expect(page.locator('#sdCheckoutConfirmNote')).toContainText('Shop sẽ đối chiếu giao dịch');
- const writesAfterOrder=orderBodies.length;
+ expect(orderBodies).toHaveLength(0);
  await swipeToConfirmPayment(page);
- expect(orderBodies).toHaveLength(writesAfterOrder);
+ expect(orderBodies).toHaveLength(1);
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('SD-TEST-001');
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
  await expect(page.locator('#sdCheckoutStepSubtitle')).toHaveText('Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.');
