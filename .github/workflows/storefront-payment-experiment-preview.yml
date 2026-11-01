@@ -1,4 +1,5 @@
 name: Storefront payment experiment — isolated Preview
+# This branch's marked candidate push runs one guarded Preview deploy and browser pass.
 
 on:
   create:
