@@ -1326,7 +1326,7 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 .checkout-intro{flex:0 0 auto}
 .checkout-intro p{margin:0 0 4px;font-size:12px;font-weight:650;line-height:1.5}
 .checkout-intro small{display:block;color:var(--muted);font-size:10px;line-height:1.6}
-.checkout-drawer .checkout-form{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;margin:0;padding:0 3px 16px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start;grid-auto-rows:max-content}
+.checkout-drawer .checkout-form{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-padding-top:12px;margin:0;padding:0 3px 16px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start;grid-auto-rows:max-content}
 .checkout-drawer .checkout-fields{gap:9px;padding-bottom:6px}
 .checkout-drawer .checkout-fields input,.checkout-drawer .checkout-fields select,.checkout-drawer .checkout-fields textarea{min-height:42px;font-size:12px}
 .checkout-drawer .checkout-fields textarea{min-height:68px}
@@ -1872,7 +1872,8 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   .cart-drawer{display:flex;flex-direction:column}
   .cart-list{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
   .cart-bottom{padding-bottom:4px}
-  .checkout-drawer .checkout-form{padding-bottom:8px}
+  .checkout-drawer .checkout-form{padding-bottom:16px}
+  .checkout-drawer{background:var(--sd-glass-shell-strong,var(--sd-reference-surface-strong))}
   /* The full-screen viewer becomes a framed frosted gallery; no faux monogram is used as a logo. */
   .sd-fullscreen-header{display:none!important}
   .sd-fullscreen-stage{
