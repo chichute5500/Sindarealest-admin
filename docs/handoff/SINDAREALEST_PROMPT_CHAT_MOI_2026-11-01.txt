@@ -1,15 +1,59 @@
-TIẾP TỤC SINDAREALEST — KIỂM TRA TỒN ĐỌNG THEO % VÀ ĐỢI TÔI GIAO VIỆC
+TIẾP TỤC TRỰC TIẾP SINDAREALEST — PR #159 — ĐA LUỒNG THỰC CHẤT, KHÔNG KHỞI ĐỘNG LẠI
 
-REPO: chichute5500/Sindarealest-admin.
-BẮT BUỘC ĐỌC: docs/handoff/SINDAREALEST_MASTER_HANDOFF_2026-11-01.md trên branch fix/audit-2026-10, hoặc file .md tôi đính kèm. Đây là dự án đang làm dở, không làm lại Owner PASS.
+BẠN LÀ: Principal Storefront Engineer + Mobile UI/UX Motion + Performance + QA/Security.
+User/Owner đã yêu cầu TIẾP TỤC TRIỂN KHAI, không phải chỉ lập kế hoạch hay chờ giao lại. Nói tiếng Việt, ưu tiên giao diện mobile Xiaomi 15 Ultra.
 
-VIỆC ĐẦU TIÊN: CHỈ ĐIỀU TRA/BÁO CÁO, CHƯA SỬA CODE.
-- Kiểm tra lại main HEAD, Production deploy, PR #154/#155/#158/#159/#137/#139/#119/#120 và CI mới nhất đúng SHA. Các nhánh khác có thể đang thay đổi, không lấy số cũ làm mới.
-- D1 Production sindarealest-db đã PASS 0015–0017, PR #160 MERGED và Cloudflare Production deployment SUCCESS. Không làm lại D1; chỉ còn giám sát Rows Read/Written sau deploy theo traffic.
-- Đưa một bảng TOÀN DIỆN gồm: HẠNG MỤC | % HOÀN THÀNH | % CÒN LẠI | ĐÃ PASS | CÒN TỒN ĐỌNG | MỨC ƯU TIÊN | PR/NHÁNH. % phải có căn cứ; thiếu bằng chứng ghi chưa định lượng được.
-- Phân biệt code test PASS, Owner visual PASS và kiểm thử thực tế trên Xiaomi 15 Ultra. Không bịa visual parity >=95%; không nhầm trùng D1 trên PR #155/#159.
-- Đề xuất thứ tự công việc, sau đó DỪNG CHỜ TÔI GIAO ĐẦU VIỆC. Không commit/merge/deploy/thay database khi chỉ được yêu cầu đánh giá.
+REPO: chichute5500/Sindarealest-admin
+BRANCH DUY NHẤT: fix/audit-2026-10
+PR DUY NHẤT: #159 — OPEN/DRAFT, chưa merge.
+PREVIEW: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev/
+GITHUB: https://github.com/chichute5500/Sindarealest-admin/pull/159
 
-SAU KHI TÔI GIAO: làm trực tiếp trên nhánh/PR hiện hữu, đa luồng các tác vụ độc lập khi có công cụ thật, không chồng CSS, tự chụp CURRENT/TARGET, QA đúng SHA, không đụng Production chưa phê duyệt.
+BẮT BUỘC đọc đúng bản mới nhất trên nhánh #159 của:
+1) docs/handoff/SINDAREALEST_MASTER_HANDOFF_2026-11-01.md
+2) docs/handoff/SINDAREALEST_AUDIT_2026-11-01.md (lịch sử; HEAD và số đo cũ không thay cho hiện tại)
+3) AGENTS.md, docs/QA_RESOURCE_POLICY.md
+4) docs/handoff/SINDAREALEST_PROMPT_CHAT_MOI_2026-11-01.txt
+Sau đó kiểm tra lại PR HEAD/CI/Main/Preview revision và source thực, không hỏi lại Owner những điều đã có.
 
-TRẢ LỜI TIẾNG VIỆT, NGẮN GỌN, RÕ RÀNG. Tôi sẽ chọn phần tiếp theo sau khi xem bảng %.
+RANH GIỚI:
+- CHỈ sửa PR #159, không tạo branch/PR khác, không merge Main/Production khi chưa Owner PASS.
+- #154 đã MERGED, AI khác phụ trách Admin; bảo vệ giao diện Admin đã PASS.
+- #155 OPEN/DRAFT của AI khác; không can thiệp D1/performance branch đó.
+- #158 Owner tuyên bố dự án LỖI, đã CLOSED không merge; BỎ TOÀN BỘ, không sử dụng code/thiết kế.
+- #160 Production D1 đã MERGED và PASS, các migration 0015–0017 đã có Main; không làm lại, không chạy D1 migration Production.
+- Không ghi D1/R2 Production, giao dịch thật, secrets, tài khoản khách thật. Dùng tests GET-only/mocks/SQLite disposable.
+- Giữ 15 danh mục, thiết kế xanh nhạt Liquid Glass + Dark Gold, kính nổi mịn viền hồng/cyan, Hero/Gallery đã PASS; Welcome được Owner cho phép thiết kế/tối ưu lại nhưng Welcome MỚI CHƯA PASS.
+- Rules đặt hàng: hàng riêng cọc 30% làm tròn lên 100.000đ, hàng sẵn 100.000đ; thanh toán hết -5% + freeship; không QR khi chưa có giá; tracking 6 bước, bảo hành kích hoạt Hoàn thành.
+
+TRẠNG THÁI CHỐT (PHẢI REFRESH):
+- Source candidate e4cf36fd (commit tài liệu bàn giao sẽ đổi HEAD mới). Preview deploy SUCCESS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291532629
+- Full automated tests SUCCESS tại e4cf36fd: https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291532642
+- Mock Playwright mobile SUCCESS tại code dca65acf: https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291134877
+- Sửa xong tại source: lỗi F5 drawer checkout ló ra, header brand/tagline dính chữ trong lúc tải CSS, Welcome ngắn nhẹ hơn, 404 còn một main, #order tự mở, Zalo copy biến thể, scroll-reveal một lần. Đã chuyển 12 khối CSS trong body vào head, GIỮ nguyên 28/28 block và thứ tự cascade; bindReveal chạy trước API products.
+- PR diverged với Main: ahead 201, behind 156, 87 files, dirty/merge conflict; public/admin/index.html khác Main do các đợt tích hợp; TUYỆT ĐỐI không merge/cherry-pick đè phần Admin.
+- CSS vẫn chồng: 102 nhóm selector cùng ngữ cảnh, 70 nhóm khai báo giá trị khác; chưa chứng minh 70 lỗi. Đừng xóa tất cả hay thêm CSS override vá.
+- Chưa PASS: real-device F5/Welcome Light-Dark, mobile LCP/CLS/TBT/FPS sau sửa, ảnh so sánh với Owner reference, Google OAuth test thật, phone ownership, thanh toán sandbox đầy đủ và giải quyết conflict Main an toàn.
+- Lighthouse cũ ở 0c9faee: Home mobile 57/LCP 7.055s/CLS .02/TBT 719ms; Catalog mobile 62/LCP 11.434s/CLS .188/TBT 234ms. KHÔNG gọi đó là số mới.
+- Daily Workers Free reset 07:00 VN; xác minh quota hiện tại, không lấy quota hôm trước làm lý do ngừng làm.
+
+YÊU CẦU BẮT BUỘC ĐA LUỒNG:
+CHẠY CÁC CÔNG VIỆC ĐỘC LẬP SONG SONG BẰNG CÔNG CỤ THẬT. Nếu có agent/process đa luồng thì phân rõ quyền sở hữu file; nếu chỉ có tool connector thì Promise.all cho đọc/fetch song song, chạy test job độc lập và một coordinator commit tuần tự. KHÔNG tự nhận đang đa luồng nếu chỉ tuần tự; KHÔNG để thời gian đợi CI/Preview trống: trong khi job chạy hãy kiểm tra luồng khác. Không poll vô ích. Hạn chế số lần push/live request.
+
+LUỒNG A (CSS/Visual): phân tích 102/70 nhóm selector; xác minh header, Welcome, cart/account/checkout drawer ngay lúc parse HTML và F5; chụp 360/390px Light/Dark, giữ hiệu ứng kính; sửa tận gốc, không xếp lớp CSS chồng.
+LUỒNG B (Performance/SSR): đo LCP/CLS/TBT/FPS có kiểm soát, SSR→CSR hydration, font swap, image download; A/B responsive WebP thumbnails không đụng R2 gốc, không bật Image Resizing mất phí; giữ kết quả tốt, rollback thử nghiệm kém.
+LUỒNG C (Mobile QA): browser mock 360/390px, reload nhiều lần, slide modal, 4 bottom tabs đứng yên, route /sanpham và deep link, category chip, Google guest UI, checkout 3 bước, API địa chỉ offline/retry, bảo hành/tra cứu, keyboard, Back/Forward, reduced motion; screenshot BEFORE/AFTER đúng SHA.
+LUỒNG D (Security/Tests): regression source/unit, Turnstile/no secret, không rò giá ẩn, customer phone access, SEO/SSR/404, QA_RESOURCE_POLICY, request budgeting. Không gọi webhook/API write Production.
+LUỒNG E (Read-only Integration): compare Main vs #159, nhận diện file trùng Main (migrations/ADMIN), identify xung đột do #154, đề xuất cách giải quyết nhưng KHÔNG merge Main và KHÔNG sửa nhánh AI khác. Một người điều phối giữ lock file public/index.html; tích hợp patch tuần tự sau khi HEAD được xác minh.
+
+NGUYÊN TẮC ĐIỀU PHỐI:
+- Ngay khi bắt đầu: truy xuất HEAD, source, workflow và QA độc lập song song; xác định nhiệm vụ đầu tiên có thể hoàn thành.
+- LUỒNG A và B không được đồng thời ghi public/index.html. Các luồng khác chỉ viết script/test/file riêng. Trước mọi commit kiểm tra HEAD thực, tránh ghi đè.
+- Dùng local targeted tests trước, rồi npm run check, npm test, mocked Playwright, QA GET-only. Chụp so bản Preview và đo lần mới trên chính SHA đã deploy. Không trigger Preview liên tục mỗi commit; gộp batch, deploy 1 candidate khi sẵn sàng.
+- Phải thực sự sửa code, chạy test và tiếp tục các mục chưa hoàn thành; không dừng ở lời khuyên. Khi phát hiện regression FAIL, tìm nguyên nhân và sửa, không hạ yêu cầu hoặc xóa test.
+- Mọi kết luận phải tách CODE FIXED / CI PASS / PREVIEW PASS / OWNER PASS. Không gọi 60/120 FPS hoặc tương đồng >95% nếu chưa đo/so có căn cứ.
+- Chỉ đề nghị đưa lên Main khi đã rõ xung đột, có bằng chứng QA và Owner PASS.
+
+BÀN GIAO BẮT BUỘC MỖI LƯỢT: nhánh/PR/HEAD, danh sách các nhóm A–E với file và commit, link screenshot/Preview/CI, số đo Performance và điều kiện test, phần chưa PASS, conflict hiện tại, bước kế tiếp. Không dùng % tiến độ ước lượng như dữ liệu thật.
+
+BẮT ĐẦU TRIỂN KHAI NGAY TRÊN BRANCH #159. KHÔNG HỎI LẠI LỊCH SỬ. KHÔNG TỰ MERGE MAIN.

@@ -119,3 +119,24 @@ Giữ branch fix/audit-2026-10, không merge Main.
 Bạn là Principal Frontend/QA/Performance Engineer tiếp tục **trực tiếp** SinDarealest Storefront trong repo chichute5500/Sindarealest-admin, branch fix/audit-2026-10, PR #159 OPEN/DRAFT. ĐỌC FILE NÀY trước; không hỏi lại lịch sử, không làm lại các mục Owner PASS, không làm demo/ZIP, không merge Main, không chạm D1/R2 Production hoặc giao dịch thật.
 
 **YÊU CẦU ĐA LUỒNG VÀ TRÁNH THỜI GIAN CHỜ VÔ ÍCH:** kiểm tra PR HEAD mới nhất (source checkpoint 0c9faee; docs/workflow commit có thể mới hơn), CI 41233007424 (SUCCESS, số liệu ghi phía trên), Preview source revision, ảnh chụp và mã nguồn **đồng thời**; chia luồng độc lập A (Welcome/theme-bg CLS), B (SSR catalog/LCP/R2), C (Mobile Light/Dark visual/checkout), D (QA/security/CI). Dùng parallel tools/processes thật, không giả vờ có subagents; khóa ghi vào một file và tích hợp bằng commit có trình tự. Khi CI chờ, xử lý vấn đề khác; không liên tục push khiến CI bị cancel. Sửa đúng nguyên nhân, bảo toàn kính Liquid Glass đã duyệt; đo A/B và tự chụp đối chiếu. Tự test và commit trên branch, chạy một vòng final Preview/Lighthouse, báo SHA, số điểm, PASS/FAIL và tồn đọng. Đừng gọi hoàn tất khi chưa có bằng chứng; chỉ xin Owner PASS trước merge.
+
+---
+
+## CHECKPOINT MỚI NHẤT — 01/11/2026 — PR #159, mobile F5, CSS first paint, Welcome
+
+**ĐÂY LÀ CHECKPOINT ĐƯỢC BỔ SUNG SAU NHỮNG PHẦN HANDOFF LỊCH SỬ PHÍA TRÊN.** Master handoff + prompt cùng thư mục là nguồn hướng dẫn ưu tiên. Mọi HEAD/CI lịch sử phía trên có thể lỗi thời.
+
+- Repo: chichute5500/Sindarealest-admin; branch: fix/audit-2026-10; PR #159 OPEN/DRAFT, không merge, không Production. Trước commit tài liệu này, HEAD e4cf36fd30326d8b7c81f6a2913e15cdfbca8df2; sau khi cập nhật file phải re-fetch HEAD.
+- #154 đã MERGED (Owner/AI khác, bảo vệ Admin), #155 OPEN/DRAFT AI khác, #158 Owner bỏ vì lỗi và PR CLOSED không merge, #160 D1 Production MERGED/PASS, tuyệt đối không làm lại.
+- Owner chấp thuận tối ưu thiết kế Welcome (cũ không ưng); Welcome mới được cập nhật source nhưng CHƯA được Owner PASS.
+- Commit 13f6de0d: wrapper 404 thành div để còn đúng một main; #order auto expand; tư vấn Zalo + biến thể; reveal một lần bằng unobserve; Welcome rút gọn, rim pink/cyan, 1050ms.
+- Commit fac442ff: Welcome h2, Hero h1; subset WOFF2 bảo toàn tiếng Việt + hợp đồng kiểm tra.
+- Commit afc8ebe9: chặn cart/checkout drawer ló ra khi F5 với visibility:hidden ban đầu, chỉ xóa guard khi mở thật; browser mock QA reload.
+- Commits dca65acf, 3534e70e, 80ab246d, c78d8d95, 73bc8450: Owner chụp header “SinDarealestThời Trang Da Cá Sấu” dính chữ khi F5 và vùng trống dưới Hero; điều tra thấy 28 inline style blocks, 12 in-body (~128 KB), đã chuyển tất cả 28 vào head theo nguyên thứ tự và giữ nguyên nội dung CSS; bindReveal(document) trước await products API; test mới quan sát brand tại thời điểm parse.
+- e4cf36fd: Preview-only dispatch; current deployed candidate SUCCESS, https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291532629; source/test SUCCESS https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291532642; mock mobile checkout và header early parse PASS tại dca65acf https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291134877.
+- CSS audit read-only ở CI: 102 nhóm selector/context lặp, 70 nhóm có giá trị khác nhau; KHÔNG được gọi tất cả là bug, chưa dọn hết. Tính theo source lúc kiểm tra: 28 style blocks trong head, 0 trong body.
+- LCP/CLS/TBT sau thay đổi cuối chưa được đo và so A/B đúng cùng điều kiện. Số lịch sử ở SHA 0c9faee: Home mobile Performance 57/LCP 7.055s/CLS .02/TBT 719ms; Catalog mobile Performance 62/LCP 11.434s/CLS .188/TBT 234ms. Cần đo mới, không claim performance PASS.
+- PR #159 hiện diverged với Main: ahead 201, behind 156, 87 files và trạng thái GitHub dirty/merge conflict. public/admin/index.html khác Main; migrations 0015–0017 giống blob Main; bảo vệ #154 và PR #155. Không merge hoặc overwrite Main khi chưa được Owner PASS.
+- Outstanding P0: nghiệm thu F5 và Welcome trên Xiaomi thật, đối chiếu ảnh 360/390px Light/Dark; performance LCP/CLS/TBT/FPS mới; kiểm thử drawer/checkout và Google OAuth/sandbox an toàn; xử lý CSS ghi đè có chủ đích; an toàn tích hợp Main.
+- BẮT BUỘC THỰC HIỆN ĐA LUỒNG CÓ THẬT: A CSS/visual, B Perf/SSR, C Mobile/checkout browser QA, D Security/tests, E read-only Main integration. Đọc/đo/test độc lập chạy song song; khóa ghi source chung public/index.html và commit tuần tự; gộp patch rồi mới Preview 1 candidate; không bỏ thời gian chờ CI vô ích. Xem chỉ dẫn chi tiết tại MASTER HANDOFF và PROMPT CHAT MỚI.
+- Chỉ phụ trách PR #159, không tạo PR khác, không dùng #158, không chạm Production D1/R2, không sửa #154/#155, không merge Main, không tự công bố Owner PASS.
