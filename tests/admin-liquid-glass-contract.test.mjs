@@ -9,14 +9,15 @@ function has(value, label) {
 
 // Approved ADMIN visual tokens and both theme surfaces.
 has('--bg:#eaf3fb;', 'ice-blue light background token');
-has('--ink:#142a3c;', 'navy light text token');
+has('--ink:var(--sd-admin-ink);', 'one shared Admin foreground token');
+has('--sd-admin-ink:#091632;', 'reference navy light text token');
 has('--gold:#5c91b9;', 'blue accent token');
-has('--bg:#09131d;', 'dark background token');
-has('--ink:#eaf3fb;', 'dark text token');
+has('--bg:#061522;', 'dark background token aligned with Storefront');
+has('--ink:#edf7ff;', 'dark text token aligned with Storefront');
 has('backdrop-filter:blur(22px)', 'liquid-glass blur layer');
 has('data-admin-theme="dark"', 'dark-theme rules');
 has('id="adminThemeColor" content="#eaf3fb"', 'light Android browser chrome theme color');
-has("themeColor.setAttribute('content',dark?'#09131d':'#eaf3fb')", 'dynamic dark/light Android browser chrome color');
+has("themeColor.setAttribute('content',dark?'#061522':'#eaf3fb')", 'dynamic dark/light Android browser chrome color');
 assert.ok(adminHtml.indexOf("Apply the saved/system theme before styles paint") < adminHtml.indexOf('<style>'), 'Theme selection must run before CSS to reduce theme flash');
 has("$('#backdrop').classList.add('hidden')", 'editor overlay reset before login session check');
 has('prefers-reduced-motion:reduce', 'reduced-motion support');
@@ -139,7 +140,7 @@ assert.ok(websiteSettingsOrder.every((position, index) =>
 // Screen 10 and Screen 11 are separate views, not one long Settings page.
 const settingsPageStart = adminHtml.indexOf('function settingsPage(){');
 const backupPageStart = adminHtml.indexOf('function backupPage(){');
-const renderFunctionStart = adminHtml.indexOf('function render(){');
+const renderFunctionStart = adminHtml.indexOf('function render(motion=null){');
 assert.ok(settingsPageStart >= 0 && backupPageStart > settingsPageStart && renderFunctionStart > backupPageStart,
   'Website settings and Backup/Restore must have distinct render functions');
 const settingsPageSource = adminHtml.slice(settingsPageStart, backupPageStart);
@@ -180,9 +181,9 @@ for (const [width, height] of [
 }
 assert.match(baselineSpec, /for \(const theme of \['light', 'dark'\]\)/,
   'The required viewport matrix must continue capturing both light and dark themes');
-assert.match(adminHtml, /\.editorhead\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
+assert.match(adminHtml, /\.editorhead\{[^}]*background:var\(--sd-admin-sheet-face\);color:var\(--ink\)/,
   'Editor header must follow the active theme surface/text tokens');
-assert.match(adminHtml, /\.editorfooter\{[^}]*background:var\(--paper\);color:var\(--ink\)/,
+assert.match(adminHtml, /\.editorfooter\{[^}]*background:var\(--sd-admin-sheet-face\);color:var\(--ink\)/,
   'Editor footer must follow the active theme surface/text tokens');
 assert.match(adminHtml, /id="editorClose"[^>]*aria-label="Quay lại danh sách sản phẩm"[^>]*><svg[^>]*aria-hidden="true"/,
   'Editor back control should use an accessible SVG icon');
@@ -342,16 +343,23 @@ has('#imageGrid .image-rail .imageitem{flex:0 0 56px;width:56px;scroll-snap-alig
 has('#backdrop>.editor{display:flex;flex-direction:column;padding-bottom:0}', 'product editor does not leave a trailing gutter below its sticky footer');
 has('@media(min-width:681px){#backdrop>.editor>.editorhead{padding-top:10px;padding-bottom:10px}#backdrop>.editor>form>.editorcontent{gap:12px}}', 'desktop product price and stock fields clear the sticky action footer at the initial scroll position');
 has('#backdrop>.editor>form>.editorcontent{flex:1 1 0%;min-height:0;overflow-y:auto;align-content:start;grid-auto-rows:max-content;padding-bottom:calc(24px + env(safe-area-inset-bottom))}', 'editor content remains scrollable inside its bounded region while not stretching tab rows');
-has('#backdrop{top:70px;bottom:calc(66px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header and above bottom navigation without a dimmed backdrop');
-has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:0;box-shadow:none;background:var(--bg);overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
+has('#backdrop{top:70px;bottom:calc(60px + env(safe-area-inset-bottom));align-items:stretch;justify-content:stretch;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}', 'mobile product editor stays below the app header with breathing room above bottom navigation');
+has('#backdrop>.editor{width:100%;max-width:none;height:100%;max-height:100%;border-radius:20px;overflow:hidden}', 'mobile product editor fills only the space between app chrome and keeps footer layout contained');
+assert.ok(adminHtml.includes('.editor,.notification-panel,.mobile-more-panel,.admin-glass-dialog,.logincard,.product-category-grid,.product-quick-editor,.toast{--sd-admin-surface-face:var(--sd-admin-sheet-face)}'), 'Product editor surface material comes from the shared sheet token owner');
 has('#productEditorTabs{position:sticky;top:0;height:48px;min-height:48px;max-height:48px;gap:3px;padding:4px}', 'mobile product editor tabs stay compact without covering form fields');
 has('.product-editor-tabs{position:sticky;top:0;z-index:3;', 'desktop editor tabs stick at the top of their own scroll viewport without covering gallery headings');
 has('.product-mobile-status,.product-mobile-meta,.product-mobile-actions,.product-mobile-inline-meta{display:none}', 'mobile-only product facts and actions do not alter desktop table layout');
 has('#main .product-table tbody tr td:nth-child(n+2){display:none!important}', 'mobile product card consolidates existing table facts without duplicating visible rows');
+const repeatedGlassRule = adminHtml.match(/\/\* Repeated\/nested surfaces share one glass shell without another blur layer per item\. \*\/\s*[^{}]+\{([^}]*)\}/)?.[1] || '';
+assert.match(repeatedGlassRule, /sd-admin-shadow/, 'repeated glass rows keep their shared shell and contact shadow');
+assert.doesNotMatch(repeatedGlassRule, /backdrop-filter/, 'repeated rows avoid stacking expensive blur layers on long lists');
+const productListMarkup = adminHtml.match(/function productList\(\)\{[\s\S]*?\nfunction orderProductImageMarkup/)?.[0] || '';
+assert.doesNotMatch(productListMarkup, /data-action="edit"/, 'product rows open the editor without a separate edit button');
+assert.doesNotMatch(productListMarkup, /Tồn kho|Chưa kiểm kê|Hết hàng|stock\(p\)/, 'inventory remains out of the product list');
 has('class="thumb product-thumb-placeholder" role="img" aria-label="Chưa có ảnh sản phẩm"', 'missing product images use an explicitly labelled placeholder, not a generic branded texture');
 has('.product-thumb-placeholder{display:grid;place-items:center;box-sizing:border-box;', 'missing-image placeholder remains a visual, bounded thumbnail');
-has('#main .product-table .product-mobile-inline-meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;align-items:start;margin-top:3px;max-width:100%}', 'mobile product price and stock are grouped compactly beneath product identity');
-has('#main .product-table .product-mobile-inline-metric{display:flex;align-items:baseline;gap:3px;min-width:0;font-size:9px;line-height:1.1;white-space:nowrap}', 'mobile price and stock labels share a single compact baseline');
+has('#main .product-table .product-mobile-inline-meta{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;align-items:start;margin-top:3px;max-width:100%}', 'mobile product price appears beneath product identity without adding inventory');
+has('#main .product-table .product-mobile-inline-metric{display:flex;align-items:baseline;gap:3px;min-width:0;font-size:9px;line-height:1.1;white-space:nowrap}', 'mobile price label remains compact and readable');
 has('#main .product-table .prodname{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}', 'long product titles truncate neatly without increasing mobile card height');
 has('#main .product-table .product-row-info .sku{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}', 'SKU/category context wraps to two lines on 320–360px phones instead of losing its visible tail');
 has('class="prodname" title="${esc(p.title)}"', 'full product titles remain available via a title attribute when visually truncated');
@@ -376,11 +384,19 @@ has('#backdrop>.editor>form>.editorfooter{flex-shrink:0;margin-top:auto}', 'mobi
 has('@media(max-width:360px){#backdrop>.editor>form>.editorfooter{gap:6px;padding-left:8px;padding-right:8px}', 'narrow-phone gallery actions use a compact single-row footer');
 has('#backdrop>.editor>form>.editorfooter .btn{padding-inline:9px;font-size:10px;white-space:nowrap}', 'narrow-phone gallery action labels remain on one line');
 
+has('--sd-admin-stat-face:linear-gradient(180deg,transparent 15%,rgba(255,255,255,.20)', 'stat faces retain blue transmission without a broad white wash');
+has('--sd-admin-sheet-face:linear-gradient(135deg,rgba(241,249,255,.68),rgba(204,229,248,.52))', 'sheet surfaces remain translucent across More, editor and notification routes');
+has('--sd-admin-rim:linear-gradient(132deg,rgba(247,190,224,.69)', 'shared glass rim keeps one restrained pink-blue-cyan edge');
+assert.doesNotMatch(adminHtml, /\.order-management-details::after/, 'Order disclosure wrapper must not stack a second glass rim around its nested control');
+has('#main .order-table .order-management-summary{--sd-admin-surface-face:var(--sd-admin-tile-face)', 'Order management disclosure summary owns the single nested interactive glass surface');
+has('.imagebuttons button{width:29px;height:28px;display:grid;place-items:center;padding:0;border:1px solid var(--sd-glass-input-edge)', 'Product gallery actions use the shared interactive glass tokens');
+has('.gallery-trash{display:flex;align-items:center;justify-content:center;width:54px;height:50px;border:1px solid transparent', 'Product gallery drop target uses the shared glass material');
+
 
 
 console.log('PASS ADMIN ice-glass visual tokens, accessible SVG gallery controls, login contract, CSS selector matching, responsive order-row capture, and required API route strings');
 
-const renderStart = adminHtml.indexOf('function render(){');
-assert.ok(renderStart >= 0 && adminHtml.slice(renderStart, renderStart + 600).includes("settingsPage();$$('[data-view]').forEach"),
+const renderStart = adminHtml.indexOf('function render(motion=null){');
+assert.ok(renderStart >= 0 && adminHtml.slice(renderStart, renderStart + 2000).includes("$$('[data-view]').forEach"),
   "Admin render must iterate every navigation button; single-element querySelector cannot be used with forEach");
 console.log("PASS: Admin render iterates all nav controls via querySelectorAll helper.");

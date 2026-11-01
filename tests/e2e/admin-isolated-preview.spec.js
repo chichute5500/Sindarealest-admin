@@ -2,7 +2,11 @@ import { test, expect } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const adminUrl = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/'; // Pin all remote QA to the isolated Admin project.
+const adminUrl = process.env.ADMIN_TEST_URL || 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/';
+const approvedAdminPreviewHosts = new Set([
+  'feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev',
+  'admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev'
+]);
 const adminPassword = process.env.ADMIN_TEST_PASSWORD;
 const accessClientId = process.env.CF_ACCESS_CLIENT_ID;
 const accessClientSecret = process.env.CF_ACCESS_CLIENT_SECRET;
@@ -76,7 +80,7 @@ async function openLoginPage(page, testInfo) {
     const previewTargetUrl = new URL(adminUrl);
     if (
       previewTargetUrl.protocol !== 'https:' ||
-      previewTargetUrl.hostname !== 'feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev' ||
+      !approvedAdminPreviewHosts.has(previewTargetUrl.hostname) ||
       previewTargetUrl.pathname !== '/admin/'
     ) {
       throw new Error('unsafe Preview target');
@@ -303,6 +307,19 @@ test.describe('SinDarealest2 Admin Preview', () => {
     try {
       await expect(page.locator('#appView')).toBeVisible({ timeout: 20_000 });
       await expect(page.locator('#logout')).toBeVisible();
+      await expect.poll(async () => Number((await page.locator('#main .stat .value').first().textContent())?.trim()), {
+        timeout: 15_000
+      }).toBeGreaterThan(0);
+      await page.setViewportSize({ width: 432, height: 720 });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect(page.locator('.mobiletabs')).toBeVisible();
+      await expect(page.locator('.toast.show')).toBeHidden({ timeout: 6_000 });
+      mkdirSync(evidenceDir, { recursive: true });
+      await page.screenshot({
+        path: join(evidenceDir, 'dashboard-live-432x720.png'),
+        fullPage: false,
+        animations: 'disabled'
+      });
     } catch (error) {
       const loginError = redact(await page.locator('#loginError').textContent().catch(() => ''));
       const safeDetails = {
@@ -472,9 +489,8 @@ test.describe('SinDarealest2 Admin Preview', () => {
     await page.locator('#searchBox').fill(target.sku);
     await expect(rows).toHaveCount(1);
     stage('opening-product-editor');
-    // Each product row renders a desktop edit button and a mobile edit button;
-    // select the visible one so Playwright does not wait on the hidden responsive variant.
-    await rows.first().locator('button[data-action="edit"]:visible').first().click();
+    // Product rows open the editor on row activation; no separate edit button is rendered.
+    await rows.first().locator('.prodname').click();
     stage('product-editor-click-completed');
     await expect(page.locator('#backdrop')).toBeVisible();
     await expect(page.locator('#pId')).toHaveValue(target.id);

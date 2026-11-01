@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - feature/admin-isolated-handoff-2026-10-20
+      - feat/admin-liquid-glass-2-2026-10-30
+      - fix/admin-mobile-dock-forward-jump-20261101
     paths:
       - 'public/admin/index.html'
       # Ship tested Admin API fixes as well as UI changes, never a Storefront or main deployment.
@@ -29,6 +31,16 @@ on:
       - 'tests/e2e/admin-wcag-axe.spec.js'
       - 'tests/admin-reference-visual-contract.test.mjs'
       - 'tests/admin-liquid-glass-contract.test.mjs'
+      - 'tests/admin-liquid-glass-2-contract.test.mjs'
+      - 'tests/owner-css-parity-security-audit.test.mjs'
+      # Refresh exact-source provenance after Preview QA or reference capture changes.
+      - 'scripts/admin-preview-provenance-readonly.mjs'
+      - 'tests/admin-preview-provenance.test.mjs'
+      - 'tests/e2e/admin-static-baseline.spec.js'
+      - 'tests/e2e/admin-reference-same-data-qa.spec.js'
+      - 'tests/e2e/admin-isolated-preview.spec.js'
+      - 'tests/e2e/admin-12-screen-live-qa.spec.js'
+      - 'tests/e2e/admin-mobile-dock-motion.spec.js'
 
 permissions:
   contents: read
@@ -47,16 +59,17 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       # Pin this manual workflow to the isolated Admin project; never use the shared storefront variable.
       CLOUDFLARE_PAGES_PROJECT: sindarealest-admin-preview
-      PREVIEW_BRANCH: feature-admin-isolated-handoff-2026-10-20
+      PREVIEW_BRANCH: ${{ github.ref_name == 'fix/admin-mobile-dock-forward-jump-20261101' && 'admin-dock-jump-2026-11-01' || 'admin-glass-2026-10-30' }}
+      ADMIN_PREVIEW_ALIAS: ${{ github.ref_name == 'fix/admin-mobile-dock-forward-jump-20261101' && 'https://admin-dock-jump-2026-11-01.sindarealest-admin-preview.pages.dev/admin/' || 'https://admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev/admin/' }}
     steps:
       - name: Guard exact feature branch
         shell: bash
         run: |
           set -euo pipefail
-          test "${GITHUB_REF}" = "refs/heads/feature/admin-isolated-handoff-2026-10-20" || {
-            echo "::error::This workflow may only run from the ADMIN feature branch."
-            exit 1
-          }
+          case "${GITHUB_REF}" in
+            refs/heads/feature/admin-isolated-handoff-2026-10-20|refs/heads/feat/admin-liquid-glass-2-2026-10-30|refs/heads/fix/admin-mobile-dock-forward-jump-20261101) ;;
+            *) echo "::error::This workflow may only run from an approved ADMIN feature branch."; exit 1 ;;
+          esac
           test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
           test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
           test "$CLOUDFLARE_PAGES_PROJECT" = "sindarealest-admin-preview" || {
@@ -81,6 +94,14 @@ jobs:
         run: |
           npm run check
           npm test
+      - name: Check mobile dock motion with local fixture before deploying
+        if: ${{ github.ref_name == 'fix/admin-mobile-dock-forward-jump-20261101' }}
+        env:
+          ADMIN_DOCK_FIXTURE: '1'
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+          npx playwright test tests/e2e/admin-mobile-dock-motion.spec.js --reporter=line
       - name: Check deploy dependencies for known high severity advisories
         run: npm audit --omit=dev --audit-level=high
 
@@ -122,6 +143,18 @@ jobs:
 
       - name: Confirm latest source SHA is mapped to isolated Preview alias
         run: node scripts/qa-admin-preview-deployed-sha.mjs
+
+      - name: Run focused authenticated mobile dock QA on this candidate
+        if: ${{ github.ref_name == 'fix/admin-mobile-dock-forward-jump-20261101' }}
+        env:
+          ADMIN_TEST_URL: https://admin-dock-jump-2026-11-01.sindarealest-admin-preview.pages.dev/admin/
+          ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$ADMIN_TEST_PASSWORD" || { echo "::error::Missing ADMIN_TEST_PASSWORD secret"; exit 1; }
+          npx playwright test tests/e2e/admin-mobile-dock-motion.spec.js --reporter=line
 
       - name: Print expected Preview alias
         run: |

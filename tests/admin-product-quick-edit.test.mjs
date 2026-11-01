@@ -89,7 +89,7 @@ for(const marker of [
  "galleryGrid.addEventListener('pointerdown'",
  "galleryGrid.addEventListener('pointermove'",
  "galleryGrid.addEventListener('pointerup'",
- 'showHeldGalleryPreview(index)','hideHeldGalleryPreview()',
+ 'showHeldGalleryPreview(index,point=null)','hideHeldGalleryPreview()',
  "if(target.type==='trash')removeGalleryImage(from)",
  'id="galleryTrash"','gallery-held-preview','gallery-drag-ghost'
 ]) assert.ok(admin.includes(marker),'Missing Owner-requested interaction: '+marker);

@@ -99,7 +99,7 @@ for(const cfg of tests){
   expect(mode.theme).toBe(cfg.os);
   expect(mode.scheme).toContain(cfg.os);
   expect(mode.scheme).toContain('only');
-  expect(mode.background).toBe(cfg.os==='dark'?'#09131d':'#eaf3fb');
+  expect(mode.background).toBe(cfg.os==='dark'?'#061522':'#eaf3fb');
   expect(mode.ink).toBe(cfg.os==='dark'?'#eaf3fb':'#142a3c');
   expect(mode.accent).toBe(cfg.os==='dark'?'#8ebce0':'#5c91b9');
   expect(mode.logo).toBe(true);

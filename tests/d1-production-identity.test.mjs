@@ -1,0 +1,13 @@
+import assert from "node:assert/strict";
+import {assertProductionIdentity} from "../scripts/d1-production-only-0016-0017.mjs";
+const id="11111111-1111-4111-8111-111111111111",other="22222222-2222-4222-8222-222222222222";
+const prod={id:"p",name:"sindarealest2",production_branch:"main",deployment_configs:{production:{d1_databases:{DB:{id}}}}};
+const preview={id:"v",name:"sindarealest-admin-preview",deployment_configs:{preview:{d1_databases:{DB:{id:other}}}}};
+const meta={uuid:id,name:"sindarealest-db"};
+assert.deepEqual(assertProductionIdentity(prod,preview,meta),{id,name:meta.name});
+assert.throws(()=>assertProductionIdentity(prod,preview,{...meta,name:"sindarealest-admin-preview-db"}),/name mismatch/);
+assert.throws(()=>assertProductionIdentity({...prod,production_branch:"fix/audit-2026-10"},preview,meta),/not main/);
+assert.throws(()=>assertProductionIdentity({...prod,deployment_configs:{production:{d1_databases:{DB:{id:other}}}}},preview,meta),/matches Preview/);
+assert.throws(()=>assertProductionIdentity(prod,{...preview,id:prod.id},meta),/not isolated/);
+assert.throws(()=>assertProductionIdentity(prod,preview,{...meta,uuid:other}),/metadata ID mismatch/);
+console.log("PASS: guarded Production-only D1 identity checks.");

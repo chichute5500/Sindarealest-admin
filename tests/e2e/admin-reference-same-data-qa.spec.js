@@ -57,7 +57,8 @@ test('reference-comparable Admin products use labelled synthetic prices and genu
   const folder=join(root,'artifacts','admin-reference-same-data',String(process.env.GITHUB_SHA||'local').slice(0,12));
   mkdirSync(folder,{recursive:true});
   const captures=[];
-  for(const viewport of [{width:390,height:844},{width:412,height:915},{width:1280,height:800}]){
+  // The first viewport matches the supplied phone's usable app area, excluding OS bars.
+  for(const viewport of [{width:390,height:650},{width:390,height:844},{width:412,height:915},{width:1280,height:800}]){
     await page.setViewportSize(viewport);
     for(const theme of ['light','dark']){
       if((await page.locator('html').getAttribute('data-admin-theme'))!==theme)
@@ -84,7 +85,7 @@ test('reference-comparable Admin products use labelled synthetic prices and genu
   await page.setViewportSize({width:390,height:844});
   if((await page.locator('html').getAttribute('data-admin-theme'))!=='light')
     await page.locator('#adminThemeToggle').click();
-  await page.locator('#main .product-table [data-action="edit"]').first().click();
+  await page.locator('#main .product-table tbody tr[data-product-row] .prodname').first().click();
   await expect(page.locator('#backdrop .editor')).toBeVisible();
   await expect(page.locator('#pTitle')).toHaveValue(fixtureProducts[0].title);
   await page.screenshot({path:join(folder,'04_product_editor_populated_390x844_light.png'),animations:'disabled'});
