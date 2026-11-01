@@ -4679,6 +4679,16 @@ function sdDetailUpdatePaymentChoice(){
 }
 function customerPriceLabel(product){return hasConfirmedPublicPrice(product)?formatVnd(product.price):''}
 function formatVnd(value){return new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(Number(value))+'₫'}
+// Visual-only, zero-network scroll edge indicator. Avoid permanently masking
+// the first/last items when no more content exists in that direction.
+function sdUpdateDrawerScrollEdges(el){
+ if(!el)return;
+ const overflow=el.scrollHeight>el.clientHeight+2;
+ el.classList.toggle('sd-scroll-can-up',overflow&&el.scrollTop>2);
+ el.classList.toggle('sd-scroll-can-down',overflow&&el.scrollTop+el.clientHeight<el.scrollHeight-2);
+}
+function sdSyncDrawerScrollEdges(){sdUpdateDrawerScrollEdges($('#cartList'));sdUpdateDrawerScrollEdges($('#checkoutForm'))}
+function sdQueueDrawerScrollEdges(){requestAnimationFrame(sdSyncDrawerScrollEdges)}
 function renderCart(){
  const entries=cartEntries(),selected=selectedCartEntries();
  const itemCount=entries.reduce((sum,item)=>sum+item.q,0),selectedCount=selected.reduce((sum,item)=>sum+item.q,0);
@@ -4689,7 +4699,7 @@ function renderCart(){
  if(!entries.length){
   $('#cartList').innerHTML='<div class="empty-cart">Giỏ hàng đang trống.<br>Hãy chọn sản phẩm bạn quan tâm.</div>';
   $('#cartSubtotal').textContent='—';
-  return;
+  sdQueueDrawerScrollEdges();return;
  }
  const allPriced=selected.length>0&&selected.every(({p})=>hasConfirmedPublicPrice(p));
  $('#cartList').innerHTML=entries.map(({p,q,key,option})=>{
@@ -4700,6 +4710,7 @@ function renderCart(){
  }).join('');
  const subtotal=selected.reduce((sum,{p,q})=>sum+(hasConfirmedPublicPrice(p)?Number(p.price)*q:0),0);
  $('#cartSubtotal').textContent=selected.length?(allPriced?formatVnd(subtotal):selected.some(({p})=>hasConfirmedPublicPrice(p))?formatVnd(subtotal)+' (chưa gồm sản phẩm chờ báo giá)':'Chờ báo giá'):'—';
+ sdQueueDrawerScrollEdges();
 }
 function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
 function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';const target=cartReturnFocus;cartReturnFocus=null;if(restoreFocus&&wasOpen)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';const fallback=$('#cartOpen')||$('#mobileCartNav');(available?target:fallback)?.focus({preventScroll:true})},0)}
@@ -4765,7 +4776,7 @@ function sdCheckoutSetStep(step){
  [[1,'#sdCheckoutShippingStep'],[2,'#sdCheckoutPaymentStep']].forEach(([n,id])=>$(id).hidden=n!==sdCheckoutStep);
  $('#sdCheckoutReviewAddressRow').hidden=sdCheckoutStep!==2;
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
- $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;
+ $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;sdQueueDrawerScrollEdges();
  sdCheckoutSummary('#sdCheckoutItemSummary');
  if(sdCheckoutStep===2){
   const f=$('#checkoutForm').elements;
@@ -5001,6 +5012,9 @@ function sdTrackRender(orders){
  result.hidden=orders.length===0;
 }
 function bindEvents(){
+ // Bind once; passive scroll events only update the two fade classes.
+ for(const el of [$('#cartList'),$('#checkoutForm')])el?.addEventListener('scroll',()=>sdUpdateDrawerScrollEdges(el),{passive:true});
+ window.addEventListener('resize',sdQueueDrawerScrollEdges,{passive:true});
  window.addEventListener('hashchange',()=>{if(location.hash==='#order')ensureOrderGuideOpen()});
  if(location.hash==='#order')ensureOrderGuideOpen();
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
@@ -5153,7 +5167,7 @@ function sdCheckoutAdvanceToOrderCode(){
  $('#sdCheckoutDone').hidden=false;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';
  $('#sdCheckoutStepTitle').textContent='Mã đơn hàng';
  $('#sdCheckoutStepSubtitle').textContent='Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.';
- $('#checkoutForm').scrollTop=0;
+ $('#checkoutForm').scrollTop=0;sdQueueDrawerScrollEdges();
 }
 async function sdCheckoutFinalizeOrder(){
  if(!sdCheckoutSuccess||sdCheckoutOrderCreated)return;
