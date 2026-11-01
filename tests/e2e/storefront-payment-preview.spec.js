@@ -77,6 +77,22 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible({timeout:15000});
  expect(divisionRequests).toBeGreaterThan(0);
+ const review=page.locator('#sdCheckoutReviewAddressRow');
+ await expect(review).toBeVisible();
+ await expect(review.locator('strong')).toHaveText('Địa chỉ nhận hàng');
+ await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Khách kiểm tra Preview');
+ await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Địa chỉ thử nghiệm Preview');
+ const addressLayout=await review.evaluate(card=>{
+  const b=card.getBoundingClientRect(),nav=document.querySelector('#sdCheckoutStepper').getBoundingClientRect(),intro=document.querySelector('.checkout-intro').getBoundingClientRect();
+  const heading=getComputedStyle(card.querySelector('strong')),content=getComputedStyle(card.querySelector('p')),surface=getComputedStyle(card);
+  return {belowInfo:b.top>=nav.bottom-1,abovePayment:b.bottom<=intro.top+1,edgeLeft:b.left,edgeRight:innerWidth-b.right,paddingLeft:parseFloat(surface.paddingLeft),headingWeight:parseInt(heading.fontWeight,10),contentSize:parseFloat(content.fontSize)};
+ });
+ expect(addressLayout.belowInfo&&addressLayout.abovePayment,'Address must sit between the information stepper and payment title').toBe(true);
+ expect(addressLayout.edgeLeft).toBeGreaterThanOrEqual(12);
+ expect(addressLayout.edgeRight).toBeGreaterThanOrEqual(12);
+ expect(addressLayout.paddingLeft).toBeGreaterThanOrEqual(13);
+ expect(addressLayout.headingWeight).toBeGreaterThanOrEqual(700);
+ expect(addressLayout.contentSize).toBeGreaterThanOrEqual(11);
  await expect(page.locator('#sdCheckoutShippingStep')).toBeHidden();
  await expect(page.locator('#checkoutDrawer input[name="fullName"]')).toHaveValue('Khách kiểm tra Preview');
  await expect(page.locator('#checkoutDrawer input[name="phone"]')).toHaveValue('0900000000');
@@ -123,6 +139,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
+ await expect(review).toBeHidden();
  await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn.');
  await expect(page.locator('#paymentInstructions')).toContainText('Số tiền thanh toán khi nhận hàng');
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
@@ -202,6 +219,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.locator('#cartCheckout').click();
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible({timeout:15000});
+ await expect(review).toBeVisible();
  expect(await page.evaluate(()=>document.querySelector('#sdCheckoutQrWrap')===window.__sdQrBeforeNextOrder),'The same QR control must survive both real Preview checkouts').toBe(true);
  await expect(page.locator('#sdCheckoutShippingStep')).toBeHidden();
  await expect(page.locator('#checkoutDrawer input[name="fullName"]')).toHaveValue('Khách kiểm tra Preview');
