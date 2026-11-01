@@ -60,6 +60,8 @@ assert.match(dockBlurOwner[1],/border:1px solid transparent/);
 assert.match(dockBlurOwner[1],/box-shadow:var\(--sd-admin-shadow\)/);
 const dockPillOwner=html.match(/body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav\{([^}]*)\}/);
 assert.ok(dockPillOwner,'Dock pills keep their dedicated face and rim owner');
+assert.match(html,/body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav:active,[\s\S]*?body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav\[data-sd-glass-press="true"\]\{transform:none\}/,
+  'Bottom dock tabs must not inherit the shared vertical press movement');
 assert.match(dockPillOwner[1],/border:1px solid transparent/);
 assert.doesNotMatch(dockPillOwner[1],/backdrop-filter/,'Dock pills must not blur an already filtered backdrop');
 assert.doesNotMatch(html,/:root\[data-admin-theme="dark"\] \.mobiletabs\{/,'Dark dock uses the shared dedicated material owner');
