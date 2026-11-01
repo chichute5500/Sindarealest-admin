@@ -460,7 +460,8 @@ for (const {width,height,theme} of matrix) {
         await statusFilter.click();
         const filterTap=await page.evaluate(()=>window.__adminQaLastPointer);
         await statusFilter.selectOption({index:1});
-        await expect.poll(()=>page.locator('#main').getAttribute('data-admin-motion-id'),{timeout:500}).not.toBe(priorFilterMotionId);
+        if(!(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches)))
+          await expect.poll(()=>page.locator('#main').getAttribute('data-admin-motion-id'),{timeout:500}).not.toBe(priorFilterMotionId);
         await expectOriginMotion(page.locator('#main'),'Order filter result');
         if(!(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches))){
           const filterOrigin=await readOriginGeometry(page.locator('#main'));
