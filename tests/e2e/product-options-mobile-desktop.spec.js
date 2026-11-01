@@ -315,6 +315,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
  await expect(page.locator('#sdCheckoutStepSubtitle')).toHaveText('Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.');
  await expect(page.locator('#sdCheckoutDone')).toBeVisible();
+ await expect(page.locator('#sdCheckoutDone')).toBeEnabled();
  await expect(page.locator('#checkoutSubmit')).toBeHidden();
  await expect(page.locator('#paymentInstructions')).not.toContainText('Shop chưa xác nhận nhận tiền');
  await expect(page.locator('#paymentInstructions')).not.toContainText('COD còn phải thu');

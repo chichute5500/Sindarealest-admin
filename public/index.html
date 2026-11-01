@@ -5114,7 +5114,7 @@ function sdCheckoutAdvanceToOrderCode(){
  panel.querySelector('.sd-payment-transfer-stage')?.setAttribute('hidden','');
  panel.querySelector('.sd-payment-order-stage')?.removeAttribute('hidden');
  $('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;
- $('#sdCheckoutDone').hidden=false;$('#sdCheckoutDone').textContent='Đóng';
+ $('#sdCheckoutDone').hidden=false;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';
  $('#sdCheckoutStepTitle').textContent='Mã đơn hàng';
  $('#sdCheckoutStepSubtitle').textContent='Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.';
  $('#checkoutForm').scrollTop=0;
@@ -5517,10 +5517,4 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
  document.addEventListener('touchmove',release,{passive:true});
  document.addEventListener('scroll',release,true);
  window.addEventListener('blur',release);
- document.addEventListener('visibilitychange',()=>{if(document.hidden)release()});
-})();
-</script>
-
-
-</body>
-</html>
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)release()})
