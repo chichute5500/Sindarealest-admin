@@ -144,7 +144,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(createdOrders).toHaveLength(0);
  const writesBeforeDepositSwipe=writes.length;
  await swipeToConfirmPayment(page);
- expect(writes).toHaveLength(writesBeforeDepositSwipe+1);
+ await expect.poll(()=>writes.length).toBe(writesBeforeDepositSwipe+1);
+ await expect.poll(()=>createdOrders.length).toBe(1);
  expect(writes.at(-1)).toBe('POST /api/orders');
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('MÃ ĐƠN HÀNG');
@@ -227,8 +228,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const createdBeforeFullSwipe=createdOrders.length;
  const writesBeforeFullSwipe=writes.length;
  await swipeToConfirmPayment(page);
- expect(writes).toHaveLength(writesBeforeFullSwipe+1);
- expect(createdOrders).toHaveLength(createdBeforeFullSwipe+1);
+ await expect.poll(()=>writes.length).toBe(writesBeforeFullSwipe+1);
+ await expect.poll(()=>createdOrders.length).toBe(createdBeforeFullSwipe+1);
  expect(writes.at(-1)).toBe('POST /api/orders');
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');

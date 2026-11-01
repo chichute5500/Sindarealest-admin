@@ -310,7 +310,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutConfirmNote')).toContainText('Shop sẽ đối chiếu giao dịch');
  expect(orderBodies).toHaveLength(0);
  await swipeToConfirmPayment(page);
- expect(orderBodies).toHaveLength(1);
+ await expect.poll(()=>orderBodies.length).toBe(1);
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('SD-TEST-001');
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
  await expect(page.locator('#sdCheckoutStepSubtitle')).toHaveText('Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.');
