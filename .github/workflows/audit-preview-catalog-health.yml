@@ -6,6 +6,9 @@ on:
       - .github/workflows/audit-preview-catalog-health.yml
 permissions:
   contents: read
+concurrency:
+  group: audit-preview-public-catalog-health
+  cancel-in-progress: true
 jobs:
   read-only-compare:
     runs-on: ubuntu-latest
