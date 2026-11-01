@@ -257,7 +257,7 @@ for(const cfg of [
 test('Buy now and cart selection submit only the intended items',async({page,context})=>{
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
- const quoteBodies=[],orderBodies=[],errors=[];page.on('pageerror',error=>errors.push(error.message));
+ const quoteBodies=[],orderBodies=[],errors=[];page.on('pageerror',error=>errors.push(error.stack||error.message));
  await context.addInitScript(()=>localStorage.setItem('sd-cart',JSON.stringify({'qa-shoe::42':1,'qa-wallet':1})));
  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
