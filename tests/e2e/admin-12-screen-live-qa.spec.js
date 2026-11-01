@@ -52,7 +52,7 @@ for (const {width,height,theme} of matrix) {
     async function readDockGeometry(){
       return page.locator('.mobiletabs').evaluate(el=>{
         const r=el.getBoundingClientRect(),s=getComputedStyle(el),root=document.documentElement;
-        return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,left:s.left,right:s.right,bottom:s.bottom,cssWidth:s.width,
+        return{x:r.x,y:r.y,viewportBottom:innerHeight-r.bottom,width:r.width,height:r.height,position:s.position,left:s.left,right:s.right,bottom:s.bottom,cssWidth:s.width,
           innerWidth,clientWidth:root.clientWidth,visualViewportWidth:visualViewport?.width??innerWidth,
           innerHeight,visualViewportHeight:visualViewport?.height??innerHeight};
       });
@@ -307,6 +307,7 @@ for (const {width,height,theme} of matrix) {
         await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="dashboard"]')).toBeVisible({timeout:500});
         const expected={products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',dashboard:'Tổng quan'};
         const sequence=[
+          // Verify both directional animations while continuously measuring the fixed dock.
           ['products','slide-forward'],['orders','slide-forward'],['customers','slide-forward'],
           ['orders','slide-back'],['products','slide-back'],['dashboard','slide-back']
         ];
@@ -315,22 +316,32 @@ for (const {width,height,theme} of matrix) {
           const started=await page.evaluate(()=>performance.now());
           await page.locator('.mobiletabs [data-view="'+target+'"]').tap();
           await expect(page.locator('#main .pagehead h2').first()).toHaveText(expected[target],{timeout:500});
-          await expect(page.locator('#main')).toHaveAttribute('data-admin-transition',direction,{timeout:250});
           const elapsedMs=await page.evaluate(start=>performance.now()-start,started);
-          const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
           const dockAfter=await readDockGeometry();
-          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockFixedToViewport:true,viewportChanged:dock.innerWidth!==dockAfter.innerWidth||dock.visualViewportWidth!==dockAfter.visualViewportWidth,
+          report.navigationLatencyChecks.push({target,elapsedMs,dockFixedToViewport:true,viewportChanged:dock.innerWidth!==dockAfter.innerWidth||dock.visualViewportWidth!==dockAfter.visualViewportWidth,
             dockViewport:{before:{innerWidth:dock.innerWidth,clientWidth:dock.clientWidth,visualViewportWidth:dock.visualViewportWidth,x:dock.x,width:dock.width},
               after:{innerWidth:dockAfter.innerWidth,clientWidth:dockAfter.clientWidth,visualViewportWidth:dockAfter.visualViewportWidth,x:dockAfter.x,width:dockAfter.width}},
             skeletonVisible:target==='orders'||target==='customers'});
           expect(elapsedMs,'Tab '+target+' shell must paint under 500ms while its data request is deliberately delayed').toBeLessThan(500);
-          expect(timing.duration,'Tab transition duration must be 250–300ms').toBeGreaterThanOrEqual(250);
-          expect(timing.duration,'Tab transition duration must be 250–300ms').toBeLessThanOrEqual(300);
-          expect(timing.transition).toBe(direction);
-          expect(timing.from,'Tab '+target+' must enter from the '+direction+' side').toContain(direction==='slide-forward'?'22px':'-22px');
+          const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
+          expect(timing.transition,'Bottom tabs must retain their directional page transition').toBe(direction);
+          expect(timing.duration,'Directional tab motion must last 250–300ms').toBeGreaterThanOrEqual(250);
+          expect(timing.duration,'Directional tab motion must last 250–300ms').toBeLessThanOrEqual(300);
+          expect(timing.from,'Forward tabs enter from the right; reverse tabs enter from the left').toContain(direction==='slide-forward'?'22px':'-22px');
           expect(dockAfter.position,'The bottom dock must remain fixed while changing routes').toBe('fixed');
           expect(dockAfter.bottom,'The dock must stay anchored to the same safe-area bottom').toBe(dock.bottom);
           expect(Math.abs(dockAfter.height-dock.height),'The fixed dock must keep its height').toBeLessThanOrEqual(.5);
+          const dockMotionSamples=await page.locator('.mobiletabs').evaluate(async nav=>{
+            const samples=[];const start=performance.now();
+            while(performance.now()-start<320){await new Promise(requestAnimationFrame);const rect=nav.getBoundingClientRect();samples.push({y:rect.y,bottom:innerHeight-rect.bottom})}
+            return samples;
+          });
+          const maxDockYDelta=Math.max(...dockMotionSamples.map(sample=>Math.abs(sample.y-dock.y)));
+          const maxDockBottomDelta=Math.max(...dockMotionSamples.map(sample=>Math.abs(sample.bottom-dock.viewportBottom)));
+          report.navigationLatencyChecks.at(-1).dockMotionSamples=dockMotionSamples.length;
+          report.navigationLatencyChecks.at(-1).maxDockYDelta=maxDockYDelta;
+          expect(maxDockBottomDelta,'The dock must not jump vertically during tab navigation').toBeLessThanOrEqual(.5);
+          expect(maxDockYDelta,'The dock must keep its viewport Y throughout tab navigation').toBeLessThanOrEqual(.5);
           for(const snapshot of [dock,dockAfter]){
             const expectedWidth=Math.min(snapshot.innerWidth-28,520),expectedX=(snapshot.innerWidth-expectedWidth)/2;
             expect(Math.abs(snapshot.width-expectedWidth),'The fixed dock width must match its current CSS viewport').toBeLessThanOrEqual(.5);

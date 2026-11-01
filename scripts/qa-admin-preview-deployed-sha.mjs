@@ -7,7 +7,8 @@ import { main } from './admin-preview-provenance-readonly.mjs';
 const expected = String(process.env.GITHUB_SHA || '');
 const approvedBranches = new Set([
   'refs/heads/feature/admin-isolated-handoff-2026-10-20',
-  'refs/heads/feat/admin-liquid-glass-2-2026-10-30'
+  'refs/heads/feat/admin-liquid-glass-2-2026-10-30',
+  'refs/heads/fix/admin-mobile-dock-forward-jump-20261101'
 ]);
 if (!/^[a-f0-9]{40}$/i.test(expected) || !approvedBranches.has(process.env.GITHUB_REF))
   throw Error('DEPLOYMENT_SHA_PREFLIGHT_INVALID_BRANCH_OR_COMMIT');
