@@ -5054,7 +5054,13 @@ function safePaymentQrUrl(value){if(typeof value!=='string'||!value.trim())retur
 
 
 function renderPaymentInstructions(result,accessToken='',options={}){
- const panel=$('#paymentInstructions');if(!panel)return;panel.replaceChildren();panel.hidden=false;
+ const panel=$('#paymentInstructions');if(!panel)return;
+ // The QR tile is a persistent checkout control (including its listeners). Return it
+ // to its stable mount before clearing the previous order's payment stage.
+ // Otherwise a second checkout loses #sdCheckoutQrWrap and openCheckout crashes.
+ const qrMount=$('#sdCheckoutQrMount'),existingQr=$('#sdCheckoutQrWrap');
+ if(qrMount&&existingQr&&existingQr.parentElement!==qrMount)qrMount.append(existingQr);
+ panel.replaceChildren();panel.hidden=false;
  const deferOrderCode=options.deferOrderCode===true;
  panel.dataset.stage=deferOrderCode?'transfer':'order';
  const orderNumber=String(result?.orderNumber||''),summary=result?.paymentSummary||{},payment=result?.paymentInstructions,qrUrl=safePaymentQrUrl(payment?.qrImageUrl),amount=payment?.amount;
