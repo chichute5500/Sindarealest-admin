@@ -19,6 +19,14 @@ assert.match(admin,/paymentOption:selected/,"recording first receipt uses checko
 assert.match(admin,/Number\(linked\.amount\)!==Number\(order\.customer_payment_amount\)/,"amount mismatch must fail");
 assert.match(admin,/String\(linked\.transferReference\|\|''\)!==String\(order\.customer_transfer_reference/,"reference mismatch must fail");
 assert.match(admin,/Shop đã kiểm tra có tiền về tài khoản thật/,"manual verification required");
+assert.match(admin,/function updateOrderReceiptPreview\(form\)/,"Admin previews payment shortfall and overpayment before the actual ledger write");
+assert.match(admin,/data-preview-shortfall/,"receipt preview shows the remaining amount due");
+assert.match(admin,/data-preview-over/,"receipt preview shows any overpayment");
+assert.match(admin,/data-preview-cod/,"receipt preview recalculates remaining COD");
+assert.match(admin,/data-transaction-amount[\s\S]*?input[^;]+updateOrderReceiptPreview\(form\)/,"typing a received amount updates the forecast without recording a receipt");
+assert.match(admin,/Chốt giá & xác nhận khoản đã nhận/,"price and payment terms are confirmed in the same primary payment action when needed");
+assert.match(admin,/paymentTermsNote:order\.payment_terms_note\|\|''/,"combined action preserves the saved order terms note");
+assert.match(admin,/Mã trên sao kê \(ít nhất 4 ký tự\)/,"Admin tells the operator why a short bank reference such as 66 is rejected");
 assert.match(transactions,/payment_received_verified/);
 assert.match(requests,/discountedCheckoutFullAmount\(total\)/,"server full discount preserved");
 assert.match(requests,/const reference=String\(order\.order_number\|\|''\)\.trim\(\)\.toUpperCase\(\)/,"transfer content is generated from the canonical order number");
