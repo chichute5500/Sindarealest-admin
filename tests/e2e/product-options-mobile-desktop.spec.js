@@ -331,6 +331,9 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.locator('#accountClose').click();await page.locator('#cartOpen').click();
  await page.locator('[data-cart-pick="qa-shoe::42"]').uncheck();
  await expect(page.locator('#cartCheckout')).toContainText('1 sản phẩm');
+ await page.route('**/api/customer/profile',route=>route.fulfill({status:503,contentType:'application/json',body:'{"error":"Không tải được hồ sơ trên máy chủ."}'}));
+ await page.evaluate(()=>window.sdAccountBridge?.onAuth(true));
+ await expect(page.locator('#accountCloudStatus')).toContainText('Không tải được hồ sơ trên máy chủ.');
  const quoteCountBeforeSavedAddressCheckout=quoteBodies.length;await page.locator('#cartCheckout').click();await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();await expect(page.locator('#sdCheckoutShippingStep')).toBeHidden();await expect.poll(()=>quoteBodies.length).toBeGreaterThan(quoteCountBeforeSavedAddressCheckout);await expect(page.locator('#checkoutDrawer input[name="fullName"]')).toHaveValue('Khách mua ngay');await expect(page.locator('#checkoutDrawer input[name="fullName"]')).not.toBeFocused();await expect(page.locator('#checkoutDrawer input[name="phone"]')).toHaveValue('0900000000');await expect(page.locator('#checkoutStreet')).toHaveValue('Địa chỉ kiểm thử');
  expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  await expect(page.locator('#checkoutDrawer')).toHaveCSS('width','390px');

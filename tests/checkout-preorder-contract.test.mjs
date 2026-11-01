@@ -62,6 +62,7 @@ assert.match(html,/id="sdCheckoutConfirmRange" type="range" min="0" max="100" st
 assert.match(glass,/--progress:0%/,'The slider track starts empty');
 assert.match(glass,/\.sd-checkout-confirm-wrap::before\{[^}]*width:var\(--progress\)[^}]*linear-gradient\(100deg,#72b7dc,#438fc2\)[^}]*transition:width 55ms linear/,'The rounded slider fill follows the thumb smoothly');
 assert.match(glass,/\.sd-checkout-confirm-range::-webkit-slider-runnable-track\{height:6px;border-radius:999px;background:transparent\}/,'The native range track stays clear above the full-height fill');
+assert.match(glass,/\.sd-checkout-confirm-range::-webkit-slider-thumb\{box-sizing:border-box;width:52px;height:52px;margin-top:-23px/,'The arrow thumb nearly fills the slider height');
 assert.match(html,/sdCheckoutConfirmWrap'\)\.style\.setProperty\('--progress',progress\+'%'\)/,'Slider fill updates continuously while moving');
 assert.match(html,/Xác nhận đã thanh toán/,'The slider uses the owner-requested confirmation copy');
 assert.match(html,/Tiến hành thanh toán →/,'The payment step uses a clear payment action label');
@@ -81,6 +82,7 @@ assert.match(html,/button\.dataset\.detailPaymentOption=choice\.value/,'Product 
 assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displays the full-payment discount');
 assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice into checkout');
 assert.match(html,/async function saveCheckoutAddressFromForm\(\)/,'A successfully placed order saves its address for the next order');
+assert.match(html,/function loadLocalShippingAddress\(\)\{if\(accountSyncMode==='cloud'\)/,'Local saved addresses remain available if account sync is guest, loading, or failed');
 assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Success view uses the requested progress message');
 assert.match(html,/sd-order-received-note[\s\S]*Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn\./,'Order confirmation explains when production starts');
 assert.match(html,/\.checkout-drawer \[hidden\]\{display:none!important\}/,'Hidden checkout actions remain hidden after order submission');
