@@ -318,6 +318,10 @@ for (const {width,height,theme} of matrix) {
           const elapsedMs=await page.evaluate(start=>performance.now()-start,started);
           const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
           const dockAfter=await readDockGeometry();
+          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockStationary:true,
+            dockViewport:{before:{innerWidth:dock.innerWidth,clientWidth:dock.clientWidth,visualViewportWidth:dock.visualViewportWidth,x:dock.x,width:dock.width},
+              after:{innerWidth:dockAfter.innerWidth,clientWidth:dockAfter.clientWidth,visualViewportWidth:dockAfter.visualViewportWidth,x:dockAfter.x,width:dockAfter.width}},
+            skeletonVisible:target==='orders'||target==='customers'});
           expect(elapsedMs,'Tab '+target+' shell must paint under 500ms while its data request is deliberately delayed').toBeLessThan(500);
           expect(timing.duration,'Tab transition duration must be 250–300ms').toBeGreaterThanOrEqual(250);
           expect(timing.duration,'Tab transition duration must be 250–300ms').toBeLessThanOrEqual(300);
@@ -327,7 +331,7 @@ for (const {width,height,theme} of matrix) {
           expect(dockAfter.bottom,'The dock must stay anchored to the same safe-area bottom').toBe(dock.bottom);
           expect(Math.abs(dockAfter.height-dock.height),'The fixed dock must keep its height').toBeLessThanOrEqual(.5);
           for(const snapshot of [dock,dockAfter]){
-            const expectedWidth=Math.min(snapshot.clientWidth-28,520),expectedX=(snapshot.clientWidth-expectedWidth)/2;
+            const expectedWidth=Math.min(snapshot.innerWidth-28,520),expectedX=(snapshot.innerWidth-expectedWidth)/2;
             expect(Math.abs(snapshot.width-expectedWidth),'The fixed dock width must match its current CSS viewport').toBeLessThanOrEqual(.5);
             expect(Math.abs(snapshot.x-expectedX),'The fixed dock must stay centered in its current CSS viewport').toBeLessThanOrEqual(.5);
           }
@@ -339,10 +343,6 @@ for (const {width,height,theme} of matrix) {
           expect(Math.abs(dockAfter.y+dockAfter.height+dockBottomOffset-dockAfter.innerHeight),
             'The dock must stay fixed to the viewport bottom even if the browser visual viewport changes').toBeLessThanOrEqual(1);
           if(target==='orders'||target==='customers')await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="'+target+'"]')).toBeVisible();
-          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockStationary:true,
-            dockViewport:{before:{innerWidth:dock.innerWidth,clientWidth:dock.clientWidth,visualViewportWidth:dock.visualViewportWidth,x:dock.x,width:dock.width},
-              after:{innerWidth:dockAfter.innerWidth,clientWidth:dockAfter.clientWidth,visualViewportWidth:dockAfter.visualViewportWidth,x:dockAfter.x,width:dockAfter.width}},
-            skeletonVisible:target==='orders'||target==='customers'});
         }
         expect(delayedRouteCounts.orders,'Rapid navigation must share one pending Orders GET').toBe(1);
         expect(delayedRouteCounts.customers,'Rapid navigation must share one pending Customers GET').toBe(1);
