@@ -260,6 +260,61 @@ try{
  }));
  assert.deepEqual(afterCycles,{navCount:1,bodyOverflow:"",accounts:1});
  console.log("PASS: 20 guest account drawer open/close cycles without duplicated nav or retained body scroll lock.");
+  // Local-only pending-products regression: no real orders, customer data or remote writes.
+ // Both modal buttons must be clickable before the delayed /api/products response.
+ const slowCases=[{width:360,mode:"light"},{width:360,mode:"dark"},
+                  {width:390,mode:"light"},{width:390,mode:"dark"}];
+ await Promise.all(slowCases.map(async ({width,mode})=>{
+  const slowContext=await browser.newContext({
+   viewport:{width,height:844},colorScheme:mode,reducedMotion:"reduce",serviceWorkers:"block"
+  });
+  const slowPage=await slowContext.newPage();
+  let delivered=false;
+  try{
+   await slowPage.route("**/*",async route=>{
+    const req=route.request(),url=new URL(req.url());
+    if(url.pathname==="/api/products"){
+     await new Promise(resolve=>setTimeout(resolve,7000));
+     delivered=true;
+     return route.fulfill(json(sample));
+    }
+    if(url.pathname==="/api/settings")return route.fulfill(json({welcomeEnabled:false}));
+    if(url.pathname==="/api/customer/session")return route.fulfill(json({active:false}));
+    if(url.hostname==="provinces.open-api.vn"&&url.pathname==="/api/v2/p/")
+     return route.fulfill(json([{code:79,name:"TP Hồ Chí Minh"}]));
+    if(url.hostname==="provinces.open-api.vn"&&url.pathname.startsWith("/api/v2/p/"))
+     return route.fulfill(json({wards:[{code:27123,name:"Phường Bến Nghé"}]}));
+    if(req.method()!=="GET"&&req.method()!=="HEAD")
+     return route.abort("blockedbyclient");
+    return route.continue();
+   });
+   await slowPage.addInitScript(()=>{
+    try{sessionStorage.setItem("sd-welcome-seen-in-tab","1")}catch{}
+   });
+   const response=await slowPage.goto(origin+"/sanpham",{
+    waitUntil:"domcontentloaded",timeout:35000
+   });
+   assert.equal(response.status(),200);
+   await slowPage.locator("#mobileAccountNav").click({timeout:4500});
+   await slowPage.locator("#accountDrawer.open").waitFor({timeout:2500});
+   assert.equal(delivered,false,"Account must open before products API replies");
+   await slowPage.locator("#accountClose").click();
+   await slowPage.waitForFunction(
+    ()=>!document.querySelector("#accountDrawer").classList.contains("open"));
+   await slowPage.locator("#mobileCartNav").click({timeout:3000});
+   await slowPage.locator("#cartDrawer.open").waitFor({timeout:2500});
+   assert.equal(delivered,false,"Cart must open before products API replies");
+   await slowPage.screenshot({
+    path:join(evidenceDir,`07-slow-products-dock-${width}-${mode}.png`),
+    animations:"disabled"
+   });
+   await slowPage.waitForFunction(
+    ()=>document.documentElement.dataset.catalogHydration==="ready",
+    null,{timeout:20000});
+   await slowPage.locator("#cartClose").click();
+  }finally{await slowContext.close()}
+ }));
+ console.log("PASS: mobile Cart/Account dock works during slow API at 360/390px Light/Dark.");
  console.log("PASS: single four-tab mobile bottom navigation remains fixed and contained after reload and scroll.");
  console.log("PASS: browser-mocked checkout: mixed cart requires quote (no deposit/QR); priced-only cart validates deposit and 3 steps, Back persistence, Esc, no duplicate submission; 0 real writes.");
 }finally{await context.close();await browser.close()}

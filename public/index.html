@@ -5002,6 +5002,12 @@ $('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetai
  document.addEventListener('keydown',e=>{const op=e.target.closest&&e.target.closest('[data-open-product]');if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#productOverlay').classList.contains('open')){closeDetail()}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowRight'){changeDetailImage(detailIndex+1,true)}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowLeft'){changeDetailImage(detailIndex-1,true)}});
 }
 async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year').textContent=new Date().getFullYear();loadCart();loadFavorites();loadOrderHistory();loadLocalShippingAddress();bindEvents();
+ // Bottom nav markup follows this script. Bind on DOM ready independently
+ // of /api/products so a slow/failed API never disables mobile Cart/Account.
+ if(document.readyState==='loading')
+   document.addEventListener('DOMContentLoaded',setupMobileBottomNav,{once:true});
+ else setupMobileBottomNav();
+ setupNavSpy();
  // Reveal editorial sections independently of the product API. Slow D1/API
  // responses must never leave a blank page beneath the Hero on refresh.
  bindReveal(document);
@@ -5023,7 +5029,7 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
  // render featured + catalog as before; Home can be opened later without reload.
  const initialCatalogListing=catalogCategoryFromLocation()!==null;
  if(!initialCatalogListing){renderFeatured();renderFilters();renderCatalog()}
- renderCart();bindReveal(document);initArtSlideshowWhenVisible();setupNavSpy();setupMobileBottomNav();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
+ renderCart();bindReveal(document);initArtSlideshowWhenVisible();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
 }
 
 let accountSyncMode='guest',cloudOrderHistory=[],cloudSyncEpoch=0,cloudFavoriteQueue=Promise.resolve();
