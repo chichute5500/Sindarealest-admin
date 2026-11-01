@@ -1462,6 +1462,7 @@ html.sd-catalog-route #products .filter-pill{
 <div class="checkout-fields"><input name="fullName" maxlength="120" required autocomplete="name" placeholder="Họ tên *" aria-label="Họ tên"><input name="phone" maxlength="24" required autocomplete="tel" inputmode="tel" placeholder="Số điện thoại *" aria-label="Số điện thoại"><input name="email" type="email" maxlength="160" autocomplete="email" placeholder="Email (không bắt buộc)" aria-label="Email"><select name="province" id="checkoutProvince" required aria-label="Tỉnh/thành phố"><option value="">Đang tải tỉnh/thành…</option></select><input type="hidden" name="provinceCode" id="checkoutProvinceCode"><select name="ward" id="checkoutWard" required disabled aria-label="Xã/phường"><option value="">Chọn tỉnh/thành trước</option></select><input type="hidden" name="wardCode" id="checkoutWardCode"><input name="streetAddress" id="checkoutStreet" maxlength="300" required autocomplete="street-address" placeholder="Số nhà, tên đường, thôn/tổ *" aria-label="Địa chỉ chi tiết"><p id="checkoutAddressMessage" class="checkout-message" role="status" aria-live="polite"></p><textarea name="note" maxlength="1200" rows="2" placeholder="Ghi chú thêm (không bắt buộc)" aria-label="Ghi chú thêm"></textarea></div>
 </section>
 <section class="sd-checkout-panel" id="sdCheckoutPaymentStep" hidden>
+<div class="sd-checkout-box"><strong>Sản phẩm trong đơn</strong><div class="sd-checkout-item-list" id="sdCheckoutItemSummary" aria-label="Sản phẩm trong đơn"></div></div>
 <div class="sd-checkout-box" id="sdCheckoutQuoteNotice">Đang kiểm tra tình trạng hàng và giá từ hệ thống…</div>
 <div class="sd-checkout-box sd-checkout-review-row"><span>Địa chỉ nhận hàng</span><button type="button" data-sd-review-step="1">Sửa</button><p id="sdCheckoutReviewAddress"></p></div>
 <div class="sd-checkout-options" id="sdCheckoutOptions" role="radiogroup" aria-label="Chọn hình thức thanh toán"></div>
@@ -2484,7 +2485,7 @@ function sdCheckoutSetStep(step){
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
  $('#checkoutSubmit').textContent=sdCheckoutStep===1?'Tiếp tục chọn cách thanh toán →':'Gửi đơn hàng';
  $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;
- if(sdCheckoutStep===1)sdCheckoutSummary('#sdCheckoutItemSummary');
+ sdCheckoutSummary('#sdCheckoutItemSummary');
  if(sdCheckoutStep===2){
   const f=$('#checkoutForm').elements;
   $('#sdCheckoutReviewAddress').textContent=[f.fullName.value.trim(),f.phone.value.trim(),[f.streetAddress.value.trim(),f.ward.value,f.province.value].filter(Boolean).join(', ')].filter(Boolean).join(' · ');

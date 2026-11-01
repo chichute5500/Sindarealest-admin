@@ -31,6 +31,7 @@ const glass=html.match(/<style id="sd-checkout-steps-source-backed-2026-10-27">(
 assert.ok(glass.includes("var(--sd-reference-surface"),"Checkout must reuse existing Liquid Glass palette, not standalone black-gold");
 assert.match(glass,/\.checkout-drawer \.sd-checkout-option/,"Checkout additions must stay inside original drawer");
 assert.ok(html.includes('id="sdCheckoutStepper"')&&html.includes('id="sdCheckoutShippingStep"')&&html.includes('id="sdCheckoutPaymentStep"'));
+assert.ok(html.includes('id="sdCheckoutItemSummary"'),'Payment step shows the exact products and quantities before the order is sent');
 assert.doesNotMatch(html,/id="sdCheckoutReviewStep"/,'Checkout has no duplicate review page');
 assert.match(html,/sd-order-reference/,'Order number is prominent on confirmation');
 assert.match(html,/checkout-drawer\{left:0;right:0;width:100vw/,'Checkout uses the full screen');
