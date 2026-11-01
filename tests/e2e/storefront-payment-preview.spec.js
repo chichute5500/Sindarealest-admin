@@ -19,6 +19,42 @@ async function swipeToConfirmPayment(page){
  await page.mouse.up();
 }
 
+async function assertCheckoutScrollAndHeader(page,requireScroll){
+ const state=await page.evaluate(()=>{
+  const drawer=document.querySelector('#checkoutDrawer'),form=document.querySelector('#checkoutForm');
+  const header=document.querySelector('.checkout-header'),footer=document.querySelector('#checkoutDrawer .sd-checkout-footer');
+  const title=header.querySelector('h2'),nav=document.querySelector('#sdCheckoutStepper'),intro=document.querySelector('.checkout-intro');
+  const address=document.querySelector('#sdCheckoutReviewAddressRow'),rect=node=>node.getBoundingClientRect();
+  form.scrollTop=0;
+  const titleBox=rect(title),frame=rect(drawer),headY=rect(header).top,footerY=rect(footer).top,navY=rect(nav).top,introY=rect(intro).top;
+  form.scrollTop=form.scrollHeight;
+  const scroll=form.scrollTop;
+  const result={
+   titleCentered:Math.abs((titleBox.left+titleBox.right)/2-(frame.left+frame.right)/2),
+   titleWeight:parseInt(getComputedStyle(title).fontWeight,10),titleFont:getComputedStyle(title).fontFamily,
+   oneScrollBody:nav.parentElement===form&&intro.parentElement===form&&address.parentElement===form&&document.querySelector('#paymentInstructions').parentElement===form&&header.parentElement===drawer&&footer.parentElement===drawer,
+   headerShift:Math.abs(rect(header).top-headY),footerShift:Math.abs(rect(footer).top-footerY),
+   navShift:navY-rect(nav).top,introShift:introY-rect(intro).top,scroll,
+   headerGlass:getComputedStyle(header).backgroundImage,footerGlass:getComputedStyle(footer).backgroundImage
+  };
+  form.scrollTop=0;
+  return result;
+ });
+ expect(state.oneScrollBody).toBe(true);
+ expect(state.titleCentered).toBeLessThanOrEqual(2);
+ expect(state.titleWeight).toBeGreaterThanOrEqual(700);
+ expect(state.titleFont).toContain('SD Serif');
+ expect(state.headerShift).toBeLessThanOrEqual(1.5);
+ expect(state.footerShift).toBeLessThanOrEqual(1.5);
+ expect(state.headerGlass).toContain('gradient');
+ expect(state.footerGlass).toContain('gradient');
+ if(requireScroll){
+  expect(state.scroll,'Mobile step content must scroll together').toBeGreaterThan(12);
+  expect(state.navShift).toBeGreaterThan(10);
+  expect(state.introShift).toBeGreaterThan(10);
+ }
+}
+
 test('real Preview checkout: deposit/full amounts, all requested viewports and both themes, no payment receipt writes',async({page})=>{
  const headers={};
  if(process.env.CF_ACCESS_CLIENT_ID&&process.env.CF_ACCESS_CLIENT_SECRET){
@@ -117,6 +153,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    if(theme==='dark')await expect(page.locator('html')).toHaveClass(/dark/);
    else await expect(page.locator('html')).not.toHaveClass(/dark/);
    await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
+   await assertCheckoutScrollAndHeader(page,width<=390);
    await expect(page.locator('#sdCheckoutSelectedAmount')).toContainText(buyNowDeposit.toLocaleString('vi-VN'));
    await expect(page.locator('#sdCheckoutRemaining')).toContainText((buyNowTotal-buyNowDeposit).toLocaleString('vi-VN'));
    await expect(page.locator('#sdCheckoutDiscount')).toContainText('Không áp dụng');
@@ -132,6 +169,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    expect(overflow,`horizontal overflow at ${width}x${height} ${theme}`).toBe(false);
   }
  }
+ await page.setViewportSize({width:390,height:844});
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
  await page.locator('#checkoutSubmit').click();
@@ -139,6 +177,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
+ await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
  await expect(review).toBeHidden();
  await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn.');
@@ -170,6 +209,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('MÃ ĐƠN HÀNG');
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
+ await assertCheckoutScrollAndHeader(page,false);
  await expect(page.locator('#sdCheckoutStepSubtitle')).toHaveText('Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.');
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-order-code.png'),fullPage:false,animations:'disabled'});
  await page.evaluate(()=>{window.__sdQrBeforeNextOrder=document.querySelector('#sdCheckoutQrWrap')});
@@ -243,6 +283,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
+ await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#paymentInstructions')).toContainText('Thanh toán hết · giảm 5%');
  await expect(page.locator('#paymentInstructions')).toContainText(Math.round(actualCartTotal*.05).toLocaleString('vi-VN'));
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
@@ -256,6 +297,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(writes.at(-1)).toBe('POST /api/orders');
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
+ await assertCheckoutScrollAndHeader(page,false);
  const cartFullOrderNumber=(await page.locator('#paymentInstructions .sd-order-reference strong').innerText()).trim();
  await page.screenshot({path:join(output,'390x844-cart-full-order-code.png'),fullPage:false,animations:'disabled'});
  await page.locator('#sdCheckoutDone').click();
