@@ -8,7 +8,8 @@ export const BRANCH = 'feature-admin-isolated-handoff-2026-10-20';
 export const ALIAS = 'https://feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev/admin/';
 export const APPROVED_PREVIEWS = new Map([
   ['feature-admin-isolated-hando.sindarealest-admin-preview.pages.dev', BRANCH],
-  ['admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev', 'admin-glass-2026-10-30']
+  ['admin-glass-2026-10-30.sindarealest-admin-preview.pages.dev', 'admin-glass-2026-10-30'],
+  ['admin-dock-jump-2026-11-01.sindarealest-admin-preview.pages.dev', 'fix/admin-mobile-dock-forward-jump-20261101']
 ]);
 const shaValid = value => /^[a-f0-9]{40}$/i.test(String(value || ''));
 const hostOf = value => { try { const url = new URL(value); return url.protocol === 'https:' ? url.hostname.toLowerCase() : null; } catch { return null; } };
