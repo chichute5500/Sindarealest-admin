@@ -5,6 +5,18 @@ const base=process.env.SD_OPTIONS_BASE_URL||'http://127.0.0.1:4173';
 const dir='artifacts/product-options';
 mkdirSync(dir,{recursive:true});
 test.use({serviceWorkers:'block'});
+
+async function assertCartCheckoutGlassParity(page){
+ const g=await page.evaluate(()=>{
+  const cart=getComputedStyle(document.querySelector('#cartDrawer')),checkout=getComputedStyle(document.querySelector('#checkoutDrawer'));
+  return {cartWidth:cart.width,checkoutWidth:checkout.width,cartRadius:cart.borderRadius,checkoutRadius:checkout.borderRadius,cartSurface:cart.backgroundColor,checkoutSurface:checkout.backgroundColor};
+ });
+ expect(g.checkoutWidth).toBe(g.cartWidth);
+ expect(g.checkoutRadius).toBe(g.cartRadius);
+ expect(g.checkoutSurface).toBe(g.cartSurface);
+ expect(parseFloat(g.checkoutRadius)).toBeGreaterThanOrEqual(24);
+}
+
 async function swipeToConfirmPayment(page){
  const slider=page.locator('#sdCheckoutConfirmRange'),box=await slider.boundingBox();
  if(!box)throw new Error('Payment confirmation slider is not visible');
@@ -293,7 +305,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
  await page.locator('#detailBuyNow').click();
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
- await expect(page.locator('#checkoutDrawer')).toHaveCSS('width','390px');
+ await assertCartCheckoutGlassParity(page);
  await page.locator('#checkoutDrawer input[name="fullName"]').fill('Khách mua ngay');
  await page.locator('#checkoutDrawer input[name="phone"]').fill('0900000000');
  await page.locator('#checkoutStreet').fill('Địa chỉ kiểm thử');
@@ -356,6 +368,6 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutReviewAddressRow')).toBeVisible();
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();await expect(page.locator('#sdCheckoutShippingStep')).toBeHidden();await expect.poll(()=>quoteBodies.length).toBeGreaterThan(quoteCountBeforeSavedAddressCheckout);await expect(page.locator('#checkoutDrawer input[name="fullName"]')).toHaveValue('Khách mua ngay');await expect(page.locator('#checkoutDrawer input[name="fullName"]')).not.toBeFocused();await expect(page.locator('#checkoutDrawer input[name="phone"]')).toHaveValue('0900000000');await expect(page.locator('#checkoutStreet')).toHaveValue('Địa chỉ kiểm thử');await expect(page.locator('#checkoutProvince')).toHaveValue('Thành phố Hồ Chí Minh');await expect(page.locator('#checkoutWard')).toHaveValue('Phường Bà Rịa');
  expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
- await expect(page.locator('#checkoutDrawer')).toHaveCSS('width','390px');
+ await assertCartCheckoutGlassParity(page);
  expect(errors).toEqual([]);
 });
