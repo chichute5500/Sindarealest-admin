@@ -152,6 +152,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
  await expect(page.locator('#sdCheckoutStepSubtitle')).toHaveText('Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.');
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-order-code.png'),fullPage:false,animations:'disabled'});
+ await page.evaluate(()=>{window.__sdQrBeforeNextOrder=document.querySelector('#sdCheckoutQrWrap')});
  const buyNowOrderNumber=(await page.locator('#paymentInstructions .sd-order-reference strong').innerText()).trim();
  const buyNowItems=createdOrders.at(-1)?.items||[];
  expect(buyNowItems).toHaveLength(1);
@@ -199,6 +200,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.locator('#cartCheckout').click();
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible({timeout:15000});
+ expect(await page.evaluate(()=>document.querySelector('#sdCheckoutQrWrap')===window.__sdQrBeforeNextOrder),'The same QR control must survive both real Preview checkouts').toBe(true);
  await expect(page.locator('#sdCheckoutShippingStep')).toBeHidden();
  await expect(page.locator('#checkoutDrawer input[name="fullName"]')).toHaveValue('Khách kiểm tra Preview');
  const cartQuoteResponse=await cartQuoteResponsePromise;
