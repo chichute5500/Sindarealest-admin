@@ -26,7 +26,7 @@ assert.ok(!full.includes('data-add='),'SSR placeholder cannot pretend a cart but
 assert.ok(full.includes('"@type":"ItemList"'),'JSON-LD includes real product URLs');
 // Catalogs must expose real detail links without declaring eight incomplete
 // Product entries that Google rejects as rich product snippets.
-const catalogJson=full.match(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/)?.[1];
+const catalogJson=full.split('<script type="application/ld+json">')[1]?.split('</script>')[0];
 assert.ok(catalogJson,"Catalog ItemList JSON-LD must be present");
 const list=JSON.parse(catalogJson);
 assert.equal(list["@type"],"ItemList");
