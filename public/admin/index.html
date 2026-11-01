@@ -2538,7 +2538,7 @@ function showOrderDetails(id,source=null,clickPoint=null){
  const url=new URL(location.href);url.searchParams.set('view','order-detail');url.searchParams.set('orderId',selectedOrderId);
  history.pushState({view,orderId:selectedOrderId,sdAdminView:true,sdAdminOrderDetailEntered:true},'',url.pathname+url.search+url.hash);
  const motion=Number.isFinite(clickPoint?.x)&&Number.isFinite(clickPoint?.y)?{type:'origin',x:clickPoint.x,y:clickPoint.y}:adminOriginMotion(source);
- render(motion);window.scrollTo({top:0,behavior:'auto'});
+ window.scrollTo({top:0,behavior:'auto'});render(motion);
 }
 async function returnToOrderList(id,focusActions=false){
  const targetId=String(id||selectedOrderId||'');selectedOrderId='';await setView('orders');
