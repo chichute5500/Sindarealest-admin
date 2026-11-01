@@ -1,6 +1,7 @@
 // Read-only exact-source verification for the payment experiment Preview.
 const repository="chichute5500/Sindarealest-admin";
 const branch="feat/storefront-payment-cod-sync-20261101";
+const pagesBranch="payment-sync-20261101";
 const alias="payment-sync-20261101.sindarealest-admin-preview.pages.dev";
 const sha=String(process.env.GITHUB_SHA||"");
 const account=process.env.CLOUDFLARE_ACCOUNT_ID||"",token=process.env.CLOUDFLARE_API_TOKEN||"";
@@ -20,7 +21,7 @@ for(let attempt=0;attempt<12;attempt++){
     const sourceSha=deployment?.deployment_trigger?.metadata?.commit_hash||deployment?.deployment_trigger?.metadata?.commitHash;
     const sourceBranch=deployment?.deployment_trigger?.metadata?.branch||deployment?.deployment_trigger?.metadata?.branch_name;
     const aliases=Array.isArray(deployment?.aliases)?deployment.aliases:[];
-    return environment==="preview"&&sourceSha===sha&&sourceBranch===branch&&aliases.includes(alias)&&
+    return environment==="preview"&&sourceSha===sha&&sourceBranch===pagesBranch&&aliases.includes(alias)&&
       (deployment?.latest_stage?.status==="success"||deployment?.stage?.status==="success");
   });
   if(verified)break;
