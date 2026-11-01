@@ -28,6 +28,9 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   form.scrollTop=0;
   const titleBox=rect(title),frame=rect(drawer),headY=rect(header).top,footerY=rect(footer).top,navY=rect(nav).top,introY=rect(intro).top,navVisible=nav.getClientRects().length>0;
   form.scrollTop=form.scrollHeight;
+  form.dispatchEvent(new Event('scroll'));
+  const bottomFade=getComputedStyle(form).getPropertyValue('--sd-scroll-fade-bottom').trim();
+  const clippedBottom= form.classList.contains('sd-scroll-can-up') && !form.classList.contains('sd-scroll-can-down');
   const scroll=form.scrollTop;
   const result={
    titleCentered:Math.abs((titleBox.left+titleBox.right)/2-(frame.left+frame.right)/2),
@@ -52,6 +55,11 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
    outerShadow:getComputedStyle(drawer).boxShadow
   };
   form.scrollTop=0;
+  form.dispatchEvent(new Event('scroll'));
+  result.bottomFade=bottomFade;
+  result.clippedBottom=clippedBottom;
+  result.topFade=getComputedStyle(form).getPropertyValue('--sd-scroll-fade-top').trim();
+  result.topHasBottomFade=form.classList.contains('sd-scroll-can-down');
   return result;
  });
  expect(state.oneScrollBody).toBe(true);
@@ -79,6 +87,10 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   expect(state.scroll,'Mobile step content must scroll together').toBeGreaterThan(12);
   if(state.navVisible)expect(state.navShift).toBeGreaterThan(10);
   expect(state.introShift).toBeGreaterThan(10);
+  expect(state.bottomFade,'Scrolled content must fade smoothly under top title').toBe('0px');
+  expect(state.clippedBottom).toBe(true);
+  expect(state.topFade,'First card must not be faded when fully at the top').toBe('0px');
+  expect(state.topHasBottomFade,'Content continuing under action buttons must feather').toBe(true);
  }
 }
 
@@ -224,6 +236,10 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
  await expect(review).toBeHidden();
+ // Screenshot the *scroll boundary* itself instead of only its rest position.
+ await page.locator('#checkoutForm').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
+ await page.screenshot({path:join(output,'390x844-checkout-qr-mid-scroll-feather.png'),fullPage:false,animations:'disabled'});
+ await page.locator('#checkoutForm').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'))});
  await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn.');
  await expect(page.locator('#paymentInstructions')).toContainText('Số tiền thanh toán khi nhận hàng');
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
