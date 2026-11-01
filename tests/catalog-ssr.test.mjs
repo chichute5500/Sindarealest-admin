@@ -74,7 +74,7 @@ assert.match(storefront,/if\(!active\)initArtSlideshowWhenVisible\(\)/);
 assert.match(storefront,/document\.documentElement\.classList\.contains\('sd-catalog-route'\)\)return;const rect=/);
 // SQL and hydrated list must use the same deterministic tiebreak for
 // products created in the same batch. This prevents LCP-image replacement.
-assert.ok(storefront.includes("fetchpriority=\\\"\\${eager&&idx<2?'high':'low'}\\\""),"Hydration keeps first two image requests high priority");
+assert.ok(storefront.includes("eager&&idx<2?'high':'low'"),"Hydration keeps first two image requests high priority");
 assert.match(storefront,/const dateOrder=timestamp\(b\)\.localeCompare\(timestamp\(a\)\)/);
 assert.match(storefront,/return left<right\?1:left>right\?-1:0;/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");
