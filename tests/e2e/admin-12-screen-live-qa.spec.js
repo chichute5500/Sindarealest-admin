@@ -351,8 +351,7 @@ for (const {width,height,theme} of matrix) {
       };
       for(const [screen,view] of screens){
         await page.evaluate(v=>{const nav=[...document.querySelectorAll('[data-view]')].find(el=>el.dataset.view===v);if(!nav)throw new Error('Missing Admin navigation button '+v);nav.click()},view);
-        // Navigation awaits a backend read for operational views. A fixed 500ms delay
-        // previously captured Orders again under the Customers filename.
+        // The route shell is synchronous; wait for its real data before taking a screen capture.
         await expect(page.locator('#main .pagehead h2').first(),
           'Capture must show the intended module, not the previous page').toHaveText(expectedHeadings[view],{timeout:20000});
         if(view==='orders')await expect(page.locator('#orderResultSummary')).toHaveText(/^Hiển thị \d+ \/ \d+ đơn hàng$/,{timeout:20000});
@@ -398,8 +397,18 @@ for (const {width,height,theme} of matrix) {
       await expect(page.locator('#orderResultSummary')).toHaveText(/^Hiển thị \d+ \/ \d+ đơn hàng$/,{timeout:20000});
       const statusFilter=page.locator('#orderStatusFilter');
       if(await statusFilter.count()&&await statusFilter.locator('option').count()>1){
+        const filterBox=await statusFilter.boundingBox();
+        await statusFilter.click();
         await statusFilter.selectOption({index:1});
         await expect(page.locator('#main')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        const filterOrigin=await page.locator('#main').evaluate(el=>{
+          const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
+          return{x,y,left:rect.left,top:rect.top};
+        });
+        expect(Math.abs(filterOrigin.x-(filterBox.x+filterBox.width/2-filterOrigin.left)),
+          'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
+        expect(Math.abs(filterOrigin.y-(filterBox.y+filterBox.height/2-filterOrigin.top)),
+          'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
         await page.locator('#orderStatusFilter').selectOption({index:0});
       }
       const requiredQaOrder=(process.env.QA_EXPECT_ORDER_ID||'').trim();
@@ -409,9 +418,20 @@ for (const {width,height,theme} of matrix) {
         : page.locator('.sd-order-card[data-order-open]:visible').first();
       if(requiredQaOrder) await expect(detail,'Must find the run-owned isolated QA order before marking 12-screen acceptance PASS').toBeVisible({timeout:15000});
       if(await detail.count()){
-        await detail.click();
+        await detail.scrollIntoViewIfNeeded();
+        const detailBox=await detail.boundingBox();
+        const tapPoint={x:detailBox.x+detailBox.width/2,y:detailBox.y+detailBox.height/2};
+        await page.mouse.click(tapPoint.x,tapPoint.y);
         await expect(page.locator('.order-detail-page')).toBeVisible();
         await expect(page.locator('#main')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        const detailOrigin=await page.locator('#main').evaluate(el=>{
+          const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
+          return{x,y,left:rect.left,top:rect.top};
+        });
+        expect(Math.abs(detailOrigin.x-(tapPoint.x-detailOrigin.left)),
+          'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
+        expect(Math.abs(detailOrigin.y-(tapPoint.y-detailOrigin.top)),
+          'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
         await shot('07_order_detail');
         const advancedOpen=page.locator('#main [data-action="open-order-advanced"]');
         if(await advancedOpen.count()){

@@ -386,7 +386,7 @@ has('#backdrop>.editor>form>.editorfooter .btn{padding-inline:9px;font-size:10px
 
 has('--sd-admin-stat-face:linear-gradient(180deg,transparent 15%,rgba(255,255,255,.20)', 'stat faces retain blue transmission without a broad white wash');
 has('--sd-admin-sheet-face:linear-gradient(135deg,rgba(241,249,255,.68),rgba(204,229,248,.52))', 'sheet surfaces remain translucent across More, editor and notification routes');
-has('--sd-admin-rim:linear-gradient(132deg,rgba(247,190,224,.60)', 'shared glass rim keeps one restrained pink-blue-cyan edge');
+has('--sd-admin-rim:linear-gradient(132deg,rgba(247,190,224,.69)', 'shared glass rim keeps one restrained pink-blue-cyan edge');
 assert.doesNotMatch(adminHtml, /\.order-management-details::after/, 'Order disclosure wrapper must not stack a second glass rim around its nested control');
 has('#main .order-table .order-management-summary{--sd-admin-surface-face:var(--sd-admin-tile-face)', 'Order management disclosure summary owns the single nested interactive glass surface');
 has('.imagebuttons button{width:29px;height:28px;display:grid;place-items:center;padding:0;border:1px solid var(--sd-glass-input-edge)', 'Product gallery actions use the shared interactive glass tokens');

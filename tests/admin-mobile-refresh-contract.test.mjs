@@ -29,6 +29,7 @@ assert.match(html, /if\(targetView==='customers'\)return \['customers'\]/, 'Cust
 assert.match(html, /function loadAdminViewData\(targetView\)\{\s*return Promise\.allSettled\(/, 'Allow detail callers to await route data without blocking the initial route shell');
 assert.match(html, /function setView\(v,updateUrl=true,motion=null\)[\s\S]*?const routeData=loadAdminViewData\(v\);\s*render\([\s\S]*?return routeData;/, 'Render a route shell immediately while returning a completion promise for focus/scroll restoration');
 assert.match(html, /function adminViewHasPendingData\(targetView\)/, 'Render a route skeleton while first data is pending');
+assert.match(html, /if\(main\.querySelector\('\.admin-loading-grid'\)\)return;\s*if\(view==='order-detail'\)/, 'Return after painting route skeletons before binding controls that do not exist yet');
 assert.match(html, /const ADMIN_PRIMARY_VIEWS=\['dashboard','products','orders','customers'\]/, 'Limit directional transitions to the four main dock routes');
 assert.match(html, /duration:280,easing:'cubic-bezier\(\.22,\.72,\.22,1\)'/, 'Keep route and reveal motion within the requested 250–300ms range');
 assert.match(html, /to>from\?'slide-forward':'slide-back'/, 'Choose slide direction from the primary route order');
