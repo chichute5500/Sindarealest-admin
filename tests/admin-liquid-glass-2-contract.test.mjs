@@ -46,21 +46,21 @@ assert.doesNotMatch(html,/#main \.mobilecards tbody tr,#main \.customer-mobile-s
 assert.ok(html.includes('--sd-dock-height:61px;--sd-dock-bottom:18px'), 'Dock dimensions must follow the measured reference');
 
  // Keep one backdrop-blur owner on the outer dock. Pills retain their raised
- // glass face and rim without re-filtering the pixels behind their parent.
- const dockBlurOwner=html.match(/body:has\\(#appView:not\\(\\.hidden\\)\\) \\.mobiletabs\\{([^}]*)\\}/);
- assert.ok(dockBlurOwner,'Mobile dock must have one dedicated material owner');
- assert.match(dockBlurOwner[1],/-webkit-backdrop-filter:blur\\(18px\\) saturate\\(125%\\);backdrop-filter:blur\\(18px\\) saturate\\(125%\\)/,
-   'Dock uses one moderate backdrop blur');
- assert.match(dockBlurOwner[1],/border:1px solid transparent/);
- assert.match(dockBlurOwner[1],/box-shadow:var\\(--sd-admin-shadow\\)/);
- const dockPillOwner=html.match(/body:has\\(#appView:not\\(\\.hidden\\)\\) \\.mobiletabs \\.nav\\{([^}]*)\\}/);
- assert.ok(dockPillOwner,'Dock pills keep their dedicated face and rim owner');
- assert.match(dockPillOwner[1],/border:1px solid transparent/);
- assert.doesNotMatch(dockPillOwner[1],/backdrop-filter/,'Dock pills must not blur an already filtered backdrop');
- assert.doesNotMatch(html,/:root\\[data-admin-theme="dark"\\] \\.mobiletabs\\{/,'Dark dock uses the shared dedicated material owner');
- const dockFilterRules=Array.from(html.matchAll(/([^{}]+)\\{([^{}]*)\\}/g))
-   .filter(match=>/\\.mobiletabs(?:\\s|$)/.test(match[1])&&/(?:-webkit-)?backdrop-filter\\s*:/.test(match[2]));
- assert.equal(dockFilterRules.length,1,'All Admin routes and themes must share one dock backdrop-filter rule');
+// glass face and rim without re-filtering the pixels behind their parent.
+const dockBlurOwner=html.match(/body:has\(#appView:not\(\.hidden\)\) \.mobiletabs\{([^}]*)\}/);
+assert.ok(dockBlurOwner,'Mobile dock must have one dedicated material owner');
+assert.match(dockBlurOwner[1],/-webkit-backdrop-filter:blur\(18px\) saturate\(125%\);backdrop-filter:blur\(18px\) saturate\(125%\)/,
+  'Dock uses one moderate backdrop blur');
+assert.match(dockBlurOwner[1],/border:1px solid transparent/);
+assert.match(dockBlurOwner[1],/box-shadow:var\(--sd-admin-shadow\)/);
+const dockPillOwner=html.match(/body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav\{([^}]*)\}/);
+assert.ok(dockPillOwner,'Dock pills keep their dedicated face and rim owner');
+assert.match(dockPillOwner[1],/border:1px solid transparent/);
+assert.doesNotMatch(dockPillOwner[1],/backdrop-filter/,'Dock pills must not blur an already filtered backdrop');
+assert.doesNotMatch(html,/:root\[data-admin-theme="dark"\] \.mobiletabs\{/,'Dark dock uses the shared dedicated material owner');
+const dockFilterRules=Array.from(html.matchAll(/([^{}]+)\{([^{}]*)\}/g))
+  .filter(match=>/\.mobiletabs(?:\s|$)/.test(match[1])&&/(?:-webkit-)?backdrop-filter\s*:/.test(match[2]));
+assert.equal(dockFilterRules.length,1,'All Admin routes and themes must share one dock backdrop-filter rule');
 
 assert.ok(html.includes('var(--sd-dock-height) + var(--sd-dock-bottom) + 20px + env(safe-area-inset-bottom)'), 'Content must clear the entire dock footprint and safe area');
 assert.doesNotMatch(html,/\.mobiletabs[^{}]*\{[^{}]*white-space:normal/, 'Dock labels must not wrap');
