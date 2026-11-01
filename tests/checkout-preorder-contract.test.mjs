@@ -126,6 +126,8 @@ const cartCheckoutEnd=cartMarkup.indexOf('</button>',cartCheckoutStart);
 assert.ok(cartCheckoutStart>=0&&cartCheckoutStart<cartSubtotalPos&&cartSubtotalPos<cartCheckoutEnd,'Subtotal is visibly inside the checkout action bar, not a separate footer layer');
 assert.match(cartMarkup,/id="cartCheckoutLabel"/,'The checkout action label remains independently updateable');
 assert.doesNotMatch(cartMarkup,/cart-note|Chỉ món được tích sẽ vào đơn|Giá được hệ thống kiểm tra khi đặt hàng/,'Remove the unnecessary note entirely');
+assert.doesNotMatch(cartMarkup,/cartZalo|Tư vấn \/ đặt hàng qua Zalo/,'Cart keeps only the integrated payment action, with no Zalo bar');
+assert.doesNotMatch(html,/consultCart\(|\$\('#cartZalo'\)/,'Removed cart-only Zalo code must not leave null element handlers');
 assert.match(html,/\$\('#cartCheckoutLabel'\)\.textContent=selected\.length/,'Refreshing the cart preserves the subtotal and the integrated checkout action');
 assert.match(html,/\.cart-bottom \.cart-checkout-bar\{[^}]*display:grid;[^}]*min-height:72px/,'Single compact payment bar houses subtotal and action');
 
