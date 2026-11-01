@@ -24,6 +24,19 @@ assert.match(full,/id="catalogGrid"><article[^]*?loading="lazy"/,
 
 assert.ok(!full.includes('data-add='),'SSR placeholder cannot pretend a cart button works without hydrated product data');
 assert.ok(full.includes('"@type":"ItemList"'),'JSON-LD includes real product URLs');
+// Catalogs must expose real detail links without declaring eight incomplete
+// Product entries that Google rejects as rich product snippets.
+const catalogJson=full.match(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/)?.[1];
+assert.ok(catalogJson,"Catalog ItemList JSON-LD must be present");
+const list=JSON.parse(catalogJson);
+assert.equal(list["@type"],"ItemList");
+assert.equal(list.itemListElement.length,8);
+assert.ok(list.itemListElement.every((entry,i)=>
+  entry["@type"]==="ListItem"&&entry.position===i+1&&
+  entry.url==="https://shop.example/sanpham/sneaker/SD-SN001"&&
+  !Object.hasOwn(entry,"item")));
+assert.doesNotMatch(catalogJson,/"@type":"Product"/,
+  "Listing pages must not claim each linked product has merchant pricing or reviews");
 assert.ok(full.includes('images/test-image.webp'));
 assert.ok(!full.includes('https://evil.example'),'No remote image host may be injected');
 assert.ok(!full.includes('<img src=x onerror=alert(1)>'),'Untrusted title is escaped');
