@@ -122,8 +122,8 @@ export async function onRequestPost({ request, env }) {
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
-    // The transfer memo is the server-issued order number. It can be shown
-    // before bank details are activated and cannot be authored by the browser.
+    // Keep the quote-issued transfer memo stable when the matching verified QR
+    // snapshot is still active; without a prepared QR, fall back to the order code.
     const transferReference = selectedPaymentOption ? (requestedTransferReference||orderNumber) : "";
     const statements = [];
 
