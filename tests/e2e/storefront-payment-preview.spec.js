@@ -8,7 +8,7 @@ const output='artifacts/storefront-payment-preview';
 mkdirSync(output,{recursive:true});
 if(!url)throw Error('SD_PAYMENT_PREVIEW_URL is required; this spec is for the deployed Preview only.');
 
-test('real Preview checkout: deposit/full amounts, all requested viewports and both themes, no payment/order writes',async({page})=>{
+test('real Preview checkout: deposit/full amounts, all requested viewports and both themes, no payment receipt writes',async({page})=>{
  const headers={};
  if(process.env.CF_ACCESS_CLIENT_ID&&process.env.CF_ACCESS_CLIENT_SECRET){
   headers['CF-Access-Client-Id']=process.env.CF_ACCESS_CLIENT_ID;
