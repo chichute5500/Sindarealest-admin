@@ -41,7 +41,9 @@ assert.match(html,/sd-order-reference/,'Order number is prominent after QR');
 assert.match(html,/sd-payment-transfer-stage[\s\S]*sd-payment-order-stage/,'QR transfer and order reference are separate customer-visible stages');
 assert.match(html,/Nhận cọc & xác nhận đơn/,'Order tracking combines deposit receipt and order confirmation into one milestone');
 assert.match(html,/data-account-orders-refresh/,'Linked order cards can reload server-confirmed payment state');
-assert.match(html,/checkout-drawer\{left:0;right:0;width:100vw/,'Checkout uses the full screen');
+assert.doesNotMatch(html,/\.checkout-drawer\{left:0;right:0;width:100vw;max-width:none;border-radius:0\}/,'Checkout must never flatten the mobile cart-shaped glass shell');
+assert.match(html,/#cartDrawer,#checkoutDrawer\{background:var\(--sd-reference-surface\)!important\}/,'Cart and Checkout use the same outer glass material');
+assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{\s*top:calc\(7px \+ env\(safe-area-inset-top\)\);[\s\S]*?border:1px solid var\(--sd-reference-edge\);border-radius:26px;/,'Mobile drawers share inset geometry and 26px corners');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
 assert.match(html,/getElementById|querySelector|#sdCheckoutQrImage/);
@@ -113,8 +115,8 @@ assert.ok(markupHeader<markupForm&&markupForm<markupStepper&&markupStepper<marku
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*display:grid/,'Checkout form is the only scrolling body');
 assert.match(html,/\.checkout-heading h2\{[^}]*left:50%;top:50%;transform:translate\(-50%,-50%\);[^}]*font:700 25px\/1\.2 SD Serif/,'Bold order title stays physically centered in every stage');
 assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{visibility:hidden;pointer-events:none\}/,'Success step does not shift header geometry');
-assert.match(html,/\.checkout-header\{[^}]*background:var\(--sd-glass-shell-strong/,'Checkout header shares the Storefront glass shell');
-assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*background:var\(--sd-glass-shell-strong/,'Checkout footer shares the Storefront glass shell');
+assert.match(html,/\.checkout-header\{[^}]*border-bottom:1px solid var\(--line\);background:transparent;box-shadow:none/,'Checkout header sits on the same single glass shell as the cart');
+assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*background:transparent;box-shadow:none/,'Checkout footer does not create a detached glass rectangle');
 
 
 assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number explains how to copy it');
