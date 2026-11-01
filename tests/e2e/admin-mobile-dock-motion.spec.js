@@ -57,7 +57,10 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
     const main=page.locator('#main');
     const geometry=()=>dock.evaluate(el=>{
       const r=el.getBoundingClientRect();
-      return{y:r.y,bottom:(visualViewport?.height??innerHeight)-r.bottom,height:r.height};
+      const tabs=[...el.querySelectorAll(':scope > [data-view]')].map(tab=>{
+        const box=tab.getBoundingClientRect();return{x:box.x,y:box.y,width:box.width,height:box.height};
+      });
+      return{x:r.x,y:r.y,bottom:(visualViewport?.height??innerHeight)-r.bottom,width:r.width,height:r.height,tabs};
     });
     const expectedTitle={dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng'};
     const sequence=[
@@ -76,10 +79,14 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
           const sample=()=>{
             const viewportHeight=innerHeight,rect=nav.getBoundingClientRect(),animation=main.getAnimations({subtree:false}).at(-1);
             const style=getComputedStyle(nav);
-            trace.points.push({at:performance.now()-start,y:rect.y,rectBottom:rect.bottom,bottom:(visualViewport?.height??viewportHeight)-rect.bottom,
+            const tabs=[...nav.querySelectorAll(':scope > [data-view]')].map(tab=>{
+              const box=tab.getBoundingClientRect();return{x:box.x,y:box.y,width:box.width,height:box.height};
+            });
+            trace.points.push({at:performance.now()-start,x:rect.x,y:rect.y,dockWidth:rect.width,innerWidth,
+              visualViewportWidth:visualViewport?.width??innerWidth,rectBottom:rect.bottom,bottom:(visualViewport?.height??viewportHeight)-rect.bottom,
               height:rect.height,cssHeight:style.height,minHeight:style.minHeight,
               viewportHeight,visualHeight:visualViewport?.height??viewportHeight,clientHeight:document.documentElement.clientHeight,
-              scrollY,transform:style.transform,
+              scrollY,transform:style.transform,tabs,
               bodyTransform:getComputedStyle(document.body).transform});
             if(!trace.transition&&animation&&main.dataset.adminTransition){
               trace.transition={type:main.dataset.adminTransition,duration:animation.effect.getTiming().duration,
@@ -109,6 +116,17 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
       expect(Math.max(...samples.map(p=>Math.abs(p.bottom-before.bottom))),
         'The fixed dock must remain anchored to the viewport bottom').toBeLessThanOrEqual(.5);
       expect(Math.abs((await geometry()).height-before.height),'Dock height stays constant').toBeLessThanOrEqual(.5);
+      expect(Math.max(...samples.map(p=>Math.abs(p.x-before.x))),'Dock horizontal position must not shift').toBeLessThanOrEqual(.5);
+      expect(Math.max(...samples.map(p=>Math.abs(p.dockWidth-before.width))),'Dock width must not stretch').toBeLessThanOrEqual(.5);
+      let largestTabDelta={delta:0};
+      for(const sample of samples)sample.tabs.forEach((tab,index)=>{
+        for(const key of ['x','y','width','height']){
+          const delta=Math.abs(tab[key]-before.tabs[index][key]);
+          if(delta>largestTabDelta.delta)largestTabDelta={delta,index,key,initial:before.tabs[index],sample:tab,
+            at:sample.at,dock:{width:sample.dockWidth,y:sample.y,innerWidth:sample.innerWidth}};
+        }
+      });
+      expect(largestTabDelta.delta,'Dock tabs must keep the same size and position while changing the selected view: '+JSON.stringify({target,before,largestTabDelta})).toBeLessThanOrEqual(.5);
     }
     expect(pageErrors,'No browser runtime errors during tab navigation').toEqual([]);
   }finally{await context.close()}

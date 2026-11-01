@@ -71,6 +71,15 @@ assert.ok(dockGeometryOwner,'Signed-in mobile dock has one direct-body geometry 
 assert.match(dockGeometryOwner[1],/top:calc\(100dvh - var\(--sd-dock-height,61px\) - var\(--sd-dock-bottom,18px\) - env\(safe-area-inset-bottom\)\)/,
   'Dock stays at the visual viewport coordinate when innerHeight briefly changes');
 assert.doesNotMatch(dockGeometryOwner[1],/bottom:/,'Do not re-anchor the dock to the shifting layout viewport');
+assert.match(dockGeometryOwner[1],/left:max\(14px,calc\(\(100dvw - 520px\)\/2\)\)/,'Dock horizontal position follows the stable visual viewport width');
+assert.match(dockGeometryOwner[1],/width:min\(calc\(100dvw - 28px\),520px\)/,'Dock width follows the stable visual viewport width');
+assert.match(dockGeometryOwner[1],/grid-template-columns:repeat\(5,minmax\(0,1fr\)\);[^}]*transition:none/,
+  'Dock columns and outer geometry remain fixed when a tab is selected');
+assert.doesNotMatch(html,/\.mobiletabs:has\([^}]*grid-template-columns:/,
+  'Selected tabs must not resize the dock columns');
+assert.match(dockPillOwner[1],/transition:none/,'Dock pills change state without a stretch or shrink animation');
+assert.match(html,/body:has\(#appView:not\(\.hidden\)\) #appView\{overflow-x:clip\}/,
+  'Page slide stays clipped inside the app and cannot expand the horizontal viewport');
 const setViewSource=html.slice(html.indexOf('function setView(v,updateUrl=true,motion=null){'),html.indexOf("window.addEventListener('popstate'"));
 assert.ok(setViewSource.indexOf("window.scrollTo({top:0,behavior:'auto'})")<setViewSource.indexOf('render(adminRouteMotion('),
   'Reset mobile scroll before replacing route content so the fixed dock does not jump when content height changes');
