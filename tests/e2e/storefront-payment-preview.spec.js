@@ -461,7 +461,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  const metrics=await drawer.evaluate(el=>{
   const list=el.querySelector('#cartList'),header=el.querySelector('.cart-header'),footer=el.querySelector('.cart-bottom'),last=list.querySelector('.cart-row:last-child');
   const view=x=>x.getBoundingClientRect();
-  const before={drawerScroll:getComputedStyle(el).overflowY,listScroll:getComputedStyle(list).overflowY,drawerOverflow:el.scrollHeight-el.clientHeight,listOverflow:list.scrollHeight-list.clientHeight,headerTop:view(header).top,footerBottom:view(footer).bottom};
+  const before={drawerScroll:getComputedStyle(el).overflowY,listScroll:getComputedStyle(list).overflowY,listScrollX:getComputedStyle(list).overflowX,drawerOverflow:el.scrollHeight-el.clientHeight,listOverflow:list.scrollHeight-list.clientHeight,headerTop:view(header).top,footerBottom:view(footer).bottom};
   el.scrollTop=el.scrollHeight;
   const after={headerTop:view(header).top,footerBottom:view(footer).bottom,lastBottom:view(last).bottom,footerTop:view(footer).top,scroll:el.scrollTop};
   el.scrollTop=0;
@@ -469,6 +469,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  });
  expect(metrics.before.drawerScroll,'Cart shell must own scrolling').toBe('auto');
  expect(metrics.before.listScroll,'Cart list must not clip product tiles').toBe('visible');
+ expect(metrics.before.listScrollX,'Cart list must not clip horizontally either').toBe('visible');
  expect(metrics.before.listOverflow).toBeLessThanOrEqual(2);
  expect(metrics.before.drawerOverflow).toBeGreaterThan(0);
  expect(metrics.after.scroll).toBeGreaterThan(0);
