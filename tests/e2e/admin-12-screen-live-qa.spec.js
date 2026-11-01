@@ -42,6 +42,21 @@ for (const {width,height,theme} of matrix) {
       evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],navigationLatencyChecks:[],apiRouteTimings:[],observedAtUtc:new Date().toISOString()};
     const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:width===432&&theme==='light'?'no-preference':'reduce'});
     const page=await context.newPage();
+    async function expectOriginMotion(locator,label='Reveal'){
+      const reducedMotion=await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+      if(reducedMotion){
+        const state=await locator.evaluate(el=>({transition:el.dataset.adminTransition||null,animations:el.getAnimations().filter(animation=>animation.playState==='running').length}));
+        expect(state,label+' must honor reduced-motion preference').toEqual({transition:null,animations:0});
+      }else await expect(locator,label+' must expand from its interaction origin').toHaveAttribute('data-admin-transition','origin',{timeout:250});
+    }
+    async function readDockGeometry(){
+      return page.locator('.mobiletabs').evaluate(el=>{
+        const r=el.getBoundingClientRect(),s=getComputedStyle(el),root=document.documentElement;
+        return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,left:s.left,right:s.right,bottom:s.bottom,cssWidth:s.width,
+          innerWidth,clientWidth:root.clientWidth,visualViewportWidth:visualViewport?.width??innerWidth,
+          innerHeight,visualViewportHeight:visualViewport?.height??innerHeight};
+      });
+    }
     const delayedRouteCounts={orders:0,customers:0};
     const delayedRouteHandlers={};
     try {
@@ -282,14 +297,14 @@ for (const {width,height,theme} of matrix) {
           ['orders','slide-back'],['products','slide-back'],['dashboard','slide-back']
         ];
         for(const [target,direction] of sequence){
-          const dock=await page.locator('.mobiletabs').evaluate(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,bottom:s.bottom,innerHeight,visualViewportHeight:visualViewport?.height??innerHeight}});
+          const dock=await readDockGeometry();
           const started=await page.evaluate(()=>performance.now());
           await page.locator('.mobiletabs [data-view="'+target+'"]').tap();
           await expect(page.locator('#main .pagehead h2').first()).toHaveText(expected[target],{timeout:500});
           await expect(page.locator('#main')).toHaveAttribute('data-admin-transition',direction,{timeout:250});
           const elapsedMs=await page.evaluate(start=>performance.now()-start,started);
           const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
-          const dockAfter=await page.locator('.mobiletabs').evaluate(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,bottom:s.bottom,innerHeight,visualViewportHeight:visualViewport?.height??innerHeight}});
+          const dockAfter=await readDockGeometry();
           expect(elapsedMs,'Tab '+target+' shell must paint under 500ms while its data request is deliberately delayed').toBeLessThan(500);
           expect(timing.duration,'Tab transition duration must be 250–300ms').toBeGreaterThanOrEqual(250);
           expect(timing.duration,'Tab transition duration must be 250–300ms').toBeLessThanOrEqual(300);
@@ -297,9 +312,16 @@ for (const {width,height,theme} of matrix) {
           expect(timing.from,'Tab '+target+' must enter from the '+direction+' side').toContain(direction==='slide-forward'?'22px':'-22px');
           expect(dockAfter.position,'The bottom dock must remain fixed while changing routes').toBe('fixed');
           expect(dockAfter.bottom,'The dock must stay anchored to the same safe-area bottom').toBe(dock.bottom);
-          expect(Math.abs(dockAfter.x-dock.x),'The fixed dock must keep its horizontal position').toBeLessThanOrEqual(.5);
-          expect(Math.abs(dockAfter.width-dock.width),'The fixed dock must keep its width').toBeLessThanOrEqual(.5);
           expect(Math.abs(dockAfter.height-dock.height),'The fixed dock must keep its height').toBeLessThanOrEqual(.5);
+          for(const snapshot of [dock,dockAfter]){
+            const expectedWidth=Math.min(snapshot.clientWidth-28,520),expectedX=(snapshot.clientWidth-expectedWidth)/2;
+            expect(Math.abs(snapshot.width-expectedWidth),'The fixed dock width must match its current CSS viewport').toBeLessThanOrEqual(.5);
+            expect(Math.abs(snapshot.x-expectedX),'The fixed dock must stay centered in its current CSS viewport').toBeLessThanOrEqual(.5);
+          }
+          if(dockAfter.clientWidth===dock.clientWidth){
+            expect(Math.abs(dockAfter.x-dock.x),'The fixed dock must keep its horizontal position when the CSS viewport is unchanged').toBeLessThanOrEqual(.5);
+            expect(Math.abs(dockAfter.width-dock.width),'The fixed dock must keep its width when the CSS viewport is unchanged').toBeLessThanOrEqual(.5);
+          }
           const dockBottomOffset=parseFloat(dockAfter.bottom);
           expect(Math.abs(dockAfter.y+dockAfter.height+dockBottomOffset-dockAfter.innerHeight),
             'The dock must stay fixed to the viewport bottom even if the browser visual viewport changes').toBeLessThanOrEqual(1);
@@ -320,13 +342,13 @@ for (const {width,height,theme} of matrix) {
       if(width===432 && theme==='light'){
         await page.locator('#adminMenuToggle').tap();
         await expect(page.locator('#mobileMorePanel')).toBeVisible();
-        await expect(page.locator('#mobileMorePanel')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await expectOriginMotion(page.locator('#mobileMorePanel'),'Mobile More menu');
         await shot('13_mobile_menu');
         await page.locator('#adminMenuToggle').tap();
         await expect(page.locator('#mobileMorePanel')).toBeHidden();
         await page.locator('#notificationToggle').tap();
         await expect(page.locator('#notificationPanel')).toBeVisible();
-        await expect(page.locator('#notificationPanel')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await expectOriginMotion(page.locator('#notificationPanel'),'Notification panel');
         await shot('14_notifications');
         await page.locator('#notificationToggle').tap();
         await expect(page.locator('#notificationPanel')).toBeHidden();
@@ -334,11 +356,11 @@ for (const {width,height,theme} of matrix) {
         await expect(page.locator('#main .pagehead h2').first()).toHaveText('Tổng quan',{timeout:500});
         await page.locator('#main .pagehead [data-action="add"]').tap();
         await expect(page.locator('#backdrop')).toBeVisible();
-        await expect(page.locator('#backdrop .editor')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await expectOriginMotion(page.locator('#backdrop .editor'),'Product editor');
         await shot('15_add_product','#backdrop');
         await page.locator('#productCategoryToggle').tap();
         await expect(page.locator('#productCategoryGrid')).toBeVisible();
-        await expect(page.locator('#productCategoryGrid')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+        await expectOriginMotion(page.locator('#productCategoryGrid'),'Product category filter');
         await page.locator('#productCategoryToggle').tap();
         await page.locator('#editorClose').tap();
         await expect(page.locator('#backdrop')).toBeHidden();
@@ -379,7 +401,7 @@ for (const {width,height,theme} of matrix) {
         if(await contactSummary.count()){
           await contactSummary.click();
           await expect(page.locator('#main .customer-mobile-details[open]')).toBeVisible();
-          await expect(page.locator('#main .customer-mobile-extra')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+          await expectOriginMotion(page.locator('#main .customer-mobile-extra'),'Customer contact disclosure');
           await shot('17_customer_contact_expanded');
         } else report.screens.push({screen:'17_customer_contact_expanded',status:'UNAVAILABLE_NOT_ACCEPTED',reason:'No live customer detail to expand'});
       }
@@ -399,11 +421,7 @@ for (const {width,height,theme} of matrix) {
           await galleryImage.hover();
           await page.mouse.down();
           await expect(page.locator('.gallery-held-preview')).toBeVisible({timeout:1200});
-          const reducedMotion=await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
-          if(reducedMotion){
-            const motion=await page.locator('.gallery-held-preview').evaluate(el=>({transition:el.dataset.adminTransition||null,animations:el.getAnimations().length}));
-            expect(motion,'Held gallery preview should respect reduced-motion preference').toEqual({transition:null,animations:0});
-          }else await expect(page.locator('.gallery-held-preview')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+          await expectOriginMotion(page.locator('.gallery-held-preview'),'Held gallery preview');
           await page.mouse.up();
           await expect(page.locator('.gallery-held-preview')).toHaveCount(0);
         }
@@ -418,15 +436,17 @@ for (const {width,height,theme} of matrix) {
         const filterBox=await statusFilter.boundingBox();
         await statusFilter.click();
         await statusFilter.selectOption({index:1});
-        await expect(page.locator('#main')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
-        const filterOrigin=await page.locator('#main').evaluate(el=>{
-          const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
-          return{x,y,left:rect.left,top:rect.top};
-        });
-        expect(Math.abs(filterOrigin.x-(filterBox.x+filterBox.width/2-filterOrigin.left)),
-          'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
-        expect(Math.abs(filterOrigin.y-(filterBox.y+filterBox.height/2-filterOrigin.top)),
-          'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
+        await expectOriginMotion(page.locator('#main'),'Order filter result');
+        if(!(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches))){
+          const filterOrigin=await page.locator('#main').evaluate(el=>{
+            const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
+            return{x,y,left:rect.left,top:rect.top};
+          });
+          expect(Math.abs(filterOrigin.x-(filterBox.x+filterBox.width/2-filterOrigin.left)),
+            'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
+          expect(Math.abs(filterOrigin.y-(filterBox.y+filterBox.height/2-filterOrigin.top)),
+            'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
+        }
         await page.locator('#orderStatusFilter').selectOption({index:0});
       }
       const requiredQaOrder=(process.env.QA_EXPECT_ORDER_ID||'').trim();
@@ -441,21 +461,23 @@ for (const {width,height,theme} of matrix) {
         const tapPoint={x:detailBox.x+detailBox.width/2,y:detailBox.y+detailBox.height/2};
         await page.mouse.click(tapPoint.x,tapPoint.y);
         await expect(page.locator('.order-detail-page')).toBeVisible();
-        await expect(page.locator('#main')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
-        const detailOrigin=await page.locator('#main').evaluate(el=>{
-          const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
-          return{x,y,left:rect.left,top:rect.top};
-        });
-        expect(Math.abs(detailOrigin.x-(tapPoint.x-detailOrigin.left)),
-          'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
-        expect(Math.abs(detailOrigin.y-(tapPoint.y-detailOrigin.top)),
-          'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
+        await expectOriginMotion(page.locator('#main'),'Order detail');
+        if(!(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches))){
+          const detailOrigin=await page.locator('#main').evaluate(el=>{
+            const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
+            return{x,y,left:rect.left,top:rect.top};
+          });
+          expect(Math.abs(detailOrigin.x-(tapPoint.x-detailOrigin.left)),
+            'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
+          expect(Math.abs(detailOrigin.y-(tapPoint.y-detailOrigin.top)),
+            'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
+        }
         await shot('07_order_detail');
         const advancedOpen=page.locator('#main [data-action="open-order-advanced"]');
         if(await advancedOpen.count()){
           await advancedOpen.click();
           await expect(page.locator('#sdOrderAdvanced')).toHaveAttribute('open','');
-          await expect(page.locator('#sdOrderAdvanced > :not(summary)')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+          await expectOriginMotion(page.locator('#sdOrderAdvanced > :not(summary)'),'Advanced order details');
         }
       } else {
         report.screens.push({screen:'07_order_detail',status:'NO_REAL_ORDER_NOT_ACCEPTED',reason:'No live business record; no order fabricated'});
