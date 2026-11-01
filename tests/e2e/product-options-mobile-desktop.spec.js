@@ -254,7 +254,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.route('https://provinces.open-api.vn/api/v2/p/**',async route=>{
   const requestUrl=new URL(route.request().url());
   const payload=requestUrl.searchParams.has('depth')?{code:79,name:'Thành phố Hồ Chí Minh',wards:[{code:26560,name:'Phường Bà Rịa'}]}:[{code:79,name:'Thành phố Hồ Chí Minh'}];
-  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(payload)});
+  await route.fulfill({status:200,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify(payload)});
  });
  await page.route('**/api/checkout-quote',async route=>{
   const body=route.request().postDataJSON();quoteBodies.push(body);

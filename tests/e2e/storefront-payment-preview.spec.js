@@ -25,7 +25,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   const payload=requestUrl.searchParams.has('depth')
    ?{code:79,name:'Thành phố Hồ Chí Minh',wards:[{code:26560,name:'Phường Bà Rịa'}]}
    :[{code:79,name:'Thành phố Hồ Chí Minh'}];
-  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(payload)});
+  await route.fulfill({status:200,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify(payload)});
  });
  const response=await page.goto(url,{waitUntil:'domcontentloaded'});
  expect(response?.status()).toBe(200);
