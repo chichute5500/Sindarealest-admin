@@ -35,6 +35,15 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const cards=page.locator('#catalogGrid .product-card').filter({hasText:'Giá:'});
  await expect(cards.first()).toBeVisible({timeout:20000});
  const productCard=cards.first(),productLink=productCard.locator('[data-open-product]').first();
+ const secondCartProductCard=cards.nth(1);
+ await expect(secondCartProductCard).toBeVisible();
+ await secondCartProductCard.locator('[data-add]').click();
+ if(await page.locator('#productOverlay.open').count()){
+  const seedCartOption=page.locator('#detailVariants .sd-product-option-chip:not(:disabled)').first();
+  if(await seedCartOption.count())await seedCartOption.click();
+  await page.locator('#detailAdd').click();
+  await page.locator('#detailClose').click();
+ }
  const productId=await productLink.getAttribute('data-open-product');
  await productLink.click();
  await expect(page.locator('#productOverlay')).toHaveClass(/open/);
@@ -113,6 +122,10 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#sdCheckoutStepSubtitle')).toHaveText('Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.');
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-order-code.png'),fullPage:false,animations:'disabled'});
  const buyNowOrderNumber=(await page.locator('#paymentInstructions .sd-order-reference strong').innerText()).trim();
+ const buyNowItems=createdOrders.at(-1)?.items||[];
+ expect(buyNowItems).toHaveLength(1);
+ expect(buyNowItems[0].id).toBe(productId);
+ expect(buyNowItems[0].quantity).toBe(1);
  await page.locator('#sdCheckoutDone').click();
  await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
 
@@ -135,8 +148,6 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(buyNowAccountOrder.locator('.local-order-delivery')).toHaveCount(0);
  await page.locator('#accountClose').click();
 
- const secondCartProductCard=cards.nth(1);
- await expect(secondCartProductCard).toBeVisible();
  for(const card of [productCard,secondCartProductCard]){
   await card.locator('[data-add]').click();
   if(await page.locator('#productOverlay.open').count()){

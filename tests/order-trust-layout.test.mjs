@@ -31,7 +31,7 @@ assert.match(section, /Cam kết hậu mãi[\s\S]*?Bảo hành 1 năm[\s\S]*?B�
   'The compact footer must retain the supplied brand commitments.');
 assert.match(section, /href="https:\/\/zalo\.me\/0827049192"[^>]*aria-label="Tư vấn hoặc đặt hàng qua Zalo"/,
   'The standalone Zalo CTA must use the confirmed contact URL and accessible label.');
-assert.match(section, /Tư vấn\/đặt hàng qua Zalo/,
+assert.match(section, /Tư vấn \/ đặt hàng qua Zalo/,
   'The CTA must use the agreed consultation/order wording.');
 const orderStyles = html.match(/<style id="sd-order-uniform-tiles">([\s\S]*?)<\/style>/)?.[1] || '';
 assert.match(orderStyles, /#order \.order-zalo-cta\{[^}]*background:#0068ff;border-color:#0068ff;color:#fff/,

@@ -89,6 +89,23 @@ jobs:
       # NEVER run a mutating D1 cutover from the routine production deploy.
       # Restore/migrations/catalog changes need a separately reviewed manual run.
 
+      # Build the exact public assets used by the Storefront before any
+      # production Pages upload. The source images and font TTFs are preserved;
+      # these scripts only create generated files under public/.
+      - name: Generate and verify lightweight Storefront media
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow fonttools brotli
+          python3 scripts/build-material-thumbnails.py
+          python3 scripts/build-logo-asset.py
+          python3 scripts/build-font-assets.py
+          test -s public/logo-ui.webp
+          test -s public/images/brand-emblem-nav.webp
+          test -s public/images/theme-croc-dark-tile.webp
+          test -s public/images/theme-croc-albino-tile.webp
+          for weight in NotoSans-Regular NotoSans-Bold NotoSerif-Regular NotoSerif-Bold; do
+            test -s "public/fonts/${weight}.woff2"
+          done
+
       - name: Deploy to verified Cloudflare Pages project
         if: success()
         env:

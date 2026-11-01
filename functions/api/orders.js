@@ -4,7 +4,13 @@ import { sendAdminPush } from "../_notifications.js";
 import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
-const phoneOk = (value) => /^[+0-9() .-]{9,20}$/.test(value);
+const phoneOk = (value) => {
+  if(typeof value!=="string" || value.length>24 || !/^[+0-9() .-]+$/.test(value))return false;
+  let digits=value.replace(/[() .-]/g,"");
+  if(digits.startsWith("+84"))digits="0"+digits.slice(3);
+  else if(digits.startsWith("84"))digits="0"+digits.slice(2);
+  return /^0[35789][0-9]{8}$/.test(digits);
+};
 
 export async function onRequestPost({ request, env }) {
   if (request.headers.get("Origin")) {

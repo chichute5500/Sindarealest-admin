@@ -14,8 +14,8 @@ const firstStyleEnd = html.indexOf('</style>', firstStyleStart);
 const legacyCss = html.slice(firstStyleStart, firstStyleEnd);
 assert.doesNotMatch(legacyCss, /\.service(?:-strip|-copy|-icon|-text)?(?=[\s{.:,])/,
   'The legacy base stylesheet must not override benefit tiles.');
-assert.ok(start > html.indexOf('id="sd-protection-script"'),
-  'The single source of truth must load after earlier page styles.');
+assert.ok(start > firstStyleEnd && start < html.indexOf('</head>'),
+  'The single source of truth must follow the original base CSS but load before first paint.');
 
 const stripStart = html.indexOf('<div class="service-strip glass">');
 const stripEnd = html.indexOf('\n    </div>\n  </section>', stripStart);

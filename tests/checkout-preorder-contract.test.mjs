@@ -42,7 +42,10 @@ assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a r
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
 assert.match(html,/getElementById|querySelector|#sdCheckoutQrImage/);
 assert.match(quote,/paymentReady:false/,"Selecting a method must not mean Shop has confirmed a payment request");
-assert.doesNotMatch(quote,/qrImageUrl|makeCheckoutTransferReference/,"Checkout quote must not reveal transfer instructions before Admin confirmation");
+assert.match(quote,/validPublicQrImageKey/,"Only a verified active Shop QR can make the quote payment-ready");
+assert.match(quote,/env\.IMAGES\.head/,"The configured QR object must exist before it is considered ready");
+assert.match(quote,/makeCheckoutTransferReference/,"The server derives transfer reference readiness from the customer phone and catalog SKU");
+assert.doesNotMatch(quote,/qrImageUrl:configured|transferReference:configured|bankName:configured|accountNumber:configured/,"The pre-submit quote must not return QR or bank transfer details");
 assert.doesNotMatch(quote,/order_payment_transactions|payment_status\s*=/,"Quote must not verify or mutate bank transactions");
 assert.match(create,/calculateCheckoutQuote\(items\.map/,"Submit re-evaluates amount from server DB");
 assert.match(create,/quotedTotal !== serverQuote\.total/,"Stale quote must fail closed");

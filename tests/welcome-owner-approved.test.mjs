@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 
 // Owner PASS on 2026-10-25, source of truth: PR #113 / 4df440bc.
 const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+// Owner requested a lighter Welcome on 2026-11-01; retain first-paint/keyboard protections.
 const performance=html.match(/<style id="sd-welcome-desktop-mobile-performance-2026-10-25">([\s\S]*?)<\/style>/)?.[1];
 assert.ok(performance,'Approved desktop/mobile Welcome CSS must be present before body');
 assert.ok(html.indexOf('id="sd-welcome-desktop-mobile-performance-2026-10-25"')<html.indexOf('</head>'));
@@ -18,7 +19,10 @@ assert.ok(performance.includes('@media(min-width:761px)'));
 assert.ok(performance.includes('@media(max-width:760px)'));
 assert.ok(performance.includes('#welcomeSplash .welcome-texture{filter:none!important;transform:none!important;transition:none!important}'));
 assert.ok(performance.includes('#welcomeSplash .welcome-content>*{animation:none!important;filter:none!important}'));
-assert.ok(html.includes('window.setTimeout(dismiss,reduced?220:1450);'),'Opening lifecycle must match approved quick Welcome');
+assert.ok(html.includes('window.setTimeout(dismiss,reduced?100:1050);'),'Refined Welcome should release about a second after storefront readiness');
+assert.match(html, /class="welcome-logo-frame"/, 'Welcome uses a static 3D halo around the brand logo');
+assert.match(performance, /#welcomeSplash \.welcome-logo-frame\{/, 'Welcome material belongs to existing authoritative stylesheet');
+assert.doesNotMatch(html, /A MARK OF DISTINCTION · SINCE YOUR FIRST IMPRESSION/, 'Avoid redundant Welcome copy');
 assert.ok(html.includes('    },360);\n  }\n  window.__sdDismissWelcome'),'Closing overlay must match approved 360ms dismissal');
 assert.match(html,/\.welcome-texture--dark\{[^\n]*filter:none\}/);
 assert.match(html,/\.welcome-texture--light\{[^\n]*filter:none\}/);
@@ -28,7 +32,11 @@ assert.ok(!html.includes('<picture class="hero-reference-art"'),'Never bring bac
 console.log('PASS: Owner-approved Welcome from PR #113 isolated into fix branch; code-only HERO protected.');
 
 // Guard the approved fade against uncovering a still-locked or unfinished page.
-assert.match(html,/if\(!window\.__sdStorefrontReady\|\|document\.readyState==='loading'\)/);
+assert.match(html,/if\(document\.readyState==='loading'\)/,
+ 'Welcome must wait for document parse, not products API hydration');
+assert.match(html,/document\.addEventListener\('DOMContentLoaded',dismiss,\{once:true\}\)/);
+assert.doesNotMatch(html,/window\.__sdStorefrontReady=true;\s*dismiss\(\);\s*\},2400\)/,
+ 'No 2.4-second network fallback delay when public SSR is already available');
 assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);\n    void document\.body\.offsetHeight;\n    s\.classList\.add\('is-leaving'\)/);
 assert.match(html,/init\(\)\.then\(finishStorefrontStartup,finishStorefrontStartup\)/);
 
@@ -37,8 +45,8 @@ assert.match(performance,/#welcomeSplash\.is-leaving \.welcome-content\{[\s\S]*?
 assert.match(performance,/#welcomeSplash\.is-leaving\{\n  transition:opacity \.20s ease \.10s,visibility 0s linear \.30s!important/);
 
 // Cold-cache first-paint guard: wait for the correct Noto Serif/Sans glyphs.
-assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular\.ttf"/);
-assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.ttf"/);
+assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2" as="font" type="font\/woff2"/);
+assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.woff2" as="font" type="font\/woff2"/);
 assert.match(performance,/html\.js-enabled:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title/);
 assert.match(html,/document\.fonts\.load\('400 30px "SD Serif"'/);
 assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);

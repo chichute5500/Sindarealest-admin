@@ -45,29 +45,25 @@ if(root){
   if(authReturn){
     const reason=params.get("auth_reason")||"unknown";
     const reasonMessages={
-      provider_denied:"Bạn đã hủy cấp quyền hoặc Facebook, Google, Zalo từ chối yêu cầu.",
+      provider_denied:"Bạn đã hủy đăng nhập hoặc chưa cấp quyền truy cập tài khoản.",
       no_code:"Nhà cung cấp đăng nhập chưa gửi mã xác thực về website.",
       invalid_code:"Mã xác thực được trả về không hợp lệ.",
-      invalid_state:"Phiên bảo mật không khớp. Hãy sử dụng cùng một trình duyệt từ đầu đến cuối, không đổi tab hoặc chế độ ẩn danh.",
-      token_rejected:"Nhà cung cấp từ chối mã xác thực. Hãy kiểm tra URL callback và thiết lập OAuth của Facebook, Google hoặc Zalo.",
+      invalid_state:"Phiên đăng nhập đã hết hạn hoặc bị gián đoạn. Vui lòng thử lại trên cùng một trình duyệt.",
+      token_rejected:"Không thể xác nhận đăng nhập. Vui lòng thử lại sau.",
       token_invalid:"Nhà cung cấp không trả về token hợp lệ.",
       profile_rejected:"Không lấy được hồ sơ từ nhà cung cấp đăng nhập sau khi cấp quyền.",
       profile_invalid:"Nhà cung cấp đăng nhập chưa trả về mã định danh tài khoản hợp lệ.",
-      profile_api_error:"Zalo trả về lỗi khi lấy thông tin tài khoản, dù đã cấp quyền. Hệ thống đang kiểm tra lỗi này.",
-      profile_relay_unavailable:"Máy chủ Việt Nam dùng để xác minh tài khoản Zalo chưa kết nối được. Bạn có thể dùng Google để đăng nhập.",
-      facebook_unavailable:"Facebook Login chưa sẵn sàng trên Preview. Kiểm tra URL callback và trạng thái ứng dụng Meta.",
-      callback_error:"Lỗi xử lý callback. Máy chủ sẽ cần kiểm tra luồng đăng nhập.",
-      session_store:"Đã lấy được hồ sơ, nhưng không thể tạo phiên tài khoản trong cơ sở dữ liệu Preview.",
+      profile_api_error:"Chưa thể xác minh tài khoản Zalo. Bạn có thể sử dụng Google để đăng nhập.",
+      profile_relay_unavailable:"Đăng nhập Zalo tạm thời gián đoạn. Bạn có thể sử dụng Google.",
+      facebook_unavailable:"Đăng nhập Facebook hiện chưa khả dụng. Vui lòng sử dụng Google.",
+      callback_error:"Không hoàn tất được đăng nhập. Vui lòng thử lại.",
+      session_store:"Không thể duy trì phiên đăng nhập. Vui lòng thử lại sau.",
       unknown:"Chưa hoàn tất đăng nhập. Vui lòng thử lại."
     };
     if(authReturn==="email_verified")notify("Email đã xác minh thành công. Tài khoản đã kích hoạt.","success");
     else if(authReturn==="email_verify_failed")notify("Liên kết xác minh sai hoặc hết hạn. Hãy yêu cầu mã mới.","error");
     else if(authReturn==="success")notify("");
-    else notify("Đăng nhập chưa thành công. "+(reason==="profile_api_error_-501" ?
-      "Zalo báo lỗi -501 khi máy chủ lấy thông tin tài khoản. Có thể liên quan đến IP máy chủ ở ngoài Việt Nam; Shop đang xử lý kết nối. Bạn có thể đăng nhập qua Google." :
-      /^profile_api_error_-?\d{1,5}$/.test(reason) ?
-        "Zalo báo mã lỗi API "+reason.slice("profile_api_error_".length)+". Vui lòng gửi mã lỗi này để kiểm tra." :
-        (reasonMessages[reason]||reasonMessages.unknown)),"error");
+    else notify("Đăng nhập chưa thành công. "+(reasonMessages[reason]||reasonMessages.unknown),"error");
     params.delete("customer_auth");params.delete("auth_reason");
     const rest=window.location.pathname+(params.size?"?"+params:"")+window.location.hash;
     history.replaceState(history.state,"",rest);
@@ -100,7 +96,7 @@ if(root){
       if(!res.ok){root.hidden=false;if(guest)guest.hidden=true;notify("Máy chủ chưa đọc được phiên tài khoản (HTTP "+res.status+").");return;}
       const data=await res.json(),active=!!data.authenticated;
       if(oauthResult==="success" && !active)
-        notify("Nhà cung cấp đã trả về nhưng trình duyệt chưa giữ được phiên. Hãy kiểm tra cookie hoặc lỗi xử lý callback.","error");
+        notify("Đăng nhập chưa được duy trì. Vui lòng thử lại trên cùng trình duyệt.","error");
       else if(oauthResult==="success" && active)
         notify("Đăng nhập thành công qua "+({zalo:"Zalo",google:"Google",facebook:"Facebook",email:"Email"}[data.user?.provider]||"tài khoản")+". Tài khoản đã được xác nhận.","success");
       // An existing login is independent of a newly failed OAuth attempt.
@@ -111,8 +107,8 @@ if(root){
         facebook=q("[data-auth-facebook]");
       if(google){
         google.disabled=!data.providers?.google;
-        google.querySelector("[data-auth-provider-label]").textContent=data.providers?.google?"Tiếp tục với Google":"Google (chưa cấu hình)";
-        google.title=data.providers?.google?"":"Cần tạo Google OAuth Client ID và Secret trong Google Cloud";
+        google.querySelector("[data-auth-provider-label]").textContent=data.providers?.google?"Tiếp tục với Google":"Google tạm thời chưa khả dụng";
+        google.title=data.providers?.google?"":"Đăng nhập Google hiện chưa sẵn sàng. Vui lòng thử lại sau.";
       }
       if(zalo){
         zalo.hidden=true;
@@ -123,7 +119,7 @@ if(root){
       if(facebook){
         facebook.hidden=true;
         facebook.disabled=true;
-        facebook.title="Facebook Login tạm ngừng khi ứng dụng Meta chưa được mở công khai";
+        facebook.title="Đăng nhập Facebook hiện chưa khả dụng.";
       }
       // Email/password is experimental on the isolated Preview only.
       // Never present this option on Production before verification/recovery is completed.

@@ -70,3 +70,14 @@ assert.ok(accountCss.includes('html.dark #accountDrawer')&&accountCss.includes('
 assert.ok(accountCss.includes('background:var(--sd-account-button)')&&accountCss.includes('--sd-account-button-edge'),"Google button must visibly separate from login card");
 assert.ok(accountCss.includes('#accountDrawer [hidden] {display:none!important}'),"Hidden cards/toasts must remain hidden against legacy display CSS");
 console.log("PASS: account greeting/logout unification, transient success notice and light/dark Liquid Glass; customer sync and checkout unaffected.");
+
+/* Public errors must be customer-facing, not operator configuration notes.
+ * Login provider availability and server-side diagnostics remain unchanged. */
+for(const internal of [/cơ sở dữ liệu Preview/i,/Kiểm tra URL callback/i,
+  /Google OAuth Client ID/i,/Lỗi xử lý callback/i,/Mailjet Stats/i,
+  /Zalo báo mã lỗi API/i]){
+ assert.doesNotMatch(auth,internal,"An operational diagnosis leaked into the Account UI");
+}
+assert.ok(auth.includes('session_store:"Không thể duy trì phiên đăng nhập. Vui lòng thử lại sau."'),
+ "Failed session save needs a clear customer-facing message");
+console.log("PASS: Account OAuth failures cannot display Preview/DB/callback configuration notes.");

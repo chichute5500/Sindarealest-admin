@@ -1,5 +1,5 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, readJsonBodyLimited } from "../_lib.js";
-import { calculateCheckoutQuote } from "../_payments.js";
+import { calculateCheckoutQuote, validPublicQrImageKey, checkoutTransferSku, makeCheckoutTransferReference } from "../_payments.js";
 import { normalizeProductOption } from "../_product-options.js";
 
 const NO_STORE={"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"};
@@ -32,6 +32,9 @@ export async function onRequestPost({request,env}) {
       const stock=byId.get(id).stock;
       if(stock!==null&&stock!==undefined&&requested.get(id)>Number(stock))return fail("Số lượng hàng vượt tồn kho ghi nhận; vui lòng liên hệ cửa hàng.",409);
     }
+    const sku=checkoutTransferSku(ids.map(id=>byId.get(id)));
+    const phone=String(parsed.value?.phone||"");
+    const transferReference=/^[+0-9() .-]{9,20}$/.test(phone)?makeCheckoutTransferReference(phone,sku):"";
     const showPrices=(await getSetting(env.DB,"show_prices","0"))==="1";
     const quote=calculateCheckoutQuote(ids.map(id=>{
       const p=byId.get(id);const raw=p.price;
@@ -39,9 +42,14 @@ export async function onRequestPost({request,env}) {
       const unitPrice=showPrices&&Number(p.source_price_confirmed)===1&&Number.isSafeInteger(price)&&price>=0?price:null;
       return {fulfillmentType:normalizeFulfillmentType(p.fulfillment_type),quantity:requested.get(id),unitPrice};
     }));
-    if(!quote.eligible)return json({ok:true,quoteReady:false,paymentReady:false,reason:quote.reason,options:[]},200,NO_STORE);
-    return json({ok:true,quoteReady:true,paymentReady:false,total:quote.total,options:quote.options,
-      reason:"Báo giá chỉ giúp bạn chọn cách thanh toán. Sau khi nhận đơn, Shop sẽ xác nhận điều kiện và gửi hướng dẫn chuyển khoản."
+    if(!quote.eligible)return json({ok:true,quoteReady:false,paymentReady:false,reason:quote.reason,fulfillmentType:quote.fulfillmentType||"unclassified",options:[]},200,NO_STORE);
+    const keys=await Promise.all(["payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name","payment_qr_instructions"].map(k=>getSetting(env.DB,k,"")));
+    const [active,key,bankName,accountNumber,accountName,instructions]=keys;
+    const configured=Boolean(transferReference)&&active==="1"&&validPublicQrImageKey(key)&&!!bankName&&!!accountNumber&&!!accountName
+      &&typeof env.IMAGES?.head==="function"&&Boolean(await env.IMAGES.head(key));
+    return json({ok:true,quoteReady:true,paymentReady:Boolean(configured),fulfillmentType:quote.fulfillmentType,total:quote.total,options:quote.options,
+      reason:configured?"":(!transferReference?"Cần số điện thoại hợp lệ và mã SKU trước khi hiện QR.":"QR ngân hàng chưa được Shop kích hoạt hoặc xác minh. Chưa chuyển khoản; vẫn có thể gửi yêu cầu đặt hàng."),
+      transferReferenceAvailableAfterSubmit:false
     },200,NO_STORE);
   }catch{return fail("Không kiểm tra được hình thức thanh toán. Vui lòng thử lại.",503)}
 }
