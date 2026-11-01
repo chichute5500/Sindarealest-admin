@@ -35,3 +35,5 @@ Real Xiaomi 15 Ultra Owner QA; Google OAuth test account; phone ownership verifi
 
 ## 2026-11-01 low-risk Main alignment update
 At audit commit \`0d470a49\`, four overlapping policy/deployment guard paths became **exact copies of the current Main versions**: \`AGENTS.md\`, \`docs/QA_RESOURCE_POLICY.md\`, \`.github/workflows/qa-resource-policy.yml\`, \`.github/workflows/deploy.yml\`. This reduces future conflict risk without changing Main, Admin or Production. Keep other divergences until compatible integration is validated.
+
+2026-11-01: Archived PR #159's earlier QA rerun note to `docs/qa/ADMIN_D1_REVISION_PLAYWRIGHT_RERUN_PR159_ARCHIVE_2026-11-01.md`; original shared `docs/qa/ADMIN_D1_REVISION_PLAYWRIGHT_RERUN_2026-11-01.md` is now exactly Main's PR #154 note. No Main writes.
