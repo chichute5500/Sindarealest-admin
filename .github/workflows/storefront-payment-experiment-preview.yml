@@ -1,5 +1,6 @@
 name: Storefront payment experiment — isolated Preview
 # This branch's marked candidate push runs one guarded Preview deploy and browser pass.
+# Candidate marker is required in the triggering commit subject.
 
 on:
   create:
