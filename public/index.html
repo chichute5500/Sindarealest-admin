@@ -1305,7 +1305,13 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 
 /* Reference-aligned cart and a separate order-details step. */
 .cart-drawer{width:min(460px,100%);background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%)}
-.cart-list{min-height:0}
+.cart-list{min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 0 16px;scroll-padding-block:12px 16px}
+/* Fade only when more content exists beyond the visible scrollport. A hard crop at
+   the title/footer makes glass cards look as if the entire background was sliced. */
+#cartList,#checkoutForm{--sd-scroll-fade-top:0px;--sd-scroll-fade-bottom:0px;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--sd-scroll-fade-top),#000 calc(100% - var(--sd-scroll-fade-bottom)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 var(--sd-scroll-fade-top),#000 calc(100% - var(--sd-scroll-fade-bottom)),transparent 100%)}
+#cartList.sd-scroll-can-up,#checkoutForm.sd-scroll-can-up{--sd-scroll-fade-top:22px}
+#cartList.sd-scroll-can-down,#checkoutForm.sd-scroll-can-down{--sd-scroll-fade-bottom:28px}
+#cartList::-webkit-scrollbar,#checkoutForm::-webkit-scrollbar{display:none}
 .cart-bottom{flex:0 0 auto;padding:13px 0 calc(4px + env(safe-area-inset-bottom))}
 .cart-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink);font-size:12px;line-height:1.4}
 .cart-summary strong{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
@@ -1329,7 +1335,7 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 .checkout-intro{flex:0 0 auto}
 .checkout-intro p{margin:0 0 4px;font-size:12px;font-weight:650;line-height:1.5}
 .checkout-intro small{display:block;color:var(--muted);font-size:10px;line-height:1.6}
-.checkout-drawer .checkout-form{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-padding-top:12px;margin:0;padding:0 3px 16px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start;grid-auto-rows:max-content}
+.checkout-drawer .checkout-form{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-padding-block:12px 18px;margin:0;padding:12px 3px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start;grid-auto-rows:max-content}
 .checkout-drawer .checkout-fields{gap:9px;padding-bottom:6px}
 .checkout-drawer .checkout-fields input,.checkout-drawer .checkout-fields select,.checkout-drawer .checkout-fields textarea{min-height:42px;font-size:12px}
 .checkout-drawer .checkout-fields textarea{min-height:68px}
@@ -2047,7 +2053,8 @@ html.dark .sd-fullscreen-share{
     max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
     overflow-x:hidden!important;
   }
-  .account-drawer,.cart-drawer{overflow-y:auto!important;overscroll-behavior:contain}
+  .account-drawer{overflow-y:auto!important;overscroll-behavior:contain}
+  .cart-drawer{overflow-y:hidden!important;overscroll-behavior:contain}
   .cart-drawer{display:flex!important;flex-direction:column!important}
   .cart-list{flex:1 1 auto;min-height:0;overflow-y:auto!important;overscroll-behavior:contain}
   .checkout-drawer{overflow:hidden!important}
