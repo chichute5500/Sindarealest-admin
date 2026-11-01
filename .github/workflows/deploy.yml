@@ -5,6 +5,17 @@ on:
   push:
     branches:
       - main
+    # No Production deploy for AI/QA instructions alone; runtime changes still deploy.
+    paths-ignore:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'GEMINI.md'
+      - '.cursor/rules/**'
+      - '.github/copilot-instructions.md'
+      - 'docs/QA_RESOURCE_POLICY.md'
+      - 'scripts/qa-resource-guard.mjs'
+      - '.github/workflows/qa-resource-policy.yml'
+      - '.github/workflows/deploy.yml'
 
 permissions:
   contents: read

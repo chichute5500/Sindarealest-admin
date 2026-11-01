@@ -1,6 +1,6 @@
 # SINDAREALEST — QA + Workers Requests policy for all future development
 
-**Status:** active on branches that include these files; not yet on `main` until separately approved and integrated. This policy applies to ALL tasks, not just D1 or PR #159.
+**Status:** Owner-approved for `main` on 2026-11-01. New branches created from this Main commit inherit the policy. Existing branches must carry/copy their own files. Applies to ALL future tasks, not just D1 or PR #159.
 
 ## Verified baseline and interpretation
 - Cloudflare Pages Functions read-only report, around 40 hours ending 2026-11-01 03:xx Vietnam: shared `sindarealest-admin-preview` script **~86,563 Requests**, `sindarealest2` Production **~21,616**. These are NOT daily quota counts.
@@ -53,4 +53,4 @@ Remaining work and risks:
 Production/Main changed: NO unless explicit Owner approval:
 ```
 
-**Deployment limitation:** Since pushes to `main` trigger a Production deployment, this policy must NOT be pushed to Main just to enable future agents without a separately reviewed rollout. An AI on a new branch only sees these instructions if that branch actually contains the files.
+**Deployment safety:** Owner approved this policy-only Main commit. `.github/workflows/deploy.yml` excludes policy-only changes; this commit uses `[CF-Pages-Skip]` to skip an independent Cloudflare Git integration deployment, if any. Real runtime changes continue through Production approval and existing deployment gates. Read rules from the currently checked-out branch.

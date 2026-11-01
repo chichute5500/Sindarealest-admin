@@ -21,4 +21,4 @@ Repository: `chichute5500/Sindarealest-admin`. These instructions are part of th
 - Never trigger multiple full Playwright/Lighthouse QA jobs on every source push. Prefer local targeted tests per commit; one full live Preview QA after the release candidate is deployed.
 - Guard remote checks with bounded retries, concurrency and correct SHA. Only compare site Requests using matching time ranges. D1 Rows Read != Workers Requests.
 - The monitoring report is in PR #155 / `scripts/workers-pages-request-attribution-readonly.mjs`. The token `CLOUDFLARE_ANALYTICS_TOKEN` is for analytics read-only; do not elevate deploy token permissions.
-- A rule file on a feature branch is NOT global until propagated/merged into the branch an AI actually checks out. Future branches from current `main` may need the policy copied; never claim otherwise.
+- These instructions are Owner-approved in `main` (2026-11-01), so branches created after that commit inherit them. Existing older branches must carry their own copies. Never assume a policy is present without checking the branch.
