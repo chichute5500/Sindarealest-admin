@@ -856,7 +856,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-step.past b{border-color:var(--gold)}
 .checkout-drawer .sd-checkout-panel{display:grid;align-content:start;gap:9px;min-height:0}
 .checkout-drawer .sd-checkout-panel[hidden],.checkout-drawer .sd-checkout-qr-wrap[hidden]{display:none!important}
-.checkout-drawer .sd-checkout-box{border:1px solid var(--sd-reference-edge,var(--line));border-radius:15px;padding:11px;background:var(--sd-reference-surface,var(--glass));display:grid;gap:9px;font-size:11px}
+.checkout-drawer .sd-checkout-box{border:1px solid var(--sd-reference-edge,var(--line));border-radius:17px;padding:12px;background:var(--sd-glass-shell,var(--glass));display:grid;gap:9px;font-size:11px}
 .checkout-drawer .sd-checkout-box>strong{font-size:11px}
 .checkout-drawer .sd-checkout-item-list{display:grid;gap:7px}
 .checkout-drawer .sd-checkout-item{display:flex;align-items:center;gap:8px;min-width:0;font-size:10px}
@@ -890,7 +890,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-review-row p{grid-column:1/-1;font-size:12px;font-weight:500;color:var(--ink);line-height:1.6;margin:0;overflow-wrap:anywhere}
 .checkout-drawer .sd-checkout-review-row button{border:0;background:none;color:var(--gold);font-size:11px;font-weight:650;text-decoration:underline}
 .checkout-drawer .sd-checkout-caution{color:var(--muted);line-height:1.6;display:block}
-.checkout-drawer .sd-checkout-footer{flex:0 0 auto;display:grid;gap:5px;padding:8px 3px 2px;border-top:1px solid var(--sd-reference-edge,var(--line));background:var(--sd-glass-shell-strong,var(--glass));box-shadow:0 -5px 18px rgba(38,82,116,.055)}
+.checkout-drawer .sd-checkout-footer{flex:0 0 auto;display:grid;gap:8px;padding:13px 0 4px;border-top:1px solid var(--line);background:transparent;box-shadow:none}
 .checkout-drawer .sd-checkout-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:0}
 .checkout-drawer .sd-checkout-actions .pill-btn{width:100%;min-height:44px}
 .checkout-drawer .sd-checkout-actions #checkoutSubmit{margin:0;max-height:none;height:auto;min-height:44px;font-size:10px;padding:10px 13px}
@@ -1319,7 +1319,7 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 .checkout-backdrop.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .24s ease,visibility 0s}
 .checkout-drawer{position:fixed;z-index:186;top:0;right:0;bottom:0;box-sizing:border-box;width:min(520px,100%);padding:calc(16px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;overflow:hidden;border:1px solid var(--line);border-radius:24px 0 0 24px;background:var(--glass);color:var(--ink);box-shadow:-18px 0 48px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(26px) saturate(155%);backdrop-filter:blur(26px) saturate(155%);transform:translateX(102%);visibility:hidden;pointer-events:none;transition:transform .32s cubic-bezier(.22,.61,.36,1),visibility 0s linear .32s}
 .checkout-drawer.open{transform:translateX(0);visibility:visible;pointer-events:auto;transition:transform .32s cubic-bezier(.22,.61,.36,1),visibility 0s}
-.checkout-header{position:relative;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;min-height:52px;gap:12px;padding:5px 8px;border:1px solid var(--sd-reference-edge,var(--line));border-radius:19px;background:var(--sd-glass-shell-strong,var(--glass));box-shadow:var(--sd-glass-panel-shadow,var(--sd-reference-shadow))}
+.checkout-header{position:relative;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;min-height:54px;gap:12px;padding:0 0 13px;border-bottom:1px solid var(--line);background:transparent;box-shadow:none}
 .checkout-heading{display:flex;align-items:center;gap:12px;min-width:0}
 .checkout-heading h2{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font:700 25px/1.2 SD Serif,Georgia,serif;text-align:center;white-space:nowrap;pointer-events:none}
 .checkout-backlink{flex:0 0 auto;min-height:36px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--glass);color:var(--ink);font-size:11px}
@@ -1873,7 +1873,6 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   .cart-list{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
   .cart-bottom{padding-bottom:4px}
   .checkout-drawer .checkout-form{padding-bottom:16px}
-  .checkout-drawer{background:var(--sd-glass-shell-strong,var(--sd-reference-surface-strong))}
   /* The full-screen viewer becomes a framed frosted gallery; no faux monogram is used as a logo. */
   .sd-fullscreen-header{display:none!important}
   .sd-fullscreen-stage{
@@ -2023,7 +2022,7 @@ html.dark .sd-fullscreen-share{
   -webkit-backdrop-filter:blur(24px) saturate(145%);
   backdrop-filter:blur(24px) saturate(145%);
 }
-#cartDrawer{background:var(--sd-reference-surface)!important}
+#cartDrawer,#checkoutDrawer{background:var(--sd-reference-surface)!important}
 .cart-list{width:100%;align-items:stretch}
 .cart-row{width:100%;box-sizing:border-box}
 
@@ -3103,9 +3102,8 @@ html.dark #productOverlay .detail-price:not([hidden]){color:#f4d5a4}
 }
 
 
-/* Storefront checkout simplification: full-page checkout, clear cart selection and visible order reference. */
-.checkout-drawer{left:0;right:0;width:100vw;max-width:none;border-radius:0}
-@media(max-width:760px){.checkout-drawer{left:0;right:0;width:100vw;max-width:none;border-radius:0;padding-inline:12px}}
+/* Keep cart and checkout within the same inset rounded mobile glass sheet.
+   The shared drawer rules above own geometry; no full-viewport override here. */
 .cart-row{grid-template-columns:22px 60px minmax(0,1fr) max-content!important;gap:9px}
 .cart-pick{display:grid;place-items:center;align-self:stretch;cursor:pointer}
 .cart-pick input{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
