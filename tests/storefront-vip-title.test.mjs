@@ -32,7 +32,7 @@ assert.match(html,/\$\('#detailTitle'\)\.innerHTML=productTitleWithVip/,"Product
 assert.match(html,/<div class="cart-row-copy"><strong>\$\{productTitleWithVip/,"Cart product names must highlight VIP");
 assert.match(html,/name\.innerHTML=productTitleWithVip/,"Checkout product names must highlight VIP");
 assert.match(html,/productTitleWithVip\(p\.title\|\|'Sản phẩm tuyển chọn'\)/,"Favorites must keep VIP");
-assert.match(html,/productTitleWithVip\(item\.title\|\|'Sản phẩm',false\)/,"Order history must keep VIP");
+assert.match(html,/productTitleWithVip\(product\.title,false\)/,"Order history must keep VIP after resolving product metadata for its image");
 assert.match(html,/document\.title=displayProductName/,"SEO title must remain plain text");
 assert.match(html,/img\.alt=displayProductName/,"Image alt text must remain plain text");
 console.log("PASS: display-only red VIP highlight in product title, detail, cart, favorites, checkout; secure text and light/dark CSS preserved.");

@@ -12,7 +12,7 @@ const orderSection=storefront.indexOf('id="order"');
 const trackingCard=storefront.indexOf('id="orderTracking"');
 const featuredSection=storefront.indexOf('id="featured"');
 assert.ok(orderSection>=0&&orderSection<trackingCard&&trackingCard<featuredSection,"Public tracking belongs below Đặt hàng an tâm and above Featured");
-for(const marker of ['id="sdTrackForm"','id="sdTrackResults"',"$('#sdTrackForm').addEventListener","function sdTrackRender(","function sdTrackDate(","/* SD_TRACK_6:"])
+for(const marker of ['id="sdTrackForm"','id="sdTrackResults"',"$('#sdTrackForm').addEventListener","function sdTrackRender(","function sdTrackDate(","Nhận cọc & xác nhận đơn","Nhận đủ tiền & xác nhận đơn","/* SD_TRACK_6:"])
  assert.ok(storefront.includes(marker),"Missing mobile/desktop public tracking UI: "+marker);
 for(const disallowed of [
  "Nhập mã đơn hoặc số điện thoại đã đặt để xem 6 bước xử lý của Shop.",

@@ -33,7 +33,10 @@ assert.match(glass,/\.checkout-drawer \.sd-checkout-option/,"Checkout additions 
 assert.ok(html.includes('id="sdCheckoutStepper"')&&html.includes('id="sdCheckoutShippingStep"')&&html.includes('id="sdCheckoutPaymentStep"'));
 assert.ok(html.includes('id="sdCheckoutItemSummary"'),'Payment step shows the exact products and quantities before the order is sent');
 assert.doesNotMatch(html,/id="sdCheckoutReviewStep"/,'Checkout has no duplicate review page');
-assert.match(html,/sd-order-reference/,'Order number is prominent on confirmation');
+assert.match(html,/sd-order-reference/,'Order number is prominent after QR');
+assert.match(html,/sd-payment-transfer-stage[\s\S]*sd-payment-order-stage/,'QR transfer and order reference are separate customer-visible stages');
+assert.match(html,/Nhận cọc & xác nhận đơn/,'Order tracking combines deposit receipt and order confirmation into one milestone');
+assert.match(html,/data-account-orders-refresh/,'Linked order cards can reload server-confirmed payment state');
 assert.match(html,/checkout-drawer\{left:0;right:0;width:100vw/,'Checkout uses the full screen');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
@@ -53,7 +56,7 @@ assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displ
 assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice into checkout');
 assert.match(html,/async function saveCheckoutAddressFromForm\(\)/,'A successfully placed order saves its address for the next order');
 assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Success view uses the requested progress message');
-assert.match(html,/sd-order-received-note[\s\S]*Shop đã tiếp nhận đơn\. Sẽ bắt đầu làm sản phẩm khi đã nhận được khoản thanh toán\./,'Order confirmation explains when production starts');
+assert.match(html,/sd-order-received-note[\s\S]*Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn\./,'Order confirmation explains when production starts');
 assert.match(html,/\.checkout-drawer \[hidden\]\{display:none!important\}/,'Hidden checkout actions remain hidden after order submission');
 assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number explains how to copy it');
 assert.match(html,/Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng\./,'Deposit overpayment is explained in plain language');
