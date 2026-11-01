@@ -472,6 +472,9 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
   }
  },available);
  await expect(rows).toHaveCount(4);
+ // Real four-item carts can contain long luxury product names. Reserve their
+ // full card height in the visual fixture to reproduce the 390x844 overflow.
+ await rows.evaluateAll(nodes=>nodes.forEach(row=>{row.style.minHeight='174px'}));
  await expect(page.locator('#cartCheckout #cartSubtotal')).toBeVisible();
  await expect(page.locator('#cartZalo')).toHaveCount(0);
  await expect.poll(()=>drawer.evaluate(el=>Math.abs(el.getBoundingClientRect().left-7))).toBeLessThanOrEqual(2);
