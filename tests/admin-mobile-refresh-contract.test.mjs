@@ -32,7 +32,15 @@ assert.match(html, /function adminViewHasPendingData\(targetView\)/, 'Render a r
 assert.match(html, /if\(main\.querySelector\('\.admin-loading-grid'\)\)return;\s*if\(view==='order-detail'\)/, 'Return after painting route skeletons before binding controls that do not exist yet');
 assert.match(html, /const ADMIN_PRIMARY_VIEWS=\['dashboard','products','orders','customers'\]/, 'Limit directional transitions to the four main dock routes');
 assert.match(html, /duration:280,easing:'cubic-bezier\(\.22,\.72,\.22,1\)'/, 'Keep route and reveal motion within the requested 250–300ms range');
-assert.match(html, /to>from\?'slide-forward':'slide-back'/, 'Choose slide direction from the primary route order');
+assert.match(html, /requested\?\.type==='bottom-tab'&&from>=0&&to>=0&&from!==to\)return null/, 'Bottom dock navigation must not transform the page surface');
+assert.match(html, /if\(requested\?\.type==='history'&&from>=0&&to>=0&&from!==to\)return\{type:to>from\?'slide-forward':'slide-back'\}/, 'Keep directional motion for browser history navigation');
+const routeMotionSource = html.match(/function adminRouteMotion\([\s\S]*?\n\}/)?.[0];
+assert.ok(routeMotionSource, 'Route motion function exists');
+const adminRouteMotion = vm.runInNewContext(`(()=>{const ADMIN_PRIMARY_VIEWS=['dashboard','products','orders','customers'];function adminConsumeRenderMotionIntent(){return null}function adminOriginMotion(){return null};${routeMotionSource};return adminRouteMotion})()`);
+assert.equal(adminRouteMotion('products','orders',{type:'bottom-tab'}), null, 'Forward dock navigation must not animate the page surface');
+assert.equal(adminRouteMotion('customers','products',{type:'bottom-tab'}), null, 'Reverse dock navigation must not animate the page surface');
+assert.equal(adminRouteMotion('products','orders',{type:'history'})?.type, 'slide-forward', 'Forward browser history navigation keeps its transition');
+assert.equal(adminRouteMotion('customers','products',{type:'history'})?.type, 'slide-back', 'Reverse browser history navigation keeps its transition');
 assert.match(html, /function adminOriginMotion\(source\)/, 'Use the last pointer or keyboard position for non-tab reveals');
 assert.match(html, /adminAnimateSurface\(panel,adminOriginMotion\(a\)\)/, 'Open the More menu from its trigger point');
 assert.match(html, /closest\('#main details > summary'\)/, 'Expand native Admin disclosures from their summary point');
