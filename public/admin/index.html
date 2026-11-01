@@ -2019,6 +2019,9 @@ body:has(#main .statgrid) #main .pagehead .btn.primary:disabled{opacity:.45;tran
  .mobiletabs{position:fixed;display:grid;z-index:7;left:0;right:0;bottom:calc(var(--sd-dock-bottom,18px) + env(safe-area-inset-bottom));width:min(calc(100% - 28px),520px);height:var(--sd-dock-height,61px);min-height:var(--sd-dock-height,61px);margin:0 auto;padding:5px;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;border-radius:30px}
  body:has(#appView:not(.hidden)) .mobiletabs{border:1px solid transparent;background:var(--sd-admin-dock-face);box-shadow:var(--sd-admin-shadow);-webkit-backdrop-filter:blur(18px) saturate(125%);backdrop-filter:blur(18px) saturate(125%)}
  body:has(#appView:not(.hidden)) .mobiletabs .nav{position:relative;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:0;padding:4px 1px;gap:3px;border-radius:20px;background:var(--sd-admin-tile-face);--sd-admin-rim:var(--sd-admin-tile-rim);box-shadow:var(--sd-admin-tile-shadow);white-space:nowrap;font-size:clamp(9px,2.55vw,11px);font-weight:500;line-height:1.15;letter-spacing:-.025em;color:var(--sd-admin-ink)}
+ /* The dock is fixed; its tab tiles must not inherit the shared press translateY. */
+ body:has(#appView:not(.hidden)) .mobiletabs .nav:active,
+ body:has(#appView:not(.hidden)) .mobiletabs .nav[data-sd-glass-press="true"]{transform:none}
  .mobiletabs:has(.nav:first-child.active){grid-template-columns:1.2fr repeat(4,minmax(0,1fr))}
  .mobiletabs .nav span:first-child{width:auto}
  .mobiletabs .nav span:first-child svg{width:19px;height:19px}
