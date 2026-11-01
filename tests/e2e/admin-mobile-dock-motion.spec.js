@@ -32,7 +32,13 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
       });
     }
     await page.goto(fixture?'https://admin-dock-fixture.invalid/admin/':adminUrl.href,{waitUntil:'domcontentloaded'});
+    await page.waitForFunction(()=>{
+      const app=document.querySelector('#appView'),login=document.querySelector('#loginView');
+      return app&&!app.classList.contains('hidden')||login&&!login.classList.contains('hidden');
+    },undefined,{timeout:12000});
+    let submittedLogin=false;
     if(!fixture&&await page.locator('#loginView').isVisible()){
+      submittedLogin=true;
       await page.locator('#password').fill(password);
       await page.locator('#loginForm button[type="submit"]').click();
     }
@@ -41,7 +47,8 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
       const loginVisible=await page.locator('#loginView').isVisible();
       const loginError=loginVisible?await page.locator('#loginError').innerText():'';
       throw new Error('ADMIN_AUTH_NOT_ESTABLISHED: '+(loginError||
-        (loginVisible?'Login form remained visible after submission':'Admin app did not become visible')));
+        (loginVisible?(submittedLogin?'Login form remained visible after submission':'Login form appeared without a submit'):
+          'Admin app did not become visible')));
     }
     await expect(page.locator('.mobiletabs')).toBeVisible();
     await expect(page.locator('body > .mobiletabs')).toBeVisible();
