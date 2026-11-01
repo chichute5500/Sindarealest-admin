@@ -7,7 +7,7 @@ assert.match(html,/function ensureOrderGuideOpen\(\)/,'Order guide can be expand
 assert.match(html,/#detailOrderLink'\)\.addEventListener\('click',[^\n]*ensureOrderGuideOpen\(\)/,'Product detail link expands order guide');
 assert.match(html,/hashchange',[^\n]*location\.hash==='#order'/,'Hashchange expands order guide');
 assert.match(html,/async function consultProduct\(id\)[^\n]*optionText=option\?/,'Zalo product message includes selected variant');
-assert.match(html,/async function consultCart\(\)[^\n]*Biến thể:/,'Zalo cart message includes variants');
+assert.doesNotMatch(html,/async function consultCart\(\)|id="cartZalo"|\$\('#cartZalo'\)/,'Cart no longer contains the removed Zalo action or handler');
 assert.match(html,/revealObserver\.unobserve\(el\)/,'Reveal observer stops after first show');
 assert.doesNotMatch(html,/el\.classList\.remove\('is-visible'\)/,'Reveal must not hide elements on reverse scroll');
 assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,'Welcome has a shorter delay');
