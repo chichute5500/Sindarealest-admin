@@ -135,7 +135,10 @@ assert.doesNotMatch(html,/sd-scroll-can-up|sd-scroll-can-down|sd-scroll-fade|sdU
 assert.doesNotMatch(html,/#cartList,#checkoutForm\{[^}]*mask-image/,'Cart and Checkout are not masked or faded at their scroll boundaries');
 assert.match(html,/\.cart-list\{[^}]*background:transparent/,'Cart list shares one uninterrupted glass surface with footer');
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*background:transparent/,'Checkout content shares one uninterrupted glass surface with footer');
-assert.match(html,/\.cart-drawer\{overflow-y:hidden!important;overscroll-behavior:contain\}/,'Cart shell does not create a second mobile scroll region');
+assert.match(html,/\.cart-drawer\{overflow-y:auto!important;overscroll-behavior:contain/,'Mobile cart uses its outer shell as its only scrolling container');
+assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-list\{[^}]*overflow-y:visible!important/,'Populated cart no longer crops half a product tile inside an inner scrollport');
+assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2;margin-top:auto\}/,'Combined subtotal and checkout bar remains reachable while outer drawer scrolls');
+assert.match(html,/#cartDrawer \.cart-header\{position:sticky;top:0;z-index:2\}/,'Floating cart header remains in place in the unified scroll region');
 
 assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border-top:0;background:transparent;box-shadow:none/,'Checkout footer has no full-width separator or detached glass rectangle');
 
