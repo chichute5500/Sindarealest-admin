@@ -54,6 +54,7 @@ assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentCho
 assert.match(html,/async function saveCheckoutAddressFromForm\(\)/,'A successfully placed order saves its address for the next order');
 assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Success view uses the requested progress message');
 assert.match(html,/sd-order-received-note[\s\S]*Shop đã tiếp nhận đơn\. Sẽ bắt đầu làm sản phẩm khi đã nhận được khoản thanh toán\./,'Order confirmation explains when production starts');
+assert.match(html,/\.checkout-drawer \[hidden\]\{display:none!important\}/,'Hidden checkout actions remain hidden after order submission');
 assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number explains how to copy it');
 assert.match(html,/Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng\./,'Deposit overpayment is explained in plain language');
 assert.match(html,/Số tiền thanh toán khi nhận hàng '\+formatVnd\(choice\.codExpected\)/,'Payment choices use clear delivery-payment wording');
