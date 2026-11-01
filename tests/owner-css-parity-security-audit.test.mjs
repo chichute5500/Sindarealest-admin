@@ -20,16 +20,21 @@ test('Admin has exactly one approved blue palette for each theme, not obsolete b
  for(const obsolete of ['--bg:#f4f0e9','--bg:#eee7dc','--bg:#f2eee6','--bg:#090908'])
   assert.ok(!css.includes(obsolete),'Obsolete overwritten theme should be removed: '+obsolete);
  assert.match(css,/:root\{[\s\S]*?color-scheme:only light;[\s\S]*?--bg:#eaf3fb;/);
- assert.match(css,/:root\[data-admin-theme="dark"\]\{[\s\S]*?color-scheme:only dark;[\s\S]*?--bg:#09131d;/);
+ assert.match(css,/:root\[data-admin-theme="dark"\]\{[\s\S]*?color-scheme:only dark;[\s\S]*?--bg:#061522;/);
  assert.match(css,/font-family:Inter,"Noto Sans",system-ui/,'Preserve approved Admin typography');
  assert.match(css,/color:var\(--ink\)/,'Preserve inherited Admin text');
 });
 
 test('Admin and Storefront share the approved light-blue identity without forcing same layouts or dark palettes',()=>{
- for(const token of ['--ink:#142a3c','--gold:#5c91b9']){
+ for(const token of ['--gold:#5c91b9']){
   assert.ok(css.includes(token),'Admin missing shared token '+token);
   assert.ok(web.includes(token),'Storefront missing shared token '+token);
  }
+ // Admin's measured reference uses a deeper navy; Storefront keeps its
+ // existing Owner-approved text color and independent theme palette.
+ assert.ok(css.includes('--ink:var(--sd-admin-ink);'));
+ assert.ok(css.includes('--sd-admin-ink:#091632;'));
+ assert.ok(web.includes('--ink:#142a3c;'));
  assert.ok(css.includes('--bg:#eaf3fb;'));
  assert.ok(web.includes('--page:#eaf3fb;'));
  assert.ok(web.includes(':root{color-scheme:only light;'));

@@ -10,7 +10,7 @@ const expected=[
   '#main .product-table .thumb{width:62px',
   '#main .order-table .order-mobile-summary',
   '#main .activity-log-card',
-  '#backdrop .editor-tab[aria-selected="true"]',
+  '.editor-tab[aria-selected="true"]',
   'body:has(#loginView:not(.hidden)) .logincard',
   '@media(max-width:390px)',
   '@media(max-width:359px)',
@@ -19,6 +19,8 @@ const expected=[
   "activityFiltersExpanded=false"
 ];
 for(const selector of expected) assert.ok(src.includes(selector),'Missing reference-design safeguard: '+selector);
+assert.match(src, /\.editor-tab\[aria-selected="true"\]\{[^}]*background:var\(--glass-selected-face\)[^}]*box-shadow:var\(--sd-admin-control-shadow\),var\(--sd-admin-selected-shadow\)/,
+  'Editor tab selection must use the shared light/dark glass state tokens');
 for(const id of ['loginForm','password','productForm','pTitle','pCategory','pDescription','pPrice','imageGrid','saveProduct','activityAdvancedToggle'])
  assert.ok(src.includes('id="'+id+'"'),'Reference-design pass must not remove business control '+id);
 assert.ok(src.includes('document.documentElement.dataset.adminTheme'),'Both themes must be supported');
