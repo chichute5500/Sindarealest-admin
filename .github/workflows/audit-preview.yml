@@ -3,6 +3,12 @@ on:
   # Full remote QA / deployment only for a pinned, intentionally selected candidate SHA.
   # Local source checks still run per commit; no Cloudflare requests for intermediate edits.
   workflow_dispatch:
+  # One-time Owner-approved Preview trigger (01 Nov 2026): only a dedicated
+  # marker file activates this isolated non-production workflow on push.
+  # Ordinary source commits never deploy or consume Cloudflare requests.
+  push:
+    branches: [fix/audit-2026-10]
+    paths: [docs/qa/AUDIT_PREVIEW_DISPATCH_20261101.trigger]
 permissions:
   contents: read
 concurrency:
