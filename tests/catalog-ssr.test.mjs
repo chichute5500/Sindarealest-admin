@@ -55,12 +55,12 @@ assert.match(storefront,/if\(!active&&products\.length&&featured&&!featured\.que
 // Offscreen Home material artwork must not load/rotate on direct /sanpham.
 assert.match(storefront,/function initArtSlideshowWhenVisible\(\)/);
 assert.match(storefront,/artSlideObserver\.observe\(slide\)/);
-assert.match(storefront,/bindReveal\\(document\\);initArtSlideshowWhenVisible\\(\\);/,
+assert.ok(storefront.includes('bindReveal(document);initArtSlideshowWhenVisible();'),
   'Home slideshow still starts only after products are hydrated');
 const apiStart=storefront.indexOf("await fetch('/api/products'");
 const initStart=storefront.indexOf('async function init()');
 assert.ok(initStart>=0&&apiStart>initStart);
-assert.match(storefront.slice(initStart,apiStart),/setupNavSpy\\(\\)/,
+assert.ok(storefront.slice(initStart,apiStart).includes('setupNavSpy();'),
   'Mobile section navigation starts before product API resolves');
 assert.match(storefront,/if\(!active\)initArtSlideshowWhenVisible\(\)/);
 assert.match(storefront,/document\.documentElement\.classList\.contains\('sd-catalog-route'\)\)return;const rect=/);
