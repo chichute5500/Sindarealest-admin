@@ -318,7 +318,7 @@ for (const {width,height,theme} of matrix) {
           const elapsedMs=await page.evaluate(start=>performance.now()-start,started);
           const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
           const dockAfter=await readDockGeometry();
-          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockStationary:true,
+          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockFixedToViewport:true,viewportChanged:dock.innerWidth!==dockAfter.innerWidth||dock.visualViewportWidth!==dockAfter.visualViewportWidth,
             dockViewport:{before:{innerWidth:dock.innerWidth,clientWidth:dock.clientWidth,visualViewportWidth:dock.visualViewportWidth,x:dock.x,width:dock.width},
               after:{innerWidth:dockAfter.innerWidth,clientWidth:dockAfter.clientWidth,visualViewportWidth:dockAfter.visualViewportWidth,x:dockAfter.x,width:dockAfter.width}},
             skeletonVisible:target==='orders'||target==='customers'});
@@ -335,7 +335,7 @@ for (const {width,height,theme} of matrix) {
             expect(Math.abs(snapshot.width-expectedWidth),'The fixed dock width must match its current CSS viewport').toBeLessThanOrEqual(.5);
             expect(Math.abs(snapshot.x-expectedX),'The fixed dock must stay centered in its current CSS viewport').toBeLessThanOrEqual(.5);
           }
-          if(dockAfter.clientWidth===dock.clientWidth){
+          if(dockAfter.innerWidth===dock.innerWidth&&dockAfter.visualViewportWidth===dock.visualViewportWidth){
             expect(Math.abs(dockAfter.x-dock.x),'The fixed dock must keep its horizontal position when the CSS viewport is unchanged').toBeLessThanOrEqual(.5);
             expect(Math.abs(dockAfter.width-dock.width),'The fixed dock must keep its width when the CSS viewport is unchanged').toBeLessThanOrEqual(.5);
           }
