@@ -18,6 +18,14 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const errors=[],writes=[];
  page.on('pageerror',error=>errors.push(error.message));
  page.on('request',request=>{if(request.url().includes('/api/')&&!['GET','HEAD'].includes(request.method()))writes.push(request.method()+' '+new URL(request.url()).pathname)});
+ // Keep address selection deterministic in the isolated Preview browser run; the payment/order API remains real.
+ await page.route('https://provinces.open-api.vn/api/v2/p/**',async route=>{
+  const requestUrl=new URL(route.request().url());
+  const payload=requestUrl.searchParams.has('depth')
+   ?{code:79,name:'Thành phố Hồ Chí Minh',wards:[{code:26560,name:'Phường Bà Rịa'}]}
+   :[{code:79,name:'Thành phố Hồ Chí Minh'}];
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(payload)});
+ });
  const response=await page.goto(url,{waitUntil:'domcontentloaded'});
  expect(response?.status()).toBe(200);
  const welcome=page.locator('#welcomeSplash');
