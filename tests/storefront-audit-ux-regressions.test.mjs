@@ -31,7 +31,7 @@ assert.match(html,/\.checkout-drawer\.open\{transform:translateX\(0\);visibility
 assert.match(html,/\.checkout-drawer\{position:fixed;[^\n]*visibility:hidden;pointer-events:none;transition:transform/,'Closed checkout uses the original delayed visibility slide-out');
 
 const headMarkup=html.slice(0,html.indexOf('</head>'));
-const styleStarts=[...html.matchAll(/<style\\b[^>]*>/gi)].map(m=>m.index);
+const styleStarts=[...html.matchAll(/<style\b[^>]*>/gi)].map(m=>m.index);
 assert.equal(styleStarts.length,28,'CSS is retained without accidentally dropping an approved rule block');
 assert.ok(styleStarts.every(offset=>offset<headMarkup.length),
  'All visual CSS must be available before the first header/hero can paint');
