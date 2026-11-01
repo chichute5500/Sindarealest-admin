@@ -1305,12 +1305,7 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 
 /* Reference-aligned cart and a separate order-details step. */
 .cart-drawer{width:min(460px,100%);background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%)}
-.cart-list{min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 0 16px;scroll-padding-block:12px 16px}
-/* Fade only when more content exists beyond the visible scrollport. A hard crop at
-   the title/footer makes glass cards look as if the entire background was sliced. */
-#cartList,#checkoutForm{--sd-scroll-fade-top:0px;--sd-scroll-fade-bottom:0px;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--sd-scroll-fade-top),#000 calc(100% - var(--sd-scroll-fade-bottom)),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 var(--sd-scroll-fade-top),#000 calc(100% - var(--sd-scroll-fade-bottom)),transparent 100%)}
-#cartList.sd-scroll-can-up,#checkoutForm.sd-scroll-can-up{--sd-scroll-fade-top:22px}
-#cartList.sd-scroll-can-down,#checkoutForm.sd-scroll-can-down{--sd-scroll-fade-bottom:28px}
+.cart-list{min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 0 16px;scroll-padding-block:12px 16px;background:transparent}
 #cartList::-webkit-scrollbar,#checkoutForm::-webkit-scrollbar{display:none}
 .cart-bottom{flex:0 0 auto;padding:13px 0 calc(4px + env(safe-area-inset-bottom))}
 .cart-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink);font-size:12px;line-height:1.4}
@@ -1335,7 +1330,7 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 .checkout-intro{flex:0 0 auto}
 .checkout-intro p{margin:0 0 4px;font-size:12px;font-weight:650;line-height:1.5}
 .checkout-intro small{display:block;color:var(--muted);font-size:10px;line-height:1.6}
-.checkout-drawer .checkout-form{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-padding-block:12px 18px;margin:0;padding:12px 3px 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start;grid-auto-rows:max-content}
+.checkout-drawer .checkout-form{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-padding-block:12px 18px;margin:0;padding:12px 3px 18px;background:transparent;display:grid;grid-template-columns:minmax(0,1fr);gap:12px;align-content:start;grid-auto-rows:max-content}
 .checkout-drawer .checkout-fields{gap:9px;padding-bottom:6px}
 .checkout-drawer .checkout-fields input,.checkout-drawer .checkout-fields select,.checkout-drawer .checkout-fields textarea{min-height:42px;font-size:12px}
 .checkout-drawer .checkout-fields textarea{min-height:68px}
@@ -4679,16 +4674,6 @@ function sdDetailUpdatePaymentChoice(){
 }
 function customerPriceLabel(product){return hasConfirmedPublicPrice(product)?formatVnd(product.price):''}
 function formatVnd(value){return new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(Number(value))+'₫'}
-// Visual-only, zero-network scroll edge indicator. Avoid permanently masking
-// the first/last items when no more content exists in that direction.
-function sdUpdateDrawerScrollEdges(el){
- if(!el)return;
- const overflow=el.scrollHeight>el.clientHeight+2;
- el.classList.toggle('sd-scroll-can-up',overflow&&el.scrollTop>2);
- el.classList.toggle('sd-scroll-can-down',overflow&&el.scrollTop+el.clientHeight<el.scrollHeight-2);
-}
-function sdSyncDrawerScrollEdges(){sdUpdateDrawerScrollEdges($('#cartList'));sdUpdateDrawerScrollEdges($('#checkoutForm'))}
-function sdQueueDrawerScrollEdges(){requestAnimationFrame(sdSyncDrawerScrollEdges)}
 function renderCart(){
  const entries=cartEntries(),selected=selectedCartEntries();
  const itemCount=entries.reduce((sum,item)=>sum+item.q,0),selectedCount=selected.reduce((sum,item)=>sum+item.q,0);
@@ -4699,7 +4684,7 @@ function renderCart(){
  if(!entries.length){
   $('#cartList').innerHTML='<div class="empty-cart">Giỏ hàng đang trống.<br>Hãy chọn sản phẩm bạn quan tâm.</div>';
   $('#cartSubtotal').textContent='—';
-  sdQueueDrawerScrollEdges();return;
+  return;
  }
  const allPriced=selected.length>0&&selected.every(({p})=>hasConfirmedPublicPrice(p));
  $('#cartList').innerHTML=entries.map(({p,q,key,option})=>{
@@ -4710,7 +4695,6 @@ function renderCart(){
  }).join('');
  const subtotal=selected.reduce((sum,{p,q})=>sum+(hasConfirmedPublicPrice(p)?Number(p.price)*q:0),0);
  $('#cartSubtotal').textContent=selected.length?(allPriced?formatVnd(subtotal):selected.some(({p})=>hasConfirmedPublicPrice(p))?formatVnd(subtotal)+' (chưa gồm sản phẩm chờ báo giá)':'Chờ báo giá'):'—';
- sdQueueDrawerScrollEdges();
 }
 function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
 function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';const target=cartReturnFocus;cartReturnFocus=null;if(restoreFocus&&wasOpen)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';const fallback=$('#cartOpen')||$('#mobileCartNav');(available?target:fallback)?.focus({preventScroll:true})},0)}
@@ -4776,7 +4760,7 @@ function sdCheckoutSetStep(step){
  [[1,'#sdCheckoutShippingStep'],[2,'#sdCheckoutPaymentStep']].forEach(([n,id])=>$(id).hidden=n!==sdCheckoutStep);
  $('#sdCheckoutReviewAddressRow').hidden=sdCheckoutStep!==2;
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
- $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;sdQueueDrawerScrollEdges();
+ $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;
  sdCheckoutSummary('#sdCheckoutItemSummary');
  if(sdCheckoutStep===2){
   const f=$('#checkoutForm').elements;
@@ -5012,9 +4996,6 @@ function sdTrackRender(orders){
  result.hidden=orders.length===0;
 }
 function bindEvents(){
- // Bind once; passive scroll events only update the two fade classes.
- for(const el of [$('#cartList'),$('#checkoutForm')])el?.addEventListener('scroll',()=>sdUpdateDrawerScrollEdges(el),{passive:true});
- window.addEventListener('resize',sdQueueDrawerScrollEdges,{passive:true});
  window.addEventListener('hashchange',()=>{if(location.hash==='#order')ensureOrderGuideOpen()});
  if(location.hash==='#order')ensureOrderGuideOpen();
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
@@ -5167,7 +5148,7 @@ function sdCheckoutAdvanceToOrderCode(){
  $('#sdCheckoutDone').hidden=false;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';
  $('#sdCheckoutStepTitle').textContent='Mã đơn hàng';
  $('#sdCheckoutStepSubtitle').textContent='Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.';
- $('#checkoutForm').scrollTop=0;sdQueueDrawerScrollEdges();
+ $('#checkoutForm').scrollTop=0;
 }
 async function sdCheckoutFinalizeOrder(){
  if(!sdCheckoutSuccess||sdCheckoutOrderCreated)return;
