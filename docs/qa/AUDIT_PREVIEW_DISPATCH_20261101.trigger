@@ -28,3 +28,5 @@ Only Preview Pages branch fix/audit-2026-10; Production NO.
 2026-11-01 candidate 93d9057d3b7e: SSR catalog images 3-8 defer to viewport observer with no-JS <noscript> fallback. Source full CI run 41298892694 PASS; local-only mocked Playwright run 41298892608 PASS. Deploy ONE isolated Preview; verify source marker and no-JS SSR. Never Main / Production.
 
 2026-11-01 single-candidate a82ec23e9166: reserve mobile catalog categoryFilters min-height:50px in existing CSS, no overlay or Owner-PASS design change. Source CI 41300008978 PASS and mocked checkout 41300008986 PASS; deploy isolated Preview only.
+
+2026-11-01 Final Owner PASS integration candidate: safely merged Main Admin + PR159 Storefront at 455602c6ad8f4804d047f1c3f490f730c67db46d. One SHA-pinned isolated Preview and read-only browser QA; do not deploy Production from these workflows.
