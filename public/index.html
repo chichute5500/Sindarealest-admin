@@ -5517,4 +5517,10 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
  document.addEventListener('touchmove',release,{passive:true});
  document.addEventListener('scroll',release,true);
  window.addEventListener('blur',release);
- document.addEventListener('visibilitychange',()=>{if(document.hidden)release()})
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)release()});
+})();
+</script>
+
+
+</body>
+</html>
