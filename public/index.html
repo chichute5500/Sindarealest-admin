@@ -2489,7 +2489,7 @@ function sdCheckoutRenderQuote(){
  if(ready)for(const choice of q.options||[]){
   const b=document.createElement('button'),radio=document.createElement('span'),details=document.createElement('span'),label=document.createElement('b'),hint=document.createElement('small'),amount=document.createElement('strong');
   b.type='button';b.className='sd-checkout-option tap-target';b.dataset.sdPaymentOption=choice.value;b.setAttribute('role','radio');radio.className='sd-checkout-radio';details.className='sd-checkout-option-label';amount.className='sd-checkout-option-price';
-  label.textContent=choice.value==='full'?'Thanh toán hết · giảm 5%':'Đặt cọc 30%';hint.textContent=choice.value==='full'?'Giá gốc '+formatVnd(q.total)+' · Giảm '+formatVnd(choice.discountAmount)+' · Khi nhận hàng 0đ':'Chuyển '+formatVnd(choice.amount)+' · Khi nhận hàng '+formatVnd(choice.codExpected);amount.textContent=formatVnd(choice.amount);details.append(label,hint);b.append(radio,details,amount);options.append(b);
+  label.textContent=choice.value==='full'?'Thanh toán hết · giảm 5%':'Đặt cọc 30%';hint.textContent=choice.value==='full'?'Giá gốc '+formatVnd(q.total)+' · Giảm '+formatVnd(choice.discountAmount)+' · Thanh toán khi nhận hàng 0đ':'Chuyển '+formatVnd(choice.amount)+' · Số tiền thanh toán khi nhận hàng '+formatVnd(choice.codExpected);amount.textContent=formatVnd(choice.amount);details.append(label,hint);b.append(radio,details,amount);options.append(b);
  }
  qrBox.hidden=true;
  sdCheckoutRefreshChoice();
