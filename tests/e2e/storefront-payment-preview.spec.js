@@ -36,6 +36,14 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
    headerShift:Math.abs(rect(header).top-headY),footerShift:Math.abs(rect(footer).top-footerY),
    navShift:navY-rect(nav).top,navVisible,introShift:introY-rect(intro).top,scroll,
    headerGlass:getComputedStyle(header).backgroundImage,footerGlass:getComputedStyle(footer).backgroundImage,
+   cartHeaderGlass:getComputedStyle(document.querySelector('#cartDrawer .cart-header')).backgroundImage,
+   cartHeaderRadius:getComputedStyle(document.querySelector('#cartDrawer .cart-header')).borderRadius,
+   checkoutHeaderRadius:getComputedStyle(header).borderRadius,
+   cartHeaderShadow:getComputedStyle(document.querySelector('#cartDrawer .cart-header')).boxShadow,
+   checkoutHeaderShadow:getComputedStyle(header).boxShadow,
+   cartTitleWeight:parseInt(getComputedStyle(document.querySelector('#cartDrawer .cart-header h2')).fontWeight,10),
+   footerBorder:getComputedStyle(footer).borderTopWidth,
+   cartFooterBorder:getComputedStyle(document.querySelector('#cartDrawer .cart-bottom')).borderTopWidth,
    cartSurface:getComputedStyle(document.querySelector('#cartDrawer')).backgroundColor,
    checkoutSurface:getComputedStyle(drawer).backgroundColor,
    cartRadius:getComputedStyle(document.querySelector('#cartDrawer')).borderRadius,
@@ -52,8 +60,14 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.titleFont).toContain('SD Serif');
  expect(state.headerShift).toBeLessThanOrEqual(1.5);
  expect(state.footerShift).toBeLessThanOrEqual(1.5);
- expect(state.headerGlass,'Header must not be a second detached glass card').toBe('none');
- expect(state.footerGlass,'Footer must not look like a white rectangular overlay').toBe('none');
+ expect(state.headerGlass,'Checkout must use the SAME floating glass as the cart header').toBe(state.cartHeaderGlass);
+ expect(state.headerGlass).toContain('gradient');
+ expect(state.checkoutHeaderRadius).toBe(state.cartHeaderRadius);
+ expect(state.checkoutHeaderShadow).toBe(state.cartHeaderShadow);
+ expect(state.cartTitleWeight).toBeGreaterThanOrEqual(700);
+ expect(state.footerGlass,'Footer must blend into the shared glass sheet').toBe('none');
+ expect(state.footerBorder,'No horizontal line across bottom checkout').toBe('0px');
+ expect(state.cartFooterBorder,'No horizontal line across cart bottom').toBe('0px');
  expect(state.checkoutSurface,'Same glass material as Cart').toBe(state.cartSurface);
  if(page.viewportSize().width<=760){
   expect(state.checkoutRadius,'Checkout must use same rounding as cart').toBe(state.cartRadius);
