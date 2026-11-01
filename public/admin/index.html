@@ -2377,7 +2377,7 @@ function ordersPage(){
    <div class="sd-order-card-top"><b>${esc(o.order_number)}</b><span>${esc(o.created_at||'')}</span></div>
    <div class="sd-order-card-main"><div class="sd-order-card-images">${items.slice(0,2).map(orderProductImageMarkup).join('')}</div><div class="sd-order-card-info"><strong>${esc(items[0]?.title||'Đơn hàng')}</strong><small>${items.length>1?'+'+(items.length-1)+' sản phẩm khác · ':''}${esc(o.full_name||'Khách hàng')} · ${esc(o.phone||'')}</small></div></div>
    <div class="sd-order-card-bottom"><strong class="sd-order-card-total">${esc(money(o.total))}</strong><span class="sd-order-card-payment">${esc(paymentLabel)}</span><span class="sd-order-card-chevron" aria-hidden="true">›</span></div>
-   ${Number(o.price_confirmation_required)===1?'<div class="sd-order-card-flag">Cần xác nhận giá</div>':''}
+   ${o.total===null||o.total===undefined||!Number.isSafeInteger(Number(o.total))||!items.length||items.some(item=>item.unitPrice===null||item.unitPrice===undefined)?'<div class="sd-order-card-flag">Đơn cũ thiếu giá</div>':''}
    <span class="sd-order-card-order-status">${esc(orderStatusLabel(o.status))}${net>0?' · Đã nhận '+esc(money(net)):''}</span>
   </article>`;
  }).join('');

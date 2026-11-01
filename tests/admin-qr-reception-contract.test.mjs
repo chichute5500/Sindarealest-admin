@@ -17,6 +17,8 @@ for(const state of ["none:'Chưa nhận'","short:'Nhận thiếu'","exact:'Nhậ
 assert.match(admin,/Nhập tiền đã về tài khoản\. Web tự tính số còn thiếu, nhận đủ hay nhận dư/,"ordinary flow uses the saved checkout price and method");
 assert.match(admin,/>Xác nhận tiền Shop đã nhận<\/button>/,"primary receipt action only confirms real money received");
 assert.doesNotMatch(admin,/Chốt giá|xác nhận điều kiện đơn hàng|data-terms-confirmed/,"normal order flow must not expose price/terms as separate tasks");
+assert.doesNotMatch(admin,/Cần xác nhận giá/,"new checkout prices must not look like a manual Admin price-confirmation task");
+assert.match(admin,/Đơn cũ thiếu giá/,"only historical orders missing prices need the old-order correction path");
 assert.match(admin,/paymentOption:selected/,"recording first receipt uses checkout choice");
 assert.match(admin,/Number\(linked\.amount\)!==Number\(order\.customer_payment_amount\)/,"amount mismatch must fail");
 assert.match(admin,/String\(linked\.transferReference\|\|''\)!==String\(order\.customer_transfer_reference/,"reference mismatch must fail");
