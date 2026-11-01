@@ -306,8 +306,11 @@ for (const {width,height,theme} of matrix) {
       if(width===432&&theme==='light'){
         await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="dashboard"]')).toBeVisible({timeout:500});
         const expected={products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',dashboard:'Tổng quan'};
-        const sequence=['products','orders','customers','orders','products','dashboard'];
-        for(const target of sequence){
+        const sequence=[
+          ['products','slide-forward'],['orders','slide-forward'],['customers','slide-forward'],
+          ['orders','slide-back'],['products','slide-back'],['dashboard','slide-back']
+        ];
+        for(const [target,direction] of sequence){
           const dock=await readDockGeometry();
           const started=await page.evaluate(()=>performance.now());
           await page.locator('.mobiletabs [data-view="'+target+'"]').tap();
@@ -319,8 +322,11 @@ for (const {width,height,theme} of matrix) {
               after:{innerWidth:dockAfter.innerWidth,clientWidth:dockAfter.clientWidth,visualViewportWidth:dockAfter.visualViewportWidth,x:dockAfter.x,width:dockAfter.width}},
             skeletonVisible:target==='orders'||target==='customers'});
           expect(elapsedMs,'Tab '+target+' shell must paint under 500ms while its data request is deliberately delayed').toBeLessThan(500);
-          expect(await page.locator('#main').getAttribute('data-admin-transition'),'Dock navigation must not animate a transformed page surface').toBeNull();
-          expect(await page.locator('#main').evaluate(el=>el.getAnimations({subtree:false}).length),'Dock navigation must not leave a page-surface animation running').toBe(0);
+          const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
+          expect(timing.transition,'Bottom tabs must retain their directional page transition').toBe(direction);
+          expect(timing.duration,'Directional tab motion must last 250–300ms').toBeGreaterThanOrEqual(250);
+          expect(timing.duration,'Directional tab motion must last 250–300ms').toBeLessThanOrEqual(300);
+          expect(timing.from,'Forward tabs enter from the right; reverse tabs enter from the left').toContain(direction==='slide-forward'?'22px':'-22px');
           expect(dockAfter.position,'The bottom dock must remain fixed while changing routes').toBe('fixed');
           expect(dockAfter.bottom,'The dock must stay anchored to the same safe-area bottom').toBe(dock.bottom);
           expect(Math.abs(dockAfter.height-dock.height),'The fixed dock must keep its height').toBeLessThanOrEqual(.5);
