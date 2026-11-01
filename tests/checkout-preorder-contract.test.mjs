@@ -119,6 +119,13 @@ assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
 assert.match(html,/\.cart-bottom\{border-top:0;padding-top:14px;background:transparent\}/,'Cart bottom has no full-width background seam');
+assert.match(html,/#cartList,#checkoutForm\{--sd-scroll-fade-top:0px;--sd-scroll-fade-bottom:0px;[\s\S]*?mask-image:linear-gradient\(/,'Both scrollports have conditional feathered edges');
+assert.match(html,/#cartList\.sd-scroll-can-up,#checkoutForm\.sd-scroll-can-up\{--sd-scroll-fade-top:22px\}/,'Top fade is enabled only when content exists above');
+assert.match(html,/#cartList\.sd-scroll-can-down,#checkoutForm\.sd-scroll-can-down\{--sd-scroll-fade-bottom:28px\}/,'Bottom fade is enabled only when content exists below');
+assert.match(html,/function sdUpdateDrawerScrollEdges\(el\)\{[\s\S]*?el\.classList\.toggle\('sd-scroll-can-up',overflow&&el\.scrollTop>2\)/,'Top fade tracks scroll position');
+assert.match(html,/el\.classList\.toggle\('sd-scroll-can-down',overflow&&el\.scrollTop\+el\.clientHeight<el\.scrollHeight-2\)/,'Bottom fade tracks remaining content');
+assert.match(html,/\.cart-drawer\{overflow-y:hidden!important;overscroll-behavior:contain\}/,'Cart shell does not create a second mobile scroll region');
+
 assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border-top:0;background:transparent;box-shadow:none/,'Checkout footer has no full-width separator or detached glass rectangle');
 
 
