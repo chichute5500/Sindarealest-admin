@@ -5,6 +5,17 @@ on:
   push:
     branches:
       - main
+    # No Production deploy for AI/QA instructions alone; runtime changes still deploy.
+    paths-ignore:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'GEMINI.md'
+      - '.cursor/rules/**'
+      - '.github/copilot-instructions.md'
+      - 'docs/QA_RESOURCE_POLICY.md'
+      - 'scripts/qa-resource-guard.mjs'
+      - '.github/workflows/qa-resource-policy.yml'
+      - '.github/workflows/deploy.yml'
 
 permissions:
   contents: read
@@ -78,12 +89,6 @@ jobs:
       # NEVER run a mutating D1 cutover from the routine production deploy.
       # Restore/migrations/catalog changes need a separately reviewed manual run.
 
-      - name: Build lightweight material tile images without touching originals
-        run: |
-          python3 -m pip install --quiet --break-system-packages Pillow
-          python3 scripts/build-material-thumbnails.py
-          python3 scripts/build-logo-asset.py
-          test -s public/images/brand-emblem-nav.webp
       - name: Deploy to verified Cloudflare Pages project
         if: success()
         env:
