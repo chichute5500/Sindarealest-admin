@@ -70,12 +70,13 @@ for (const {width,height,theme} of matrix) {
     }
     const delayedRouteCounts={orders:0,customers:0};
     const delayedRouteHandlers={};
+    const injectedDelayRequests=new WeakSet();
     try {
       if(width===432&&theme==='light'){
         // Test-only latency injection against the real, authenticated Preview GETs.
         // It proves route shells paint without waiting for live business data.
         for(const name of ['orders','customers']){
-          delayedRouteHandlers[name]=async route=>{delayedRouteCounts[name]++;await new Promise(resolve=>setTimeout(resolve,2200));await route.continue()};
+          delayedRouteHandlers[name]=async route=>{delayedRouteCounts[name]++;injectedDelayRequests.add(route.request());await new Promise(resolve=>setTimeout(resolve,2200));await route.continue()};
           await page.route('**/api/admin/'+name+'*',delayedRouteHandlers[name]);
         }
       }
@@ -108,7 +109,7 @@ for (const {width,height,theme} of matrix) {
           const timing=request.timing();
           const durationMs=Number.isFinite(timing.responseEnd)&&timing.responseEnd>=0?timing.responseEnd:null;
           const timeToFirstByteMs=Number.isFinite(timing.responseStart)&&timing.responseStart>=0?timing.responseStart:null;
-          report.apiRouteTimings.push({path:url.pathname,durationMs,timeToFirstByteMs,testInjectedDelay:width===432&&theme==='light'});
+          report.apiRouteTimings.push({path:url.pathname,durationMs,timeToFirstByteMs,testInjectedDelay:injectedDelayRequests.delete(request)});
         } catch {}
       });
       // Reject stale alias HTML before authenticating or collecting evidence.
@@ -449,6 +450,8 @@ for (const {width,height,theme} of matrix) {
       await expect(page.locator('#orderResultSummary')).toHaveText(/^Hiển thị \d+ \/ \d+ đơn hàng$/,{timeout:20000});
       const statusFilter=page.locator('#orderStatusFilter');
       if(await statusFilter.count()&&await statusFilter.locator('option').count()>1){
+        await expect.poll(()=>page.locator('#main').getAttribute('data-admin-motion-id'),{timeout:1200}).toBeNull();
+        const priorFilterMotionId=await page.locator('#main').getAttribute('data-admin-motion-id');
         const filterBox=await statusFilter.boundingBox();
         await page.evaluate(()=>{
           window.__adminQaLastPointer=null;
@@ -457,6 +460,7 @@ for (const {width,height,theme} of matrix) {
         await statusFilter.click();
         const filterTap=await page.evaluate(()=>window.__adminQaLastPointer);
         await statusFilter.selectOption({index:1});
+        await expect.poll(()=>page.locator('#main').getAttribute('data-admin-motion-id'),{timeout:500}).not.toBe(priorFilterMotionId);
         await expectOriginMotion(page.locator('#main'),'Order filter result');
         if(!(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches))){
           const filterOrigin=await readOriginGeometry(page.locator('#main'));
