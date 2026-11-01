@@ -307,6 +307,7 @@ for (const {width,height,theme} of matrix) {
         await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="dashboard"]')).toBeVisible({timeout:500});
         const expected={products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng',dashboard:'Tổng quan'};
         const sequence=[
+          // Verify both directional animations while continuously measuring the fixed dock.
           ['products','slide-forward'],['orders','slide-forward'],['customers','slide-forward'],
           ['orders','slide-back'],['products','slide-back'],['dashboard','slide-back']
         ];
