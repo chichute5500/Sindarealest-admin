@@ -247,10 +247,7 @@ for(const cfg of [
 test('Buy now and cart selection submit only the intended items',async({page,context})=>{
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
- const quoteBodies=[],orderBodies=[],errors=[],divisionTraffic=[];page.on('pageerror',error=>errors.push(error.message));
- page.on('request',request=>{if(new URL(request.url()).hostname==='provinces.open-api.vn')divisionTraffic.push({kind:'request',method:request.method(),url:request.url()})});
- page.on('requestfailed',request=>{if(new URL(request.url()).hostname==='provinces.open-api.vn')divisionTraffic.push({kind:'failed',method:request.method(),url:request.url(),error:request.failure()?.errorText||''})});
- page.on('response',response=>{if(new URL(response.url()).hostname==='provinces.open-api.vn')divisionTraffic.push({kind:'response',status:response.status(),url:response.url()})});
+ const quoteBodies=[],orderBodies=[],errors=[];page.on('pageerror',error=>errors.push(error.message));
  await context.addInitScript(()=>localStorage.setItem('sd-cart',JSON.stringify({'qa-shoe::42':1,'qa-wallet':1})));
  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
@@ -287,12 +284,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.locator('#checkoutDrawer input[name="fullName"]').fill('Khách mua ngay');
  await page.locator('#checkoutDrawer input[name="phone"]').fill('0900000000');
  await page.locator('#checkoutStreet').fill('Địa chỉ kiểm thử');
- const province=page.locator('#checkoutProvince');
- try{await expect.poll(()=>province.locator('option').count()).toBeGreaterThan(1)}catch{
-  const state=await page.evaluate(()=>({drawerOpen:document.querySelector('#checkoutDrawer')?.classList.contains('open'),provinceDisabled:document.querySelector('#checkoutProvince')?.disabled,provinceOptionCount:document.querySelector('#checkoutProvince')?.options.length,addressMessage:document.querySelector('#checkoutAddressMessage')?.textContent,retryVisible:!document.querySelector('#checkoutAddressRetry')?.hidden,submitDisabled:document.querySelector('#checkoutSubmit')?.disabled,loadStarted:typeof checkoutProvinceLoadStarted==='undefined'?null:checkoutProvinceLoadStarted,loaderType:typeof loadCheckoutProvinces,openerType:typeof openCheckout}));
-  throw Error('Checkout province-load diagnostic: '+JSON.stringify({state,divisionRequests,divisionTraffic,pageErrors:errors,quoteRequestCount:quoteBodies.length,orderRequestCount:orderBodies.length,orderAccessTokenPresent:orderBodies.length>0}));
- }
- expect(divisionRequests).toBeGreaterThan(0);await province.selectOption({index:1});
+ const province=page.locator('#checkoutProvince');await expect.poll(()=>province.locator('option').count()).toBeGreaterThan(1);expect(divisionRequests).toBeGreaterThan(0);await province.selectOption({index:1});
  const ward=page.locator('#checkoutWard');await expect.poll(()=>ward.locator('option').count()).toBeGreaterThan(1);await ward.selectOption({index:1});
  await page.locator('#checkoutSubmit').click();await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
