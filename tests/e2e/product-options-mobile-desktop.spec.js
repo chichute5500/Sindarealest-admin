@@ -9,9 +9,10 @@ async function swipeToConfirmPayment(page){
  const slider=page.locator('#sdCheckoutConfirmRange'),box=await slider.boundingBox();
  if(!box)throw new Error('Payment confirmation slider is not visible');
  const y=box.y+box.height/2;
- await page.mouse.move(box.x+Math.min(24,box.width*.08),y);
+ await page.mouse.move(box.x+1,y);
  await page.mouse.down();
- await page.mouse.move(box.x+box.width-Math.min(24,box.width*.08),y,{steps:16});
+ await page.mouse.move(box.x+box.width-1,y,{steps:16});
+ await expect(page.locator('#sdCheckoutConfirmLabel')).toHaveText('Đang lấy mã đơn');
  await page.mouse.up();
 }
 const items=[
