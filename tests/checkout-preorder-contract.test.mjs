@@ -89,6 +89,19 @@ assert.match(html,/function loadLocalShippingAddress\(\)\{if\(accountSyncMode===
 assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Success view uses the requested progress message');
 assert.match(html,/sd-order-received-note[\s\S]*Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn\./,'Order confirmation explains when production starts');
 assert.match(html,/\.checkout-drawer \[hidden\]\{display:none!important\}/,'Hidden checkout actions remain hidden after order submission');
+// The reviewed address belongs directly beneath the completed "Thông tin" step,
+// not between the product summary and the payment choices.
+const addressCard=html.indexOf('id="sdCheckoutReviewAddressRow"');
+const progressNav=html.indexOf('id="sdCheckoutStepper"');
+const paymentIntro=html.indexOf('class="checkout-intro"');
+const paymentPanel=html.indexOf('id="sdCheckoutPaymentStep"');
+assert.ok(progressNav<addressCard&&addressCard<paymentIntro&&paymentIntro<paymentPanel,'Address card follows the information step and precedes the payment title');
+assert.equal(html.split('id="sdCheckoutReviewAddress"').length-1,1,'Only one reviewed address exists');
+assert.match(html,/id="sdCheckoutReviewAddressRow" hidden><strong>Địa chỉ nhận hàng<\/strong>/,'The address has a bold heading and is initially hidden');
+assert.match(html,/\$\('#sdCheckoutReviewAddressRow'\)\.hidden=sdCheckoutStep!==2/,'Only the payment choice step displays the address card');
+assert.match(html,/classList\.add\('sd-checkout-success'\);\$\('#sdCheckoutReviewAddressRow'\)\.hidden=true/,'The QR and order-code screens do not retain the address card');
+assert.match(glass,/\.checkout-drawer \.sd-checkout-review-row\{[^}]*margin:2px 5px 4px;padding:13px 15px/,'Address insets are scoped to the reviewed-address tile');
+
 assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number explains how to copy it');
 assert.match(html,/Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng\./,'Deposit overpayment is explained in plain language');
 assert.match(html,/Số tiền thanh toán khi nhận hàng '\+formatVnd\(choice\.codExpected\)/,'Payment choices use clear delivery-payment wording');
