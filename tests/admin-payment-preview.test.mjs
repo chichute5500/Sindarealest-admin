@@ -34,10 +34,10 @@ function preview({ option = "deposit", required = 1_400_000, current = 0, codExp
 }
 
 assert.deepEqual(preview(), { state: "waiting", title: "Chưa ghi nhận tiền chuyển", received: "0 đ", shortfall: "1.400.000 đ", cod: "3.100.000 đ", over: "0 đ", surplusHidden: true });
-assert.deepEqual(preview({ input: "1000000" }), { state: "short", title: "Sau khoản này vẫn còn thiếu 400.000 đ", received: "1.000.000 đ", shortfall: "400.000 đ", cod: "3.100.000 đ", over: "0 đ", surplusHidden: true });
-assert.deepEqual(preview({ current: 1_000_000, input: "400000" }), { state: "exact", title: "Vừa đủ tiền cần chuyển", received: "1.400.000 đ", shortfall: "0 đ", cod: "3.100.000 đ", over: "0 đ", surplusHidden: true });
-assert.deepEqual(preview({ input: "1400000" }), { state: "exact", title: "Vừa đủ tiền cần chuyển", received: "1.400.000 đ", shortfall: "0 đ", cod: "3.100.000 đ", over: "0 đ", surplusHidden: true });
+assert.deepEqual(preview({ input: "1000000" }), { state: "short", title: "Nhận thiếu · còn thiếu 400.000 đ", received: "1.000.000 đ", shortfall: "400.000 đ", cod: "3.100.000 đ", over: "0 đ", surplusHidden: true });
+assert.deepEqual(preview({ current: 1_000_000, input: "400000" }), { state: "exact", title: "Nhận đủ tiền cần chuyển", received: "1.400.000 đ", shortfall: "0 đ", cod: "3.100.000 đ", over: "0 đ", surplusHidden: true });
+assert.deepEqual(preview({ input: "1400000" }), { state: "exact", title: "Nhận đủ tiền cần chuyển", received: "1.400.000 đ", shortfall: "0 đ", cod: "3.100.000 đ", over: "0 đ", surplusHidden: true });
 assert.deepEqual(preview({ input: "1600000" }), { state: "over", title: "Nhận dư 200.000 đ", received: "1.600.000 đ", shortfall: "0 đ", cod: "2.900.000 đ", over: "200.000 đ", surplusHidden: false });
-assert.deepEqual(preview({ option: "full", required: 4_275_000, current: 3_000_000, codExpected: 0 }), { state: "short", title: "Đã nhận một phần · còn thiếu 1.275.000 đ", received: "3.000.000 đ", shortfall: "1.275.000 đ", cod: "0 đ", over: "0 đ", surplusHidden: true });
+assert.deepEqual(preview({ option: "full", required: 4_275_000, current: 3_000_000, codExpected: 0 }), { state: "short", title: "Nhận thiếu · còn thiếu 1.275.000 đ", received: "3.000.000 đ", shortfall: "1.275.000 đ", cod: "0 đ", over: "0 đ", surplusHidden: true });
 assert.equal(preview({ option: "full", required: 4_275_000, current: 3_000_000, codExpected: 0, input: "1275000" }).state, "exact");
 console.log("PASS: Admin live receipt preview covers no transfer, short, exact, excess, and discounted full payment.");
