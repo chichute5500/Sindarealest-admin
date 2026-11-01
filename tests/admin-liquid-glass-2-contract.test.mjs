@@ -62,6 +62,9 @@ const dockPillOwner=html.match(/body:has\(#appView:not\(\.hidden\)\) \.mobiletab
 assert.ok(dockPillOwner,'Dock pills keep their dedicated face and rim owner');
 assert.match(html,/body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav:active,[\s\S]*?body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav\[data-sd-glass-press="true"\]\{transform:none\}/,
   'Bottom dock tabs must not inherit the shared vertical press movement');
+const setViewSource=html.slice(html.indexOf('function setView(v,updateUrl=true,motion=null){'),html.indexOf("window.addEventListener('popstate'"));
+assert.ok(setViewSource.indexOf("window.scrollTo({top:0,behavior:'auto'})")<setViewSource.indexOf('render(adminRouteMotion('),
+  'Reset mobile scroll before replacing route content so the fixed dock does not jump when content height changes');
 assert.match(dockPillOwner[1],/border:1px solid transparent/);
 assert.doesNotMatch(dockPillOwner[1],/backdrop-filter/,'Dock pills must not blur an already filtered backdrop');
 assert.doesNotMatch(html,/:root\[data-admin-theme="dark"\] \.mobiletabs\{/,'Dark dock uses the shared dedicated material owner');
