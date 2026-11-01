@@ -47,10 +47,12 @@ function productCards(rows,origin,{eager=false}={}){
   }).join("");
 }
 function catalogSchema(rows,origin){
+  // Catalog pages are lists, not individual merchant product pages.
+  // A nested Product without a public price/review makes Google's Product
+  // snippets report every previewed item as invalid. Link to each canonical
+  // detail URL instead; the page keeps the same eight SSR cards and images.
   const list=rows.map((p,i)=>({
-    "@type":"ListItem",position:i+1,
-    item:{"@type":"Product",name:p.title,url:origin+canonicalProductPath(p),
-      image:origin+imageFor(p),brand:{"@type":"Brand",name:"SinDarealest"}}
+    "@type":"ListItem",position:i+1,url:origin+canonicalProductPath(p)
   }));
   // Escape '<' and U+2028/U+2029 before embedding JSON into an inline script.
   return JSON.stringify({"@context":"https://schema.org","@type":"ItemList",itemListElement:list})
