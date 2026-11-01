@@ -314,6 +314,30 @@ try{
    await slowPage.locator("#cartClose").click();
   }finally{await slowContext.close()}
  }));
+
+ // First-time Welcome must dismiss while the products API is still stalled.
+ await Promise.all([{width:360,mode:"dark"},{width:390,mode:"light"}].map(async ({width,mode})=>{
+  const c=await browser.newContext({viewport:{width,height:844},colorScheme:mode,reducedMotion:"no-preference",serviceWorkers:"block"});
+  const p=await c.newPage();let productsDelivered=false,provinceCalls=0;
+  try{
+   await p.route("**/*",async route=>{
+    const req=route.request(),url=new URL(req.url());
+    if(url.pathname==="/api/products"){await new Promise(r=>setTimeout(r,7000));productsDelivered=true;return route.fulfill(json(sample));}
+    if(url.pathname==="/api/settings")return route.fulfill(json({welcomeEnabled:true}));
+    if(url.pathname==="/api/customer/session")return route.fulfill(json({active:false}));
+    if(url.hostname==="provinces.open-api.vn"){provinceCalls++;return route.fulfill(json([]))}
+    if(req.method()!=="GET"&&req.method()!=="HEAD")return route.abort("blockedbyclient");
+    return route.continue();
+   });
+   await p.goto(origin+"/",{waitUntil:"domcontentloaded",timeout:35000});
+   assert.equal(await p.locator("#welcomeSplash").count(),1);
+   await p.screenshot({path:join(evidenceDir,`08-welcome-first-${width}-${mode}.png`),animations:"disabled"});
+   await p.waitForFunction(()=>!document.querySelector("#welcomeSplash"),null,{timeout:3000});
+   assert.equal(productsDelivered,false,"Welcome must dismiss before products API responds");
+   assert.equal(provinceCalls,0,"Unopened shipping form must not fetch addresses");
+  }finally{await c.close()}
+ }));
+ console.log("PASS: first-visit Welcome releases on slow API, no unused address fetch.");
  console.log("PASS: mobile Cart/Account dock works during slow API at 360/390px Light/Dark.");
  console.log("PASS: single four-tab mobile bottom navigation remains fixed and contained after reload and scroll.");
  console.log("PASS: browser-mocked checkout: mixed cart requires quote (no deposit/QR); priced-only cart validates deposit and 3 steps, Back persistence, Esc, no duplicate submission; 0 real writes.");

@@ -32,7 +32,11 @@ assert.ok(!html.includes('<picture class="hero-reference-art"'),'Never bring bac
 console.log('PASS: Owner-approved Welcome from PR #113 isolated into fix branch; code-only HERO protected.');
 
 // Guard the approved fade against uncovering a still-locked or unfinished page.
-assert.match(html,/if\(!window\.__sdStorefrontReady\|\|document\.readyState==='loading'\)/);
+assert.match(html,/if\(document\.readyState==='loading'\)/,
+ 'Welcome must wait for document parse, not products API hydration');
+assert.match(html,/document\.addEventListener\('DOMContentLoaded',dismiss,\{once:true\}\)/);
+assert.doesNotMatch(html,/window\.__sdStorefrontReady=true;\s*dismiss\(\);\s*\},2400\)/,
+ 'No 2.4-second network fallback delay when public SSR is already available');
 assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);\n    void document\.body\.offsetHeight;\n    s\.classList\.add\('is-leaving'\)/);
 assert.match(html,/init\(\)\.then\(finishStorefrontStartup,finishStorefrontStartup\)/);
 

@@ -44,6 +44,10 @@ const startup=html.indexOf('async function init()');
 const productsFetch=html.indexOf("await fetch('/api/products'",startup);
 assert.ok(startup>=0&&productsFetch>startup,'Startup and products request exist');
 const prior=html.slice(startup,productsFetch);
+assert.ok(!prior.includes('loadCheckoutProvinces();'),
+ 'Homepage startup must not fetch provinces before opening checkout');
+assert.ok(html.includes('checkoutProvinceLoadStarted=true;\n  void loadCheckoutProvinces();'),
+ 'Checkout fetches province options once on first opening');
 assert.ok(prior.includes('bindReveal(document);'),
  'Editorial reveal must start before a slow products API response');
 assert.ok(prior.includes("document.addEventListener('DOMContentLoaded',setupMobileBottomNav,{once:true})"),
