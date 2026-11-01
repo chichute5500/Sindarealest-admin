@@ -12,6 +12,8 @@ const DB={prepare(sql){statements.push(sql);return {
  all:async()=>({results:rows})
 }}};
 const full=await renderPublicCatalog(shell,{DB},origin,{home:true});
+assert.doesNotMatch(full,/<link rel="preload" as="image"/,
+ "Home must not preload below-the-fold catalog images");
 assert.ok(full.includes('id="featuredGrid"><article'),'Home featured visible in raw HTML');
 assert.ok(full.includes('id="catalogGrid"><article'),'Catalog visible with JS disabled');
 assert.ok(full.includes('class="product-card-footer" aria-hidden="true"'),'SSR must reserve the same product-card footer height before catalog hydration');
@@ -38,6 +40,18 @@ assert.deepEqual(priority.map(x=>x[2]),["high","high","low","low","low","low","l
   "Only the above-the-fold first mobile row should compete at high image priority");
 assert.equal(priority[0][1],"eager");assert.equal(priority[1][1],"eager");
 assert.ok(priority.slice(2).every(x=>x[1]==="lazy"),"Offscreen SSR images preserve native lazy behavior");
+const preloadMatches=[...category.matchAll(/<link rel="preload" as="image" href="([^"]+)" fetchpriority="high">/g)];
+assert.deepEqual(preloadMatches.map(x=>x[1]),["/images/test-image.webp"],
+ "Repeated first-row image sources must use only one preload");
+assert.ok(category.indexOf('<link rel="preload" as="image"')<category.indexOf('</head>'),
+ "First-viewport image hints belong in <head>, not below product card markup");
+assert.ok(!preloadMatches.some(x=>x[1].includes("evil.example")),
+ "HTML preloads must reject untrusted image URLs");
+const twoRows=rows.map((r,i)=>({...r,images_json:i===1?'["/media/12345678-1234-4234-8234-123456789abc.webp"]':r.images_json}));
+const twoImages=await renderPublicCatalog(shell,{DB:{prepare:()=>({all:async()=>({results:twoRows})})}},origin);
+assert.equal([...twoImages.matchAll(/<link rel="preload" as="image"/g)].length,2,
+ "Two distinct first-row images must each get exactly one head preload");
+
 
 assert.ok(category.includes('id="featuredGrid"></div>'),'Category route must not populate hidden home sections');
 assert.equal(await renderPublicCatalog(shell,{DB},origin,{categorySlug:"not-a-category"}),shell);

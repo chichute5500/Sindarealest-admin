@@ -69,8 +69,16 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
       '<div class="catalog-grid" id="catalogGrid">'+cards+'</div>');
     if(home)html=html.replace('<div class="featured-grid" id="featuredGrid"></div>',
       '<div class="featured-grid" id="featuredGrid">'+productCards(rows.slice(0,4),origin,{eager:false})+'</div>');
+    // On direct catalog entry the first mobile row is the initial LCP.
+    // Discover its validated, public R2 images in <head> before the parser
+    // traverses large style/script blocks. Never preload offscreen Home cards.
+    // Deduplicate identical images; no third-party hosts or D1/R2 writes.
+    const aboveFoldPreloads=home?"":[...new Set(rows.slice(0,2).map(imageFor))]
+      .map(src=>'<link rel="preload" as="image" href="'+h(src)+'" fetchpriority="high">')
+      .join("\n");
     // HTML in source and no-JS has real product descriptions; JS replaces cards from /api/products.
-    html=html.replace('</head>','<script type="application/ld+json">'+catalogSchema(rows,origin)+'</script>\n</head>');
+    html=html.replace('</head>',aboveFoldPreloads+
+      '<script type="application/ld+json">'+catalogSchema(rows,origin)+'</script>\n</head>');
     return html;
   }catch{return html} // D1 errors must not become a 500 or leak SQL details.
 }
