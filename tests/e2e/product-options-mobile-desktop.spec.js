@@ -300,11 +300,15 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  const province=page.locator('#checkoutProvince');await expect.poll(()=>province.locator('option').count()).toBeGreaterThan(1);expect(divisionRequests).toBeGreaterThan(0);await province.selectOption({index:1});
  const ward=page.locator('#checkoutWard');await expect.poll(()=>ward.locator('option').count()).toBeGreaterThan(1);await ward.selectOption({index:1});
  await page.locator('#checkoutSubmit').click();await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();
+ await expect(page.locator('#sdCheckoutReviewAddressRow')).toBeVisible();
+ await expect(page.locator('#sdCheckoutReviewAddressRow strong')).toHaveText('Địa chỉ nhận hàng');
+ await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Khách mua ngay');
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
  await expect(page.locator('#checkoutSubmit')).toHaveText('Tiến hành thanh toán →');
  expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
+ await expect(page.locator('#sdCheckoutReviewAddressRow')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
  await expect(page.locator('#sdCheckoutOpenBank')).toHaveCount(0);
  await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
@@ -349,6 +353,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  expect(await page.evaluate(()=>document.querySelector('#sdCheckoutQrWrap')===window.__sdQrBeforeSecondCheckout),'QR tile must survive closing one order and opening the next').toBe(true);
  await expect(page.locator('#sdCheckoutConfirmRange')).toBeEnabled();
  await expect(page.locator('#sdCheckoutConfirmLabel')).toHaveText('Xác nhận đã thanh toán');
+ await expect(page.locator('#sdCheckoutReviewAddressRow')).toBeVisible();
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();await expect(page.locator('#sdCheckoutShippingStep')).toBeHidden();await expect.poll(()=>quoteBodies.length).toBeGreaterThan(quoteCountBeforeSavedAddressCheckout);await expect(page.locator('#checkoutDrawer input[name="fullName"]')).toHaveValue('Khách mua ngay');await expect(page.locator('#checkoutDrawer input[name="fullName"]')).not.toBeFocused();await expect(page.locator('#checkoutDrawer input[name="phone"]')).toHaveValue('0900000000');await expect(page.locator('#checkoutStreet')).toHaveValue('Địa chỉ kiểm thử');await expect(page.locator('#checkoutProvince')).toHaveValue('Thành phố Hồ Chí Minh');await expect(page.locator('#checkoutWard')).toHaveValue('Phường Bà Rịa');
  expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  await expect(page.locator('#checkoutDrawer')).toHaveCSS('width','390px');
