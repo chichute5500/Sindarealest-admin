@@ -39,6 +39,7 @@ on:
       - 'tests/e2e/admin-static-baseline.spec.js'
       - 'tests/e2e/admin-reference-same-data-qa.spec.js'
       - 'tests/e2e/admin-isolated-preview.spec.js'
+      - 'tests/e2e/admin-12-screen-live-qa.spec.js'
 
 permissions:
   contents: read
