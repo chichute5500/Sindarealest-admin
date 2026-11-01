@@ -138,3 +138,15 @@ KHÔNG tạo branch/PR mới. KHÔNG hứa làm việc nền rồi báo sau. Cha
 - AGENTS.md và docs/QA_RESOURCE_POLICY.md: đọc bắt buộc.
 - PR: https://github.com/chichute5500/Sindarealest-admin/pull/159
 - Preview: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev/
+
+
+## CHECKPOINT TIẾP NỐI — 01/11/2026 — dock mobile không chờ sản phẩm
+
+- Repo / PR / branch: chichute5500/Sindarealest-admin, #159 OPEN/DRAFT, fix/audit-2026-10; tuyệt đối không merge Main/Production, không ghi D1/R2, không đụng #154/#155/#158/#160.
+- Source sửa mới: commit afa86825b3713f1550677a444fd9777632f31f00. Nguyên nhân: setupMobileBottomNav và setupNavSpy đặt sau await fetch('/api/products'); markup #mobileBottomNav lại nằm sau script khởi tạo. Đã đăng ký bottom dock ở DOMContentLoaded (hoặc chạy ngay nếu DOM đã ready), nav spy chạy trước API, bỏ gắn sự kiện sau hydration. Không thay đổi CSS, Admin hay schema.
+- Browser local mocked checkout run 41293535518: SUCCESS. Playwright tạo 11 ảnh artifact 13077869665, bao gồm 360px và 390px Light/Dark với /api/products bị trì hoãn 7 giây; Cart/Account mở ngay trước response, không viết request POST thật. Checkout/phone/quote không giá/Back/Esc/address retry/20 vòng account còn PASS.
+- Test source cũ có giả định sai rằng nav spy phải nằm cạnh slideshow sau API. Đã cập nhật contract ở tests/catalog-ssr.test.mjs (commits 10709150, d2caeba9) và tests/storefront-audit-ux-regressions.test.mjs (commit 1ca2944cae92784372522b454ceea52939fd6a59). CI full source run 41293860611: SUCCESS.
+- Luồng E read-only: so Main 9fce1a85c9c19620a8269cce80575cdc92d9919c với audit: diverged, ahead 202/behind 156 trước code-fix; migration 0015–0017 và functions/api/admin/products.js, admin/orders.js là blob giống Main; public/admin/index.html khác Main, KHÔNG SỬA. Không resolve merge conflicts/merge Main.
+- Preview gần nhất xác minh trước lượt sửa: e4cf36fd, run 41291532629 SUCCESS. Lượt này đưa marker để chạy MỘT lần isolated Preview sau CI; kiểm chứng exact audit-source-revision trước khi nói Preview PASS. Lighthouse mới nhất, LCP/CLS/TBT/FPS và Android thật, full Owner-reference visual chưa PASS.
+- CSS audit vẫn 102 nhóm selector/context trùng / 70 nhóm có giá trị khác (dữ liệu audit trước, không được coi là số bug), không dọn bừa hoặc thêm override. Không báo đã tối ưu hiệu năng khi chưa có A/B cùng điều kiện.
+- BẮT BUỘC: tiếp tục luồng A CSS/Welcome/F5, B LCP/CLS/font/SSR, C mobile screenshot chức năng, D security/checkout, E conflict; chỉ một writer public/index.html và HEAD lease trước commit; giữ Owner PASS; Preview-only; đợi Owner PASS trước release.

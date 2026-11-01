@@ -11,3 +11,8 @@ Scenario: closed checkout, cart and account must never flash on reload; browser 
 2026-11-01: Refresh mobile CSS first-paint fix validated via full CI.
 Candidate code: 73bc8450ca703520b335c017647766d218692c27
 Preview-only; do not merge Production.
+
+01 Nov 2026 — next single Preview candidate after CI SUCCESS run 41293860611.
+Source code commit: 1ca2944cae92784372522b454ceea52939fd6a59
+Browser mock evidence: 41293535518 (11 screenshots, 360/390 Light/Dark).
+Only Preview Pages branch fix/audit-2026-10; Production NO.
