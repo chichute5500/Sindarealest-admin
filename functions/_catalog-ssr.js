@@ -28,7 +28,7 @@ function productCards(rows,origin,{eager=false}={}){
     // client data arrives; never invent a price or a working action in SSR.
     return '<article class="product-card sd-server-rendered" data-ssr-product="'+h(p.id)+'">'+
      '<a class="product-open" href="'+h(href)+'" aria-label="Xem chi tiết '+h(title)+'">'+
-     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(eager&&i<2?"eager":"lazy")+'" '+(i===0?'fetchpriority="high" ':'')+'decoding="async"><span class="photo-shade"></span></span>'+
+     '<span class="product-photo"><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(eager&&i<2?"eager":"lazy")+'" '+(i<2&&eager?'fetchpriority="high" ':'fetchpriority="low" ')+'decoding="async"><span class="photo-shade"></span></span>'+
      '<div class="product-info"><div class="sd-card-status-row"><span class="fulfillment-badge fulfillment-'+type+'" data-fulfillment-type="'+type+'">'+h(label)+'</span>'+
      '<span class="product-sku">Mã SKU: '+h(sku||"Chưa được cung cấp")+'</span></div>'+
      (type==="made_to_order"?'<small class="sd-card-making-time">⏱ Làm hàng 5–20 ngày</small>':"")+

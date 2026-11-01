@@ -5,10 +5,11 @@ import {onRequest as middleware} from "../functions/_middleware.js";
 const origin="https://shop.example";
 const shell='<html><head><title>SinDarealest</title></head><body><div class="featured-grid" id="featuredGrid"></div><div class="catalog-grid" id="catalogGrid"></div></body></html>';
 const row={id:"shoe-1",slug:"shoe-1",sku:"SD-SN001",sku_verified:1,title:'Giày VIP <img src=x onerror=alert(1)>',category:"sneakers",images_json:'["images/test-image.webp","https://evil.example/track.png"]',fulfillment_type:"made_to_order"};
+const rows=Array.from({length:8},(_,i)=>({...row,id:"shoe-"+(i+1),slug:"shoe-"+(i+1)}));
 let statements=[];
 const DB={prepare(sql){statements.push(sql);return {
- bind(...args){return {all:async()=>({results:args.includes("sneakers")?[row]:[]})}},
- all:async()=>({results:[row]})
+ bind(...args){return {all:async()=>({results:args.includes("sneakers")?rows:[]})}},
+ all:async()=>({results:rows})
 }}};
 const full=await renderPublicCatalog(shell,{DB},origin,{home:true});
 assert.ok(full.includes('id="featuredGrid"><article'),'Home featured visible in raw HTML');
@@ -31,6 +32,13 @@ const category=await renderPublicCatalog(shell,{DB},origin,{categorySlug:"sneake
 assert.ok(category.includes('id="catalogGrid"><article'));
 assert.match(category,/id="catalogGrid"><article[^]*?loading="eager"/,
   "Direct catalog entry should eagerly load the first visible product image");
+const priority=[...category.matchAll(/<img src="[^"]+" alt="[^"]+" width="480" height="440" loading="(eager|lazy)" fetchpriority="(high|low)" decoding="async">/g)];
+assert.equal(priority.length,8,"The bounded catalog has eight accessible SSR image elements");
+assert.deepEqual(priority.map(x=>x[2]),["high","high","low","low","low","low","low","low"],
+  "Only the above-the-fold first mobile row should compete at high image priority");
+assert.equal(priority[0][1],"eager");assert.equal(priority[1][1],"eager");
+assert.ok(priority.slice(2).every(x=>x[1]==="lazy"),"Offscreen SSR images preserve native lazy behavior");
+
 assert.ok(category.includes('id="featuredGrid"></div>'),'Category route must not populate hidden home sections');
 assert.equal(await renderPublicCatalog(shell,{DB},origin,{categorySlug:"not-a-category"}),shell);
 assert.equal(await renderPublicCatalog(shell,{},origin,{home:true}),shell);
@@ -66,6 +74,7 @@ assert.match(storefront,/if\(!active\)initArtSlideshowWhenVisible\(\)/);
 assert.match(storefront,/document\.documentElement\.classList\.contains\('sd-catalog-route'\)\)return;const rect=/);
 // SQL and hydrated list must use the same deterministic tiebreak for
 // products created in the same batch. This prevents LCP-image replacement.
+assert.ok(storefront.includes("fetchpriority=\\\"\\${eager&&idx<2?'high':'low'}\\\""),"Hydration keeps first two image requests high priority");
 assert.match(storefront,/const dateOrder=timestamp\(b\)\.localeCompare\(timestamp\(a\)\)/);
 assert.match(storefront,/return left<right\?1:left>right\?-1:0;/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");

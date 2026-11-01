@@ -18,3 +18,5 @@ Browser mock evidence: 41293535518 (11 screenshots, 360/390 Light/Dark).
 Only Preview Pages branch fix/audit-2026-10; Production NO.
 
 2026-11-01 additional one-shot local-first candidate: Welcome DOM-ready and lazy provinces, CI 41294763441, mock browser 41294763445. Trigger only isolated Preview and pinned GET-only QA. Never Production.
+
+2026-11-01: image priority candidate: first two SSR+CSR images high; offscreen low, source-only test.

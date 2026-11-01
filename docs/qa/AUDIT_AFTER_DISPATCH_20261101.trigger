@@ -5,3 +5,5 @@ Scope: / and /sanpham, responsive Light/Dark, LCP, CLS, TBT, fonts and images.
 Source changes: defer /api/v2/p/ until opening checkout, release first Welcome
 when DOM shell completes (do not wait for /api/products).
 No user/customer writes. No Production deploy. No Main merge.
+
+2026-11-01: compare mobile catalog LCP against c50b baseline 10.607s after priority change, same Preview and device conditions.
