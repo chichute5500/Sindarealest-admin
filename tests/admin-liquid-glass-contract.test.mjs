@@ -107,7 +107,7 @@ has("if(e.key==='Escape'&&view==='order-detail'){e.preventDefault();closeOrderDe
 has("if(e.key==='Escape'){e.preventDefault();closeEditor();return}", 'Escape closes the currently open product editor modal');
 
 // Accessible names for repeated controls must identify the affected record, not just say "Save".
-has('Đã thanh toán (đã xác minh)', 'payment status must be presented as a ledger-derived, read-only label');
+for(const state of ["none:'Chưa nhận'","short:'Nhận thiếu'","exact:'Nhận đủ'","over:'Nhận dư'"])has(state,'payment status is calculated from the received ledger: '+state);
 has('data-action="record-payment"', 'admin must have an explicit manual verification action for real bank receipts');
 assert.doesNotMatch(adminHtml, /data-payment-status=/, 'payment status must not be directly editable in the order UI');
 

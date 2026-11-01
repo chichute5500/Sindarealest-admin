@@ -108,7 +108,7 @@ assert.match(raisedListOwner[1], /--sd-admin-surface-face:var\(--sd-admin-tile-f
   'Repeated list rows must use the raised tile face');
 assert.match(raisedListOwner[1], /--sd-admin-shadow:var\(--sd-admin-tile-shadow\)/,
   'Repeated list rows must use the raised tile shadow');
-const nestedInsetOwner = html.match(/#main \.sd-admin-qr-intent,\.activity-view-tabs,#main \.sd-order-payment-money,#main \.sd-order-next-note,#main:has\(#searchBox\) \.product-publish-filter-row\{([^}]*)\}/);
+const nestedInsetOwner = html.match(/\.activity-view-tabs,#main \.sd-order-payment-money,#main \.sd-order-next-note,#main:has\(#searchBox\) \.product-publish-filter-row\{([^}]*)\}/);
 assert.ok(nestedInsetOwner, 'Nested notices and filter surfaces must retain one inset owner');
 assert.match(nestedInsetOwner[1], /--sd-admin-surface-face:var\(--sd-admin-inset-face\)/,
   'Nested notices and filter surfaces must retain the inset face');
@@ -151,7 +151,7 @@ assert.match(html, /\.shortcut,\.mobile-more-item\{--sd-admin-surface-face:var\(
   'Dashboard quick actions and More menu items must share the raised tile material');
 assert.match(html, /\.product-visibility-row,\.mobilecards tbody tr,\.activity-log-card,#main \.sd-order-card,\.order-detail-item,\.dashboard-activity-table tbody tr\{[^{}]*--sd-admin-surface-face:var\(--sd-admin-tile-face\)/,
   'Product and customer mobile cards must use the shared raised tile face');
-assert.match(html, /#main \.sd-admin-qr-intent,\.activity-view-tabs,#main \.sd-order-payment-money,[^{}]*\{[^{}]*--sd-admin-surface-face:var\(--sd-admin-inset-face\)/,
+assert.match(html, /\.activity-view-tabs,#main \.sd-order-payment-money,[^{}]*\{[^{}]*--sd-admin-surface-face:var\(--sd-admin-inset-face\)/,
   'Order notices and payment details must retain the nested inset face');
 assert.doesNotMatch(html, /#main \.product-table tbody tr\{[^}]*background:var\(--sd-admin-face\)/,
   'Product cards must not be overridden by the old raised face after the shared inset owner');

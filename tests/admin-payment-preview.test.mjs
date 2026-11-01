@@ -2,6 +2,17 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const html = readFileSync(new URL("../public/admin/index.html", import.meta.url), "utf8");
+const stateStart = html.indexOf("function orderReceiptState(summary){");
+const stateEnd = html.indexOf("\nfunction orderReceiptStateLabel", stateStart);
+assert.ok(stateStart >= 0 && stateEnd > stateStart, "Four-state receipt calculation is present");
+const receiptState = new Function(html.slice(stateStart, stateEnd) + "; return orderReceiptState;")();
+assert.deepEqual([
+  receiptState({ requiredAmount: 1_400_000, netReceivedAmount: 0 }),
+  receiptState({ requiredAmount: 1_400_000, netReceivedAmount: 1_000_000 }),
+  receiptState({ requiredAmount: 1_400_000, netReceivedAmount: 1_400_000 }),
+  receiptState({ requiredAmount: 1_400_000, netReceivedAmount: 1_600_000 }),
+  receiptState({ requiredAmount: null, netReceivedAmount: 0 })
+], ["none", "short", "exact", "over", "unknown"]);
 const start = html.indexOf("function updateOrderReceiptPreview(form){");
 const end = html.indexOf("\nfunction sdOrderStepDate", start);
 assert.ok(start >= 0 && end > start, "Admin receipt preview helper is present");

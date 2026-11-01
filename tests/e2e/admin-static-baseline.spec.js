@@ -247,18 +247,21 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         full_name: 'Khách thử nghiệm giao diện',
         phone: '—', email: '', address: '',
         items: [{ id: 'UI-ONLY-ITEM', title: 'Sản phẩm thử nghiệm giao diện', quantity: 1, sku: 'UI-FIXTURE-001', skuVerified: false, unitPrice: null }],
-        total: null, status: 'pending_confirmation', payment_status: 'unpaid', price_confirmation_required: true
+        total: null, status: 'pending_confirmation', payment_status: 'unpaid', price_confirmation_required: true,
+        payment_summary: { requiredAmount: null, netReceivedAmount: 0, status: 'payment_terms_unavailable' }
       }, {
         id: 'UI-ONLY-ORDER-2', order_number: 'UI-ONLY-ORDER-2', created_at: 'DỮ LIỆU TEST',
         full_name: 'Khách UI Fixture 2', phone: '0000000002', email: '', address: '',
         items: [{ id: 'UI-ONLY-ITEM-2', title: 'Sản phẩm UI fixture 2', quantity: 1, sku: 'UI-FIXTURE-002', skuVerified: false, unitPrice: 3200000, fulfillmentType: 'in_stock' }],
-        total: 3200000, status: 'processing', payment_status: 'unpaid', price_confirmation_required: false
+        total: 3200000, status: 'processing', payment_status: 'unpaid', price_confirmation_required: false,
+        payment_summary: { requiredAmount: 3200000, netReceivedAmount: 0, status: 'waiting_for_payment' }
       }, {
         id: 'UI-ONLY-ORDER-3', order_number: 'UI-ONLY-ORDER-3', created_at: 'DỮ LIỆU TEST',
         full_name: 'Khách UI Fixture 3', phone: '0000000003', email: '', address: '',
         items: [{ id: 'UI-ONLY-ITEM-3', title: 'Sản phẩm UI fixture 3', quantity: 1, sku: 'UI-FIXTURE-003', skuVerified: false, unitPrice: 7800000, fulfillmentType: 'made_to_order' }],
         total: 7800000, received_amount: 7800000, status: 'completed', payment_status: 'paid',
-        payment_terms_confirmed_at: '2026-10-21T00:00:00.000Z', price_confirmation_required: false
+        payment_terms_confirmed_at: '2026-10-21T00:00:00.000Z', price_confirmation_required: false,
+        payment_summary: { requiredAmount: 7800000, netReceivedAmount: 7800000, status: 'paid_in_full' }
       }]
     },
     '/api/admin/customers': {
@@ -1678,7 +1681,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await page.locator('#clearOrderFilters').click();
       await page.locator('#orderStatusFilter').selectOption('completed');await expect(cards).toHaveCount(1);
       await page.locator('#orderStatusFilter').selectOption('all');
-      await page.locator('#orderPaymentFilter').selectOption('paid');await expect(cards).toHaveCount(1);
+      await page.locator('#orderPaymentFilter').selectOption('exact');await expect(cards).toHaveCount(1);
       await page.locator('#clearOrderFilters').click();await expect(cards).toHaveCount(3);
       const dims=await row.evaluate(el=>({w:el.getBoundingClientRect().width,h:el.getBoundingClientRect().height,v:innerWidth}));
       expect(dims.w).toBeLessThanOrEqual(dims.v);expect(dims.h).toBeLessThan(300);

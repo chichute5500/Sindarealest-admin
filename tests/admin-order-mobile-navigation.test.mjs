@@ -6,7 +6,8 @@ for(const snippet of ['class="sd-order-cards"','data-order-open="${esc(o.id)}"',
 }
 assert.equal(admin.split('</style>').length-1,1,'Keep the single Admin stylesheet');
 assert.ok(admin.includes("if(!$('#backdrop').classList.contains('hidden'))"),'Back first closes editor');
-for(const token of ["title:'Làm hàng'","title:'Gửi hàng'","timeline_confirmed_at","timeline_payment_at","timeline_processing_at","timeline_shipped_at","timeline_completed_at",
+for(const token of ["title:'Làm hàng'","title:'Gửi hàng'","timeline_confirmed_at","timeline_processing_at","timeline_shipped_at","timeline_completed_at",
  "step.done&&sdOrderStepDate(step.date)","timeZone:'Asia/Ho_Chi_Minh'"])assert.ok(admin.includes(token),'Missing five-step, completion-only date rule: '+token);
 assert.ok(!admin.includes('Chưa có ngày'),'Never show a placeholder date for unfinished steps');
-console.log('PASS: five distinct steps, completion-only dates, browser Back and cards.');
+assert.match(admin,/status==='confirmed'\?\{termsConfirmed:true,paymentTermsNote:order\?\.payment_terms_note\|\|''\}/,'confirming an order also records its checkout price and terms in the existing API');
+console.log('PASS: four clear order steps without duplicate payment progress, completion-only dates, browser Back and cards.');
