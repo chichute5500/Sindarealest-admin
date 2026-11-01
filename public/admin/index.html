@@ -2651,7 +2651,9 @@ function adminAnimateSurface(element,motion){
 function adminRouteMotion(previous,next,requested,source){
  const from=ADMIN_PRIMARY_VIEWS.indexOf(previous),to=ADMIN_PRIMARY_VIEWS.indexOf(next);
  if(from>=0&&from===to&&['bottom-tab','history'].includes(requested?.type))return null;
- if(requested?.type==='bottom-tab'&&from>=0&&to>=0&&from!==to)return{type:to>from?'slide-forward':'slide-back'};
+ // A transform animation on the page surface makes the fixed mobile dock jump
+ // on forward navigation in mobile browsers. Keep dock navigation stationary.
+ if(requested?.type==='bottom-tab'&&from>=0&&to>=0&&from!==to)return null;
  if(requested?.type==='history'&&from>=0&&to>=0&&from!==to)return{type:to>from?'slide-forward':'slide-back'};
  if(requested?.type==='origin')return requested;
  return adminConsumeRenderMotionIntent()||adminOriginMotion(source);
