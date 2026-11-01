@@ -3,6 +3,12 @@ on:
   # Full remote QA / deployment only for a pinned, intentionally selected candidate SHA.
   # Local source checks still run per commit; no Cloudflare requests for intermediate edits.
   workflow_dispatch:
+  # Only the intentional release-candidate marker may trigger expensive live QA.
+  # Ordinary source pushes never hit Cloudflare. This workflow verifies the
+  # exact deployed SHA before any screenshot, Lighthouse, or resource probes.
+  push:
+    branches: [fix/audit-2026-10]
+    paths: [docs/qa/AUDIT_AFTER_DISPATCH_20261101.trigger]
 permissions:
   contents: read
 concurrency:

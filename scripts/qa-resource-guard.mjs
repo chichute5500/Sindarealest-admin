@@ -10,11 +10,15 @@ function review(name,source){
  const remote=/pages\.dev|ADMIN_TEST_URL|AUDIT_TARGET_URL|wrangler\s+pages\s+deploy/i.test(source);
  const fullQa=/\blighthouse\b|AUDIT_STRICT_VISUAL|audit-readonly\.mjs|audit-lcp-probe\.mjs/i.test(source);
  const autoPush=/^\s{2,4}push:\s*(?:#.*)?$/m.test(trigger);
+ // Explicit one-off candidate-marker pushes are not ordinary source pushes.
+ // Only the exact marker on the designated audit branch is permitted; broad
+ // globs, source paths, or other branches must still be blocked.
+ const candidateOnly=/^  push:\n    branches: \[fix\/audit-2026-10\]\n    paths: \[docs\/qa\/AUDIT_AFTER_DISPATCH_20261101\.trigger\]/m.test(trigger);
  const hasConcurrency=/^concurrency:\s*$/m.test(source)
   && /^\s+group:\s*.+$/m.test(source)
   && /^\s+cancel-in-progress:\s*(true|false|\$\{\{.+\}\})/m.test(source);
  if(remote&&!hasConcurrency)failures.push('live workflow missing concurrency group + cancel-in-progress');
- if(remote&&fullQa&&autoPush)failures.push('full live Lighthouse/visual QA auto-triggers on source push; use candidate-only/manual QA');
+ if(remote&&fullQa&&autoPush&&!candidateOnly)failures.push('full live Lighthouse/visual QA auto-triggers on source push; use candidate-only/manual QA');
  if(remote&&/while\s+(true|:)|for\s*\(\s*;\s*;\s*\)/i.test(source))failures.push('unbounded remote request loop');
  return failures.map(f=>name+': '+f);
 }
@@ -23,6 +27,11 @@ function selfTest(){
  const bad='name: QA\non:\n  push:\n    branches: [fix/audit]\njobs:\n  qa:\n    steps:\n      - run: npx lighthouse https://example.pages.dev';
  assert.deepEqual(review('ok',ok),[]);
  assert.equal(review('bad',bad).length,2);
+ const candidate='name: QA\non:\n  workflow_dispatch:\n  push:\n    branches: [fix/audit-2026-10]\n    paths: [docs/qa/AUDIT_AFTER_DISPATCH_20261101.trigger]\nconcurrency:\n  group: preview-sha\n  cancel-in-progress: true\njobs:\n  qa:\n    steps:\n      - run: npx lighthouse https://example.pages.dev';
+ assert.deepEqual(review('candidate-marker',candidate),[],
+  'One intentional SHA-pinned candidate marker may launch read-only live QA');
+ assert.equal(review('bad-source-push',candidate.replace(
+  'docs/qa/AUDIT_AFTER_DISPATCH_20261101.trigger','public/index.html')).length,1);
  console.log('PASS: QA resource policy self-tests');
 }
 if(process.argv.includes('--self-test')){selfTest();process.exit(0)}
