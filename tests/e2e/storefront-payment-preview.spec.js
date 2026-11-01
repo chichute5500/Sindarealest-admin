@@ -429,3 +429,53 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(writes.every(path=>path==='POST /api/checkout-quote'||path==='POST /api/orders'||path==='POST /api/order-tracking'),'Only the isolated Preview order and public tracking lookup may be written').toBe(true);
  expect(errors,'Preview should have no browser runtime errors').toEqual([]);
 });
+
+
+test('four-item mobile cart has one scroll surface without a clipped inner list',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.emulateMedia({colorScheme:'light'});
+ const response=await page.goto(url,{waitUntil:'domcontentloaded'});
+ expect(response?.status()).toBe(200);
+ const welcome=page.locator('#welcomeSplash');
+ if(await welcome.count())await page.locator('#skipIntro').click();
+ await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+ const cards=page.locator('#catalogGrid .product-card').filter({hasText:'Giá:'});
+ await expect(cards.nth(3)).toBeVisible({timeout:20000});
+ for(let i=0;i<4;i++){
+  await cards.nth(i).locator('[data-add]').click();
+  if(await page.locator('#productOverlay.open').count()){
+   const variant=page.locator('#detailVariants .sd-product-option-chip:not(:disabled)').first();
+   if(await variant.count())await variant.click();
+   await page.locator('#detailAdd').click();
+   await page.locator('#detailClose').click();
+  }
+ }
+ await page.locator('#mobileCartNav').click();
+ const drawer=page.locator('#cartDrawer'),rows=page.locator('#cartList .cart-row');
+ await expect(drawer).toHaveClass(/open/);
+ await expect(rows).toHaveCount(4);
+ await expect(page.locator('#cartCheckout #cartSubtotal')).toBeVisible();
+ await expect(page.locator('#cartZalo')).toHaveCount(0);
+ await expect.poll(()=>drawer.evaluate(el=>Math.abs(el.getBoundingClientRect().left-7))).toBeLessThanOrEqual(2);
+ await page.waitForTimeout(550);
+ const metrics=await drawer.evaluate(el=>{
+  const list=el.querySelector('#cartList'),header=el.querySelector('.cart-header'),footer=el.querySelector('.cart-bottom'),last=list.querySelector('.cart-row:last-child');
+  const view=x=>x.getBoundingClientRect();
+  const before={drawerScroll:getComputedStyle(el).overflowY,listScroll:getComputedStyle(list).overflowY,drawerOverflow:el.scrollHeight-el.clientHeight,listOverflow:list.scrollHeight-list.clientHeight,headerTop:view(header).top,footerBottom:view(footer).bottom};
+  el.scrollTop=el.scrollHeight;
+  const after={headerTop:view(header).top,footerBottom:view(footer).bottom,lastBottom:view(last).bottom,footerTop:view(footer).top,scroll:el.scrollTop};
+  el.scrollTop=0;
+  return {before,after};
+ });
+ expect(metrics.before.drawerScroll,'Cart shell must own scrolling').toBe('auto');
+ expect(metrics.before.listScroll,'Cart list must not clip product tiles').toBe('visible');
+ expect(metrics.before.listOverflow).toBeLessThanOrEqual(2);
+ expect(metrics.before.drawerOverflow).toBeGreaterThan(0);
+ expect(metrics.after.scroll).toBeGreaterThan(0);
+ expect(Math.abs(metrics.after.headerTop-metrics.before.headerTop),'Header stays fixed').toBeLessThanOrEqual(2);
+ expect(Math.abs(metrics.after.footerBottom-metrics.before.footerBottom),'Payment bar stays fixed').toBeLessThanOrEqual(2);
+ expect(metrics.after.lastBottom,'Last product is fully reachable above the payment bar').toBeLessThanOrEqual(metrics.after.footerTop+2);
+ await page.screenshot({path:join(output,'390x844-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
+ await drawer.evaluate(el=>el.scrollTop=el.scrollHeight);
+ await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
+});
