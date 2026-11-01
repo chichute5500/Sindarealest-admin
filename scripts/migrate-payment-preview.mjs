@@ -26,9 +26,12 @@ assert.equal(previewStore?.name,"sindarealest2");
 const previewId=preview?.deployment_configs?.preview?.d1_databases?.DB?.id||preview?.deployment_configs?.preview?.d1_databases?.DB?.database_id;
 const storeProductionId=previewStore?.deployment_configs?.production?.d1_databases?.DB?.id||previewStore?.deployment_configs?.production?.d1_databases?.DB?.database_id;
 const adminProductionId=preview?.deployment_configs?.production?.d1_databases?.DB?.id||preview?.deployment_configs?.production?.d1_databases?.DB?.database_id;
-if(!/^[a-f0-9-]{36}$/i.test(previewId||"")||![storeProductionId,adminProductionId].every(x=>/^[a-f0-9-]{36}$/i.test(x||"")))
+if(!/^[a-f0-9-]{36}$/i.test(previewId||"")||!/^[a-f0-9-]{36}$/i.test(storeProductionId||""))
   throw Error("Cannot verify Preview and Production D1 identities; refusing migration.");
-if([storeProductionId,adminProductionId].some(x=>x.toLowerCase()===previewId.toLowerCase()))
+if(adminProductionId&&!/^[a-f0-9-]{36}$/i.test(adminProductionId))
+  throw Error("Malformed Admin Production D1 identity; refusing migration.");
+if(storeProductionId.toLowerCase()===previewId.toLowerCase()||
+  (adminProductionId&&/^[a-f0-9-]{36}$/i.test(adminProductionId)&&adminProductionId.toLowerCase()===previewId.toLowerCase()))
   throw Error("Target Preview D1 matches a Production D1; refusing migration.");
 const dbName=(await cf("/d1/database/"+encodeURIComponent(previewId))).name;
 if(!dbName)throw Error("Preview D1 name is unavailable.");
