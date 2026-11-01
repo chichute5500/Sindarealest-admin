@@ -40,6 +40,11 @@ assert.match(headMarkup,/\.brand-copy\{display:flex;flex-direction:column;/,
 assert.match(headMarkup,/@media\(max-width:760px\)\{\s*\.nav-wrap \.nav \.brand\{/,
  'Approved mobile nav brand geometry must be ready before first paint');
 
+// Filter chips hydrate asynchronously after SSR. Reserve exactly one 40px
+// mobile chip row + 10px vertical padding before JavaScript inserts children,
+// so the catalog grid cannot jump ~40px during the first viewport render.
+assert.ok(headMarkup.includes('#products .catalog-tools .filter-pills{min-height:50px;gap:8px;padding:2px 2px 8px;'),
+ 'Mobile category filter rail must reserve its final row height before hydration');
 const startup=html.indexOf('async function init()');
 const productsFetch=html.indexOf("await fetch('/api/products'",startup);
 assert.ok(startup>=0&&productsFetch>startup,'Startup and products request exist');
