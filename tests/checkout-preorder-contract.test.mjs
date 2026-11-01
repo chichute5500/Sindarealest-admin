@@ -113,4 +113,8 @@ const restoreQr=paymentRender.indexOf('qrMount.append(existingQr)');
 const clearOldStage=paymentRender.indexOf('panel.replaceChildren()');
 assert.ok(restoreQr>=0&&clearOldStage>restoreQr,'Keep the live QR node and its listeners across sequential checkouts');
 assert.match(html,/\$\('#sdCheckoutQrMount'\)\.append\(\$\('#sdCheckoutQrWrap'\)\)/,'Second checkout mounts the retained QR tile');
+assert.match(html,/\$\('#sdCheckoutConfirmRange'\)\.disabled=false/,'Every new checkout re-enables the slider');
+assert.match(html,/\$\('#sdCheckoutConfirmLabel'\)\.textContent='Xác nhận đã thanh toán'/,'Every new checkout resets the slider label');
+assert.match(html,/if\(sdCheckoutOrderCreating\)return;sdCheckoutOrderCreating=true/,'An in-flight order is protected against duplicate submit');
+assert.match(html,/finally\{sdCheckoutOrderCreating=false\}/,'A failed submission unlocks retry');
 console.log("PASS: owner-approved Liquid Glass checkout steps; server-authoritative deposits; QR fail-closed; Admin choice recorded without marking paid.");
