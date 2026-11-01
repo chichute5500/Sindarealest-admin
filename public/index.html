@@ -1308,9 +1308,10 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 .cart-list{min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:12px 0 16px;scroll-padding-block:12px 16px;background:transparent}
 #cartList::-webkit-scrollbar,#checkoutForm::-webkit-scrollbar{display:none}
 .cart-bottom{flex:0 0 auto;padding:13px 0 calc(4px + env(safe-area-inset-bottom))}
-.cart-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink);font-size:12px;line-height:1.4}
-.cart-summary strong{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
-.cart-bottom .cart-note{margin:7px 0 9px;font-size:10px;line-height:1.55;color:var(--muted)}
+.cart-bottom .cart-checkout-bar{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;min-height:72px;padding:11px 17px;white-space:normal;text-align:center}
+.cart-bottom .cart-checkout-bar .cart-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;width:100%;font-size:11px;font-weight:500;line-height:1.35;color:var(--ink);text-align:left}
+.cart-bottom .cart-checkout-bar .cart-summary strong{font-size:14px;font-weight:750;font-variant-numeric:tabular-nums;text-align:right;overflow-wrap:anywhere}
+.cart-bottom .cart-checkout-bar .cart-checkout-label{display:block;font-size:12px;font-weight:750;line-height:1.35;text-align:center}
 .cart-bottom .pill-btn{width:100%;margin-top:7px}
 .cart-row{grid-template-columns:68px minmax(0,1fr) max-content;align-items:center}
 .cart-row-copy{min-width:0}
@@ -3587,9 +3588,10 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
   <div class="cart-header"><h2 id="cartTitle">Giỏ hàng (0)</h2><button class="icon-btn tap-target" id="cartClose" aria-label="Đóng giỏ hàng">×</button></div>
   <div class="cart-list" id="cartList" aria-live="polite"></div>
   <div class="cart-bottom">
-    <div class="cart-summary"><span>Tạm tính món đã chọn</span><strong id="cartSubtotal">—</strong></div>
-    <p class="cart-note">Chỉ món được tích sẽ vào đơn. Giá được hệ thống kiểm tra khi đặt hàng.</p>
-    <button class="pill-btn primary tap-target" id="cartCheckout" type="button" disabled>Tiếp tục đặt hàng <span class="arrow">→</span></button>
+    <button class="pill-btn primary tap-target cart-checkout-bar" id="cartCheckout" type="button" disabled>
+      <span class="cart-summary"><span>Tạm tính món đã chọn</span><strong id="cartSubtotal">—</strong></span>
+      <span class="cart-checkout-label" id="cartCheckoutLabel">Chọn sản phẩm muốn thanh toán</span>
+    </button>
     <button class="pill-btn tap-target" id="cartZalo" type="button" disabled>Tư vấn / đặt hàng qua Zalo ↗</button>
   </div>
 </div>
@@ -4679,7 +4681,7 @@ function renderCart(){
  const itemCount=entries.reduce((sum,item)=>sum+item.q,0),selectedCount=selected.reduce((sum,item)=>sum+item.q,0);
  $('#cartTitle').textContent='Giỏ hàng ('+itemCount+')';
  $('#cartCheckout').disabled=!selected.length;
- $('#cartCheckout').textContent=selected.length?'Thanh toán '+selectedCount+' sản phẩm →':'Chọn sản phẩm muốn thanh toán';
+ $('#cartCheckoutLabel').textContent=selected.length?'Thanh toán '+selectedCount+' sản phẩm →':'Chọn sản phẩm muốn thanh toán';
  $('#cartZalo').disabled=!entries.length;
  if(!entries.length){
   $('#cartList').innerHTML='<div class="empty-cart">Giỏ hàng đang trống.<br>Hãy chọn sản phẩm bạn quan tâm.</div>';
