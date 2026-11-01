@@ -151,6 +151,18 @@ try {
   assert.equal(publicPending.amount,142500);
   assert.equal(publicPending.freeShipping,false);
   assert.match(publicPending.qrImageUrl,/^\/payment-qr\/qr-/);
+  const checkoutWithActiveQr={...checkout,phone:'0000000103'};
+  const direct=await (await expectStatus('Checkout creates a QR request from the active verified Shop QR',await invoke(ordersPost,'/api/orders','POST',checkoutWithActiveQr),201)).json();
+  assert.equal(direct.paymentReady,true);
+  assert.equal(direct.paymentTermsConfirmed,true);
+  assert.equal(direct.paymentInstructions.amount,142500);
+  assert.equal(direct.paymentInstructions.transferContent,direct.orderNumber);
+  const directRecord=one('SELECT id FROM orders WHERE order_number=?',direct.orderNumber);
+  assert.equal(one("SELECT created_by AS actor FROM order_payment_requests WHERE order_id=? AND status='pending'",directRecord.id).actor,'customer_checkout');
+  assert.equal(one("SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?",directRecord.id).n,0,'Creating a QR request must never record money as received');
+  const directPublic=await (await expectStatus('Order token returns checkout QR immediately',await invoke(orderPaymentGet,'/api/order-payment?orderNumber='+encodeURIComponent(direct.orderNumber)+'&token='+direct.orderAccessToken),200)).json();
+  assert.equal(directPublic.paymentReady,true);
+  assert.equal(directPublic.amount,142500);
   fakeObjects.delete(qrKey);
   const stale=await (await expectStatus('Missing QR object fails closed',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
   assert.equal(stale.paymentReady,false);
@@ -182,7 +194,7 @@ try {
   await expectStatus('Cancel settled order',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:record.id,status:'cancelled'},true),200);
   await expectStatus('Cancelled order cannot get new QR',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{orderId:record.id,paymentOption:'full'},true),409);
   assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
-  assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='order_created'").n,1);
+  assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='order_created'").n,2);
   assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='payment_received_verified'").n,1);
   assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='payment_refund_verified'").n,1);
   console.log(JSON.stringify({scope:'DISPOSABLE_SQLITE_ONE_DATABASE_REAL_HANDLERS',productionWrites:0,remoteRequests:0,realTransfers:0,pass:true,checks:trace},null,2));
