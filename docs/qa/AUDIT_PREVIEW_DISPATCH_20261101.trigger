@@ -24,3 +24,5 @@ Only Preview Pages branch fix/audit-2026-10; Production NO.
 2026-11-01: verified source check PASS run 41295836780; dispatch image priority candidate with fixed test, isolated Cloudflare Preview.
 
 2026-11-01 Preview experimental first-row SSR <head> image preload candidate 3cbf7f7. CI 41297037913 PASS. Before/after check against c50b/dd216f baselines, no production writes, may revert if regresses.
+
+2026-11-01 candidate 93d9057d3b7e: SSR catalog images 3-8 defer to viewport observer with no-JS <noscript> fallback. Source full CI run 41298892694 PASS; local-only mocked Playwright run 41298892608 PASS. Deploy ONE isolated Preview; verify source marker and no-JS SSR. Never Main / Production.
