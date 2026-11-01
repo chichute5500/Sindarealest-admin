@@ -136,7 +136,7 @@ assert.doesNotMatch(html,/#cartList,#checkoutForm\{[^}]*mask-image/,'Cart and Ch
 assert.match(html,/\.cart-list\{[^}]*background:transparent/,'Cart list shares one uninterrupted glass surface with footer');
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*background:transparent/,'Checkout content shares one uninterrupted glass surface with footer');
 assert.match(html,/\.cart-drawer\{overflow-y:auto!important;overscroll-behavior:contain/,'Mobile cart uses its outer shell as its only scrolling container');
-assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-list\{[^}]*overflow-y:visible!important/,'Populated cart no longer crops half a product tile inside an inner scrollport');
+assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-list\{[^}]*overflow:visible!important/,'Both list overflow axes are visible: no implicit clipped inner scrollport');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2;margin-top:auto\}/,'Combined subtotal and checkout bar remains reachable while outer drawer scrolls');
 assert.match(html,/#cartDrawer \.cart-header\{position:sticky;top:0;z-index:2\}/,'Floating cart header remains in place in the unified scroll region');
 
