@@ -74,7 +74,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
    await expect(page.locator('#sdCheckoutSelectedAmount')).toContainText(deposit.toLocaleString('vi-VN'));
    await expect(page.locator('#sdCheckoutRemaining')).toContainText((total-deposit).toLocaleString('vi-VN'));
-   await expect(page.locator('#sdCheckoutDiscount')).toContainText('0');
+   await expect(page.locator('#sdCheckoutDiscount')).toContainText('Không áp dụng');
    await expect(page.locator('#sdCheckoutQrWrap')).toBeHidden();
    await page.screenshot({path:join(output,`${width}x${height}-${theme}-deposit.png`),fullPage:false,animations:'disabled'});
    await page.locator('#sdCheckoutOptions [data-sd-payment-option="full"]').click();
