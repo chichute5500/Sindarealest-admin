@@ -40,6 +40,7 @@ on:
       - 'tests/e2e/admin-reference-same-data-qa.spec.js'
       - 'tests/e2e/admin-isolated-preview.spec.js'
       - 'tests/e2e/admin-12-screen-live-qa.spec.js'
+      - 'tests/e2e/admin-mobile-dock-motion.spec.js'
 
 permissions:
   contents: read
@@ -147,7 +148,7 @@ jobs:
           test -n "$ADMIN_TEST_PASSWORD" || { echo "::error::Missing ADMIN_TEST_PASSWORD secret"; exit 1; }
           npm install --no-save @playwright/test
           npx playwright install --with-deps chromium
-          npx playwright test tests/e2e/admin-12-screen-live-qa.spec.js --grep "432x744 light" --reporter=line
+          npx playwright test tests/e2e/admin-mobile-dock-motion.spec.js --reporter=line
 
       - name: Print expected Preview alias
         run: |
