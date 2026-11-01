@@ -22,3 +22,5 @@ Only Preview Pages branch fix/audit-2026-10; Production NO.
 2026-11-01: image priority candidate: first two SSR+CSR images high; offscreen low, source-only test.
 
 2026-11-01: verified source check PASS run 41295836780; dispatch image priority candidate with fixed test, isolated Cloudflare Preview.
+
+2026-11-01 Preview experimental first-row SSR <head> image preload candidate 3cbf7f7. CI 41297037913 PASS. Before/after check against c50b/dd216f baselines, no production writes, may revert if regresses.

@@ -9,3 +9,5 @@ No user/customer writes. No Production deploy. No Main merge.
 2026-11-01: compare mobile catalog LCP against c50b baseline 10.607s after priority change, same Preview and device conditions.
 
 2026-11-01: verified source check PASS run 41295836780; dispatch image priority candidate with fixed test, Lighthouse GET only.
+
+2026-11-01 GET-only Lighthouse experimental first-row SSR <head> image preload candidate 3cbf7f7. CI 41297037913 PASS. Before/after check against c50b/dd216f baselines, no production writes, may revert if regresses.
