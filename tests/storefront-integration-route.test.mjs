@@ -44,7 +44,10 @@ const correct=await middleware(ctx(old,"/sanpham/giaytay/internal-abc123"));
 assert.equal(correct.status,200);
 const seo=await correct.text();
 assert.match(seo,/canonical" href="https:\/\/shop\.example\/sanpham\/giaytay\/internal-abc123"/);
-assert.match(seo,/"@type":"Product"/);
+assert.match(seo,/"@type":"WebPage"/,"Product detail without public offer/reviews uses truthful WebPage markup");
+assert.doesNotMatch(seo,/"@type":"Product"/,"Never publish an incomplete rich-result Product");
+assert.doesNotMatch(seo,/"offers"|aggregateRating|"review"/,
+  "Do not invent pricing or customer ratings in structured data");
 assert.doesNotMatch(seo,/"sku":"SD001"/);
 assert.doesNotMatch(seo,/Mã sản phẩm: SD001/);
 const verifiedResponse=await middleware(ctx(verified,"/sanpham/giaytay/REAL-001"));
