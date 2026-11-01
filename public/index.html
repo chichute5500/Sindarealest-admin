@@ -3796,7 +3796,7 @@ const catalogImageObserver=typeof IntersectionObserver==='function'
      const img=entry.target;
      catalogImageObserver.unobserve(img);
      const src=img.getAttribute('data-src');
-     if(src){img.src=src;img.removeAttribute('data-src')}
+     if(src){img.src=src;img.style.visibility='';img.removeAttribute('data-src')}
    }
  },{rootMargin:'400px 0px',threshold:0})
  :null;
@@ -3805,7 +3805,7 @@ function activateCatalogImages(){
  catalogImageObserver?.disconnect();
  grid.querySelectorAll('img[data-src]').forEach(img=>{
    if(catalogImageObserver)catalogImageObserver.observe(img);
-   else{img.src=img.getAttribute('data-src');img.removeAttribute('data-src')}
+   else{img.src=img.getAttribute('data-src');img.style.visibility='';img.removeAttribute('data-src')}
  });
 }
 /* One-shot reveal: sections stay readable when scrolling back up.
@@ -5004,6 +5004,8 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
  // Reveal editorial sections independently of the product API. Slow D1/API
  // responses must never leave a blank page beneath the Hero on refresh.
  bindReveal(document);
+ // SSR photos must remain usable even if /api/products takes seconds or fails.
+ activateCatalogImages();
  try{const res=await fetch('/api/products',{cache:'no-store'});if(!res.ok)throw new Error('API sản phẩm trả về HTTP '+res.status);const payload=await res.json();products=Array.isArray(payload)?payload:(payload.products||payload.data||[]);if(!Array.isArray(products))throw new Error('Dữ liệu sản phẩm không hợp lệ');products=products.map(p=>({...p,images:(p.images||[]).map(imgPath)}));normalizeCart();normalizeFavorites();}catch(err){
   // Keep the read-only, current D1-backed server-rendered catalog as a
   // navigable no-JS fallback. Never expose infrastructure instructions to

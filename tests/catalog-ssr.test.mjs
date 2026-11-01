@@ -40,6 +40,14 @@ assert.deepEqual(priority.map(x=>x[2]),["high","high","low","low","low","low","l
   "Only the above-the-fold first mobile row should compete at high image priority");
 assert.equal(priority[0][1],"eager");assert.equal(priority[1][1],"eager");
 assert.ok(priority.slice(2).every(x=>x[1]==="lazy"),"Offscreen SSR images preserve native lazy behavior");
+assert.equal((category.match(/class="sd-ssr-deferred-img" data-src="/g)||[]).length,6,
+ "SSR should defer six far-below-the-fold source downloads until near viewport");
+assert.equal((category.match(/<noscript><img src="/g)||[]).length,6,
+ "JS-disabled catalog must still contain all deferred images as fallbacks");
+assert.ok(category.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
+ "No-JS mode must hide the placeholder without doubling the media box");
+assert.ok(!full.includes('sd-ssr-deferred-img'),
+ "Home SSR should remain unchanged; only direct catalog routes are optimized");
 const preloadMatches=[...category.matchAll(/<link rel="preload" as="image" href="([^"]+)" fetchpriority="high">/g)];
 assert.deepEqual(preloadMatches.map(x=>x[1]),["/images/test-image.webp"],
  "Repeated first-row image sources must use only one preload");
@@ -84,6 +92,10 @@ const initStart=storefront.indexOf('async function init()');
 assert.ok(initStart>=0&&apiStart>initStart);
 assert.ok(storefront.slice(initStart,apiStart).includes('setupNavSpy();'),
   'Mobile section navigation starts before product API resolves');
+assert.ok(storefront.slice(initStart,apiStart).includes('activateCatalogImages();'),
+  'Initialize SSR deferred images before a slow or unavailable products API');
+assert.ok(storefront.includes("img.style.visibility='';img.removeAttribute('data-src')"),
+  'Observed SSR placeholders must become visible as their actual source begins loading');
 assert.match(storefront,/if\(!active\)initArtSlideshowWhenVisible\(\)/);
 assert.match(storefront,/document\.documentElement\.classList\.contains\('sd-catalog-route'\)\)return;const rect=/);
 // SQL and hydrated list must use the same deterministic tiebreak for
