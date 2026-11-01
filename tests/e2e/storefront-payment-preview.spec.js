@@ -37,8 +37,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.locator('#cartCheckout').click();
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
 
- await page.locator('input[name="fullName"]').fill('Khách kiểm tra Preview');
- await page.locator('input[name="phone"]').fill('0900000000');
+ await page.locator('#checkoutDrawer input[name="fullName"]').fill('Khách kiểm tra Preview');
+ await page.locator('#checkoutDrawer input[name="phone"]').fill('0900000000');
  await page.locator('#checkoutStreet').fill('Địa chỉ thử nghiệm Preview');
  const province=page.locator('#checkoutProvince');
  await expect.poll(()=>province.locator('option').count(),{timeout:15000}).toBeGreaterThan(1);
