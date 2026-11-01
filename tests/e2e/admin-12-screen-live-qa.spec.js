@@ -39,7 +39,7 @@ for (const {width,height,theme} of matrix) {
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
     const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},deviceScaleFactor:dpr,theme,
-      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],navigationLatencyChecks:[],observedAtUtc:new Date().toISOString()};
+      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],navigationLatencyChecks:[],apiRouteTimings:[],observedAtUtc:new Date().toISOString()};
     const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:width===432&&theme==='light'?'no-preference':'reduce'});
     const page=await context.newPage();
     const delayedRouteCounts={orders:0,customers:0};
@@ -73,6 +73,14 @@ for (const {width,height,theme} of matrix) {
               !(['/api/admin/login','/api/admin/logout'].includes(url.pathname) && request.method()==='POST')) {
             report.nonAuthMutationRequests.push({method:request.method(),path:url.pathname});
           }
+        } catch {}
+      });
+      page.on('requestfinished',request=>{
+        try {
+          const url=new URL(request.url());
+          if(url.origin!==origin||!['/api/admin/orders','/api/admin/customers'].includes(url.pathname)||request.method()!=='GET')return;
+          const timing=request.timing(),durationMs=Number.isFinite(timing.responseEnd)&&timing.responseEnd>=0?timing.responseEnd-timing.startTime:null;
+          report.apiRouteTimings.push({path:url.pathname,durationMs,testInjectedDelay:width===432&&theme==='light'});
         } catch {}
       });
       // Reject stale alias HTML before authenticating or collecting evidence.
@@ -274,21 +282,27 @@ for (const {width,height,theme} of matrix) {
           ['orders','slide-back'],['products','slide-back'],['dashboard','slide-back']
         ];
         for(const [target,direction] of sequence){
-          const dock=await page.locator('.mobiletabs').boundingBox();
+          const dock=await page.locator('.mobiletabs').evaluate(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,bottom:s.bottom,innerHeight,visualViewportHeight:visualViewport?.height??innerHeight}});
           const started=await page.evaluate(()=>performance.now());
           await page.locator('.mobiletabs [data-view="'+target+'"]').tap();
           await expect(page.locator('#main .pagehead h2').first()).toHaveText(expected[target],{timeout:500});
           await expect(page.locator('#main')).toHaveAttribute('data-admin-transition',direction,{timeout:250});
           const elapsedMs=await page.evaluate(start=>performance.now()-start,started);
           const timing=await page.locator('#main').evaluate(el=>{const animation=el.getAnimations({subtree:false}).at(-1);return{duration:animation?.effect?.getTiming()?.duration||0,transition:el.dataset.adminTransition||'',from:animation?.effect?.getKeyframes()?.[0]?.transform||''}});
-          const dockAfter=await page.locator('.mobiletabs').boundingBox();
+          const dockAfter=await page.locator('.mobiletabs').evaluate(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,bottom:s.bottom,innerHeight,visualViewportHeight:visualViewport?.height??innerHeight}});
           expect(elapsedMs,'Tab '+target+' shell must paint under 500ms while its data request is deliberately delayed').toBeLessThan(500);
           expect(timing.duration,'Tab transition duration must be 250–300ms').toBeGreaterThanOrEqual(250);
           expect(timing.duration,'Tab transition duration must be 250–300ms').toBeLessThanOrEqual(300);
           expect(timing.transition).toBe(direction);
           expect(timing.from,'Tab '+target+' must enter from the '+direction+' side').toContain(direction==='slide-forward'?'22px':'-22px');
-          expect(Math.abs(dockAfter.x-dock.x)).toBeLessThanOrEqual(.5);
-          expect(Math.abs(dockAfter.y-dock.y)).toBeLessThanOrEqual(.5);
+          expect(dockAfter.position,'The bottom dock must remain fixed while changing routes').toBe('fixed');
+          expect(dockAfter.bottom,'The dock must stay anchored to the same safe-area bottom').toBe(dock.bottom);
+          expect(Math.abs(dockAfter.x-dock.x),'The fixed dock must keep its horizontal position').toBeLessThanOrEqual(.5);
+          expect(Math.abs(dockAfter.width-dock.width),'The fixed dock must keep its width').toBeLessThanOrEqual(.5);
+          expect(Math.abs(dockAfter.height-dock.height),'The fixed dock must keep its height').toBeLessThanOrEqual(.5);
+          const dockBottomOffset=parseFloat(dockAfter.bottom);
+          expect(Math.abs(dockAfter.y+dockAfter.height+dockBottomOffset-dockAfter.innerHeight),
+            'The dock must stay fixed to the viewport bottom even if the browser visual viewport changes').toBeLessThanOrEqual(1);
           if(target==='orders'||target==='customers')await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="'+target+'"]')).toBeVisible();
           report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockStationary:true,skeletonVisible:target==='orders'||target==='customers'});
         }
@@ -385,7 +399,11 @@ for (const {width,height,theme} of matrix) {
           await galleryImage.hover();
           await page.mouse.down();
           await expect(page.locator('.gallery-held-preview')).toBeVisible({timeout:1200});
-          await expect(page.locator('.gallery-held-preview')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
+          const reducedMotion=await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches);
+          if(reducedMotion){
+            const motion=await page.locator('.gallery-held-preview').evaluate(el=>({transition:el.dataset.adminTransition||null,animations:el.getAnimations().length}));
+            expect(motion,'Held gallery preview should respect reduced-motion preference').toEqual({transition:null,animations:0});
+          }else await expect(page.locator('.gallery-held-preview')).toHaveAttribute('data-admin-transition','origin',{timeout:250});
           await page.mouse.up();
           await expect(page.locator('.gallery-held-preview')).toHaveCount(0);
         }
