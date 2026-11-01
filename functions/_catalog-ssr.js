@@ -32,7 +32,7 @@ function productCards(rows,origin,{eager=false}={}){
     const defer=eager&&i>=2;
     const img=defer
       ?'<img class="sd-ssr-deferred-img" data-src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async" style="visibility:hidden">'+
-       '<noscript><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="lazy" decoding="async"></noscript>'
+       '<noscript><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async"></noscript>'
       :'<img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(eager&&i<2?"eager":"lazy")+'" '+(i<2&&eager?'fetchpriority="high" ':'fetchpriority="low" ')+'decoding="async">';
     return '<article class="product-card sd-server-rendered" data-ssr-product="'+h(p.id)+'">'+
      '<a class="product-open" href="'+h(href)+'" aria-label="Xem chi tiết '+h(title)+'">'+
