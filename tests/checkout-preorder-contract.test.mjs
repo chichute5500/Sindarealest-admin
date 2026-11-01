@@ -115,8 +115,11 @@ assert.ok(markupHeader<markupForm&&markupForm<markupStepper&&markupStepper<marku
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*display:grid/,'Checkout form is the only scrolling body');
 assert.match(html,/\.checkout-heading h2\{[^}]*left:50%;top:50%;transform:translate\(-50%,-50%\);[^}]*font:700 25px\/1\.2 SD Serif/,'Bold order title stays physically centered in every stage');
 assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{visibility:hidden;pointer-events:none\}/,'Success step does not shift header geometry');
-assert.match(html,/\.checkout-header\{[^}]*border-bottom:1px solid var\(--line\);background:transparent;box-shadow:none/,'Checkout header sits on the same single glass shell as the cart');
-assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*background:transparent;box-shadow:none/,'Checkout footer does not create a detached glass rectangle');
+assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px;background:var\(--sd-glass-shell-strong/,'Cart and Checkout use a single shared floating glass header style');
+assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
+assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
+assert.match(html,/\.cart-bottom\{border-top:0;padding-top:14px;background:transparent\}/,'Cart bottom has no full-width background seam');
+assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border-top:0;background:transparent;box-shadow:none/,'Checkout footer has no full-width separator or detached glass rectangle');
 
 
 assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number explains how to copy it');
