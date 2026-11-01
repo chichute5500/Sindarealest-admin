@@ -60,7 +60,8 @@ assert.match(html,/sdCheckoutSaveQr/);
 assert.doesNotMatch(html,/sdCheckoutOpenBank|Mở ứng dụng ngân hàng/,'Checkout no longer offers a bank-app launch action');
 assert.match(html,/id="sdCheckoutConfirmRange" type="range" min="0" max="100" step="1"/,'The transfer confirmation is a continuous swipe slider');
 assert.match(glass,/--progress:0%/,'The slider track starts empty');
-assert.match(glass,/linear-gradient\(90deg,#4a88b4 0 var\(--progress\),transparent var\(--progress\) 100%\)/,'The blue track follows the slider progress');
+assert.match(glass,/\.sd-checkout-confirm-wrap::before\{[^}]*width:var\(--progress\)[^}]*linear-gradient\(100deg,#72b7dc,#438fc2\)[^}]*transition:width 55ms linear/,'The rounded slider fill follows the thumb smoothly');
+assert.match(glass,/\.sd-checkout-confirm-range::-webkit-slider-runnable-track\{height:6px;border-radius:999px;background:transparent\}/,'The native range track stays clear above the full-height fill');
 assert.match(html,/sdCheckoutConfirmWrap'\)\.style\.setProperty\('--progress',progress\+'%'\)/,'Slider fill updates continuously while moving');
 assert.match(html,/Xác nhận đã thanh toán/,'The slider uses the owner-requested confirmation copy');
 assert.match(html,/Tiến hành thanh toán →/,'The payment step uses a clear payment action label');
@@ -74,6 +75,7 @@ assert.match(checkoutSubmit,/sdCheckoutLoadPaymentInstructions/,'The payment ste
 assert.doesNotMatch(checkoutSubmit,/fetch\('\/api\/orders'/,'Opening the QR does not create an order');
 assert.match(create,/requestedTransferReference&&\(!qrSnapshot/,'Finalization refuses a stale or changed QR snapshot');
 assert.match(html,/progress>=100\?'Đang lấy mã đơn'/,'The slider changes to the requested loading label at completion');
+assert.match(html,/sdCheckoutConfirmRange'\)\.setAttribute\('aria-valuetext','0%'\)/,'Reopening checkout resets the slider accessibility value');
 assert.match(html,/sdCheckoutOrderCreated\)return/,'The code stage cannot appear before order creation succeeds');
 assert.match(html,/button\.dataset\.detailPaymentOption=choice\.value/,'Product detail renders selectable deposit and full payment choices');
 assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displays the full-payment discount');

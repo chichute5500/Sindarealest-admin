@@ -898,12 +898,14 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer.sd-checkout-success .sd-checkout-actions{grid-template-columns:minmax(0,1fr)}
 .checkout-drawer.sd-checkout-success .sd-checkout-actions #sdCheckoutDone{grid-column:1;justify-self:end;width:auto;min-width:150px;max-width:240px}
 .checkout-drawer .sd-checkout-confirm-wrap{--progress:0%;position:relative;grid-column:1/-1;display:grid;place-items:center;min-height:56px;overflow:hidden;border:1px solid var(--sd-reference-edge,var(--line));border-radius:999px;background:var(--sd-reference-surface,var(--glass));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 5px 18px rgba(92,145,185,.12)}
+.checkout-drawer .sd-checkout-confirm-wrap::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--progress);border-radius:inherit;background:linear-gradient(100deg,#72b7dc,#438fc2);transition:width 55ms linear;pointer-events:none}
+.checkout-drawer .sd-checkout-confirm-wrap[style*="--progress: 100%"]::before{transition:none}
 .checkout-drawer .sd-checkout-confirm-wrap[hidden]{display:none!important}
 .checkout-drawer .sd-checkout-confirm-label{position:relative;z-index:1;max-width:calc(100% - 64px);color:var(--ink);font-size:12px;font-weight:750;text-align:center;pointer-events:none}
 .checkout-drawer .sd-checkout-confirm-range{position:absolute;z-index:2;inset:0;width:100%;height:100%;margin:0;appearance:none;-webkit-appearance:none;background:transparent;cursor:ew-resize;touch-action:pan-y}
-.checkout-drawer .sd-checkout-confirm-range::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(90deg,#4a88b4 0 var(--progress),transparent var(--progress) 100%)}
+.checkout-drawer .sd-checkout-confirm-range::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:transparent}
 .checkout-drawer .sd-checkout-confirm-range::-moz-range-track{height:6px;border-radius:999px;background:transparent}
-.checkout-drawer .sd-checkout-confirm-range::-moz-range-progress{height:6px;border-radius:999px;background:#4a88b4}
+.checkout-drawer .sd-checkout-confirm-range::-moz-range-progress{height:6px;border-radius:999px;background:transparent}
 .checkout-drawer .sd-checkout-confirm-range::-webkit-slider-thumb{box-sizing:border-box;width:44px;height:44px;margin-top:-19px;appearance:none;-webkit-appearance:none;border:1px solid var(--sd-reference-edge,var(--line));border-radius:50%;background:var(--sd-reference-surface-strong,var(--panel-strong)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12h15m-6-6 6 6-6 6' fill='none' stroke='%234a88b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/20px 20px no-repeat;box-shadow:0 2px 8px rgba(34,68,94,.2)}
 .checkout-drawer .sd-checkout-confirm-range::-moz-range-thumb{box-sizing:border-box;width:44px;height:44px;border:1px solid var(--sd-reference-edge,var(--line));border-radius:50%;background:var(--sd-reference-surface-strong,var(--panel-strong)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12h15m-6-6 6 6-6 6' fill='none' stroke='%234a88b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/20px 20px no-repeat;box-shadow:0 2px 8px rgba(34,68,94,.2)}
 .checkout-drawer .sd-checkout-confirm-wrap:focus-within{outline:2px solid #4a88b4;outline-offset:3px}
@@ -4760,7 +4762,7 @@ function openCheckout(options={}){
  panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
- sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
+ sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
  $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
  if(!checkoutProvinceLoadStarted){
@@ -5037,7 +5039,7 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  const add=(parent,tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;parent.append(node);return node};
  const transferStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-transfer-stage'):panel;
  const orderStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-order-stage'):panel;
- if(deferOrderCode){orderStage.hidden=true;$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=false;add(transferStage,'p','sd-payment-stage-label','BƯỚC 1 / 2 · THANH TOÁN');add(transferStage,'h3','',ready?'Chuyển khoản theo thông tin bên dưới':'Shop chưa có QR chuyển khoản');}
+ if(deferOrderCode){orderStage.hidden=true;$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=false;add(transferStage,'p','sd-payment-stage-label','BƯỚC 1 / 2 · THANH TOÁN');add(transferStage,'h3','',ready?'Chuyển khoản theo thông tin bên dưới':'Shop chưa có QR chuyển khoản');}
  else add(panel,'h3','',ready?'Hướng dẫn chuyển khoản':'Thông tin đơn hàng');
  if(orderNumber){
   const orderCard=add(orderStage,'button','sd-order-reference','');orderCard.type='button';orderCard.setAttribute('aria-label','Sao chép mã đơn '+orderNumber);
