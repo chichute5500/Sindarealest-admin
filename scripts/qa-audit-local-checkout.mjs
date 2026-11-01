@@ -319,6 +319,17 @@ try{
  await Promise.all([{width:360,mode:"dark"},{width:390,mode:"light"}].map(async ({width,mode})=>{
   const c=await browser.newContext({viewport:{width,height:844},colorScheme:mode,reducedMotion:"no-preference",serviceWorkers:"block"});
   const p=await c.newPage();let productsDelivered=false,provinceCalls=0;
+  // DOMContentLoaded on slow CI may arrive after the 1s intro auto-dismiss.
+  // Detect Welcome insertion while the parser is still building the page.
+  await p.addInitScript(()=>{
+   window.__qaSawFirstWelcome=false;
+   const watcher=new MutationObserver(()=>{
+    if(document.getElementById("welcomeSplash")){
+     window.__qaSawFirstWelcome=true;watcher.disconnect();
+    }
+   });
+   watcher.observe(document,{childList:true,subtree:true});
+  });
   try{
    await p.route("**/*",async route=>{
     const req=route.request(),url=new URL(req.url());
@@ -330,7 +341,8 @@ try{
     return route.continue();
    });
    await p.goto(origin+"/",{waitUntil:"domcontentloaded",timeout:35000});
-   assert.equal(await p.locator("#welcomeSplash").count(),1);
+   assert.equal(await p.evaluate(()=>window.__qaSawFirstWelcome),true,
+    "The first Home visit must show Welcome even if auto-dismiss finishes before DOMContentLoaded");
    await p.screenshot({path:join(evidenceDir,`08-welcome-first-${width}-${mode}.png`),animations:"disabled"});
    await p.waitForFunction(()=>!document.querySelector("#welcomeSplash"),null,{timeout:3000});
    assert.equal(productsDelivered,false,"Welcome must dismiss before products API responds");
