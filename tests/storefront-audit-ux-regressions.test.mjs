@@ -30,4 +30,13 @@ for(const [id,openPattern] of [
 assert.match(html,/\.checkout-drawer\.open\{transform:translateX\(0\);visibility:visible/,'Keep the original checkout slide-in effect');
 assert.match(html,/\.checkout-drawer\{position:fixed;[^\n]*visibility:hidden;pointer-events:none;transition:transform/,'Closed checkout uses the original delayed visibility slide-out');
 
+const headMarkup=html.slice(0,html.indexOf('</head>'));
+const styleStarts=[...html.matchAll(/<style\\b[^>]*>/gi)].map(m=>m.index);
+assert.equal(styleStarts.length,28,'CSS is retained without accidentally dropping an approved rule block');
+assert.ok(styleStarts.every(offset=>offset<headMarkup.length),
+ 'All visual CSS must be available before the first header/hero can paint');
+assert.match(headMarkup,/\.brand-copy\{display:flex;flex-direction:column;/,
+ 'Brand must be stacked before header is inserted (no first-paint joined name/tagline)');
+assert.match(headMarkup,/@media\(max-width:760px\)\{\s*\.nav-wrap \.nav \.brand\{/,
+ 'Approved mobile nav brand geometry must be ready before first paint');
 console.log('PASS: Storefront 404/route/consultation/reveal/Welcome/drawer first-paint contracts');

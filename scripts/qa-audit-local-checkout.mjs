@@ -63,9 +63,18 @@ await page.addInitScript(()=>{
  // Check *during streaming HTML parsing*, before the later drawer CSS arrives.
  // This reproduces the brief checkout panel revealed by Android refresh.
  window.__sdFirstPaintDrawerLeaks=[];
+ window.__sdHeaderFirstPaint=[];
  const ids=['accountDrawer','cartDrawer','checkoutBackdrop','checkoutDrawer'];
  const captured=new Set();
  const observer=new MutationObserver(()=>{
+   if(window.__sdHeaderFirstPaint.length===0){
+     const header=document.querySelector('.nav-wrap .nav .brand-copy');
+     if(header){
+       const text=header.querySelector('.brand-name');
+       const computed=getComputedStyle(header),nameStyle=getComputedStyle(text);
+       window.__sdHeaderFirstPaint.push({display:computed.display,direction:computed.flexDirection,nowrap:nameStyle.whiteSpace});
+     }
+   }
    for(const id of ids){
      if(captured.has(id))continue;
      const el=document.getElementById(id);
@@ -85,6 +94,9 @@ try{
  assert.equal(response.status(),200);
  assert.deepEqual(await page.evaluate(()=>window.__sdFirstPaintDrawerLeaks),[],
   'No drawer or checkout backdrop can paint before the late motion CSS is parsed');
+ assert.deepEqual(await page.evaluate(()=>window.__sdHeaderFirstPaint),[
+  {display:'flex',direction:'column',nowrap:'nowrap'}
+ ],'Header must be fully styled at the first DOM paint, including brand name and tagline');
  await page.locator('#catalogGrid [data-add="qa-wallet"]').waitFor({timeout:20000});
  await page.locator('#catalogGrid [data-add="qa-wallet"]').click();
  await page.locator('#catalogGrid [data-add="qa-clutch"]').click();
@@ -156,6 +168,9 @@ try{
  await page.reload({waitUntil:"domcontentloaded",timeout:30000});
  assert.deepEqual(await page.evaluate(()=>window.__sdFirstPaintDrawerLeaks),[],
   'Android-style refresh must not flash the checkout or cart drawer during parsing');
+ assert.deepEqual(await page.evaluate(()=>window.__sdHeaderFirstPaint),[
+  {display:'flex',direction:'column',nowrap:'nowrap'}
+ ],'After mobile refresh, the brand lockup must not briefly render as joined inline text');
  await page.locator('#catalogGrid article[data-product]').first().waitFor({timeout:25000});
  // Screenshot only after first catalog thumbnail decodes; loading an article
  // does not mean its image has reached the compositor on a cold Android reload.
