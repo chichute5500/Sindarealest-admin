@@ -441,14 +441,20 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
  const cards=page.locator('#catalogGrid .product-card').filter({hasText:'Giá:'});
  await expect(cards.nth(3)).toBeVisible({timeout:20000});
- for(let i=0;i<4;i++){
-  await cards.nth(i).locator('[data-add]').click();
+ const addButtons=cards.locator('[data-add]');
+ const identifiers=await addButtons.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('data-add')));
+ const seen=new Set();
+ for(let i=0;i<Math.min(identifiers.length,16);i++){
+  const id=identifiers[i];if(!id||seen.has(id))continue;seen.add(id);
+  await addButtons.nth(i).click();
   if(await page.locator('#productOverlay.open').count()){
    const variant=page.locator('#detailVariants .sd-product-option-chip:not(:disabled)').first();
    if(await variant.count())await variant.click();
    await page.locator('#detailAdd').click();
    await page.locator('#detailClose').click();
   }
+  const lines=await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('sd-cart')||'{}')).length);
+  if(lines>=4)break;
  }
  await page.locator('#mobileCartNav').click();
  const drawer=page.locator('#cartDrawer'),rows=page.locator('#cartList .cart-row');
