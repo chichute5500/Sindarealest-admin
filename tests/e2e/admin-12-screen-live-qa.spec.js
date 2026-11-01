@@ -39,7 +39,7 @@ for (const {width,height,theme} of matrix) {
     const folder=join(process.cwd(),'artifacts','admin-12-screen-live',runSha.slice(0,12),width+'x'+height+'_'+theme);
     mkdirSync(folder,{recursive:true});
     const report={sourceSha:runSha,deployedShaExpected:declaredDeployedSha||null,deploymentVerification:'NOT_PERFORMED_BY_SCREENSHOT_TEST',screenshotMode:'VIEWPORT_PIXEL_MATCHED',viewport:{width,height},deviceScaleFactor:dpr,theme,
-      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],navigationLatencyChecks:[],apiRouteTimings:[],observedAtUtc:new Date().toISOString()};
+      evidenceScope:'LIVE_AUTHENTICATED_READ_ONLY_SCREENS',screens:[],nonAuthMutationRequests:[],pageErrors:[],consoleErrors:[],expectedInitialSessionResponses:[],navigationLatencyChecks:[],apiRouteTimings:[],interactionOrigins:[],observedAtUtc:new Date().toISOString()};
     const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,colorScheme:theme,hasTouch:width<=820,isMobile:width<=820,serviceWorkers:'block',reducedMotion:width===432&&theme==='light'?'no-preference':'reduce'});
     const page=await context.newPage();
     async function expectOriginMotion(locator,label='Reveal'){
@@ -55,6 +55,17 @@ for (const {width,height,theme} of matrix) {
         return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,left:s.left,right:s.right,bottom:s.bottom,cssWidth:s.width,
           innerWidth,clientWidth:root.clientWidth,visualViewportWidth:visualViewport?.width??innerWidth,
           innerHeight,visualViewportHeight:visualViewport?.height??innerHeight};
+      });
+    }
+    async function readOriginGeometry(locator){
+      return locator.evaluate(el=>{
+        const [x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
+        // The active WAAPI scale shifts getBoundingClientRect(). Read the
+        // authored origin first, then cancel only in the test so the box is
+        // measured in its untransformed layout coordinates.
+        el.getAnimations({subtree:false}).forEach(animation=>animation.cancel());
+        const rect=el.getBoundingClientRect();
+        return{x,y,left:rect.left,top:rect.top};
       });
     }
     const delayedRouteCounts={orders:0,customers:0};
@@ -94,8 +105,10 @@ for (const {width,height,theme} of matrix) {
         try {
           const url=new URL(request.url());
           if(url.origin!==origin||!['/api/admin/orders','/api/admin/customers'].includes(url.pathname)||request.method()!=='GET')return;
-          const timing=request.timing(),durationMs=Number.isFinite(timing.responseEnd)&&timing.responseEnd>=0?timing.responseEnd-timing.startTime:null;
-          report.apiRouteTimings.push({path:url.pathname,durationMs,testInjectedDelay:width===432&&theme==='light'});
+          const timing=request.timing();
+          const durationMs=Number.isFinite(timing.responseEnd)&&timing.responseEnd>=0?timing.responseEnd:null;
+          const timeToFirstByteMs=Number.isFinite(timing.responseStart)&&timing.responseStart>=0?timing.responseStart:null;
+          report.apiRouteTimings.push({path:url.pathname,durationMs,timeToFirstByteMs,testInjectedDelay:width===432&&theme==='light'});
         } catch {}
       });
       // Reject stale alias HTML before authenticating or collecting evidence.
@@ -326,7 +339,10 @@ for (const {width,height,theme} of matrix) {
           expect(Math.abs(dockAfter.y+dockAfter.height+dockBottomOffset-dockAfter.innerHeight),
             'The dock must stay fixed to the viewport bottom even if the browser visual viewport changes').toBeLessThanOrEqual(1);
           if(target==='orders'||target==='customers')await expect(page.locator('#main .admin-loading-grid[data-admin-loading-view="'+target+'"]')).toBeVisible();
-          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockStationary:true,skeletonVisible:target==='orders'||target==='customers'});
+          report.navigationLatencyChecks.push({target,direction,initialTransform:timing.from,elapsedMs,transitionMs:timing.duration,dockStationary:true,
+            dockViewport:{before:{innerWidth:dock.innerWidth,clientWidth:dock.clientWidth,visualViewportWidth:dock.visualViewportWidth,x:dock.x,width:dock.width},
+              after:{innerWidth:dockAfter.innerWidth,clientWidth:dockAfter.clientWidth,visualViewportWidth:dockAfter.visualViewportWidth,x:dockAfter.x,width:dockAfter.width}},
+            skeletonVisible:target==='orders'||target==='customers'});
         }
         expect(delayedRouteCounts.orders,'Rapid navigation must share one pending Orders GET').toBe(1);
         expect(delayedRouteCounts.customers,'Rapid navigation must share one pending Customers GET').toBe(1);
@@ -434,17 +450,22 @@ for (const {width,height,theme} of matrix) {
       const statusFilter=page.locator('#orderStatusFilter');
       if(await statusFilter.count()&&await statusFilter.locator('option').count()>1){
         const filterBox=await statusFilter.boundingBox();
+        await page.evaluate(()=>{
+          window.__adminQaLastPointer=null;
+          document.addEventListener('pointerdown',event=>{window.__adminQaLastPointer={x:event.clientX,y:event.clientY}}, {capture:true,once:true});
+        });
         await statusFilter.click();
+        const filterTap=await page.evaluate(()=>window.__adminQaLastPointer);
         await statusFilter.selectOption({index:1});
         await expectOriginMotion(page.locator('#main'),'Order filter result');
         if(!(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches))){
-          const filterOrigin=await page.locator('#main').evaluate(el=>{
-            const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
-            return{x,y,left:rect.left,top:rect.top};
-          });
-          expect(Math.abs(filterOrigin.x-(filterBox.x+filterBox.width/2-filterOrigin.left)),
+          const filterOrigin=await readOriginGeometry(page.locator('#main'));
+          const tapX=filterTap?.x??filterBox.x+filterBox.width/2,tapY=filterTap?.y??filterBox.y+filterBox.height/2;
+          const deltaX=filterOrigin.x-(tapX-filterOrigin.left),deltaY=filterOrigin.y-(tapY-filterOrigin.top);
+          report.interactionOrigins.push({action:'order-filter',tapX,tapY,originX:filterOrigin.x,originY:filterOrigin.y,deltaX,deltaY});
+          expect(Math.abs(deltaX),
             'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
-          expect(Math.abs(filterOrigin.y-(filterBox.y+filterBox.height/2-filterOrigin.top)),
+          expect(Math.abs(deltaY),
             'Order filter result must expand from the tapped filter control').toBeLessThanOrEqual(3);
         }
         await page.locator('#orderStatusFilter').selectOption({index:0});
@@ -463,13 +484,12 @@ for (const {width,height,theme} of matrix) {
         await expect(page.locator('.order-detail-page')).toBeVisible();
         await expectOriginMotion(page.locator('#main'),'Order detail');
         if(!(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches))){
-          const detailOrigin=await page.locator('#main').evaluate(el=>{
-            const rect=el.getBoundingClientRect(),[x,y]=getComputedStyle(el).transformOrigin.split(' ').map(parseFloat);
-            return{x,y,left:rect.left,top:rect.top};
-          });
-          expect(Math.abs(detailOrigin.x-(tapPoint.x-detailOrigin.left)),
+          const detailOrigin=await readOriginGeometry(page.locator('#main'));
+          const deltaX=detailOrigin.x-(tapPoint.x-detailOrigin.left),deltaY=detailOrigin.y-(tapPoint.y-detailOrigin.top);
+          report.interactionOrigins.push({action:'order-detail',tapX:tapPoint.x,tapY:tapPoint.y,originX:detailOrigin.x,originY:detailOrigin.y,deltaX,deltaY});
+          expect(Math.abs(deltaX),
             'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
-          expect(Math.abs(detailOrigin.y-(tapPoint.y-detailOrigin.top)),
+          expect(Math.abs(deltaY),
             'Order detail must expand from the tapped order card').toBeLessThanOrEqual(3);
         }
         await shot('07_order_detail');
