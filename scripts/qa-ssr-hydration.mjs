@@ -34,4 +34,27 @@ try{
    console.log("PASS: stable SSR -> CSR order and preserved LCP image at "+width+"px");
   }finally{await context.close()}
  }
+ // Prove SSR fallback remains genuinely usable when JavaScript is off:
+ // the no-JS <noscript> images replace invisible JS placeholders in each card.
+ const noJs=await browser.newContext({viewport:{width:390,height:844},
+  javaScriptEnabled:false,serviceWorkers:"block",reducedMotion:"reduce"});
+ const noJsPage=await noJs.newPage();
+ await noJsPage.route("**/*",route=>
+  ["GET","HEAD"].includes(route.request().method())?route.continue():route.abort("blockedbyclient")
+ );
+ try{
+  const response=await noJsPage.goto(base+"/sanpham",{waitUntil:"domcontentloaded",timeout:45000});
+  assert.equal(response.status(),200,"No-JS direct catalog should load");
+  const original=noJsPage.locator("#catalogGrid .sd-ssr-deferred-img");
+  const fallback=noJsPage.locator("#catalogGrid noscript img");
+  assert.equal(await original.count(),6,"Expected six delayed JS placeholders");
+  assert.equal(await fallback.count(),6,"Expected six real no-JS product photos");
+  assert.equal(await original.first().evaluate(img=>getComputedStyle(img).display),"none",
+   "No-JS mode must hide blank placeholders without doubling image geometry");
+  assert.notEqual(await fallback.first().evaluate(img=>getComputedStyle(img).display),"none",
+   "The no-JS fallback photo must retain visible layout");
+  assert.ok((await fallback.first().getAttribute("src"))?.startsWith("/"),
+   "No-JS product photo must use an approved same-origin source");
+  console.log("PASS: no-JS catalog retains all six deferred product images and stable media boxes");
+ }finally{await noJs.close()}
 }finally{await browser.close()}
