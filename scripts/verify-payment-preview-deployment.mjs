@@ -1,4 +1,5 @@
 // Read-only exact-source verification for the payment experiment Preview.
+import {sanitizedDeployments} from './admin-preview-provenance-readonly.mjs';
 const repository="chichute5500/Sindarealest-admin";
 const branch="feat/storefront-payment-cod-sync-20261101";
 const pagesBranch="payment-sync-20261101";
@@ -15,15 +16,8 @@ for(let attempt=0;attempt<12;attempt++){
   if(!response.ok)throw Error("Cannot verify isolated Preview deployment metadata (HTTP "+response.status+").");
   const payload=await response.json();
   if(payload?.success!==true||!Array.isArray(payload.result))throw Error("Unexpected Pages deployment metadata.");
-  verified=payload.result.some(item=>{
-    const deployment=item?.deployment||item;
-    const environment=deployment?.environment||deployment?.deployment_trigger?.environment;
-    const sourceSha=deployment?.deployment_trigger?.metadata?.commit_hash||deployment?.deployment_trigger?.metadata?.commitHash;
-    const sourceBranch=deployment?.deployment_trigger?.metadata?.branch||deployment?.deployment_trigger?.metadata?.branch_name;
-    const aliases=Array.isArray(deployment?.aliases)?deployment.aliases:[];
-    return environment==="preview"&&sourceSha===sha&&sourceBranch===pagesBranch&&aliases.includes(alias)&&
-      (deployment?.latest_stage?.status==="success"||deployment?.stage?.status==="success");
-  });
+  verified=sanitizedDeployments(payload.result).some(deployment=>deployment.environment==="preview"&&
+    deployment.sha===sha&&deployment.branch===pagesBranch&&deployment.aliases.includes(alias)&&deployment.stage==="success");
   if(verified)break;
   if(attempt<11)await new Promise(resolve=>setTimeout(resolve,4000));
 }
