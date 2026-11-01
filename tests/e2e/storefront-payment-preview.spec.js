@@ -28,9 +28,6 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   form.scrollTop=0;
   const titleBox=rect(title),frame=rect(drawer),headY=rect(header).top,footerY=rect(footer).top,navY=rect(nav).top,introY=rect(intro).top,navVisible=nav.getClientRects().length>0;
   form.scrollTop=form.scrollHeight;
-  form.dispatchEvent(new Event('scroll'));
-  const bottomFade=getComputedStyle(form).getPropertyValue('--sd-scroll-fade-bottom').trim();
-  const clippedBottom= form.classList.contains('sd-scroll-can-up') && !form.classList.contains('sd-scroll-can-down');
   const scroll=form.scrollTop;
   const result={
    titleCentered:Math.abs((titleBox.left+titleBox.right)/2-(frame.left+frame.right)/2),
@@ -46,6 +43,10 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
    checkoutHeaderShadow:getComputedStyle(header).boxShadow,
    cartTitleWeight:parseInt(getComputedStyle(document.querySelector('#cartDrawer .cart-header h2')).fontWeight,10),
    footerBorder:getComputedStyle(footer).borderTopWidth,
+   cartScrollMask:getComputedStyle(document.querySelector('#cartList')).maskImage,
+   checkoutScrollMask:getComputedStyle(form).maskImage,
+   cartListBackground:getComputedStyle(document.querySelector('#cartList')).backgroundColor,
+   checkoutFormBackground:getComputedStyle(form).backgroundColor,
    cartFooterBorder:getComputedStyle(document.querySelector('#cartDrawer .cart-bottom')).borderTopWidth,
    cartSurface:getComputedStyle(document.querySelector('#cartDrawer')).backgroundColor,
    checkoutSurface:getComputedStyle(drawer).backgroundColor,
@@ -55,11 +56,6 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
    outerShadow:getComputedStyle(drawer).boxShadow
   };
   form.scrollTop=0;
-  form.dispatchEvent(new Event('scroll'));
-  result.bottomFade=bottomFade;
-  result.clippedBottom=clippedBottom;
-  result.topFade=getComputedStyle(form).getPropertyValue('--sd-scroll-fade-top').trim();
-  result.topHasBottomFade=form.classList.contains('sd-scroll-can-down');
   return result;
  });
  expect(state.oneScrollBody).toBe(true);
@@ -77,6 +73,10 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.footerBorder,'No horizontal line across bottom checkout').toBe('0px');
  expect(state.cartFooterBorder,'No horizontal line across cart bottom').toBe('0px');
  expect(state.checkoutSurface,'Same glass material as Cart').toBe(state.cartSurface);
+ expect(state.cartScrollMask,'Cart items must stay fully legible, no edge fading').toBe('none');
+ expect(state.checkoutScrollMask,'Checkout items must stay fully legible, no edge fading').toBe('none');
+ expect(state.cartListBackground,'Cart scroll surface must have no separate strip').toBe('rgba(0, 0, 0, 0)');
+ expect(state.checkoutFormBackground,'Checkout scroll surface must have no separate strip').toBe('rgba(0, 0, 0, 0)');
  if(page.viewportSize().width<=760){
   expect(state.checkoutRadius,'Checkout must use same rounding as cart').toBe(state.cartRadius);
   expect(parseFloat(state.checkoutRadius)).toBeGreaterThanOrEqual(24);
@@ -87,10 +87,6 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   expect(state.scroll,'Mobile step content must scroll together').toBeGreaterThan(12);
   if(state.navVisible)expect(state.navShift).toBeGreaterThan(10);
   expect(state.introShift).toBeGreaterThan(10);
-  expect(state.bottomFade,'Scrolled content must fade smoothly under top title').toBe('0px');
-  expect(state.clippedBottom).toBe(true);
-  expect(state.topFade,'First card must not be faded when fully at the top').toBe('0px');
-  expect(state.topHasBottomFade,'Content continuing under action buttons must feather').toBe(true);
  }
 }
 
@@ -236,9 +232,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
  await expect(review).toBeHidden();
- // Screenshot the *scroll boundary* itself instead of only its rest position.
+ // Screenshot the scroll boundary without any opacity or gradient mask.
  await page.locator('#checkoutForm').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
- await page.screenshot({path:join(output,'390x844-checkout-qr-mid-scroll-feather.png'),fullPage:false,animations:'disabled'});
+ await page.screenshot({path:join(output,'390x844-checkout-qr-mid-scroll-clear.png'),fullPage:false,animations:'disabled'});
  await page.locator('#checkoutForm').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'))});
  await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn.');
  await expect(page.locator('#paymentInstructions')).toContainText('Số tiền thanh toán khi nhận hàng');
