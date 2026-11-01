@@ -115,6 +115,15 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   await page.locator('#detailAdd').click();
   await page.locator('#detailClose').click();
  }
+ // Capture the actual Cart material before checkout at the owner's mobile size,
+ // rather than judging the result only from CSS tokens.
+ await page.setViewportSize({width:390,height:844});
+ await page.emulateMedia({colorScheme:'light'});
+ await page.locator('#mobileCartNav').click();
+ await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+ await page.screenshot({path:join(output,'390x844-cart-reference.png'),fullPage:false,animations:'disabled'});
+ await page.locator('#cartClose').click();
+ await expect(page.locator('#cartDrawer')).not.toHaveClass(/open/);
  const productId=await productLink.getAttribute('data-open-product');
  await productLink.click();
  await expect(page.locator('#productOverlay')).toHaveClass(/open/);
