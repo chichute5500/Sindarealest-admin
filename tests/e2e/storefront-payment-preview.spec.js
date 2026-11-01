@@ -151,6 +151,17 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   return Math.round(Math.max(Math.abs(box.left-7),Math.abs(innerWidth-box.right-7)));
  })).toBeLessThanOrEqual(2);
  await page.waitForTimeout(550);
+ await expect(page.locator('#cartCheckout #cartSubtotal')).toBeVisible();
+ await expect(page.locator('#cartCheckout #cartSubtotal')).not.toHaveText('—');
+ await expect(page.locator('#cartCheckoutLabel')).toContainText('Thanh toán');
+ await expect(page.locator('#cartDrawer .cart-note')).toHaveCount(0);
+ await expect(page.locator('#cartZalo')).toHaveCount(0);
+ const cartBarLayout=await page.locator('#cartCheckout').evaluate(button=>{
+  const t=button.querySelector('#cartSubtotal').getBoundingClientRect(),b=button.getBoundingClientRect(),f=button.closest('.cart-bottom').getBoundingClientRect();
+  return {totalInside:t.top>=b.top&&t.bottom<=b.bottom,buttonInside:f.top<=b.top&&f.bottom>=b.bottom};
+ });
+ expect(cartBarLayout.totalInside).toBe(true);
+ expect(cartBarLayout.buttonInside).toBe(true);
  await page.screenshot({path:join(output,'390x844-cart-reference.png'),fullPage:false,animations:'disabled'});
  await page.locator('#cartClose').click();
  await expect(page.locator('#cartDrawer')).not.toHaveClass(/open/);
