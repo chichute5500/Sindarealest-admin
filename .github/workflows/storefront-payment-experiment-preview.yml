@@ -60,7 +60,7 @@ jobs:
           }
       - name: Install and run local-only checks and full test suite
         run: |
-          npm ci --no-audit --no-fund
+          npm install --no-audit --no-fund
           npm run check
           npm test
       - name: Read-only guard proves Preview bindings differ from Production
