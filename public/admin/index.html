@@ -2540,12 +2540,14 @@ function orderDetailPage(){
  const id=esc(order.id);
  return `${head('Vận hành','Xử lý đơn hàng','Mã đơn '+String(order.order_number||''),'<button class="btn" type="button" data-action="back-to-orders" data-id="'+id+'">← Đơn hàng</button>')}<div class="order-detail-page sd-order-detail-page" data-order-detail-id="${id}"><div id="orderDetailContent" class="order-detail-page-content">${orderDetailMarkup(order)}</div></div>`;
 }
-function showOrderDetails(id,source=null){
+function showOrderDetails(id,source=null,clickPoint=null){
+
  const order=orders.find(item=>String(item.id)===String(id));if(!order){toast('Không tìm thấy đơn hàng trong dữ liệu hiện tại.');return}
  selectedOrderId=String(order.id);view='order-detail';
  const url=new URL(location.href);url.searchParams.set('view','order-detail');url.searchParams.set('orderId',selectedOrderId);
  history.pushState({view,orderId:selectedOrderId,sdAdminView:true,sdAdminOrderDetailEntered:true},'',url.pathname+url.search+url.hash);
- render(adminOriginMotion(source));window.scrollTo({top:0,behavior:'auto'});
+ const motion=Number.isFinite(clickPoint?.x)&&Number.isFinite(clickPoint?.y)?{type:'origin',x:clickPoint.x,y:clickPoint.y}:adminOriginMotion(source);
+ render(motion);window.scrollTo({top:0,behavior:'auto'});
 }
 async function returnToOrderList(id,focusActions=false){
  const targetId=String(id||selectedOrderId||'');selectedOrderId='';await setView('orders');
@@ -2674,7 +2676,7 @@ if(view==='order-detail'){main.querySelectorAll('[data-action=save-order-detail-
 if(view==='orders'){
 const row=b=>b.closest('tr');
 let orderSearchDebounce;const orderSearchInput=$('#orderSearchBox');if(orderSearchInput)orderSearchInput.addEventListener('input',e=>{orderSearch=e.target.value;const pos=orderSearchInput.selectionStart;clearTimeout(orderSearchDebounce);orderSearchDebounce=setTimeout(()=>{render();const next=$('#orderSearchBox');if(next){next.focus();try{next.setSelectionRange(pos,pos)}catch{}}},130)});const orderStatusSelect=$('#orderStatusFilter');if(orderStatusSelect)orderStatusSelect.addEventListener('change',e=>{orderStatusFilter=e.target.value;render();$('#orderStatusFilter')?.focus()});const orderPaymentSelect=$('#orderPaymentFilter');if(orderPaymentSelect)orderPaymentSelect.addEventListener('change',e=>{orderPaymentFilter=e.target.value;render();$('#orderPaymentFilter')?.focus()});$('#clearOrderFilters')?.addEventListener('click',()=>{orderSearch='';orderStatusFilter='all';orderPaymentFilter='all';render();$('#orderSearchBox')?.focus()});
-main.querySelectorAll('[data-order-open]').forEach(card=>{card.addEventListener('click',()=>showOrderDetails(card.dataset.orderOpen,card));card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();showOrderDetails(card.dataset.orderOpen,card)}})});
+main.querySelectorAll('[data-order-open]').forEach(card=>{card.addEventListener('click',event=>showOrderDetails(card.dataset.orderOpen,card,event.detail>0?{x:event.clientX,y:event.clientY}:null));card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();showOrderDetails(card.dataset.orderOpen,card)}})});
 }
 if(view==='order-detail'){
 const row=b=>b.closest('[data-order-form]');
