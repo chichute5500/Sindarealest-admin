@@ -151,17 +151,19 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   return Math.round(Math.max(Math.abs(box.left-7),Math.abs(innerWidth-box.right-7)));
  })).toBeLessThanOrEqual(2);
  await page.waitForTimeout(550);
- await expect(page.locator('#cartCheckout #cartSubtotal')).toBeVisible();
- await expect(page.locator('#cartCheckout #cartSubtotal')).not.toHaveText('—');
+ await expect(page.locator('#cartDrawer .cart-subtotal-bar #cartSubtotal')).toBeVisible();
+ await expect(page.locator('#cartDrawer .cart-subtotal-bar #cartSubtotal')).not.toHaveText('—');
  await expect(page.locator('#cartCheckoutLabel')).toContainText('Thanh toán');
  await expect(page.locator('#cartDrawer .cart-note')).toHaveCount(0);
  await expect(page.locator('#cartZalo')).toHaveCount(0);
  const cartBarLayout=await page.locator('#cartCheckout').evaluate(button=>{
-  const t=button.querySelector('#cartSubtotal').getBoundingClientRect(),b=button.getBoundingClientRect(),f=button.closest('.cart-bottom').getBoundingClientRect();
-  return {totalInside:t.top>=b.top&&t.bottom<=b.bottom,buttonInside:f.top<=b.top&&f.bottom>=b.bottom};
+  const summary=button.previousElementSibling,subtotal=summary?.querySelector('#cartSubtotal');
+  const s=summary?.getBoundingClientRect(),t=subtotal?.getBoundingClientRect(),b=button.getBoundingClientRect(),f=button.closest('.cart-bottom').getBoundingClientRect();
+  const mat=el=>getComputedStyle(el);
+  return {separate:summary?.classList.contains('cart-subtotal-bar')&&!button.contains(subtotal),summaryAbove:s&&s.bottom+4<=b.top,subtotalInside:s&&t&&t.top>=s.top&&t.bottom<=s.bottom,buttonInside:f.top<=b.top&&f.bottom>=b.bottom,material:mat(summary).backgroundImage===mat(button).backgroundImage&&mat(button).backgroundImage===mat(document.querySelector('.nav-wrap .nav')).backgroundImage,shadow:mat(summary).boxShadow===mat(button).boxShadow&&mat(button).boxShadow===mat(document.querySelector('.nav-wrap .nav')).boxShadow};
  });
- expect(cartBarLayout.totalInside).toBe(true);
- expect(cartBarLayout.buttonInside).toBe(true);
+ expect(cartBarLayout.separate&&cartBarLayout.summaryAbove&&cartBarLayout.subtotalInside&&cartBarLayout.buttonInside).toBe(true);
+ expect(cartBarLayout.material&&cartBarLayout.shadow,'Cart footer bars match the Storefront Header film').toBe(true);
  await page.screenshot({path:join(output,'390x844-cart-reference.png'),fullPage:false,animations:'disabled'});
  await page.locator('#cartClose').click();
  await expect(page.locator('#cartDrawer')).not.toHaveClass(/open/);
@@ -475,7 +477,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  // Real four-item carts can contain long luxury product names. Reserve their
  // full card height in the visual fixture to reproduce the 390x844 overflow.
  await rows.evaluateAll(nodes=>nodes.forEach(row=>{row.style.minHeight='174px'}));
- await expect(page.locator('#cartCheckout #cartSubtotal')).toBeVisible();
+ await expect(page.locator('#cartDrawer .cart-subtotal-bar #cartSubtotal')).toBeVisible();
  await expect(page.locator('#cartZalo')).toHaveCount(0);
  await expect.poll(()=>drawer.evaluate(el=>Math.abs(el.getBoundingClientRect().left-7))).toBeLessThanOrEqual(2);
  await page.waitForTimeout(550);
@@ -498,6 +500,8 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  expect(Math.abs(metrics.after.footerBottom-metrics.before.footerBottom),'Payment bar stays fixed').toBeLessThanOrEqual(2);
  expect(metrics.after.lastBottom,'Last product is fully reachable above the payment bar').toBeLessThanOrEqual(metrics.after.footerTop+2);
  await page.screenshot({path:join(output,'390x844-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
+ await drawer.evaluate(el=>el.scrollTop=el.scrollHeight/2);
+ await page.screenshot({path:join(output,'390x844-cart-four-products-middle.png'),fullPage:false,animations:'disabled'});
  await drawer.evaluate(el=>el.scrollTop=el.scrollHeight);
  await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
 });

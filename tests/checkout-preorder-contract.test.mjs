@@ -115,21 +115,23 @@ assert.ok(markupHeader<markupForm&&markupForm<markupStepper&&markupStepper<marku
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*display:grid/,'Checkout form is the only scrolling body');
 assert.match(html,/\.checkout-heading h2\{[^}]*left:50%;top:50%;transform:translate\(-50%,-50%\);[^}]*font:700 25px\/1\.2 SD Serif/,'Bold order title stays physically centered in every stage');
 assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{visibility:hidden;pointer-events:none\}/,'Success step does not shift header geometry');
-assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px;background:var\(--sd-glass-shell-strong/,'Cart and Checkout use a single shared floating glass header style');
+assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px/,'Floating headers preserve the same geometry');
+assert.match(html,/#cartDrawer \.cart-subtotal-bar,#cartDrawer \.cart-checkout-bar\{[^}]*background:var\(--sd-glass-shell-strong\)/,'Cart bars inherit main Header glass');
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
 assert.match(html,/\.cart-bottom\{border-top:0;padding-top:14px;background:transparent\}/,'Cart bottom has no full-width background seam');
 
 const cartMarkup=html.slice(html.indexOf('<div class="cart-drawer"'),html.indexOf('<button type="button" class="checkout-backdrop"'));
 const cartCheckoutStart=cartMarkup.indexOf('id="cartCheckout"'),cartSubtotalPos=cartMarkup.indexOf('id="cartSubtotal"');
-const cartCheckoutEnd=cartMarkup.indexOf('</button>',cartCheckoutStart);
-assert.ok(cartCheckoutStart>=0&&cartCheckoutStart<cartSubtotalPos&&cartSubtotalPos<cartCheckoutEnd,'Subtotal is visibly inside the checkout action bar, not a separate footer layer');
+const cartSummaryStart=cartMarkup.indexOf('class="cart-subtotal-bar cart-summary"'),cartSummaryEnd=cartMarkup.indexOf('</div>',cartSummaryStart);
+assert.ok(cartSummaryStart>=0&&cartSummaryStart<cartSubtotalPos&&cartSubtotalPos<cartSummaryEnd&&cartSummaryEnd<cartCheckoutStart,'Subtotal is its own glass bar preceding checkout');
 assert.match(cartMarkup,/id="cartCheckoutLabel"/,'The checkout action label remains independently updateable');
 assert.doesNotMatch(cartMarkup,/cart-note|Chỉ món được tích sẽ vào đơn|Giá được hệ thống kiểm tra khi đặt hàng/,'Remove the unnecessary note entirely');
 assert.doesNotMatch(cartMarkup,/cartZalo|Tư vấn \/ đặt hàng qua Zalo/,'Cart keeps only the integrated payment action, with no Zalo bar');
 assert.doesNotMatch(html,/consultCart\(|\$\('#cartZalo'\)/,'Removed cart-only Zalo code must not leave null element handlers');
 assert.match(html,/\$\('#cartCheckoutLabel'\)\.textContent=selected\.length/,'Refreshing the cart preserves the subtotal and the integrated checkout action');
-assert.match(html,/\.cart-bottom \.cart-checkout-bar\{[^}]*display:grid;[^}]*min-height:72px/,'Single compact payment bar houses subtotal and action');
+assert.match(html,/\.cart-bottom \.cart-subtotal-bar\{[^}]*display:flex;[^}]*min-height:47px/,'Compact subtotal bar');
+assert.match(html,/\.cart-bottom \.cart-checkout-bar\{[^}]*display:grid;[^}]*min-height:56px/,'Independent checkout bar');
 
 assert.doesNotMatch(html,/sd-scroll-can-up|sd-scroll-can-down|sd-scroll-fade|sdUpdateDrawerScrollEdges|sdQueueDrawerScrollEdges/,'No unrequested gradient/fade logic is present in checkout');
 assert.doesNotMatch(html,/#cartList,#checkoutForm\{[^}]*mask-image/,'Cart and Checkout are not masked or faded at their scroll boundaries');
@@ -137,7 +139,7 @@ assert.match(html,/\.cart-list\{[^}]*background:transparent/,'Cart list shares o
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*background:transparent/,'Checkout content shares one uninterrupted glass surface with footer');
 assert.match(html,/\.cart-drawer\{overflow-y:auto!important;overscroll-behavior:contain/,'Mobile cart uses its outer shell as its only scrolling container');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-list\{[^}]*overflow:visible!important/,'Both list overflow axes are visible: no implicit clipped inner scrollport');
-assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2;margin-top:auto\}/,'Combined subtotal and checkout bar remains reachable while outer drawer scrolls');
+assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2;margin-top:auto\}/,'Both glass footer bars remain reachable while outer drawer scrolls');
 assert.match(html,/#cartDrawer \.cart-header\{position:sticky;top:0;z-index:2\}/,'Floating cart header remains in place in the unified scroll region');
 
 assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border-top:0;background:transparent;box-shadow:none/,'Checkout footer has no full-width separator or detached glass rectangle');
