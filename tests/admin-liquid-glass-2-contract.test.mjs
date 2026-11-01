@@ -53,11 +53,19 @@ assert.match(repeatedSurfaceOwner[2], /background:var\(--sd-admin-surface-face,v
   'Repeated surfaces must use the shared theme-aware glass face');
 assert.match(repeatedSurfaceOwner[2], /box-shadow:var\(--sd-admin-shadow\)/,
   'Repeated surfaces must use the shared contact shadow');
-for (const surface of ['#main .mobilecards tbody tr', '.activity-log-card', '#main .sd-order-card', '.product-results-summary', '#main:has(#searchBox) .product-publish-filter-row', '.dashboard-activity-table tbody tr']) {
+for (const surface of ['.mobilecards tbody tr', '.activity-log-card', '#main .sd-order-card', '.product-results-summary', '#main:has(#searchBox) .product-publish-filter-row', '.dashboard-activity-table tbody tr']) {
   assert.ok(repeatedSurfaceOwner[1].includes(surface), `Missing shared inset material owner for ${surface}`);
 }
-assert.match(html, /\.activity-log-card,#main \.sd-order-card,\.order-detail-item,[^{}]*\{--sd-admin-surface-face:var\(--sd-admin-inset-face\);--sd-admin-shadow:var\(--sd-admin-inset-shadow\);--sd-admin-rim:var\(--sd-admin-inset-rim\)\}/,
-  'Repeated rows must use the shared inset glass variant');
+const raisedListOwner = html.match(/\.product-visibility-row,\.mobilecards tbody tr,\.activity-log-card,#main \.sd-order-card,\.order-detail-item,\.dashboard-activity-table tbody tr\{([^}]*)\}/);
+assert.ok(raisedListOwner, 'Product, customer, order, and activity rows must share one raised tile owner');
+assert.match(raisedListOwner[1], /--sd-admin-surface-face:var\(--sd-admin-tile-face\)/,
+  'Repeated list rows must use the raised tile face');
+assert.match(raisedListOwner[1], /--sd-admin-shadow:var\(--sd-admin-tile-shadow\)/,
+  'Repeated list rows must use the raised tile shadow');
+const nestedInsetOwner = html.match(/#main \.sd-admin-qr-intent,\.activity-view-tabs,#main \.sd-order-payment-money,#main \.sd-order-next-note,#main:has\(#searchBox\) \.product-publish-filter-row\{([^}]*)\}/);
+assert.ok(nestedInsetOwner, 'Nested notices and filter surfaces must retain one inset owner');
+assert.match(nestedInsetOwner[1], /--sd-admin-surface-face:var\(--sd-admin-inset-face\)/,
+  'Nested notices and filter surfaces must retain the inset face');
 assert.match(html, /\.order-detail-page-actions\{[^}]*--sd-admin-surface-face:var\(--sd-admin-sheet-face\)/,
   'Order detail actions must use the shared sheet material');
 assert.match(html, /#main \.order-table \.order-management-summary\{--sd-admin-surface-face:var\(--sd-admin-tile-face\);--sd-admin-shadow:var\(--sd-admin-tile-shadow\);--sd-admin-rim:var\(--sd-admin-tile-rim\)/,
@@ -80,8 +88,12 @@ assert.match(html, /\.slider:before\{[^}]*background:var\(--sd-admin-icon-face\)
   'Settings switches must use the raised shared glass thumb');
 assert.match(html, /\.switch input:checked\+\.slider\{background:var\(--sd-admin-success-face\)/,
   'Settings switches must show a theme-aware selected glass state');
-assert.match(html, /#main \.product-visibility-toggle\[aria-checked="true"\] \.product-visibility-track\{background:var\(--sd-admin-success-face\)/,
-  'Product visibility switch must use the shared semantic glass state');
+assert.match(html, /#main \.product-visibility-toggle\[aria-checked="true"\] \.product-visibility-track\{[^}]*background:var\(--sd-admin-toggle-on-face\)/,
+  'Visible product switch must use its distinct green glass track state');
+assert.match(html, /#main \.product-visibility-track\{[^}]*background:var\(--sd-admin-toggle-off-face\)/,
+  'Hidden product switch must use its distinct red glass track state');
+assert.ok(html.includes('--sd-admin-toggle-on-rim:')&&html.includes('--sd-admin-toggle-off-rim:'),
+  'Product switch states must retain distinct colored glass rims');
 assert.match(html, /body:has\(#appView:not\(\.hidden\)\) \.topbar #notificationToggle\[aria-expanded="true"\]\{box-shadow:var\(--sd-admin-control-shadow\),var\(--sd-admin-selected-shadow\)\}/,
   'Expanded notification state must survive the app-wide header material owner');
 const sharedLayer2 = html.match(/\/\* Shared Layer 2 surface owner[^*]*\*\/\s*([^{}]+)\{([^{}]*)\}/);
@@ -91,8 +103,10 @@ assert.match(sharedLayer2[1], /product-quick-editor/, 'Inline product editor mus
 assert.doesNotMatch(sharedLayer2[1], /\.shortcut/, 'Dashboard shortcuts must avoid a nested blur over their parent panel');
 assert.match(html, /\.shortcut,\.mobile-more-item\{--sd-admin-surface-face:var\(--sd-admin-tile-face\);--sd-admin-shadow:var\(--sd-admin-tile-shadow\);--sd-admin-rim:var\(--sd-admin-tile-rim\)\}/,
   'Dashboard quick actions and More menu items must share the raised tile material');
-assert.match(html, /\.product-visibility-row,\.mobilecards tbody tr,#main \.sd-admin-qr-intent,[^{}]*\{[^{}]*--sd-admin-surface-face:var\(--sd-admin-inset-face\)/,
-  'Product and customer mobile cards must use the nested glass face');
+assert.match(html, /\.product-visibility-row,\.mobilecards tbody tr,\.activity-log-card,#main \.sd-order-card,\.order-detail-item,\.dashboard-activity-table tbody tr\{[^{}]*--sd-admin-surface-face:var\(--sd-admin-tile-face\)/,
+  'Product and customer mobile cards must use the shared raised tile face');
+assert.match(html, /#main \.sd-admin-qr-intent,\.activity-view-tabs,#main \.sd-order-payment-money,[^{}]*\{[^{}]*--sd-admin-surface-face:var\(--sd-admin-inset-face\)/,
+  'Order notices and payment details must retain the nested inset face');
 assert.doesNotMatch(html, /#main \.product-table tbody tr\{[^}]*background:var\(--sd-admin-face\)/,
   'Product cards must not be overridden by the old raised face after the shared inset owner');
 assert.match(html, /body:has\(#appView:not\(\.hidden\)\) \.topbar \.topright #logout\{background:var\(--sd-admin-danger-face\)\}/,
