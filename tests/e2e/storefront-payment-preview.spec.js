@@ -26,7 +26,12 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const cards=page.locator('#catalogGrid .product-card').filter({hasText:'Giá:'});
  await expect(cards.first()).toBeVisible({timeout:20000});
  await cards.first().locator('[data-add]').click();
- if(await page.locator('#productOverlay.open').count())await page.locator('#detailClose').click();
+ if(await page.locator('#productOverlay.open').count()){
+  const option=page.locator('#detailVariants .sd-product-option-chip:not(:disabled)').first();
+  if(await option.count())await option.click();
+  await page.locator('#detailAdd').click();
+  await page.locator('#detailClose').click();
+ }
  await page.locator('#cartOpen').click();
  await expect(page.locator('#cartCheckout')).toBeEnabled();
  await page.locator('#cartCheckout').click();
