@@ -89,12 +89,14 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  }
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();
- await expect(page.locator('#sdCheckoutReviewStep')).toBeVisible();
- await page.locator('#checkoutSubmit').click();
  await expect(page.locator('#paymentInstructions')).toBeVisible();
- await expect(page.locator('#checkoutMessage')).toContainText('Mã yêu cầu');
- await expect(page.locator('#paymentInstructions')).toContainText('Chờ Shop xác nhận');
+ await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
+ await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('MÃ ĐƠN HÀNG');
+ await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
+ await expect(page.locator('#checkoutMessage')).toContainText('Đã gửi đơn');
+ await expect(page.locator('#paymentInstructions')).toContainText('Chưa ghi nhận tiền');
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
- expect(writes,'Only quote and the isolated Preview test order may be written; no payment receipt is created').toEqual(['POST /api/checkout-quote','POST /api/orders']);
+ expect(writes.filter(path=>path==='POST /api/orders'),'Only the isolated Preview order may be created').toHaveLength(1);
+ expect(writes.every(path=>path==='POST /api/checkout-quote'||path==='POST /api/orders'),'Only read-only quotes and the isolated Preview order may be written').toBe(true);
  expect(errors,'Preview should have no browser runtime errors').toEqual([]);
 });

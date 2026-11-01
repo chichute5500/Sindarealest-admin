@@ -243,3 +243,53 @@ for(const cfg of [
  });
 
 }
+
+test('Buy now and cart selection submit only the intended items',async({page,context})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
+ const quoteBodies=[],orderBodies=[],errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await context.addInitScript(()=>localStorage.setItem('sd-cart',JSON.stringify({'qa-shoe::42':1,'qa-wallet':1})));
+ await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
+ await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
+ await page.route('https://provinces.open-api.vn/api/v2/p/**',async route=>{
+  const requestUrl=new URL(route.request().url());
+  const payload=requestUrl.searchParams.has('depth')?{code:79,name:'Thành phố Hồ Chí Minh',wards:[{code:26560,name:'Phường Bà Rịa'}]}:[{code:79,name:'Thành phố Hồ Chí Minh'}];
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(payload)});
+ });
+ await page.route('**/api/checkout-quote',async route=>{
+  const body=route.request().postDataJSON();quoteBodies.push(body);
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,quoteReady:true,paymentReady:false,total:100000,options:[{value:'deposit',label:'Đặt cọc 30%',amount:100000,discountAmount:0,codExpected:0},{value:'full',label:'Thanh toán toàn bộ, giảm 5%',amount:95000,discountAmount:5000,codExpected:0}]})});
+ });
+ await page.route('**/api/orders',async route=>{
+  orderBodies.push(route.request().postDataJSON());
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',status:'pending_confirmation',priceConfirmationRequired:false,total:100000,message:'Shop sẽ xác nhận đơn.',paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false}})});
+ });
+ await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+ await page.locator('[data-open-product="qa-wallet"]').first().evaluate(el=>el.click());
+ await expect(page.locator('#sdDetailPaymentQuote')).toContainText('Cọc 30%');
+ await page.locator('#detailBuyNow').click();
+ await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+ await expect(page.locator('#checkoutDrawer')).toHaveCSS('width','390px');
+ await page.locator('#checkoutDrawer input[name="fullName"]').fill('Khách mua ngay');
+ await page.locator('#checkoutDrawer input[name="phone"]').fill('0900000000');
+ await page.locator('#checkoutStreet').fill('Địa chỉ kiểm thử');
+ const province=page.locator('#checkoutProvince');await expect.poll(()=>province.locator('option').count()).toBeGreaterThan(1);await province.selectOption({index:1});
+ const ward=page.locator('#checkoutWard');await expect.poll(()=>ward.locator('option').count()).toBeGreaterThan(1);await ward.selectOption({index:1});
+ await page.locator('#checkoutSubmit').click();await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();
+ expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
+ await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
+ await page.locator('#checkoutSubmit').click();await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('SD-TEST-001');
+ expect(orderBodies).toHaveLength(1);expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
+ expect(saved).toEqual({'qa-shoe::42':1,'qa-wallet':1});
+ await page.locator('#checkoutClose').click();await page.locator('#cartOpen').click();
+ await page.locator('[data-cart-pick="qa-shoe::42"]').uncheck();
+ await expect(page.locator('#cartCheckout')).toContainText('1 sản phẩm');
+ await page.locator('#cartCheckout').click();await page.locator('#checkoutDrawer input[name="fullName"]').fill('Khách chọn giỏ');await page.locator('#checkoutDrawer input[name="phone"]').fill('0900000000');await page.locator('#checkoutStreet').fill('Địa chỉ kiểm thử');
+ await province.selectOption({index:1});await expect.poll(()=>ward.locator('option').count()).toBeGreaterThan(1);await ward.selectOption({index:1});
+ await page.locator('#checkoutSubmit').click();await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();
+ expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
+ await expect(page.locator('#checkoutDrawer')).toHaveCSS('width','390px');
+ expect(errors).toEqual([]);
+});

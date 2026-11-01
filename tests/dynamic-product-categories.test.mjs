@@ -151,7 +151,7 @@ assert.match(html,/#productOverlay \.detail-purchase-button,/,"Purchase controls
 assert.match(html,/#productOverlay \.detail-actions \.detail-purchase-button:active\{/,"Purchase controls must still offer the tactile active state.");
 assert.ok(html.includes("$('#detailBuyNow').addEventListener('click'"));
 assert.ok(html.includes("option=selectedDetailOption(currentProduct)"),"Buy now must require the product-specific selection");
-assert.ok(html.includes("if(!id||option===null||!addToCart(id,option))return;closeDetail(false,false);openCheckout()"),"Buy now must preserve the selected option and keep Owner-PASS checkout flow");
+assert.ok(html.includes("if(!id||option===null)return;closeDetail(false,false);openCheckout({items:[{id,option,quantity:1}]})"),"Buy now submits only the selected product and option");
 assert.ok(!detail.includes('id="detailZalo"')||detail.indexOf('id="detailZalo"')>detail.indexOf('id="detailBuyNow"'));
 assert.match(html,/border:1px solid rgba\(205,167,93,\.60\)/);
 assert.match(html,/background:linear-gradient\(135deg,rgba\(255,252,236,\.82\),rgba\(244,214,148,\.44\)\)/);

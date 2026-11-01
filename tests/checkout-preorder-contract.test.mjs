@@ -30,7 +30,10 @@ const adminUi=readFileSync(new URL("../public/admin/index.html",import.meta.url)
 const glass=html.match(/<style id="sd-checkout-steps-source-backed-2026-10-27">([\s\S]*?)<\/style>/)?.[1]||"";
 assert.ok(glass.includes("var(--sd-reference-surface"),"Checkout must reuse existing Liquid Glass palette, not standalone black-gold");
 assert.match(glass,/\.checkout-drawer \.sd-checkout-option/,"Checkout additions must stay inside original drawer");
-assert.ok(html.includes('id="sdCheckoutStepper"')&&html.includes('id="sdCheckoutShippingStep"')&&html.includes('id="sdCheckoutPaymentStep"')&&html.includes('id="sdCheckoutReviewStep"'));
+assert.ok(html.includes('id="sdCheckoutStepper"')&&html.includes('id="sdCheckoutShippingStep"')&&html.includes('id="sdCheckoutPaymentStep"'));
+assert.doesNotMatch(html,/id="sdCheckoutReviewStep"/,'Checkout has no duplicate review page');
+assert.match(html,/sd-order-reference/,'Order number is prominent on confirmation');
+assert.match(html,/checkout-drawer\{left:0;right:0;width:100vw/,'Checkout uses the full screen');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
 assert.match(html,/getElementById|querySelector|#sdCheckoutQrImage/);

@@ -99,7 +99,8 @@ try {
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const adminHtml=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
  assert.ok(html.includes('function renderProductOptions(p)'));
- assert.ok(html.includes('function sdCheckoutItems(){return cartEntries()'));
+ assert.ok(html.includes('function sdCheckoutItems(){return checkoutItemsOverride?'));
+ assert.ok(html.includes('selectedCartEntries().map'));
  assert.ok(html.includes('const items=sdCheckoutItems();if(!items.length)'));
  assert.ok(html.includes('selectedDetailOption(currentProduct)'));
  assert.match(html,/data-cart-select/);
