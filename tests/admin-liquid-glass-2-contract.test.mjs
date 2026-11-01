@@ -60,8 +60,12 @@ assert.match(dockBlurOwner[1],/border:1px solid transparent/);
 assert.match(dockBlurOwner[1],/box-shadow:var\(--sd-admin-shadow\)/);
 const dockPillOwner=html.match(/body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav\{([^}]*)\}/);
 assert.ok(dockPillOwner,'Dock pills keep their dedicated face and rim owner');
-assert.match(html,/body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav:active,[\s\S]*?body:has\(#appView:not\(\.hidden\)\) \.mobiletabs \.nav\[data-sd-glass-press="true"\]\{transform:none\}/,
-  'Bottom dock tabs must not inherit the shared vertical press movement');
+assert.match(html,/\.sidebar \.nav:active/,'Sidebar retains its press feedback');
+assert.match(html,/\.sidebar \.nav\[data-sd-glass-press="true"\]/,'Press translation applies only to sidebar navigation');
+assert.doesNotMatch(html,/\.mobiletabs \.nav(?::active|\[data-sd-glass-press="true"\])\s*\{[^}]*transform:/,
+  'Bottom dock tiles must never get a competing vertical transform rule');
+assert.match(html,/<\/div><nav class="mobiletabs">[\s\S]*?<\/nav>\n<div id="backdrop"/,
+  'Dock is a sibling of the scrolling app surface, outside its repaint tree');
 const setViewSource=html.slice(html.indexOf('function setView(v,updateUrl=true,motion=null){'),html.indexOf("window.addEventListener('popstate'"));
 assert.ok(setViewSource.indexOf("window.scrollTo({top:0,behavior:'auto'})")<setViewSource.indexOf('render(adminRouteMotion('),
   'Reset mobile scroll before replacing route content so the fixed dock does not jump when content height changes');
