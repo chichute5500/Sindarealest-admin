@@ -160,8 +160,7 @@ body{
     var(--bg);
 }
 :root[data-admin-theme="dark"] .topbar,
-:root[data-admin-theme="dark"] .sidebar,
-:root[data-admin-theme="dark"] .mobiletabs{
+:root[data-admin-theme="dark"] .sidebar{
   background:rgba(9,19,29,.70);
   border-color:var(--line);
   backdrop-filter:blur(24px) saturate(150%);
@@ -1939,8 +1938,8 @@ body:has(#appView:not(.hidden)) #appView{
  background-image:radial-gradient(circle at 82.5% 3.4%,rgba(135,193,236,.045) 0 163px,var(--sd-admin-ambient-rim) 164px 165px,transparent 167px),radial-gradient(ellipse at 4% 24%,rgba(243,205,229,.035),transparent 44%),radial-gradient(ellipse at 100% 45%,rgba(147,191,230,.04),transparent 50%);
  background-attachment:fixed;
 }
-/* Only rim pseudo-elements use this gradient. All content surfaces retain alpha. */
-body:has(#appView:not(.hidden)) :where(.topbar,.mobiletabs,.mobiletabs .nav),
+/* Shared chrome surfaces blur once; dock and pills keep their dedicated glass faces. */
+body:has(#appView:not(.hidden)) :where(.topbar),
 #main :is(.stat-icon,.shortcut-icon,.dashboard-revenue-visual){
  border:1px solid transparent;
  background:var(--sd-admin-face);
@@ -2026,8 +2025,8 @@ body:has(#main .statgrid) #main .pagehead .btn.primary:disabled{opacity:.45;tran
  #main .dashboard-revenue-copy p{font-size:9px;line-height:12.825px}
  #main .dashboard-revenue-visual svg{width:26px;height:26px}
  .mobiletabs{position:fixed;display:grid;z-index:7;left:0;right:0;bottom:calc(var(--sd-dock-bottom,18px) + env(safe-area-inset-bottom));width:min(calc(100% - 28px),520px);height:var(--sd-dock-height,61px);min-height:var(--sd-dock-height,61px);margin:0 auto;padding:5px;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;border-radius:30px}
- body:has(#appView:not(.hidden)) .mobiletabs{background:var(--sd-admin-dock-face);-webkit-backdrop-filter:blur(30px) saturate(125%);backdrop-filter:blur(30px) saturate(125%)}
- body:has(#appView:not(.hidden)) .mobiletabs .nav{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:0;padding:4px 1px;gap:3px;border-radius:20px;background:var(--sd-admin-tile-face);--sd-admin-rim:var(--sd-admin-tile-rim);box-shadow:var(--sd-admin-tile-shadow);white-space:nowrap;font-size:clamp(9px,2.55vw,11px);font-weight:500;line-height:1.15;letter-spacing:-.025em;color:var(--sd-admin-ink)}
+ body:has(#appView:not(.hidden)) .mobiletabs{border:1px solid transparent;background:var(--sd-admin-dock-face);box-shadow:var(--sd-admin-shadow);-webkit-backdrop-filter:blur(18px) saturate(125%);backdrop-filter:blur(18px) saturate(125%)}
+ body:has(#appView:not(.hidden)) .mobiletabs .nav{position:relative;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:0;padding:4px 1px;gap:3px;border-radius:20px;background:var(--sd-admin-tile-face);--sd-admin-rim:var(--sd-admin-tile-rim);box-shadow:var(--sd-admin-tile-shadow);white-space:nowrap;font-size:clamp(9px,2.55vw,11px);font-weight:500;line-height:1.15;letter-spacing:-.025em;color:var(--sd-admin-ink)}
  .mobiletabs:has(.nav:first-child.active){grid-template-columns:1.2fr repeat(4,minmax(0,1fr))}
  .mobiletabs .nav span:first-child{width:auto}
  .mobiletabs .nav span:first-child svg{width:19px;height:19px}
