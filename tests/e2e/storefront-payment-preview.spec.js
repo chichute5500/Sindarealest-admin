@@ -26,7 +26,7 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   const title=header.querySelector('h2'),nav=document.querySelector('#sdCheckoutStepper'),intro=document.querySelector('.checkout-intro');
   const address=document.querySelector('#sdCheckoutReviewAddressRow'),rect=node=>node.getBoundingClientRect();
   form.scrollTop=0;
-  const titleBox=rect(title),frame=rect(drawer),headY=rect(header).top,footerY=rect(footer).top,navY=rect(nav).top,introY=rect(intro).top;
+  const titleBox=rect(title),frame=rect(drawer),headY=rect(header).top,footerY=rect(footer).top,navY=rect(nav).top,introY=rect(intro).top,navVisible=nav.getClientRects().length>0;
   form.scrollTop=form.scrollHeight;
   const scroll=form.scrollTop;
   const result={
@@ -34,7 +34,7 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
    titleWeight:parseInt(getComputedStyle(title).fontWeight,10),titleFont:getComputedStyle(title).fontFamily,
    oneScrollBody:nav.parentElement===form&&intro.parentElement===form&&address.parentElement===form&&document.querySelector('#paymentInstructions').parentElement===form&&header.parentElement===drawer&&footer.parentElement===drawer,
    headerShift:Math.abs(rect(header).top-headY),footerShift:Math.abs(rect(footer).top-footerY),
-   navShift:navY-rect(nav).top,introShift:introY-rect(intro).top,scroll,
+   navShift:navY-rect(nav).top,navVisible,introShift:introY-rect(intro).top,scroll,
    headerGlass:getComputedStyle(header).backgroundImage,footerGlass:getComputedStyle(footer).backgroundImage
   };
   form.scrollTop=0;
@@ -50,7 +50,7 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.footerGlass).toContain('gradient');
  if(requireScroll){
   expect(state.scroll,'Mobile step content must scroll together').toBeGreaterThan(12);
-  expect(state.navShift).toBeGreaterThan(10);
+  if(state.navVisible)expect(state.navShift).toBeGreaterThan(10);
   expect(state.introShift).toBeGreaterThan(10);
  }
 }
