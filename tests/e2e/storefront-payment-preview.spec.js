@@ -135,6 +135,14 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.emulateMedia({colorScheme:'light'});
  await page.locator('#mobileCartNav').click();
  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+ // Wait until both independent sliding layers have settled; an immediate
+ // screenshot can blend the closing product viewer over the entering cart.
+ await expect(page.locator('#productOverlay')).not.toHaveClass(/open/);
+ await expect.poll(()=>page.locator('#cartDrawer').evaluate(el=>{
+  const box=el.getBoundingClientRect();
+  return Math.round(Math.max(Math.abs(box.left-7),Math.abs(innerWidth-box.right-7)));
+ })).toBeLessThanOrEqual(2);
+ await page.waitForTimeout(550);
  await page.screenshot({path:join(output,'390x844-cart-reference.png'),fullPage:false,animations:'disabled'});
  await page.locator('#cartClose').click();
  await expect(page.locator('#cartDrawer')).not.toHaveClass(/open/);
