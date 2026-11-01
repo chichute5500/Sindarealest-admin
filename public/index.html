@@ -2050,9 +2050,9 @@ html.dark .sd-fullscreen-share{
     overflow-x:hidden!important;
   }
   .account-drawer{overflow-y:auto!important;overscroll-behavior:contain}
-  .cart-drawer{overflow-y:hidden!important;overscroll-behavior:contain}
+  .cart-drawer{overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .cart-drawer{display:flex!important;flex-direction:column!important}
-  .cart-list{flex:1 1 auto;min-height:0;overflow-y:auto!important;overscroll-behavior:contain}
+  .cart-list{flex:0 0 auto;min-height:0;overflow-y:visible!important;overscroll-behavior:contain}
   .checkout-drawer{overflow:hidden!important}
 }
 
@@ -2187,15 +2187,17 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
     bottom:auto!important;
     min-height:0!important;
     max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
-    overflow:hidden!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
   }
   .cart-drawer:has(.cart-row) .cart-list{
-    flex:1 1 auto!important;
+    flex:0 0 auto!important;
     max-height:none;
     min-height:0!important;
-    overflow-y:auto!important;
+    overflow-y:visible!important;
   }
-  .cart-drawer:has(.cart-row) .cart-bottom{margin-top:auto}
+  .cart-drawer:has(.cart-row) .cart-bottom{position:sticky;bottom:0;z-index:2;margin-top:auto}
+  #cartDrawer .cart-header{position:sticky;top:0;z-index:2}
 }
 
 
