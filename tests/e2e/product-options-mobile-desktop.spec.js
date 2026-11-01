@@ -267,7 +267,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
  await page.locator('[data-open-product="qa-wallet"]').first().evaluate(el=>el.click());
- await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toContainText('Cọc 30%');
+ await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toContainText('Đặt cọc 30%');
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]')).toContainText('giảm 5%');
  await page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]').click();
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');

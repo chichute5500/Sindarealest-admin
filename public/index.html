@@ -869,6 +869,8 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-qr-actions .pill-btn{min-height:38px;padding:7px;font-size:10px;white-space:normal}
 .checkout-drawer .sd-checkout-qr-warning{margin:0;color:#c3212f;font-size:10px;font-weight:750;line-height:1.55}
 html.dark .checkout-drawer .sd-checkout-qr-warning{color:#ff7d85}
+.checkout-drawer .sd-order-received-note{margin:10px 0;color:#c3212f;font-size:14px;font-weight:800;line-height:1.55}
+html.dark .checkout-drawer .sd-order-received-note{color:#ff7d85}
 .checkout-drawer .sd-checkout-remaining{border-top:1px solid var(--line);padding-top:8px}
 .checkout-drawer .sd-checkout-remaining strong{color:var(--gold)}
 @media(max-width:360px){.checkout-drawer .sd-checkout-copy{padding:5px 6px}.checkout-drawer .sd-checkout-qr-actions .pill-btn{font-size:9px}}
@@ -2733,6 +2735,7 @@ function renderPaymentInstructions(result,accessToken=''){
  const add=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;panel.append(node);return node};
  if(orderNumber){const orderCard=add('button','sd-order-reference','');orderCard.type='button';orderCard.setAttribute('aria-label','Sao chép mã đơn '+orderNumber);const caption=document.createElement('small'),number=document.createElement('strong'),hint=document.createElement('span');caption.textContent='MÃ ĐƠN HÀNG';number.textContent=orderNumber;hint.className='sd-order-copy-hint';hint.textContent='Nhấn vào đây để sao chép mã đơn';orderCard.append(caption,number,hint);orderCard.addEventListener('click',async()=>{const copied=await sdCopyCheckoutText(orderNumber);hint.textContent=copied?'Đã sao chép mã đơn':'Không sao chép được. Hãy nhấn giữ mã đơn để sao chép.'})}
  add('h3','',ready?'Hướng dẫn chuyển khoản':'Thông tin đơn hàng');
+ add('p','sd-order-received-note','Shop đã tiếp nhận đơn. Sẽ bắt đầu làm sản phẩm khi đã nhận được khoản thanh toán.');
  const details=add('div','payment-data');
  const row=(label,value)=>{if(value===null||value===undefined||value==='')return;const line=document.createElement('div'),name=document.createElement('span'),val=document.createElement('strong');name.textContent=label;val.textContent=String(value);line.append(name,val);details.append(line)};
  if(Number.isSafeInteger(summary.total))row('Tổng giá trị đơn',formatVnd(summary.total));

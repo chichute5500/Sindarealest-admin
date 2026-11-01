@@ -93,9 +93,22 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('MÃ ĐƠN HÀNG');
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
- await expect(page.locator('#checkoutMessage')).toContainText('Đã gửi đơn');
- await expect(page.locator('#paymentInstructions')).toContainText('Chưa ghi nhận tiền');
+ await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop đã tiếp nhận đơn. Sẽ bắt đầu làm sản phẩm khi đã nhận được khoản thanh toán.');
+ await expect(page.locator('#paymentInstructions')).toContainText('Số tiền thanh toán khi nhận hàng');
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
+ const qrWrap=page.locator('#sdCheckoutQrWrap');
+ if(await qrWrap.isVisible()){
+  await expect.poll(()=>page.locator('#sdCheckoutQrImage').evaluate(image=>image.naturalWidth),{timeout:10000}).toBeGreaterThan(0);
+  await expect(page.locator('#sdCheckoutBankName')).not.toBeEmpty();
+  await expect(page.locator('#sdCheckoutAccountNumber')).not.toBeEmpty();
+  await expect(page.locator('#sdCheckoutTransferContent')).toContainText('SD-');
+  await expect(page.locator('#sdCheckoutSaveQr')).toBeVisible();
+  await expect(page.locator('#sdCheckoutOpenBank')).toBeVisible();
+ }else{
+  await expect(page.locator('#paymentInstructions')).toContainText('QR chuyển khoản chưa sẵn sàng');
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:join(output,'390x844-order-confirmation.png'),fullPage:false,animations:'disabled'});
  expect(writes.filter(path=>path==='POST /api/orders'),'Only the isolated Preview order may be created').toHaveLength(1);
  expect(writes.every(path=>path==='POST /api/checkout-quote'||path==='POST /api/orders'),'Only read-only quotes and the isolated Preview order may be written').toBe(true);
  expect(errors,'Preview should have no browser runtime errors').toEqual([]);
