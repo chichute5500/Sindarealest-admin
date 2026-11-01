@@ -2755,9 +2755,9 @@ if(view==='customers'){let customerSearchDebounce;const searchInput=$('#customer
  if(v==='order-detail'&&!selectedOrderId)return;
  const previousView=view;view=v;if(v!=='order-detail')selectedOrderId='';
  if(updateUrl){const url=new URL(location.href);if(v==='dashboard')url.searchParams.delete('view');else url.searchParams.set('view',v);if(v==='order-detail')url.searchParams.set('orderId',selectedOrderId);else url.searchParams.delete('orderId');history.pushState({view:v,orderId:v==='order-detail'?selectedOrderId:null,sdAdminView:true},'',url.pathname+url.search+url.hash)}
+ window.scrollTo({top:0,behavior:'auto'});
  const routeData=loadAdminViewData(v);
  render(adminRouteMotion(previousView,v,motion,motion?.source));
- window.scrollTo({top:0,behavior:'auto'});
  return routeData;
 }
 window.addEventListener('popstate',event=>{
