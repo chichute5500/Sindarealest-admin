@@ -39,4 +39,6 @@ assert.match(headMarkup,/\.brand-copy\{display:flex;flex-direction:column;/,
  'Brand must be stacked before header is inserted (no first-paint joined name/tagline)');
 assert.match(headMarkup,/@media\(max-width:760px\)\{\s*\.nav-wrap \.nav \.brand\{/,
  'Approved mobile nav brand geometry must be ready before first paint');
+assert.match(html,/bindEvents\(\);\s*\/\/ Reveal editorial sections independently of the product API\.[\s\S]*?bindReveal\(document\);\s*try\{const res=await fetch\('\/api\/products'/,
+ 'Editor/section reveal must start before a slow products API response');
 console.log('PASS: Storefront 404/route/consultation/reveal/Welcome/drawer first-paint contracts');
