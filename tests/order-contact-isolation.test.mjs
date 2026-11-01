@@ -50,6 +50,7 @@ const response = await createOrder({
       streetAddress: "12 Đường thử",
       address: "12 Đường thử, Phường thử, Lâm Đồng",
       items: [{ id: "product-1", quantity: 2 }],
+      paymentOption: "deposit", quotedTotal: 3000000,
       note: "Giao giờ hành chính",
     }),
   }),
@@ -144,12 +145,13 @@ async function runPriceCase({ price, confirmed, showPrices }) {
         streetAddress: "12 Đường thử",
         address: "12 Đường thử, Phường thử, Lâm Đồng",
         items: [{ id: "product-price-case", quantity: 2 }],
+        ...(showPrices&&confirmed&&Number.isSafeInteger(price)&&price>=0?{paymentOption:"deposit",quotedTotal:price*2}:{}),
         note: "",
       }),
     }),
     env: { DB: testDB },
   });
-  assert.equal(response.status, 201, "a valid order request can still be accepted pending price confirmation");
+  assert.equal(response.status, 201, "a valid order request can still be accepted pending price confirmation: "+await response.clone().text());
   const body = await response.json();
   const itemStatement = savedStatements.find((s) => /INSERT INTO order_items\b/.test(s.sql));
   const orderStatement = savedStatements.find((s) => /INSERT INTO orders\b/.test(s.sql));

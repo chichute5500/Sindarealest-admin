@@ -1,5 +1,5 @@
 import { fail, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
-import { validPublicQrImageKey, summarizePaymentRows, discountedCheckoutFullAmount } from "../../_payments.js";
+import { validPublicQrImageKey, summarizePaymentRows, discountedCheckoutFullAmount, calculateCheckoutQuote, summarizeOrderPayment } from "../../_payments.js";
 
 function referenceCode() {
   return "SD" + Date.now().toString(36).toUpperCase() + crypto.randomUUID().replaceAll("-","").slice(0,8).toUpperCase();
@@ -44,15 +44,12 @@ export async function onRequestPost(context) {
     const total = Number(order.total);
     if (!Number.isSafeInteger(total) || total <= 0 || total > 2000000000) return fail("Tổng tiền đã xác nhận không hợp lệ.", 409);
 
-    const itemRows = await db.prepare("SELECT fulfillment_type,quantity,line_total FROM order_items WHERE order_id=?").bind(orderId).all();
+    const itemRows = await db.prepare("SELECT quantity,line_total FROM order_items WHERE order_id=?").bind(orderId).all();
     const items = itemRows.results || [];
     if (!items.length || items.some(item => item.line_total === null || item.line_total === undefined || (typeof item.line_total === "string" && !item.line_total.trim()) || !Number.isSafeInteger(Number(item.line_total)) || Number(item.line_total) < 0)) return fail("Một hoặc nhiều dòng hàng chưa có giá được xác nhận.", 409);
     const itemTotal = items.reduce((sum, item) => sum + Number(item.line_total), 0);
     if (!Number.isSafeInteger(itemTotal) || itemTotal !== total) return fail("Tổng đơn chưa khớp tổng các dòng hàng đã xác nhận; cần kiểm tra thủ công.", 409);
-    const fulfillmentTypes = new Set(items.map(item => ["in_stock", "made_to_order", "unclassified"].includes(item.fulfillment_type) ? item.fulfillment_type : "unclassified"));
-    if (fulfillmentTypes.size !== 1) return fail("Giỏ có nhiều loại hàng; vui lòng tư vấn thủ công thay vì tự động yêu cầu thanh toán.", 409);
-    const fulfillmentType = [...fulfillmentTypes][0];
-    if (fulfillmentType === "unclassified") return fail("Loại hàng chưa được Admin xác nhận; chưa thể tạo yêu cầu thanh toán tự động.", 409);
+    const fulfillmentType = "all_shipped";
 
     const settings = await db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?)").bind("payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name").all();
     const cfg = Object.fromEntries((settings.results || []).map(row => [row.key, row.value]));
@@ -61,32 +58,38 @@ export async function onRequestPost(context) {
     const activeQrObject = await context.env.IMAGES.head(cfg.payment_qr_active_key);
     if (!activeQrObject) return fail("Ảnh QR đang kích hoạt không còn truy cập được; chưa thể tạo yêu cầu chuyển khoản.", 409);
 
-    const transactionRows = await db.prepare("SELECT direction,amount FROM order_payment_transactions WHERE order_id=?").bind(orderId).all();
+    const transactionRows = await db.prepare("SELECT direction,amount,actor FROM order_payment_transactions WHERE order_id=?").bind(orderId).all();
     const transactions = transactionRows.results || [];
     const summary = summarizePaymentRows(transactions, total);
+    const selectedAudit = await db.prepare(
+      "SELECT details_json FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1"
+    ).bind(orderId).first();
+    let selected={};try{selected=JSON.parse(selectedAudit?.details_json||'{}')}catch{}
+    const selectedOption=["deposit","full"].includes(selected.selectedPaymentOption)?selected.selectedPaymentOption:null;
+    if(paymentOption==="full"&&selectedOption!=="full")return fail("Chỉ áp dụng giảm 5% khi khách đã chọn thanh toán toàn bộ tại checkout.",409);
+    if(["deposit","full"].includes(paymentOption)&&selectedOption&&paymentOption!==selectedOption)return fail("Yêu cầu thanh toán phải khớp phương thức khách đã chọn. Không tự đổi phương thức khi khách chuyển thiếu.",409);
+    const selectedTerms=selectedOption?summarizeOrderPayment({total,paymentOption:selectedOption,transactions,termsConfirmed:true}):null;
     let amount;
     const installmentType = paymentOption;
     let shippingBenefit = "standard_shipping";
     if (paymentOption === "deposit") {
       if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; hãy chọn thanh toán số dư sau khi Admin đối chiếu.", 409);
-      amount = fulfillmentType === "made_to_order" ? Math.ceil((total * 0.3)/100000)*100000 : 100000;
+      amount = calculateCheckoutQuote([{unitPrice:total,quantity:1}]).options[0].amount;
       if (!Number.isSafeInteger(amount) || amount <= 0 || amount > total) return fail("Khoản đặt cọc theo quy định lớn hơn tổng tiền đơn; cần tư vấn thủ công.", 409);
     } else if (paymentOption === "full") {
       if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; không tạo lại yêu cầu thanh toán đủ. Hãy chọn thanh toán số dư.", 409);
       amount = discountedCheckoutFullAmount(total);
       shippingBenefit = "free_shipping";
     } else {
-      if (summary.netReceivedAmount <= 0 || summary.remainingBalance === null || summary.remainingBalance <= 0) return fail("Thanh toán số dư chỉ được tạo sau khi đã xác minh khoản nhận và còn dư phải thu.", 409);
-      amount = summary.remainingBalance;
+      if (selectedTerms && selectedTerms.shortfall !== null && selectedTerms.shortfall <= 0) return fail("Đơn đã đủ khoản chuyển theo phương thức khách chọn; không cần tạo yêu cầu bổ sung.",409);
+      const received=selectedTerms?.netReceivedAmount ?? summary.netReceivedAmount;
+      if (received <= 0) return fail("Thanh toán bổ sung chỉ được tạo sau khi Admin xác nhận đã nhận một phần tiền.",409);
+      amount = selectedTerms?.shortfall ?? summary.remainingBalance;
+      if (!Number.isSafeInteger(amount) || amount <= 0) return fail("Đơn không còn khoản thanh toán cần thu.",409);
     }
 
     const id = crypto.randomUUID();
-    const selectedAudit = await db.prepare(
-      "SELECT details_json FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1"
-    ).bind(orderId).first();
-    let selected={};try{selected=JSON.parse(selectedAudit?.details_json||'{}')}catch{}
-    const requestedReference=selected.selectedPaymentOption===paymentOption ? String(selected.transferReference||'') : '';
-    const reference=/^[0-9]{4}-[A-Z0-9-]{1,36}-[A-Z]{4}$/.test(requestedReference)?requestedReference:referenceCode();
+    const reference=String(order.order_number||'').trim().toUpperCase()||referenceCode();
 
     // Re-check the validated order and financial snapshot in the same atomic write
     // that creates the QR request. An order price/terms edit or verified transaction
@@ -101,8 +104,7 @@ export async function onRequestPost(context) {
       "AND price_confirmation_required=0 AND payment_terms_confirmed_at=?) " +
       "AND (SELECT COUNT(*) FROM order_items WHERE order_id=?)=? " +
       "AND COALESCE((SELECT SUM(line_total) FROM order_items WHERE order_id=?),-1)=? " +
-      "AND NOT EXISTS (SELECT 1 FROM order_items WHERE order_id=? " +
-      "AND (line_total IS NULL OR COALESCE(fulfillment_type,'unclassified')<>?))" +
+      "AND NOT EXISTS (SELECT 1 FROM order_items WHERE order_id=? AND line_total IS NULL)" +
       excludePriorTransactions +
       " AND (SELECT COUNT(*) FROM order_payment_transactions WHERE order_id=?)=? " +
       "AND COALESCE((SELECT SUM(CASE WHEN direction='received' THEN amount ELSE -amount END) " +
@@ -119,7 +121,7 @@ export async function onRequestPost(context) {
       orderId,total,order.payment_terms_confirmed_at,
       orderId,items.length,
       orderId,itemTotal,
-      orderId,fulfillmentType,
+      orderId,
       ...(paymentOption === "balance" ? [] : [orderId]),
       orderId,transactions.length,
       orderId,summary.netReceivedAmount,

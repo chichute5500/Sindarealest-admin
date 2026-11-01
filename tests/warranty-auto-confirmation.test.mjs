@@ -25,17 +25,20 @@ const schema=[
  '0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql',
  '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
  '0007_order_contact_details.sql','0008_product_sku_verification.sql',
- '0009_fulfillment_and_manual_payments.sql',
+ '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql',
 ].map(file=>readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8')).join('\n');
 function fixture(total, {existingWarranty=false, secondItem=false,simulateCodeCollision=false}={}){
  const sql=new DatabaseSync(':memory:');
  sql.exec('PRAGMA foreign_keys=ON;'+schema);
  sql.prepare('INSERT INTO customers(id,full_name,phone) VALUES(?,?,?)').run('cust','QA TEST','0000000000');
- sql.prepare('INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required) VALUES(?,?,?,?,?,?,0)').run('order','SD-QA-1001','cust','pending_confirmation',total,total);
+ sql.prepare("INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,payment_terms_confirmed_at) VALUES(?,?,?,?,?,?,0,'2026-10-30')").run('order','SD-QA-1001','cust','pending_confirmation',total,total);
+ const fullAmount=total-Math.round(total*0.05);
+ sql.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES('checkout','customer','order_created','order','order',?)").run(JSON.stringify({selectedPaymentOption:'full',selectedPaymentAmount:fullAmount}));
  sql.prepare('INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)')
    .run('item-a','order','product-a','QA-A','Sản phẩm QA A',1,secondItem?Math.floor(total/2):total,secondItem?Math.floor(total/2):total);
  if(secondItem)sql.prepare('INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)')
    .run('item-b','order','product-b','QA-B','Sản phẩm QA B',1,total-Math.floor(total/2),total-Math.floor(total/2));
+ sql.prepare("INSERT INTO order_payment_transactions(id,order_id,direction,amount,transaction_reference,actor) VALUES('payment','order','received',?,'BANK-QA-RECEIPT','admin')").run(fullAmount);
  if(existingWarranty)sql.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) VALUES('legacy','order','item-a','SDW-LEGACY001','Bảo hành cũ',24,'2026-01-01','2028-01-01','active')").run();
  let beforeBatch=null,collisionPending=simulateCodeCollision,batchCount=0;
  const DB={
@@ -117,6 +120,7 @@ for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
 // only when status is actually completed, never at confirmation.
 {
  const f=fixture(2_500_000);
+ for(const status of ['confirmed','processing','shipped'])assert.equal((await f.patch(status)).status,200);
  const finished=await f.patch('completed');
  assert.equal(finished.status,200);
  assert.equal((await finished.json()).warrantiesIssued,1);

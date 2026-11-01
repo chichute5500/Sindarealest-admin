@@ -5,14 +5,16 @@ import { dbOrFail, fail, json, rateLimitPublicRequest, readJsonBodyLimited } fro
 const phoneExpression="REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(oc.phone,c.phone),' ',''),'-',''),'(',''),')',''),'+',''),'.',''),'/','')";
 const requestedPaymentAmount = "(SELECT CAST(json_extract(ac.details_json,'$.selectedPaymentAmount') AS INTEGER) FROM audit_logs ac WHERE ac.entity_type='order' AND ac.entity_id=o.id AND ac.action='order_created' ORDER BY ac.created_at DESC LIMIT 1)";
 const paymentOption = "(SELECT json_extract(ac.details_json,'$.selectedPaymentOption') FROM audit_logs ac WHERE ac.entity_type='order' AND ac.entity_id=o.id AND ac.action='order_created' ORDER BY ac.created_at DESC LIMIT 1)";
+const deliveryAt="(SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_delivery_updated' AND json_extract(a.details_json,'$.to')=o.delivery_status)";
 const stageAt = status => "(SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='"+status+"')";
 const paymentAt =
  "(SELECT MIN(pt.verified_at) FROM order_payment_transactions pt WHERE pt.order_id=o.id AND pt.direction='received' AND pt.actor<>'admin_cod_completion'"+
  " AND (SELECT COALESCE(SUM(tx.amount),0) FROM order_payment_transactions tx WHERE tx.order_id=o.id AND tx.direction='received' AND tx.actor<>'admin_cod_completion'"+
  " AND (tx.verified_at<pt.verified_at OR (tx.verified_at=pt.verified_at AND tx.rowid<=pt.rowid)))>="+
  " COALESCE("+requestedPaymentAmount+",o.total))";
-const select = "SELECT o.id AS id,o.order_number AS orderNumber,o.status AS status,o.created_at AS createdAt,"+
+const select = "SELECT o.id AS id,o.order_number AS orderNumber,o.status AS status,o.delivery_status AS deliveryStatus,o.created_at AS createdAt,"+
  paymentOption+" AS paymentOption,"+
+ deliveryAt+" AS deliveryAt,"+
  stageAt('confirmed')+" AS confirmedAt,"+
  paymentAt+" AS paymentAt,"+
  stageAt('processing')+" AS processingAt,"+
@@ -35,6 +37,7 @@ function timestamp(value) {
 const completedProgress = (done,date) => ({state:done?"done":"upcoming",completedAt:done?timestamp(date):null});
 export function publicOrderProgress(row, viaPhone) {
  const status=String(row.status||"");
+ const deliveryStatus=String(row.deliveryStatus||(["shipped","completed"].includes(status)?status==="completed"?"delivered":"in_transit":"not_shipped"));
  const cancelled=status==="cancelled";
  const confirmed=["confirmed","processing","shipped","completed"].includes(status);
  const processing=["processing","shipped","completed"].includes(status);
@@ -47,20 +50,20 @@ export function publicOrderProgress(row, viaPhone) {
   {title:"Xác nhận đơn",...completedProgress(confirmed||Boolean(row.confirmedAt),row.confirmedAt)},
   {title:deposit?"Đã nhận cọc":"Đã nhận thanh toán",...completedProgress(paid,row.paymentAt)},
   {title:"Đang làm sản phẩm",...completedProgress(shipped,row.shippedAt)},
-  {title:"Đã gửi hàng",...completedProgress(shipped||Boolean(row.shippedAt),row.shippedAt)},
-  {title:"Hoàn thành",...completedProgress(completed,row.completedAt)}
+  {title:"Đã gửi hàng",...completedProgress(shipped||deliveryStatus==="failed_returning"||deliveryStatus==="returned"||Boolean(row.shippedAt),row.shippedAt)},
+  {title:deliveryStatus==="failed_returning"?"Giao thất bại / Đang hoàn hàng":deliveryStatus==="returned"?"Đã hoàn hàng về Shop":"Giao thành công",...completedProgress(["delivered","failed_returning","returned"].includes(deliveryStatus),deliveryStatus==="delivered"?row.completedAt:row.deliveryAt)}
  ];
  if(!cancelled){
    // Show exactly one next operational milestone when prior milestones are
    // recorded. Never mark an unperformed milestone "done" to fill a gap.
    const current=steps.findIndex(step=>step.state==="upcoming");
-   if(current>=0)steps[current].state="current";
+   if(current>=0&&deliveryStatus!=="returned")steps[current].state="current";
  }
  // A phone number can identify many private customer orders. Do not expose
  // full order identifiers through unauthenticated phone-based search.
  const orderNumber=String(row.orderNumber||"");
  const safeNumber=viaPhone?(orderNumber.length>4?"••••"+orderNumber.slice(-4):"••••"):orderNumber;
- return {orderNumber:safeNumber,status:cancelled?"cancelled":completed?"completed":"in_progress",steps};
+ return {orderNumber:safeNumber,status:cancelled?"cancelled":completed?"completed":"in_progress",deliveryStatus,deliveryStatusLabel:({not_shipped:"Chờ gửi hàng",in_transit:"Đang giao",delivered:"Giao thành công",failed_returning:"Giao thất bại / Đang hoàn hàng",returned:"Đã hoàn hàng về Shop"})[deliveryStatus]||"Chưa rõ",steps};
 }
 
 export async function onRequestPost({request,env}) {

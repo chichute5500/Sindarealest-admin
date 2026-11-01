@@ -19,7 +19,7 @@ function validateOperations(operations) {
   const keys = ["customers","orders","orderItems","warranties","warrantyClaims","auditLogs"];
   if (!operations || typeof operations !== "object" || keys.some(k => !Array.isArray(operations[k])) || keys.some(k => operations[k].length > 20000)) return { error: "Bản sao lưu thiếu danh sách dữ liệu vận hành hoặc vượt giới hạn." };
   const customers = operations.customers, orders = operations.orders, items = operations.orderItems, warranties = operations.warranties, claims = operations.warrantyClaims, logs = operations.auditLogs;
-  const optionalKeys = ["customerAddressDetails","orderShippingAddresses","orderContactDetails","orderItemDetails","warrantyClaimAttachments","orderPaymentRequests","orderPaymentTransactions"];
+  const optionalKeys = ["customerAddressDetails","orderShippingAddresses","orderContactDetails","orderItemDetails","warrantyClaimAttachments","orderPaymentRequests","orderPaymentTransactions","orderCodSettlements"];
   for (const key of optionalKeys) {
     if (operations[key] !== undefined && (!Array.isArray(operations[key]) || operations[key].length > 20000)) {
       return { error: "Bản sao lưu có danh sách địa chỉ/ảnh đính kèm không hợp lệ hoặc vượt giới hạn." };
@@ -37,6 +37,7 @@ function validateOperations(operations) {
   const warrantyClaimAttachments = operations.warrantyClaimAttachments || [];
   const orderPaymentRequests = operations.orderPaymentRequests || [];
   const orderPaymentTransactions = operations.orderPaymentTransactions || [];
+  const orderCodSettlements = operations.orderCodSettlements || [];
   const providedOrderContactDetails = operations.orderContactDetails === undefined ? null : operations.orderContactDetails;
   const customerById = new Map();
   const orderById = new Map(), itemById = new Map();
@@ -49,7 +50,7 @@ function validateOperations(operations) {
     customerIds.add(c.id); phones.add(c.phone); customerById.set(c.id, c);
   }
   for (const o of orders) {
-    if (!str(o.id,100,true) || !str(o.order_number,80,true) || !customerIds.has(o.customer_id) || !["pending_confirmation","confirmed","processing","shipped","completed","cancelled"].includes(o.status) || !["unpaid","pending","paid","refunded"].includes(o.payment_status) || !nullableInteger(o.subtotal) || !nullableInteger(o.total) || ![0,1,"0","1",false,true].includes(o.price_confirmation_required) || (o.payment_terms_confirmed_at != null && !timestamp(o.payment_terms_confirmed_at)) || (o.payment_terms_confirmed_by !== undefined && !str(o.payment_terms_confirmed_by,80)) || (o.payment_terms_note !== undefined && !str(o.payment_terms_note,1000)) || (o.public_access_token_hash != null && !/^[a-f0-9]{64}$/.test(o.public_access_token_hash)) || !str(o.customer_note,1200) || !timestamp(o.created_at) || !timestamp(o.updated_at)) return { error: "Bản sao lưu có đơn hàng không hợp lệ hoặc tham chiếu khách hàng không tồn tại." };
+    if (!str(o.id,100,true) || !str(o.order_number,80,true) || !customerIds.has(o.customer_id) || !["pending_confirmation","confirmed","processing","shipped","completed","cancelled"].includes(o.status) || (o.delivery_status!==undefined&&!['not_shipped','in_transit','delivered','failed_returning','returned'].includes(o.delivery_status)) || !["unpaid","pending","paid","refunded"].includes(o.payment_status) || !nullableInteger(o.subtotal) || !nullableInteger(o.total) || ![0,1,"0","1",false,true].includes(o.price_confirmation_required) || (o.payment_terms_confirmed_at != null && !timestamp(o.payment_terms_confirmed_at)) || (o.payment_terms_confirmed_by !== undefined && !str(o.payment_terms_confirmed_by,80)) || (o.payment_terms_note !== undefined && !str(o.payment_terms_note,1000)) || (o.public_access_token_hash != null && !/^[a-f0-9]{64}$/.test(o.public_access_token_hash)) || !str(o.customer_note,1200) || !timestamp(o.created_at) || !timestamp(o.updated_at)) return { error: "Bản sao lưu có đơn hàng không hợp lệ hoặc tham chiếu khách hàng không tồn tại." };
     if (orderIds.has(o.id) || orderNumbers.has(o.order_number)) return { error: "Bản sao lưu có ID hoặc mã đơn hàng trùng." };
     orderIds.add(o.id); orderNumbers.add(o.order_number); orderById.set(o.id, o);
   }
@@ -113,6 +114,13 @@ function validateOperations(operations) {
     const signedAmount = Number(transaction.amount) * (transaction.direction === "received" ? 1 : -1);
     ledgerNetByOrder.set(transaction.order_id, priorNet + signedAmount);
   }
+  const codSettlementOrders=new Set(),codSettlementReferences=new Set(),codSettlementIds=new Set();
+  for(const settlement of orderCodSettlements){
+    if(!str(settlement.id,100,true)||!orderIds.has(settlement.order_id)||!integer(settlement.amount,1,2_000_000_000)||!str(settlement.transaction_reference,80,true)||!str(settlement.note,500)||!str(settlement.actor,80,true)||!timestamp(settlement.verified_at)||!timestamp(settlement.created_at))return {error:"Bản sao lưu có đối soát COD không hợp lệ."};
+    const reference=settlement.transaction_reference.toLocaleUpperCase("en-US");
+    if(codSettlementIds.has(settlement.id)||codSettlementOrders.has(settlement.order_id)||codSettlementReferences.has(reference))return {error:"Bản sao lưu có đối soát COD trùng lặp."};
+    codSettlementIds.add(settlement.id);codSettlementOrders.add(settlement.order_id);codSettlementReferences.add(reference);
+  }
   // A verified refund can never exceed the money received for that order.
   // Check the full imported ledger before constructing any destructive D1 batch.
   if ([...ledgerNetByOrder.values()].some(net => net < 0)) {
@@ -158,7 +166,7 @@ function validateOperations(operations) {
     const customer = customerById.get(order.customer_id);
     return { order_id: order.id, full_name: customer.full_name, phone: customer.phone, email: customer.email || "", created_at: order.created_at };
   });
-  return { value: { customers,orders,items,warranties,claims,logs,customerAddressDetails,orderShippingAddresses,orderContactDetails,orderItemDetails,warrantyClaimAttachments,orderPaymentRequests,orderPaymentTransactions } };
+  return { value: { customers,orders,items,warranties,claims,logs,customerAddressDetails,orderShippingAddresses,orderContactDetails,orderItemDetails,warrantyClaimAttachments,orderPaymentRequests,orderPaymentTransactions,orderCodSettlements } };
 }
 
 export async function onRequestPost(context) {
@@ -233,7 +241,7 @@ export async function onRequestPost(context) {
     if (operations) statements.push(
       db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'"), db.prepare("DELETE FROM warranty_claim_uploads"),
       db.prepare("DELETE FROM customer_address_details"), db.prepare("DELETE FROM order_shipping_addresses"), db.prepare("DELETE FROM order_item_details"),
-      db.prepare("DELETE FROM warranty_claims"), db.prepare("DELETE FROM warranties"), db.prepare("DELETE FROM order_payment_transactions"), db.prepare("DELETE FROM order_payment_requests"), db.prepare("DELETE FROM order_items"),
+      db.prepare("DELETE FROM warranty_claims"), db.prepare("DELETE FROM warranties"), db.prepare("DELETE FROM order_cod_settlements"), db.prepare("DELETE FROM order_payment_transactions"), db.prepare("DELETE FROM order_payment_requests"), db.prepare("DELETE FROM order_items"),
       db.prepare("DELETE FROM order_contact_details"), db.prepare("DELETE FROM orders"), db.prepare("DELETE FROM customers"), db.prepare("DELETE FROM audit_logs"), db.prepare("DELETE FROM public_rate_limits")
     );
     statements.push(db.prepare("DELETE FROM products"));
@@ -246,12 +254,13 @@ export async function onRequestPost(context) {
     if (operations) {
       for (const c of operations.customers) statements.push(db.prepare("INSERT INTO customers(id,full_name,phone,email,address,created_at,updated_at) VALUES(?,?,?,?,?,?,?)").bind(c.id,c.full_name,c.phone,c.email,c.address,c.created_at,c.updated_at));
       for (const a of operations.customerAddressDetails) statements.push(db.prepare("INSERT INTO customer_address_details(customer_id,province_code,province,ward_code,ward,street_address,updated_at) VALUES(?,?,?,?,?,?,?)").bind(a.customer_id,a.province_code,a.province,a.ward_code,a.ward,a.street_address,a.updated_at));
-      for (const o of operations.orders) statements.push(db.prepare("INSERT INTO orders(id,order_number,customer_id,status,payment_status,subtotal,total,price_confirmation_required,customer_note,payment_terms_confirmed_at,payment_terms_confirmed_by,payment_terms_note,public_access_token_hash,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(o.id,o.order_number,o.customer_id,o.status,o.payment_status,o.subtotal,o.total,Number(o.price_confirmation_required)?1:0,o.customer_note,o.payment_terms_confirmed_at ?? null,o.payment_terms_confirmed_by || "",o.payment_terms_note || "",o.public_access_token_hash ?? null,o.created_at,o.updated_at));
+      for (const o of operations.orders) statements.push(db.prepare("INSERT INTO orders(id,order_number,customer_id,status,delivery_status,payment_status,subtotal,total,price_confirmation_required,customer_note,payment_terms_confirmed_at,payment_terms_confirmed_by,payment_terms_note,public_access_token_hash,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(o.id,o.order_number,o.customer_id,o.status,o.delivery_status||(['shipped','completed'].includes(o.status)?o.status==='completed'?'delivered':'in_transit':'not_shipped'),o.payment_status,o.subtotal,o.total,Number(o.price_confirmation_required)?1:0,o.customer_note,o.payment_terms_confirmed_at ?? null,o.payment_terms_confirmed_by || "",o.payment_terms_note || "",o.public_access_token_hash ?? null,o.created_at,o.updated_at));
       for (const a of operations.orderShippingAddresses) statements.push(db.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(a.order_id,a.province_code,a.province,a.ward_code,a.ward,a.street_address,a.full_address,a.created_at));
       for (const c of operations.orderContactDetails) statements.push(db.prepare("INSERT INTO order_contact_details(order_id,full_name,phone,email,created_at) VALUES(?,?,?,?,?)").bind(c.order_id,c.full_name,c.phone,c.email,c.created_at));
       for (const i of operations.items) statements.push(db.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(i.id,i.order_id,i.product_id,i.sku,Number(i.sku_verified ?? i.skuVerified)===1?1:0,i.title,i.quantity,i.unit_price,i.line_total,["in_stock","made_to_order","unclassified"].includes(i.fulfillment_type)?i.fulfillment_type:"unclassified"));
       for (const request of operations.orderPaymentRequests) statements.push(db.prepare("INSERT INTO order_payment_requests(id,order_id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(request.id,request.order_id,request.installment_type,request.amount,request.shipping_benefit || (request.installment_type === "full" ? "free_shipping" : "standard_shipping"),request.transfer_reference,request.qr_image_key,request.bank_name,request.account_number,request.account_name,request.status,request.created_by,request.created_at,request.updated_at));
       for (const transaction of operations.orderPaymentTransactions) statements.push(db.prepare("INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor,verified_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(transaction.id,transaction.order_id,transaction.payment_request_id || null,transaction.direction,transaction.amount,transaction.transaction_reference,transaction.note,transaction.actor,transaction.verified_at,transaction.created_at));
+      for (const settlement of operations.orderCodSettlements) statements.push(db.prepare("INSERT INTO order_cod_settlements(id,order_id,amount,transaction_reference,note,actor,verified_at,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(settlement.id,settlement.order_id,settlement.amount,settlement.transaction_reference,settlement.note,settlement.actor,settlement.verified_at,settlement.created_at));
       for (const d of operations.orderItemDetails) statements.push(db.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(d.item_id,d.size));
       for (const w of operations.warranties) statements.push(db.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.order_id,w.order_item_id,w.warranty_code,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
       for (const c of operations.claims) statements.push(db.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message,status,admin_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)").bind(c.id,c.order_id,c.customer_id,c.warranty_code,c.message,c.status,c.admin_note,c.created_at,c.updated_at));

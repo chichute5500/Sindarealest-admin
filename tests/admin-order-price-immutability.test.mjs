@@ -17,7 +17,7 @@ function makeDB({ items = [baselineItem], hasTransactions = false, hasPendingReq
         bind(...values) { this.values = values; return this; },
         async first() {
           calls.first.push({ sql, values: this.values });
-          if (sql === "SELECT id,status FROM orders WHERE id=?") return { id: "order-1", status: "processing" };
+          if (sql.startsWith("SELECT id,status,total,price_confirmation_required,payment_terms_confirmed_at,delivery_status FROM orders WHERE id=?")) return { id: "order-1", status: "processing",total:100000,price_confirmation_required:0,payment_terms_confirmed_at:"2026-01-01",delivery_status:"not_shipped" };
           if (sql === "SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' LIMIT 1") {
             return hasPendingRequest ? { id: "pending-request-1" } : null;
           }

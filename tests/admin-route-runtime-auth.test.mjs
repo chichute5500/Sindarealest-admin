@@ -15,7 +15,7 @@ function collect(dir){
   });
 }
 const files=collect(root);
-assert.equal(files.length,22,'All Admin route modules must be audited when the API surface changes');
+assert.equal(files.length,24,'All Admin route modules must be audited when the API surface changes');
 const secret='runtime-route-auth-test-secret-more-than-32-chars';
 const password='runtime-route-auth-test-password';
 const validSession=await createSession(secret);

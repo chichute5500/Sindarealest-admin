@@ -43,8 +43,10 @@ function makeDb(options = {}) {
           if (sql.includes("SELECT id,status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders") || sql.includes("SELECT id,order_number,status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders")) return options.order ?? baseOrder;
           if (sql.includes("AS net_received")) return { net_received: options.netReceived ?? 0 };
           if (sql.includes("AS received_amount")) return options.paymentTotals ?? { received_amount: 0, refunded_amount: 0 };
+          if (sql.includes("SELECT details_json FROM audit_logs WHERE entity_type='order'")) return options.selectedAudit ?? options.checkoutAudit ?? null;
+          if (sql.includes("FROM order_cod_settlements WHERE order_id=?")) return { amount: options.codReceivedAmount ?? 0 };
           if (sql.includes("SELECT id,order_id,status FROM order_payment_requests")) return options.paymentRequest ?? null;
-          if (sql.includes("SELECT id,order_number,status,payment_status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders")) {
+          if (sql.includes("SELECT id,order_number,status,delivery_status,payment_status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders")) {
             if (options.publicOrder && values[0] === options.publicOrder.order_number && values[1] === options.publicOrder.public_access_token_hash) return options.publicOrder;
             return null;
           }
@@ -321,7 +323,7 @@ function adminContext(db, req) { return { request: req, env: { DB: db, ADMIN_PAS
   assert.equal(payload.amount, 100000, "made-to-order deposit is rounded up to the next 100,000 by the server");
   assert.equal(payload.shippingBenefit, "standard_shipping");
   assert.equal(payload.freeShippingApplied, false);
-  assert.match(payload.transferReference, /^SD[A-Z0-9]+$/);
+  assert.equal(payload.transferReference, "SD-TEST-001", "transfer memo must include the server-issued order code");
   assert.ok(db.batches[0].some(s => s.sql.includes("INSERT INTO order_payment_requests")));
   assert.ok(db.batches[0].some(s => s.sql.includes("payment_request_created")));
   assert.doesNotMatch(JSON.stringify(db.batches[0]), /amount=(?:30000|100000)/, "QR config/ledger must not mutate QR image payload");
@@ -457,9 +459,27 @@ for (const [label, amount] of [
   })));
   const payload = await response.json();
   assert.equal(response.status, 201);
-  assert.equal(payload.amount, 100000, "in-stock deposit must be the fixed 100,000 VND");
+  assert.equal(payload.amount, 200000, "in-stock deposit also uses 30% rounded up to the next 100,000 VND");
   assert.equal(payload.shippingBenefit, "standard_shipping");
   assert.equal(payload.freeShippingApplied, false);
+}
+{
+  const db = makeDb();
+  const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {orderId:"order-1",paymentOption:"full"})));
+  assert.equal(response.status,409,"5% discount is unavailable unless customer selected full payment");
+  assert.equal(db.batches.length,0);
+}
+{
+  const db=makeDb({selectedAudit:{details_json:JSON.stringify({selectedPaymentOption:"deposit"})}});
+  const response=await createPaymentRequest(adminContext(db,request("/api/admin/payment-requests",{orderId:"order-1",paymentOption:"full"})));
+  assert.equal(response.status,409,"Admin cannot silently replace customer deposit selection with discounted full payment");
+  assert.equal(db.batches.length,0);
+}
+{
+  const db=makeDb({selectedAudit:{details_json:JSON.stringify({selectedPaymentOption:"full"})}});
+  const response=await createPaymentRequest(adminContext(db,request("/api/admin/payment-requests",{orderId:"order-1",paymentOption:"deposit"})));
+  assert.equal(response.status,409,"Admin cannot silently replace customer full-payment selection with a deposit");
+  assert.equal(db.batches.length,0);
 }
 {
   const db = makeDb();
@@ -470,7 +490,7 @@ for (const [label, amount] of [
   assert.equal(db.batches.length, 0);
 }
 {
-  const db = makeDb();
+  const db = makeDb({selectedAudit:{details_json:JSON.stringify({selectedPaymentOption:"full"})}});
   const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
     orderId: "order-1", paymentOption: "full"
   })));
@@ -485,20 +505,20 @@ for (const [label, amount] of [
   const db = makeDb({ orderItems: [
     { fulfillment_type: "in_stock", quantity: 1, line_total: 50000 },
     { fulfillment_type: "made_to_order", quantity: 1, line_total: 50000 }
-  ] });
+  ],selectedAudit:{details_json:JSON.stringify({selectedPaymentOption:"full"})} });
   const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
     orderId: "order-1", paymentOption: "full"
   })));
-  assert.equal(response.status, 409, "mixed fulfillment types require manual consultation");
-  assert.equal(db.batches.length, 0);
+  assert.equal(response.status, 201, "mixed fulfillment types use the same supported payment options and all items ship");
+  assert.equal(db.batches.length, 1);
 }
 {
   const db = makeDb({ orderItems: [{ fulfillment_type: "unclassified", quantity: 1, line_total: 100000 }] });
   const response = await createPaymentRequest(adminContext(db, request("/api/admin/payment-requests", {
     orderId: "order-1", paymentOption: "deposit"
   })));
-  assert.equal(response.status, 409, "unclassified products must not receive automatic payment requests");
-  assert.equal(db.batches.length, 0);
+  assert.equal(response.status, 201, "unclassified fulfillment does not create an extra payment method or block delivery");
+  assert.equal(db.batches.length, 1);
 }
 
 
@@ -507,7 +527,7 @@ for (const [label, amount] of [
   const tokenHash = await hashOrderAccessToken(token);
   const order = { ...baseOrder, order_number: "SD-TOKEN-FULL-PAID", public_access_token_hash: tokenHash, payment_status: "paid", total: 100000, payment_terms_confirmed_at: "2026-10-21T07:00:00Z", price_confirmation_required: 0 };
   const paidRequest = { id: "request-paid", installment_type: "full", amount: 100000, shipping_benefit: "free_shipping", transfer_reference: "SDFULL123456", qr_image_key: QR_KEY, bank_name: "Ngân hàng thử", account_number: "1234567890", account_name: "NGUYEN VAN A", status: "settled", created_at: "2026-10-21T07:01:00Z" };
-  const db = makeDb({ publicOrder: order, pendingRequest: paidRequest });
+  const db = makeDb({ publicOrder: order, pendingRequest: paidRequest, paymentTotals:{received_amount:100000,refunded_amount:0}, checkoutAudit:{details_json:JSON.stringify({selectedPaymentOption:'full'})} });
   const response = await getOrderPayment({ request: new Request("https://shop.example/api/order-payment?orderNumber=SD-TOKEN-FULL-PAID&token=" + token), env: { DB: db, IMAGES: { head: async key => ({ key }) } } });
   const payload = await response.json();
   assert.equal(payload.paymentReady, false);

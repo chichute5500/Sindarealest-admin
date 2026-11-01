@@ -1,5 +1,5 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
-import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, checkoutTransferSku, checkoutTransferReferenceMatches } from "../_payments.js";
+import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
 import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
 
@@ -74,6 +74,7 @@ export async function onRequestPost({ request, env }) {
     const selectedPaymentOption = body.paymentOption == null || body.paymentOption === "" ? "" : String(body.paymentOption);
     if (selectedPaymentOption && !["deposit","full"].includes(selectedPaymentOption)) return fail("Phương thức thanh toán đã chọn không hợp lệ.", 400);
     const serverQuote = calculateCheckoutQuote(items.map(i => ({fulfillmentType:i.fulfillmentType,unitPrice:i.price,quantity:i.quantity})));
+    if (serverQuote.eligible && !selectedPaymentOption) return fail("Vui lòng chọn đặt cọc 30% hoặc thanh toán toàn bộ giảm 5% trước khi gửi đơn.",400);
     if (selectedPaymentOption) {
       if (!serverQuote.eligible) return fail("Giá hoặc tình trạng hàng đã thay đổi. Vui lòng kiểm tra lại bước thanh toán.", 409);
       if (!Number.isSafeInteger(body.quotedTotal) || body.quotedTotal !== serverQuote.total) return fail("Giá trị đơn đã thay đổi. Vui lòng xem lại lựa chọn thanh toán.", 409);
@@ -82,13 +83,13 @@ export async function onRequestPost({ request, env }) {
     const selectedAmount = choice?.amount ?? null;
     const selectedRemainingAmount = choice?.remainingAmount ?? null;
     const selectedDiscountAmount = choice?.discountAmount ?? 0;
-    const transferReference = selectedPaymentOption ? String(body.transferReference||"").trim().toUpperCase() : "";
-    if (selectedPaymentOption && !checkoutTransferReferenceMatches(transferReference,phone,checkoutTransferSku(items)))
-      return fail("Nội dung chuyển khoản không hợp lệ hoặc không khớp số điện thoại và SKU. Vui lòng kiểm tra lại bước QR.",409);
     const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
+    // The transfer memo is the server-issued order number. It can be shown
+    // before bank details are activated and cannot be authored by the browser.
+    const transferReference = selectedPaymentOption ? orderNumber : "";
     const statements = [];
 
     // The customer row is a long-lived profile, not an order form. Never
@@ -130,7 +131,8 @@ export async function onRequestPost({ request, env }) {
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, customerPaymentVerified:false })));
     await env.DB.batch(statements);
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
-    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", priceConfirmationRequired: !priceKnown, total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, message: priceKnown ? "Đã tiếp nhận đơn. SinDarealest sẽ liên hệ xác nhận." : "Đã tiếp nhận yêu cầu. Giá và tổng tiền sẽ được SinDarealest xác nhận trước khi chốt đơn." }, 201);
+    const paymentSummary=selectedPaymentOption&&priceKnown?summarizeOrderPayment({total:subtotal,paymentOption:selectedPaymentOption,transactions:[],termsConfirmed:false}):null;
+    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", deliveryStatus:"not_shipped", priceConfirmationRequired: !priceKnown, total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, paymentSummary, message: priceKnown ? "Đã tiếp nhận đơn. Shop sẽ xác nhận điều kiện thanh toán trước khi gửi hướng dẫn chuyển khoản." : "Đã tiếp nhận yêu cầu. Giá và tổng tiền sẽ được SinDarealest xác nhận trước khi chốt đơn." }, 201);
   } catch { return fail("Chưa thể lưu đơn hàng. Vui lòng thử lại hoặc liên hệ SinDarealest qua Zalo.", 503); }
 }
 

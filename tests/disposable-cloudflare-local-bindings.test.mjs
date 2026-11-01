@@ -26,7 +26,8 @@ try{
   assert.ok(DB && IMAGES,'Expected local D1 and R2 bindings');
   const files=['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql',
   '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
-  '0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql'];
+  '0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql',
+  '0018_payment_delivery_settlement.sql'];
   // D1.exec() is line-delimited and cannot safely apply full multi-line
   // migration files. Prepare and execute each complete SQL statement instead.
   for(const name of files){

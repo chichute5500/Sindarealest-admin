@@ -18,7 +18,8 @@ const TOTAL_RECORD_COUNT_SQL = `SELECT
   (SELECT COUNT(*) FROM (SELECT 1 FROM order_item_details LIMIT 5001)) +
   (SELECT COUNT(*) FROM (SELECT 1 FROM warranty_claim_attachments LIMIT 5001)) +
   (SELECT COUNT(*) FROM (SELECT 1 FROM order_payment_requests LIMIT 5001)) +
-  (SELECT COUNT(*) FROM (SELECT 1 FROM order_payment_transactions LIMIT 5001)) AS total_count`;
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_payment_transactions LIMIT 5001)) +
+  (SELECT COUNT(*) FROM (SELECT 1 FROM order_cod_settlements LIMIT 5001)) AS total_count`;
 
 function boundedTableQuery(db, table, orderBy) {
   return db.prepare(
@@ -66,9 +67,10 @@ export async function onRequestGet(context) {
       boundedTableQuery(db, "warranty_claim_attachments", "claim_id"),
       boundedTableQuery(db, "order_payment_requests", "created_at, id"),
       boundedTableQuery(db, "order_payment_transactions", "created_at, id"),
+      boundedTableQuery(db, "order_cod_settlements", "created_at, id"),
       db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?,?,?,?,?,?)").bind(...settingKeys),
     ]);
-    if (!Array.isArray(resultSets) || resultSets.length !== 16) {
+    if (!Array.isArray(resultSets) || resultSets.length !== 17) {
       throw new Error("D1 snapshot returned an incomplete result set");
     }
     const totalRecords = Number(resultSets[0]?.results?.[0]?.total_count);
@@ -79,7 +81,7 @@ export async function onRequestGet(context) {
       return fail("Bản sao lưu vượt giới hạn 5.000 bản ghi cho một lần xử lý. Hãy lên kế hoạch xuất/nhập theo lô trước khi tiếp tục.", 413);
     }
     const rowsAt = (index) => resultSets[index]?.results || [];
-    const settingMap = new Map(rowsAt(15).map((row) => [row.key, row.value]));
+    const settingMap = new Map(rowsAt(16).map((row) => [row.key, row.value]));
     const setting = (key, fallback) => settingMap.get(key) ?? fallback;
     const productRows = { results: rowsAt(1) };
     const customers = { results: rowsAt(2) };
@@ -95,6 +97,7 @@ export async function onRequestGet(context) {
     const warrantyClaimAttachments = { results: rowsAt(12) };
     const orderPaymentRequests = { results: rowsAt(13) };
     const orderPaymentTransactions = { results: rowsAt(14) };
+    const orderCodSettlements = { results: rowsAt(15) };
     const showPrices = setting("show_prices", "0");
     const welcomeEnabled = setting("welcome_enabled", "1");
     const welcomeTitleLine1 = setting("welcome_title_line_1", "Đẳng cấp thật.");
@@ -142,6 +145,7 @@ export async function onRequestGet(context) {
         warrantyClaimAttachments: warrantyClaimAttachments.results || [],
         orderPaymentRequests: orderPaymentRequests.results || [],
         orderPaymentTransactions: orderPaymentTransactions.results || [],
+        orderCodSettlements: orderCodSettlements.results || [],
       },
     };
 

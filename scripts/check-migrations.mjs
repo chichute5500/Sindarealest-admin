@@ -110,6 +110,12 @@ try {
   run(["d1", "execute", databaseName, "--local", "--config", configPath,
     "--command", "SELECT shipping_benefit FROM order_payment_requests LIMIT 0;"],
     "Verify payment shipping benefit field");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT delivery_status FROM orders LIMIT 0;"],
+    "Verify separate order delivery outcome field");
+  run(["d1", "execute", databaseName, "--local", "--config", configPath,
+    "--command", "SELECT amount,transaction_reference,verified_at FROM order_cod_settlements LIMIT 0;"],
+    "Verify separately verified carrier COD remittance ledger");
   const fulfillmentCountResult = run(["d1", "execute", databaseName, "--local", "--config", configPath, "--json",
     "--command", "SELECT COUNT(*) AS unclassified_seed_count FROM products WHERE fulfillment_type='unclassified';"],
     "Verify historical product types remain unclassified");
@@ -183,7 +189,7 @@ try {
   }
   console.log("PASS: synthetic local D1 order, payment request, verified receipt, aggregate ledger totals, and duplicate transaction-reference constraint.");
 
-  console.log("PASS: temporary local D1 migrations; 0007 backfills historic order contacts; 0008 keeps seed SKUs unverified; 0009 leaves historical fulfillment unclassified and adds payment-ledger fields.");
+  console.log("PASS: temporary local D1 migrations; 0007 backfills historic order contacts; 0008 keeps seed SKUs unverified; 0009 adds payment-ledger fields; 0018 separates delivery outcome from verified COD remittance.");
 } finally {
   rmSync(temp, { recursive: true, force: true });
 }

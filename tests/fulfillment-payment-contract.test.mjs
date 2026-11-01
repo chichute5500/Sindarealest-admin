@@ -58,12 +58,11 @@ assert.match(adminOrders, /body\?\.paymentStatus !== undefined/, "Admin order PA
 assert.doesNotMatch(adminOrders, /SET status=\?,payment_status=COALESCE/, "order PATCH must never set payment status from a client field");
 const paymentRequestApi = read("../functions/api/admin/payment-requests.js");
 assert.match(paymentRequestApi, /Object\.hasOwn\(body, "amount"\)/, "client-supplied amount must be rejected");
-assert.match(paymentRequestApi, /Math\.ceil\(\(total \* 0\.3\)\/100000\)\*100000/, "made-to-order deposit must round up to a 100k VND increment");
-assert.match(paymentRequestApi, /: 100000;/, "in-stock deposit must be fixed at 100,000 VND");
-assert.match(paymentRequestApi, /fulfillmentTypes\.size !== 1/, "mixed fulfillment order must fail closed");
-assert.match(paymentRequestApi, /fulfillmentType === "unclassified"/, "unclassified items must require manual consultation");
+assert.match(paymentRequestApi, /calculateCheckoutQuote\(\[\{unitPrice:total,quantity:1\}\]\)\.options\[0\]\.amount/, "Admin must use the shared quote for the 30% deposit rounded up to 100k increments");
+assert.doesNotMatch(paymentRequestApi, /fulfillmentTypes\.size !== 1|fulfillmentType === "unclassified"/, "all products remain deliverable under the same two payment methods");
+assert.match(read("../functions/_payments.js"), /Math\.ceil\(\(total\*0\.3\)\/100000\)\*100000/, "shared deposit formula rounds up to 100k increments");
 assert.match(paymentRequestApi, /shippingBenefit = "free_shipping"/, "full payment alone grants free shipping");
-assert.match(paymentRequestApi, /summary\.remainingBalance/, "balance amount must be based on the ledger-calculated remaining balance");
+assert.match(paymentRequestApi, /selectedTerms\?\.shortfall/, "supplemental amount must use the selected checkout terms and verified ledger");
 assert.doesNotMatch(read("../public/admin/index.html"), /data-payment-amount=/, "Admin must not send a client-controlled amount");
 const transactionApi = read("../functions/api/admin/payment-transactions.js");
 assert.match(transactionApi, /payment_received_verified/, "verified receipts need an audit action");
@@ -72,7 +71,7 @@ assert.match(transactionApi, /amount>netReceived/, "refunds must not exceed prev
 const orderPaymentApi = read("../functions/api/order-payment.js");
 assert.match(orderPaymentApi, /Cache-Control.*private, no-store/, "capability-token payment responses must not be cached");
 assert.match(orderPaymentApi, /ORDER BY CASE WHEN status=\x27pending\x27 THEN 0 ELSE 1 END, created_at DESC, id DESC LIMIT 1/, "current pending installment must win timestamp ties");
-assert.match(orderPaymentApi, /const freeShipping = order\.payment_status === "paid" && freeShippingEligible/, "freeship is applied only after verified total is paid");
+assert.match(orderPaymentApi, /const freeShipping = paymentSummary\.paidInFull && freeShippingEligible/, "freeship is applied only after the selected full-payment amount is verified");
 assert.match(orderPaymentApi, /Referrer-Policy/, "capability-token payment details must disable referrer leakage");
 assert.match(orderPaymentApi, /public_access_token_hash/, "public order payment must be capability-token scoped");
 assert.match(orderPaymentApi, /payment_terms_confirmed_at/, "payment details must wait for server-side price and terms confirmation");

@@ -33,6 +33,7 @@ export async function onRequest(context) {
       const labels={products:"Sản phẩm",warranties:"Bảo hành",settings:"Cài đặt",
         "payment-requests":"Yêu cầu thanh toán","payment-transactions":"Thanh toán",
         "payment-qr":"QR thanh toán","payment-qr-upload":"QR thanh toán",
+        "cod-settlements":"Đối soát COD","order-delivery":"Giao hàng",
         "restore":"Khôi phục dữ liệu"};
       if(Object.hasOwn(labels,part)) {
         const task=sendAdminPush(context.env,{title:labels[part]+" được cập nhật",body:"Có thay đổi mới trong quản trị SinDarealest.",url:"/admin/"});

@@ -14,7 +14,7 @@ const migrations = [
   "0004_admin_notifications.sql", "0005_address_warranty_verification.sql",
   "0006_remove_warranty_otp.sql", "0007_order_contact_details.sql",
   "0008_product_sku_verification.sql", "0009_fulfillment_and_manual_payments.sql",
-  "0015_d1_rows_read_indexes.sql"
+  "0015_d1_rows_read_indexes.sql", "0018_payment_delivery_settlement.sql"
 ];
 for (const filename of migrations) {
   db.exec(readFileSync(new URL("../migrations/" + filename, import.meta.url), "utf8"));
@@ -150,8 +150,9 @@ assert.deepEqual(
   "Re-applying the index migration must not change any Admin results"
 );
 assert.deepEqual(
-  optimizedRows,baselineRows,
-  "All fields, raw amounts, real status dates, joins, row order and nulls must equal original main SQL"
+  optimizedRows.map(({delivery_status,cod_received_amount,received_amount,...row})=>row),
+  baselineRows.map(({received_amount,...row})=>row),
+  "Unchanged fields, real status dates, joins, row order and nulls must equal the original query"
 );
 assert.equal(optimizedRows.length,3,"Both query versions return all order item rows");
 
@@ -175,7 +176,8 @@ assert.equal(a.timeline_processing_at,"2026-10-26 14:00:00");
 assert.equal(a.timeline_shipped_at,null);
 assert.equal(a.timeline_completed_at,null);
 assert.equal(a.timeline_payment_at,"2026-10-26 14:30:00");
-assert.equal(a.received_amount,150000);
+assert.equal(a.received_amount,30000,"legacy COD-completion rows are not Shop-confirmed bank receipts");
+assert.equal(a.cod_received_amount,0,"legacy COD rows are not verified carrier remittances");
 assert.equal(a.refunded_amount,5000);
 assert.equal(a.pending_payment_request_id,"request-pending-a");
 assert.equal(a.pending_payment_amount,120000);

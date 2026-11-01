@@ -23,7 +23,7 @@ const schema=[
  "0001_schema.sql","0003_storefront_operations.sql","0004_admin_notifications.sql",
  "0005_address_warranty_verification.sql","0006_remove_warranty_otp.sql",
  "0007_order_contact_details.sql","0008_product_sku_verification.sql",
- "0009_fulfillment_and_manual_payments.sql"
+ "0009_fulfillment_and_manual_payments.sql","0018_payment_delivery_settlement.sql"
 ].map(path=>readFileSync(new URL("../migrations/"+path,import.meta.url),"utf8")).join("\n");
 const sql=new DatabaseSync(":memory:");
 sql.exec("PRAGMA foreign_keys=ON;"+schema);
@@ -33,7 +33,7 @@ for(const [id,num,status,created] of [
  ["progress","SD-QA-PROCESS-1111","processing","2026-10-24 03:00:00"],
  ["done","SD-QA-DONE-3333","completed","2026-10-20 01:00:00"]
 ]){
- sql.prepare("INSERT INTO orders(id,order_number,customer_id,status,created_at) VALUES(?,?,?,?,?)").run(id,num,"cust",status,created);
+ sql.prepare("INSERT INTO orders(id,order_number,customer_id,status,delivery_status,created_at) VALUES(?,?,?,?,?,?)").run(id,num,"cust",status,status==='completed'?'delivered':status==='shipped'?'in_transit':'not_shipped',created);
  sql.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES(?,?,'order_created','order',?,?,?)")
  .run("checkout-"+id,"customer",id,JSON.stringify({selectedPaymentOption:"deposit",selectedPaymentAmount:2700000}),created);
 }
@@ -81,7 +81,7 @@ async function search(term,ip="198.51.100.23",headers={}){
 }
 function validateSafe(order,{masked=false}={}){
  assert.equal(order.steps.length,6,"Exactly six public steps");
- assert.deepEqual(order.steps.map(s=>s.title),["Đã gửi đơn","Xác nhận đơn","Đã nhận cọc","Đang làm sản phẩm","Đã gửi hàng","Hoàn thành"]);
+ assert.deepEqual(order.steps.map(s=>s.title),["Đã gửi đơn","Xác nhận đơn","Đã nhận cọc","Đang làm sản phẩm","Đã gửi hàng","Giao thành công"]);
  assert.equal(Object.hasOwn(order,"fullName"),false);
  assert.equal(Object.hasOwn(order,"phone"),false);
  assert.equal(Object.hasOwn(order,"total"),false);
@@ -128,6 +128,24 @@ assert.equal(payload.orders.length,3);
 for(const item of payload.orders)validateSafe(item,{masked:true});
 assert.ok(!JSON.stringify(payload).includes("PRIVATE-NAME-TEST"));
 assert.ok(!JSON.stringify(payload).includes("PRIVATE-ADDRESS-TEST"));
+
+sql.prepare("UPDATE orders SET status='shipped',delivery_status='failed_returning' WHERE id='progress'").run();
+sql.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES('delivery-failed','admin','order_delivery_updated','order','progress',?,'2026-10-27 04:00:00')")
+ .run(JSON.stringify({from:'in_transit',to:'failed_returning'}));
+const failed=(await (await search("SD-QA-PROCESS-1111","198.51.100.27")).json()).orders[0];
+assert.equal(failed.deliveryStatus,'failed_returning');
+assert.equal(failed.steps[4].title,'Đã gửi hàng');
+assert.equal(failed.steps[5].title,'Giao thất bại / Đang hoàn hàng');
+assert.equal(failed.steps[5].state,'done');
+assert.equal(failed.steps[5].completedAt,'2026-10-27T04:00:00Z');
+sql.prepare("UPDATE orders SET delivery_status='returned' WHERE id='progress'").run();
+sql.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES('delivery-returned','admin','order_delivery_updated','order','progress',?,'2026-10-28 04:00:00')")
+ .run(JSON.stringify({from:'failed_returning',to:'returned'}));
+const returned=(await (await search("SD-QA-PROCESS-1111","198.51.100.28")).json()).orders[0];
+assert.equal(returned.deliveryStatus,'returned');
+assert.equal(returned.deliveryStatusLabel,'Đã hoàn hàng về Shop');
+assert.equal(returned.steps[5].title,'Đã hoàn hàng về Shop');
+assert.equal(returned.steps[5].completedAt,'2026-10-28T04:00:00Z');
 assert.ok(!JSON.stringify(payload).includes("0901234567"));
 assert.ok(!JSON.stringify(payload).includes("SD-QA-DONE-3333"),"Phone lookup does not enumerate full order IDs");
 assert.ok(queries.some(q=>q.includes("json_extract(a.details_json,'$.status')='confirmed'")));

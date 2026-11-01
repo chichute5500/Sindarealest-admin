@@ -296,7 +296,7 @@ for (const [label, mutate] of [
   assert.equal(itemInsert.values[9], "made_to_order", "restore must preserve the original order-item fulfillment snapshot");
   const orderInsert = db.statements.find(statement => statement.sql.startsWith("INSERT INTO orders"));
   assert.ok(orderInsert.sql.includes("payment_terms_confirmed_at"), "order confirmation details must survive backup/restore");
-  assert.equal(orderInsert.values[9], "2026-01-02 12:00:00");
+  assert.equal(orderInsert.values[10], "2026-01-02 12:00:00");
 }
 
 {

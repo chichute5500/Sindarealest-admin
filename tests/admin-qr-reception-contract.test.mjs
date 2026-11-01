@@ -21,5 +21,5 @@ assert.match(admin,/String\(linked\.transferReference\|\|''\)!==String\(order\.c
 assert.match(admin,/Shop đã kiểm tra có tiền về tài khoản thật/,"manual verification required");
 assert.match(transactions,/payment_received_verified/);
 assert.match(requests,/discountedCheckoutFullAmount\(total\)/,"server full discount preserved");
-assert.match(requests,/requestedReference=selected\.selectedPaymentOption===paymentOption/,"original transfer content retained");
+assert.match(requests,/const reference=String\(order\.order_number\|\|''\)\.trim\(\)\.toUpperCase\(\)/,"transfer content is generated from the canonical order number");
 console.log("PASS: QR-first Admin order reception without automatic payment verification.");

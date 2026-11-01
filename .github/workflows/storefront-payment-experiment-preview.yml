@@ -1,0 +1,108 @@
+name: Storefront payment experiment — isolated Preview
+
+on:
+  create:
+    branches:
+      - feat/storefront-payment-cod-sync-20261101
+  push:
+    branches:
+      - feat/storefront-payment-cod-sync-20261101
+    paths:
+      - 'public/index.html'
+      - 'public/admin/index.html'
+      - 'functions/**'
+      - 'migrations/0018_payment_delivery_settlement.sql'
+      - 'scripts/migrate-payment-preview.mjs'
+      - 'scripts/verify-payment-preview-deployment.mjs'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/storefront-payment-experiment-preview.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storefront-payment-experiment-preview
+  cancel-in-progress: false
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH_ALIAS: payment-sync-20261101
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Refuse unexpected source or target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feat/storefront-payment-cod-sync-20261101'
+          test "$CF_TARGET" = 'sindarealest-admin-preview'
+          test "$CF_BRANCH_ALIAS" = 'payment-sync-20261101'
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          git log -1 --format=%s | grep -F '[payment-preview-candidate]' >/dev/null || {
+            echo 'This workflow runs only for an explicitly marked Preview candidate commit.'
+            exit 1
+          }
+      - name: Install and run local-only checks and full test suite
+        run: |
+          npm ci --no-audit --no-fund
+          npm run check
+          npm test
+      - name: Read-only guard proves Preview bindings differ from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/payment-preview.json"
+          curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest2" > "$RUNNER_TEMP/payment-production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/payment-preview.json" "$RUNNER_TEMP/payment-production.json"
+      - name: Apply additive migration to verified Preview D1 only
+        run: node scripts/migrate-payment-preview.mjs
+      - name: Deploy exact candidate to isolated Pages Preview alias
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH_ALIAS" --commit-hash "$GITHUB_SHA" --commit-message "payment/COD experiment $GITHUB_SHA"
+      - name: Verify exact Preview alias and source SHA before browser QA
+        run: node scripts/verify-payment-preview-deployment.mjs
+      - name: Run real-browser Preview checkout and capture evidence
+        env:
+          SD_PAYMENT_PREVIEW_URL: https://payment-sync-20261101.sindarealest-admin-preview.pages.dev/
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --with-deps chromium
+          npx playwright test tests/e2e/storefront-payment-preview.spec.js --reporter=line
+      - name: Save real Preview screenshots and Playwright evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storefront-payment-preview-${{ github.sha }}
+          path: artifacts/storefront-payment-preview/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Record test URL and deployed SHA
+        if: always()
+        run: |
+          {
+            echo "Preview URL: https://payment-sync-20261101.sindarealest-admin-preview.pages.dev/"
+            echo "Source SHA: $GITHUB_SHA"
+            echo "Production writes: none"
+            echo "Preview D1: additive migration only, after identity comparison"
+          } >> "$GITHUB_STEP_SUMMARY"

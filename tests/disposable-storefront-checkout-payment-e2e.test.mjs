@@ -23,7 +23,7 @@ const migrations = [
   '0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql',
   '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
   '0007_order_contact_details.sql','0008_product_sku_verification.sql',
-  '0009_fulfillment_and_manual_payments.sql'
+  '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql'
 ];
 for (const migration of migrations)
   db.exec(readFileSync(new URL('../migrations/'+migration,import.meta.url),'utf8'));
@@ -89,8 +89,12 @@ try {
     fullName:'KHACH HANG QA (KHONG CO THAT)',phone:'0000000102',
     address:'Dia chi thu nghiem, KHONG GIAO HANG',
     note:'DISPOSABLE QA ONLY — khong xu ly thuc te',
+    paymentOption:'full',quotedTotal:150000,
     items:[{id:productId,quantity:1}]
   };
+  const noMethod={...checkout};delete noMethod.paymentOption;delete noMethod.quotedTotal;
+  await expectStatus('Reject priced checkout without a selected payment method',await invoke(ordersPost,'/api/orders','POST',noMethod),400);
+  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,0,'method selection is required before creating a priced order');
   await expectStatus('Reject cross-origin checkout',await invoke(ordersPost,'/api/orders','POST',checkout,false,'https://evil.invalid'),403);
   const created=await (await expectStatus('Checkout POST -> D1 order',await invoke(ordersPost,'/api/orders','POST',checkout),201)).json();
   assert.ok(created.orderNumber.startsWith('SD-'));

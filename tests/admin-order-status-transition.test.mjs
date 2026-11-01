@@ -15,7 +15,8 @@ async function patchOrder({ existingStatus, simulateCancelRace = false }) {
         values: [],
         bind(...values) { this.values = values; return this; },
         async first() {
-          if (sql === "SELECT id,status FROM orders WHERE id=?") return { id: "test-order", status: existingStatus };
+          if (sql.startsWith("SELECT id,status,total,price_confirmation_required,payment_terms_confirmed_at,delivery_status FROM orders WHERE id=?")) return { id: "test-order", status: existingStatus,total:100000,price_confirmation_required:0,payment_terms_confirmed_at:"2026-01-01",delivery_status:"in_transit" };
+          if (sql.includes("SELECT json_extract(details_json,'$.selectedPaymentOption')")) return { payment_option:"full" };
           if (sql.includes("SELECT id FROM order_payment_requests")) return null;
           return null;
         },
@@ -23,6 +24,7 @@ async function patchOrder({ existingStatus, simulateCancelRace = false }) {
           if (sql === "SELECT id,quantity,unit_price FROM order_items WHERE order_id=?") {
             return { results: [{ id: "item-1", quantity: 1, unit_price: 100000 }] };
           }
+          if (sql === "SELECT direction,amount,actor FROM order_payment_transactions WHERE order_id=?") return { results:[{direction:"received",amount:95000,actor:"admin"}] };
           return { results: [] };
         },
       };
@@ -63,7 +65,7 @@ async function patchOrder({ existingStatus, simulateCancelRace = false }) {
 }
 
 {
-  const { response, statements } = await patchOrder({ existingStatus: "processing", simulateCancelRace: true });
+  const { response, statements } = await patchOrder({ existingStatus: "shipped", simulateCancelRace: true });
   assert.equal(response.status, 409,
     "a concurrent cancellation must prevent a stale status update from reopening the order");
   const update = statements.find(item => item.sql.startsWith("UPDATE orders SET status="));
