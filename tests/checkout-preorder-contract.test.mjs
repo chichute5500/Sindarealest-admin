@@ -119,6 +119,16 @@ assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
 assert.match(html,/\.cart-bottom\{border-top:0;padding-top:14px;background:transparent\}/,'Cart bottom has no full-width background seam');
+
+const cartMarkup=html.slice(html.indexOf('<div class="cart-drawer"'),html.indexOf('<button type="button" class="checkout-backdrop"'));
+const cartCheckoutStart=cartMarkup.indexOf('id="cartCheckout"'),cartSubtotalPos=cartMarkup.indexOf('id="cartSubtotal"');
+const cartCheckoutEnd=cartMarkup.indexOf('</button>',cartCheckoutStart);
+assert.ok(cartCheckoutStart>=0&&cartCheckoutStart<cartSubtotalPos&&cartSubtotalPos<cartCheckoutEnd,'Subtotal is visibly inside the checkout action bar, not a separate footer layer');
+assert.match(cartMarkup,/id="cartCheckoutLabel"/,'The checkout action label remains independently updateable');
+assert.doesNotMatch(cartMarkup,/cart-note|Chỉ món được tích sẽ vào đơn|Giá được hệ thống kiểm tra khi đặt hàng/,'Remove the unnecessary note entirely');
+assert.match(html,/\$\('#cartCheckoutLabel'\)\.textContent=selected\.length/,'Refreshing the cart preserves the subtotal and the integrated checkout action');
+assert.match(html,/\.cart-bottom \.cart-checkout-bar\{[^}]*display:grid;[^}]*min-height:72px/,'Single compact payment bar houses subtotal and action');
+
 assert.doesNotMatch(html,/sd-scroll-can-up|sd-scroll-can-down|sd-scroll-fade|sdUpdateDrawerScrollEdges|sdQueueDrawerScrollEdges/,'No unrequested gradient/fade logic is present in checkout');
 assert.doesNotMatch(html,/#cartList,#checkoutForm\{[^}]*mask-image/,'Cart and Checkout are not masked or faded at their scroll boundaries');
 assert.match(html,/\.cart-list\{[^}]*background:transparent/,'Cart list shares one uninterrupted glass surface with footer');
