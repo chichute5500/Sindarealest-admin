@@ -7,3 +7,5 @@ when DOM shell completes (do not wait for /api/products).
 No user/customer writes. No Production deploy. No Main merge.
 
 2026-11-01: compare mobile catalog LCP against c50b baseline 10.607s after priority change, same Preview and device conditions.
+
+2026-11-01: verified source check PASS run 41295836780; dispatch image priority candidate with fixed test, Lighthouse GET only.
