@@ -136,6 +136,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   await expect(page.locator('#sdCheckoutSaveQr')).toBeVisible();
   await expect(page.locator('#sdCheckoutOpenBank')).toHaveCount(0);
   await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
+  await expect(page.locator('#sdCheckoutConfirmRange')).toBeEnabled();
+  await expect(page.locator('#sdCheckoutConfirmLabel')).toHaveText('Xác nhận đã thanh toán');
   await expect(page.locator('#sdCheckoutConfirmNote')).toContainText('Shop sẽ đối chiếu giao dịch');
  };
  await assertVerifiedQr();
