@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 
 // Owner PASS on 2026-10-25, source of truth: PR #113 / 4df440bc.
 const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+// Owner requested a lighter Welcome on 2026-11-01; retain first-paint/keyboard protections.
 const performance=html.match(/<style id="sd-welcome-desktop-mobile-performance-2026-10-25">([\s\S]*?)<\/style>/)?.[1];
 assert.ok(performance,'Approved desktop/mobile Welcome CSS must be present before body');
 assert.ok(html.indexOf('id="sd-welcome-desktop-mobile-performance-2026-10-25"')<html.indexOf('</head>'));
@@ -18,7 +19,10 @@ assert.ok(performance.includes('@media(min-width:761px)'));
 assert.ok(performance.includes('@media(max-width:760px)'));
 assert.ok(performance.includes('#welcomeSplash .welcome-texture{filter:none!important;transform:none!important;transition:none!important}'));
 assert.ok(performance.includes('#welcomeSplash .welcome-content>*{animation:none!important;filter:none!important}'));
-assert.ok(html.includes('window.setTimeout(dismiss,reduced?220:1450);'),'Opening lifecycle must match approved quick Welcome');
+assert.ok(html.includes('window.setTimeout(dismiss,reduced?100:1050);'),'Refined Welcome should release about a second after storefront readiness');
+assert.match(html, /class="welcome-logo-frame"/, 'Welcome uses a static 3D halo around the brand logo');
+assert.match(performance, /#welcomeSplash \.welcome-logo-frame\{/, 'Welcome material belongs to existing authoritative stylesheet');
+assert.doesNotMatch(html, /A MARK OF DISTINCTION · SINCE YOUR FIRST IMPRESSION/, 'Avoid redundant Welcome copy');
 assert.ok(html.includes('    },360);\n  }\n  window.__sdDismissWelcome'),'Closing overlay must match approved 360ms dismissal');
 assert.match(html,/\.welcome-texture--dark\{[^\n]*filter:none\}/);
 assert.match(html,/\.welcome-texture--light\{[^\n]*filter:none\}/);

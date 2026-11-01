@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+assert.equal([...html.matchAll(/<main\b/g)].length,1,'Only one main landmark is present.');
+assert.match(html,/<div id="notFoundPage" class="not-found-page"/,'Retain 404 UX without a second main');
+assert.match(html,/function ensureOrderGuideOpen\(\)/,'Order guide can be expanded by deep link');
+assert.match(html,/#detailOrderLink'\)\.addEventListener\('click',[^\n]*ensureOrderGuideOpen\(\)/,'Product detail link expands order guide');
+assert.match(html,/hashchange',[^\n]*location\.hash==='#order'/,'Hashchange expands order guide');
+assert.match(html,/async function consultProduct\(id\)[^\n]*optionText=option\?/,'Zalo product message includes selected variant');
+assert.match(html,/async function consultCart\(\)[^\n]*Biến thể:/,'Zalo cart message includes variants');
+assert.match(html,/revealObserver\.unobserve\(el\)/,'Reveal observer stops after first show');
+assert.doesNotMatch(html,/el\.classList\.remove\('is-visible'\)/,'Reveal must not hide elements on reverse scroll');
+assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,'Welcome has a shorter delay');
+console.log('PASS: Storefront 404/route/consultation/reveal/Welcome source contracts');
