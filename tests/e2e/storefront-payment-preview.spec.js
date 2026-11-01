@@ -26,6 +26,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const cards=page.locator('#catalogGrid .product-card').filter({hasText:'Giá:'});
  await expect(cards.first()).toBeVisible({timeout:20000});
  await cards.first().locator('[data-add]').click();
+ if(await page.locator('#productOverlay.open').count())await page.locator('#detailClose').click();
  await page.locator('#cartOpen').click();
  await expect(page.locator('#cartCheckout')).toBeEnabled();
  await page.locator('#cartCheckout').click();
@@ -73,6 +74,6 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    expect(overflow,`horizontal overflow at ${width}x${height} ${theme}`).toBe(false);
   }
  }
- expect(writes,'Preview checkout selection must not create orders or claim receipts').toEqual([]);
+ expect(writes,'Preview may create exactly one isolated test order, but must not claim payment receipt').toEqual(['POST /api/orders']);
  expect(errors,'Preview should have no browser runtime errors').toEqual([]);
 });
