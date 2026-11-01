@@ -83,9 +83,10 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Khách kiểm tra Preview');
  await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Địa chỉ thử nghiệm Preview');
  const addressLayout=await review.evaluate(card=>{
-  const b=card.getBoundingClientRect(),nav=document.querySelector('#sdCheckoutStepper').getBoundingClientRect(),intro=document.querySelector('.checkout-intro').getBoundingClientRect();
+  const b=card.getBoundingClientRect(),drawer=document.querySelector('#checkoutDrawer').getBoundingClientRect(),nav=document.querySelector('#sdCheckoutStepper').getBoundingClientRect(),intro=document.querySelector('.checkout-intro').getBoundingClientRect();
   const heading=getComputedStyle(card.querySelector('strong')),content=getComputedStyle(card.querySelector('p')),surface=getComputedStyle(card);
-  return {belowInfo:b.top>=nav.bottom-1,abovePayment:b.bottom<=intro.top+1,edgeLeft:b.left,edgeRight:innerWidth-b.right,paddingLeft:parseFloat(surface.paddingLeft),headingWeight:parseInt(heading.fontWeight,10),contentSize:parseFloat(content.fontSize)};
+  // Relative to the animated drawer, not the viewport: enter transitions move both together.
+  return {belowInfo:b.top>=nav.bottom-1,abovePayment:b.bottom<=intro.top+1,edgeLeft:b.left-drawer.left,edgeRight:drawer.right-b.right,paddingLeft:parseFloat(surface.paddingLeft),headingWeight:parseInt(heading.fontWeight,10),contentSize:parseFloat(content.fontSize)};
  });
  expect(addressLayout.belowInfo&&addressLayout.abovePayment,'Address must sit between the information stepper and payment title').toBe(true);
  expect(addressLayout.edgeLeft).toBeGreaterThanOrEqual(12);
