@@ -105,4 +105,12 @@ assert.match(html,/sd-checkout-qr-warning/);
 assert.match(admin,/AS customer_payment_option/);
 assert.match(adminUi,/Nội dung chuyển khoản của khách/,"Admin shows the transfer content saved with the customer order");
 assert.match(adminUi,/function orderReceiptState\(summary\)/,"Admin reports payment from the verified receipt total");
+// Regression: a successful first order moves the QR tile into its temporary stage.
+// Return it to the persistent mount before replaceChildren() destroys the stage;
+// otherwise the second order crashes inside openCheckout and never opens payment.
+const paymentRender=html.slice(html.indexOf('function renderPaymentInstructions('),html.indexOf('async function sdCopyCheckoutText('));
+const restoreQr=paymentRender.indexOf('qrMount.append(existingQr)');
+const clearOldStage=paymentRender.indexOf('panel.replaceChildren()');
+assert.ok(restoreQr>=0&&clearOldStage>restoreQr,'Keep the live QR node and its listeners across sequential checkouts');
+assert.match(html,/\$\('#sdCheckoutQrMount'\)\.append\(\$\('#sdCheckoutQrWrap'\)\)/,'Second checkout mounts the retained QR tile');
 console.log("PASS: owner-approved Liquid Glass checkout steps; server-authoritative deposits; QR fail-closed; Admin choice recorded without marking paid.");
