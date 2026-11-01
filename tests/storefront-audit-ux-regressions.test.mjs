@@ -39,13 +39,13 @@ assert.match(headMarkup,/\.brand-copy\{display:flex;flex-direction:column;/,
  'Brand must be stacked before header is inserted (no first-paint joined name/tagline)');
 assert.match(headMarkup,/@media\(max-width:760px\)\{\s*\.nav-wrap \.nav \.brand\{/,
  'Approved mobile nav brand geometry must be ready before first paint');
-assert.match(html,/bindEvents\(\);\s*\/\/ Reveal editorial sections independently of the product API\.[\s\S]*?bindReveal\(document\);\s*try\{const res=await fetch\('\/api\/products'/,
- 'Editor/section reveal must start before a slow products API response');
 
 const startup=html.indexOf('async function init()');
 const productsFetch=html.indexOf("await fetch('/api/products'",startup);
 assert.ok(startup>=0&&productsFetch>startup,'Startup and products request exist');
 const prior=html.slice(startup,productsFetch);
+assert.ok(prior.includes('bindReveal(document);'),
+ 'Editorial reveal must start before a slow products API response');
 assert.ok(prior.includes("document.addEventListener('DOMContentLoaded',setupMobileBottomNav,{once:true})"),
  'Mobile dock must bind when later HTML nav is parsed, before products API resolves');
 assert.ok(prior.includes('setupNavSpy();'),'Nav spy should not wait for products API');
