@@ -1,0 +1,12 @@
+import assert from "node:assert/strict";
+import {selectIsolatedPreviewD1} from "../scripts/audit-preview-d1-revisions.mjs";
+const id="11111111-1111-4111-8111-111111111111", prodId="22222222-2222-4222-8222-222222222222";
+const preview={name:"sindarealest-admin-preview",id:"pp",deployment_configs:{preview:{d1_databases:{DB:{id}}}}};
+const prod={name:"sindarealest2",id:"p",deployment_configs:{production:{d1_databases:{DB:{id:prodId}}}}};
+const meta={uuid:id,name:"sindarealest-admin-preview-db"};
+assert.deepEqual(selectIsolatedPreviewD1(preview,prod,meta),{id,name:meta.name});
+assert.throws(()=>selectIsolatedPreviewD1(preview,{...prod,deployment_configs:{production:{d1_databases:{DB:{id}}}}},meta),/Refusing Production D1 ID/);
+assert.throws(()=>selectIsolatedPreviewD1(preview,prod,{...meta,name:"sindarealest-db"}),/Refusing any other D1 name/);
+assert.throws(()=>selectIsolatedPreviewD1(preview,{...prod,id:preview.id},meta),/Projects must be independent/);
+assert.throws(()=>selectIsolatedPreviewD1(preview,prod,{...meta,uuid:prodId}),/D1 metadata ID mismatch/);
+console.log("PASS: D1 migration blocks mismatched Project, DB name and Production DB ID.");

@@ -1,0 +1,43 @@
+name: Audit — persist original-brand optimized assets on audit branch only
+on:
+  push:
+    branches: [fix/audit-2026-10]
+    paths:
+      - '.github/workflows/audit-opt-brand-asset.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  optimize-original-brand-assets:
+    if: github.ref == 'refs/heads/fix/audit-2026-10'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Generate unchanged logo and glyphs as compact web assets
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow fonttools brotli
+          python3 scripts/build-logo-asset.py
+          python3 scripts/build-font-assets.py
+          test -s public/logo-ui.webp
+          for f in public/fonts/*.woff2; do test -s "$f"; done
+      - name: Commit generated assets only to the audit branch
+        shell: bash
+        run: |
+          set -eu
+          test "$GITHUB_REF_NAME" = 'fix/audit-2026-10'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f public/logo-ui.webp public/fonts/*.woff2
+          if git diff --cached --quiet; then
+            echo 'Compact assets already committed'
+            exit 0
+          fi
+          if git diff --cached --name-only | grep -Ev '^(public/logo-ui[.]webp|public/fonts/Noto(Sans|Serif)-(Regular|Bold)[.]woff2)$'; then
+            echo 'Unexpected staged file; refusing auto-commit'
+            exit 1
+          fi
+          git commit -m 'perf(assets): commit lossless WOFF2 and compressed original brand logo'
+          git push origin HEAD:fix/audit-2026-10

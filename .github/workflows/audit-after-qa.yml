@@ -1,0 +1,129 @@
+name: Audit after — isolated Preview read-only browser and Lighthouse
+on:
+  # Full remote QA / deployment only for a pinned, intentionally selected candidate SHA.
+  # Local source checks still run per commit; no Cloudflare requests for intermediate edits.
+  workflow_dispatch:
+  # Only the intentional release-candidate marker may trigger expensive live QA.
+  # Ordinary source pushes never hit Cloudflare. This workflow verifies the
+  # exact deployed SHA before any screenshot, Lighthouse, or resource probes.
+  push:
+    branches: [fix/audit-2026-10]
+    paths: [docs/qa/AUDIT_AFTER_DISPATCH_20261101.trigger]
+permissions:
+  contents: read
+concurrency:
+  group: audit-after-verified-preview-2026-10
+  cancel-in-progress: true
+jobs:
+  after:
+    if: github.ref == 'refs/heads/fix/audit-2026-10'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install audit-only browser dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright lighthouse
+          npx playwright install --with-deps chromium
+      - name: Wait for exact source revision on independent Preview (GET only)
+        shell: bash
+        run: |
+          for attempt in $(seq 1 45); do
+            live_sha=$(curl -fsS --max-time 12 -H 'Cache-Control: no-cache' "https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev/audit-source-revision.txt?ref=$GITHUB_SHA" || true)
+            if [[ "$live_sha" == "$GITHUB_SHA" ]]; then
+              echo "PASS: screenshots will measure deployed commit $GITHUB_SHA"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'Preview does not match the audited commit: no screenshot or performance PASS can be claimed.'
+          exit 1
+      - name: Verify latest published Preview still has server-rendered catalog
+        shell: bash
+        run: |
+          node --input-type=module - <<'JS'
+          import assert from 'node:assert/strict';
+          for(const route of ['/','/sanpham']){
+            const r=await fetch('https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev'+route,{signal:AbortSignal.timeout(16000)});
+            const html=await r.text();
+            assert.equal(r.status,200);
+            assert.ok(html.includes('sd-server-rendered'),'Missing real SSR products on '+route);
+            console.log('Ready: no-JS SSR on '+route);
+          }
+          JS
+      - name: Preview GET-only screenshots, source and FPS diagnostics
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+          AUDIT_OUTPUT: audit/after
+          AUDIT_STRICT_VISUAL: '1'
+        run: node scripts/audit-readonly.mjs
+      - name: Assert material images load only near the viewport (GET-only)
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+        run: node scripts/qa-material-network.mjs
+      - name: Diagnose background/CSS layout shifts on mobile and desktop
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+          AUDIT_OUTPUT: audit/after
+        run: node scripts/audit-cls-probe.mjs
+      - name: Verify stable SSR-to-CSR order and retained first image at 360/390px
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+        run: node scripts/qa-ssr-hydration.mjs
+      - name: Record repeated mobile LCP candidates and resource contention (GET only)
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+          AUDIT_OUTPUT: audit/after
+        run: node scripts/audit-lcp-probe.mjs
+      - name: Diagnose Welcome, Theme, SSR layout shifts with isolated A/B (GET only)
+        env:
+          AUDIT_TARGET_URL: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev
+          AUDIT_OUTPUT: audit/after
+        run: node scripts/audit-layout-ab.mjs
+      - name: Lighthouse Preview home and catalog mobile/desktop
+        shell: bash
+        run: |
+          mkdir -p audit/after/lighthouse
+          for route in home catalog; do
+            if [[ "$route" == home ]]; then path=/; else path=/sanpham; fi
+            for preset in mobile desktop; do
+              args=()
+              if [[ "$preset" == desktop ]]; then args+=(--preset=desktop); fi
+              npx lighthouse "https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev$path" \
+                "${args[@]}" \
+                --chrome-flags="--headless --no-sandbox --disable-gpu" \
+                --only-categories=performance,accessibility,best-practices,seo \
+                --output=json --output-path="audit/after/lighthouse/$route-$preset.json" --quiet \
+                || printf '%s\n' "Lighthouse failed: $route $preset (unverified)"
+            done
+          done
+      - name: Print verifiable Lighthouse summary
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path('audit/after/lighthouse')
+          for name in ('home-mobile','home-desktop','catalog-mobile','catalog-desktop'):
+              path=root/(name+'.json')
+              if not path.exists():
+                  print(name+': CHƯA ĐO (missing report)')
+                  continue
+              r=json.loads(path.read_text())
+              cat={k:round(v['score']*100) if v['score'] is not None else None for k,v in r['categories'].items()}
+              audits=r['audits']
+              metric=lambda k:round(audits[k]['numericValue'],2) if audits.get(k,{}).get('numericValue') is not None else None
+              print(name,cat,'LCP_ms',metric('largest-contentful-paint'),'CLS',metric('cumulative-layout-shift'),'TBT_ms',metric('total-blocking-time'))
+          PY
+      - name: Archive Preview metrics, never customer data
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: storefront-audit-after
+          path: audit/after
+          if-no-files-found: warn
+          retention-days: 7

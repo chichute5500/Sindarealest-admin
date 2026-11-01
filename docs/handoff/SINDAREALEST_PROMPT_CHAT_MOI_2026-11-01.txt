@@ -1,0 +1,104 @@
+TIẾP TỤC TRỰC TIẾP SINDAREALEST — PR #159 — ĐA LUỒNG THỰC CHẤT, KHÔNG KHỞI ĐỘNG LẠI
+
+BẠN LÀ: Principal Storefront Engineer + Mobile UI/UX Motion + Performance + QA/Security.
+User/Owner đã yêu cầu TIẾP TỤC TRIỂN KHAI, không phải chỉ lập kế hoạch hay chờ giao lại. Nói tiếng Việt, ưu tiên giao diện mobile Xiaomi 15 Ultra.
+
+REPO: chichute5500/Sindarealest-admin
+BRANCH DUY NHẤT: fix/audit-2026-10
+PR DUY NHẤT: #159 — OPEN/DRAFT, chưa merge.
+PREVIEW: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev/
+GITHUB: https://github.com/chichute5500/Sindarealest-admin/pull/159
+
+BẮT BUỘC đọc đúng bản mới nhất trên nhánh #159 của:
+1) docs/handoff/SINDAREALEST_MASTER_HANDOFF_2026-11-01.md
+2) docs/handoff/SINDAREALEST_AUDIT_2026-11-01.md (lịch sử; HEAD và số đo cũ không thay cho hiện tại)
+3) AGENTS.md, docs/QA_RESOURCE_POLICY.md
+4) docs/handoff/SINDAREALEST_PROMPT_CHAT_MOI_2026-11-01.txt
+Sau đó kiểm tra lại PR HEAD/CI/Main/Preview revision và source thực, không hỏi lại Owner những điều đã có.
+
+RANH GIỚI:
+- CHỈ sửa PR #159, không tạo branch/PR khác, không merge Main/Production khi chưa Owner PASS.
+- #154 đã MERGED, AI khác phụ trách Admin; bảo vệ giao diện Admin đã PASS.
+- #155 OPEN/DRAFT của AI khác; không can thiệp D1/performance branch đó.
+- #158 Owner tuyên bố dự án LỖI, đã CLOSED không merge; BỎ TOÀN BỘ, không sử dụng code/thiết kế.
+- #160 Production D1 đã MERGED và PASS, các migration 0015–0017 đã có Main; không làm lại, không chạy D1 migration Production.
+- Không ghi D1/R2 Production, giao dịch thật, secrets, tài khoản khách thật. Dùng tests GET-only/mocks/SQLite disposable.
+- Giữ 15 danh mục, thiết kế xanh nhạt Liquid Glass + Dark Gold, kính nổi mịn viền hồng/cyan, Hero/Gallery đã PASS; Welcome được Owner cho phép thiết kế/tối ưu lại nhưng Welcome MỚI CHƯA PASS.
+- Rules đặt hàng: hàng riêng cọc 30% làm tròn lên 100.000đ, hàng sẵn 100.000đ; thanh toán hết -5% + freeship; không QR khi chưa có giá; tracking 6 bước, bảo hành kích hoạt Hoàn thành.
+
+TRẠNG THÁI CHỐT (PHẢI REFRESH):
+- Source candidate e4cf36fd (commit tài liệu bàn giao sẽ đổi HEAD mới). Preview deploy SUCCESS: https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291532629
+- Full automated tests SUCCESS tại e4cf36fd: https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291532642
+- Mock Playwright mobile SUCCESS tại code dca65acf: https://github.com/chichute5500/Sindarealest-admin/actions/runs/41291134877
+- Sửa xong tại source: lỗi F5 drawer checkout ló ra, header brand/tagline dính chữ trong lúc tải CSS, Welcome ngắn nhẹ hơn, 404 còn một main, #order tự mở, Zalo copy biến thể, scroll-reveal một lần. Đã chuyển 12 khối CSS trong body vào head, GIỮ nguyên 28/28 block và thứ tự cascade; bindReveal chạy trước API products.
+- PR diverged với Main: ahead 201, behind 156, 87 files, dirty/merge conflict; public/admin/index.html khác Main do các đợt tích hợp; TUYỆT ĐỐI không merge/cherry-pick đè phần Admin.
+- CSS vẫn chồng: 102 nhóm selector cùng ngữ cảnh, 70 nhóm khai báo giá trị khác; chưa chứng minh 70 lỗi. Đừng xóa tất cả hay thêm CSS override vá.
+- Chưa PASS: real-device F5/Welcome Light-Dark, mobile LCP/CLS/TBT/FPS sau sửa, ảnh so sánh với Owner reference, Google OAuth test thật, phone ownership, thanh toán sandbox đầy đủ và giải quyết conflict Main an toàn.
+- Lighthouse cũ ở 0c9faee: Home mobile 57/LCP 7.055s/CLS .02/TBT 719ms; Catalog mobile 62/LCP 11.434s/CLS .188/TBT 234ms. KHÔNG gọi đó là số mới.
+- Daily Workers Free reset 07:00 VN; xác minh quota hiện tại, không lấy quota hôm trước làm lý do ngừng làm.
+
+YÊU CẦU BẮT BUỘC ĐA LUỒNG:
+CHẠY CÁC CÔNG VIỆC ĐỘC LẬP SONG SONG BẰNG CÔNG CỤ THẬT. Nếu có agent/process đa luồng thì phân rõ quyền sở hữu file; nếu chỉ có tool connector thì Promise.all cho đọc/fetch song song, chạy test job độc lập và một coordinator commit tuần tự. KHÔNG tự nhận đang đa luồng nếu chỉ tuần tự; KHÔNG để thời gian đợi CI/Preview trống: trong khi job chạy hãy kiểm tra luồng khác. Không poll vô ích. Hạn chế số lần push/live request.
+
+LUỒNG A (CSS/Visual): phân tích 102/70 nhóm selector; xác minh header, Welcome, cart/account/checkout drawer ngay lúc parse HTML và F5; chụp 360/390px Light/Dark, giữ hiệu ứng kính; sửa tận gốc, không xếp lớp CSS chồng.
+LUỒNG B (Performance/SSR): đo LCP/CLS/TBT/FPS có kiểm soát, SSR→CSR hydration, font swap, image download; A/B responsive WebP thumbnails không đụng R2 gốc, không bật Image Resizing mất phí; giữ kết quả tốt, rollback thử nghiệm kém.
+LUỒNG C (Mobile QA): browser mock 360/390px, reload nhiều lần, slide modal, 4 bottom tabs đứng yên, route /sanpham và deep link, category chip, Google guest UI, checkout 3 bước, API địa chỉ offline/retry, bảo hành/tra cứu, keyboard, Back/Forward, reduced motion; screenshot BEFORE/AFTER đúng SHA.
+LUỒNG D (Security/Tests): regression source/unit, Turnstile/no secret, không rò giá ẩn, customer phone access, SEO/SSR/404, QA_RESOURCE_POLICY, request budgeting. Không gọi webhook/API write Production.
+LUỒNG E (Read-only Integration): compare Main vs #159, nhận diện file trùng Main (migrations/ADMIN), identify xung đột do #154, đề xuất cách giải quyết nhưng KHÔNG merge Main và KHÔNG sửa nhánh AI khác. Một người điều phối giữ lock file public/index.html; tích hợp patch tuần tự sau khi HEAD được xác minh.
+
+NGUYÊN TẮC ĐIỀU PHỐI:
+- Ngay khi bắt đầu: truy xuất HEAD, source, workflow và QA độc lập song song; xác định nhiệm vụ đầu tiên có thể hoàn thành.
+- LUỒNG A và B không được đồng thời ghi public/index.html. Các luồng khác chỉ viết script/test/file riêng. Trước mọi commit kiểm tra HEAD thực, tránh ghi đè.
+- Dùng local targeted tests trước, rồi npm run check, npm test, mocked Playwright, QA GET-only. Chụp so bản Preview và đo lần mới trên chính SHA đã deploy. Không trigger Preview liên tục mỗi commit; gộp batch, deploy 1 candidate khi sẵn sàng.
+- Phải thực sự sửa code, chạy test và tiếp tục các mục chưa hoàn thành; không dừng ở lời khuyên. Khi phát hiện regression FAIL, tìm nguyên nhân và sửa, không hạ yêu cầu hoặc xóa test.
+- Mọi kết luận phải tách CODE FIXED / CI PASS / PREVIEW PASS / OWNER PASS. Không gọi 60/120 FPS hoặc tương đồng >95% nếu chưa đo/so có căn cứ.
+- Chỉ đề nghị đưa lên Main khi đã rõ xung đột, có bằng chứng QA và Owner PASS.
+
+BÀN GIAO BẮT BUỘC MỖI LƯỢT: nhánh/PR/HEAD, danh sách các nhóm A–E với file và commit, link screenshot/Preview/CI, số đo Performance và điều kiện test, phần chưa PASS, conflict hiện tại, bước kế tiếp. Không dùng % tiến độ ước lượng như dữ liệu thật.
+
+BẮT ĐẦU TRIỂN KHAI NGAY TRÊN BRANCH #159. KHÔNG HỎI LẠI LỊCH SỬ. KHÔNG TỰ MERGE MAIN.
+
+
+## CHECKPOINT TIẾP NỐI — 01/11/2026 — dock mobile không chờ sản phẩm
+
+- Repo / PR / branch: chichute5500/Sindarealest-admin, #159 OPEN/DRAFT, fix/audit-2026-10; tuyệt đối không merge Main/Production, không ghi D1/R2, không đụng #154/#155/#158/#160.
+- Source sửa mới: commit afa86825b3713f1550677a444fd9777632f31f00. Nguyên nhân: setupMobileBottomNav và setupNavSpy đặt sau await fetch('/api/products'); markup #mobileBottomNav lại nằm sau script khởi tạo. Đã đăng ký bottom dock ở DOMContentLoaded (hoặc chạy ngay nếu DOM đã ready), nav spy chạy trước API, bỏ gắn sự kiện sau hydration. Không thay đổi CSS, Admin hay schema.
+- Browser local mocked checkout run 41293535518: SUCCESS. Playwright tạo 11 ảnh artifact 13077869665, bao gồm 360px và 390px Light/Dark với /api/products bị trì hoãn 7 giây; Cart/Account mở ngay trước response, không viết request POST thật. Checkout/phone/quote không giá/Back/Esc/address retry/20 vòng account còn PASS.
+- Test source cũ có giả định sai rằng nav spy phải nằm cạnh slideshow sau API. Đã cập nhật contract ở tests/catalog-ssr.test.mjs (commits 10709150, d2caeba9) và tests/storefront-audit-ux-regressions.test.mjs (commit 1ca2944cae92784372522b454ceea52939fd6a59). CI full source run 41293860611: SUCCESS.
+- Luồng E read-only: so Main 9fce1a85c9c19620a8269cce80575cdc92d9919c với audit: diverged, ahead 202/behind 156 trước code-fix; migration 0015–0017 và functions/api/admin/products.js, admin/orders.js là blob giống Main; public/admin/index.html khác Main, KHÔNG SỬA. Không resolve merge conflicts/merge Main.
+- Preview gần nhất xác minh trước lượt sửa: e4cf36fd, run 41291532629 SUCCESS. Lượt này đưa marker để chạy MỘT lần isolated Preview sau CI; kiểm chứng exact audit-source-revision trước khi nói Preview PASS. Lighthouse mới nhất, LCP/CLS/TBT/FPS và Android thật, full Owner-reference visual chưa PASS.
+- CSS audit vẫn 102 nhóm selector/context trùng / 70 nhóm có giá trị khác (dữ liệu audit trước, không được coi là số bug), không dọn bừa hoặc thêm override. Không báo đã tối ưu hiệu năng khi chưa có A/B cùng điều kiện.
+- BẮT BUỘC: tiếp tục luồng A CSS/Welcome/F5, B LCP/CLS/font/SSR, C mobile screenshot chức năng, D security/checkout, E conflict; chỉ một writer public/index.html và HEAD lease trước commit; giữ Owner PASS; Preview-only; đợi Owner PASS trước release.
+
+## CHECKPOINT QA — 2026-11-01 — LCP + PREVIEW + MAIN INTEGRATION
+- Repo `chichute5500/Sindarealest-admin`; existing PR #159 on `fix/audit-2026-10` OPEN/DRAFT. Source+Preview QA candidate commit `ee1da987f878cd477bf16f1af8a72d6957a05ba4`; Main stays at `9fce1a85c9c19620a8269cce80575cdc92d9919c`. DO NOT merge Main, change Admin, alter Production D1/R2 or claim Owner PASS.
+- Main-vs-audit comparison at candidate: **ahead 215 / behind 156 / 90 files**. 20 paths modified on both sides; 11 have exactly identical Git blob, nine differ. These are *overlaps*, not proof that all nine are textual merge conflicts. See `docs/qa/PR159_MAIN_INTEGRATION_PLAN_20261101.md`; retain Main's newer Owner-PASS Admin UI.
+- Source fix in prior candidate `c50b815b`: first-visit Welcome releases when DOM ready, no longer waits for /api/products; checkout province list loads only on checkout open. Mock browser on 360/390 Light/Dark passed (run 41294763445); source and Preview run 41294961360 / 41294961227 passed.
+- Source fix `dd216f48` prioritizes first two SSR+CSR catalog images. Full CI 41295951676 PASS, independent Preview 41295951750 PASS, remote read-only QA 41295951684 PASS. Lighthouse **catalog-mobile** Performance 77, LCP 6043.61ms, CLS .04, TBT 70ms vs earlier `c50b815b` Performance 73, LCP 10607.91ms, CLS .04, TBT 41ms. Two separate runs, not a guaranteed population average. Home mobile 77 / LCP 1536.04ms / CLS .02 / TBT 1033.5ms at `dd216f48`; desktop Home 100, Catalog 98.
+- Candidate `3cbf7f7` introduced validated first-row SSR image preload hints on direct catalog routes only; Home untouched. Source CI 41297037913 PASS. Trigger commit `ee1da987f878cd477bf16f1af8a72d6957a05ba4`, independent Preview 41297169711 PASS, source CI 41297169898 PASS, **GET-only screenshot/SSR/motion/Lighthouse QA** 41297169778 PASS, artifact accessible from GH Action. Lighthouse: Home mobile Performance **80**, LCP 1733.09ms, CLS .02, TBT 753.5ms; catalog mobile **77**, LCP **6027.57ms**, CLS .04, TBT 79ms; Home desktop 100 / 358.23ms LCP; Catalog desktop 98 / 1081.08ms LCP. No material catalog gain versus 6.04s prior; do NOT claim preload alone solved LCP.
+- Repeated restricted-network LCP probe catalog 390px Light: first priority change ~5800–6116ms (`dd216f48`), preload ~5548–5584ms (`ee1da987f878cd477bf16f1af8a72d6957a05ba4`); variance exists. Browser reports first-viewport image LCP source `/media/f68f91f0-c01d-4261-94e3-9a43311f98a2.webp`. Other product image source ~569KB and all eight catalog photos begin loading near first viewport. Durable improvement likely requires **responsive smaller R2 thumbnails**, an authorized image-resize facility or upload pipeline; none authorized yet. Never touch Production R2 objects or enable paid Image Resizing without Owner approval. Avoid speculative CSS changes.
+- QA screenshot coverage `audit/after/screenshots`: Home/Catalog Light/Dark at 360,390,768,1280,1920. Existing mocked checkout and navigation tests PASS. Remote screenshot evidence is not equivalent to Owner Xiaomi 15 Ultra test or `>=95%` visual reference PASS.
+- CSS scan: 102 same-selector/context groups, 70 value conflicts across scopes; informational, not 70 bugs. A basic exact-duplicate scanner found ~1.5KB potential, insufficient to justify risky bulk cleanup. Layout A/B did not prove disabling theme background resolves current CLS. Welcome layout shift may be tied to async settings copy, measured around 0.019, below .1.
+- Remaining tests requiring external permissions/Owner: actual Xiaomi 15 Ultra F5/Welcome Light/Dark/keyboard/cart; Owner approval of Welcome and visual >=95% with reference; real Google OAuth test account, phone ownership policy, and a non-Production payment sandbox if one exists. Do not make an actual payment or use real customers. E2E mocked checkout is not equivalent to signed-in test account/payment sandbox.
+- Policy: branch must remain DRAFT; no Main merge/production updates without specific Owner PASS. Latest source is the QA candidate commit; documentation-only follow-on commits do not change deployed code but will not equal the pinned Preview SHA.
+- Relevant direct links: PR https://github.com/chichute5500/Sindarealest-admin/pull/159 ; Preview https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev/ ; SHA-pinned QA https://github.com/chichute5500/Sindarealest-admin/actions/runs/41297169778 ; CI https://github.com/chichute5500/Sindarealest-admin/actions/runs/41297169898 .
+\n## CHECKPOINT VERIFIED — 2026-11-01 — offscreen SSR media gating (NO Production)\n
+- Branch `fix/audit-2026-10`, PR #159 remains OPEN/DRAFT and **mergeable=false**. Validated source SHA `93d9057d3b7ea159649aca05f31086158791a644`; pinned Preview/remote QA SHA `d491e3ef1ab9f7c6be80e196310e1d9a384b1eac`. Preview: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev/ . Main and all Production D1/R2 unchanged.
+- Actual source modifications: `functions/_catalog-ssr.js` SSR routes defer photos 3–8 using `data-src`; `<noscript>` real same-origin fallback and JS-disabled stylesheet preserve all eight image cards. `public/index.html` installs existing IntersectionObserver before `/api/products` fetch, reveals deferred SSR photos as visible; API-failure fallback still scroll-loads. Source contracts `tests/catalog-ssr.test.mjs`; browser JS-disabled acceptance `scripts/qa-ssr-hydration.mjs`; mock timing race fixed in `scripts/qa-audit-local-checkout.mjs`.
+- CI source `41298892694` **PASS**; local-only mocked checkout Playwright `41298892608` **PASS**; independent isolated Preview `41299050751` **PASS**, exact deployed SHA independently checked by read-only QA `41299050750` **PASS**. No payment requests, no customer-data writes. New read-only JS-disabled test reported: `PASS: no-JS catalog retains all six deferred product images and stable media boxes`.
+- Baseline QA `ee1da987` Lighthouse mobile Catalog **77 / LCP 6027.57ms / CLS 0.04 / TBT 79ms**, Home **80 / LCP 1733.09ms / CLS .02 / TBT 753.5ms**. Candidate `d491e3ef`: Catalog **78 / LCP 5575.39ms / CLS .06 / TBT 101ms**, Home **87 / LCP 1666.70ms / CLS .02 / TBT 453.5ms**. Those are single-run lab samples and TBT/CLS can vary. Do not claim consistent improvement to Home from unrelated catalog code. Catalog LCP remains FAIL versus recommended 2.5s.
+- Repeated limited-network browser probe Catalog 390 Light: baseline **5584, 5548ms**, candidate **4176, 3908ms**; Catalog 360 Dark baseline 5540, candidate 3912ms. In first run of each, 6 nonpreloaded R2 image requests were pushed from ~950ms to ~3227ms, removing contention for the 68KB LCP image. Larger raw R2 photos are still 300KB–569KB. Real responsive low-resolution variants still needed for substantial LCP gains. Do not enable Cloudflare paid image resizing or mutate Preview/Production R2 without explicit approval.
+- Visual identity invariant: all **10** fully rendered Catalog screenshots across widths **360/390/768/1280/1920** in **Light and Dark** are *pixel-for-pixel identical* before `ee1da987` vs after `d491e3ef`. Verified by exact RGB array equality using saved GitHub Action artifacts. This does **not** establish >=95% parity with Owner's separate target design or Android Xiaomi device PASS.
+- CSS audit 102 same-selector contexts / 70 differing value groups informational; do not remove all blindly. Main/audit merge conflict risk still open; `docs/qa/PR159_MAIN_INTEGRATION_PLAN_20261101.md` is read-only resolution matrix: protect newer Main Admin and full test union. **No Main merge/rebase or Production deploy authorized.**
+- Remaining owner-required gates: physical Android F5/Welcome/drawer/checkout QA and subjective visual signoff; real Google OAuth test-account permission; payment sandbox (if available); **explicit approval** before generating/uploading derived ~400px card thumbnails into isolated Preview R2 or enabling a billed image pipeline; separate PASS/authorization for eventual Main merge/Production. Continue source-only tasks without waiting where possible, but do not claim production parity or payments when unverified.
+- Links: CI https://github.com/chichute5500/Sindarealest-admin/actions/runs/41298892694 ; mock https://github.com/chichute5500/Sindarealest-admin/actions/runs/41298892608 ; Preview deploy https://github.com/chichute5500/Sindarealest-admin/actions/runs/41299050751 ; QA + screenshots https://github.com/chichute5500/Sindarealest-admin/actions/runs/41299050750 .
+
+## 01-11-2026 — Latest validated mobile Storefront, PR159 (do not repeat PASS work)
+- Branch fix/audit-2026-10, PR #159 DRAFT. Latest verified deployed code SHA \`530017ddcef9b473adb7db200b0685c9abcdbc08\`; standalone source CI run 41300184374 PASS, isolated Preview deploy 41300184417 PASS, exact-SHA browser/Lighthouse run 41300184426 PASS, checkout mock run 41300008986 PASS. No Production D1/R2 or Main writes.
+- Root-cause fix: reserve mobile #categoryFilters rail via existing rule \`min-height:50px\` before JS hydration. Catalog mobile standalone Lighthouse CLS **0.00**, browser A/B CLS **0.0173** from previous **0.0355**; LCP **6042.85ms** (previous **5575.39ms**, run-to-run variance); Perf 77; TBT 38ms. Home mobile Perf 93 / LCP 1439ms / CLS .02 / TBT 314.5ms. Page remains slow on mobile catalog, do not claim performance PASS.
+- Screenshots: all 10 fully rendered Catalog screenshots at 360/390/768/1280/1920 in Light/Dark are EXACT RGB pixel matches between previous candidate \`d491e3ef\` and \`530017dd\`; checked via Pillow ImageChops. Home dynamic screenshots differ; do not claim pixel parity there. This is NOT Owner's separate target reference acceptance.
+- Image bandwidth bottleneck: original R2 product photos ~300–569KB; Lighthouse Image Delivery insight estimates ~1.55MiB avoidable bytes. Candidate already delays six SSR below-fold images; first-row LCP photo ~68KB. Further target <=2.5s requires validated responsive-image delivery or optimized card media; **never** mutate Production R2, create Preview R2 derived assets or enable paid Cloudflare processing without explicit Owner authorization.
+- Branch-only, safe file-level integration commit \`0d470a492b8632a206e5a59db82854d2b5322c32\` synced EXACT Main Git blobs for \`AGENTS.md\`, \`docs/QA_RESOURCE_POLICY.md\`, \`.github/workflows/qa-resource-policy.yml\`, \`.github/workflows/deploy.yml\`. Main stayed \`9fce1a85c9c19620a8269cce80575cdc92d9919c\`. This is NOT a merge/rebase or production deployment. Do not copy older PR159 \`public/admin/index.html\` over newer Owner-PASS Admin on Main.
+- Remaining technical integration blockers: differing \`public/admin/index.html\` (keep Main), \`package.json\` (union test commands), \`tests/admin-mobile-refresh-contract.test.mjs\` (keep Main updated tests), \`scripts/qa-resource-guard.mjs\` (preserve scoped candidate marker), overlapping PR154/159 handoff doc (archive latter). Do not perform Main merge without separate Owner PASS.
+- Owner-required final gate: Android Xiaomi 15 Ultra F5 / initial Welcome / theme / drawer / account / checkout, genuine Google OAuth test account and non-Production payment sandbox if configured, explicit final visual approval and later separate Main-release permission. Simulated checkout and browser tests cannot substitute physical owner or payment provider.
+- QA evidence: https://github.com/chichute5500/Sindarealest-admin/actions/runs/41300184426 ; Preview: https://fix-audit-2026-10.sindarealest-admin-preview.pages.dev/ ; no Owner PASS yet.

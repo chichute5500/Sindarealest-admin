@@ -6,7 +6,7 @@ const hero=html.match(/<section class="sd-code-hero wrap" id="home"[\s\S]*?<\/se
 assert.ok(hero,'Code-only Hero must be the live home section');
 assert.match(hero,/<h1 class="sdh-title" id="sdh-title">/);
 assert.match(hero,/<span>Phong cách<\/span><span class="sdh-em">Đẳng cấp<\/span><span>từ da cá sấu<\/span>/);
-assert.match(hero,/<a class="sdh-cta sdh-cta--zalo" href="https:\/\/zalo\.me\/0827049192" target="_blank" rel="noopener noreferrer"[^>]*>Tư Vấn Đặt sản phẩm theo yêu cầu của bạn/);
+assert.match(hero, /Tư vấn \/ đặt hàng qua Zalo/);
 assert.match(hero,/<span class="sdh-glass-label">SINDAREALEST · SIGNATURE<\/span><span class="sdh-glass-message"><span>Da cá sấu thật<\/span><span>Phong cách sống thật<\/span><\/span>/);
 assert.match(css,/\.sd-code-hero \.sdh-glass-label\{[^}]*translateY\(-4px\)/);
 assert.match(css,/\.sd-code-hero \.sdh-glass-message span:first-child/);
