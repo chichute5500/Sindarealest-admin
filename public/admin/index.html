@@ -2016,8 +2016,8 @@ body:has(#main .statgrid) #main .pagehead .btn.primary:disabled{opacity:.45;tran
  #main .dashboard-revenue-copy strong{font-size:10.5px;line-height:14.3px;margin-bottom:2px}
  #main .dashboard-revenue-copy p{font-size:9px;line-height:12.825px}
  #main .dashboard-revenue-visual svg{width:26px;height:26px}
- /* Keep the viewport dock outside the repainting, scrolling app surface. */
- body:has(#appView:not(.hidden)) > .mobiletabs{position:fixed;display:grid;z-index:7;left:0;right:0;bottom:calc(var(--sd-dock-bottom,18px) + env(safe-area-inset-bottom));width:min(calc(100% - 28px),520px);height:var(--sd-dock-height,61px);min-height:var(--sd-dock-height,61px);margin:0 auto;padding:5px;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;border-radius:30px}
+ /* 100dvh follows the visible screen while innerHeight can briefly grow on a tab tap. */
+ body:has(#appView:not(.hidden)) > .mobiletabs{position:fixed;display:grid;z-index:7;left:0;right:0;top:calc(100dvh - var(--sd-dock-height,61px) - var(--sd-dock-bottom,18px) - env(safe-area-inset-bottom));width:min(calc(100% - 28px),520px);height:var(--sd-dock-height,61px);min-height:var(--sd-dock-height,61px);margin:0 auto;padding:5px;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;border-radius:30px}
  body:has(#appView:not(.hidden)) .mobiletabs{border:1px solid transparent;background:var(--sd-admin-dock-face);box-shadow:var(--sd-admin-shadow);-webkit-backdrop-filter:blur(18px) saturate(125%);backdrop-filter:blur(18px) saturate(125%)}
  body:has(#appView:not(.hidden)) .mobiletabs .nav{position:relative;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;min-height:0;padding:4px 1px;gap:3px;border-radius:20px;background:var(--sd-admin-tile-face);--sd-admin-rim:var(--sd-admin-tile-rim);box-shadow:var(--sd-admin-tile-shadow);white-space:nowrap;font-size:clamp(9px,2.55vw,11px);font-weight:500;line-height:1.15;letter-spacing:-.025em;color:var(--sd-admin-ink)}
  .mobiletabs:has(.nav:first-child.active){grid-template-columns:1.2fr repeat(4,minmax(0,1fr))}
@@ -2649,8 +2649,7 @@ function adminAnimateSurface(element,motion){
 function adminRouteMotion(previous,next,requested,source){
  const from=ADMIN_PRIMARY_VIEWS.indexOf(previous),to=ADMIN_PRIMARY_VIEWS.indexOf(next);
  if(from>=0&&from===to&&['bottom-tab','history'].includes(requested?.type))return null;
- // A transform animation on the page surface makes the fixed mobile dock jump
- // on forward navigation in mobile browsers. Keep dock navigation stationary.
+ // Move only #main; the dock is a body sibling anchored to the visual viewport.
  if(requested?.type==='bottom-tab'&&from>=0&&to>=0&&from!==to)return{type:to>from?'slide-forward':'slide-back'};
  if(requested?.type==='history'&&from>=0&&to>=0&&from!==to)return{type:to>from?'slide-forward':'slide-back'};
  if(requested?.type==='origin')return requested;

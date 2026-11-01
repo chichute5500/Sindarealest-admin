@@ -50,7 +50,7 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
     const main=page.locator('#main');
     const geometry=()=>dock.evaluate(el=>{
       const r=el.getBoundingClientRect();
-      return{y:r.y,bottom:innerHeight-r.bottom,height:r.height};
+      return{y:r.y,bottom:(visualViewport?.height??innerHeight)-r.bottom,height:r.height};
     });
     const expectedTitle={dashboard:'Tổng quan',products:'Sản phẩm',orders:'Đơn hàng',customers:'Danh sách khách hàng'};
     const sequence=[
@@ -67,9 +67,13 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
           const trace=window.__dockTrace,nav=document.querySelector('.mobiletabs'),main=document.querySelector('#main');
           const start=performance.now();
           const sample=()=>{
-            const rect=nav.getBoundingClientRect(),animation=main.getAnimations({subtree:false}).at(-1);
-            trace.points.push({at:performance.now()-start,y:rect.y,bottom:innerHeight-rect.bottom,
-              viewportHeight:visualViewport?.height??innerHeight,scrollY,transform:getComputedStyle(nav).transform});
+            const viewportHeight=innerHeight,rect=nav.getBoundingClientRect(),animation=main.getAnimations({subtree:false}).at(-1);
+            const style=getComputedStyle(nav);
+            trace.points.push({at:performance.now()-start,y:rect.y,rectBottom:rect.bottom,bottom:(visualViewport?.height??viewportHeight)-rect.bottom,
+              height:rect.height,cssHeight:style.height,minHeight:style.minHeight,
+              viewportHeight,visualHeight:visualViewport?.height??viewportHeight,clientHeight:document.documentElement.clientHeight,
+              scrollY,transform:style.transform,
+              bodyTransform:getComputedStyle(document.body).transform});
             if(!trace.transition&&animation&&main.dataset.adminTransition){
               trace.transition={type:main.dataset.adminTransition,duration:animation.effect.getTiming().duration,
                 from:animation.effect.getKeyframes()[0]?.transform||''};

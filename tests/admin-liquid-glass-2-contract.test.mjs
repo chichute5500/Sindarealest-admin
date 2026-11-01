@@ -66,6 +66,11 @@ assert.doesNotMatch(html,/\.mobiletabs \.nav(?::active|\[data-sd-glass-press="tr
   'Bottom dock tiles must never get a competing vertical transform rule');
 assert.match(html,/<\/div><nav class="mobiletabs">[\s\S]*?<\/nav>\n<div id="backdrop"/,
   'Dock is a sibling of the scrolling app surface, outside its repaint tree');
+const dockGeometryOwner=html.match(/body:has\(#appView:not\(\.hidden\)\) > \.mobiletabs\{([^}]*)\}/);
+assert.ok(dockGeometryOwner,'Signed-in mobile dock has one direct-body geometry owner');
+assert.match(dockGeometryOwner[1],/top:calc\(100dvh - var\(--sd-dock-height,61px\) - var\(--sd-dock-bottom,18px\) - env\(safe-area-inset-bottom\)\)/,
+  'Dock stays at the visual viewport coordinate when innerHeight briefly changes');
+assert.doesNotMatch(dockGeometryOwner[1],/bottom:/,'Do not re-anchor the dock to the shifting layout viewport');
 const setViewSource=html.slice(html.indexOf('function setView(v,updateUrl=true,motion=null){'),html.indexOf("window.addEventListener('popstate'"));
 assert.ok(setViewSource.indexOf("window.scrollTo({top:0,behavior:'auto'})")<setViewSource.indexOf('render(adminRouteMotion('),
   'Reset mobile scroll before replacing route content so the fixed dock does not jump when content height changes');
