@@ -32,3 +32,6 @@ Nine tip blobs are different. This list records content overlaps, **not nine gua
 
 Real Xiaomi 15 Ultra Owner QA; Google OAuth test account; phone ownership verification requirements; non-Production payment sandbox; responsive R2 media thumbnails need authorized design/space, not a speculative production mutation. Mobile catalog LCP remains ~6 seconds under Lighthouse even after current code-side optimizations.
 \n## Catalog candidate d491e3ef status\nPixel-identical 10 fullpage catalog screenshots Light/Dark 360/390/768/1280/1920 versus ee1da987; separate Preview full QA `41299050750` PASS. Catalog mobile LCP 6027.57 -> 5575.39ms; before further media transformation, obtain explicit permission to create Preview-R2-only derived thumbnails, never alter originals or Production.\n
+
+## 2026-11-01 low-risk Main alignment update
+At audit commit \`0d470a49\`, four overlapping policy/deployment guard paths became **exact copies of the current Main versions**: \`AGENTS.md\`, \`docs/QA_RESOURCE_POLICY.md\`, \`.github/workflows/qa-resource-policy.yml\`, \`.github/workflows/deploy.yml\`. This reduces future conflict risk without changing Main, Admin or Production. Keep other divergences until compatible integration is validated.
