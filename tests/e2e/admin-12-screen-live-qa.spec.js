@@ -52,7 +52,7 @@ for (const {width,height,theme} of matrix) {
     async function readDockGeometry(){
       return page.locator('.mobiletabs').evaluate(el=>{
         const r=el.getBoundingClientRect(),s=getComputedStyle(el),root=document.documentElement;
-        return{x:r.x,y:r.y,width:r.width,height:r.height,position:s.position,left:s.left,right:s.right,bottom:s.bottom,cssWidth:s.width,
+        return{x:r.x,y:r.y,viewportBottom:innerHeight-r.bottom,width:r.width,height:r.height,position:s.position,left:s.left,right:s.right,bottom:s.bottom,cssWidth:s.width,
           innerWidth,clientWidth:root.clientWidth,visualViewportWidth:visualViewport?.width??innerWidth,
           innerHeight,visualViewportHeight:visualViewport?.height??innerHeight};
       });
@@ -330,7 +330,7 @@ for (const {width,height,theme} of matrix) {
             return samples;
           });
           const maxDockYDelta=Math.max(...dockMotionSamples.map(sample=>Math.abs(sample.y-dock.y)));
-          const maxDockBottomDelta=Math.max(...dockMotionSamples.map(sample=>Math.abs(sample.bottom-dock.bottom)));
+          const maxDockBottomDelta=Math.max(...dockMotionSamples.map(sample=>Math.abs(sample.bottom-dock.viewportBottom)));
           report.navigationLatencyChecks.at(-1).dockMotionSamples=dockMotionSamples.length;
           report.navigationLatencyChecks.at(-1).maxDockYDelta=maxDockYDelta;
           expect(maxDockBottomDelta,'The dock must not jump vertically during tab navigation').toBeLessThanOrEqual(.5);
