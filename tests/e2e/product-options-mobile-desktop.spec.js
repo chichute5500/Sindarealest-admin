@@ -305,7 +305,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.locator('#sdCheckoutDone').click();await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
  await page.locator('#mobileAccountNav').click();await page.locator('#accountOrdersAction').click();
  const orderCard=page.locator('#accountOrdersList [data-order-number="SD-TEST-001"]');await expect(orderCard).toContainText('Chờ thanh toán');await expect(orderCard.locator('img')).toHaveCount(1);await expect(orderCard).not.toContainText('Giao hàng');
- await orderCard.locator('[data-order-payment-check]').click();await expect(orderCard).toContainText('Shop đã nhận đủ tiền');await expect(orderCard).toContainText('Đủ điều kiện');await expect(orderCard).toContainText('Chờ gửi hàng');await expect(orderCard).toContainText('Đã đồng bộ với Shop');expect(paymentRefreshRequests).toBe(1);
+ await orderCard.locator('[data-order-payment-check]').click();await expect.poll(()=>paymentRefreshRequests).toBe(1);await expect(orderCard.locator('.local-order-payment>strong')).toHaveText('Shop đã nhận đủ tiền');await expect(orderCard).toContainText('Đủ điều kiện');await expect(orderCard).toContainText('Chờ gửi hàng');await expect(orderCard.locator('.local-order-sync-message')).toContainText('Đã đồng bộ với Shop');
  await page.locator('#accountClose').click();await page.locator('#cartOpen').click();
  await page.locator('[data-cart-pick="qa-shoe::42"]').uncheck();
  await expect(page.locator('#cartCheckout')).toContainText('1 sản phẩm');
