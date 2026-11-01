@@ -11,4 +11,6 @@ assert.match(html,/async function consultCart\(\)[^\n]*Biến thể:/,'Zalo cart
 assert.match(html,/revealObserver\.unobserve\(el\)/,'Reveal observer stops after first show');
 assert.doesNotMatch(html,/el\.classList\.remove\('is-visible'\)/,'Reveal must not hide elements on reverse scroll');
 assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,'Welcome has a shorter delay');
+assert.match(html,/<h2 class="welcome-title">/, 'Welcome is not a competing document H1');
+assert.match(html,/<h1 class="sdh-title" id="sdh-title">/, 'Main Hero remains the primary H1');
 console.log('PASS: Storefront 404/route/consultation/reveal/Welcome source contracts');
