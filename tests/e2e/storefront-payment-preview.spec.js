@@ -35,7 +35,13 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
    oneScrollBody:nav.parentElement===form&&intro.parentElement===form&&address.parentElement===form&&document.querySelector('#paymentInstructions').parentElement===form&&header.parentElement===drawer&&footer.parentElement===drawer,
    headerShift:Math.abs(rect(header).top-headY),footerShift:Math.abs(rect(footer).top-footerY),
    navShift:navY-rect(nav).top,navVisible,introShift:introY-rect(intro).top,scroll,
-   headerGlass:getComputedStyle(header).backgroundImage,footerGlass:getComputedStyle(footer).backgroundImage
+   headerGlass:getComputedStyle(header).backgroundImage,footerGlass:getComputedStyle(footer).backgroundImage,
+   cartSurface:getComputedStyle(document.querySelector('#cartDrawer')).backgroundColor,
+   checkoutSurface:getComputedStyle(drawer).backgroundColor,
+   cartRadius:getComputedStyle(document.querySelector('#cartDrawer')).borderRadius,
+   checkoutRadius:getComputedStyle(drawer).borderRadius,
+   drawerLeft:frame.left,drawerRight:innerWidth-frame.right,
+   outerShadow:getComputedStyle(drawer).boxShadow
   };
   form.scrollTop=0;
   return result;
@@ -46,8 +52,15 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.titleFont).toContain('SD Serif');
  expect(state.headerShift).toBeLessThanOrEqual(1.5);
  expect(state.footerShift).toBeLessThanOrEqual(1.5);
- expect(state.headerGlass).toContain('gradient');
- expect(state.footerGlass).toContain('gradient');
+ expect(state.headerGlass,'Header must not be a second detached glass card').toBe('none');
+ expect(state.footerGlass,'Footer must not look like a white rectangular overlay').toBe('none');
+ expect(state.checkoutSurface,'Same glass material as Cart').toBe(state.cartSurface);
+ if(page.viewportSize().width<=760){
+  expect(state.checkoutRadius,'Checkout must use same rounding as cart').toBe(state.cartRadius);
+  expect(parseFloat(state.checkoutRadius)).toBeGreaterThanOrEqual(24);
+  expect(state.drawerLeft).toBeGreaterThanOrEqual(6);
+  expect(state.drawerRight).toBeGreaterThanOrEqual(6);
+ }
  if(requireScroll){
   expect(state.scroll,'Mobile step content must scroll together').toBeGreaterThan(12);
   if(state.navVisible)expect(state.navShift).toBeGreaterThan(10);
