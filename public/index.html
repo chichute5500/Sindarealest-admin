@@ -1476,7 +1476,7 @@ html.sd-catalog-route #products .filter-pill{
     </div>
   </div>
 </aside>
-<div class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Giỏ hàng" aria-hidden="true" inert>
+<div class="cart-drawer" id="cartDrawer" style="visibility:hidden" role="dialog" aria-modal="true" aria-label="Giỏ hàng" aria-hidden="true" inert>
   <div class="cart-header"><h2 id="cartTitle">Giỏ hàng (0)</h2><button class="icon-btn tap-target" id="cartClose" aria-label="Đóng giỏ hàng">×</button></div>
   <div class="cart-list" id="cartList" aria-live="polite"></div>
   <div class="cart-bottom">
@@ -1486,8 +1486,8 @@ html.sd-catalog-route #products .filter-pill{
     <button class="pill-btn tap-target" id="cartZalo" type="button" disabled>Tư vấn / đặt hàng qua Zalo ↗</button>
   </div>
 </div>
-<button type="button" class="checkout-backdrop" id="checkoutBackdrop" aria-label="Đóng biểu mẫu đặt hàng" tabindex="-1"></button>
-<aside class="checkout-drawer glass" id="checkoutDrawer" role="dialog" aria-modal="true" aria-label="Thông tin đặt hàng" aria-hidden="true" tabindex="-1" inert>
+<button type="button" class="checkout-backdrop" id="checkoutBackdrop" style="visibility:hidden" aria-label="Đóng biểu mẫu đặt hàng" tabindex="-1"></button>
+<aside class="checkout-drawer glass" id="checkoutDrawer" style="visibility:hidden" role="dialog" aria-modal="true" aria-label="Thông tin đặt hàng" aria-hidden="true" tabindex="-1" inert>
   <div class="cart-header checkout-header">
     <div class="checkout-heading"><button type="button" class="checkout-backlink tap-target" id="checkoutBack">← Giỏ hàng</button><h2>Đặt hàng</h2></div>
     <button class="icon-btn tap-target" type="button" id="checkoutClose" aria-label="Đóng đặt hàng">×</button>
@@ -2521,7 +2521,7 @@ function renderCart(){
   return `<div class="cart-row"><img src="${escapeHtml(allImages(p)[0])}" alt="${escapeHtml(p.title)}"><div class="cart-row-copy"><strong>${productTitleWithVip(p.title,false)}</strong><small>Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}</small>${optionMarkup}<small class="cart-row-price">${priceText}</small><div class="qty-controls"><button class="tap-target" data-qty="-1" data-id="${escapeHtml(id)}" aria-label="Giảm số lượng">−</button><span>${q}</span><button class="tap-target" data-qty="1" data-id="${escapeHtml(id)}" aria-label="Tăng số lượng">+</button></div></div><button class="remove-item tap-target" data-remove="${escapeHtml(id)}" aria-label="Xóa sản phẩm">Xóa</button></div>`;
  }).join('');
 }
-function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
+function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
 function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';const target=cartReturnFocus;cartReturnFocus=null;if(restoreFocus&&wasOpen)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';const fallback=$('#cartOpen')||$('#mobileCartNav');(available?target:fallback)?.focus({preventScroll:true})},0)}
 
 let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="deposit",sdCheckoutSuccess=false;
@@ -2611,6 +2611,9 @@ function openCheckout(){
  checkoutReturnFocus=document.activeElement;
  closeCart(false);$('#cartDrawer').setAttribute('inert','');
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
+ // Closed drawers are hidden inline until their first intentional opening;
+ // their full motion CSS is parsed after the drawer markup on a cold reload.
+ panel.style.visibility='';backdrop.style.visibility='';
  panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='deposit';$('#checkoutSubmit').disabled=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();sdCheckoutSetStep(1);

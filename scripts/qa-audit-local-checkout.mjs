@@ -58,10 +58,33 @@ await page.route("**/*",async route=>{
  }
  return route.continue();
 });
-await page.addInitScript(()=>{try{sessionStorage.setItem("sd-welcome-seen-in-tab","1")}catch{}});
+await page.addInitScript(()=>{
+ try{sessionStorage.setItem("sd-welcome-seen-in-tab","1")}catch{}
+ // Check *during streaming HTML parsing*, before the later drawer CSS arrives.
+ // This reproduces the brief checkout panel revealed by Android refresh.
+ window.__sdFirstPaintDrawerLeaks=[];
+ const ids=['accountDrawer','cartDrawer','checkoutBackdrop','checkoutDrawer'];
+ const captured=new Set();
+ const observer=new MutationObserver(()=>{
+   for(const id of ids){
+     if(captured.has(id))continue;
+     const el=document.getElementById(id);
+     if(!el)continue;
+     captured.add(id);
+     const style=getComputedStyle(el);
+     if(style.display!=='none'&&style.visibility!=='hidden'){
+       window.__sdFirstPaintDrawerLeaks.push({id,display:style.display,visibility:style.visibility});
+     }
+   }
+   if(captured.size===ids.length)observer.disconnect();
+ });
+ observer.observe(document,{childList:true,subtree:true});
+});
 try{
  const response=await page.goto(origin+"/sanpham",{waitUntil:"domcontentloaded",timeout:35000});
  assert.equal(response.status(),200);
+ assert.deepEqual(await page.evaluate(()=>window.__sdFirstPaintDrawerLeaks),[],
+  'No drawer or checkout backdrop can paint before the late motion CSS is parsed');
  await page.locator('#catalogGrid [data-add="qa-wallet"]').waitFor({timeout:20000});
  await page.locator('#catalogGrid [data-add="qa-wallet"]').click();
  await page.locator('#catalogGrid [data-add="qa-clutch"]').click();
@@ -131,6 +154,8 @@ try{
  // Regression: Android-style reload must not duplicate or detach bottom nav.
  // This runs on local mock data and never invokes checkout after reload.
  await page.reload({waitUntil:"domcontentloaded",timeout:30000});
+ assert.deepEqual(await page.evaluate(()=>window.__sdFirstPaintDrawerLeaks),[],
+  'Android-style refresh must not flash the checkout or cart drawer during parsing');
  await page.locator('#catalogGrid article[data-product]').first().waitFor({timeout:25000});
  // Screenshot only after first catalog thumbnail decodes; loading an article
  // does not mean its image has reached the compositor on a cold Android reload.

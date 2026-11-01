@@ -13,4 +13,21 @@ assert.doesNotMatch(html,/el\.classList\.remove\('is-visible'\)/,'Reveal must no
 assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,'Welcome has a shorter delay');
 assert.match(html,/<h2 class="welcome-title">/, 'Welcome is not a competing document H1');
 assert.match(html,/<h1 class="sdh-title" id="sdh-title">/, 'Main Hero remains the primary H1');
-console.log('PASS: Storefront 404/route/consultation/reveal/Welcome source contracts');
+
+/* On the first parse, drawer markup precedes its full animation CSS. aria-hidden
+   and inert never hide a painted surface, so preserve a first-paint visibility
+   gate until the user explicitly opens the drawer. This catches the Android
+   refresh/Welcome-bypass one-frame checkout flash. */
+for(const [id,openPattern] of [
+  ['cartDrawer',/const panel=\$\('#cartDrawer'\);panel\.style\.visibility='';panel\.removeAttribute\('inert'\)/],
+  ['checkoutDrawer',/panel\.style\.visibility='';backdrop\.style\.visibility='';/],
+  ['checkoutBackdrop',/panel\.style\.visibility='';backdrop\.style\.visibility='';/],
+  ['accountDrawer',/panel\.style\.visibility='';panel\.removeAttribute\('inert'\)/]
+]){
+  assert.match(html,new RegExp('id="'+id+'"[^>]*style="visibility:hidden"'),'Closed '+id+' must be hidden before deferred CSS is parsed');
+  assert.match(html,openPattern,'First deliberate open must clear the initial inline guard for '+id);
+}
+assert.match(html,/\.checkout-drawer\.open\{transform:translateX\(0\);visibility:visible/,'Keep the original checkout slide-in effect');
+assert.match(html,/\.checkout-drawer\{position:fixed;[^\n]*visibility:hidden;pointer-events:none;transition:transform/,'Closed checkout uses the original delayed visibility slide-out');
+
+console.log('PASS: Storefront 404/route/consultation/reveal/Welcome/drawer first-paint contracts');
