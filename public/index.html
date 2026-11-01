@@ -4574,7 +4574,28 @@ async function saveAccountAddress(event){event.preventDefault();const form=event
  }else throw Error('Tài khoản chưa sẵn sàng. Hãy thử lại.');
  updateAccountAddressSummary();
 }catch(e){setAccountAddressMessage(e.message||'Không thể lưu địa chỉ.','error')}}
-async function prefillCheckoutFromLocalAddress(){const saved=loadLocalShippingAddress();if(!saved)return;const form=$('#checkoutForm');if(!form)return;const waitForOptions=async select=>{for(let i=0;i<40;i++){if(select&&!select.disabled&&select.options.length>1)return true;await new Promise(resolve=>setTimeout(resolve,100))}return false};try{if(!$('#checkoutForm [name="fullName"]').value.trim())$('#checkoutForm [name="fullName"]').value=String(saved.fullName||'');if(!$('#checkoutForm [name="phone"]').value.trim())$('#checkoutForm [name="phone"]').value=String(saved.phone||'');if(!$('#checkoutForm [name="email"]').value.trim())$('#checkoutForm [name="email"]').value=String(saved.email||'');if(!$('#checkoutStreet').value.trim())$('#checkoutStreet').value=String(saved.streetAddress||'');const province=$('#checkoutProvince');if(!province.value&&await waitForOptions(province)){const option=[...province.options].find(o=>(saved.provinceCode&&o.dataset.code===String(saved.provinceCode))||o.value===String(saved.province||''));if(option){province.value=option.value;await loadCheckoutWards();const ward=$('#checkoutWard');await waitForOptions(ward);const wardOption=[...ward.options].find(o=>(saved.wardCode&&o.dataset.code===String(saved.wardCode))||o.value===String(saved.ward||''));if(wardOption){ward.value=wardOption.value;$('#checkoutWardCode').value=wardOption.dataset.code||''}}}}catch{}}
+async function prefillCheckoutFromLocalAddress(){
+ const saved=loadLocalShippingAddress();if(!saved)return;const form=$('#checkoutForm');if(!form)return;
+ const waitForOptions=async select=>{for(let i=0;i<40;i++){if(select&&!select.disabled&&select.options.length>1)return true;await new Promise(resolve=>setTimeout(resolve,100))}return false};
+ try{
+  if(!form.elements.fullName.value.trim())form.elements.fullName.value=String(saved.fullName||'');
+  if(!form.elements.phone.value.trim())form.elements.phone.value=String(saved.phone||'');
+  if(!form.elements.email.value.trim())form.elements.email.value=String(saved.email||'');
+  if(!$('#checkoutStreet').value.trim())$('#checkoutStreet').value=String(saved.streetAddress||'');
+  const province=$('#checkoutProvince');if(!await waitForOptions(province))return;
+  const savedProvince=[...province.options].find(option=>(saved.provinceCode&&option.dataset.code===String(saved.provinceCode))||option.value===String(saved.province||''));
+  if(!savedProvince)return;
+  if(!province.value)province.value=savedProvince.value;
+  if(province.value!==savedProvince.value)return;
+  const ward=$('#checkoutWard'),savedWardCode=String(saved.wardCode||''),savedWardName=String(saved.ward||'');
+  const currentWard=ward.selectedOptions[0];
+  const wardAlreadyMatches=!ward.disabled&&((savedWardCode&&currentWard?.dataset.code===savedWardCode)||(!savedWardCode&&currentWard?.value===savedWardName));
+  if(!wardAlreadyMatches)await loadCheckoutWards();
+  if(!await waitForOptions(ward))return;
+  const savedWard=[...ward.options].find(option=>(savedWardCode&&option.dataset.code===savedWardCode)||option.value===savedWardName);
+  if(savedWard){ward.value=savedWard.value;$('#checkoutWardCode').value=savedWard.dataset.code||''}
+ }catch{}
+}
 
 function savedCheckoutAddressComplete(saved){return !!saved&&[saved.fullName,saved.phone,saved.province,saved.ward,saved.streetAddress].every(value=>String(value||'').trim())}
 function checkoutAddressComplete(){const f=$('#checkoutForm')?.elements,province=$('#checkoutProvince'),ward=$('#checkoutWard');return !!f&&!!f.fullName.value.trim()&&!!f.phone.value.trim()&&!!f.streetAddress.value.trim()&&!!province.value&&!!province.selectedOptions[0]?.dataset.code&&!!ward.value&&!!ward.selectedOptions[0]?.dataset.code}
