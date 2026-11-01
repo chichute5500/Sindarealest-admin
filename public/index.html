@@ -895,6 +895,18 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-actions #checkoutSubmit{margin:0;max-height:none;height:auto;min-height:44px;font-size:10px;padding:10px 13px}
 .checkout-drawer .sd-checkout-actions #sdCheckoutPrev{font-size:10px}
 .checkout-drawer .sd-checkout-actions button:disabled{opacity:.62;cursor:wait}
+.checkout-drawer.sd-checkout-success .sd-checkout-actions{grid-template-columns:minmax(0,1fr)}
+.checkout-drawer.sd-checkout-success .sd-checkout-actions #sdCheckoutDone{grid-column:1;justify-self:end;width:auto;min-width:150px;max-width:240px}
+.checkout-drawer .sd-checkout-confirm-wrap{position:relative;grid-column:1/-1;display:grid;place-items:center;min-height:56px;overflow:hidden;border:1px solid var(--sd-reference-edge,var(--line));border-radius:999px;background:var(--sd-reference-surface,var(--glass));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 5px 18px rgba(92,145,185,.12)}
+.checkout-drawer .sd-checkout-confirm-wrap[hidden]{display:none!important}
+.checkout-drawer .sd-checkout-confirm-label{position:relative;z-index:1;max-width:calc(100% - 64px);color:var(--ink);font-size:12px;font-weight:750;text-align:center;pointer-events:none}
+.checkout-drawer .sd-checkout-confirm-range{position:absolute;z-index:2;inset:0;width:100%;height:100%;margin:0;appearance:none;-webkit-appearance:none;background:transparent;cursor:ew-resize;touch-action:pan-y}
+.checkout-drawer .sd-checkout-confirm-range::-webkit-slider-runnable-track{height:100%;background:transparent}
+.checkout-drawer .sd-checkout-confirm-range::-moz-range-track{height:100%;background:transparent}
+.checkout-drawer .sd-checkout-confirm-range::-webkit-slider-thumb{width:46px;height:46px;margin-top:5px;appearance:none;-webkit-appearance:none;border:1px solid var(--sd-reference-edge,var(--line));border-radius:50%;background:var(--sd-reference-surface-strong,var(--panel-strong)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12h15m-6-6 6 6-6 6' fill='none' stroke='%234a88b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/20px 20px no-repeat;box-shadow:0 2px 8px rgba(34,68,94,.2)}
+.checkout-drawer .sd-checkout-confirm-range::-moz-range-thumb{width:44px;height:44px;border:1px solid var(--sd-reference-edge,var(--line));border-radius:50%;background:var(--sd-reference-surface-strong,var(--panel-strong)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12h15m-6-6 6 6-6 6' fill='none' stroke='%234a88b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/20px 20px no-repeat;box-shadow:0 2px 8px rgba(34,68,94,.2)}
+.checkout-drawer .sd-checkout-confirm-wrap:focus-within{outline:2px solid #4a88b4;outline-offset:3px}
+.checkout-drawer .sd-checkout-confirm-note{grid-column:1/-1;margin:0;padding:0 5px;color:var(--muted);font-size:10px;line-height:1.5;text-align:center}
 .checkout-drawer [hidden]{display:none!important}
 .checkout-drawer #checkoutMessage:not(:empty){padding:6px 4px;font-size:10px;line-height:1.45;max-height:72px;overflow:auto}
 @media(max-width:360px){.checkout-drawer .sd-checkout-step{font-size:8px}.checkout-drawer .sd-checkout-stepper{gap:3px}}
@@ -908,7 +920,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-copy .sd-copy-icon::before{content:"";position:absolute;left:3px;top:2px;width:10px;height:11px;border:1.5px solid currentColor;border-radius:2px}
 .checkout-drawer .sd-checkout-copy .sd-copy-icon::after{content:"";position:absolute;left:6px;top:5px;width:10px;height:11px;border:1.5px solid currentColor;border-radius:2px;background:var(--sd-reference-surface,var(--glass))}
 .checkout-drawer .sd-checkout-copy:active{background:var(--panel-strong)}
-.checkout-drawer .sd-checkout-qr-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.checkout-drawer .sd-checkout-qr-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
 .checkout-drawer .sd-checkout-qr-actions .pill-btn{min-height:38px;padding:7px;font-size:10px;white-space:normal}
 .checkout-drawer .sd-checkout-qr-warning{margin:0;color:#c3212f;font-size:10px;font-weight:750;line-height:1.55}
 html.dark .checkout-drawer .sd-checkout-qr-warning{color:#ff7d85}
@@ -916,7 +928,7 @@ html.dark .checkout-drawer .sd-checkout-qr-warning{color:#ff7d85}
 html.dark .checkout-drawer .sd-order-received-note{color:#ff7d85}
 .checkout-drawer .sd-checkout-remaining{border-top:1px solid var(--line);padding-top:8px}
 .checkout-drawer .sd-checkout-remaining strong{color:var(--gold)}
-@media(max-width:360px){.checkout-drawer .sd-checkout-copy{padding:5px 6px}.checkout-drawer .sd-checkout-qr-actions .pill-btn{font-size:9px}}
+@media(max-width:360px){.checkout-drawer .sd-checkout-copy{padding:5px 6px}.checkout-drawer .sd-checkout-qr-actions .pill-btn{font-size:9px}.checkout-drawer .sd-checkout-confirm-label{font-size:11px}}
 </style>
 <style id="sd-vip-product-title-2026-10-27">
 /* Only emphasized VIP text in rendered product names; all approved Liquid Glass surfaces stay unchanged. */
@@ -3605,7 +3617,7 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 <button type="button" class="sd-checkout-copy" data-sd-copy="amount"><span>Số tiền cần chuyển</span><b id="sdCheckoutAmount"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="reference"><span>Nội dung chuyển khoản</span><b id="sdCheckoutTransferContent"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 </div></div>
-<div class="sd-checkout-qr-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutSaveQr">⇩ Lưu ảnh QR</button><button type="button" class="pill-btn tap-target" id="sdCheckoutOpenBank">↗ Mở ứng dụng ngân hàng</button></div>
+<div class="sd-checkout-qr-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutSaveQr">⇩ Lưu ảnh QR</button></div>
 <p class="sd-checkout-qr-warning">QR KHÔNG NHÚNG SỐ TIỀN. Vui lòng tự nhập chính xác số tiền và nội dung chuyển khoản hiển thị phía trên. Shop xác nhận sau khi đối chiếu tiền thực nhận.</p>
 <p id="sdCheckoutBankFeedback" class="sd-checkout-hint" role="status" aria-live="polite"></p>
 </div>
@@ -3619,7 +3631,7 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 <div id="paymentInstructions" class="payment-instructions" role="status" aria-live="polite" hidden></div>
 </form>
 <div class="sd-checkout-footer">
-<div class="sd-checkout-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutPrev">Giỏ hàng</button><button class="pill-btn primary tap-target" id="checkoutSubmit" type="submit" form="checkoutForm">Tiếp tục chọn thanh toán →</button><button type="button" class="pill-btn primary tap-target" id="sdCheckoutDone" hidden>Đóng</button></div>
+<div class="sd-checkout-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutPrev">Giỏ hàng</button><button class="pill-btn primary tap-target" id="checkoutSubmit" type="submit" form="checkoutForm">Tiếp tục chọn thanh toán →</button><div class="sd-checkout-confirm-wrap" id="sdCheckoutConfirmWrap" hidden><label class="sd-checkout-confirm-label" for="sdCheckoutConfirmRange">Xác nhận đã thanh toán</label><input class="sd-checkout-confirm-range" id="sdCheckoutConfirmRange" type="range" min="0" max="100" step="5" value="0" aria-label="Kéo mũi tên từ trái sang phải để xác nhận đã thanh toán"></div><p class="sd-checkout-confirm-note" id="sdCheckoutConfirmNote" hidden>Thao tác này chỉ mở mã đơn. Shop sẽ đối chiếu giao dịch trước khi ghi nhận tiền đã nhận.</p><button type="button" class="pill-btn primary tap-target" id="sdCheckoutDone" hidden>Đóng</button></div>
 <p id="checkoutMessage" class="checkout-message" role="status" aria-live="polite"></p>
 </div>
 </aside>
@@ -4674,6 +4686,7 @@ function sdCheckoutSummary(selector){
  }
 }
 function sdCheckoutSelected(){return sdCheckoutQuote?.quoteReady===true?sdCheckoutQuote.options?.find(x=>x.value===sdCheckoutChoice):null}
+function sdCheckoutSubmitLabel(){return sdCheckoutStep===1?'Tiếp tục chọn thanh toán →':'Tiến hành thanh toán →'}
 function sdCheckoutRefreshChoice(){
  const value=sdCheckoutSelected(),amount=value?formatVnd(value.amount):'Chờ Shop xác nhận';
  const remainder=value?formatVnd(value.codExpected):'Chờ Shop xác nhận';
@@ -4708,6 +4721,7 @@ function sdCheckoutSetStep(step){
  const productionNote=$('#sdOrderProductionCaution');if(productionNote)productionNote.hidden=!sdCheckoutItems().some(({id})=>productFulfillmentType(findProductByKey(id))==='made_to_order');
  const captions=[['Thông tin nhận hàng','Nhập địa chỉ một lần. Lần sau thông tin đã lưu sẽ được dùng lại.'],['Chọn cách thanh toán','Chọn một cách thanh toán để xem QR chuyển khoản.']];
  $('#sdCheckoutStepTitle').textContent=captions[sdCheckoutStep-1][0];$('#sdCheckoutStepSubtitle').textContent=captions[sdCheckoutStep-1][1];
+ $('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();
  [[1,'#sdCheckoutShippingStep'],[2,'#sdCheckoutPaymentStep']].forEach(([n,id])=>$(id).hidden=n!==sdCheckoutStep);
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
  $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;
@@ -4737,7 +4751,7 @@ function openCheckout(options={}){
  panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
- sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#sdCheckoutDone').hidden=true;$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
+ sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
  $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
  if(!checkoutProvinceLoadStarted){
@@ -5014,7 +5028,7 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  const add=(parent,tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;parent.append(node);return node};
  const transferStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-transfer-stage'):panel;
  const orderStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-order-stage'):panel;
- if(deferOrderCode){orderStage.hidden=true;add(transferStage,'p','sd-payment-stage-label','BƯỚC 1 / 2 · THANH TOÁN');add(transferStage,'h3','',ready?'Chuyển khoản theo thông tin bên dưới':'Shop chưa có QR chuyển khoản');}
+ if(deferOrderCode){orderStage.hidden=true;$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=false;add(transferStage,'p','sd-payment-stage-label','BƯỚC 1 / 2 · THANH TOÁN');add(transferStage,'h3','',ready?'Chuyển khoản theo thông tin bên dưới':'Shop chưa có QR chuyển khoản');}
  else add(panel,'h3','',ready?'Hướng dẫn chuyển khoản':'Thông tin đơn hàng');
  if(orderNumber){
   const orderCard=add(orderStage,'button','sd-order-reference','');orderCard.type='button';orderCard.setAttribute('aria-label','Sao chép mã đơn '+orderNumber);
@@ -5048,7 +5062,7 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  $('#sdCheckoutBankName').textContent=payment.bankName;$('#sdCheckoutAccountName').textContent=payment.accountName;$('#sdCheckoutAccountNumber').textContent=payment.accountNumber;$('#sdCheckoutAmount').textContent=formatVnd(amount);$('#sdCheckoutTransferContent').textContent=payment.transferContent;image.alt='Mã QR chuyển khoản đã được Shop xác minh';
  image.onerror=()=>{qrWrap.hidden=true;const error=add(transferStage,'p','payment-warning','Không tải được QR đã xác minh. Vui lòng chưa chuyển khoản và liên hệ Shop.');error.scrollIntoView?.({block:'nearest'})};
  image.src=qrUrl;qrWrap.hidden=false;transferStage.append(qrWrap);
- if(deferOrderCode){add(transferStage,'p','sd-payment-truth-note','Sau khi quét QR, bấm “Tiếp tục đến mã đơn”. Bước này không xác nhận Shop đã nhận tiền.');$('#sdCheckoutDone').textContent='Tiếp tục đến mã đơn →';}
+ if(deferOrderCode){$('#sdCheckoutConfirmWrap').hidden=false;$('#sdCheckoutConfirmNote').hidden=false;$('#sdCheckoutDone').hidden=true;add(transferStage,'p','sd-payment-truth-note','Kéo thanh bên dưới để xác nhận bạn đã chuyển khoản. Thao tác này chỉ mở mã đơn; Shop sẽ đối chiếu trước khi ghi nhận tiền đã nhận.');}
  else if(orderNumber&&accessToken.length>=40){const check=add(panel,'button','pill-btn tap-target','Kiểm tra cập nhật thanh toán');check.type='button';check.dataset.paymentUpdate='true';check.addEventListener('click',()=>refreshOrderPayment(orderNumber,accessToken,check));}
 }
 async function sdCopyCheckoutText(value){
@@ -5082,17 +5096,22 @@ $('#sdCheckoutSaveQr').addEventListener('click',async()=>{
   sdCheckoutBankMessage('Đã yêu cầu lưu ảnh QR. Kiểm tra mục Tải xuống trên điện thoại.');
  }catch(err){sdCheckoutBankMessage(err.message||'Không thể lưu ảnh QR.')}
 });
-$('#sdCheckoutOpenBank').addEventListener('click',async()=>{
- try{
-  const blob=await sdCheckoutQrBlob(),filename='SinDarealest-QR.'+(blob.type.includes('jpeg')?'jpg':blob.type.includes('webp')?'webp':'png');
-  const file=new File([blob],filename,{type:blob.type}),details=sdCheckoutBankDetails();
-  const text=['Thông tin chuyển khoản SinDarealest',details.bank,details.account,details.accountName,'Số tiền: '+details.amount,'Nội dung: '+details.reference].join('\n');
-  if(typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],text,title:'SinDarealest - Chuyển khoản'});sdCheckoutBankMessage('Chọn ứng dụng ngân hàng hoặc ứng dụng hỗ trợ trong bảng chia sẻ của thiết bị.');return;
-  }
-  if(typeof navigator.share==='function'){await navigator.share({text,title:'SinDarealest - Chuyển khoản'});sdCheckoutBankMessage('Hãy mở ứng dụng ngân hàng từ bảng chia sẻ nếu có hỗ trợ.');return}
-  sdCheckoutBankMessage('Trình duyệt không hỗ trợ mở trực tiếp ứng dụng ngân hàng. Hãy lưu QR và mở app ngân hàng của bạn để quét/chọn ảnh QR.');
- }catch(err){if(err?.name!=='AbortError')sdCheckoutBankMessage('Không mở được ứng dụng ngân hàng tự động. Hãy lưu QR, rồi mở ứng dụng ngân hàng để quét.')}
+function sdCheckoutAdvanceToOrderCode(){
+ const panel=$('#paymentInstructions');
+ if(!sdCheckoutSuccess||panel?.dataset.stage!=='transfer')return;
+ panel.dataset.stage='order';
+ panel.querySelector('.sd-payment-transfer-stage')?.setAttribute('hidden','');
+ panel.querySelector('.sd-payment-order-stage')?.removeAttribute('hidden');
+ $('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;
+ $('#sdCheckoutDone').hidden=false;$('#sdCheckoutDone').textContent='Đóng';
+ $('#sdCheckoutStepTitle').textContent='Mã đơn hàng';
+ $('#sdCheckoutStepSubtitle').textContent='Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.';
+ $('#checkoutForm').scrollTop=0;
+}
+$('#sdCheckoutConfirmRange').addEventListener('change',event=>{
+ const slider=event.currentTarget;
+ if(Number(slider.value)>=100)sdCheckoutAdvanceToOrderCode();
+ else slider.value='0';
 });
 $('#sdCheckoutPrev').addEventListener('click',()=>{if(sdCheckoutStep>1)sdCheckoutSetStep(sdCheckoutStep-1);else $('#checkoutBack').click()});
 $('#sdCheckoutOptions').addEventListener('click',e=>{const b=e.target.closest('[data-sd-payment-option]');if(!b||!sdCheckoutQuote?.quoteReady)return;sdCheckoutChoice=b.dataset.sdPaymentOption;sdCheckoutRefreshChoice()});$('#sdDetailPaymentQuote').addEventListener('click',e=>{const b=e.target.closest('[data-detail-payment-option]');if(!b)return;detailPaymentChoice=b.dataset.detailPaymentOption;sdDetailUpdatePaymentChoice()});
@@ -5115,7 +5134,7 @@ if(sdCheckoutStep===1){
  sdCheckoutSetStep(2);button.disabled=false;return;
 }
 if(sdCheckoutStep===2&&sdCheckoutQuote?.quoteReady===true&&!sdCheckoutSelected()){message.textContent='Hãy chọn một trong hai cách thanh toán.';return}
-$('#paymentInstructions').hidden=true;const items=sdCheckoutItems();if(!items.length){message.textContent='Giỏ hàng đang trống.';return}button.disabled=true;button.textContent='Đang gửi…';message.textContent='';try{const data=Object.fromEntries(new FormData(form).entries());const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,items,...sdCheckoutPaymentPayload()})});let result={};try{result=await response.json()}catch{}if(!response.ok)throw Error(result.error||'Chưa thể gửi yêu cầu đặt hàng.');message.textContent='';await saveCheckoutAddressFromForm();renderPaymentInstructions(result,result.orderAccessToken||'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent='Chờ thanh toán';$('#sdCheckoutStepSubtitle').textContent='Quét QR và chuyển khoản. Shop xác nhận đơn sau khi đối chiếu tiền đã nhận.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=false;form.scrollTop=0;rememberOrderRequest(result,items);sdCheckoutSuccess=true;if(checkoutFromCart){for(const item of items){const key=cartKey(item.id,item.option||'');const left=Number(cart[key]||0)-item.quantity;if(left>0)cart[key]=left;else{delete cart[key];cartUnchecked.delete(key)}}saveCart()}checkoutItemsOverride=null;form.reset();$('#checkoutWard').disabled=true;$('#checkoutWard').innerHTML='<option value="">Chọn tỉnh/thành trước</option>';$('#checkoutProvinceCode').value='';$('#checkoutWardCode').value='';$('#checkoutAddressMessage').textContent='';renderCart()}catch(error){message.textContent=error.message||'Lỗi kết nối. Bạn có thể tiếp tục qua Zalo.'}finally{button.disabled=false;if(!sdCheckoutSuccess)button.textContent='Gửi đơn hàng'}});$('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&panel?.dataset.stage==='transfer'){panel.dataset.stage='order';panel.querySelector('.sd-payment-transfer-stage')?.setAttribute('hidden','');panel.querySelector('.sd-payment-order-stage')?.removeAttribute('hidden');$('#sdCheckoutStepTitle').textContent='Mã đơn hàng';$('#sdCheckoutStepSubtitle').textContent='Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.';$('#sdCheckoutDone').textContent='Đóng';$('#checkoutForm').scrollTop=0;return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();ensureOrderGuideOpen();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,option=selectedDetailOption(currentProduct);if(!id||option===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){showToast('Chọn đặt cọc 30% hoặc thanh toán hết giảm 5% trước.');$('#sdDetailPaymentQuote')?.scrollIntoView({behavior:'smooth',block:'center'});return}closeDetail(false,false);openCheckout({items:[{id,option,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
+$('#paymentInstructions').hidden=true;const items=sdCheckoutItems();if(!items.length){message.textContent='Giỏ hàng đang trống.';return}button.disabled=true;button.textContent='Đang tạo đơn…';message.textContent='';try{const data=Object.fromEntries(new FormData(form).entries());const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,items,...sdCheckoutPaymentPayload()})});let result={};try{result=await response.json()}catch{}if(!response.ok)throw Error(result.error||'Chưa thể gửi yêu cầu đặt hàng.');message.textContent='';await saveCheckoutAddressFromForm();renderPaymentInstructions(result,result.orderAccessToken||'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent='Chờ thanh toán';$('#sdCheckoutStepSubtitle').textContent='Quét QR và chuyển khoản. Shop xác nhận đơn sau khi đối chiếu tiền đã nhận.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=!$('#sdCheckoutConfirmWrap').hidden;form.scrollTop=0;rememberOrderRequest(result,items);sdCheckoutSuccess=true;if(checkoutFromCart){for(const item of items){const key=cartKey(item.id,item.option||'');const left=Number(cart[key]||0)-item.quantity;if(left>0)cart[key]=left;else{delete cart[key];cartUnchecked.delete(key)}}saveCart()}checkoutItemsOverride=null;form.reset();$('#checkoutWard').disabled=true;$('#checkoutWard').innerHTML='<option value="">Chọn tỉnh/thành trước</option>';$('#checkoutProvinceCode').value='';$('#checkoutWardCode').value='';$('#checkoutAddressMessage').textContent='';renderCart()}catch(error){message.textContent=error.message||'Lỗi kết nối. Bạn có thể tiếp tục qua Zalo.'}finally{button.disabled=false;if(!sdCheckoutSuccess)button.textContent=sdCheckoutSubmitLabel()}});$('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&panel?.dataset.stage==='transfer'){sdCheckoutAdvanceToOrderCode();return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();ensureOrderGuideOpen();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,option=selectedDetailOption(currentProduct);if(!id||option===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){showToast('Chọn đặt cọc 30% hoặc thanh toán hết giảm 5% trước.');$('#sdDetailPaymentQuote')?.scrollIntoView({behavior:'smooth',block:'center'});return}closeDetail(false,false);openCheckout({items:[{id,option,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
 $('#detailZoom').addEventListener('click',openFullscreenImage);
 $('#detailPrev').addEventListener('click',()=>changeDetailImage(detailIndex-1,true,'right'));
 $('#detailNext').addEventListener('click',()=>changeDetailImage(detailIndex+1,true,'left'));

@@ -8,6 +8,16 @@ const output='artifacts/storefront-payment-preview';
 mkdirSync(output,{recursive:true});
 if(!url)throw Error('SD_PAYMENT_PREVIEW_URL is required; this spec is for the deployed Preview only.');
 
+async function swipeToConfirmPayment(page){
+ const slider=page.locator('#sdCheckoutConfirmRange'),box=await slider.boundingBox();
+ if(!box)throw new Error('Payment confirmation slider is not visible');
+ const y=box.y+box.height/2;
+ await page.mouse.move(box.x+Math.min(24,box.width*.08),y);
+ await page.mouse.down();
+ await page.mouse.move(box.x+box.width-Math.min(24,box.width*.08),y,{steps:16});
+ await page.mouse.up();
+}
+
 test('real Preview checkout: deposit/full amounts, all requested viewports and both themes, no payment receipt writes',async({page})=>{
  const headers={};
  if(process.env.CF_ACCESS_CLIENT_ID&&process.env.CF_ACCESS_CLIENT_SECRET){
@@ -38,6 +48,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  });
  const response=await page.goto(url,{waitUntil:'domcontentloaded'});
  expect(response?.status()).toBe(200);
+ await expect(page.locator('.nav .brand-symbol')).toBeVisible();
+ await expect.poll(()=>page.locator('.nav .brand-symbol').evaluate(image=>image.naturalWidth)).toBeGreaterThan(0);
  const welcome=page.locator('#welcomeSplash');
  if(await welcome.count())await page.locator('#skipIntro').click();
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
@@ -71,6 +83,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const options=page.locator('#sdCheckoutOptions [data-sd-payment-option]');
  await expect(options).toHaveCount(2,{timeout:15000});
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
+ await expect(page.locator('#checkoutSubmit')).toHaveText('Tiến hành thanh toán →');
  const buyNowTotal=Number((await page.locator('#sdCheckoutGrossTotal').innerText()).replace(/\D/g,''));
  expect(Number.isSafeInteger(buyNowTotal)&&buyNowTotal>0).toBe(true);
  const buyNowDeposit=Math.ceil(buyNowTotal*.3/100000)*100000;
@@ -120,12 +133,16 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   await expect(page.locator('#sdCheckoutAccountNumber')).not.toBeEmpty();
   await expect(page.locator('#sdCheckoutTransferContent')).toContainText('SD-');
   await expect(page.locator('#sdCheckoutSaveQr')).toBeVisible();
-  await expect(page.locator('#sdCheckoutOpenBank')).toBeVisible();
+  await expect(page.locator('#sdCheckoutOpenBank')).toHaveCount(0);
+  await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
+  await expect(page.locator('#sdCheckoutConfirmNote')).toContainText('Shop sẽ đối chiếu giao dịch');
  };
  await assertVerifiedQr();
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-qr-step.png'),fullPage:false,animations:'disabled'});
- await page.locator('#sdCheckoutDone').click();
+ const writesBeforeDepositSwipe=writes.length;
+ await swipeToConfirmPayment(page);
+ expect(writes).toHaveLength(writesBeforeDepositSwipe);
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('MÃ ĐƠN HÀNG');
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
@@ -204,7 +221,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
  await assertVerifiedQr();
  await page.screenshot({path:join(output,'390x844-cart-full-qr-step.png'),fullPage:false,animations:'disabled'});
- await page.locator('#sdCheckoutDone').click();
+ const writesBeforeFullSwipe=writes.length;
+ await swipeToConfirmPayment(page);
+ expect(writes).toHaveLength(writesBeforeFullSwipe);
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
  const cartFullOrderNumber=(await page.locator('#paymentInstructions .sd-order-reference strong').innerText()).trim();

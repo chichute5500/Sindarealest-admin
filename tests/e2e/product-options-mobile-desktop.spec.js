@@ -5,6 +5,15 @@ const base=process.env.SD_OPTIONS_BASE_URL||'http://127.0.0.1:4173';
 const dir='artifacts/product-options';
 mkdirSync(dir,{recursive:true});
 test.use({serviceWorkers:'block'});
+async function swipeToConfirmPayment(page){
+ const slider=page.locator('#sdCheckoutConfirmRange'),box=await slider.boundingBox();
+ if(!box)throw new Error('Payment confirmation slider is not visible');
+ const y=box.y+box.height/2;
+ await page.mouse.move(box.x+Math.min(24,box.width*.08),y);
+ await page.mouse.down();
+ await page.mouse.move(box.x+box.width-Math.min(24,box.width*.08),y,{steps:16});
+ await page.mouse.up();
+}
 const items=[
  {id:'qa-shoe',sku:'QA-SHOE-001',title:'Giày lười kiểm thử',category:'loafers',categoryLabel:'Giày lười'},
  {id:'qa-belt',sku:'QA-BELT-001',title:'Thắt lưng kiểm thử',category:'belts',categoryLabel:'Thắt lưng'},
@@ -266,9 +275,10 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  });
  let paymentRefreshRequests=0;
  await page.route('**/api/order-payment?*',async route=>{paymentRefreshRequests++;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',paymentReady:false,paymentTermsConfirmed:true,priceConfirmationRequired:false,total:100000,paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false}})})});
+ await page.route('**/test-qr.svg',route=>route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="white"/><path d="M8 8h20v20H8zm28 0h20v20H36zM8 36h20v20H8zm28 0h8v8h-8zm12 8h8v12H48z" fill="black"/></svg>'}));
  await page.route('**/api/orders',async route=>{
   orderBodies.push(route.request().postDataJSON());
-  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:'preview-access-token-1234567890123456789012345678901234567890',status:'pending_confirmation',priceConfirmationRequired:false,total:100000,message:'Shop sẽ xác nhận đơn.',paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false}})});
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:'preview-access-token-1234567890123456789012345678901234567890',status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentReady:true,paymentTermsConfirmed:true,paymentInstructions:{status:'ready',qrImageUrl:'/test-qr.svg',amount:100000,qrIncludesAmount:false,bankName:'VIB',accountName:'KHACH KIEM THU',accountNumber:'477884',transferContent:'SD-TEST-001'},message:'Shop sẽ xác nhận đơn.',paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false}})});
  });
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
@@ -288,12 +298,17 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  const ward=page.locator('#checkoutWard');await expect.poll(()=>ward.locator('option').count()).toBeGreaterThan(1);await ward.selectOption({index:1});
  await page.locator('#checkoutSubmit').click();await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
+ await expect(page.locator('#checkoutSubmit')).toHaveText('Tiến hành thanh toán →');
  expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
- await expect(page.locator('#sdCheckoutDone')).toHaveText('Xem mã đơn →');
- await page.locator('#sdCheckoutDone').click();
+ await expect(page.locator('#sdCheckoutOpenBank')).toHaveCount(0);
+ await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
+ await expect(page.locator('#sdCheckoutConfirmNote')).toContainText('Shop sẽ đối chiếu giao dịch');
+ const writesAfterOrder=orderBodies.length;
+ await swipeToConfirmPayment(page);
+ expect(orderBodies).toHaveLength(writesAfterOrder);
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('SD-TEST-001');
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
  await expect(page.locator('#sdCheckoutStepSubtitle')).toHaveText('Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.');

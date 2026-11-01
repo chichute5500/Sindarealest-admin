@@ -16,6 +16,9 @@ on:
       - 'migrations/0018_payment_delivery_settlement.sql'
       - 'scripts/migrate-payment-preview.mjs'
       - 'scripts/verify-payment-preview-deployment.mjs'
+      - 'scripts/build-logo-asset.py'
+      - 'public/logo.png'
+      - 'public/images/brand-emblem.png'
       - 'tests/**'
       - 'package.json'
       - 'package-lock.json'
@@ -64,6 +67,11 @@ jobs:
           npm install --no-audit --no-fund
           npm run check
           npm test
+      - name: Build required navigation logo asset for the isolated Preview
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 scripts/build-logo-asset.py
+          test -s public/images/brand-emblem-nav.webp
       - name: Read-only guard proves Preview bindings differ from Production
         shell: bash
         run: |

@@ -53,7 +53,14 @@ assert.match(create,/selectedPaymentAmount:selectedAmount/,"Selected amount must
 assert.match(html,/sdCheckoutRemaining/);
 assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
-assert.match(html,/sdCheckoutOpenBank/);
+assert.doesNotMatch(html,/sdCheckoutOpenBank|Mở ứng dụng ngân hàng/,'Checkout no longer offers a bank-app launch action');
+assert.match(html,/id="sdCheckoutConfirmRange" type="range" min="0" max="100"/,'The transfer confirmation is a swipe slider');
+assert.match(html,/Xác nhận đã thanh toán/,'The slider uses the owner-requested confirmation copy');
+assert.match(html,/Tiến hành thanh toán →/,'The payment step uses a clear payment action label');
+assert.match(html,/function sdCheckoutAdvanceToOrderCode\(\)/,'Customer confirmation only advances the local order-code stage');
+const confirmFlow=html.match(/function sdCheckoutAdvanceToOrderCode\(\)\{([\s\S]*?)\n\}/)?.[1]||'';
+assert.doesNotMatch(confirmFlow,/\bfetch\s*\(/,'The slider cannot write or refresh a payment receipt');
+assert.doesNotMatch(confirmFlow,/paymentSummary|netReceivedAmount|payment_status|payment-transactions/,'The slider cannot mutate payment truth');
 assert.match(html,/button\.dataset\.detailPaymentOption=choice\.value/,'Product detail renders selectable deposit and full payment choices');
 assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displays the full-payment discount');
 assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice into checkout');
@@ -65,6 +72,7 @@ assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number ex
 assert.match(html,/Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng\./,'Deposit overpayment is explained in plain language');
 assert.match(html,/Số tiền thanh toán khi nhận hàng '\+formatVnd\(choice\.codExpected\)/,'Payment choices use clear delivery-payment wording');
 assert.match(html,/id="sdCheckoutDone"[^>]*>Đóng/,'The final button performs a real close action, not a disabled sent action');
+assert.match(html,/sd-checkout-success \.sd-checkout-actions\{grid-template-columns:minmax\(0,1fr\)\}/,'Success actions use the full footer width instead of the former narrow left column');
 assert.doesNotMatch(html,/Lưu mã đơn bên dưới để tra cứu|Đã gửi đơn\. Thông tin và mã đơn|Chọn phương thức hoặc gửi đơn không đồng nghĩa|COD còn phải thu/,'Old confusing confirmation copy is removed');
 assert.match(create,/paymentRequestWriteIndex[\s\S]*customer_checkout/,'Checkout creates a payment request from the Shop QR without writing a receipt');
 assert.match(create,/payment_terms_confirmed_by[\s\S]*customer_checkout/,'A confirmed catalog price and explicit customer choice define checkout terms');
