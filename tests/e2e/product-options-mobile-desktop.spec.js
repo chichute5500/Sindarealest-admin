@@ -303,7 +303,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
  expect(saved).toEqual({'qa-shoe::42':1,'qa-wallet':1});
  await page.locator('#sdCheckoutDone').click();await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
- await page.locator(cfg.w<=760?'#mobileAccountNav':'#accountOpen').click();await page.locator('#accountOrdersAction').click();
+ await page.locator('#mobileAccountNav').click();await page.locator('#accountOrdersAction').click();
  const orderCard=page.locator('#accountOrdersList [data-order-number="SD-TEST-001"]');await expect(orderCard).toContainText('Chờ thanh toán');await expect(orderCard.locator('img')).toHaveCount(1);await expect(orderCard).not.toContainText('Giao hàng');
  await orderCard.locator('[data-order-payment-check]').click();await expect(orderCard).toContainText('Shop đã nhận đủ tiền');await expect(orderCard).toContainText('Đủ điều kiện');await expect(orderCard).toContainText('Chờ gửi hàng');await expect(orderCard).toContainText('Đã đồng bộ với Shop');expect(paymentRefreshRequests).toBe(1);
  await page.locator('#accountClose').click();await page.locator('#cartOpen').click();
