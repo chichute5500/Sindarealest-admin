@@ -93,6 +93,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.locator('#checkoutSubmit').click();
  await expect(page.locator('#paymentInstructions')).toBeVisible();
  await expect(page.locator('#checkoutMessage')).toContainText('Mã yêu cầu');
+ await expect(page.locator('#paymentInstructions')).toContainText('Chờ Shop xác nhận');
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
  expect(writes,'Only quote and the isolated Preview test order may be written; no payment receipt is created').toEqual(['POST /api/checkout-quote','POST /api/orders']);
  expect(errors,'Preview should have no browser runtime errors').toEqual([]);
