@@ -91,8 +91,10 @@ test('mobile Admin dock stays fixed through forward and reverse tab slides',asyn
         .toContain(direction==='slide-forward'?'22px':'-22px');
 
       expect(samples.length,'Sample from pointerdown through the full animation').toBeGreaterThan(10);
+      const low=samples.reduce((a,b)=>b.y<a.y?b:a),high=samples.reduce((a,b)=>b.y>a.y?b:a);
+      const traceSummary=JSON.stringify({target,before,first:samples[0],low,high,last:samples.at(-1)});
       expect(Math.max(...samples.map(p=>Math.abs(p.y-before.y))),
-        'The fixed dock must not move down or rebound during tab navigation').toBeLessThanOrEqual(.5);
+        'The fixed dock must not move down or rebound during tab navigation: '+traceSummary).toBeLessThanOrEqual(.5);
       expect(Math.max(...samples.map(p=>Math.abs(p.bottom-before.bottom))),
         'The fixed dock must remain anchored to the viewport bottom').toBeLessThanOrEqual(.5);
       expect(Math.abs((await geometry()).height-before.height),'Dock height stays constant').toBeLessThanOrEqual(.5);
