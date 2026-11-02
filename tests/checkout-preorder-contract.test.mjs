@@ -47,7 +47,7 @@ assert.match(html,/#cartDrawer,#checkoutDrawer\{[\s\S]*?background:transparent!i
 assert.match(html,/#cartDrawer::before,#checkoutDrawer::before\{[\s\S]*?background:var\(--sd-reference-surface\);[\s\S]*?backdrop-filter:blur\(24px\) saturate\(145%\)/,'Keep the exact original frosted drawer tone behind the scrolling content');
 assert.match(html,/html.dark #cartDrawer \.cart-header,[\s\S]*?html.dark #checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*background:var\(--sd-glass-shell-strong\)!important/,'Dark Cart and Checkout use the same approved logo Header face');
 assert.match(html,/#cartDrawer::before,#checkoutDrawer::before\{[^}]*position:sticky;\s*top:0;[^}]*flex:0 0 var\(--sd-native-glass-height,0px\);[^}]*height:var\(--sd-native-glass-height,0px\);[^}]*margin-bottom:calc\(-1 \* var\(--sd-native-glass-height,0px\) - var\(--sd-native-glass-gap,14px\)\)/,'Background frost stays pinned to entire drawer scrollport without taking layout space');
-assert.match(html,/<script id="sd-native-drawer-glass-geometry">[\s\S]*?new ResizeObserver\(entries=>entries\.forEach\(\(\{target\}\)=>update\(target\)\)\)/,'Keep backing geometry aligned on resize, not each scroll frame');
+assert.match(html,/<script id="sd-native-drawer-glass-geometry">[\s\S]*?const observer=new ResizeObserver\(entries=>entries\.forEach\(\(\{target\}\)=>\{[\s\S]*?update\(target\.id==='checkoutDrawer'\|\|target\.id==='cartDrawer'\?target:target\.closest\('#checkoutDrawer'\)\)/,'Observe drawer plus Checkout footer dimensions, without on-scroll JavaScript');
 assert.match(html,/#cartDrawer>\.cart-header,\s*#cartDrawer>\.cart-list,\s*#checkoutDrawer>\.checkout-header,\s*#checkoutDrawer>\.checkout-form\{[^}]*position:relative;[^}]*z-index:1;/,'The scrolling bodies paint over the pinned frost without changing sticky footers');
 assert.match(html,/#cartDrawer>\.cart-bottom,\s*#checkoutDrawer>\.sd-checkout-footer\{z-index:2\}/,'Footer z-order is preserved without forcing position relative');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2/,'Populated Cart payment bar remains sticky on phones');
@@ -209,7 +209,7 @@ assert.match(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-che
 assert.doesNotMatch(html,/sd-(?:checkout|cart)-optical-(?:mirror|lens)/,'No synthetic CSS blur mirrors');
 assert.doesNotMatch(html,/<script[^>]+src="\/(?:cart|checkout)-glass-optics\.js"/,'No animation-driven JS clipping');
 assert.match(html,/#checkoutDrawer \.checkout-header\{position:sticky;top:0;z-index:3;flex-shrink:0\}/,'Sticky glass header preserved');
-assert.match(html,/#checkoutDrawer \.sd-checkout-footer\{position:sticky;bottom:0;z-index:3;margin-top:auto;flex-shrink:0\}/,'Sticky glass footer preserved');
+assert.match(html,/#checkoutDrawer \.sd-checkout-footer\{[^}]*position:sticky;[^}]*top:calc\(100% - var\(--sd-checkout-footer-height,73px\)\);[^}]*bottom:0;[^}]*z-index:3;[^}]*margin-top:auto;[^}]*flex-shrink:0/,'Mobile Checkout footer uses measured top pin and bottom sticky fallback');
 assert.match(html,/function sdCheckoutItems\(\)\{return checkoutItemsOverride\?checkoutItemsOverride\.map/,'Restore selected-Cart source for Checkout item summary');
 assert.doesNotMatch(html,/checkoutSessionItems|checkoutOpenEpoch|sdCheckoutRetryQuote/,'Visual styling must not alter checkout order/session state');
 assert.match(html,/function openCheckout\(options=\{\}\)\{[\s\S]*?prefillCheckoutFromLocalAddress\(\)\.then\(async\(\)=>/,'Checkout address and quote sequencing is back to working flow');
