@@ -1210,7 +1210,7 @@ test('mobile account payment refresh: five server statuses, local/Cloud, reload 
    status:'pending_confirmation',deliveryStatus:'not_shipped',total:4500000,
    priceConfirmationRequired:false,items:[],paymentSummary:null
   }))));
-  localStorage.removeItem('sd-order-payment-refresh-v1');
+  // New Playwright context starts without a cooldown; do not erase it on reload.
  },numbers);
  const localCalls=new Map(),cloudNumber='SD-QA-CLOUD-REFRESH-06';
  await page.route('**/api/order-payment?*',async route=>{
