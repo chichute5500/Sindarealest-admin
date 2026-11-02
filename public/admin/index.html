@@ -2378,7 +2378,7 @@ function ordersPage(){
    <div class="sd-order-card-main"><div class="sd-order-card-images">${items.slice(0,2).map(orderProductImageMarkup).join('')}</div><div class="sd-order-card-info"><strong>${esc(items[0]?.title||'Đơn hàng')}</strong><small>${items.length>1?'+'+(items.length-1)+' sản phẩm khác · ':''}${esc(o.full_name||'Khách hàng')} · ${esc(o.phone||'')}</small></div></div>
    <div class="sd-order-card-bottom"><strong class="sd-order-card-total">${esc(money(o.total))}</strong><span class="sd-order-card-payment">${esc(paymentLabel)}</span><span class="sd-order-card-chevron" aria-hidden="true">›</span></div>
    ${o.total===null||o.total===undefined||!Number.isSafeInteger(Number(o.total))||!items.length||items.some(item=>item.unitPrice===null||item.unitPrice===undefined)?'<div class="sd-order-card-flag">Đơn cũ thiếu giá</div>':''}
-   <span class="sd-order-card-order-status">${esc(orderStatusLabel(o.status))}${net>0?' · Đã nhận '+esc(money(net)):''}</span>
+   <span class="sd-order-card-order-status">${esc(orderStatusLabel(o.status,o.delivery_status))}${net>0?' · Đã nhận '+esc(money(net)):''}</span>
   </article>`;
  }).join('');
  return `${head('Vận hành','Đơn hàng','Chạm vào đơn để xem, đối soát thanh toán và xử lý.')}
@@ -2392,7 +2392,7 @@ function ordersPage(){
  </div><div class="sd-order-cards" role="list">${adminResourceState.orders.error&&!adminResourceState.orders.loaded?'<div class="empty" role="status">Không thể tải đơn hàng từ máy chủ. <button class="btn small" type="button" data-action="retry-orders">Thử tải lại</button></div>':cards||`<div class="empty">${orders.length?'Không có đơn khớp bộ lọc.':'Chưa có đơn hàng.'}</div>`}</div></section>`;
 }
 function orderFulfillmentLabel(value){return value==='in_stock'?'Hàng có sẵn':value==='made_to_order'?'Hàng đặt riêng':'Chưa phân loại'}
-function orderStatusLabel(value){return ({pending_confirmation:'Chờ xác nhận',confirmed:'Đã xác nhận',processing:'Đang xử lý',shipped:'Đang giao',completed:'Giao thành công',cancelled:'Đã hủy'})[value]||String(value||'Chưa rõ')}
+function orderStatusLabel(value,deliveryStatus=''){if(value==='shipped'&&deliveryStatus==='failed_returning')return 'Giao thất bại';if(value==='shipped'&&deliveryStatus==='returned')return 'Đã hoàn hàng';return ({pending_confirmation:'Chờ xác nhận',confirmed:'Đã xác nhận',processing:'Đang xử lý',shipped:'Đang giao',completed:'Giao thành công',cancelled:'Đã hủy'})[value]||String(value||'Chưa rõ')}
 function orderDeliveryStatusLabel(value){return ({not_shipped:'Chờ gửi hàng',in_transit:'Đang giao',delivered:'Giao thành công',failed_returning:'Giao thất bại / Đang hoàn hàng',returned:'Đã hoàn hàng về Shop'})[value]||'Chưa có trạng thái giao hàng'}
 function orderReceiptState(summary){const rawRequired=summary?.requiredAmount;if(rawRequired===null||rawRequired===undefined||rawRequired==='')return 'unknown';const required=Number(rawRequired),received=Number(summary?.netReceivedAmount);if(!Number.isSafeInteger(required)||required<0)return 'unknown';if(!Number.isSafeInteger(received)||received<=0)return 'none';return received<required?'short':received===required?'exact':'over'}
 function orderReceiptStateLabel(summary){return ({none:'Chưa nhận',short:'Nhận thiếu',exact:'Nhận đủ',over:'Nhận dư',unknown:'Chưa xác định'})[orderReceiptState(summary)]}
@@ -2461,7 +2461,7 @@ function orderDetailMarkup(order){
  ];
  return `
  <section class="panel sd-order-overview"><div class="panelbody">
-  <div class="sd-order-overview-heading"><span class="status ${order.status==='cancelled'?'off':'unknown'}">${esc(orderStatusLabel(order.status))}</span><span class="status unknown">${esc(orderDeliveryStatusLabel(order.delivery_status))}</span><span class="status ${order.payment_summary?.eligibleToShip?'on':'unknown'}">${esc(orderPaymentStatusLabel(order.payment_status,order))}</span></div>
+  <div class="sd-order-overview-heading"><span class="status ${order.status==='cancelled'?'off':'unknown'}">${esc(orderStatusLabel(order.status,order.delivery_status))}</span><span class="status unknown">${esc(orderDeliveryStatusLabel(order.delivery_status))}</span><span class="status ${order.payment_summary?.eligibleToShip?'on':'unknown'}">${esc(orderPaymentStatusLabel(order.payment_status,order))}</span></div>
   <div class="sd-order-identity"><b>${esc(order.full_name||'Chưa có tên')}</b><a href="tel:${esc(String(order.phone||'').replace(/[^+0-9]/g,''))}">${esc(order.phone||'Chưa có số điện thoại')}</a></div>
   <div class="sd-order-address">${esc(order.address||'Chưa có địa chỉ giao hàng')}</div>
   <div class="sd-order-overview-total"><span>Tổng đơn hàng</span><strong>${esc(money(order.total))}</strong></div>
