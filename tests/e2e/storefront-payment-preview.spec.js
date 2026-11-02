@@ -684,6 +684,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const blinkAnimations=await cartOptions.evaluateAll(els=>els.map(el=>getComputedStyle(el).animationName));
  expect(blinkAnimations).toEqual(['sd-checkout-choice-alert','sd-checkout-choice-alert']);
  await page.waitForTimeout(850);
+ await page.screenshot({path:join(output,'390x844-payment-choice-red-blink.png'),fullPage:false,animations:'allow'});
  const choiceScroll=await page.locator('#checkoutDrawer').evaluate(d=>({
   scrollTop:d.scrollTop,top:d.querySelector('#sdCheckoutOptions').getBoundingClientRect().top,
   bottom:d.querySelector('#sdCheckoutOptions').getBoundingClientRect().bottom,
