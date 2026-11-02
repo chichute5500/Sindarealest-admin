@@ -2047,7 +2047,10 @@ html.dark .sd-fullscreen-share{
 #cartDrawer::before,#checkoutDrawer::before{
   content:"";
   position:sticky;
-  top:0;
+  /* A zero sticky top clamps this pane BELOW the drawer's top padding and
+     leaves an exposed dark strip above the header. Match its negative
+     margin-top so frost begins at the actual rounded frame edge. */
+  top:calc(-1 * var(--sd-native-glass-pad-top,0px));
   display:block;
   flex:0 0 var(--sd-native-glass-height,0px);
   /* The pseudo-element is a flex child. Its default 100% width only covers
