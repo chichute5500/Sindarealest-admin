@@ -50,7 +50,7 @@ function setup({deposit=2_700_000,net=2_700_000,paymentOption='deposit',orderSta
 }
 // Keep Admin mobile progress separate from public warranty and bank settlement.
 const adminHtml=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
-const stages=adminHtml.match(/const orderSteps=\[([\s\S]*?)\n \];/);
+const stages=adminHtml.match(/const orderSteps=\[([\s\S]*?)\n\s*\];/);
 assert.ok(stages,'Admin must render a delivery progress timeline');
 assert.equal((stages[1].match(/\btitle:/g)||[]).length,5,'Admin progress must have five steps');
 for(const label of ['Giao hàng thành công','Giao hàng thất bại','Đã nhận tiền','Đã hoàn hàng','Đối soát tiền COD','timeline_cod_received_at']){
