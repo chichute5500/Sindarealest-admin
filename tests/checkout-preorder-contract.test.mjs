@@ -155,6 +155,18 @@ assert.doesNotMatch(html,/sd-scroll-can-up|sd-scroll-can-down|sd-scroll-fade|sdU
 assert.doesNotMatch(html,/#cartList,#checkoutForm\{[^}]*mask-image/,'Cart and Checkout are not masked or faded at their scroll boundaries');
 assert.match(html,/\.cart-list\{[^}]*background:transparent/,'Cart list shares one uninterrupted glass surface with footer');
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*background:transparent/,'Checkout content shares one uninterrupted glass surface with footer');
+
+const checkoutOptics=readFileSync(new URL('../public/checkout-glass-optics.js',import.meta.url),'utf8');
+assert.match(html,/<script defer src="\/checkout-glass-optics\.js"><\/script>/,'Mobile Checkout optical lens must be loaded');
+assert.match(html,/#checkoutDrawer \.sd-checkout-optical-lens\{[^}]*overflow:hidden;border-radius:inherit/,'Checkout optics are clipped to the actual glass bars');
+assert.match(html,/#checkoutDrawer \.sd-checkout-optical-mirror\{[^}]*filter:blur\(14px\)/,'Checkout mirrors use the same 14px source blur as Cart');
+assert.match(checkoutOptics,/drawer\.querySelector\('\.checkout-header'\)/,'Checkout header has an optical lens');
+assert.match(checkoutOptics,/drawer\.querySelector\('\.sd-checkout-footer'\)/,'Checkout footer has an optical lens');
+assert.match(checkoutOptics,/clone\.style\.removeProperty\('mask-image'\)/,'Mirrors may not inherit the source occlusion mask');
+assert.match(checkoutOptics,/block\.style\.setProperty\('mask-image',mask\)/,'Sharp source text is suppressed only where actually covered by glass');
+assert.match(checkoutOptics,/requestAnimationFrame\(render\)/,'Scroll optics are framed and do not run synchronous layout on each scroll event');
+assert.doesNotMatch(checkoutOptics,/\bfetch\(|\/api\/|localStorage|sessionStorage|\bsubmit\(/,'Checkout optical code cannot change payments, network, or order state');
+
 assert.match(html,/\.cart-drawer\{overflow-y:auto!important;overscroll-behavior:contain/,'Mobile cart uses its outer shell as its only scrolling container');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-list\{[^}]*overflow:visible!important/,'Both list overflow axes are visible: no implicit clipped inner scrollport');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2;margin-top:auto\}/,'Both glass footer bars remain reachable while outer drawer scrolls');
