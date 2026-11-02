@@ -25,16 +25,20 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   const header=document.querySelector('.checkout-header'),footer=document.querySelector('#checkoutDrawer .sd-checkout-footer');
   const title=header.querySelector('h2'),nav=document.querySelector('#sdCheckoutStepper'),intro=document.querySelector('.checkout-intro');
   const address=document.querySelector('#sdCheckoutReviewAddressRow'),rect=node=>node.getBoundingClientRect();
-  form.scrollTop=0;
+  // Mobile scroll root is the Checkout drawer itself, exactly like Cart.
+  // Desktop deliberately retains its original nested form scroller.
+  const mobile=innerWidth<=760,scrollOwner=mobile?drawer:form;
+  form.scrollTop=0;drawer.scrollTop=0;
   const titleBox=rect(title),frame=rect(drawer),headY=rect(header).top,footerY=rect(footer).top,navY=rect(nav).top,introY=rect(intro).top,navVisible=nav.getClientRects().length>0;
-  form.scrollTop=form.scrollHeight;
-  const scroll=form.scrollTop;
+  scrollOwner.scrollTop=scrollOwner.scrollHeight;
+  const scroll=scrollOwner.scrollTop;
   const result={
    titleCentered:Math.abs((titleBox.left+titleBox.right)/2-(frame.left+frame.right)/2),
    titleWeight:parseInt(getComputedStyle(title).fontWeight,10),titleFont:getComputedStyle(title).fontFamily,
    oneScrollBody:nav.parentElement===form&&intro.parentElement===form&&address.parentElement===form&&document.querySelector('#paymentInstructions').parentElement===form&&header.parentElement===drawer&&footer.parentElement===drawer,
    headerShift:Math.abs(rect(header).top-headY),footerShift:Math.abs(rect(footer).top-footerY),
    navShift:navY-rect(nav).top,navVisible,introShift:introY-rect(intro).top,scroll,
+   mobile,drawerOverflow:getComputedStyle(drawer).overflowY,formOverflow:getComputedStyle(form).overflowY,
    headerGlass:getComputedStyle(header).backgroundImage,footerGlass:getComputedStyle(footer).backgroundImage,
    cartHeaderGlass:getComputedStyle(document.querySelector('#cartDrawer .cart-header')).backgroundImage,
    cartHeaderRadius:getComputedStyle(document.querySelector('#cartDrawer .cart-header')).borderRadius,
@@ -55,7 +59,7 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
    drawerLeft:frame.left,drawerRight:innerWidth-frame.right,
    outerShadow:getComputedStyle(drawer).boxShadow
   };
-  form.scrollTop=0;
+  form.scrollTop=0;drawer.scrollTop=0;
   return result;
  });
  expect(state.oneScrollBody).toBe(true);
@@ -78,6 +82,8 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.cartListBackground,'Cart scroll surface must have no separate strip').toBe('rgba(0, 0, 0, 0)');
  expect(state.checkoutFormBackground,'Checkout scroll surface must have no separate strip').toBe('rgba(0, 0, 0, 0)');
  if(page.viewportSize().width<=760){
+  expect(state.drawerOverflow,'Mobile Checkout must scroll the real sheet like Cart').toBe('auto');
+  expect(state.formOverflow,'No clipping strip from an inner mobile form scroller').toBe('visible');
   expect(state.checkoutRadius,'Checkout must use same rounding as cart').toBe(state.cartRadius);
   expect(parseFloat(state.checkoutRadius)).toBeGreaterThanOrEqual(24);
   expect(state.drawerLeft).toBeGreaterThanOrEqual(6);
@@ -315,7 +321,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
     // the checkout content must move without shifting or cutting its
     // Cart-matched glass header and footer. These are actual scroll offsets,
     // not synthetic scroll events or CSS-string-only visual claims.
-    const checkoutScroll=page.locator('#checkoutForm');
+    const checkoutScroll=page.locator('#checkoutDrawer');
     const scrollEnd=await checkoutScroll.evaluate(el=>Math.max(0,el.scrollHeight-el.clientHeight));
     expect(scrollEnd,'Checkout must offer real mobile scrolling').toBeGreaterThan(12);
     const baseline=await page.locator('#checkoutDrawer').evaluate(el=>({
@@ -371,9 +377,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
  await expect(review).toBeHidden();
  // Screenshot the scroll boundary without any opacity or gradient mask.
- await page.locator('#checkoutForm').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
+ await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
  await page.screenshot({path:join(output,'390x844-checkout-qr-mid-scroll-clear.png'),fullPage:false,animations:'disabled'});
- await page.locator('#checkoutForm').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'))});
+ await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'))});
  await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn.');
  await expect(page.locator('#paymentInstructions')).toContainText('Số tiền thanh toán khi nhận hàng');
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
