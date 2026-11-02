@@ -347,7 +347,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
  await expect(page.locator('#sdCheckoutOpenBank')).toHaveCount(0);
  await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
- await expect(page.locator('#sdCheckoutConfirmNote')).toContainText('Shop sẽ đối chiếu giao dịch');
+ await expect(page.locator('#sdCheckoutConfirmNote')).toBeHidden();
  expect(orderBodies).toHaveLength(0);
  await swipeToConfirmPayment(page);
  await page.locator('#sdCheckoutConfirmRange').evaluate(slider=>slider.dispatchEvent(new Event('change',{bubbles:true})));
