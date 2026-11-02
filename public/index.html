@@ -1324,14 +1324,13 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 /* One shared floating glass title bar for the Cart and Checkout drawers.
    No secondary full-width header stripe: the rounded bar floats on the SAME parent glass. */
 #cartDrawer .cart-header,#checkoutDrawer .checkout-header{position:relative;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;min-height:58px;gap:12px;padding:6px 10px;border-radius:22px}
- /* Reuse the official Storefront Header film for cart title, subtotal and action. */
- #cartDrawer .cart-header,#checkoutDrawer .checkout-header,
- #cartDrawer .cart-subtotal-bar,#cartDrawer .cart-checkout-bar{
-   border:1px solid transparent;background:var(--sd-glass-shell-strong);
-   box-shadow:var(--sd-3d-shadow);
-   -webkit-backdrop-filter:blur(17px) saturate(114%);
-   backdrop-filter:blur(17px) saturate(114%);
- }
+/* Checkout header retains its previous computed material; only the three Cart bars change. */
+#checkoutDrawer .checkout-header{
+  border:1px solid transparent;background:var(--sd-glass-shell-strong);
+  box-shadow:var(--sd-3d-shadow);
+  -webkit-backdrop-filter:blur(17px) saturate(114%);
+  backdrop-filter:blur(17px) saturate(114%);
+}
 #cartDrawer #cartClose{margin-left:auto;flex:0 0 auto}
 .checkout-heading{display:flex;align-items:center;gap:12px;min-width:0}
 #cartDrawer .cart-header h2,#checkoutDrawer .checkout-heading h2{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font:700 25px/1.2 SD Serif,Georgia,serif;text-align:center;white-space:nowrap;pointer-events:none;max-width:calc(100% - 104px);overflow:hidden;text-overflow:ellipsis}
@@ -2210,8 +2209,26 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 
 
 /* Keep the sticky header frosted, but prevent scrolled page imagery/text from ghosting through the official brand lockup. */
-.nav-wrap .nav{border:1px solid transparent;background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important;-webkit-backdrop-filter:blur(17px) saturate(114%);backdrop-filter:blur(17px) saturate(114%)}
+/* One source of truth for the logo Header's optics, reused by Cart title, subtotal and CTA. */
+.nav-wrap .nav,
+#cartDrawer .cart-header,
+#cartDrawer .cart-subtotal-bar,
+#cartDrawer #cartCheckout{
+  border:1px solid transparent;
+  background:var(--sd-glass-shell-strong)!important;
+  box-shadow:var(--sd-3d-shadow)!important;
+  -webkit-backdrop-filter:blur(17px) saturate(114%);
+  backdrop-filter:blur(17px) saturate(114%);
+}
 html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important}
+/* In a backdrop-filtered scrolling drawer, descendant backdrop blur cannot reliably
+   obscure the moving products on Android. A solid glass foundation sits below
+   the SAME logo-Header face/rim/shadow; it does not fade or mask the card edges. */
+#cartDrawer .cart-header,
+#cartDrawer .cart-subtotal-bar,
+#cartDrawer #cartCheckout{
+  background-color:var(--sd-reference-surface-strong)!important;
+}
 
 /* In light mode, blend the original white image backdrop into the satin surface without changing the source asset; keep Dark-mode product colours untouched. */
 html:not(.dark) .sd-fullscreen-frame .sd-fullscreen-image{mix-blend-mode:normal!important}

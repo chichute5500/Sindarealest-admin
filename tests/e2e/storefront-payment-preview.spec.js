@@ -141,6 +141,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  // rather than judging the result only from CSS tokens.
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light'});
+ await page.locator('.nav-wrap .nav').screenshot({path:join(output,'390x844-original-logo-header-material.png'),animations:'disabled'});
  await page.locator('#mobileCartNav').click();
  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
  // Wait until both independent sliding layers have settled; an immediate
@@ -164,6 +165,26 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  });
  expect(cartBarLayout.separate&&cartBarLayout.summaryAbove&&cartBarLayout.subtotalInside&&cartBarLayout.buttonInside).toBe(true);
  expect(cartBarLayout.material&&cartBarLayout.shadow,'Cart footer bars match the Storefront Header film').toBe(true);
+ const cartMaterial=await page.evaluate(()=>{
+  const nav=getComputedStyle(document.querySelector('.nav-wrap .nav'));
+  const nodes=['#cartDrawer .cart-header','#cartDrawer .cart-subtotal-bar','#cartCheckout'];
+  return nodes.map(selector=>{
+   const el=document.querySelector(selector),s=getComputedStyle(el),edge=getComputedStyle(el,'::after');
+   const alphaMatch=s.backgroundColor.match(/rgba?\(([^)]+)\)/);
+   const alpha=alphaMatch?(alphaMatch[1].split(',')[3]===undefined?1:Number(alphaMatch[1].split(',')[3])):0;
+   return {selector,alpha,backgroundMatches:s.backgroundImage===nav.backgroundImage,
+    shadowMatches:s.boxShadow===nav.boxShadow,filterMatches:s.backdropFilter===nav.backdropFilter,
+    rim:edge.backgroundImage,overflow:s.overflow};
+  });
+ });
+ for(const mat of cartMaterial){
+  expect(mat.backgroundMatches&&mat.shadowMatches&&mat.filterMatches,'Cart glass uses the real logo Header optics: '+mat.selector).toBe(true);
+  expect(mat.alpha,'No product text should ghost through scrolling glass: '+mat.selector).toBeGreaterThanOrEqual(.9);
+  expect(mat.rim).toContain('gradient');
+ }
+ await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});
+ await page.locator('#cartDrawer .cart-subtotal-bar').screenshot({path:join(output,'390x844-cart-subtotal-glass.png'),animations:'disabled'});
+ await page.locator('#cartCheckout').screenshot({path:join(output,'390x844-cart-checkout-glass.png'),animations:'disabled'});
  await page.screenshot({path:join(output,'390x844-cart-reference.png'),fullPage:false,animations:'disabled'});
  await page.locator('#cartClose').click();
  await expect(page.locator('#cartDrawer')).not.toHaveClass(/open/);
