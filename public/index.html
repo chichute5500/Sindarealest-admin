@@ -2212,23 +2212,24 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
    Do not dim/grade the backdrop: its apparent tone must come from moving content
    behind the glass, not from a brightness/contrast filter or painted gray fill.
    The cart drawer, product tiles, checkout and original logo Header stay unchanged. */
-.nav-wrap .nav,
+.nav-wrap .nav{
+  border:1px solid transparent;
+  background:var(--sd-glass-shell-strong)!important;
+  box-shadow:var(--sd-3d-shadow)!important;
+  -webkit-backdrop-filter:blur(17px) saturate(114%);
+  backdrop-filter:blur(17px) saturate(114%);
+}
+/* The drawer itself already filters the page. A second strong, near-opaque
+   shell buries the passing product colours. Keep the same prismatic glass
+   family, but use its more transmissive single-film face on only these bars. */
 #cartDrawer .cart-header,
 #cartDrawer .cart-subtotal-bar,
 #cartDrawer #cartCheckout{
   border:1px solid transparent;
-  background:var(--sd-glass-shell-strong)!important;
+  background:var(--sd-3d-face)!important;
   box-shadow:var(--sd-3d-shadow)!important;
-}
-.nav-wrap .nav{
-  -webkit-backdrop-filter:blur(17px) saturate(114%);
-  backdrop-filter:blur(17px) saturate(114%);
-}
-#cartDrawer .cart-header,
-#cartDrawer .cart-subtotal-bar,
-#cartDrawer #cartCheckout{
-  -webkit-backdrop-filter:blur(17px) saturate(114%);
-  backdrop-filter:blur(17px) saturate(114%);
+  -webkit-backdrop-filter:blur(10px) saturate(114%);
+  backdrop-filter:blur(10px) saturate(114%);
 }
 html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important}
 
