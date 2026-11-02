@@ -2208,10 +2208,10 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 }
 
 
-/* True translucent logo Header film for all three Cart bars; no fixed tint.
-   In the nested cart scroll layer, dynamically dim/diffuse the backdrop itself
-   so moving text beneath the glass does not compete with payment controls.
-   This adjustment affects only the three bars, never the drawer or products. */
+/* The three Cart bars use the same genuinely translucent film as the logo Header.
+   Do not dim/grade the backdrop: its apparent tone must come from moving content
+   behind the glass, not from a brightness/contrast filter or painted gray fill.
+   The cart drawer, product tiles, checkout and original logo Header stay unchanged. */
 .nav-wrap .nav,
 #cartDrawer .cart-header,
 #cartDrawer .cart-subtotal-bar,
@@ -2227,8 +2227,8 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 #cartDrawer .cart-header,
 #cartDrawer .cart-subtotal-bar,
 #cartDrawer #cartCheckout{
-  -webkit-backdrop-filter:blur(20px) saturate(122%) brightness(.68);
-  backdrop-filter:blur(20px) saturate(122%) brightness(.68);
+  -webkit-backdrop-filter:blur(17px) saturate(114%);
+  backdrop-filter:blur(17px) saturate(114%);
 }
 html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important}
 
