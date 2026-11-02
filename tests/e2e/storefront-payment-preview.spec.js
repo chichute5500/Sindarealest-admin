@@ -399,8 +399,18 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  // The previous screenshot exposed sharp "Chờ thanh toán" lettering through
  // Checkout's white glass. With Cart-matched optics, the covered pixels must
  // actually blur; a CSS-string parity assertion alone cannot prove that.
- await expect(page.locator('#checkoutDrawer .sd-checkout-optical-lens')).toHaveCount(2);
+ await expect(page.locator('#checkoutDrawer .sd-checkout-optical-lens')).toHaveCount(5);
  await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
+ await expect.poll(()=>page.locator('#checkoutDrawer').evaluate(drawer=>{
+  const footer=drawer.querySelector('.sd-checkout-footer');
+  return [...footer.querySelectorAll(':scope > .sd-checkout-optical-lens')].every(lens=>{
+   const control=drawer.querySelector('#'+lens.dataset.sdOpticalTarget);
+   const a=lens.getBoundingClientRect(),b=control.getBoundingClientRect();
+   if(!b.width||!b.height)return true;
+   return Math.abs(a.top-b.top)<2&&Math.abs(a.left-b.left)<2
+    &&Math.abs(a.width-b.width)<2&&Math.abs(a.height-b.height)<2;
+  });
+ }),{timeout:5000}).toBe(true);
  await expect.poll(()=>page.locator('#checkoutDrawer .sd-checkout-optical-mirror').count(),{timeout:5000})
   .toBeGreaterThan(0);
  await expect.poll(()=>page.locator('#checkoutForm').evaluate(form=>
@@ -432,9 +442,32 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
   await expect(page.locator('#sdCheckoutConfirmRange')).toBeEnabled();
   await expect(page.locator('#sdCheckoutConfirmLabel')).toHaveText('Xác nhận đã thanh toán');
-  await expect(page.locator('#sdCheckoutConfirmNote')).toContainText('Shop sẽ đối chiếu giao dịch');
+  await expect(page.locator('#sdCheckoutConfirmNote')).toBeHidden();
+  await expect(page.locator('#sdCheckoutConfirmNote')).toBeEmpty();
  };
  await assertVerifiedQr();
+ const qrHead=page.locator('#sdCheckoutQrWrap .sd-checkout-qr-head');
+ await expect(qrHead).toContainText('BƯỚC 1 / 2 · THANH TOÁN');
+ await expect(qrHead).toContainText('Chuyển khoản ngân hàng');
+ await expect(qrHead).toContainText('Chuyển khoản theo thông tin bên dưới');
+ await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage > .sd-payment-stage-label')).toHaveCount(0);
+ await expect(page.locator('#paymentInstructions .sd-payment-truth-note')).toHaveCount(0);
+ const qrSurfaces=await page.locator('#checkoutDrawer').evaluate(drawer=>{
+  const panel=getComputedStyle(drawer.querySelector('#paymentInstructions'));
+  const footer=getComputedStyle(drawer.querySelector('.sd-checkout-footer'));
+  const panes=[...drawer.querySelectorAll('.sd-checkout-footer>.sd-checkout-optical-lens')];
+  return {panelBackground:panel.backgroundColor,footerBackground:footer.backgroundColor,
+   panelImage:panel.backgroundImage,footerImage:footer.backgroundImage,
+   panelBorder:panel.borderTopWidth,footerBlur:footer.backdropFilter,
+   footerOpticalPanes:panes.length};
+ });
+ expect(qrSurfaces.panelBackground).toBe('rgba(0, 0, 0, 0)');
+ expect(qrSurfaces.footerBackground).toBe('rgba(0, 0, 0, 0)');
+ expect(qrSurfaces.panelImage).toBe('none');
+ expect(qrSurfaces.footerImage).toBe('none');
+ expect(qrSurfaces.panelBorder).toBe('0px');
+ expect(qrSurfaces.footerBlur).toBe('none');
+ expect(qrSurfaces.footerOpticalPanes).toBe(4);
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-qr-step.png'),fullPage:false,animations:'disabled'});
  expect(createdOrders).toHaveLength(0);
