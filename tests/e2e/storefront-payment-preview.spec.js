@@ -344,6 +344,13 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
       tintBackgrounds:tint.map(x=>x.backgroundColor),
       tintPosition:tint.map(x=>x.position),
       tintPointerEvents:tint.map(x=>x.pointerEvents),
+      tintGeometry:[document.querySelector('#cartDrawer'),document.querySelector('#checkoutDrawer')].map((host,i)=>{
+       const box=getComputedStyle(host),pane=tint[i];
+       return {id:host.id,clientWidth:host.clientWidth,clientHeight:host.clientHeight,
+        paneWidth:parseFloat(pane.width),paneHeight:parseFloat(pane.height),
+        insetLeft:parseFloat(pane.marginLeft),insetTop:parseFloat(pane.marginTop),
+        paddingLeft:parseFloat(box.paddingLeft),paddingTop:parseFloat(box.paddingTop)};
+      }),
       match:selectors.map(selector=>{
        const glass=getComputedStyle(document.querySelector(selector));
        return {selector,face:glass.backgroundImage===logo.backgroundImage,
@@ -365,6 +372,13 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
     }
     expect(logoParity.tintPosition).toEqual(['sticky','sticky']);
     expect(logoParity.tintPointerEvents).toEqual(['none','none']);
+    for(const pane of logoParity.tintGeometry){
+     expect(Math.abs(pane.clientWidth-pane.paneWidth),'Frost must reach BOTH inner edges: '+pane.id).toBeLessThanOrEqual(1);
+     expect(Math.abs(pane.clientHeight-pane.paneHeight),'Frost must fill entire frame height: '+pane.id).toBeLessThanOrEqual(1);
+     expect(Math.abs(pane.insetLeft+pane.paddingLeft),'Frost left edge must align with frame, no inset rectangle: '+pane.id).toBeLessThanOrEqual(1);
+     expect(Math.abs(pane.insetTop+pane.paddingTop),'Frost top edge must align with frame, no inset rectangle: '+pane.id).toBeLessThanOrEqual(1);
+    }
+    console.log('NATIVE_GLASS_PADDING_BOX_GEOMETRY',JSON.stringify(logoParity.tintGeometry));
     for(const value of logoParity.tintBackgrounds){
      const alpha=Number(value.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/)?.[1]??1);
      expect(alpha,'The original drawer tint must survive on the behind-content sheet').toBeGreaterThanOrEqual(.65);
