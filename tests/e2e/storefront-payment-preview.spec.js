@@ -615,6 +615,25 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  expect(endpoint).toBeGreaterThan(midpoint);
  await page.screenshot({path:join(output,'390x844-cart-eight-products-scrolled.png'),fullPage:false,animations:'disabled'});
 
+
+ // QA-only alternatives, never shipped as CSS. Reproduce the same 8-row
+ // composition at a 60% overlap to locate backdrop-root/stacking failure.
+ const cartLayerExperiments=[
+  ['as-is',''],
+  ['zero-blur','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'],
+  ['gpu-layer','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{transform:translateZ(0)!important;will-change:backdrop-filter;isolation:isolate!important;z-index:6!important}'],
+  ['parent-sticky-lens','#cartDrawer .cart-bottom{backdrop-filter:blur(56.784px) saturate(114%)!important;-webkit-backdrop-filter:blur(56.784px) saturate(114%)!important}'],
+  ['parent-isolate','#cartDrawer .cart-bottom{isolation:isolate!important;z-index:99!important}'],
+  ['compositor-strong','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:blur(100px) saturate(114%)!important;-webkit-backdrop-filter:blur(100px) saturate(114%)!important}'],
+  ['contrast-diagnostic','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:blur(56.784px) contrast(.3)!important;-webkit-backdrop-filter:blur(56.784px) contrast(.3)!important}']
+ ];
+ for(const [name,css] of cartLayerExperiments){
+  const injection=css?await page.addStyleTag({content:css}):null;
+  await drawer.evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*.6)});
+  await page.waitForTimeout(120);
+  await page.screenshot({path:join(output,'QA-EIGHT-LENS-'+name+'.png'),fullPage:false,animations:'disabled'});
+  if(injection)await injection.evaluate(el=>el.remove());
+ }
  // Eight scroll points expose real images, product names, prices and quantity
  // controls behind the glass. These are visual-only DOM fixtures, not orders.
  for(const [index,fraction] of [0,.15,.3,.45,.6,.75,.9,1].entries()){
