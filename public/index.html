@@ -2252,6 +2252,26 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   pointer-events:none;filter:blur(14px);-webkit-filter:blur(14px);
   transform:translateZ(0);
 }
+/* Match the proven Cart occlusion: real Checkout lettering crossing either
+   floating bar is optically softened, not left sharp behind a white tint.
+   The single original scrolling form stays interactive and QR is unchanged. */
+#checkoutDrawer .checkout-header,
+#checkoutDrawer .sd-checkout-footer{isolation:isolate}
+#checkoutDrawer .sd-checkout-optical-lens{
+  position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;
+  pointer-events:none;contain:paint;background:transparent;
+}
+#checkoutDrawer .sd-checkout-optical-mirror{
+  position:absolute;box-sizing:border-box;margin:0;max-width:none;
+  pointer-events:none;filter:blur(14px);-webkit-filter:blur(14px);
+  transform:translateZ(0);
+}
+#checkoutDrawer .checkout-header>.checkout-heading,
+#checkoutDrawer .checkout-header>#checkoutClose,
+#checkoutDrawer .sd-checkout-footer>.sd-checkout-actions,
+#checkoutDrawer .sd-checkout-footer>#checkoutMessage{
+  position:relative;z-index:2;
+}
 html.dark #cartDrawer .cart-header,
 html.dark #cartDrawer .cart-subtotal-bar,
 html.dark #cartDrawer #cartCheckout,
@@ -5622,5 +5642,6 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
 
 
 <script defer src="/cart-glass-optics.js"></script>
+<script defer src="/checkout-glass-optics.js"></script>
 </body>
 </html>
