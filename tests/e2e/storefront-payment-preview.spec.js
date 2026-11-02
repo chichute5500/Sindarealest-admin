@@ -30,7 +30,7 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   const mobile=innerWidth<=760,scrollOwner=mobile?drawer:form;
   form.scrollTop=0;drawer.scrollTop=0;
   const titleBox=rect(title),frame=rect(drawer),headY=rect(header).top,footerY=rect(footer).top,navY=rect(nav).top,introY=rect(intro).top,navVisible=nav.getClientRects().length>0;
-  const snapshot=()=>{const d=rect(drawer),f=rect(footer),formRect=rect(form),style=getComputedStyle(footer);return {drawerTop:d.top,drawerBottom:d.bottom,drawerHeight:drawer.clientHeight,scrollTop:drawer.scrollTop,scrollHeight:drawer.scrollHeight,footerTop:f.top,footerBottom:f.bottom,footerHeight:f.height,footerPosition:style.position,footerMarginTop:style.marginTop,footerMarginBottom:style.marginBottom,footerPaddingBottom:style.paddingBottom,footerBottomCss:style.bottom,formTop:formRect.top,formBottom:formRect.bottom,formHeight:formRect.height,gap:getComputedStyle(drawer).rowGap}};
+  const snapshot=()=>{const d=rect(drawer),f=rect(footer),formRect=rect(form),style=getComputedStyle(footer);return {drawerTop:d.top,drawerBottom:d.bottom,drawerHeight:drawer.clientHeight,scrollTop:drawer.scrollTop,scrollHeight:drawer.scrollHeight,footerTop:f.top,footerBottom:f.bottom,footerHeight:f.height,footerPosition:style.position,footerTopCss:style.top,footerHeightVar:getComputedStyle(drawer).getPropertyValue('--sd-checkout-footer-height').trim(),footerInsetVar:getComputedStyle(drawer).getPropertyValue('--sd-checkout-footer-inset').trim(),footerMarginTop:style.marginTop,footerMarginBottom:style.marginBottom,footerPaddingBottom:style.paddingBottom,footerBottomCss:style.bottom,formTop:formRect.top,formBottom:formRect.bottom,formHeight:formRect.height,gap:getComputedStyle(drawer).rowGap}};
   const beforePositions=snapshot();
   scrollOwner.scrollTop=scrollOwner.scrollHeight;
   const scroll=scrollOwner.scrollTop;
@@ -77,6 +77,12 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.headerShift).toBeLessThanOrEqual(1.5);
  if(state.footerShift>1.5)console.log('CHECKOUT_STICKY_FOOTER_DIAGNOSTIC',JSON.stringify(state.diagnostics));
  expect(state.footerShift).toBeLessThanOrEqual(1.5);
+ if(state.mobile){
+  expect(state.diagnostics.before.footerPosition,'Mobile Checkout uses real CSS sticky positioning').toBe('sticky');
+  expect(state.diagnostics.before.footerTopCss,'Order-code footer has a top pin to prevent the 14px shift').not.toBe('auto');
+  expect(parseFloat(state.diagnostics.before.footerHeightVar),'The footer pin measures the rendered controls').toBeGreaterThan(45);
+  expect(parseFloat(state.diagnostics.before.footerInsetVar),'The footer pin follows real drawer padding').toBeGreaterThanOrEqual(0);
+ }
  expect(state.cartHeaderGlass,'Cart uses a transmissive glass film within the already-blurred drawer').toContain('gradient');
  expect(state.headerGlass).toContain('gradient');
  expect(state.checkoutHeaderRadius).toBe(state.cartHeaderRadius);
