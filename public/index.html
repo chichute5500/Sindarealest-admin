@@ -890,8 +890,8 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-review-row p{grid-column:1/-1;font-size:12px;font-weight:500;color:var(--ink);line-height:1.6;margin:0;overflow-wrap:anywhere}
 .checkout-drawer .sd-checkout-review-row button{border:0;background:none;color:var(--gold);font-size:11px;font-weight:650;text-decoration:underline}
 .checkout-drawer .sd-checkout-caution{color:var(--muted);line-height:1.6;display:block}
-.checkout-drawer .sd-checkout-footer{position:relative;flex:0 0 auto;display:grid;gap:9px;padding:13px 0 calc(4px + env(safe-area-inset-bottom));border-top:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
-.checkout-drawer .sd-checkout-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:0}
+.checkout-drawer .sd-checkout-footer{position:relative;flex:0 0 auto;display:grid;gap:9px;padding:13px 0 calc(4px + env(safe-area-inset-bottom));border:0;border-top:0;background:transparent;box-shadow:none;outline:0;filter:none;isolation:auto;-webkit-backdrop-filter:none;backdrop-filter:none}
+.checkout-drawer .sd-checkout-actions{--sd-checkout-optical-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 6px 15px rgba(103,169,205,.10);display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:0;border:0;background:transparent;box-shadow:none;outline:0;-webkit-backdrop-filter:none;backdrop-filter:none}
 /* Checkout keeps its two independent actions; the shared Cart/Checkout
    optical rule below owns the material for both actions. */
 #checkoutDrawer .sd-checkout-actions .pill-btn{
@@ -2236,7 +2236,7 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 #checkoutDrawer .sd-checkout-confirm-wrap{
   border:1px solid transparent;
   background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55))!important;
-  box-shadow:var(--sd-3d-shadow)!important;
+  box-shadow:var(--sd-checkout-optical-shadow,var(--sd-3d-shadow))!important;
   -webkit-backdrop-filter:blur(56.784px) saturate(114%);
   backdrop-filter:blur(56.784px) saturate(114%);
   isolation:isolate;
@@ -2255,8 +2255,7 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 /* Match the proven Cart occlusion: real Checkout lettering crossing either
    floating bar is optically softened, not left sharp behind a white tint.
    The single original scrolling form stays interactive and QR is unchanged. */
-#checkoutDrawer .checkout-header,
-#checkoutDrawer .sd-checkout-footer{isolation:isolate}
+#checkoutDrawer .checkout-header{isolation:isolate}
 #checkoutDrawer .sd-checkout-optical-lens{
   position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;
   pointer-events:none;contain:paint;background:transparent;
