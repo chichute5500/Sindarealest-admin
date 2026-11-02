@@ -638,6 +638,29 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
 
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 
+ // QA-only compositor alternatives. None of this CSS is included in the shipped page.
+ const barSelectors='#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout';
+ const probes=[
+  {name:'current',css:''},
+  {name:'z-layer',css: '#cartDrawer .cart-header,#cartDrawer .cart-bottom{z-index:90!important;isolation:isolate!important}'},
+  {name:'pseudo-lens',css:barSelectors+'{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;isolation:isolate!important}'+
+   '#cartDrawer .cart-header::before,#cartDrawer .cart-subtotal-bar::before,#cartDrawer #cartCheckout::before'+
+   '{content:""!important;position:absolute!important;inset:0!important;z-index:-1!important;border-radius:inherit!important;pointer-events:none!important;'+
+   'background:linear-gradient(145deg,rgba(255,255,255,.28),rgba(255,255,255,.12))!important;'+
+   'backdrop-filter:blur(40.56px) saturate(114%)!important;-webkit-backdrop-filter:blur(40.56px) saturate(114%)!important}'},
+  {name:'strong-face-diagnostic',css:barSelectors+'{background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55))!important}'}
+ ];
+ for(const probe of probes){
+  const styleNode=probe.css?await page.addStyleTag({content:probe.css}):null;
+  for(const [phase,fraction] of [['top',0],['middle',.5],['bottom',1]]){
+   await drawer.evaluate((el,f)=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*f)},fraction);
+   await page.waitForTimeout(90);
+   await page.screenshot({path:join(output,'QA-CART-GLASS-'+probe.name+'-'+phase+'.png'),fullPage:false,animations:'disabled'});
+  }
+  if(styleNode)await styleNode.evaluate(el=>el.remove());
+ }
+
+
 
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
