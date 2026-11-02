@@ -118,8 +118,8 @@ assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{vis
 assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px/,'Floating headers preserve the same geometry');
 assert.match(html,/\.nav-wrap \.nav\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important/,'Original Storefront Header material remains unchanged');
 assert.match(html,/\.nav-wrap \.nav,\s*#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important;[\s\S]*?box-shadow:var\(--sd-3d-shadow\)!important/,'Only three Cart bars share the logo Header optical face and shadow');
-assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{\s*background-color:rgba\(115,111,104,\.88\)!important/,'Only Cart bars receive an understated neutral foundation, not a blue opaque gradient');
-assert.match(html,/html\.dark #cartDrawer \.cart-header,\s*html\.dark #cartDrawer \.cart-subtotal-bar,\s*html\.dark #cartDrawer #cartCheckout\{\s*background-color:rgba\(9,27,43,\.88\)!important/,'Dark Cart bars retain the Header film');
+assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{\s*background-color:/,'The three Cart bars must not have a painted static base');
+assert.doesNotMatch(html,/background-color:rgba\(115,111,104,\.88\)!important|background-color:rgba\(9,27,43,\.88\)!important/,'Remove legacy light and dark gray tint overrides');
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
 assert.match(html,/\.cart-bottom\{border-top:0;padding-top:14px;background:transparent\}/,'Cart bottom has no full-width background seam');

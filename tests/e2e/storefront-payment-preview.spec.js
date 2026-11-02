@@ -190,7 +190,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  });
  for(const mat of cartMaterial){
   expect(mat.backgroundMatches&&mat.shadowMatches&&mat.filterMatches,'Cart glass uses the real logo Header optics: '+mat.selector).toBe(true);
-  expect(mat.alpha,'Neutral translucent foundation prevents text bleed: '+mat.selector).toBeGreaterThanOrEqual(.85);
+  expect(mat.alpha,'Cart glass must be genuinely transparent so the scroll backdrop changes its appearance: '+mat.selector).toBe(0);
   expect(mat.rim).toContain('gradient');
  }
  await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});
@@ -506,6 +506,18 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
   }
  },available);
  await expect(rows).toHaveCount(4);
+ // Verify the actual header optical layer, with no tinted base beneath its film.
+ const paintedBarSurfaces=await drawer.evaluate(el=>{
+  const nav=getComputedStyle(document.querySelector('.nav-wrap .nav'));
+  return ['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(selector=>{
+   const s=getComputedStyle(el.querySelector(selector));
+   return {selector,color:s.backgroundColor,film:s.backgroundImage===nav.backgroundImage,blur:s.backdropFilter===nav.backdropFilter};
+  });
+ });
+ for(const m of paintedBarSurfaces){
+  expect(m.color,'No static gray/blue color underneath the glass at '+m.selector).toBe('rgba(0, 0, 0, 0)');
+  expect(m.film&&m.blur,'Cart must inherit the real logo Header film/blur at '+m.selector).toBe(true);
+ }
  // Real four-item carts can contain long luxury product names. Reserve their
  // full card height in the visual fixture to reproduce the 390x844 overflow.
  await rows.evaluateAll(nodes=>nodes.forEach(row=>{row.style.minHeight='174px'}));
