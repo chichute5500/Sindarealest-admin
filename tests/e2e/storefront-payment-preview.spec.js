@@ -617,29 +617,6 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 
 
- // QA-only compositor experiment: isolate actual optical response to backdrop blur.
- // In one unmoving DOM scene, compare 0px against the shipped 40.56px; restore inline styles.
- for(const [label,filter] of [['zero','blur(0px) saturate(114%)'],['forty','blur(40.56px) saturate(114%)']]){
-  await drawer.evaluate((el,filter)=>{
-   for(const selector of ['.cart-header','.cart-subtotal-bar','#cartCheckout']){
-    const bar=el.querySelector(selector);
-    bar.style.setProperty('backdrop-filter',filter,'important');
-    bar.style.setProperty('-webkit-backdrop-filter',filter,'important');
-   }
-  },filter);
-  for(const [place,position] of [['top',0],['middle',.5],['bottom',1]]){
-   await drawer.evaluate((el,position)=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*position)},position);
-   await page.waitForTimeout(85);
-   await page.screenshot({path:join(output,'QA-OPTICS-'+label+'-'+place+'.png'),fullPage:false,animations:'disabled'});
-  }
- }
- await drawer.evaluate(el=>{
-  for(const selector of ['.cart-header','.cart-subtotal-bar','#cartCheckout']){
-   const bar=el.querySelector(selector);
-   bar.style.removeProperty('backdrop-filter');
-   bar.style.removeProperty('-webkit-backdrop-filter');
-  }
- });
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
  await page.screenshot({path:join(output,'360x800-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
