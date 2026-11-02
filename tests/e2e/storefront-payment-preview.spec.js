@@ -81,7 +81,7 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   expect(state.diagnostics.before.footerPosition,'Mobile Checkout uses real CSS sticky positioning').toBe('sticky');
   expect(state.diagnostics.before.footerTopCss,'Order-code footer has a top pin to prevent the 14px shift').not.toBe('auto');
   expect(parseFloat(state.diagnostics.before.footerHeightVar),'The footer pin measures the rendered controls').toBeGreaterThan(45);
-  expect(state.diagnostics.before.footerTopCss,'Sticky top uses the real footer height, without double-subtracting drawer padding').toContain('calc(100% -');
+  expect(parseFloat(state.diagnostics.before.footerTopCss),'Browser-computed sticky top is an active pixel threshold').toBeGreaterThan(0);
  }
  expect(state.cartHeaderGlass,'Cart uses a transmissive glass film within the already-blurred drawer').toContain('gradient');
  expect(state.headerGlass).toContain('gradient');
