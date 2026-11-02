@@ -142,6 +142,14 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light'});
  await page.locator('.nav-wrap .nav').screenshot({path:join(output,'390x844-original-logo-header-material.png'),animations:'disabled'});
+ // Compare optical glass under the same photographic product context as Owner's mobile reference.
+ await page.evaluate(()=>{
+  const item=document.querySelector('#catalogGrid .product-card');
+  if(item)window.scrollTo({top:Math.max(0,item.getBoundingClientRect().top+window.scrollY-35),behavior:'instant'});
+ });
+ await expect(page.locator('.nav-wrap .nav')).toBeVisible();
+ await page.waitForTimeout(250);
+ await page.locator('.nav-wrap .nav').screenshot({path:join(output,'390x844-logo-header-over-products.png'),animations:'disabled'});
  await page.locator('#mobileCartNav').click();
  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
  // Wait until both independent sliding layers have settled; an immediate
