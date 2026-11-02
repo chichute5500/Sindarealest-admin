@@ -77,6 +77,7 @@ assert.match(html,/function sdCheckoutResetQrScroll\(\)[\s\S]*drawer.scrollTop=0
 assert.match(html,/@media\(max-width:760px\)\{#checkoutDrawer\.sd-checkout-success\.sd-checkout-from-cart \.checkout-heading h2\{left:calc\(50% \+ var\(--sd-native-glass-pad-left,0px\)\)\}\}/,
  'Only cart-origin Checkout needs the measured 13px inset correction on phones; buy-now stays centered');
 assert.match(html,/sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll\(\)/,'QR layout transition resets its scroll position');
+assert.match(html,/panel\.style\.setProperty\('--sd-native-glass-pad-left',getComputedStyle\(panel\)\.paddingLeft\)/,'Native drawer inset is initialized synchronously before Checkout opens');
 assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
 assert.doesNotMatch(html,/sdCheckoutOpenBank|Mở ứng dụng ngân hàng/,'Checkout no longer offers a bank-app launch action');

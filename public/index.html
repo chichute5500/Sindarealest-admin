@@ -5052,6 +5052,9 @@ function openCheckout(options={}){
  // Closed drawers are hidden inline until their first intentional opening;
  // their full motion CSS is parsed after the drawer markup on a cold reload.
  panel.style.visibility='';backdrop.style.visibility='';
+ // Match the existing glass ResizeObserver synchronously on open. The
+ // QR-title position must never fall back to 0px for its first paint.
+ panel.style.setProperty('--sd-native-glass-pad-left',getComputedStyle(panel).paddingLeft);
  panel.classList.toggle('sd-checkout-from-cart',checkoutFromCart);
  panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
