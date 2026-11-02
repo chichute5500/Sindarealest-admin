@@ -738,11 +738,11 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    headingX:head.x,headingWidth:head.width,titleX:rect.x,titleWidth:rect.width,
    styleLeft:style.left,cssInset:el.style.getPropertyValue('--sd-native-glass-pad-left'),
    mediaMatch:matchMedia('(max-width:760px)').matches,viewport:innerWidth};
-  console.log('PAYMENT_QR_CENTER_DIAGNOSTIC '+JSON.stringify(details));
-  return offset;
+  return details;
  });
- console.log('PAYMENT_QR_MOBILE_TITLE_CENTER_OFFSET_PX',qrTitleOffset);
- expect(qrTitleOffset).toBeLessThanOrEqual(2);
+ console.log('PAYMENT_QR_CENTER_DIAGNOSTIC',JSON.stringify(qrTitleOffset));
+ console.log('PAYMENT_QR_MOBILE_TITLE_CENTER_OFFSET_PX',qrTitleOffset.offset);
+ expect(qrTitleOffset.offset).toBeLessThanOrEqual(2);
  // Preserve the pre-existing strict header-centering assertion, but defer its
  // failure so we can still measure the new fast-slider requirement in the same
  // bounded Preview test. Never silently turn the header assertion green.
