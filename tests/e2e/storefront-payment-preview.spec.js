@@ -308,6 +308,37 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
    await assertCheckoutScrollAndHeader(page,width<=430);
    if(width<=430){
+    // Reproduce the Owner's exact failing state: the PAYMENT submit alone
+    // is disabled and says "Đang chuẩn bị thanh toán…", with order details
+    // scrolling beneath it. The Back button is a control/reference only.
+    const disabledPaymentGlass=await page.locator('#checkoutDrawer').evaluate(async drawer=>{
+     const submit=drawer.querySelector('#checkoutSubmit'),back=drawer.querySelector('#sdCheckoutPrev');
+     const previous={disabled:submit.disabled,label:submit.textContent,scroll:drawer.scrollTop};
+     submit.disabled=true;
+     submit.textContent='Đang chuẩn bị thanh toán…';
+     drawer.scrollTop=Math.round(Math.max(0,drawer.scrollHeight-drawer.clientHeight)*.7);
+     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+     const glass=getComputedStyle(submit),backGlass=getComputedStyle(back);
+     return {previous,opacity:glass.opacity,blur:glass.backdropFilter,
+      background:glass.backgroundImage,shadow:glass.boxShadow,
+      backOpacity:backGlass.opacity,backBlur:backGlass.backdropFilter,
+      backBackground:backGlass.backgroundImage,backShadow:backGlass.boxShadow};
+    });
+    expect(disabledPaymentGlass.opacity,'Disabled payment submit must retain a full glass surface').toBe('1');
+    expect(disabledPaymentGlass.backOpacity,'Back button must remain unchanged').toBe('1');
+    expect(disabledPaymentGlass.blur).toBe(disabledPaymentGlass.backBlur);
+    expect(disabledPaymentGlass.background).toBe(disabledPaymentGlass.backBackground);
+    expect(disabledPaymentGlass.shadow).toBe(disabledPaymentGlass.backShadow);
+    if(width===390){
+     await page.locator('#checkoutDrawer .sd-checkout-actions').screenshot({
+      path:join(output,`390x844-${theme}-payment-disabled-glass.png`),animations:'disabled'
+     });
+    }
+    await page.locator('#checkoutDrawer').evaluate((drawer,previous)=>{
+     const submit=drawer.querySelector('#checkoutSubmit');
+     submit.disabled=previous.disabled;submit.textContent=previous.label;
+     drawer.scrollTop=previous.scroll;
+    },disabledPaymentGlass.previous);
     // The checkout header, action buttons and slider's unfilled track must
     // use the same CURRENT computed optical face as the approved Cart bars,
     // not merely share CSS names. The green slider progress stays unchanged.
