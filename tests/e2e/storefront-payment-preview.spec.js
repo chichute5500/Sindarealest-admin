@@ -115,7 +115,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  // Real mobile scroll evidence now captures both themes at 360px and 390px,
  // alongside the existing deposit/full and account flows. Give screenshot I/O
  // enough headroom without hiding assertion or visual-parity failures.
- test.setTimeout(90000);
+ test.setTimeout(120000);
  const headers={};
  if(process.env.CF_ACCESS_CLIENT_ID&&process.env.CF_ACCESS_CLIENT_SECRET){
   headers['CF-Access-Client-Id']=process.env.CF_ACCESS_CLIENT_ID;
@@ -660,7 +660,44 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const actualCartTotal=Number((await page.locator('#sdCheckoutGrossTotal').innerText()).replace(/\D/g,''));
  expect(actualCartTotal).toBe(cartQuote.total);
  const expectedCartFullAmount=actualCartTotal-Math.round(actualCartTotal*.05);
+ // Verify actual cart navigation through BOTH buttons, preserving selected items.
+ await page.locator('#checkoutBack').click();
+ await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+ await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
+ await expect(page.locator('#cartCheckout')).toContainText('1 sản phẩm');
+ await page.locator('#cartCheckout').click();
+ await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible({timeout:15000});
+ await expect(cartOptions).toHaveCount(2,{timeout:15000});
+ await page.locator('#sdCheckoutPrev').click();
+ await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+ await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
+ await expect(page.locator('#cartCheckout')).toContainText('1 sản phẩm');
+ await page.locator('#cartCheckout').click();
+ await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible({timeout:15000});
+ await expect(cartOptions).toHaveCount(2,{timeout:15000});
+ await expect(page.locator('#sdCheckoutOptions [aria-checked="true"]')).toHaveCount(0);
+ const beforeChoiceScroll=await page.locator('#checkoutDrawer').evaluate(d=>{d.scrollTop=d.scrollHeight;return d.scrollTop});
+ await page.locator('#checkoutSubmit').click();
+ await expect(page.locator('#checkoutSubmit')).toHaveText('Hãy chọn cách thanh toán');
+ await expect(page.locator('#checkoutMessage')).toBeEmpty();
+ await expect(page.locator('#sdCheckoutOptions')).toHaveClass(/sd-checkout-needs-choice/);
+ const blinkAnimations=await cartOptions.evaluateAll(els=>els.map(el=>getComputedStyle(el).animationName));
+ expect(blinkAnimations).toEqual(['sd-checkout-choice-alert','sd-checkout-choice-alert']);
+ await page.waitForTimeout(850);
+ const choiceScroll=await page.locator('#checkoutDrawer').evaluate(d=>({
+  scrollTop:d.scrollTop,top:d.querySelector('#sdCheckoutOptions').getBoundingClientRect().top,
+  bottom:d.querySelector('#sdCheckoutOptions').getBoundingClientRect().bottom,
+  frameTop:d.getBoundingClientRect().top,frameBottom:d.getBoundingClientRect().bottom
+ }));
+ expect(choiceScroll.scrollTop,'Invalid submission scrolls toward the choices').toBeLessThan(beforeChoiceScroll);
+ expect(choiceScroll.top,'Choices are visible in Checkout').toBeGreaterThan(choiceScroll.frameTop+12);
+ expect(choiceScroll.bottom).toBeLessThan(choiceScroll.frameBottom-12);
+ await expect(page.locator('#sdCheckoutOptions')).not.toHaveClass(/sd-checkout-needs-choice/,{timeout:3500});
+ await expect(page.locator('#checkoutSubmit')).toHaveText('Hãy chọn cách thanh toán');
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="full"]').click();
+ await expect(page.locator('#checkoutSubmit')).toHaveText('Tiến hành thanh toán →');
+ await expect(page.locator('#sdCheckoutOptions')).not.toHaveAttribute('aria-invalid');
+ await expect(page.locator('#checkoutMessage')).toBeEmpty();
  await expect(page.locator('#sdCheckoutSelectedAmount')).toContainText(expectedCartFullAmount.toLocaleString('vi-VN'));
  await expect(page.locator('#sdCheckoutDiscount')).toContainText(Math.round(actualCartTotal*.05).toLocaleString('vi-VN'));
  await expect(page.locator('#sdCheckoutRemaining')).toContainText('0');
@@ -677,6 +714,30 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.screenshot({path:join(output,'390x844-cart-full-qr-step.png'),fullPage:false,animations:'disabled'});
  const createdBeforeFullSwipe=createdOrders.length;
  const writesBeforeFullSwipe=writes.length;
+ // Single-frame quick pull must keep fill and arrow aligned without transition lag.
+ const quickSlider=page.locator('#sdCheckoutConfirmRange');
+ await expect(quickSlider).toBeVisible();
+ const quickBox=await quickSlider.boundingBox();
+ if(!quickBox)throw Error('Visible slider has no box');
+ const quickY=quickBox.y+quickBox.height/2;
+ await page.mouse.move(quickBox.x+1,quickY);
+ await page.mouse.down();
+ await page.mouse.move(quickBox.x+quickBox.width*.72,quickY,{steps:1});
+ const quickPaint=await quickSlider.evaluate(el=>{
+  const pct=Number(el.value),wrap=document.querySelector('#sdCheckoutConfirmWrap');
+  const expected=pct===0?0:pct===100?el.clientWidth:28+(el.clientWidth-56)*pct/100;
+  return {pct,expected,actual:parseFloat(wrap.style.getPropertyValue('--sd-confirm-fill')),
+   painted:parseFloat(getComputedStyle(wrap,'::before').width),
+   duration:getComputedStyle(wrap,'::before').transitionDuration};
+ });
+ expect(quickPaint.pct).toBeGreaterThan(20);
+ expect(quickPaint.pct).toBeLessThan(100);
+ expect(Math.abs(quickPaint.actual-quickPaint.expected)).toBeLessThan(1);
+ expect(Math.abs(quickPaint.painted-quickPaint.expected)).toBeLessThan(2);
+ expect(quickPaint.duration).toBe('0s');
+ await page.mouse.up();
+ await expect(quickSlider).toHaveValue('0');
+ expect(createdOrders.length).toBe(createdBeforeFullSwipe);
  await swipeToConfirmPayment(page);
  await expect.poll(()=>writes.length).toBe(writesBeforeFullSwipe+1);
  await expect.poll(()=>createdOrders.length).toBe(createdBeforeFullSwipe+1);
