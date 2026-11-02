@@ -208,17 +208,15 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   expect(mat.alpha,'Cart glass must be genuinely transparent so the scroll backdrop changes its appearance: '+mat.selector).toBe(0);
   expect(mat.rim).toContain('gradient');
  }
- // Verify the restored light-mode transparency (only the blur strength changes).
- const cartGlassFaces=await page.locator('#cartDrawer').evaluate(drawer=>
-  ['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(sel=>
+ // Real logo Header's translucent multigradient is the reference face.
+ const cartGlassFaces=await page.locator('#cartDrawer').evaluate(drawer=>({
+  logo:getComputedStyle(document.querySelector('.nav-wrap .nav')).backgroundImage,
+  bars:['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(sel=>
    getComputedStyle(drawer.querySelector(sel)).backgroundImage)
- );
- for(const face of cartGlassFaces){
-  // Chromium may quantize alpha to 8-bit channels.
-  const alphas=[...face.matchAll(/rgba\(255, 255, 255, ([0-9.]+)\)/g)].map(m=>Number(m[1]));
-  expect(alphas).toHaveLength(2);
-  expect(Math.abs(alphas[0]-.70)).toBeLessThanOrEqual(.005);
-  expect(Math.abs(alphas[1]-.55)).toBeLessThanOrEqual(.005);
+ }));
+ for(const face of cartGlassFaces.bars){
+  expect(face,'Each Cart bar reuses the original Header glass face').toBe(cartGlassFaces.logo);
+  expect(face).toContain('linear-gradient(');
  }
  // Check actual mobile computed filters: values must beat every other CSS selector.
  const cartFilterCascade=await page.evaluate(()=>{
@@ -786,6 +784,7 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
   el.scrollTop=0;
   return {before,after};
  });
+ console.log('CART_EIGHT_ITEM_STICKY_GEOMETRY',JSON.stringify(metrics));
  expect(metrics.before.drawerScroll,'Cart shell must own scrolling').toBe('auto');
  expect(metrics.before.listScroll,'Cart list must not clip product tiles').toBe('visible');
  expect(metrics.before.listScrollX,'Cart list must not clip horizontally either').toBe('visible');
