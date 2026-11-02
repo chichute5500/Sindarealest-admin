@@ -131,6 +131,12 @@ const quoteLoadEnd=html.indexOf('async function sdCheckoutLoadPaymentInstruction
 const quoteLoadBody=html.slice(quoteLoadStart,quoteLoadEnd);
 assert.match(quoteLoadBody,/signal:controller\.signal/,'Read-only payment quote requests support abort after a bounded wait');
 assert.match(quoteLoadBody,/setTimeout\(\(\)=>controller\.abort\(\),12000\)/,'Slow quote API must not leave an endless pending message');
+
+const jsonReadAt=quoteLoadBody.indexOf('await response.json()');
+const timeoutClearAt=quoteLoadBody.indexOf('clearTimeout(timer)');
+assert.ok(jsonReadAt>0&&timeoutClearAt>jsonReadAt,'Abort timeout must remain active through response body parsing, not just response headers');
+assert.match(quoteLoadBody,/response\.json\(\)\.catch\(error=>\{if\(error\?\.name==='AbortError'\)throw error/,'Abort errors while reading JSON must propagate to a useful timeout notice');
+
 assert.match(quoteLoadBody,/if\(epoch!==checkoutOpenEpoch\)return/,'Responses from a closed or replaced checkout session cannot overwrite the current quote');
 assert.match(quoteLoadBody,/sdCheckoutRenderQuote\(\);\s*sdCheckoutRefreshChoice\(\)/,'Quote completion updates actual amount and payment choices without waiting for province/ward API');
 const openCheckoutBody=html.slice(html.indexOf('function openCheckout(options={}){'),html.indexOf('function closeCheckout(',html.indexOf('function openCheckout(options={}){')));
