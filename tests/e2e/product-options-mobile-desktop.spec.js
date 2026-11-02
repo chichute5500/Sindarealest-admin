@@ -310,20 +310,47 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdDetailPaymentQuote .sd-detail-payment-radio')).toHaveCount(2);
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"] .sd-detail-payment-saving')).toHaveText('Tiết kiệm 5.000₫');
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"] .sd-detail-payment-original')).toHaveText('100.000₫');
+ await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"] .sd-detail-payment-best')).toHaveText('Linh hoạt nhất');
+ await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"] .sd-detail-payment-best')).toHaveText('Ưu đãi tốt nhất');
+ await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"] b')).toHaveText('Thanh toán 100.000₫');
+ await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"] b')).toHaveText('Thanh toán 95.000₫');
  await expect(page.locator('#sdDetailPaymentQuote')).not.toContainText('Thanh toán trước để giữ đơn');
  await page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]').click();
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]')).toHaveAttribute('aria-checked','true');
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]')).toHaveClass(/selected/);
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toHaveAttribute('aria-checked','false');
- const mobileLayout=await page.locator('#sdDetailPaymentQuote').evaluate(quote=>{
-  const choices=quote.querySelector('.sd-detail-payment-options'),full=quote.querySelector('[data-detail-payment-option="full"]'),radio=full.querySelector('.sd-detail-payment-radio'),cardRect=full.getBoundingClientRect(),radioRect=radio.getBoundingClientRect();
-  return {columns:getComputedStyle(choices).gridTemplateColumns.trim().split(/\\s+/).length,radioRight:radioRect.right,cardRight:cardRect.right,radioLeft:radioRect.left,cardMiddle:cardRect.left+cardRect.width/2};
- });
- expect(mobileLayout.columns).toBe(1);
- expect(mobileLayout.radioRight).toBeLessThanOrEqual(mobileLayout.cardRight);
- expect(mobileLayout.radioLeft).toBeGreaterThan(mobileLayout.cardMiddle);
+ const assertPaymentCardLayout=async()=>{
+  const layout=await page.locator('#sdDetailPaymentQuote').evaluate(quote=>{
+   const choices=quote.querySelector('.sd-detail-payment-options');
+   const columns=getComputedStyle(choices).gridTemplateColumns.trim().split(/\s+/).length;
+   const cards=[...quote.querySelectorAll('[data-detail-payment-option]')];
+   const metrics=cards.map(card=>{
+    const rect=card.getBoundingClientRect(),radio=card.querySelector('.sd-detail-payment-radio').getBoundingClientRect(),
+     badge=card.querySelector('.sd-detail-payment-best').getBoundingClientRect(),label=card.querySelector('.sd-detail-payment-head strong').getBoundingClientRect();
+    return {width:rect.width,height:rect.height,cardRight:rect.right,cardMiddle:rect.left+rect.width/2,
+      radioLeft:radio.left,radioRight:radio.right,radioY:(radio.top+radio.bottom)/2,cardY:(rect.top+rect.bottom)/2,
+      badgeY:badge.top-rect.top,badgeRight:badge.right,labelRight:label.right};
+   });
+   return {columns,metrics};
+  });
+  expect(layout.columns).toBe(1);
+  expect(Math.abs(layout.metrics[0].width-layout.metrics[1].width)).toBeLessThan(2);
+  expect(Math.abs(layout.metrics[0].height-layout.metrics[1].height)).toBeLessThan(2);
+  expect(Math.abs(layout.metrics[0].badgeY-layout.metrics[1].badgeY)).toBeLessThan(2);
+  for(const card of layout.metrics){
+   expect(Math.abs(card.radioY-card.cardY)).toBeLessThan(2);
+   expect(card.radioRight).toBeLessThanOrEqual(card.cardRight);
+   expect(card.radioLeft).toBeGreaterThan(card.cardMiddle);
+   expect(card.badgeRight).toBeGreaterThan(card.labelRight);
+  }
+ };
+ await assertPaymentCardLayout();
  mkdirSync('artifacts/storefront-payment-preview',{recursive:true});
- await page.locator('#sdDetailPaymentQuote').screenshot({path:'artifacts/storefront-payment-preview/payment-choice-mobile.png'});
+ await page.locator('#sdDetailPaymentQuote').screenshot({path:'artifacts/storefront-payment-preview/payment-choice-mobile-390.png'});
+ await page.setViewportSize({width:430,height:932});
+ await assertPaymentCardLayout();
+ await page.locator('#sdDetailPaymentQuote').screenshot({path:'artifacts/storefront-payment-preview/payment-choice-mobile-430.png'});
+ await page.setViewportSize({width:390,height:844});
  await page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]').click();
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]')).toHaveAttribute('aria-checked','false');
