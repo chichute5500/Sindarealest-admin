@@ -115,7 +115,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   await page.route('**/*',async route=>{
    if(new URL(route.request().url()).origin===previewOrigin)
     await route.continue({headers:{...route.request().headers(),...headers}});
-   else await route.continue();
+   else await route.fallback(); // preserve context-level province/ward request fixture
   });
  }
  const errors=[],writes=[],createdOrders=[];let paymentRefreshReads=0;
