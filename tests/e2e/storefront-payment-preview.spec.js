@@ -1281,13 +1281,17 @@ test('mobile account payment refresh: five server statuses, local/Cloud, reload 
   await expect(button).toBeEnabled();
  }
  await page.screenshot({path:join(output,'390x844-payment-refresh-after-60s.png'),fullPage:false,animations:'disabled'});
- await page.evaluate(number=>{
-  accountSyncMode='cloud';
-  cloudOrderHistory=[{orderNumber:number,createdAt:new Date().toISOString(),
+ await page.route('**/api/customer/profile',route=>route.fulfill({
+  status:200,contentType:'application/json',
+  body:JSON.stringify({ok:true,favorites:[],address:null})
+ }));
+ await page.route('**/api/customer/orders',route=>route.fulfill({
+  status:200,contentType:'application/json',
+  body:JSON.stringify({ok:true,orders:[{orderNumber:cloudNumber,createdAt:new Date().toISOString(),
    status:'pending_confirmation',deliveryStatus:'not_shipped',total:4500000,
-   priceConfirmationRequired:false,items:[],paymentSummary:null}];
-  renderOrderHistory();
- },cloudNumber);
+   priceConfirmationRequired:false,items:[],paymentSummary:null}]})
+ }));
+ await page.evaluate(()=>window.sdAccountBridge.onAuth(true));
  const cloudCard=page.locator('#accountOrdersList [data-order-number="'+cloudNumber+'"]');
  const cloudButton=cloudCard.locator('[data-account-orders-refresh]');
  await expect(cloudButton).toHaveText('Cập nhật thanh toán');
