@@ -4781,7 +4781,7 @@ function renderCart(){
 function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
 function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';const target=cartReturnFocus;cartReturnFocus=null;if(restoreFocus&&wasOpen)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';const fallback=$('#cartOpen')||$('#mobileCartNav');(available?target:fallback)?.focus({preventScroll:true})},0)}
 
-let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="",sdCheckoutSuccess=false,sdCheckoutOrderCreated=false,sdCheckoutOrderCreating=false,checkoutPreselectedChoice="";
+let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="",sdCheckoutSuccess=false,sdCheckoutOrderCreated=false,sdCheckoutOrderCreating=false,checkoutPreselectedChoice="",checkoutOpenEpoch=0;
 let checkoutItemsOverride=null,checkoutFromCart=true;
 function sdCheckoutItems(){return checkoutItemsOverride?checkoutItemsOverride.map(item=>({...item})):selectedCartEntries().map(({id,option,q})=>({id,option,quantity:q}))}
 function sdCheckoutSummary(selector){
@@ -4819,10 +4819,23 @@ function sdCheckoutRenderQuote(){
  }
 }
 async function sdCheckoutLoadQuote(){
- const response=await fetch('/api/checkout-quote',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:sdCheckoutItems(),phone:$('#checkoutForm').elements.phone.value.trim()})});
+ // A saved address may still be resolving province/ward values. The price
+ // lookup does not depend on those lists and must start immediately.
+ const epoch=checkoutOpenEpoch,controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),12000);
+ let response;
+ try{
+  response=await fetch('/api/checkout-quote',{method:'POST',credentials:'same-origin',cache:'no-store',signal:controller.signal,headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:sdCheckoutItems(),phone:$('#checkoutForm').elements.phone.value.trim()})});
+ }catch(error){
+  if(error?.name==='AbortError')throw Error('Kiểm tra giá quá lâu. Vui lòng kiểm tra kết nối rồi thử lại.');
+  throw error;
+ }finally{clearTimeout(timer)}
  let data={};try{data=await response.json()}catch{}
+ if(epoch!==checkoutOpenEpoch)return;
  if(!response.ok||data.ok!==true)throw Error(data.error||'Không kiểm tra được QR và số tiền.');
- sdCheckoutQuote=data;sdCheckoutChoice=(data.options||[]).some(option=>option.value===checkoutPreselectedChoice)?checkoutPreselectedChoice:'';sdCheckoutRenderQuote();
+ sdCheckoutQuote=data;sdCheckoutChoice=(data.options||[]).some(option=>option.value===checkoutPreselectedChoice)?checkoutPreselectedChoice:'';
+ sdCheckoutRenderQuote();
+ sdCheckoutRefreshChoice();
 }
 async function sdCheckoutLoadPaymentInstructions(){
  const selected=sdCheckoutSelected();if(!selected)throw Error('Hãy chọn một trong hai cách thanh toán.');
@@ -4871,19 +4884,36 @@ function openCheckout(options={}){
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
  sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
+ const openEpoch=++checkoutOpenEpoch;
  $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
  if(!checkoutProvinceLoadStarted){
   checkoutProvinceLoadStarted=true;
   void loadCheckoutProvinces();
  }
- prefillCheckoutFromLocalAddress().then(async()=>{
-  if(!panel.classList.contains('open'))return;
+ // Prefill writes the saved phone synchronously, then waits for public
+ // address lists. Fetch the read-only price quote IN PARALLEL: never make
+ // payment options depend on a separate province/ward network request.
+ const prefillPromise=prefillCheckoutFromLocalAddress();
+ const loadQuoteSafely=()=>sdCheckoutLoadQuote().catch(error=>{
+  if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
+  sdCheckoutQuote={quoteReady:false,reason:error?.message||'Không kiểm tra được giá. Vui lòng thử lại.',options:[]};
+  sdCheckoutRenderQuote();sdCheckoutRefreshChoice();
+ });
+ const quickQuote=maySkipAddress?loadQuoteSafely():null;
+ prefillPromise.then(async()=>{
+  if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
   if(checkoutAddressComplete()){
-   try{await sdCheckoutLoadQuote()}catch(error){sdCheckoutQuote={quoteReady:false,reason:error.message,options:[]};sdCheckoutRenderQuote()}
-   if(!panel.classList.contains('open'))return;
+   if(quickQuote)await quickQuote;
+   else await loadQuoteSafely();
+   if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
    sdCheckoutSetStep(2);
   }else sdCheckoutSetStep(1);
   $('#checkoutSubmit').disabled=false;
+ }).catch(error=>{
+  if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
+  $('#checkoutSubmit').disabled=false;
+  sdCheckoutQuote={quoteReady:false,reason:'Không tải được địa chỉ. Vui lòng kiểm tra lại thông tin nhận hàng.',options:[]};
+  sdCheckoutRenderQuote();sdCheckoutSetStep(1);
  });
 }
 function closeCheckout(restoreFocus=true){
