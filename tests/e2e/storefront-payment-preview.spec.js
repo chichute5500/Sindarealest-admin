@@ -620,12 +620,10 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  // composition at a 60% overlap to locate backdrop-root/stacking failure.
  const cartLayerExperiments=[
   ['as-is',''],
-  ['zero-blur','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'],
-  ['gpu-layer','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{transform:translateZ(0)!important;will-change:backdrop-filter;isolation:isolate!important;z-index:6!important}'],
-  ['parent-sticky-lens','#cartDrawer .cart-bottom{backdrop-filter:blur(56.784px) saturate(114%)!important;-webkit-backdrop-filter:blur(56.784px) saturate(114%)!important}'],
-  ['parent-isolate','#cartDrawer .cart-bottom{isolation:isolate!important;z-index:99!important}'],
-  ['compositor-strong','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:blur(100px) saturate(114%)!important;-webkit-backdrop-filter:blur(100px) saturate(114%)!important}'],
-  ['contrast-diagnostic','#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:blur(56.784px) contrast(.3)!important;-webkit-backdrop-filter:blur(56.784px) contrast(.3)!important}']
+  ['parent-no-filter','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'],
+  ['parent-no-filter-strong-child','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:blur(90px)!important;-webkit-backdrop-filter:blur(90px)!important}'],
+  ['parent-filter-on-pseudo','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:transparent!important}#cartDrawer::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(246,251,255,.68);backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%)}'],
+  ['parent-blur-on-nested-pseudo','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:transparent!important}#cartDrawer::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgba(246,251,255,.68);backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%)}']
  ];
  for(const [name,css] of cartLayerExperiments){
   const injection=css?await page.addStyleTag({content:css}):null;
