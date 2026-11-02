@@ -121,6 +121,12 @@ assert.match(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-che
 assert.match(html,/html.dark #cartDrawer \.cart-header,[\s\S]*?html.dark #checkoutDrawer \.sd-checkout-confirm-wrap\{/,'Checkout light and dark glass stay in sync with Cart');
 assert.match(html,/\.checkout-drawer \.sd-checkout-confirm-wrap\{[^}]*border-radius:999px/,'Keep the user-approved round green slider shape and stroke');
 
+assert.doesNotMatch(html,/#checkoutDrawer \.checkout-header\{[^}]*background:/,'No second standalone checkout header film may override the Cart source');
+assert.doesNotMatch(html,/#checkoutDrawer \.sd-checkout-actions \.pill-btn\{[^}]*background:/,'Checkout buttons must not restack a second glass face');
+assert.doesNotMatch(html,/\.checkout-drawer \.sd-checkout-confirm-wrap\{[^}]*background:/,'The slider shell inherits Cart glass; its green fill remains a separate ::before layer');
+assert.match(html,/#cartDrawer \.cart-header,[\s\S]*?#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*-webkit-backdrop-filter:blur\(56\.784px\) saturate\(114%\);\s*backdrop-filter:blur\(56\.784px\) saturate\(114%\)/,'Both drawers share the same real filter, not screenshot-derived static gray');
+
+
 assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[\s\S]*?background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important;[\s\S]*?box-shadow:var\(--sd-3d-shadow\)!important/,'Cart and Checkout controls share one locally frosted film without changing either drawer');
 assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{\s*background-color:/,'The three Cart bars must not have a painted static base');
 assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[\s\S]*?background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important/,'Checkout reuses Cart optics without repainting or dimming either drawer');
