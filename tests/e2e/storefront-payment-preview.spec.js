@@ -194,17 +194,17 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   expect(mat.alpha,'Cart glass must be genuinely transparent so the scroll backdrop changes its appearance: '+mat.selector).toBe(0);
   expect(mat.rim).toContain('gradient');
  }
- // Verify the exact new light-mode film at the browser's computed CSS level.
+ // Verify the restored light-mode transparency (only the blur strength changes).
  const cartGlassFaces=await page.locator('#cartDrawer').evaluate(drawer=>
   ['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(sel=>
    getComputedStyle(drawer.querySelector(sel)).backgroundImage)
  );
  for(const face of cartGlassFaces){
-  // Chromium quantizes rgba alpha to 8-bit channels (e.g. .296 -> .294).
+  // Chromium may quantize alpha to 8-bit channels.
   const alphas=[...face.matchAll(/rgba\(255, 255, 255, ([0-9.]+)\)/g)].map(m=>Number(m[1]));
   expect(alphas).toHaveLength(2);
-  expect(Math.abs(alphas[0]-.424)).toBeLessThanOrEqual(.005);
-  expect(Math.abs(alphas[1]-.296)).toBeLessThanOrEqual(.005);
+  expect(Math.abs(alphas[0]-.28)).toBeLessThanOrEqual(.005);
+  expect(Math.abs(alphas[1]-.12)).toBeLessThanOrEqual(.005);
  }
  await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});
  await page.locator('#cartDrawer .cart-subtotal-bar').screenshot({path:join(output,'390x844-cart-subtotal-glass.png'),animations:'disabled'});
@@ -549,7 +549,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  for(const result of opticalScores){
   expect(result.main.matches,'Some computed properties remain shared with the logo Header for '+result.selector).toBeGreaterThanOrEqual(3);
    expect(result.rim.matches,'Header and Cart rim computed CSS should match for '+result.selector).toBe(result.rim.total);
-  expect(result.dynamicFilter,'Cart uses the tuned nested glass filter on '+result.selector).toContain('blur(26px)');
+  expect(result.dynamicFilter,'Cart uses the tuned nested glass filter on '+result.selector).toContain('blur(31.2px)');
    expect(result.dynamicFilter,'Do not darken the moving photographic backdrop on '+result.selector).not.toContain('brightness(');
  }
  console.log('CART_LOGO_GLASS_COMPUTED_STYLE_ONLY_NOT_VISUAL_PARITY',JSON.stringify(opticalScores));
