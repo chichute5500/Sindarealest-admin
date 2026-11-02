@@ -120,7 +120,7 @@ assert.match(html,/\.nav-wrap \.nav\{[\s\S]*?background:var\(--sd-glass-shell-st
 assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important;[^}]*box-shadow:var\(--sd-checkout-optical-shadow,var\(--sd-3d-shadow\)\)!important/,'All Cart and Checkout bars share the same glass film, with action shadows selected by the control wrapper');
 assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{\s*background-color:/,'The three Cart bars must not have a painted static base');
 assert.match(html,/\.nav-wrap \.nav\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important/,'Original Header glass film remains untouched');
-assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*backdrop-filter:blur\(56\.784px\) saturate\(114%\)/,'The current approved glass has no old brightness dimming');
+assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*backdrop-filter:blur\(17px\) saturate\(114%\)/,'The current approved glass has no old brightness dimming');
 assert.doesNotMatch(html,/background-color:rgba\(115,111,104,\.88\)!important|background-color:rgba\(9,27,43,\.88\)!important/,'Remove legacy light and dark gray tint overrides');
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
@@ -198,8 +198,8 @@ assert.match(html,/\.checkout-drawer \.sd-checkout-actions\{--sd-checkout-optica
 assert.doesNotMatch(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-footer\{isolation:isolate\}/,'Do not isolate the whole footer as a compositing surface');
 // Only visual Cart/Checkout changes are permitted after this rollback.
 assert.match(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{/,'Checkout glass shares Cart material');
-assert.match(html,/#checkoutDrawer \.sd-checkout-optical-mirror\{[^}]*filter:blur\(14px\)/,'Same optical glass blur');
-assert.match(html,/<script defer src="\/checkout-glass-optics\.js"><\/script>/,'Checkout optical effect stays mounted');
+assert.doesNotMatch(html,/sd-(?:checkout|cart)-optical-(?:mirror|lens)/,'No synthetic CSS blur mirrors');
+assert.doesNotMatch(html,/<script[^>]+src="\/(?:cart|checkout)-glass-optics\.js"/,'No animation-driven JS clipping');
 assert.match(html,/#checkoutDrawer \.checkout-header\{position:sticky;top:0;z-index:3;flex-shrink:0\}/,'Sticky glass header preserved');
 assert.match(html,/#checkoutDrawer \.sd-checkout-footer\{position:sticky;bottom:0;z-index:3;margin-top:auto;flex-shrink:0\}/,'Sticky glass footer preserved');
 assert.match(html,/function sdCheckoutItems\(\)\{return checkoutItemsOverride\?checkoutItemsOverride\.map/,'Restore selected-Cart source for Checkout item summary');
