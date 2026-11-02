@@ -5,6 +5,7 @@ import {issueSession} from "../functions/_customer-auth.js";
 import {hashOrderAccessToken} from "../functions/_payments.js";
 import {onRequestGet as getProfile,onRequestPut as putProfile} from "../functions/api/customer/profile.js";
 import {onRequestGet as getOrders,onRequestPost as linkOrder} from "../functions/api/customer/orders.js";
+import {onRequestGet as linkedPaymentDetails} from "../functions/api/customer/order-payment.js";
 const db=new DatabaseSync(":memory:");
 db.exec("PRAGMA foreign_keys=ON");
 for(const name of [
@@ -64,4 +65,9 @@ assert.equal(JSON.stringify(own).includes(secret),false);
 assert.deepEqual(other.orders,[]);
 assert.equal((await linkOrder({env,request:req("/api/customer/orders",b,"POST",{orderNumber,orderAccessToken:secret})})).status,409);
 assert.equal((await linkOrder({env,request:req("/api/customer/orders",a,"POST",{orderNumber,orderAccessToken:secret})})).status,200);
+assert.equal((await linkedPaymentDetails({env,request:req("/api/customer/order-payment?orderNumber="+orderNumber)})).status,401,'Anonymous users cannot see linked bank information');
+assert.equal((await linkedPaymentDetails({env,request:req("/api/customer/order-payment?orderNumber="+orderNumber,b)})).status,404,'A different linked account cannot see the order');
+const linkedRead=await (await linkedPaymentDetails({env,request:req("/api/customer/order-payment?orderNumber="+orderNumber,a)})).json();
+assert.equal(linkedRead.ok,true);
+assert.equal(linkedRead.paymentReady,false,'A non-priced linked order must never leak a payment QR');
 console.log("PASS: isolated customer preferences and token-only order linking, cross-account access denied.");

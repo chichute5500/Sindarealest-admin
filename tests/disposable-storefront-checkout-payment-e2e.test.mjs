@@ -246,8 +246,20 @@ try {
   },true),409);
   const depositRequestId=one("SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' ORDER BY created_at DESC LIMIT 1",depositId)?.id;
   assert.ok(depositRequestId,'Customer QR request remains pending until actual receipt verification');
-  await expectStatus('Admin verifies the bank deposit',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:depositId,paymentRequestId:depositRequestId,direction:'received',amount:100000,transactionReference:'QA-E2E-DEPOSIT-PAID'
+  await expectStatus('Admin verifies first PARTIAL deposit',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
+    orderId:depositId,paymentRequestId:depositRequestId,direction:'received',amount:40000,transactionReference:'QA-E2E-DEPOSIT-PARTIAL'
+  },true),201);
+  const topup=await (await expectStatus('Customer reads exact shortfall on SAME pending QR',await invoke(orderPaymentGet,
+    '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();
+  assert.equal(topup.paymentReady,true);
+  assert.equal(topup.additionalPayment,true);
+  assert.equal(topup.paymentSummary.shortfall,60000);
+  assert.equal(topup.amount,60000,'Never ask for original 100k again after receiving verified 40k');
+  assert.equal(topup.transferReference,depositQuote.transferReference,'Same order and original bank transfer memo');
+  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,3,'Topup view must not create an extra order');
+  assert.equal(one('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?',depositId).n,1,'Topup reuses the pending request');
+  await expectStatus('Admin verifies remaining PARTIAL deposit',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
+    orderId:depositId,paymentRequestId:depositRequestId,direction:'received',amount:60000,transactionReference:'QA-E2E-DEPOSIT-REMAIN'
   },true),201);
   const afterDeposit=await (await expectStatus('Customer sees verified deposit and COD balance',await invoke(orderPaymentGet,
     '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();

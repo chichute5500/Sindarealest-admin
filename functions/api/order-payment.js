@@ -17,6 +17,14 @@ export async function onRequestGet({ request, env }) {
     const tokenHash = await hashOrderAccessToken(token);
     const order = await env.DB.prepare("SELECT id,order_number,status,delivery_status,payment_status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders WHERE order_number=? AND public_access_token_hash=? LIMIT 1").bind(orderNumber,tokenHash).first();
     if (!order) return fail("Không tìm thấy đơn hàng hoặc mã truy cập không hợp lệ.",404);
+    return await paymentDetailsForOrder(order,env);
+  } catch { return fail("Không đọc được hướng dẫn thanh toán.",503); }
+}
+
+// Shared verified, read-only payment response for an order owned by a valid
+// capability token or a separately authenticated and linked customer account.
+export async function paymentDetailsForOrder(order,env){
+  try {
     const audit=await env.DB.prepare("SELECT details_json FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1").bind(order.id).first();
     let checkout={};try{checkout=JSON.parse(audit?.details_json||'{}')}catch{}
     const ledger=await env.DB.prepare("SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount ELSE 0 END),0) AS received_amount,COALESCE(SUM(CASE WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN amount ELSE 0 END),0) AS refunded_amount FROM order_payment_transactions WHERE order_id=?").bind(order.id).first();
@@ -68,7 +76,13 @@ export async function onRequestGet({ request, env }) {
     }
     return json({
       ok:true, ...base, paymentReady:true, installmentType:requestRow.installment_type,
-      amount:Number(requestRow.amount), shippingBenefit, freeShippingEligible, freeShipping,
+      // Reuse the already pending bank request, but never ask the customer to
+      // transfer its ORIGINAL amount after Shop has verified a partial receipt.
+      // The actual missing balance is recomputed from the authoritative ledger.
+      amount:paymentSummary.netReceivedAmount>0&&Number.isSafeInteger(paymentSummary.shortfall)
+        ?paymentSummary.shortfall:Number(requestRow.amount),
+      additionalPayment:paymentSummary.netReceivedAmount>0&&paymentSummary.shortfall>0,
+      shippingBenefit, freeShippingEligible, freeShipping,
       transferReference:requestRow.transfer_reference,
       qrImageUrl:"/payment-qr/"+requestRow.qr_image_key, bankName:requestRow.bank_name,
       accountNumber:requestRow.account_number, accountName:requestRow.account_name,
