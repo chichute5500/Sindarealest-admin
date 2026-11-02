@@ -189,7 +189,7 @@ assert.match(html,/\.payment-instructions\{margin:0;padding:0;border:0;border-ra
 assert.match(html,/<div class="sd-checkout-qr-head"><span class="sd-payment-stage-label">BƯỚC 1 \/ 2 · THANH TOÁN<\/span><strong>Chuyển khoản ngân hàng<\/strong><small class="sd-payment-stage-subtitle">Chuyển khoản theo thông tin bên dưới<\/small>/,'Step copy is INSIDE bank-transfer card');
 assert.doesNotMatch(html,/add\(transferStage,'p','sd-payment-stage-label'/,'No standalone glass-like step title');
 assert.doesNotMatch(html,/Kéo thanh bên dưới để lấy mã đơn|Đơn hàng chỉ được tạo khi lấy mã ở bước này|Thao tác này không xác nhận tiền/,'Remove redundant slider instruction paragraphs');
-assert.match(html,/#checkoutDrawer \.sd-checkout-footer>\.sd-checkout-optical-lens\{inset:auto;border-radius:22px\}/,'Footer optics are clipped to actual action buttons');
+assert.doesNotMatch(html,/sd-checkout-optical-lens/,'Footer no longer uses JS-positioned optical overlays');
 assert.match(html,/<p class="sd-checkout-confirm-note" id="sdCheckoutConfirmNote" hidden><\/p>/,'A legacy hidden compatibility node has no duplicated customer-facing copy');
 
 // The footer is a transparent layout host, not a second pane of dark glass.
