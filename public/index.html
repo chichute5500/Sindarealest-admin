@@ -893,7 +893,6 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-review-row>strong{font-size:13px;font-weight:750;line-height:1.35;color:var(--ink)}
 .checkout-drawer .sd-checkout-review-row p{grid-column:1/-1;font-size:12px;font-weight:500;color:var(--ink);line-height:1.6;margin:0;overflow-wrap:anywhere}
 .checkout-drawer .sd-checkout-review-row button{border:0;background:none;color:var(--gold);font-size:11px;font-weight:650;text-decoration:underline}
-.checkout-drawer .sd-checkout-caution{color:var(--muted);line-height:1.6;display:block}
 .checkout-drawer .sd-checkout-footer{position:relative;flex:0 0 auto;display:grid;gap:9px;padding:13px 0 calc(4px + env(safe-area-inset-bottom));border:0;border-top:0;background:transparent;box-shadow:none;outline:0;filter:none;isolation:auto;-webkit-backdrop-filter:none;backdrop-filter:none}
 .checkout-drawer .sd-checkout-actions{--sd-checkout-optical-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 6px 15px rgba(103,169,205,.10);display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:0;border:0;background:transparent;box-shadow:none;outline:0;-webkit-backdrop-filter:none;backdrop-filter:none}
 /* Checkout keeps its two independent actions; the shared Cart/Checkout
@@ -3746,11 +3745,10 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 <p class="sd-checkout-qr-warning">QR KHÔNG NHÚNG SỐ TIỀN. Vui lòng tự nhập chính xác số tiền và nội dung chuyển khoản hiển thị phía trên. Shop xác nhận sau khi đối chiếu tiền thực nhận.</p>
 <p id="sdCheckoutBankFeedback" class="sd-checkout-hint" role="status" aria-live="polite"></p>
 </div>
-<div class="sd-checkout-box"><strong>Số tiền của bạn</strong><div class="sd-checkout-summary-pair"><span>Giá trị đơn hàng</span><strong id="sdCheckoutGrossTotal">Chờ xác nhận</strong></div><div class="sd-checkout-summary-pair"><span>Số tiền cần chuyển</span><strong id="sdCheckoutSelectedAmount">Chờ xác nhận</strong></div>
-<div class="sd-checkout-summary-pair"><span>Giảm giá thanh toán đủ</span><strong id="sdCheckoutDiscount">—</strong></div>
-<div class="sd-checkout-summary-pair sd-checkout-remaining"><span id="sdCheckoutCodLabel">Số tiền thanh toán khi nhận hàng</span><strong id="sdCheckoutRemaining">—</strong></div><p class="sd-checkout-excess-note" id="sdCheckoutExcessNote" hidden>Nếu chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng.</p></div>
+<div class="sd-checkout-box"><strong>Số tiền của bạn</strong><div class="sd-checkout-summary-pair"><span>Giá trị đơn hàng</span><strong id="sdCheckoutGrossTotal"></strong></div><div class="sd-checkout-summary-pair"><span>Số tiền cần chuyển</span><strong id="sdCheckoutSelectedAmount"></strong></div>
+<div class="sd-checkout-summary-pair"><span>Giảm giá thanh toán đủ</span><strong id="sdCheckoutDiscount"></strong></div>
+<div class="sd-checkout-summary-pair sd-checkout-remaining"><span id="sdCheckoutCodLabel">Số tiền thanh toán khi nhận hàng</span><strong id="sdCheckoutRemaining"></strong></div><p class="sd-checkout-excess-note" id="sdCheckoutExcessNote" hidden>Nếu chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng.</p></div>
 <div class="sd-checkout-box sd-order-production-caution" id="sdOrderProductionCaution" role="note" hidden><strong>⏱ Lưu ý thời gian làm hàng</strong><p>Đơn hàng có sản phẩm đặt riêng, cần 5–20 ngày để chế tác trước khi vận chuyển. Thời gian này chưa bao gồm giao hàng.</p></div>
-<div class="sd-checkout-box sd-checkout-caution">Chọn cách thanh toán chưa có nghĩa Shop đã nhận tiền. Shop chỉ xác nhận sau khi đối chiếu tiền thực nhận.</div>
 </section>
 
 <div id="paymentInstructions" class="payment-instructions" role="status" aria-live="polite" hidden></div>
@@ -4876,11 +4874,11 @@ function sdCheckoutPromptChoice(){
  sdCheckoutChoiceScrollFrame=requestAnimationFrame(frame);
 }
 function sdCheckoutRefreshChoice(){
- const value=sdCheckoutSelected(),amount=value?formatVnd(value.amount):'Chờ Shop xác nhận';
- const remainder=value?formatVnd(value.codExpected):'Chờ Shop xác nhận';
- const discount=value?.discountAmount?'-'+formatVnd(value.discountAmount):'Không áp dụng';
+ const value=sdCheckoutSelected(),amount=value?formatVnd(value.amount):'';
+ const remainder=value?formatVnd(value.codExpected):'';
+ const discount=value?(value.discountAmount?'-'+formatVnd(value.discountAmount):'Không áp dụng'):'';
  document.querySelectorAll('#sdCheckoutOptions .sd-checkout-option').forEach(b=>{const active=b.dataset.sdPaymentOption===sdCheckoutChoice;b.classList.toggle('selected',active);b.setAttribute('aria-checked',String(active))});
- $('#sdCheckoutGrossTotal').textContent=Number.isSafeInteger(sdCheckoutQuote?.total)?formatVnd(sdCheckoutQuote.total):'Chờ Shop xác nhận';
+ $('#sdCheckoutGrossTotal').textContent=Number.isSafeInteger(sdCheckoutQuote?.total)?formatVnd(sdCheckoutQuote.total):'';
  for(const id of ['#sdCheckoutAmount','#sdCheckoutSelectedAmount'])$(id).textContent=amount;
  $('#sdCheckoutRemaining').textContent=remainder;
  $('#sdCheckoutCodLabel').textContent='Số tiền thanh toán khi nhận hàng';
@@ -4929,6 +4927,20 @@ function sdCheckoutSetStep(step){
   $('#sdCheckoutReviewAddress').textContent=[f.fullName.value.trim(),f.phone.value.trim(),[f.streetAddress.value.trim(),f.ward.value,f.province.value].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
   sdCheckoutRefreshChoice();
  }
+}
+function sdCheckoutResetQrScroll(){
+ const drawer=$('#checkoutDrawer'),form=$('#checkoutForm');
+ const reset=()=>{
+  if(!sdCheckoutSuccess||!drawer.classList.contains('open'))return;
+  // Mobile scrolls the drawer, desktop scrolls the form; clear BOTH.
+  drawer.scrollTop=0;
+  form.scrollTop=0;
+ };
+ reset();
+ // QR DOM mounts and image sizing may trigger scroll anchoring after the
+ // synchronous render. Keep the initial two frames at the top without any
+ // persistent scroll listener or interference with later manual scrolling.
+ requestAnimationFrame(()=>{reset();requestAnimationFrame(reset)});
 }
 function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected(),payment=sdCheckoutQuote?.paymentInstructions;return selected?{paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total,...(sdCheckoutQuote?.transferReference?{transferReference:sdCheckoutQuote.transferReference,paymentQrImageKey:sdCheckoutQuote.paymentQrImageKey,paymentBankName:payment?.bankName,paymentAccountName:payment?.accountName,paymentAccountNumber:payment?.accountNumber}:{})}:{}}
 
@@ -5398,7 +5410,9 @@ $('#paymentInstructions').hidden=true;const items=sdCheckoutItems();if(!items.le
  const selected=sdCheckoutSelected(),quote=sdCheckoutQuote||{},choice=selected||null;
  const summary=choice?{total:quote.total,paymentOption:choice.value,requiredAmount:choice.amount,discountAmount:choice.discountAmount||0,netReceivedAmount:0,shortfall:choice.amount,overpaidAmount:0,codRemaining:choice.codExpected,codReceivedAmount:0}:{};
  const preview={paymentReady:quote.paymentReady===true,paymentTermsConfirmed:Boolean(choice),paymentInstructions:quote.paymentInstructions||null,paymentSummary:summary,message:quote.reason||'Thông tin thanh toán đã sẵn sàng. Đơn hàng chỉ được tạo khi bạn lấy mã đơn.'};
- renderPaymentInstructions(preview,'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent=quote.paymentReady?'Chờ thanh toán':'Thông tin đặt hàng';$('#sdCheckoutStepSubtitle').textContent=quote.paymentReady?'Quét QR và chuyển khoản. Đơn hàng chỉ được tạo khi lấy mã đơn.':'Đơn hàng chỉ được tạo khi bạn chọn lấy mã đơn.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#sdCheckoutReviewAddressRow').hidden=true;$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=!$('#sdCheckoutConfirmWrap').hidden;$('#sdCheckoutDone').textContent='Lấy mã đơn →';form.scrollTop=0;sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;
+ // Remove the old payment-choice scroll position before mounting QR content.
+ $('#checkoutDrawer').scrollTop=0;form.scrollTop=0;
+ renderPaymentInstructions(preview,'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent=quote.paymentReady?'Chờ thanh toán':'Thông tin đặt hàng';$('#sdCheckoutStepSubtitle').textContent=quote.paymentReady?'Quét QR và chuyển khoản. Đơn hàng chỉ được tạo khi lấy mã đơn.':'Đơn hàng chỉ được tạo khi bạn chọn lấy mã đơn.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#sdCheckoutReviewAddressRow').hidden=true;$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=!$('#sdCheckoutConfirmWrap').hidden;$('#sdCheckoutDone').textContent='Lấy mã đơn →';sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll();
 }catch(error){message.textContent=error.message||'Chưa thể chuẩn bị thông tin thanh toán.'}finally{button.disabled=false;if(!sdCheckoutSuccess)button.textContent=sdCheckoutSubmitLabel()}});
 $('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&panel?.dataset.stage==='transfer'){void sdCheckoutFinalizeOrder();return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();ensureOrderGuideOpen();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,option=selectedDetailOption(currentProduct);if(!id||option===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){showToast('Chọn đặt cọc 30% hoặc thanh toán hết giảm 5% trước.');$('#sdDetailPaymentQuote')?.scrollIntoView({behavior:'smooth',block:'center'});return}closeDetail(false,false);openCheckout({items:[{id,option,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
 $('#detailZoom').addEventListener('click',openFullscreenImage);

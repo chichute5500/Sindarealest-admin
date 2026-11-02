@@ -65,6 +65,12 @@ assert.match(create,/calculateCheckoutQuote\(items\.map/,"Submit re-evaluates am
 assert.match(create,/quotedTotal !== serverQuote\.total/,"Stale quote must fail closed");
 assert.match(create,/selectedPaymentAmount:selectedAmount/,"Selected amount must come from server, not the browser");
 assert.match(html,/sdCheckoutRemaining/);
+assert.doesNotMatch(html,/sd-checkout-caution|Chọn cách thanh toán chưa có nghĩa Shop đã nhận tiền/,'Remove the obsolete payment-verification glass box and CSS');
+assert.match(html,/const value=sdCheckoutSelected\(\),amount=value\?formatVnd\(value.amount\):''/,'No amount placeholder before method selection');
+assert.match(html,/const remainder=value\?formatVnd\(value.codExpected\):''/,'No COD placeholder before method selection');
+assert.match(html,/const discount=value\?\(value.discountAmount\?/,'Discount appears only after choosing payment');
+assert.match(html,/function sdCheckoutResetQrScroll\(\)[\s\S]*drawer.scrollTop=0;[\s\S]*form.scrollTop=0;/,'QR reset handles mobile drawer and desktop form scrollers');
+assert.match(html,/sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll\(\)/,'QR layout transition resets its scroll position');
 assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
 assert.doesNotMatch(html,/sdCheckoutOpenBank|Mở ứng dụng ngân hàng/,'Checkout no longer offers a bank-app launch action');

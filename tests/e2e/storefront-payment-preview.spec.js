@@ -503,6 +503,14 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
+ // Mobile drawer, not the inner form, is the active scroll root. This
+ // assertion must happen BEFORE assertCheckoutScrollAndHeader resets scroll.
+ await expect.poll(()=>page.locator('#checkoutDrawer').evaluate(async drawer=>{
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  return Math.round(drawer.scrollTop);
+ })).toBe(0);
+ await expect(page.locator('#checkoutForm')).toHaveJSProperty('scrollTop',0);
+ await page.screenshot({path:join(output,'390x844-buy-now-qr-opened-at-top.png'),fullPage:false,animations:'disabled'});
  await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
  await expect(review).toBeHidden();
@@ -659,6 +667,10 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(cartOptions).toHaveCount(2,{timeout:15000});
  const actualCartTotal=Number((await page.locator('#sdCheckoutGrossTotal').innerText()).replace(/\D/g,''));
  expect(actualCartTotal).toBe(cartQuote.total);
+ await expect(page.locator('#sdCheckoutPaymentStep .sd-checkout-caution')).toHaveCount(0);
+ for(const selector of ['#sdCheckoutSelectedAmount','#sdCheckoutRemaining','#sdCheckoutDiscount']){
+  await expect(page.locator(selector),'Before choosing payment, '+selector+' must be blank').toBeEmpty();
+ }
  const expectedCartFullAmount=actualCartTotal-Math.round(actualCartTotal*.05);
  // Verify actual cart navigation through BOTH buttons, preserving selected items.
  await page.locator('#checkoutBack').click();
@@ -707,6 +719,12 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
+ await expect.poll(()=>page.locator('#checkoutDrawer').evaluate(async drawer=>{
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  return Math.round(drawer.scrollTop);
+ })).toBe(0);
+ await expect(page.locator('#checkoutForm')).toHaveJSProperty('scrollTop',0);
+ await page.screenshot({path:join(output,'390x844-cart-full-qr-opened-at-top.png'),fullPage:false,animations:'disabled'});
  // Preserve the pre-existing strict header-centering assertion, but defer its
  // failure so we can still measure the new fast-slider requirement in the same
  // bounded Preview test. Never silently turn the header assertion green.
