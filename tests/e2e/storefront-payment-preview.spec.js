@@ -217,8 +217,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   return matches;
  });
  for(const lens of cartFilterCascade){
-  expect(lens.backdrop).toContain('blur(40.56px)');
-  if(lens.webkit)expect(lens.webkit).toContain('blur(40.56px)'); // Chromium may omit the vendor alias.
+  expect(lens.backdrop).toContain('blur(56.784px)');
+  if(lens.webkit)expect(lens.webkit).toContain('blur(56.784px)'); // Chromium may omit the vendor alias.
   expect(lens.background).toContain('linear-gradient(');
  }
  console.log('CART_THREE_BARS_COMPUTED_CASCADE',JSON.stringify(cartFilterCascade));
@@ -565,7 +565,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  for(const result of opticalScores){
   expect(result.main.matches,'Some computed properties remain shared with the logo Header for '+result.selector).toBeGreaterThanOrEqual(3);
    expect(result.rim.matches,'Header and Cart rim computed CSS should match for '+result.selector).toBe(result.rim.total);
-  expect(result.dynamicFilter,'Cart uses the tuned nested glass filter on '+result.selector).toContain('blur(40.56px)');
+  expect(result.dynamicFilter,'Cart uses the tuned nested glass filter on '+result.selector).toContain('blur(56.784px)');
    expect(result.dynamicFilter,'Do not darken the moving photographic backdrop on '+result.selector).not.toContain('brightness(');
  }
  console.log('CART_LOGO_GLASS_COMPUTED_STYLE_ONLY_NOT_VISUAL_PARITY',JSON.stringify(opticalScores));

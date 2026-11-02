@@ -2227,11 +2227,11 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 #cartDrawer #cartCheckout{
   border:1px solid transparent;
   /* Local frosted film only on these three bars: photo remains translucent but
-     scrolling product lettering must not stay legible. No parent/row changes. */
+     scrolling product lettering must not stay legible. 40% stronger blur only. No parent/row changes. */
   background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55))!important;
   box-shadow:var(--sd-3d-shadow)!important;
-  -webkit-backdrop-filter:blur(40.56px) saturate(114%);
-  backdrop-filter:blur(40.56px) saturate(114%);
+  -webkit-backdrop-filter:blur(56.784px) saturate(114%);
+  backdrop-filter:blur(56.784px) saturate(114%);
 }
 html.dark #cartDrawer .cart-header,
 html.dark #cartDrawer .cart-subtotal-bar,
