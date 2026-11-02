@@ -198,7 +198,7 @@ assert.match(adminUi,/function orderReceiptState\(summary\)/,"Admin reports paym
 // Regression: a successful first order moves the QR tile into its temporary stage.
 // Return it to the persistent mount before replaceChildren() destroys the stage;
 // otherwise the second order crashes inside openCheckout and never opens payment.
-const paymentRender=html.slice(html.indexOf('function renderPaymentInstructions('),html.indexOf('async function sdCopyCheckoutText('));
+const paymentRender=html.slice(html.indexOf('function renderPaymentInstructions('),html.indexOf('function sdCheckoutBankMessage('));
 const restoreQr=paymentRender.indexOf('qrMount.append(existingQr)');
 const clearOldStage=paymentRender.indexOf('panel.replaceChildren()');
 assert.ok(restoreQr>=0&&clearOldStage>restoreQr,'Keep the live QR node and its listeners across sequential checkouts');
