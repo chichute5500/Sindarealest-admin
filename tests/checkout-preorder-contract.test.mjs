@@ -42,7 +42,8 @@ assert.match(html,/sd-payment-transfer-stage[\s\S]*sd-payment-order-stage/,'QR t
 assert.match(html,/Nhận cọc & xác nhận đơn/,'Order tracking combines deposit receipt and order confirmation into one milestone');
 assert.match(html,/data-account-orders-refresh/,'Linked order cards can reload server-confirmed payment state');
 assert.doesNotMatch(html,/\.checkout-drawer\{left:0;right:0;width:100vw;max-width:none;border-radius:0\}/,'Checkout must never flatten the mobile cart-shaped glass shell');
-assert.match(html,/#cartDrawer,#checkoutDrawer\{[^}]*background:var\(--sd-reference-surface\)!important;[^}]*-webkit-backdrop-filter:none!important;[^}]*backdrop-filter:none!important/,'Cart and Checkout outer sheets must not establish a backdrop root');
+assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{[^}]*background:var\(--sd-reference-surface-strong\)!important;[^}]*-webkit-backdrop-filter:blur\(24px\) saturate\(145%\);[^}]*backdrop-filter:blur\(24px\) saturate\(145%\)/,'The approved Cart and Checkout sheet keeps its frosted background');
+assert.match(html,/#cartDrawer,#checkoutDrawer\{background:var\(--sd-reference-surface\)!important\}/,'Restore the exact original Cart and Checkout sheet tone');
 assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{\s*top:calc\(7px \+ env\(safe-area-inset-top\)\);[\s\S]*?border:1px solid var\(--sd-reference-edge\);border-radius:26px;/,'Mobile drawers share inset geometry and 26px corners');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
