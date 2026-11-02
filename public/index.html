@@ -2258,7 +2258,7 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
     /* Sticky bottom alone only prevents the footer from moving below the
        scrollport. At the order-code step, the 14px residual scroll used to
        pull it UP. The top threshold also pins its natural dock position. */
-    top:calc(100% - var(--sd-checkout-footer-height,73px) - var(--sd-checkout-footer-inset,10px));
+    top:calc(100% - var(--sd-checkout-footer-height,73px));
     bottom:0;
     z-index:3;
     margin-top:auto;
@@ -5674,12 +5674,9 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
    const footer=drawer.querySelector('.sd-checkout-footer');
    if(footer){
     const footerHeight=footer.getBoundingClientRect().height;
-    const inset=Number.parseFloat(computed.paddingBottom)||0;
-    const measured=footerHeight+'px',bottomInset=inset+'px';
+    const measured=footerHeight+'px';
     if(footerHeight>0&&drawer.style.getPropertyValue('--sd-checkout-footer-height')!==measured)
      drawer.style.setProperty('--sd-checkout-footer-height',measured);
-    if(drawer.style.getPropertyValue('--sd-checkout-footer-inset')!==bottomInset)
-     drawer.style.setProperty('--sd-checkout-footer-inset',bottomInset);
    }
   }
  };
