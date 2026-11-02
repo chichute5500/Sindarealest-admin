@@ -730,9 +730,16 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-checkout-qr-head strong')).toBeInViewport();
  await page.screenshot({path:join(output,'390x844-cart-full-qr-opened-at-top.png'),fullPage:false,animations:'disabled'});
  const qrTitleOffset=await page.locator('#checkoutDrawer .checkout-heading h2').evaluate(title=>{
-  const drawer=document.querySelector('#checkoutDrawer').getBoundingClientRect();
-  const rect=title.getBoundingClientRect();
-  return Math.abs((rect.left+rect.right)/2-(drawer.left+drawer.right)/2);
+  const el=document.querySelector('#checkoutDrawer'),drawer=el.getBoundingClientRect(),rect=title.getBoundingClientRect(),
+   heading=title.closest('.checkout-heading'),head=heading.getBoundingClientRect();
+  const style=getComputedStyle(title);
+  const offset=Math.abs((rect.left+rect.right)/2-(drawer.left+drawer.right)/2);
+  const details={offset,classes:el.className,drawerX:drawer.x,drawerWidth:drawer.width,
+   headingX:head.x,headingWidth:head.width,titleX:rect.x,titleWidth:rect.width,
+   styleLeft:style.left,cssInset:el.style.getPropertyValue('--sd-native-glass-pad-left'),
+   mediaMatch:matchMedia('(max-width:760px)').matches,viewport:innerWidth};
+  console.log('PAYMENT_QR_CENTER_DIAGNOSTIC '+JSON.stringify(details));
+  return offset;
  });
  console.log('PAYMENT_QR_MOBILE_TITLE_CENTER_OFFSET_PX',qrTitleOffset);
  expect(qrTitleOffset).toBeLessThanOrEqual(2);
