@@ -591,10 +591,10 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  // The following samples are TEST ONLY: no simulated optical tint ships to shoppers.
  // Capture 4 materials across real top/middle/bottom cart scrolling contexts.
  const comparisons=[
-  ['clear-film','none','blur(17px) saturate(114%)'],
-  ['thin-film','linear-gradient(145deg,rgba(255,255,255,.20),rgba(220,245,255,.09))','blur(17px) saturate(114%)'],
-  ['logo-film','var(--sd-glass-shell-strong)','blur(17px) saturate(114%)'],
-  ['clear-9px','none','blur(9px) saturate(114%)']
+  ['clear-26','none','blur(26px) saturate(114%)'],
+  ['clear-36','none','blur(36px) saturate(114%)'],
+  ['thin-26','linear-gradient(145deg,rgba(255,255,255,.20),rgba(220,245,255,.09))','blur(26px) saturate(114%)'],
+  ['thin-36','linear-gradient(145deg,rgba(255,255,255,.20),rgba(220,245,255,.09))','blur(36px) saturate(114%)']
  ];
  for(const [name,background,filter] of comparisons){
   await drawer.evaluate((el,{background,filter})=>{
