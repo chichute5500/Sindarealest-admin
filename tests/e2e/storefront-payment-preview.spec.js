@@ -316,8 +316,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
        .every(sel=>getComputedStyle(document.querySelector(sel)).boxShadow===action)
       &&action!==original;
     }),{timeout:5000}).toBe(true);
-    // Native Header logo is the reference, not a separate set of painted panes.
-    // Parent drawers must remain outside the backdrop-root chain.
+    // The native logo Header is the reference for floating controls.
+    // The outer Cart/Checkout sheet retains its Owner-approved frosted background.
+    // Do not remove the outer 24px blur to force nested controls to blur.
     const logoParity=await page.evaluate(()=>{
      const logo=getComputedStyle(document.querySelector('.nav-wrap .nav'));
      const cart=getComputedStyle(document.querySelector('#cartDrawer'));
@@ -334,8 +335,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
         opacity:glass.opacity};
       })};
     });
-    expect(logoParity.rootFilters).toEqual(['none','none']);
-    expect(logoParity.rootWebkit).toEqual(['none','none']);
+    for(const value of [...logoParity.rootFilters,...logoParity.rootWebkit]){
+     expect(value,'The approved drawer background must remain frosted').toContain('blur(24px)');
+    }
     for(const item of logoParity.match){
      expect(item.face,'Real backdrop face equals approved logo Header: '+item.selector).toBe(true);
      expect(item.filter,'Native backdrop blur equals logo Header: '+item.selector).toBe(true);
