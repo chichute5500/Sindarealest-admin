@@ -2226,11 +2226,11 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 #cartDrawer .cart-subtotal-bar,
 #cartDrawer #cartCheckout{
   border:1px solid transparent;
-  /* Restore original transmission; increase only backdrop blur 26px -> 31.2px (+20%). */
+  /* Keep the approved transmissive face. Increase this bar-only blur 30%: 31.2px -> 40.56px. */
   background:linear-gradient(145deg,rgba(255,255,255,.28),rgba(255,255,255,.12))!important;
   box-shadow:var(--sd-3d-shadow)!important;
-  -webkit-backdrop-filter:blur(31.2px) saturate(114%);
-  backdrop-filter:blur(31.2px) saturate(114%);
+  -webkit-backdrop-filter:blur(40.56px) saturate(114%);
+  backdrop-filter:blur(40.56px) saturate(114%);
 }
 html.dark #cartDrawer .cart-header,
 html.dark #cartDrawer .cart-subtotal-bar,
