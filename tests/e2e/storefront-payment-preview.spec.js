@@ -606,7 +606,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
    }
   },{background,filter});
   for(const [position,fraction] of [['top',0],['middle',.5],['bottom',1]]){
-   await drawer.evaluate(f=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*f)},fraction);
+   await drawer.evaluate((el,f)=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*f)},fraction);
    await page.waitForTimeout(100);
    await page.screenshot({path:join(output,'390x844-OPTICAL-TEST-ONLY-'+name+'-'+position+'.png'),fullPage:false,animations:'disabled'});
   }
