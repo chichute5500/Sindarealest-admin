@@ -2059,7 +2059,8 @@ html.dark .sd-fullscreen-share{
   .cart-drawer{overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .cart-drawer{display:flex!important;flex-direction:column!important}
   .cart-list{flex:0 0 auto;min-height:0;overflow:visible!important;overscroll-behavior:contain}
-  .checkout-drawer{overflow:hidden!important}
+  .checkout-drawer{overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .checkout-drawer::-webkit-scrollbar{display:none}
 }
 
 /* Contrast pass: gallery actions must remain visible over pale product photography and satin backgrounds. */
@@ -2206,6 +2207,9 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   }
   .cart-drawer:has(.cart-row) .cart-bottom{position:sticky;bottom:0;z-index:2;margin-top:auto}
   #cartDrawer .cart-header{position:sticky;top:0;z-index:2}
+  #checkoutDrawer .checkout-header{position:sticky;top:0;z-index:3;flex-shrink:0}
+  #checkoutDrawer .checkout-form{flex:0 0 auto!important;overflow:visible!important;min-height:0;max-height:none;align-self:stretch}
+  #checkoutDrawer .sd-checkout-footer{position:sticky;bottom:0;z-index:3;margin-top:auto;flex-shrink:0}
 }
 
 
