@@ -2237,44 +2237,12 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   border:1px solid transparent;
   background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55))!important;
   box-shadow:var(--sd-checkout-optical-shadow,var(--sd-3d-shadow))!important;
-  -webkit-backdrop-filter:blur(56.784px) saturate(114%);
-  backdrop-filter:blur(56.784px) saturate(114%);
+  -webkit-backdrop-filter:blur(17px) saturate(114%);
+  backdrop-filter:blur(17px) saturate(114%);
   isolation:isolate;
 }
-/* These three bar-mounted lenses sample only the product pixels beneath them.
-   The existing glass face, rim, shadows, Cart shell and product card design stay intact. */
-#cartDrawer .sd-cart-optical-lens{
-  position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;
-  pointer-events:none;contain:paint;background:transparent;
-}
-#cartDrawer .sd-cart-optical-mirror{
-  position:absolute;box-sizing:border-box;margin:0;max-width:none;
-  pointer-events:none;filter:blur(14px);-webkit-filter:blur(14px);
-  transform:translateZ(0);
-}
-/* Match the proven Cart occlusion: real Checkout lettering crossing either
-   floating bar is optically softened, not left sharp behind a white tint.
-   The single original scrolling form stays interactive and QR is unchanged. */
-#checkoutDrawer .checkout-header{isolation:isolate}
-#checkoutDrawer .sd-checkout-optical-lens{
-  position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;
-  pointer-events:none;contain:paint;background:transparent;
-}
-#checkoutDrawer .sd-checkout-footer>.sd-checkout-optical-lens{inset:auto;border-radius:22px}
-#checkoutDrawer .sd-checkout-footer>.sd-checkout-optical-lens[data-sd-optical-target="sdCheckoutConfirmWrap"]{border-radius:999px}
-#checkoutDrawer .sd-checkout-optical-mirror{
-  position:absolute;box-sizing:border-box;margin:0;max-width:none;
-  pointer-events:none;filter:blur(14px);-webkit-filter:blur(14px);
-  transform:translateZ(0);
-}
-/* Checkout heading MUST remain unpositioned: its absolute title is
-   centered against the entire header, not the back button's flex item. */
-#checkoutDrawer .checkout-header>.checkout-heading{z-index:2}
-#checkoutDrawer .checkout-header>#checkoutClose,
-#checkoutDrawer .sd-checkout-footer>.sd-checkout-actions,
-#checkoutDrawer .sd-checkout-footer>#checkoutMessage{
-  position:relative;z-index:2;
-}
+/* Native composited glass without synthetic clones or pixel masks.
+   Real scrolling pixels remain intact under each floating glass bar. */
 html.dark #cartDrawer .cart-header,
 html.dark #cartDrawer .cart-subtotal-bar,
 html.dark #cartDrawer #cartCheckout,
@@ -5642,7 +5610,5 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
 </script>
 
 
-<script defer src="/cart-glass-optics.js"></script>
-<script defer src="/checkout-glass-optics.js"></script>
 </body>
 </html>
