@@ -348,7 +348,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
        const box=getComputedStyle(host),pane=tint[i];
        return {id:host.id,clientWidth:host.clientWidth,clientHeight:host.clientHeight,
         paneWidth:parseFloat(pane.width),paneHeight:parseFloat(pane.height),
-        insetLeft:parseFloat(pane.marginLeft),insetTop:parseFloat(pane.marginTop),
+        insetLeft:parseFloat(pane.marginLeft),insetTop:parseFloat(pane.marginTop),stickyTop:parseFloat(pane.top),
         paddingLeft:parseFloat(box.paddingLeft),paddingTop:parseFloat(box.paddingTop)};
       }),
       match:selectors.map(selector=>{
@@ -376,7 +376,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
      expect(Math.abs(pane.clientWidth-pane.paneWidth),'Frost must reach BOTH inner edges: '+pane.id).toBeLessThanOrEqual(1);
      expect(Math.abs(pane.clientHeight-pane.paneHeight),'Frost must fill entire frame height: '+pane.id).toBeLessThanOrEqual(1);
      expect(Math.abs(pane.insetLeft+pane.paddingLeft),'Frost left edge must align with frame, no inset rectangle: '+pane.id).toBeLessThanOrEqual(1);
-     expect(Math.abs(pane.insetTop+pane.paddingTop),'Frost top edge must align with frame, no inset rectangle: '+pane.id).toBeLessThanOrEqual(1);
+     expect(Math.abs(pane.insetTop+pane.paddingTop),'Frost initial position aligns with frame: '+pane.id).toBeLessThanOrEqual(1);
+     expect(Math.abs(pane.stickyTop+pane.paddingTop),'Sticky top must sit ABOVE the padding, never leave a dark strip: '+pane.id).toBeLessThanOrEqual(1);
     }
     console.log('NATIVE_GLASS_PADDING_BOX_GEOMETRY',JSON.stringify(logoParity.tintGeometry));
     for(const value of logoParity.tintBackgrounds){
