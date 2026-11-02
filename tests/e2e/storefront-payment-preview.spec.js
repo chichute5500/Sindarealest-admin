@@ -91,6 +91,9 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
 }
 
 test('real Preview checkout: deposit/full amounts, all requested viewports and both themes, no payment receipt writes',async({page})=>{
+ // The remote smoke includes several independent checkout and account flows.
+ // A 30-second suite-wide timeout can expire during the final payment refresh.
+ test.setTimeout(60000);
  const headers={};
  if(process.env.CF_ACCESS_CLIENT_ID&&process.env.CF_ACCESS_CLIENT_SECRET){
   headers['CF-Access-Client-Id']=process.env.CF_ACCESS_CLIENT_ID;
