@@ -4885,15 +4885,19 @@ function openCheckout(options={}){
  sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
  const openEpoch=++checkoutOpenEpoch;
- $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
+ // Never reuse a quote/selection or old error notice from a previous visit.
+ $('#sdCheckoutQuoteNotice').hidden=false;
+ $('#sdCheckoutQuoteNotice').textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…';
+ $('#sdCheckoutOptions').replaceChildren();
  if(!checkoutProvinceLoadStarted){
   checkoutProvinceLoadStarted=true;
   void loadCheckoutProvinces();
  }
- // Prefill writes the saved phone synchronously, then waits for public
- // address lists. Fetch the read-only price quote IN PARALLEL: never make
- // payment options depend on a separate province/ward network request.
+ // Fill name/phone/street immediately, BEFORE the first payment-step paint.
+ // Province/ward options can finish loading independently, without blocking
+ // the quote. This also avoids the temporarily blank address tile.
  const prefillPromise=prefillCheckoutFromLocalAddress();
+ $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
  const loadQuoteSafely=()=>sdCheckoutLoadQuote().catch(error=>{
   if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
   sdCheckoutQuote={quoteReady:false,reason:error?.message||'Không kiểm tra được giá. Vui lòng thử lại.',options:[]};
