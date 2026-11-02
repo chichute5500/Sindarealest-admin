@@ -537,7 +537,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  for(const result of opticalScores){
   expect(result.main.matches,'Some computed properties remain shared with the logo Header for '+result.selector).toBeGreaterThanOrEqual(3);
    expect(result.rim.matches,'Header and Cart rim computed CSS should match for '+result.selector).toBe(result.rim.total);
-  expect(result.dynamicFilter,'Cart uses the tuned nested glass filter on '+result.selector).toContain('blur(10px)');
+  expect(result.dynamicFilter,'Cart uses the tuned nested glass filter on '+result.selector).toContain('blur(26px)');
    expect(result.dynamicFilter,'Do not darken the moving photographic backdrop on '+result.selector).not.toContain('brightness(');
  }
  console.log('CART_LOGO_GLASS_COMPUTED_STYLE_ONLY_NOT_VISUAL_PARITY',JSON.stringify(opticalScores));
@@ -588,35 +588,6 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 
- // The following samples are TEST ONLY: no simulated optical tint ships to shoppers.
- // Capture 4 materials across real top/middle/bottom cart scrolling contexts.
- const comparisons=[
-  ['clear-26','none','blur(26px) saturate(114%)'],
-  ['clear-36','none','blur(36px) saturate(114%)'],
-  ['thin-26','linear-gradient(145deg,rgba(255,255,255,.20),rgba(220,245,255,.09))','blur(26px) saturate(114%)'],
-  ['thin-36','linear-gradient(145deg,rgba(255,255,255,.20),rgba(220,245,255,.09))','blur(36px) saturate(114%)']
- ];
- for(const [name,background,filter] of comparisons){
-  await drawer.evaluate((el,{background,filter})=>{
-   for(const selector of ['.cart-header','.cart-subtotal-bar','#cartCheckout']){
-    const node=document.querySelector('#cartDrawer '+selector);
-    node.style.setProperty('background',background,'important');
-    node.style.setProperty('backdrop-filter',filter,'important');
-    node.style.setProperty('-webkit-backdrop-filter',filter,'important');
-   }
-  },{background,filter});
-  for(const [position,fraction] of [['top',0],['middle',.5],['bottom',1]]){
-   await drawer.evaluate((el,f)=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*f)},fraction);
-   await page.waitForTimeout(100);
-   await page.screenshot({path:join(output,'390x844-OPTICAL-TEST-ONLY-'+name+'-'+position+'.png'),fullPage:false,animations:'disabled'});
-  }
- }
- await drawer.evaluate(()=>{
-  for(const selector of ['.cart-header','.cart-subtotal-bar','#cartCheckout']){
-   const node=document.querySelector('#cartDrawer '+selector);
-   for(const name of ['background','backdrop-filter','-webkit-backdrop-filter'])node.style.removeProperty(name);
-  }
- });
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
  await page.screenshot({path:join(output,'360x800-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
