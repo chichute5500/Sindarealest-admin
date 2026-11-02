@@ -675,29 +675,24 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  await drawer.evaluate(el=>el.scrollTop=el.scrollHeight-el.clientHeight);
  await page.screenshot({path:join(output,'360x800-cart-eight-products-bottom.png'),fullPage:false,animations:'disabled'});
 
- // Reproduce Owner's six-item case where the actual catalog shows below
- // the compact Cart shell, outside all three optical glass bars.
+ // Reproduce Owner's six-item case: the two checkout bars must nearly meet
+ // the mobile dock so sharp catalog text cannot remain exposed below Cart.
  await page.setViewportSize({width:390,height:844});
  await page.locator('#cartList .cart-row[data-qa-visual-tile]').evaluateAll(nodes=>nodes.slice(-2).forEach(node=>node.remove()));
  await expect(page.locator('#cartList .cart-row')).toHaveCount(6);
- const geometry=[];
- for(const reserve of [96,86,80,74]){
-  await drawer.evaluate((el,n)=>{
-   el.style.setProperty('max-height','calc(100dvh - '+n+'px - env(safe-area-inset-top) - env(safe-area-inset-bottom))','important');
-   el.scrollTop=el.scrollHeight;
-  },reserve);
-  await page.waitForTimeout(100);
-  const metrics=await page.evaluate(()=>{
-   const d=document.querySelector('#cartDrawer').getBoundingClientRect(),n=document.querySelector('#mobileBottomNav').getBoundingClientRect(),f=document.querySelector('#cartDrawer .cart-bottom').getBoundingClientRect();
-   const x=Math.round(d.left+d.width*.5),y=Math.round((d.bottom+n.top)/2);
-   return {drawerBottom:d.bottom,navTop:n.top,footerBottom:f.bottom,gap:n.top-d.bottom,underGap:document.elementsFromPoint(x,y).slice(0,5).map(e=>e.id||String(e.className).slice(0,45))};
-  });
-  geometry.push({reserve,...metrics});
-  await page.screenshot({path:join(output,'QA-six-item-cart-bottom-reserve-'+reserve+'.png'),fullPage:false,animations:'disabled'});
- }
- console.log('CART_SIX_PRODUCT_BOTTOM_GAP_DIAGNOSTIC',JSON.stringify(geometry));
- await drawer.evaluate(el=>el.style.removeProperty('max-height'));
- // Restore the eight rows so the desktop test still exercises full overflow.
+ await drawer.evaluate(el=>{el.scrollTop=el.scrollHeight});
+ await page.waitForTimeout(160);
+ const footerGeometry=await page.evaluate(()=>{
+  const drawer=document.querySelector('#cartDrawer').getBoundingClientRect();
+  const nav=document.querySelector('#mobileBottomNav').getBoundingClientRect();
+  const checkout=document.querySelector('#cartCheckout').getBoundingClientRect();
+  return {drawerBottom:drawer.bottom,navTop:nav.top,checkoutBottom:checkout.bottom,gap:nav.top-drawer.bottom};
+ });
+ expect(footerGeometry.gap,'No sharp catalog strip should remain visible below the Cart').toBeGreaterThanOrEqual(0);
+ expect(footerGeometry.gap,'The Cart frosted edge must reach the dock without covering it').toBeLessThanOrEqual(7);
+ console.log('CART_SIX_PRODUCT_BOTTOM_GLASS_FIXED',JSON.stringify(footerGeometry));
+ await page.screenshot({path:join(output,'390x844-cart-six-products-bottom-frosted-to-dock.png'),fullPage:false,animations:'disabled'});
+ // Desktop still needs all eight products for the inner-list scroll check.
  await page.locator('#cartList .cart-row').last().evaluate(row=>{
   for(let i=0;i<2;i++){
    const clone=row.cloneNode(true);clone.dataset.qaVisualTile='true';
