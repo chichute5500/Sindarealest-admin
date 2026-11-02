@@ -562,6 +562,20 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  expect(midpoint).toBeGreaterThan(0);
  expect(midpoint).toBeLessThan(maxScroll);
  await page.screenshot({path:join(output,'390x844-cart-four-products-middle.png'),fullPage:false,animations:'disabled'});
+ // Optical candidates, same three cart bars and real scrolling products behind them.
+ // Styles are injected for QA screenshots ONLY and fully removed before any checkout.
+ const candidates=[
+  {name:'brightness-085',film:'blur(17px) saturate(114%) brightness(.85)'},
+  {name:'brightness-075',film:'blur(17px) saturate(114%) brightness(.75)'},
+  {name:'brightness-068',film:'blur(20px) saturate(122%) brightness(.68)'},
+  {name:'contrast-082',film:'blur(17px) saturate(114%) brightness(.82) contrast(.92)'}
+ ];
+ for(const candidate of candidates){
+  const style=await page.addStyleTag({content:'#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{-webkit-backdrop-filter:'+candidate.film+'!important;backdrop-filter:'+candidate.film+'!important}'});
+  await page.waitForTimeout(70);
+  await page.screenshot({path:join(output,'390x844-cart-visual-'+candidate.name+'.png'),fullPage:false,animations:'disabled'});
+  await style.evaluate(el=>el.remove());
+ }
  await drawer.evaluate(el=>el.scrollTop=el.scrollHeight-el.clientHeight);
  const endpoint=await drawer.evaluate(el=>el.scrollTop);
  expect(endpoint).toBeGreaterThan(midpoint);
