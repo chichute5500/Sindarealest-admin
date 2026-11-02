@@ -313,7 +313,26 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.locator('#checkoutDrawer input[name="fullName"]').fill('Khách mua ngay');
  await page.locator('#checkoutDrawer input[name="phone"]').fill('0900000000');
  await page.locator('#checkoutStreet').fill('Địa chỉ kiểm thử');
- const province=page.locator('#checkoutProvince');await expect.poll(()=>province.locator('option').count()).toBeGreaterThan(1);expect(divisionRequests).toBeGreaterThan(0);await province.selectOption({index:1});
+ const province=page.locator('#checkoutProvince');
+ try{await expect.poll(()=>province.locator('option').count()).toBeGreaterThan(1)}
+ catch(error){
+  const diag=await page.evaluate(()=>({
+   checkoutOpen:document.querySelector('#checkoutDrawer')?.classList.contains('open'),
+   provinceOptions:document.querySelector('#checkoutProvince')?.options.length,
+   provinceText:document.querySelector('#checkoutProvince')?.textContent,
+   addressMessage:document.querySelector('#checkoutAddressMessage')?.textContent,
+   quoteNotice:document.querySelector('#sdCheckoutQuoteNotice')?.textContent,
+   productRows:document.querySelectorAll('#sdCheckoutItemSummary .sd-checkout-item').length,
+   shippingStepHidden:document.querySelector('#sdCheckoutShippingStep')?.hidden,
+   paymentStepHidden:document.querySelector('#sdCheckoutPaymentStep')?.hidden,
+   checkoutButton:document.querySelector('#checkoutSubmit')?.textContent,
+   checkoutButtonDisabled:document.querySelector('#checkoutSubmit')?.disabled,
+   savedAddress:!!localStorage.getItem('sd-shipping-address')
+  }));
+  console.log('SD_CHECKOUT_DIAGNOSTIC',JSON.stringify({divisionRequests,errors,diag}));
+  throw error;
+ }
+ expect(divisionRequests).toBeGreaterThan(0);await province.selectOption({index:1});
  const ward=page.locator('#checkoutWard');await expect.poll(()=>ward.locator('option').count()).toBeGreaterThan(1);await ward.selectOption({index:1});
  await page.locator('#checkoutSubmit').click();await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();
  await expect(page.locator('#sdCheckoutReviewAddressRow')).toBeVisible();
