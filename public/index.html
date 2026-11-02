@@ -2067,14 +2067,13 @@ html.dark .sd-fullscreen-share{
 #cartDrawer{--sd-native-glass-gap:14px}
 #cartDrawer>.cart-header,
 #cartDrawer>.cart-list,
-#cartDrawer>.cart-bottom,
 #checkoutDrawer>.checkout-header,
-#checkoutDrawer>.checkout-form,
-#checkoutDrawer>.sd-checkout-footer{
+#checkoutDrawer>.checkout-form{
   position:relative;
   z-index:1;
 }
-/* Keep scrollable content beneath each individual native glass header. */
+/* Do not override the sticky footer's position with a stronger ID selector.
+   A flex-item z-index is sufficient to layer footer controls over the plane. */
 #cartDrawer>.cart-header,
 #checkoutDrawer>.checkout-header{z-index:3}
 #cartDrawer>.cart-bottom,
