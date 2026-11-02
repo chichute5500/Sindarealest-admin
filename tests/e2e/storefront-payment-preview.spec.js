@@ -62,6 +62,12 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
   form.scrollTop=0;drawer.scrollTop=0;
   return result;
  });
+ // Payment product rows must be present immediately on step two; the
+ // network price quote may load later, but it must never erase cart items.
+ if(await page.locator('#sdCheckoutPaymentStep').isVisible()){
+  const rows=await page.locator('#sdCheckoutItemSummary .sd-checkout-item').count();
+  expect(rows,'Payment cannot show a blank "Sản phẩm trong đơn" tile').toBeGreaterThan(0);
+ }
  expect(state.oneScrollBody).toBe(true);
  expect(state.titleCentered).toBeLessThanOrEqual(2);
  expect(state.titleWeight).toBeGreaterThanOrEqual(700);
