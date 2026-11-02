@@ -274,7 +274,11 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
  let divisionRequests=0;
- await page.route('https://provinces.open-api.vn/api/v2/p/**',async route=>{
+ // Match both /p/ and /p/<province>?depth=2. The previous glob could
+ // miss a root-level province-list request in Chromium and leak to network.
+ // This fixtures only the public address directory; payment/order APIs
+ // remain separately asserted and never touch Production.
+ await context.route(/^https:\/\/provinces\.open-api\.vn\/api\/v2\/p(?:\/.*)?(?:\?.*)?$/,async route=>{
   divisionRequests++;
   const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, OPTIONS','Access-Control-Allow-Headers':route.request().headers()['access-control-request-headers']||'*','Access-Control-Max-Age':'86400'};
   if(route.request().method()==='OPTIONS'){await route.fulfill({status:204,headers:cors});return}
