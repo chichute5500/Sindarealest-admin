@@ -882,6 +882,18 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  expect(cartRapidFrames.every(x=>x.masked===0&&x.clones===0&&x.clipped===0),
   'No cart source content may disappear on any rapid scroll frame').toBe(true);
  console.log('CART_NATIVE_GLASS_FAST_SCROLL',JSON.stringify(cartRapidFrames));
+ const cartPlane=await drawer.evaluate(el=>({
+  hostBackdrop:getComputedStyle(el).backdropFilter,
+  planeBackdrop:getComputedStyle(el,'::before').backdropFilter,
+  planeTint:getComputedStyle(el,'::before').backgroundColor,
+  planePointerEvents:getComputedStyle(el,'::before').pointerEvents,
+  headerBackdrop:getComputedStyle(el.querySelector('.cart-header')).backdropFilter
+ }));
+ expect(cartPlane.hostBackdrop).toBe('none');
+ expect(cartPlane.planeBackdrop).toContain('blur(24px)');
+ expect(cartPlane.planePointerEvents).toBe('none');
+ expect(cartPlane.headerBackdrop).toContain('blur(17px)');
+ console.log('CART_NATIVE_BACKGROUND_PLANE',JSON.stringify(cartPlane));
 
  await page.screenshot({path:join(output,'390x844-eight-items-real-blur-60-percent.png'),fullPage:false,animations:'disabled'});
  await page.setViewportSize({width:360,height:800});
