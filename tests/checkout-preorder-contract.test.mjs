@@ -112,8 +112,17 @@ const quoteIndex=openCheckoutBody.indexOf('const quickQuote=maySkipAddress?loadQ
 const waitIndex=openCheckoutBody.indexOf('prefillPromise.then(async()=>');
 assert.ok(prefillIndex>=0&&quoteIndex>prefillIndex&&waitIndex>quoteIndex,'Start read-only quote in parallel instead of serially after administrative division loading');
 assert.match(openCheckoutBody,/\$\('#sdCheckoutOptions'\)\.replaceChildren\(\)/,'Do not display stale payment methods from a previous checkout session');
-assert.match(openCheckoutBody,/\$\('#sdCheckoutQuoteNotice'\)\.textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…'/,'Waiting state resets cleanly on each checkout open');
+assert.match(openCheckoutBody,/\$\('#sdCheckoutQuoteText'\)\.textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…'/,'Waiting state resets cleanly on each checkout open');
 assert.doesNotMatch(openCheckoutBody,/fetch\('\/api\/orders'/,'Prefilling and fetching a quote must not create an order');
+
+assert.match(html,/let checkoutItemsOverride=null,checkoutFromCart=true,checkoutSessionItems=null/,'An open payment checkout has a stable item snapshot');
+assert.match(html,/function sdCheckoutItems\(\)\{return \(checkoutSessionItems\|\|\[\]\)\.map/,'Quote, summary, and final order always read the same selection');
+assert.match(openCheckoutBody,/checkoutSessionItems=entries\.map\(item=>\(\{/,'The selected cart entries are captured once at payment opening');
+assert.match(html,/checkoutOpenEpoch\+\+;checkoutSessionItems=null/,'Closing checkout invalidates stale items and in-flight quotes');
+assert.match(html,/id="sdCheckoutQuoteText"/,'Checkout has a stable inline progress/error text node');
+assert.match(html,/id="sdCheckoutRetryQuote" hidden/,'A failed price fetch can be retried without replacing the order');
+assert.match(html,/\$\('#sdCheckoutRetryQuote'\)\.addEventListener\('click',async\(\)=>\{/,'Retry button invokes read-only quote API only after explicit tap');
+
 
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
 assert.match(html,/getElementById|querySelector|#sdCheckoutQrImage/);
