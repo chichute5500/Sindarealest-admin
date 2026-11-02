@@ -1195,3 +1195,107 @@ test('mobile account: partially verified transfer shows exact top-up QR, and ref
  expect(reads).toBe(2);
  expect(unexpectedWrites).toBe(0);
 });
+
+
+test('mobile account payment refresh: five server statuses, local/Cloud, reload and 60-second lock',async({page})=>{
+ test.setTimeout(90000);
+ await page.setViewportSize({width:390,height:844});
+ await page.clock.install({time:new Date('2026-11-03T05:40:00+07:00')});
+ const numbers=['SD-QA-REFRESH-00','SD-QA-REFRESH-01','SD-QA-REFRESH-02','SD-QA-REFRESH-03','SD-QA-REFRESH-04'];
+ const statuses=['Chưa xác nhận tiền','Chưa đủ tiền cọc','Đã nhận cọc + dư','Đã nhận đủ','Chưa cập nhật'];
+ const amounts=[0,1000000,1600000,1400000,null],requiredAmount=1400000;
+ await page.addInitScript((numbers)=>{
+  localStorage.setItem('sd-local-order-history',JSON.stringify(numbers.map(orderNumber=>({
+   orderNumber,accessToken:'a'.repeat(64),createdAt:new Date().toISOString(),
+   status:'pending_confirmation',deliveryStatus:'not_shipped',total:4500000,
+   priceConfirmationRequired:false,items:[],paymentSummary:null
+  }))));
+  localStorage.removeItem('sd-order-payment-refresh-v1');
+ },numbers);
+ const localCalls=new Map(),cloudNumber='SD-QA-CLOUD-REFRESH-06';
+ await page.route('**/api/order-payment?*',async route=>{
+  const orderNumber=new URL(route.request().url()).searchParams.get('orderNumber');
+  const index=numbers.indexOf(orderNumber);
+  if(index<0){await route.fallback();return}
+  localCalls.set(orderNumber,(localCalls.get(orderNumber)||0)+1);
+  if(index===4){await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({ok:false})});return}
+  const net=amounts[index],summary={
+   paymentOption:'deposit',total:4500000,requiredAmount,
+   netReceivedAmount:net,shortfall:Math.max(0,requiredAmount-net),
+   overpaidAmount:Math.max(0,net-requiredAmount),
+   codRemaining:Math.max(0,3100000-Math.max(0,net-requiredAmount)),
+   eligibleToShip:net>=requiredAmount
+  };
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+   ok:true,orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',
+   total:4500000,priceConfirmationRequired:false,paymentSummary:summary
+  })});
+ });
+ let cloudCalls=0;
+ await page.route('**/api/customer/order-payment?*',async route=>{
+  const orderNumber=new URL(route.request().url()).searchParams.get('orderNumber');
+  if(orderNumber!==cloudNumber){await route.fallback();return}
+  cloudCalls++;
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({
+   ok:true,orderNumber,orderStatus:'confirmed',deliveryStatus:'not_shipped',
+   total:4500000,priceConfirmationRequired:false,
+   paymentSummary:{paymentOption:'full',total:4500000,requiredAmount:4275000,
+    netReceivedAmount:4275000,shortfall:0,overpaidAmount:0,codRemaining:0,eligibleToShip:true}
+  })});
+ });
+ const response=await page.goto(url,{waitUntil:'domcontentloaded'});
+ expect(response?.status()).toBe(200);
+ const welcome=page.locator('#welcomeSplash');
+ if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+ await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+ await page.locator('#mobileAccountNav').click();
+ await page.locator('#accountOrdersAction').click();
+ for(let i=0;i<numbers.length;i++){
+  const card=page.locator('#accountOrdersList [data-order-number="'+numbers[i]+'"]'),button=card.locator('[data-order-payment-check]');
+  await expect(button).toHaveText('Cập nhật thanh toán');
+  await button.click();
+  await expect(button).toHaveText(statuses[i]);
+  await expect(button).toBeDisabled();
+  await expect(card.locator('.local-order-sync-message')).toHaveCount(0);
+  await button.evaluate(el=>el.dispatchEvent(new MouseEvent('click',{bubbles:true})));
+  expect(localCalls.get(numbers[i])).toBe(1);
+ }
+ await page.screenshot({path:join(output,'390x844-payment-refresh-local-five-statuses.png'),fullPage:false,animations:'disabled'});
+ await page.reload({waitUntil:'domcontentloaded'});
+ const welcomeAgain=page.locator('#welcomeSplash');
+ if(await welcomeAgain.count()&&await welcomeAgain.isVisible())await page.locator('#skipIntro').click();
+ await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+ await page.locator('#mobileAccountNav').click();
+ await page.locator('#accountOrdersAction').click();
+ for(let i=0;i<numbers.length;i++){
+  const button=page.locator('#accountOrdersList [data-order-number="'+numbers[i]+'"] [data-order-payment-check]');
+  await expect(button).toHaveText(statuses[i]);
+  await expect(button).toBeDisabled();
+  expect(localCalls.get(numbers[i])).toBe(1);
+ }
+ await page.screenshot({path:join(output,'390x844-payment-refresh-after-reload.png'),fullPage:false,animations:'disabled'});
+ await page.clock.fastForward(60100);
+ for(const number of numbers){
+  const button=page.locator('#accountOrdersList [data-order-number="'+number+'"] [data-order-payment-check]');
+  await expect(button).toHaveText('Cập nhật thanh toán');
+  await expect(button).toBeEnabled();
+ }
+ await page.screenshot({path:join(output,'390x844-payment-refresh-after-60s.png'),fullPage:false,animations:'disabled'});
+ await page.evaluate(number=>{
+  accountSyncMode='cloud';
+  cloudOrderHistory=[{orderNumber:number,createdAt:new Date().toISOString(),
+   status:'pending_confirmation',deliveryStatus:'not_shipped',total:4500000,
+   priceConfirmationRequired:false,items:[],paymentSummary:null}];
+  renderOrderHistory();
+ },cloudNumber);
+ const cloudCard=page.locator('#accountOrdersList [data-order-number="'+cloudNumber+'"]');
+ const cloudButton=cloudCard.locator('[data-account-orders-refresh]');
+ await expect(cloudButton).toHaveText('Cập nhật thanh toán');
+ await cloudButton.click();
+ await expect(cloudButton).toHaveText('Đã nhận đủ');
+ await expect(cloudButton).toBeDisabled();
+ expect(cloudCalls).toBe(1);
+ await expect(cloudCard.locator('.local-order-payment')).toContainText('4.275.000');
+ await expect(cloudCard.locator('.local-order-sync-message')).toHaveCount(0);
+ await page.screenshot({path:join(output,'390x844-payment-refresh-cloud.png'),fullPage:false,animations:'disabled'});
+});
