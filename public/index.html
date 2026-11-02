@@ -2050,10 +2050,18 @@ html.dark .sd-fullscreen-share{
   top:0;
   display:block;
   flex:0 0 var(--sd-native-glass-height,0px);
-  width:100%;
+  /* The pseudo-element is a flex child. Its default 100% width only covers
+     the CONTENT box, leaving an unwanted straight-edged inset panel beside
+     the padded drawer frame. Extend it to the entire padding box. */
+  align-self:flex-start;
+  width:var(--sd-native-glass-width,100%);
+  min-width:var(--sd-native-glass-width,100%);
   height:var(--sd-native-glass-height,0px);
   min-height:0;
-  margin-bottom:calc(-1 * var(--sd-native-glass-height,0px) - var(--sd-native-glass-gap,14px));
+  margin-left:calc(-1 * var(--sd-native-glass-pad-left,0px));
+  margin-top:calc(-1 * var(--sd-native-glass-pad-top,0px));
+  /* Offset the negative top margin so the actual header's layout is intact. */
+  margin-bottom:calc(-1 * var(--sd-native-glass-height,0px) - var(--sd-native-glass-gap,14px) + var(--sd-native-glass-pad-top,0px));
   z-index:0;
   border-radius:inherit;
   background:var(--sd-reference-surface);
@@ -5667,9 +5675,14 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
   if(height<=0)return;
   const computed=getComputedStyle(drawer);
   const gap=Number.parseFloat(computed.rowGap)||0;
-  const h=height+'px',g=gap+'px';
-  if(drawer.style.getPropertyValue('--sd-native-glass-height')!==h)drawer.style.setProperty('--sd-native-glass-height',h);
-  if(drawer.style.getPropertyValue('--sd-native-glass-gap')!==g)drawer.style.setProperty('--sd-native-glass-gap',g);
+  const h=height+'px',g=gap+'px',w=drawer.clientWidth+'px';
+  const pt=(Number.parseFloat(computed.paddingTop)||0)+'px';
+  const pl=(Number.parseFloat(computed.paddingLeft)||0)+'px';
+  for(const [name,value] of [
+   ['--sd-native-glass-height',h],['--sd-native-glass-gap',g],
+   ['--sd-native-glass-width',w],['--sd-native-glass-pad-top',pt],
+   ['--sd-native-glass-pad-left',pl]
+  ])if(drawer.style.getPropertyValue(name)!==value)drawer.style.setProperty(name,value);
   if(drawer.id==='checkoutDrawer'){
    const footer=drawer.querySelector('.sd-checkout-footer');
    if(footer){
