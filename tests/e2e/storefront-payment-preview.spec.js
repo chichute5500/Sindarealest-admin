@@ -201,7 +201,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  );
  for(const face of cartGlassFaces){
   // Chromium quantizes rgba alpha to 8-bit channels (e.g. .296 -> .294).
-  const alphas=[...face.matchAll(/rgba\\(255, 255, 255, ([0-9.]+)\\)/g)].map(m=>Number(m[1]));
+  const alphas=[...face.matchAll(/rgba\(255, 255, 255, ([0-9.]+)\)/g)].map(m=>Number(m[1]));
   expect(alphas).toHaveLength(2);
   expect(Math.abs(alphas[0]-.424)).toBeLessThanOrEqual(.005);
   expect(Math.abs(alphas[1]-.296)).toBeLessThanOrEqual(.005);
