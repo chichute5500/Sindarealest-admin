@@ -75,6 +75,33 @@ assert.equal(chosen.paymentInstructions.status,"ready");
 assert.equal(quoteReads.r2Heads,1,"Only selected payment performs QR verification");
 assert.equal(quoteReads.settings.filter(x=>x==="payment_qr_active").length,1);
 
+quoteSettings.show_prices="0";
+const hiddenPrice=await (await checkoutQuotePost({request:quoteRequest(),env:quoteEnv})).json();
+assert.equal(hiddenPrice.quoteReady,false,"A hidden-price product must never receive an invented amount");
+assert.equal(hiddenPrice.paymentReady,false);
+quoteSettings.show_prices="1";
+
+previewProduct.source_price_confirmed=0;
+const unverifiedPrice=await (await checkoutQuotePost({request:quoteRequest(),env:quoteEnv})).json();
+assert.equal(unverifiedPrice.quoteReady,false,"Unverified prices cannot offer deposit/full checkout");
+previewProduct.source_price_confirmed=1;
+
+previewProduct.published=0;
+const unpublished=await checkoutQuotePost({request:quoteRequest(),env:quoteEnv});
+assert.equal(unpublished.status,409,"Unpublished products must fail instead of entering an empty payment step");
+previewProduct.published=1;
+
+const qrBeforeMissing=quoteReads.r2Heads;
+quoteEnv.IMAGES.head=async()=>{quoteReads.r2Heads++;return null};
+const missingQr=await (await checkoutQuotePost({request:quoteRequest("full",4500000),env:quoteEnv})).json();
+assert.equal(missingQr.quoteReady,true,"Price quote remains valid when QR storage is unavailable");
+assert.equal(missingQr.paymentReady,false,"Never offer a QR when the R2 image is missing");
+assert.equal(quoteReads.r2Heads,qrBeforeMissing+1,"Missing QR must be rechecked on explicit choice");
+
+const staleAmount=await checkoutQuotePost({request:quoteRequest("deposit",1000000),env:quoteEnv});
+assert.equal(staleAmount.status,409,"Server must reject any outdated client quote");
+
+
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const quote=readFileSync(new URL("../functions/api/checkout-quote.js",import.meta.url),"utf8");
 const create=readFileSync(new URL("../functions/api/orders.js",import.meta.url),"utf8");
