@@ -778,13 +778,14 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  const metrics=await drawer.evaluate(el=>{
   const list=el.querySelector('#cartList'),header=el.querySelector('.cart-header'),footer=el.querySelector('.cart-bottom'),last=list.querySelector('.cart-row:last-child');
   const view=x=>x.getBoundingClientRect();
-  const before={drawerScroll:getComputedStyle(el).overflowY,listScroll:getComputedStyle(list).overflowY,listScrollX:getComputedStyle(list).overflowX,drawerOverflow:el.scrollHeight-el.clientHeight,listOverflow:list.scrollHeight-list.clientHeight,headerTop:view(header).top,footerBottom:view(footer).bottom};
+  const before={drawerScroll:getComputedStyle(el).overflowY,listScroll:getComputedStyle(list).overflowY,listScrollX:getComputedStyle(list).overflowX,drawerOverflow:el.scrollHeight-el.clientHeight,listOverflow:list.scrollHeight-list.clientHeight,headerTop:view(header).top,footerBottom:view(footer).bottom,footerPosition:getComputedStyle(footer).position};
   el.scrollTop=el.scrollHeight;
   const after={headerTop:view(header).top,footerBottom:view(footer).bottom,lastBottom:view(last).bottom,footerTop:view(footer).top,scroll:el.scrollTop};
   el.scrollTop=0;
   return {before,after};
  });
  console.log('CART_EIGHT_ITEM_STICKY_GEOMETRY',JSON.stringify(metrics));
+ expect(metrics.before.footerPosition,'Native Cart action bar remains sticky, never relative').toBe('sticky');
  expect(metrics.before.drawerScroll,'Cart shell must own scrolling').toBe('auto');
  expect(metrics.before.listScroll,'Cart list must not clip product tiles').toBe('visible');
  expect(metrics.before.listScrollX,'Cart list must not clip horizontally either').toBe('visible');
