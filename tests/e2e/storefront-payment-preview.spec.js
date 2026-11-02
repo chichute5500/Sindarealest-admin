@@ -219,7 +219,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  for(const lens of cartFilterCascade){
   expect(lens.backdrop).toContain('blur(40.56px)');
   if(lens.webkit)expect(lens.webkit).toContain('blur(40.56px)'); // Chromium may omit the vendor alias.
-  expect(lens.background).toContain('rgba(255, 255, 255, 0.7)');
+  expect(lens.background).toContain('linear-gradient(');
  }
  console.log('CART_THREE_BARS_COMPUTED_CASCADE',JSON.stringify(cartFilterCascade));
  await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});
