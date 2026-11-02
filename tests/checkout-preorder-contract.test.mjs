@@ -122,6 +122,8 @@ assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtot
 assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[\s\S]*?background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important/,'Cart optics preserve the original header and let product colors transmit through drawer');
 assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[\s\S]*?-webkit-backdrop-filter:blur\(56\.784px\) saturate\(114%\);\s*backdrop-filter:blur\(56\.784px\) saturate\(114%\)/,'Three Cart bars use an additional 40% blur without new layering or brightness tint');
 assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[^}]*brightness\(/,'Cart glass must never darken real photographs with brightness()');
+assert.match(html,/<script defer src="\/cart-glass-optics\.js"><\/script>/,'Cart optical lens runs without touching order code');
+assert.match(html,/#cartDrawer \.sd-cart-optical-lens\{[^}]*pointer-events:none/,'Optical mirrors do not intercept checkout interaction');
 assert.doesNotMatch(html,/background-color:rgba\(115,111,104,\.88\)!important|background-color:rgba\(9,27,43,\.88\)!important/,'Remove legacy light and dark gray tint overrides');
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');

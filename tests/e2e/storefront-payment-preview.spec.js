@@ -616,22 +616,6 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  await page.screenshot({path:join(output,'390x844-cart-eight-products-scrolled.png'),fullPage:false,animations:'disabled'});
 
 
- // QA-only alternatives, never shipped as CSS. Reproduce the same 8-row
- // composition at a 60% overlap to locate backdrop-root/stacking failure.
- const cartLayerExperiments=[
-  ['as-is',''],
-  ['parent-no-filter','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'],
-  ['parent-no-filter-strong-child','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout{backdrop-filter:blur(90px)!important;-webkit-backdrop-filter:blur(90px)!important}'],
-  ['parent-filter-on-pseudo','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:transparent!important}#cartDrawer::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(246,251,255,.68);backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%)}'],
-  ['parent-blur-on-nested-pseudo','#cartDrawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:transparent!important}#cartDrawer::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgba(246,251,255,.68);backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%)}']
- ];
- for(const [name,css] of cartLayerExperiments){
-  const injection=css?await page.addStyleTag({content:css}):null;
-  await drawer.evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*.6)});
-  await page.waitForTimeout(120);
-  await page.screenshot({path:join(output,'QA-EIGHT-LENS-'+name+'.png'),fullPage:false,animations:'disabled'});
-  if(injection)await injection.evaluate(el=>el.remove());
- }
  // Eight scroll points expose real images, product names, prices and quantity
  // controls behind the glass. These are visual-only DOM fixtures, not orders.
  for(const [index,fraction] of [0,.15,.3,.45,.6,.75,.9,1].entries()){
@@ -669,65 +653,20 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 
 
- // QA-only optical mirror: blur only the product pixels physically passing
- // behind each of the three glass lenses; outside-lens product pixels stay sharp.
- await drawer.evaluate(shell=>{
-  const rows=[...shell.querySelectorAll('#cartList .cart-row')];
-  const bars=['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(sel=>shell.querySelector(sel));
-  const lenses=bars.map(bar=>{
-   const lens=document.createElement('div');
-   lens.setAttribute('aria-hidden','true');
-   lens.className='qa-product-lens';
-   Object.assign(lens.style,{position:'absolute',inset:'0',zIndex:'0',overflow:'hidden',borderRadius:'inherit',pointerEvents:'none'});
-   for(const child of [...bar.children]){
-    if(getComputedStyle(child).position==='static')child.style.position='relative';
-    child.style.zIndex='3';
-   }
-   bar.style.isolation='isolate';
-   bar.insertBefore(lens,bar.firstChild);
-   return lens;
-  });
-  shell.scrollTop=Math.round((shell.scrollHeight-shell.clientHeight)*.6);
-  for(const row of rows){
-   const r=row.getBoundingClientRect();
-   let topCrop=0,bottomCrop=0;
-   bars.forEach((bar,i)=>{
-    const b=bar.getBoundingClientRect();
-    const width=Math.min(r.right,b.right)-Math.max(r.left,b.left);
-    const height=Math.min(r.bottom,b.bottom)-Math.max(r.top,b.top);
-    if(width<8||height<2)return;
-    const mirror=row.cloneNode(true);
-    mirror.removeAttribute('id');
-    mirror.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
-    mirror.setAttribute('aria-hidden','true');
-    Object.assign(mirror.style,{
-     position:'absolute',
-     left:(r.left-b.left)+'px',top:(r.top-b.top)+'px',
-     width:r.width+'px',height:r.height+'px',
-     minWidth:r.width+'px',minHeight:r.height+'px',
-     margin:'0',pointerEvents:'none',
-     filter:'blur(14px)',WebkitFilter:'blur(14px)',
-     transform:'translateZ(0)'
-    });
-    lenses[i].appendChild(mirror);
-    if(i===0)topCrop=Math.max(topCrop,Math.min(r.height,b.bottom-r.top));
-    else bottomCrop=Math.max(bottomCrop,Math.min(r.height,r.bottom-b.top));
-   });
-   row.style.clipPath='inset('+topCrop+'px 0px '+bottomCrop+'px 0px)';
-  }
- });
- await page.waitForTimeout(120);
- await page.screenshot({path:join(output,'QA-EIGHT-LENS-true-product-blur.png'),fullPage:false,animations:'disabled'});
- await page.locator('#cartDrawer .cart-subtotal-bar').screenshot({path:join(output,'QA-EIGHT-LENS-true-product-blur-subtotal.png'),animations:'disabled'});
- await page.locator('#cartDrawer #cartCheckout').screenshot({path:join(output,'QA-EIGHT-LENS-true-product-blur-payment.png'),animations:'disabled'});
- await drawer.evaluate(shell=>{
-  shell.querySelectorAll('.qa-product-lens').forEach(e=>e.remove());
-  shell.querySelectorAll('#cartList .cart-row').forEach(row=>{row.style.removeProperty('clip-path')});
-  ['.cart-header','.cart-subtotal-bar','#cartCheckout'].forEach(selector=>{
-   const el=shell.querySelector(selector);el.style.removeProperty('isolation');
-   for(const child of el.children){child.style.removeProperty('z-index')}
-  });
- });
+ // Verify the shipped lens, rather than a manually injected QA workaround.
+ await drawer.evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*.6)});
+ await page.waitForTimeout(160);
+ await expect(page.locator('#cartDrawer .sd-cart-optical-lens')).toHaveCount(3);
+ const focus=await drawer.evaluate(el=>({
+  blurredMirrors:el.querySelectorAll('.sd-cart-optical-mirror').length,
+  clippedRealRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).clipPath!=='none').length,
+  mirrorFilters:[...el.querySelectorAll('.sd-cart-optical-mirror')].map(row=>getComputedStyle(row).filter)
+ }));
+ expect(focus.blurredMirrors,'Product content crossing the glass must have an optical mirror').toBeGreaterThan(0);
+ expect(focus.clippedRealRows,'Sharp source pixels behind the glass must be hidden').toBeGreaterThan(0);
+ for(const filter of focus.mirrorFilters)expect(filter).toContain('blur(14px)');
+ console.log('CART_EIGHT_PRODUCT_REAL_GLASS_BLUR',JSON.stringify(focus));
+ await page.screenshot({path:join(output,'390x844-eight-items-real-blur-60-percent.png'),fullPage:false,animations:'disabled'});
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
  await page.screenshot({path:join(output,'360x800-cart-eight-products-top.png'),fullPage:false,animations:'disabled'});

@@ -2232,6 +2232,18 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   box-shadow:var(--sd-3d-shadow)!important;
   -webkit-backdrop-filter:blur(56.784px) saturate(114%);
   backdrop-filter:blur(56.784px) saturate(114%);
+  isolation:isolate;
+}
+/* These three bar-mounted lenses sample only the product pixels beneath them.
+   The existing glass face, rim, shadows, Cart shell and product card design stay intact. */
+#cartDrawer .sd-cart-optical-lens{
+  position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit;
+  pointer-events:none;contain:paint;background:transparent;
+}
+#cartDrawer .sd-cart-optical-mirror{
+  position:absolute;box-sizing:border-box;margin:0;max-width:none;
+  pointer-events:none;filter:blur(14px);-webkit-filter:blur(14px);
+  transform:translateZ(0);
 }
 html.dark #cartDrawer .cart-header,
 html.dark #cartDrawer .cart-subtotal-bar,
@@ -5591,5 +5603,6 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
 </script>
 
 
+<script defer src="/cart-glass-optics.js"></script>
 </body>
 </html>
