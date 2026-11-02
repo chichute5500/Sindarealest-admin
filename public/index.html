@@ -2028,20 +2028,12 @@ html.dark .sd-fullscreen-share{
   .nav-wrap .nav .nav-actions{margin-left:auto!important;flex:0 0 auto}
 }
 /* Frosted drawer sheets stay distinct while keeping gaps between nested cards translucent. */
-.account-drawer{
+.account-drawer,.cart-drawer,.checkout-drawer{
   background:var(--sd-reference-surface-strong)!important;
   -webkit-backdrop-filter:blur(24px) saturate(145%);
   backdrop-filter:blur(24px) saturate(145%);
 }
-/* Unlike the outer page Header, Cart/Checkout are nested inside the same
-   scrolling drawer. A backdrop-filter on that ancestor creates a backdrop
-   root and prevents child glass from sampling real moving content. Keep the
-   outer sheet translucent without filtering; only its floating bars blur. */
-#cartDrawer,#checkoutDrawer{
-  background:var(--sd-reference-surface)!important;
-  -webkit-backdrop-filter:none!important;
-  backdrop-filter:none!important;
-}
+#cartDrawer,#checkoutDrawer{background:var(--sd-reference-surface)!important}
 .cart-list{width:100%;align-items:stretch}
 .cart-row{width:100%;box-sizing:border-box}
 
