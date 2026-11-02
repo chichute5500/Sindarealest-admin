@@ -1123,3 +1123,61 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  await expect(page.locator('#cartDrawer [class*="optical-lens"]')).toHaveCount(0);
  await page.screenshot({path:join(output,'1280x800-cart-eight-items-desktop-list-scrolled.png'),fullPage:false,animations:'disabled'});
 });
+
+
+test('mobile account: partially verified transfer shows exact top-up QR, and refresh never marks an unverified receipt',async({page})=>{
+ test.setTimeout(45000);
+ await page.setViewportSize({width:390,height:844});
+ const number='SD-QA-LOCAL-TOPUP-01';
+ const original=2100000,received=1500000;
+ await page.addInitScript((orderNumber)=>{
+  localStorage.setItem('sd-local-order-history',JSON.stringify([{
+   orderNumber,accessToken:'a'.repeat(64),createdAt:new Date().toISOString(),
+   status:'confirmed',deliveryStatus:'not_shipped',priceConfirmationRequired:false,total:6800000,
+   items:[],paymentSummary:{total:6800000,paymentOption:'deposit',requiredAmount:2100000,
+    netReceivedAmount:1500000,shortfall:600000,codRemaining:4700000,eligibleToShip:false}
+  }]));
+ },number);
+ let shortfall=600000,reads=0,unexpectedWrites=0;
+ await page.route('**/api/order-payment?*',async route=>{
+  const u=new URL(route.request().url());if(u.searchParams.get('orderNumber')!==number){await route.fallback();return}
+  reads++;
+  const summary={total:6800000,paymentOption:'deposit',requiredAmount:original,
+   netReceivedAmount:received+(shortfall===0?600000:0),shortfall,codRemaining:4700000,
+   eligibleToShip:shortfall===0,paidInFull:false};
+  await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},
+   body:JSON.stringify({ok:true,orderNumber:number,orderStatus:'confirmed',deliveryStatus:'not_shipped',
+    priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:shortfall>0,
+    paymentSummary:summary,total:6800000,amount:shortfall,
+    qrImageUrl:'/payment-qr/qr-ui-topup-fixture.png',bankName:'QA BANK',
+    accountName:'QA ACCOUNT',accountNumber:'0000000000',transferReference:'SD-QA-SAME-ORDER',
+    message:shortfall>0?'Shop đã nhận một phần tiền.':'Shop đã xác nhận đủ tiền cọc.'})});
+ });
+ await page.route('**/payment-qr/qr-ui-topup-fixture.png',async route=>{
+  await route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="160" height="160" fill="white"/><rect x="20" y="20" width="120" height="120" stroke="#111827" stroke-width="12" fill="none"/></svg>'});
+ });
+ page.on('request',request=>{if(request.method()==='POST'&&new URL(request.url()).pathname==='/api/orders')unexpectedWrites++});
+ const response=await page.goto(url,{waitUntil:'domcontentloaded'});expect(response?.status()).toBe(200);
+ const welcome=page.locator('#welcomeSplash');if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+ await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+ await page.locator('#mobileAccountNav').click();
+ await page.locator('#accountOrdersAction').click();
+ const card=page.locator('#accountOrdersList [data-order-number="'+number+'"]');
+ await expect(card).toBeVisible();
+ await expect(card.locator('[data-account-payment-topup]')).toContainText('600.000');
+ await card.locator('[data-account-payment-topup]').click();
+ const panel=card.locator('.local-order-topup');
+ await expect(panel).toBeVisible();
+ await expect(panel).toContainText('600.000');
+ await expect(panel).toContainText('SD-QA-SAME-ORDER');
+ await expect(panel).not.toContainText('2.100.000');
+ await expect(panel.locator('img')).toHaveJSProperty('naturalWidth',160);
+ await page.screenshot({path:join(output,'390x844-account-topup-600k-ui-fixture.png'),fullPage:false,animations:'disabled'});
+ shortfall=0;
+ await panel.locator('[data-account-payment-topup]').click();
+ await expect(card.locator('.local-order-topup')).toHaveCount(0);
+ await expect(card.locator('[data-account-payment-topup]')).toHaveCount(0);
+ await expect(card).toContainText('Shop đã xác nhận đủ khoản cần chuyển');
+ expect(reads).toBe(2);
+ expect(unexpectedWrites).toBe(0);
+});
