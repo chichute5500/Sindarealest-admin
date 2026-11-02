@@ -136,9 +136,9 @@
     const style=clone.style;
     const transform='translate3d('+(r.left-b.left)+'px,'+(r.top-b.top)+'px,0)';
     if(style.transform!==transform)style.transform=transform;
-    const width=r.width+'px',height=r.height+'px';
-    if(style.width!==width){style.width=width;style.minWidth=width}
-    if(style.height!==height){style.height=height;style.minHeight=height}
+    const mirrorWidth=r.width+'px',mirrorHeight=r.height+'px';
+    if(style.width!==mirrorWidth){style.width=mirrorWidth;style.minWidth=mirrorWidth}
+    if(style.height!==mirrorHeight){style.height=mirrorHeight;style.minHeight=mirrorHeight}
     covered.push([b.top-r.top,b.bottom-r.top]);
    });
    const mask=transparentZones(r.height,covered);
