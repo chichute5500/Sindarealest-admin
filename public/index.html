@@ -867,6 +867,10 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-options{display:grid;gap:8px}
 .checkout-drawer .sd-checkout-option{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:10px 11px;text-align:left;border-radius:14px;border:1px solid var(--sd-reference-edge,var(--line));background:var(--sd-reference-surface,var(--glass));color:var(--ink)}
 .checkout-drawer .sd-checkout-option.selected{border-color:var(--gold);background:var(--panel-strong);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 3px 14px rgba(92,145,185,.10)}
+/* Only the two payment choices pulse for the 2s validation window. */
+.checkout-drawer .sd-checkout-options.sd-checkout-needs-choice .sd-checkout-option{animation:sd-checkout-choice-alert .34s ease-in-out 6}
+@keyframes sd-checkout-choice-alert{0%,100%{border-color:var(--sd-reference-edge,var(--line));box-shadow:none}50%{border-color:#e23b4b;box-shadow:0 0 0 2px rgba(226,59,75,.32)}}
+@media(prefers-reduced-motion:reduce){.checkout-drawer .sd-checkout-options.sd-checkout-needs-choice .sd-checkout-option{animation:none;border-color:#e23b4b}}
 .checkout-drawer .sd-checkout-radio{width:18px;height:18px;flex:0 0 18px;border:1.5px solid var(--gold);border-radius:50%;display:grid;place-items:center}
 .checkout-drawer .sd-checkout-option.selected .sd-checkout-radio:after{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold)}
 .checkout-drawer .sd-checkout-option-label{min-width:0;flex:1;display:grid;gap:3px;font-size:11px}
@@ -908,7 +912,7 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer.sd-checkout-success .sd-checkout-actions{grid-template-columns:minmax(0,1fr)}
 .checkout-drawer.sd-checkout-success .sd-checkout-actions #sdCheckoutDone{grid-column:1;justify-self:end;width:auto;min-width:150px;max-width:240px}
 .checkout-drawer .sd-checkout-confirm-wrap{--progress:0%;position:relative;grid-column:1/-1;display:grid;place-items:center;min-height:56px;overflow:hidden;border-radius:999px}
-.checkout-drawer .sd-checkout-confirm-wrap::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--progress);border-radius:inherit;background:linear-gradient(100deg,#8ed29d,#6dbb81);transition:width 55ms linear;pointer-events:none}
+.checkout-drawer .sd-checkout-confirm-wrap::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--sd-confirm-fill,var(--progress));border-radius:inherit;background:linear-gradient(100deg,#8ed29d,#6dbb81);transition:none;pointer-events:none}
 .dark .checkout-drawer .sd-checkout-confirm-wrap::before{background:linear-gradient(100deg,#328653,#246b42)}
 .checkout-drawer .sd-checkout-confirm-wrap[style*="--progress: 100%"]::before{transition:none}
 .checkout-drawer .sd-checkout-confirm-wrap[hidden]{display:none!important}
@@ -4815,6 +4819,7 @@ function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)ret
 
 let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="",sdCheckoutSuccess=false,sdCheckoutOrderCreated=false,sdCheckoutOrderCreating=false,checkoutPreselectedChoice="";
 let checkoutItemsOverride=null,checkoutFromCart=true;
+let sdCheckoutChoicePulseTimer=0,sdCheckoutChoiceScrollFrame=0;
 function sdCheckoutItems(){return checkoutItemsOverride?checkoutItemsOverride.map(item=>({...item})):selectedCartEntries().map(({id,option,q})=>({id,option,quantity:q}))}
 function sdCheckoutSummary(selector){
  const target=$(selector);if(!target)return;target.replaceChildren();
@@ -4828,6 +4833,48 @@ function sdCheckoutSummary(selector){
 }
 function sdCheckoutSelected(){return sdCheckoutQuote?.quoteReady===true?sdCheckoutQuote.options?.find(x=>x.value===sdCheckoutChoice):null}
 function sdCheckoutSubmitLabel(){return sdCheckoutStep===1?'Tiếp tục chọn thanh toán →':'Tiến hành thanh toán →'}
+function sdCheckoutClearChoicePrompt(){
+ clearTimeout(sdCheckoutChoicePulseTimer);
+ cancelAnimationFrame(sdCheckoutChoiceScrollFrame);
+ const options=$('#sdCheckoutOptions');
+ options.classList.remove('sd-checkout-needs-choice');
+ options.removeAttribute('aria-invalid');
+ if(!sdCheckoutSuccess)$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();
+}
+function sdCheckoutPromptChoice(){
+ const options=$('#sdCheckoutOptions'),button=$('#checkoutSubmit');
+ if(!options.querySelector('.sd-checkout-option'))return;
+ button.textContent='Hãy chọn cách thanh toán';
+ $('#checkoutMessage').textContent='';
+ options.setAttribute('aria-invalid','true');
+ options.classList.remove('sd-checkout-needs-choice');
+ void options.offsetWidth; // Re-trigger both borders on every invalid attempt.
+ options.classList.add('sd-checkout-needs-choice');
+ clearTimeout(sdCheckoutChoicePulseTimer);
+ sdCheckoutChoicePulseTimer=setTimeout(()=>options.classList.remove('sd-checkout-needs-choice'),2040);
+ cancelAnimationFrame(sdCheckoutChoiceScrollFrame);
+ // Scroll within the actual modal scrollport; never scroll the page behind the glass.
+ let scroller=options.parentElement;
+ while(scroller&&scroller!==document.body){
+  const overflow=getComputedStyle(scroller).overflowY;
+  if(scroller.scrollHeight>scroller.clientHeight+4&&/auto|scroll/.test(overflow))break;
+  scroller=scroller.parentElement;
+ }
+ if(!scroller||scroller===document.body)scroller=$('#checkoutDrawer');
+ const from=scroller.scrollTop,optionRect=options.getBoundingClientRect(),scrollRect=scroller.getBoundingClientRect();
+ const maxScroll=Math.max(0,scroller.scrollHeight-scroller.clientHeight);
+ const goal=Math.max(0,Math.min(maxScroll,from+optionRect.top-scrollRect.top-(scroller.clientHeight-optionRect.height)/2));
+ if(Math.abs(goal-from)<2)return;
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches){scroller.scrollTop=goal;return}
+ const started=performance.now(),duration=720;
+ const frame=now=>{
+  if(sdCheckoutStep!==2||sdCheckoutChoice||!$('#checkoutDrawer').classList.contains('open'))return;
+  const t=Math.min(1,(now-started)/duration),eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  scroller.scrollTop=from+(goal-from)*eased;
+  if(t<1)sdCheckoutChoiceScrollFrame=requestAnimationFrame(frame);
+ };
+ sdCheckoutChoiceScrollFrame=requestAnimationFrame(frame);
+}
 function sdCheckoutRefreshChoice(){
  const value=sdCheckoutSelected(),amount=value?formatVnd(value.amount):'Chờ Shop xác nhận';
  const remainder=value?formatVnd(value.codExpected):'Chờ Shop xác nhận';
@@ -4857,7 +4904,7 @@ async function sdCheckoutLoadQuote(){
  sdCheckoutQuote=data;sdCheckoutChoice=(data.options||[]).some(option=>option.value===checkoutPreselectedChoice)?checkoutPreselectedChoice:'';sdCheckoutRenderQuote();
 }
 async function sdCheckoutLoadPaymentInstructions(){
- const selected=sdCheckoutSelected();if(!selected)throw Error('Hãy chọn một trong hai cách thanh toán.');
+ const selected=sdCheckoutSelected();if(!selected)throw Error('Hãy chọn cách thanh toán');
  const response=await fetch('/api/checkout-quote',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:sdCheckoutItems(),phone:$('#checkoutForm').elements.phone.value.trim(),paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total})});
  let data={};try{data=await response.json()}catch{}
  if(!response.ok||data.ok!==true)throw Error(data.error||'Giá hoặc cách thanh toán đã thay đổi. Vui lòng kiểm tra lại.');
@@ -4865,6 +4912,7 @@ async function sdCheckoutLoadPaymentInstructions(){
  sdCheckoutQuote=data;sdCheckoutChoice=selected.value;return data;
 }
 function sdCheckoutSetStep(step){
+ sdCheckoutClearChoicePrompt();
  sdCheckoutStep=Math.max(1,Math.min(2,Number(step)||1));
  $('#sdCheckoutStepper').hidden=false;
  const productionNote=$('#sdOrderProductionCaution');if(productionNote)productionNote.hidden=!sdCheckoutItems().some(({id})=>productFulfillmentType(findProductByKey(id))==='made_to_order');
@@ -4884,7 +4932,18 @@ function sdCheckoutSetStep(step){
 }
 function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected(),payment=sdCheckoutQuote?.paymentInstructions;return selected?{paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total,...(sdCheckoutQuote?.transferReference?{transferReference:sdCheckoutQuote.transferReference,paymentQrImageKey:sdCheckoutQuote.paymentQrImageKey,paymentBankName:payment?.bankName,paymentAccountName:payment?.accountName,paymentAccountNumber:payment?.accountNumber}:{})}:{}}
 
+function sdCheckoutReturnToCart(){
+ // Cart checkout has a real cart history entry: return without losing selection.
+ if(checkoutFromCart&&storefrontModalHistoryType()==='checkout'){history.back();return}
+ // Buy-now needs a direct Cart destination too, without a stale Checkout entry.
+ const current=history.state&&typeof history.state==='object'&&!Array.isArray(history.state)?history.state:{};
+ history.replaceState({...current,[SD_MODAL_HISTORY_KEY]:'cart'},'',location.href);
+ closeCheckout(false);
+ openCart();
+ setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0);
+}
 function openCheckout(options={}){
+ sdCheckoutClearChoicePrompt();
  dismissToast();
  renderCart();
  checkoutItemsOverride=Array.isArray(options.items)?options.items.map(item=>({...item})):null;checkoutFromCart=!checkoutItemsOverride;checkoutPreselectedChoice=['deposit','full'].includes(options.paymentChoice)?options.paymentChoice:'';
@@ -4901,7 +4960,7 @@ function openCheckout(options={}){
  panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
- sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
+ sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--sd-confirm-fill','0px');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
  // Do not show a blank Payment address card before asynchronous saved-address hydration.
  // Keep the original address, quote, selection and order logic unchanged.
@@ -4924,6 +4983,7 @@ function openCheckout(options={}){
  });
 }
 function closeCheckout(restoreFocus=true){
+ sdCheckoutClearChoicePrompt();
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  if(!panel)return;
  const wasOpen=panel.classList.contains('open');
@@ -5117,7 +5177,7 @@ function bindEvents(){
  window.addEventListener('hashchange',()=>{if(location.hash==='#order')ensureOrderGuideOpen()});
  if(location.hash==='#order')ensureOrderGuideOpen();
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
- $('#themeToggle').addEventListener('click',toggleTheme);$('#cartOpen').addEventListener('click',()=>toggleStorefrontModal('cart'));$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart));$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBack').addEventListener('click',()=>{if(sdCheckoutStep>1){sdCheckoutSetStep(sdCheckoutStep-1);return}requestStorefrontModalClose('checkout',()=>{closeCheckout(false);openCart();setTimeout(()=>$('#cartCheckout')?.focus({preventScroll:true}),0)})});$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'));$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount));$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',navigateAccountContact);$('#accountFavoritesAction')?.addEventListener('click',()=>setAccountView('favorites'));$('#accountFavoritesBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountOrdersAction')?.addEventListener('click',()=>setAccountView('orders'));$('#accountOrdersBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressAction')?.addEventListener('click',()=>setAccountView('address'));$('#accountAddressBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressForm')?.addEventListener('submit',saveAccountAddress);$('#accountAddressProvince')?.addEventListener('change',()=>loadAccountAddressWards());$('#detailFavorite')?.addEventListener('click',()=>{if(currentProduct)toggleFavorite(favoriteKey(currentProduct))});$('#accountFavoritesList')?.addEventListener('click',event=>{const remove=event.target.closest('[data-favorite-remove]');if(remove){toggleFavorite(remove.dataset.favoriteRemove);return}const open=event.target.closest('[data-favorite-open]');if(open){const key=open.dataset.favoriteOpen;closeAccount(false);openDetail(key)}});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});document.addEventListener('keydown',e=>{if(e.key==='Tab'){if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}if($('#sdFullscreenViewer').classList.contains('open')){trapFullscreenTab(e);return}if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}if($('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if($('#accountDrawer').classList.contains('open')){trapAccountTab(e);return}}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))requestStorefrontModalClose('checkout',closeCheckout);else if($('#cartDrawer').classList.contains('open'))requestStorefrontModalClose('cart',closeCart);else if($('#accountDrawer').classList.contains('open'))requestStorefrontModalClose('account',closeAccount)});
+ $('#themeToggle').addEventListener('click',toggleTheme);$('#cartOpen').addEventListener('click',()=>toggleStorefrontModal('cart'));$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart));$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBack').addEventListener('click',sdCheckoutReturnToCart);$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'));$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount));$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',navigateAccountContact);$('#accountFavoritesAction')?.addEventListener('click',()=>setAccountView('favorites'));$('#accountFavoritesBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountOrdersAction')?.addEventListener('click',()=>setAccountView('orders'));$('#accountOrdersBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressAction')?.addEventListener('click',()=>setAccountView('address'));$('#accountAddressBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressForm')?.addEventListener('submit',saveAccountAddress);$('#accountAddressProvince')?.addEventListener('change',()=>loadAccountAddressWards());$('#detailFavorite')?.addEventListener('click',()=>{if(currentProduct)toggleFavorite(favoriteKey(currentProduct))});$('#accountFavoritesList')?.addEventListener('click',event=>{const remove=event.target.closest('[data-favorite-remove]');if(remove){toggleFavorite(remove.dataset.favoriteRemove);return}const open=event.target.closest('[data-favorite-open]');if(open){const key=open.dataset.favoriteOpen;closeAccount(false);openDetail(key)}});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});document.addEventListener('keydown',e=>{if(e.key==='Tab'){if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}if($('#sdFullscreenViewer').classList.contains('open')){trapFullscreenTab(e);return}if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}if($('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if($('#accountDrawer').classList.contains('open')){trapAccountTab(e);return}}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))requestStorefrontModalClose('checkout',closeCheckout);else if($('#cartDrawer').classList.contains('open'))requestStorefrontModalClose('cart',closeCart);else if($('#accountDrawer').classList.contains('open'))requestStorefrontModalClose('account',closeAccount)});
 $('#sdTrackForm').addEventListener('submit',async ev=>{
  ev.preventDefault();const button=$('#sdTrackSubmit'),msg=$('#sdTrackMessage'),lookup=$('#sdTrackInput').value.trim();
  const phoneLookup=/^[+0-9().\s/-]+$/.test(lookup)&&/^\d{9,12}$/.test(lookup.replace(/\D/g,''));
@@ -5188,7 +5248,7 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  const add=(parent,tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;parent.append(node);return node};
  const transferStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-transfer-stage'):panel;
  const orderStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-order-stage'):panel;
- if(deferOrderCode){orderStage.hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=false;if(!ready)add(transferStage,'h3','','Shop chưa có QR chuyển khoản');}
+ if(deferOrderCode){orderStage.hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--sd-confirm-fill','0px');$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=false;if(!ready)add(transferStage,'h3','','Shop chưa có QR chuyển khoản');}
  else add(panel,'h3','',ready?'Hướng dẫn chuyển khoản':'Thông tin đơn hàng');
  if(orderNumber){
   const orderCard=add(orderStage,'button','sd-order-reference','');orderCard.type='button';orderCard.setAttribute('aria-label','Sao chép mã đơn '+orderNumber);
@@ -5288,23 +5348,32 @@ async function sdCheckoutFinalizeOrder(){
   rememberOrderRequest(result,items);
   if(checkoutFromCart){for(const item of items){const key=cartKey(item.id,item.option||'');const left=Number(cart[key]||0)-item.quantity;if(left>0)cart[key]=left;else{delete cart[key];cartUnchecked.delete(key)}}saveCart()}
   checkoutItemsOverride=null;formResetCheckout();renderCart();sdCheckoutAdvanceToOrderCode();
- }catch(error){message.textContent=error.message||'Không thể lấy mã đơn. Vui lòng thử lại.';slider.disabled=false;slider.value='0';$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');slider.setAttribute('aria-valuetext','0%');button.disabled=false;if(label)label.textContent='Xác nhận đã thanh toán';if(button.offsetParent!==null)button.textContent='Lấy mã đơn →'}finally{sdCheckoutOrderCreating=false}
+ }catch(error){message.textContent=error.message||'Không thể lấy mã đơn. Vui lòng thử lại.';slider.disabled=false;slider.value='0';sdCheckoutSyncConfirmFill(slider);slider.setAttribute('aria-valuetext','0%');button.disabled=false;if(label)label.textContent='Xác nhận đã thanh toán';if(button.offsetParent!==null)button.textContent='Lấy mã đơn →'}finally{sdCheckoutOrderCreating=false}
+}
+function sdCheckoutSyncConfirmFill(slider){
+ const progress=Math.max(0,Math.min(100,Number(slider.value)||0)),diameter=56;
+ const usable=Math.max(0,slider.clientWidth-diameter);
+ const fill=progress===0?0:progress===100?slider.clientWidth:diameter/2+usable*progress/100;
+ const wrap=$('#sdCheckoutConfirmWrap');
+ wrap.style.setProperty('--progress',progress+'%');
+ wrap.style.setProperty('--sd-confirm-fill',fill+'px');
 }
 function formResetCheckout(){const form=$('#checkoutForm');form.reset();$('#checkoutWard').disabled=true;$('#checkoutWard').innerHTML='<option value="">Chọn tỉnh/thành trước</option>';$('#checkoutProvinceCode').value='';$('#checkoutWardCode').value='';$('#checkoutAddressMessage').textContent=''}
+window.addEventListener('resize',()=>sdCheckoutSyncConfirmFill($('#sdCheckoutConfirmRange')));
 $('#sdCheckoutConfirmRange').addEventListener('input',event=>{
  const slider=event.currentTarget,progress=Math.max(0,Math.min(100,Number(slider.value)||0));
- $('#sdCheckoutConfirmWrap').style.setProperty('--progress',progress+'%');
+ sdCheckoutSyncConfirmFill(slider);
  const label=$('#sdCheckoutConfirmLabel');if(label)label.textContent=progress>=100?'Đang lấy mã đơn':'Xác nhận đã thanh toán';
  slider.setAttribute('aria-valuetext',progress>=100?'Đang lấy mã đơn':progress+'%');
 });
 $('#sdCheckoutConfirmRange').addEventListener('change',event=>{
  const slider=event.currentTarget;
  if(Number(slider.value)>=100){void sdCheckoutFinalizeOrder();return}
- slider.value='0';$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');
+ slider.value='0';sdCheckoutSyncConfirmFill(slider);
  const label=$('#sdCheckoutConfirmLabel');if(label)label.textContent='Xác nhận đã thanh toán';slider.setAttribute('aria-valuetext','0%');
 });
-$('#sdCheckoutPrev').addEventListener('click',()=>{if(sdCheckoutStep>1)sdCheckoutSetStep(sdCheckoutStep-1);else $('#checkoutBack').click()});
-$('#sdCheckoutOptions').addEventListener('click',e=>{const b=e.target.closest('[data-sd-payment-option]');if(!b||!sdCheckoutQuote?.quoteReady)return;sdCheckoutChoice=b.dataset.sdPaymentOption;sdCheckoutRefreshChoice()});$('#sdDetailPaymentQuote').addEventListener('click',e=>{const b=e.target.closest('[data-detail-payment-option]');if(!b)return;detailPaymentChoice=b.dataset.detailPaymentOption;sdDetailUpdatePaymentChoice()});
+$('#sdCheckoutPrev').addEventListener('click',sdCheckoutReturnToCart);
+$('#sdCheckoutOptions').addEventListener('click',e=>{const b=e.target.closest('[data-sd-payment-option]');if(!b||!sdCheckoutQuote?.quoteReady)return;sdCheckoutChoice=b.dataset.sdPaymentOption;sdCheckoutClearChoicePrompt();sdCheckoutRefreshChoice()});$('#sdDetailPaymentQuote').addEventListener('click',e=>{const b=e.target.closest('[data-detail-payment-option]');if(!b)return;detailPaymentChoice=b.dataset.detailPaymentOption;sdDetailUpdatePaymentChoice()});
 document.querySelectorAll('[data-sd-review-step]').forEach(b=>b.addEventListener('click',()=>sdCheckoutSetStep(b.dataset.sdReviewStep)));
 $('#checkoutForm').addEventListener('submit',async e=>{e.preventDefault();const form=e.currentTarget,button=$('#checkoutSubmit'),message=$('#checkoutMessage');
 if(sdCheckoutSuccess||button.disabled)return;
@@ -5323,7 +5392,7 @@ if(sdCheckoutStep===1){
  try{await sdCheckoutLoadQuote()}catch(error){sdCheckoutQuote={paymentReady:false,reason:error.message,options:[]};sdCheckoutRenderQuote()}
  sdCheckoutSetStep(2);button.disabled=false;return;
 }
-if(sdCheckoutStep===2&&sdCheckoutQuote?.quoteReady===true&&!sdCheckoutSelected()){message.textContent='Hãy chọn một trong hai cách thanh toán.';return}
+if(sdCheckoutStep===2&&sdCheckoutQuote?.quoteReady===true&&!sdCheckoutSelected()){sdCheckoutPromptChoice();return}
 $('#paymentInstructions').hidden=true;const items=sdCheckoutItems();if(!items.length){message.textContent='Giỏ hàng đang trống.';return}button.disabled=true;button.textContent='Đang chuẩn bị thanh toán…';message.textContent='';try{
  if(sdCheckoutQuote?.quoteReady===true)await sdCheckoutLoadPaymentInstructions();
  const selected=sdCheckoutSelected(),quote=sdCheckoutQuote||{},choice=selected||null;
