@@ -184,7 +184,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    const alphaMatch=s.backgroundColor.match(/rgba?\(([^)]+)\)/);
    const alpha=alphaMatch?(alphaMatch[1].split(',')[3]===undefined?1:Number(alphaMatch[1].split(',')[3])):0;
    return {selector,alpha,backgroundMatches:s.backgroundImage===nav.backgroundImage,
-    shadowMatches:s.boxShadow===nav.boxShadow,filterMatches:s.backdropFilter==='blur(20px) saturate(1.22) brightness(0.68)',
+    shadowMatches:s.boxShadow===nav.boxShadow,filterMatches:s.backdropFilter===nav.backdropFilter && s.webkitBackdropFilter===nav.webkitBackdropFilter && !s.backdropFilter.includes('brightness('),
     rim:edge.backgroundImage,overflow:s.overflow};
   });
  });
@@ -523,10 +523,17 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
   });
  });
  for(const result of opticalScores){
-  expect(result.ratio,'The shared logo Header film/shadow/rim must match for '+result.selector).toBeGreaterThanOrEqual(.95);
-  expect(result.dynamicFilter,'Live backdrop darkens product text without painting a gray tint on '+result.selector).toBe('blur(20px) saturate(1.22) brightness(0.68)');
+  expect(result.main.matches,'Header and Cart face computed CSS should match for '+result.selector).toBe(result.main.total);
+   expect(result.rim.matches,'Header and Cart rim computed CSS should match for '+result.selector).toBe(result.rim.total);
+  expect(result.dynamicFilter,'Cart must have the same computed filter as the logo Header on '+result.selector).toBe(await page.locator('.nav-wrap .nav').evaluate(el=>getComputedStyle(el).backdropFilter));
+   expect(result.dynamicFilter,'Do not darken the moving photographic backdrop on '+result.selector).not.toContain('brightness(');
  }
- console.log('CART_LOGO_GLASS_COMPUTED_PARITY',JSON.stringify(opticalScores));
+ console.log('CART_LOGO_GLASS_COMPUTED_STYLE_ONLY_NOT_VISUAL_PARITY',JSON.stringify(opticalScores));
+  const layers=await drawer.evaluate(el=>{
+   const read=element=>{const s=getComputedStyle(element);return {background:s.backgroundImage,backgroundColor:s.backgroundColor,backdropFilter:s.backdropFilter,webkitBackdropFilter:s.webkitBackdropFilter,overflow:s.overflow,position:s.position,transform:s.transform,isolation:s.isolation,opacity:s.opacity,zIndex:s.zIndex}};
+   return {logoHeader:read(document.querySelector('.nav-wrap .nav')),drawer:read(el),cartList:read(el.querySelector('#cartList')),cartHeader:read(el.querySelector('.cart-header')),subtotal:read(el.querySelector('.cart-subtotal-bar')),payment:read(el.querySelector('#cartCheckout'))};
+  });
+  console.log('CART_GLASS_STACKING_AND_COMPOSITING_DIAGNOSTICS',JSON.stringify(layers));
  // Real four-item carts can contain long luxury product names. Reserve their
  // full card height in the visual fixture to reproduce the 390x844 overflow.
  await rows.evaluateAll(nodes=>nodes.forEach(row=>{row.style.minHeight='174px'}));
@@ -567,5 +574,5 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  const endpoint=await drawer.evaluate(el=>el.scrollTop);
  expect(endpoint).toBeGreaterThan(midpoint);
  await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
- console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint}));
+ console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 });
