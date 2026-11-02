@@ -9,18 +9,22 @@
  const drawer=document.getElementById('checkoutDrawer');
  const form=drawer?.querySelector('#checkoutForm');
  if(!drawer||!form)return;
- const targets=[
-  drawer.querySelector('.checkout-header'),
-  drawer.querySelector('.sd-checkout-footer')
- ];
- if(targets.some(bar=>!bar))return;
- const lenses=targets.map(bar=>{
+ const header=drawer.querySelector('.checkout-header');
+ const footer=drawer.querySelector('.sd-checkout-footer');
+ // The footer itself must NEVER become a frosted rectangle: only its
+ // actual control-shaped panes can obscure scrolling text.
+ const controls=['#sdCheckoutPrev','#checkoutSubmit','#sdCheckoutConfirmWrap','#sdCheckoutDone']
+  .map(selector=>drawer.querySelector(selector));
+ if(!header||!footer||controls.some(el=>!el))return;
+ const targets=[{bar:header,mount:header},...controls.map(bar=>({bar,mount:footer}))];
+ const lenses=targets.map(({bar,mount})=>{
   const lens=document.createElement('div');
   lens.className='sd-checkout-optical-lens';
+  lens.dataset.sdOpticalTarget=bar.id||'checkout-header';
   lens.setAttribute('aria-hidden','true');
   lens.inert=true;
-  bar.insertBefore(lens,bar.firstChild);
-  return {bar,lens,mirrors:new Map()};
+  mount.insertBefore(lens,mount.firstChild);
+  return {bar,mount,lens,mirrors:new Map()};
  });
  const touched=new Set();
  let frame=0,refresh=false;
@@ -97,7 +101,20 @@
   const blocks=[...form.children].filter(el=>el.getClientRects().length>0
    &&getComputedStyle(el).display!=='none');
   const active=new Set(blocks);
-  const rects=lenses.map(group=>group.bar.getBoundingClientRect());
+  const footerRect=footer.getBoundingClientRect();
+  const rects=lenses.map(group=>{
+   const r=group.bar.getBoundingClientRect();
+   if(group.mount===footer){
+    const style=group.lens.style;
+    const left=(r.left-footerRect.left)+'px',top=(r.top-footerRect.top)+'px';
+    const width=r.width+'px',height=r.height+'px';
+    if(style.left!==left)style.left=left;
+    if(style.top!==top)style.top=top;
+    if(style.width!==width)style.width=width;
+    if(style.height!==height)style.height=height;
+   }
+   return r;
+  });
   for(const block of blocks){
    const r=block.getBoundingClientRect();
    const covered=[];
@@ -124,8 +141,10 @@
    });
    const mask=transparentZones(r.height,covered);
    if(mask){
-    block.style.setProperty('mask-image',mask);
-    block.style.setProperty('-webkit-mask-image',mask);
+    if(block.style.getPropertyValue('mask-image')!==mask){
+     block.style.setProperty('mask-image',mask);
+     block.style.setProperty('-webkit-mask-image',mask);
+    }
     touched.add(block);
    }else{
     block.style.removeProperty('mask-image');
@@ -159,7 +178,20 @@
   subtree:true,childList:true,characterData:true,
   attributes:true,attributeFilter:['hidden','class','src']
  });
- form.addEventListener('input',()=>schedule(true),{passive:true});
+ // Typing must not tear down and rebuild all heavy blurred QR mirrors.
+ // Update any overlapping input value in place, then schedule one RAF.
+ form.addEventListener('input',()=>{
+  for(const group of lenses)for(const [source,clone] of group.mirrors){
+   const originalFields=source.querySelectorAll('input,textarea,select');
+   const mirroredFields=clone.querySelectorAll('input,textarea,select');
+   originalFields.forEach((field,i)=>{
+    if(!mirroredFields[i])return;
+    if('value' in mirroredFields[i])mirroredFields[i].value=field.value;
+    if('checked' in mirroredFields[i])mirroredFields[i].checked=field.checked;
+   });
+  }
+  schedule();
+ },{passive:true});
  form.addEventListener('change',()=>schedule(true),{passive:true});
  schedule();
 })();
