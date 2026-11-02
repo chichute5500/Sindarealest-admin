@@ -33,7 +33,10 @@
       for(const clone of group.mirrors.values())clone.remove();
       group.mirrors.clear();
     }
-    for(const row of touched)row.style.removeProperty('clip-path');
+    for(const row of touched){
+      row.style.removeProperty('mask-image');
+      row.style.removeProperty('-webkit-mask-image');
+    }
     touched.clear();
   }
 
@@ -51,6 +54,40 @@
     return copy;
   }
 
+  // A hard clip on the source row previously sliced products in a straight
+  // line at the top of the sticky footer. Feather the source out and restore
+  // the blurred mirror inside each lens instead: no harsh clipping seam.
+  function softProductMask(height,covered){
+    const ranges=covered.map(([start,end])=>[
+      Math.max(0,Math.min(height,start)),
+      Math.max(0,Math.min(height,end))
+    ]).filter(([start,end])=>end>start).sort((a,b)=>a[0]-b[0]);
+    if(!ranges.length)return '';
+    const merged=[];
+    for(const [start,end] of ranges){
+      const last=merged[merged.length-1];
+      if(last&&start<=last[1]+2)last[1]=Math.max(last[1],end);
+      else merged.push([start,end]);
+    }
+    const stops=[];
+    let lastStop=0;
+    for(const [start,end] of merged){
+      const feather=Math.min(12,(end-start)*.5);
+      const softStart=Math.max(lastStop,Math.max(0,start-12));
+      const transparentStart=Math.max(softStart,Math.min(height,start+feather));
+      const transparentEnd=Math.max(transparentStart,Math.min(height,end-feather));
+      const softEnd=Math.max(transparentEnd,Math.min(height,end+12));
+      stops.push('black '+softStart+'px');
+      stops.push('transparent '+transparentStart+'px');
+      stops.push('transparent '+transparentEnd+'px');
+      stops.push('black '+softEnd+'px');
+      lastStop=softEnd;
+    }
+    // Prevent the original sharp lettering from drawing across the lens,
+    // while retaining a gradual opacity transition at the lens boundary.
+    return 'linear-gradient(to bottom, black 0px, '+stops.join(', ')+', black '+height+'px)';
+  }
+
   function render(){
     frame=0;
     if(!drawer.classList.contains('open')){
@@ -63,7 +100,7 @@
     const active=new Set(rows);
     for(const row of rows){
       const r=row.getBoundingClientRect();
-      let cropTop=0,cropBottom=0;
+      const covered=[];
       lenses.forEach((group,index)=>{
         const b=rects[index];
         const overlapW=Math.min(r.right,b.right)-Math.max(r.left,b.left);
@@ -88,14 +125,16 @@
           minWidth:r.width+'px',
           minHeight:r.height+'px'
         });
-        if(index===0)cropTop=Math.max(cropTop,Math.min(r.height,b.bottom-r.top));
-        else cropBottom=Math.max(cropBottom,Math.min(r.height,r.bottom-b.top));
+        covered.push([b.top-r.top,b.bottom-r.top]);
       });
-      if(cropTop||cropBottom){
-        row.style.clipPath='inset('+Math.max(0,cropTop)+'px 0px '+Math.max(0,cropBottom)+'px 0px)';
+      const softMask=softProductMask(r.height,covered);
+      if(softMask){
+        row.style.setProperty('mask-image',softMask);
+        row.style.setProperty('-webkit-mask-image',softMask);
         touched.add(row);
       }else{
-        row.style.removeProperty('clip-path');
+        row.style.removeProperty('mask-image');
+        row.style.removeProperty('-webkit-mask-image');
         touched.delete(row);
       }
     }
@@ -105,7 +144,11 @@
       }
     }
     for(const row of touched){
-      if(!active.has(row)){row.style.removeProperty('clip-path');touched.delete(row)}
+      if(!active.has(row)){
+        row.style.removeProperty('mask-image');
+        row.style.removeProperty('-webkit-mask-image');
+        touched.delete(row);
+      }
     }
   }
   function schedule(){

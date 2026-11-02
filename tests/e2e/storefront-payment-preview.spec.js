@@ -659,11 +659,13 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  await expect(page.locator('#cartDrawer .sd-cart-optical-lens')).toHaveCount(3);
  const focus=await drawer.evaluate(el=>({
   blurredMirrors:el.querySelectorAll('.sd-cart-optical-mirror').length,
-  clippedRealRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).clipPath!=='none').length,
+  softMaskedRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).maskImage.includes('linear-gradient')).length,
+  harshClippedRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).clipPath!=='none').length,
   mirrorFilters:[...el.querySelectorAll('.sd-cart-optical-mirror')].map(row=>getComputedStyle(row).filter)
  }));
  expect(focus.blurredMirrors,'Product content crossing the glass must have an optical mirror').toBeGreaterThan(0);
- expect(focus.clippedRealRows,'Sharp source pixels behind the glass must be hidden').toBeGreaterThan(0);
+ expect(focus.softMaskedRows,'Sharp source pixels behind glass must fade rather than hard clip').toBeGreaterThan(0);
+ expect(focus.harshClippedRows,'Product cards must never have a rectangular hard clipping seam').toBe(0);
  for(const filter of focus.mirrorFilters)expect(filter).toContain('blur(14px)');
  console.log('CART_EIGHT_PRODUCT_REAL_GLASS_BLUR',JSON.stringify(focus));
  await page.screenshot({path:join(output,'390x844-eight-items-real-blur-60-percent.png'),fullPage:false,animations:'disabled'});
