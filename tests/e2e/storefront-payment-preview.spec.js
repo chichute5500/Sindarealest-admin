@@ -292,15 +292,15 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.emulateMedia({colorScheme:'light'});
  await expect(page.locator('html')).not.toHaveClass(/dark/);
 
- for(const [width,height] of [[360,800],[390,844],[768,1024],[1440,900]]){
+ for(const [width,height] of [[360,800],[390,844],[430,932],[768,1024],[1440,900]]){
   await page.setViewportSize({width,height});
   for(const theme of ['light','dark']){
    await page.emulateMedia({colorScheme:theme});
    if(theme==='dark')await expect(page.locator('html')).toHaveClass(/dark/);
    else await expect(page.locator('html')).not.toHaveClass(/dark/);
    await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
-   await assertCheckoutScrollAndHeader(page,width<=390);
-   if(width<=390){
+   await assertCheckoutScrollAndHeader(page,width<=430);
+   if(width<=430){
     // The checkout header, action buttons and slider's unfilled track must
     // use the same CURRENT computed optical face as the approved Cart bars,
     // not merely share CSS names. The green slider progress stays unchanged.
@@ -333,9 +333,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
      expect(bar.radius,'Checkout bars keep rounded glass edges: '+bar.selector).toBeGreaterThanOrEqual(22);
      expect(bar.hasBrightness,'No brightness-tinted checkout glass: '+bar.selector).toBe(false);
     }
-    if(width===390){
-     await page.locator('#checkoutDrawer .checkout-header').screenshot({path:join(output,`390x844-${theme}-checkout-header-glass.png`),animations:'disabled'});
-     await page.locator('#checkoutDrawer .sd-checkout-actions').screenshot({path:join(output,`390x844-${theme}-checkout-actions-glass.png`),animations:'disabled'});
+    if(width===390||width===430){
+     await page.locator('#checkoutDrawer .checkout-header').screenshot({path:join(output,`${width}x${height}-${theme}-checkout-header-glass.png`),animations:'disabled'});
+     await page.locator('#checkoutDrawer .sd-checkout-actions').screenshot({path:join(output,`${width}x${height}-${theme}-checkout-actions-glass.png`),animations:'disabled'});
     }
     // Real mid-scroll proof for BOTH themes and narrow Android layouts:
     // the checkout content must move without shifting or cutting its
