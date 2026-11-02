@@ -315,7 +315,15 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]')).toHaveAttribute('aria-checked','true');
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]')).toHaveClass(/selected/);
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toHaveAttribute('aria-checked','false');
- await page.locator('#sdDetailPaymentQuote').screenshot({path:dir+'/payment-choice-mobile.png'});
+ const mobileLayout=await page.locator('#sdDetailPaymentQuote').evaluate(quote=>{
+  const choices=quote.querySelector('.sd-detail-payment-options'),full=quote.querySelector('[data-detail-payment-option="full"]'),radio=full.querySelector('.sd-detail-payment-radio'),cardRect=full.getBoundingClientRect(),radioRect=radio.getBoundingClientRect();
+  return {columns:getComputedStyle(choices).gridTemplateColumns.trim().split(/\\s+/).length,radioRight:radioRect.right,cardRight:cardRect.right,radioLeft:radioRect.left,cardMiddle:cardRect.left+cardRect.width/2};
+ });
+ expect(mobileLayout.columns).toBe(1);
+ expect(mobileLayout.radioRight).toBeLessThanOrEqual(mobileLayout.cardRight);
+ expect(mobileLayout.radioLeft).toBeGreaterThan(mobileLayout.cardMiddle);
+ mkdirSync('artifacts/storefront-payment-preview',{recursive:true});
+ await page.locator('#sdDetailPaymentQuote').screenshot({path:'artifacts/storefront-payment-preview/payment-choice-mobile.png'});
  await page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]').click();
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
  await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="full"]')).toHaveAttribute('aria-checked','false');
