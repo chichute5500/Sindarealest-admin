@@ -506,18 +506,26 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
   }
  },available);
  await expect(rows).toHaveCount(4);
- // Verify the actual header optical layer, with no tinted base beneath its film.
- const paintedBarSurfaces=await drawer.evaluate(el=>{
-  const nav=getComputedStyle(document.querySelector('.nav-wrap .nav'));
+ // Check the real browser-computed material, including rim, rather than only
+ // searching for matching CSS token strings. Geometry and content may differ.
+ const opticalScores=await drawer.evaluate(el=>{
+  const original=document.querySelector('.nav-wrap .nav');
+  const cssKeys=['backgroundImage','backgroundColor','backdropFilter','boxShadow','borderTopWidth','borderTopStyle','borderTopColor'];
+  const rimKeys=['backgroundImage','opacity','webkitMaskImage','borderRadius'];
+  const score=(node,keys,pseudo)=>{
+   const a=getComputedStyle(original,pseudo),b=getComputedStyle(node,pseudo);
+   const matches=keys.filter(k=>a[k]===b[k]).length;
+   return {matches,total:keys.length,ratio:matches/keys.length};
+  };
   return ['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(selector=>{
-   const s=getComputedStyle(el.querySelector(selector));
-   return {selector,color:s.backgroundColor,film:s.backgroundImage===nav.backgroundImage,blur:s.backdropFilter===nav.backdropFilter};
+   const target=el.querySelector(selector),main=score(target,cssKeys,null),rim=score(target,rimKeys,'::after');
+   return {selector,main,rim,ratio:(main.matches+rim.matches)/(main.total+rim.total)};
   });
  });
- for(const m of paintedBarSurfaces){
-  expect(m.color,'No static gray/blue color underneath the glass at '+m.selector).toBe('rgba(0, 0, 0, 0)');
-  expect(m.film&&m.blur,'Cart must inherit the real logo Header film/blur at '+m.selector).toBe(true);
+ for(const result of opticalScores){
+  expect(result.ratio,'Logo Header material parity >=95% for '+result.selector).toBeGreaterThanOrEqual(.95);
  }
+ console.log('CART_LOGO_GLASS_COMPUTED_PARITY',JSON.stringify(opticalScores));
  // Real four-item carts can contain long luxury product names. Reserve their
  // full card height in the visual fixture to reproduce the 390x844 overflow.
  await rows.evaluateAll(nodes=>nodes.forEach(row=>{row.style.minHeight='174px'}));
@@ -543,9 +551,20 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  expect(Math.abs(metrics.after.headerTop-metrics.before.headerTop),'Header stays fixed').toBeLessThanOrEqual(2);
  expect(Math.abs(metrics.after.footerBottom-metrics.before.footerBottom),'Payment bar stays fixed').toBeLessThanOrEqual(2);
  expect(metrics.after.lastBottom,'Last product is fully reachable above the payment bar').toBeLessThanOrEqual(metrics.after.footerTop+2);
+ // scrollHeight/2 is NOT the midpoint of the usable scroll range: it usually
+ // clamps to the end and made prior middle/end screenshots indistinguishable.
+ const maxScroll=await drawer.evaluate(el=>Math.max(0,el.scrollHeight-el.clientHeight));
+ expect(maxScroll,'Four-item visual QA must have an actual scroll range').toBeGreaterThan(24);
+ await drawer.evaluate(el=>el.scrollTop=0);
  await page.screenshot({path:join(output,'390x844-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
- await drawer.evaluate(el=>el.scrollTop=el.scrollHeight/2);
+ await drawer.evaluate(el=>el.scrollTop=Math.floor((el.scrollHeight-el.clientHeight)/2));
+ const midpoint=await drawer.evaluate(el=>el.scrollTop);
+ expect(midpoint).toBeGreaterThan(0);
+ expect(midpoint).toBeLessThan(maxScroll);
  await page.screenshot({path:join(output,'390x844-cart-four-products-middle.png'),fullPage:false,animations:'disabled'});
- await drawer.evaluate(el=>el.scrollTop=el.scrollHeight);
+ await drawer.evaluate(el=>el.scrollTop=el.scrollHeight-el.clientHeight);
+ const endpoint=await drawer.evaluate(el=>el.scrollTop);
+ expect(endpoint).toBeGreaterThan(midpoint);
  await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
+ console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint}));
 });
