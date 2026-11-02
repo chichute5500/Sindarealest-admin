@@ -3774,7 +3774,15 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 <script>
 (()=>{
 'use strict';
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const $=s=>document.querySelector(s), $=s=>Array.from(document.querySelectorAll(s));
+// Shared between account payment top-ups and checkout QR rendering.
+function safePaymentQrUrl(value){if(typeof value!=='string'||!value.trim())return '';try{const url=new URL(value,window.location.origin);if(url.protocol!=='https:'&&url.origin!==window.location.origin)return '';return url.href}catch{return ''}}
+async function sdCopyCheckoutText(value){
+ if(!value)return false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return true}}catch{}
+ const input=document.createElement('textarea');input.value=value;input.style.position='fixed';input.style.left='-9999px';document.body.append(input);input.select();
+ let ok=false;try{ok=document.execCommand('copy')}catch{}input.remove();return ok;
+}
 const ZALO='https://zalo.me/0827049192';
 let products=[], filtered=[], page=1, perPage=8, currentProduct=null, cart={}, cartUnchecked=new Set(), favorites=[], localOrderHistory=[], localShippingAddress=null, accountAddressWardRequest=0, toastTimer=null, artTimer=null, featuredTimer=null, artIndex=0, currentSlideSrc='', detailTimer=null, detailSwapTimer=null, fullscreenSwapTimer=null, detailAnimationTimer=null, fullscreenAnimationTimer=null, detailTransitionId=0, fullscreenTransitionId=0, fullscreenActiveLayer=0, fullscreenFadePendingLayer=-1, detailIndex=0, detailImages=[], detailPaymentChoice='';
 const FAVORITES_STORAGE_KEY='sd-favorites';
@@ -5318,7 +5326,6 @@ function showWarrantyRecords(records){
 
 async function optimizeWarrantyPhoto(file){let bitmap;try{bitmap=await createImageBitmap(file)}catch{throw Error('Không đọc được ảnh đã chọn.')}const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));const ctx=canvas.getContext('2d',{alpha:false});ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.82));if(!blob)throw Error('Không thể tối ưu ảnh.');if(blob.size>5*1024*1024)throw Error('Ảnh sau tối ưu vượt 5 MB.');return blob}
 $('#warrantyClaimForm').addEventListener('submit',async e=>{e.preventDefault();const b=$('#warrantySubmit'),m=$('#warrantyClaimMessage'),message=$('#claimWarrantyMessage').value.trim(),claimToken=$('#claimWarrantyCode').value,issueType=$('#claimIssueType').value,contactPhone=$('#claimContactPhone').value.trim(),photo=$('#warrantyPhoto').files&&$('#warrantyPhoto').files[0];if(!claimToken){m.textContent='Hãy tra cứu và chọn bảo hành trước khi gửi yêu cầu.';return}b.disabled=true;b.textContent='Đang gửi…';m.textContent='';try{let imageKey='';if(photo){const file=await optimizeWarrantyPhoto(photo),form=new FormData();form.append('claimToken',claimToken);form.append('file',file,'warranty-issue.webp');const ur=await fetch('/api/warranty-claim-uploads',{method:'POST',credentials:'same-origin',body:form});let uj={};try{uj=await ur.json()}catch{}if(!ur.ok)throw Error(uj.error||'Không tải được ảnh lỗi.');imageKey=uj.imageKey||''}const r=await fetch('/api/warranty-claims',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({claimToken,issueType,contactPhone,message,imageKey})});let j={};try{j=await r.json()}catch{}if(!r.ok)throw Error(j.error||'Chưa thể gửi yêu cầu bảo hành.');m.textContent=j.message||'Đã tiếp nhận yêu cầu bảo hành.';$('#claimWarrantyMessage').value='';$('#warrantyPhoto').value=''}catch(err){m.textContent=err.message||'Không thể gửi yêu cầu.'}finally{b.disabled=false;b.textContent='Gửi yêu cầu bảo hành'}});
-function safePaymentQrUrl(value){if(typeof value!=='string'||!value.trim())return '';try{const url=new URL(value,window.location.origin);if(url.protocol!=='https:'&&url.origin!==window.location.origin)return '';return url.href}catch{return ''}}
 
 
 function renderPaymentInstructions(result,accessToken='',options={}){
@@ -5372,12 +5379,6 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  image.src=qrUrl;qrWrap.hidden=false;transferStage.append(qrWrap);
  if(deferOrderCode){$('#sdCheckoutConfirmWrap').hidden=false;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=true;}
  else if(orderNumber&&accessToken.length>=40){const check=add(panel,'button','pill-btn tap-target','Kiểm tra cập nhật thanh toán');check.type='button';check.dataset.paymentUpdate='true';check.addEventListener('click',()=>refreshOrderPayment(orderNumber,accessToken,check));}
-}
-async function sdCopyCheckoutText(value){
- if(!value)return false;
- try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return true}}catch{}
- const input=document.createElement('textarea');input.value=value;input.style.position='fixed';input.style.left='-9999px';document.body.append(input);input.select();
- let ok=false;try{ok=document.execCommand('copy')}catch{}input.remove();return ok;
 }
 function sdCheckoutBankMessage(text){$('#sdCheckoutBankFeedback').textContent=text}
 function sdCheckoutBankDetails(){
