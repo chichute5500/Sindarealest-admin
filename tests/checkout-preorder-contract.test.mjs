@@ -143,6 +143,11 @@ assert.match(openCheckoutBody,/\$\('#sdCheckoutQuoteText'\)\.textContent='Đang 
 assert.doesNotMatch(openCheckoutBody,/fetch\('\/api\/orders'/,'Prefilling and fetching a quote must not create an order');
 
 assert.match(html,/let checkoutItemsOverride=null,checkoutFromCart=true,checkoutSessionItems=null/,'An open payment checkout has a stable item snapshot');
+
+assert.match(html,/function savedCheckoutAddressComplete\(saved\)\{[\s\S]*?saved\.provinceCode[\s\S]*?saved\.wardCode/,'Only saved addresses with explicit province and ward codes qualify to skip address entry');
+assert.match(html,/sdCheckoutSetStep\(checkoutAddressComplete\(\)\?2:1\)/,'Payment step must not show before address selects are hydrated and validated');
+assert.doesNotMatch(html,/sdCheckoutSetStep\(maySkipAddress\?2:1\)/,'The presence of saved names alone cannot show an empty Payment address card');
+
 assert.match(html,/function sdCheckoutItems\(\)\{return \(checkoutSessionItems\|\|\[\]\)\.map/,'Quote, summary, and final order always read the same selection');
 assert.match(openCheckoutBody,/checkoutSessionItems=entries\.map\(item=>\(\{/,'The selected cart entries are captured once at payment opening');
 assert.match(html,/checkoutOpenEpoch\+\+;checkoutSessionItems=null/,'Closing checkout invalidates stale items and in-flight quotes');
