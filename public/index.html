@@ -3694,7 +3694,7 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 </section>
 <section class="sd-checkout-panel" id="sdCheckoutPaymentStep" hidden>
 <div class="sd-checkout-box"><strong>Sản phẩm trong đơn</strong><div class="sd-checkout-item-list" id="sdCheckoutItemSummary" aria-label="Sản phẩm trong đơn"></div></div>
-<div class="sd-checkout-box" id="sdCheckoutQuoteNotice" role="status" aria-live="polite"><span id="sdCheckoutQuoteText">Đang kiểm tra tình trạng hàng và giá từ hệ thống…</span><button type="button" class="pill-btn tap-target" id="sdCheckoutRetryQuote" hidden>Kiểm tra lại giá</button></div>
+<div class="sd-checkout-box" id="sdCheckoutQuoteNotice">Đang kiểm tra tình trạng hàng và giá từ hệ thống…</div>
 <div class="sd-checkout-options" id="sdCheckoutOptions" role="radiogroup" aria-label="Chọn hình thức thanh toán"></div>
 <div id="sdCheckoutQrMount"></div>
 <div class="sd-checkout-box sd-checkout-qr-wrap" id="sdCheckoutQrWrap" hidden>
@@ -4681,15 +4681,7 @@ async function prefillCheckoutFromLocalAddress(){
  }catch{}
 }
 
-function savedCheckoutAddressComplete(saved){
- // An address without canonical division IDs cannot skip address validation.
- // Legacy localStorage entries often contain labels only, leaving both selects
- // empty while the UI incorrectly jumps straight to Payment.
- return !!saved&&[saved.fullName,saved.phone,saved.province,saved.ward,saved.streetAddress]
-  .every(value=>String(value||'').trim())
-  &&/^\d{1,12}$/.test(String(saved.provinceCode||''))
-  &&/^\d{1,12}$/.test(String(saved.wardCode||''));
-}
+function savedCheckoutAddressComplete(saved){return !!saved&&[saved.fullName,saved.phone,saved.province,saved.ward,saved.streetAddress].every(value=>String(value||'').trim())}
 function checkoutAddressComplete(){const f=$('#checkoutForm')?.elements,province=$('#checkoutProvince'),ward=$('#checkoutWard');return !!f&&!!f.fullName.value.trim()&&!!f.phone.value.trim()&&!!f.streetAddress.value.trim()&&!!province.value&&!!province.selectedOptions[0]?.dataset.code&&!!ward.value&&!!ward.selectedOptions[0]?.dataset.code}
 async function saveCheckoutAddressFromForm(){
  const form=$('#checkoutForm'),f=form?.elements;if(!f)return;
@@ -4789,11 +4781,9 @@ function renderCart(){
 function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
 function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';const target=cartReturnFocus;cartReturnFocus=null;if(restoreFocus&&wasOpen)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';const fallback=$('#cartOpen')||$('#mobileCartNav');(available?target:fallback)?.focus({preventScroll:true})},0)}
 
-let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="",sdCheckoutSuccess=false,sdCheckoutOrderCreated=false,sdCheckoutOrderCreating=false,checkoutPreselectedChoice="",checkoutOpenEpoch=0;
-let checkoutItemsOverride=null,checkoutFromCart=true,checkoutSessionItems=null;
-/* All steps, the quote and final order must use one frozen selection.
-   A cart/catalog refresh must never empty or silently change an open order. */
-function sdCheckoutItems(){return (checkoutSessionItems||[]).map(item=>({...item}))}
+let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="",sdCheckoutSuccess=false,sdCheckoutOrderCreated=false,sdCheckoutOrderCreating=false,checkoutPreselectedChoice="";
+let checkoutItemsOverride=null,checkoutFromCart=true;
+function sdCheckoutItems(){return checkoutItemsOverride?checkoutItemsOverride.map(item=>({...item})):selectedCartEntries().map(({id,option,q})=>({id,option,quantity:q}))}
 function sdCheckoutSummary(selector){
  const target=$(selector);if(!target)return;target.replaceChildren();
  for(const {id,quantity,option} of sdCheckoutItems()){
@@ -4820,9 +4810,7 @@ function sdCheckoutRefreshChoice(){
 }
 function sdCheckoutRenderQuote(){
  const q=sdCheckoutQuote,ready=q?.quoteReady===true,notice=$('#sdCheckoutQuoteNotice'),options=$('#sdCheckoutOptions'),qrBox=$('#sdCheckoutQrWrap');
- notice.hidden=ready;
- $('#sdCheckoutQuoteText').textContent=ready?'':(q?.reason||'Chưa thể xác minh giá. Bạn vẫn có thể gửi yêu cầu để Shop xác nhận.');
- $('#sdCheckoutRetryQuote').hidden=ready;
+ notice.hidden=ready;notice.textContent=ready?'':(q?.reason||'Chưa thể xác minh giá. Bạn vẫn có thể gửi yêu cầu để Shop xác nhận.');
  options.replaceChildren();
  if(ready)for(const choice of q.options||[]){
   const b=document.createElement('button'),radio=document.createElement('span'),details=document.createElement('span'),label=document.createElement('b'),hint=document.createElement('small'),amount=document.createElement('strong');
@@ -4831,25 +4819,10 @@ function sdCheckoutRenderQuote(){
  }
 }
 async function sdCheckoutLoadQuote(){
- // The timeout must cover the ENTIRE response, including response.json().
- // Previously it was cleared as soon as headers arrived: a stalled body could
- // leave "Đang kiểm tra tình trạng hàng và giá" on screen indefinitely.
- const epoch=checkoutOpenEpoch,controller=new AbortController();
- const timer=setTimeout(()=>controller.abort(),12000);
- try{
-  const response=await fetch('/api/checkout-quote',{method:'POST',credentials:'same-origin',cache:'no-store',signal:controller.signal,headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:sdCheckoutItems(),phone:$('#checkoutForm').elements.phone.value.trim()})});
-  const data=await response.json().catch(error=>{if(error?.name==='AbortError')throw error;return {}});
-  if(epoch!==checkoutOpenEpoch)return;
-  if(!response.ok||data.ok!==true)throw Error(data.error||'Không kiểm tra được giá và số tiền. Vui lòng thử lại.');
-  sdCheckoutQuote=data;
-  sdCheckoutChoice=(data.options||[]).some(option=>option.value===checkoutPreselectedChoice)?checkoutPreselectedChoice:'';
-  sdCheckoutRenderQuote();
-  sdCheckoutRefreshChoice();
- }catch(error){
-  if(epoch!==checkoutOpenEpoch)return;
-  if(error?.name==='AbortError')throw Error('Kiểm tra giá quá lâu. Vui lòng kiểm tra kết nối rồi thử lại.');
-  throw error;
- }finally{clearTimeout(timer)}
+ const response=await fetch('/api/checkout-quote',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({items:sdCheckoutItems(),phone:$('#checkoutForm').elements.phone.value.trim()})});
+ let data={};try{data=await response.json()}catch{}
+ if(!response.ok||data.ok!==true)throw Error(data.error||'Không kiểm tra được QR và số tiền.');
+ sdCheckoutQuote=data;sdCheckoutChoice=(data.options||[]).some(option=>option.value===checkoutPreselectedChoice)?checkoutPreselectedChoice:'';sdCheckoutRenderQuote();
 }
 async function sdCheckoutLoadPaymentInstructions(){
  const selected=sdCheckoutSelected();if(!selected)throw Error('Hãy chọn một trong hai cách thanh toán.');
@@ -4882,17 +4855,10 @@ function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected(),payment=
 function openCheckout(options={}){
  dismissToast();
  renderCart();
- checkoutSessionItems=null;
  checkoutItemsOverride=Array.isArray(options.items)?options.items.map(item=>({...item})):null;checkoutFromCart=!checkoutItemsOverride;checkoutPreselectedChoice=['deposit','full'].includes(options.paymentChoice)?options.paymentChoice:'';
  const entries=checkoutItemsOverride?checkoutItemsOverride:selectedCartEntries();
  if(!entries.length){showToast('Chọn ít nhất một sản phẩm trong giỏ để thanh toán.');checkoutItemsOverride=null;checkoutFromCart=true;return}
  const missing=entries.find(({id,option})=>{const p=findProductByKey(id);return productOptionKind(p)&&!option});if(missing){checkoutItemsOverride=null;checkoutFromCart=true;closeCart(false);openDetail(missing.id);focusDetailOption();return}
- checkoutSessionItems=entries.map(item=>({
-  id:String(item.id||''),
-  option:String(item.option||''),
-  quantity:Number(item.quantity??item.q)
- })).filter(item=>item.id&&Number.isSafeInteger(item.quantity)&&item.quantity>0);
- if(!checkoutSessionItems.length){checkoutItemsOverride=null;checkoutFromCart=true;showToast('Không xác định được sản phẩm thanh toán. Vui lòng chọn lại.');return}
  if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('checkout');
  checkoutReturnFocus=document.activeElement;
  closeCart(false);$('#cartDrawer').setAttribute('inert','');
@@ -4905,44 +4871,19 @@ function openCheckout(options={}){
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
  sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
- const openEpoch=++checkoutOpenEpoch;
- // Never reuse a quote/selection or old error notice from a previous visit.
- $('#sdCheckoutQuoteNotice').hidden=false;
- $('#sdCheckoutQuoteText').textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…';
- $('#sdCheckoutRetryQuote').hidden=true;
- $('#sdCheckoutOptions').replaceChildren();
+ $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
  if(!checkoutProvinceLoadStarted){
   checkoutProvinceLoadStarted=true;
   void loadCheckoutProvinces();
  }
- // Fill name/phone/street immediately, BEFORE the first payment-step paint.
- // Province/ward options can finish loading independently, without blocking
- // the quote. This also avoids the temporarily blank address tile.
- const prefillPromise=prefillCheckoutFromLocalAddress();
- // Always show Address until the actual select controls have been hydrated.
- // Saved names alone are not proof the province/ward IDs were restored.
- $('#checkoutSubmit').disabled=maySkipAddress;
- sdCheckoutSetStep(checkoutAddressComplete()?2:1);
- const loadQuoteSafely=()=>sdCheckoutLoadQuote().catch(error=>{
-  if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
-  sdCheckoutQuote={quoteReady:false,reason:error?.message||'Không kiểm tra được giá. Vui lòng thử lại.',options:[]};
-  sdCheckoutRenderQuote();sdCheckoutRefreshChoice();
- });
- const quickQuote=maySkipAddress?loadQuoteSafely():null;
- prefillPromise.then(async()=>{
-  if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
+ prefillCheckoutFromLocalAddress().then(async()=>{
+  if(!panel.classList.contains('open'))return;
   if(checkoutAddressComplete()){
-   if(quickQuote)await quickQuote;
-   else await loadQuoteSafely();
-   if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
+   try{await sdCheckoutLoadQuote()}catch(error){sdCheckoutQuote={quoteReady:false,reason:error.message,options:[]};sdCheckoutRenderQuote()}
+   if(!panel.classList.contains('open'))return;
    sdCheckoutSetStep(2);
   }else sdCheckoutSetStep(1);
   $('#checkoutSubmit').disabled=false;
- }).catch(error=>{
-  if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
-  $('#checkoutSubmit').disabled=false;
-  sdCheckoutQuote={quoteReady:false,reason:'Không tải được địa chỉ. Vui lòng kiểm tra lại thông tin nhận hàng.',options:[]};
-  sdCheckoutRenderQuote();sdCheckoutSetStep(1);
  });
 }
 function closeCheckout(restoreFocus=true){
@@ -4950,7 +4891,6 @@ function closeCheckout(restoreFocus=true){
  if(!panel)return;
  const wasOpen=panel.classList.contains('open');
  panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');
- checkoutOpenEpoch++;checkoutSessionItems=null; // invalidate slow quote responses
  backdrop.classList.remove('open');
  if(!$('#cartDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';
  const target=checkoutReturnFocus;checkoutReturnFocus=null;
@@ -5334,18 +5274,6 @@ $('#sdCheckoutConfirmRange').addEventListener('change',event=>{
  const label=$('#sdCheckoutConfirmLabel');if(label)label.textContent='Xác nhận đã thanh toán';slider.setAttribute('aria-valuetext','0%');
 });
 $('#sdCheckoutPrev').addEventListener('click',()=>{if(sdCheckoutStep>1)sdCheckoutSetStep(sdCheckoutStep-1);else $('#checkoutBack').click()});
-$('#sdCheckoutRetryQuote').addEventListener('click',async()=>{
- const button=$('#sdCheckoutRetryQuote'),panel=$('#checkoutDrawer');
- if(button.disabled||!panel.classList.contains('open')||!sdCheckoutItems().length)return;
- button.disabled=true;button.hidden=true;
- $('#sdCheckoutQuoteText').textContent='Đang kiểm tra lại giá và tình trạng hàng…';
- try{await sdCheckoutLoadQuote()}
- catch(error){
-  if(!panel.classList.contains('open'))return;
-  sdCheckoutQuote={quoteReady:false,paymentReady:false,reason:error?.message||'Chưa thể kiểm tra giá.',options:[]};
-  sdCheckoutRenderQuote();sdCheckoutRefreshChoice();
- }finally{button.disabled=false}
-});
 $('#sdCheckoutOptions').addEventListener('click',e=>{const b=e.target.closest('[data-sd-payment-option]');if(!b||!sdCheckoutQuote?.quoteReady)return;sdCheckoutChoice=b.dataset.sdPaymentOption;sdCheckoutRefreshChoice()});$('#sdDetailPaymentQuote').addEventListener('click',e=>{const b=e.target.closest('[data-detail-payment-option]');if(!b)return;detailPaymentChoice=b.dataset.detailPaymentOption;sdDetailUpdatePaymentChoice()});
 document.querySelectorAll('[data-sd-review-step]').forEach(b=>b.addEventListener('click',()=>sdCheckoutSetStep(b.dataset.sdReviewStep)));
 $('#checkoutForm').addEventListener('submit',async e=>{e.preventDefault();const form=e.currentTarget,button=$('#checkoutSubmit'),message=$('#checkoutMessage');

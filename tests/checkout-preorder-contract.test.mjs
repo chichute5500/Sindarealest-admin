@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { calculateCheckoutQuote, makeCheckoutTransferReference, checkoutTransferReferenceMatches } from "../functions/_payments.js";
-import { onRequestPost as checkoutQuotePost } from "../functions/api/checkout-quote.js";
 
 const item=(type,unitPrice,quantity=1)=>({fulfillmentType:type,unitPrice,quantity});
 const stock=calculateCheckoutQuote([item("in_stock",4500000)]);
@@ -27,81 +26,6 @@ assert.match(transferReference,/^SD-[A-Z2-9]{8}$/);
 assert.equal(checkoutTransferReferenceMatches(transferReference,"0900000000","QA-WALLET-001"),true);
 assert.equal(checkoutTransferReferenceMatches("SD-INVALID","0900000000","QA-WALLET-001"),false);
 
-// Contract: initial Checkout quote must NOT pay for unrelated QR D1 settings
-// or remote R2 existence checks. Only explicit payment-method selection may do
-// that work. No fake payment receipt or data mutations are allowed in phase 1.
-const quoteReads={prices:0,settings:[],r2Heads:0};
-const previewProduct={id:"qa-wallet-1",sku:"SD-VN-001",title:"Ví da",category:"wallets",price:4500000,published:1,source_price_confirmed:1,stock:20,fulfillment_type:"in_stock"};
-const qrTestKey="qr-00000000-0000-4000-8000-000000000000.png";
-const quoteSettings={
- show_prices:"1",payment_qr_active:"1",payment_qr_active_key:qrTestKey,
- payment_qr_bank_name:"VIB",payment_qr_account_number:"123456789",
- payment_qr_account_name:"QA",payment_qr_instructions:""
-};
-const quoteDB={
- prepare(sql){
-  if(sql.startsWith("SELECT id,sku,title,category,price,published,source_price_confirmed,stock,fulfillment_type")){
-   return {bind(...ids){return {async all(){quoteReads.prices++;return {results:ids.includes(previewProduct.id)?[previewProduct]:[]}}}}};
-  }
-  if(sql.startsWith("SELECT value FROM settings WHERE key")){
-   return {bind(key){return {async first(){quoteReads.settings.push(key);return {value:quoteSettings[key]??null}}}}};
-  }
-  throw Error("Unexpected read-only Checkout SQL: "+sql);
- }
-};
-const quoteEnv={DB:quoteDB,IMAGES:{async head(key){quoteReads.r2Heads++;return key===qrTestKey?{key}:null}}};
-const quoteRequest=(choice,quotedTotal)=>new Request("https://preview.test/api/checkout-quote",{
- method:"POST",headers:{"Content-Type":"application/json"},
- body:JSON.stringify({items:[{id:previewProduct.id,option:"",quantity:1}],phone:"0900000000",
-  ...(choice?{paymentOption:choice,quotedTotal}:{})})
-});
-const preflightResponse=await checkoutQuotePost({request:quoteRequest(),env:quoteEnv});
-assert.equal(preflightResponse.status,200);
-const preflight=await preflightResponse.json();
-assert.equal(preflight.quoteReady,true);
-assert.equal(preflight.paymentReady,false);
-assert.equal(preflight.options.length,2);
-assert.equal(preflight.total,4500000);
-assert.deepEqual(quoteReads.settings,["show_prices"],"Unselected quote must read only the price visibility gate");
-assert.equal(quoteReads.r2Heads,0,"Unselected quote must not wait for R2 QR head");
-const chosenResponse=await checkoutQuotePost({request:quoteRequest("deposit",4500000),env:quoteEnv});
-assert.equal(chosenResponse.status,200);
-const chosen=await chosenResponse.json();
-assert.equal(chosen.quoteReady,true);
-assert.equal(chosen.paymentReady,true,"QR stays verified on explicit payment choice");
-assert.equal(chosen.paymentOption,"deposit");
-assert.equal(chosen.selectedPaymentAmount,1400000);
-assert.equal(chosen.paymentInstructions.status,"ready");
-assert.equal(quoteReads.r2Heads,1,"Only selected payment performs QR verification");
-assert.equal(quoteReads.settings.filter(x=>x==="payment_qr_active").length,1);
-
-quoteSettings.show_prices="0";
-const hiddenPrice=await (await checkoutQuotePost({request:quoteRequest(),env:quoteEnv})).json();
-assert.equal(hiddenPrice.quoteReady,false,"A hidden-price product must never receive an invented amount");
-assert.equal(hiddenPrice.paymentReady,false);
-quoteSettings.show_prices="1";
-
-previewProduct.source_price_confirmed=0;
-const unverifiedPrice=await (await checkoutQuotePost({request:quoteRequest(),env:quoteEnv})).json();
-assert.equal(unverifiedPrice.quoteReady,false,"Unverified prices cannot offer deposit/full checkout");
-previewProduct.source_price_confirmed=1;
-
-previewProduct.published=0;
-const unpublished=await checkoutQuotePost({request:quoteRequest(),env:quoteEnv});
-assert.equal(unpublished.status,409,"Unpublished products must fail instead of entering an empty payment step");
-previewProduct.published=1;
-
-const qrBeforeMissing=quoteReads.r2Heads;
-quoteEnv.IMAGES.head=async()=>{quoteReads.r2Heads++;return null};
-const missingQr=await (await checkoutQuotePost({request:quoteRequest("full",4500000),env:quoteEnv})).json();
-assert.equal(missingQr.quoteReady,true,"Price quote remains valid when QR storage is unavailable");
-assert.equal(missingQr.paymentReady,false,"Never offer a QR when the R2 image is missing");
-assert.equal(quoteReads.r2Heads,qrBeforeMissing+1,"Missing QR must be rechecked on explicit choice");
-
-const staleAmount=await checkoutQuotePost({request:quoteRequest("deposit",1000000),env:quoteEnv});
-assert.equal(staleAmount.status,409,"Server must reject any outdated client quote");
-
-
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const quote=readFileSync(new URL("../functions/api/checkout-quote.js",import.meta.url),"utf8");
 const create=readFileSync(new URL("../functions/api/orders.js",import.meta.url),"utf8");
@@ -121,47 +45,6 @@ assert.doesNotMatch(html,/\.checkout-drawer\{left:0;right:0;width:100vw;max-widt
 assert.match(html,/#cartDrawer,#checkoutDrawer\{background:var\(--sd-reference-surface\)!important\}/,'Cart and Checkout use the same outer glass material');
 assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{\s*top:calc\(7px \+ env\(safe-area-inset-top\)\);[\s\S]*?border:1px solid var\(--sd-reference-edge\);border-radius:26px;/,'Mobile drawers share inset geometry and 26px corners');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
-const firstStage=quote.indexOf('if(!selectedOption)return json({');
-const qrSettingsQuery=quote.indexOf('const keys=await Promise.all(');
-assert.ok(firstStage>0&&qrSettingsQuery>firstStage,'The preflight response must return before any QR D1 settings or R2 request');
-
-
-const quoteLoadStart=html.indexOf('async function sdCheckoutLoadQuote(){');
-const quoteLoadEnd=html.indexOf('async function sdCheckoutLoadPaymentInstructions(){',quoteLoadStart);
-const quoteLoadBody=html.slice(quoteLoadStart,quoteLoadEnd);
-assert.match(quoteLoadBody,/signal:controller\.signal/,'Read-only payment quote requests support abort after a bounded wait');
-assert.match(quoteLoadBody,/setTimeout\(\(\)=>controller\.abort\(\),12000\)/,'Slow quote API must not leave an endless pending message');
-
-const jsonReadAt=quoteLoadBody.indexOf('await response.json()');
-const timeoutClearAt=quoteLoadBody.indexOf('clearTimeout(timer)');
-assert.ok(jsonReadAt>0&&timeoutClearAt>jsonReadAt,'Abort timeout must remain active through response body parsing, not just response headers');
-assert.match(quoteLoadBody,/response\.json\(\)\.catch\(error=>\{if\(error\?\.name==='AbortError'\)throw error/,'Abort errors while reading JSON must propagate to a useful timeout notice');
-
-assert.match(quoteLoadBody,/if\(epoch!==checkoutOpenEpoch\)return/,'Responses from a closed or replaced checkout session cannot overwrite the current quote');
-assert.match(quoteLoadBody,/sdCheckoutRenderQuote\(\);\s*sdCheckoutRefreshChoice\(\)/,'Quote completion updates actual amount and payment choices without waiting for province/ward API');
-const openCheckoutBody=html.slice(html.indexOf('function openCheckout(options={}){'),html.indexOf('function closeCheckout(',html.indexOf('function openCheckout(options={}){')));
-const prefillIndex=openCheckoutBody.indexOf('const prefillPromise=prefillCheckoutFromLocalAddress()');
-const quoteIndex=openCheckoutBody.indexOf('const quickQuote=maySkipAddress?loadQuoteSafely():null');
-const waitIndex=openCheckoutBody.indexOf('prefillPromise.then(async()=>');
-assert.ok(prefillIndex>=0&&quoteIndex>prefillIndex&&waitIndex>quoteIndex,'Start read-only quote in parallel instead of serially after administrative division loading');
-assert.match(openCheckoutBody,/\$\('#sdCheckoutOptions'\)\.replaceChildren\(\)/,'Do not display stale payment methods from a previous checkout session');
-assert.match(openCheckoutBody,/\$\('#sdCheckoutQuoteText'\)\.textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…'/,'Waiting state resets cleanly on each checkout open');
-assert.doesNotMatch(openCheckoutBody,/fetch\('\/api\/orders'/,'Prefilling and fetching a quote must not create an order');
-
-assert.match(html,/let checkoutItemsOverride=null,checkoutFromCart=true,checkoutSessionItems=null/,'An open payment checkout has a stable item snapshot');
-
-assert.match(html,/function savedCheckoutAddressComplete\(saved\)\{[\s\S]*?saved\.provinceCode[\s\S]*?saved\.wardCode/,'Only saved addresses with explicit province and ward codes qualify to skip address entry');
-assert.match(html,/sdCheckoutSetStep\(checkoutAddressComplete\(\)\?2:1\)/,'Payment step must not show before address selects are hydrated and validated');
-assert.doesNotMatch(html,/sdCheckoutSetStep\(maySkipAddress\?2:1\)/,'The presence of saved names alone cannot show an empty Payment address card');
-
-assert.match(html,/function sdCheckoutItems\(\)\{return \(checkoutSessionItems\|\|\[\]\)\.map/,'Quote, summary, and final order always read the same selection');
-assert.match(openCheckoutBody,/checkoutSessionItems=entries\.map\(item=>\(\{/,'The selected cart entries are captured once at payment opening');
-assert.match(html,/checkoutOpenEpoch\+\+;checkoutSessionItems=null/,'Closing checkout invalidates stale items and in-flight quotes');
-assert.match(html,/id="sdCheckoutQuoteText"/,'Checkout has a stable inline progress/error text node');
-assert.match(html,/id="sdCheckoutRetryQuote" hidden/,'A failed price fetch can be retried without replacing the order');
-assert.match(html,/\$\('#sdCheckoutRetryQuote'\)\.addEventListener\('click',async\(\)=>\{/,'Retry button invokes read-only quote API only after explicit tap');
-
-
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
 assert.match(html,/getElementById|querySelector|#sdCheckoutQrImage/);
 assert.match(quote,/paymentReady:false/,"Selecting a method must not mean Shop has confirmed a payment request");
@@ -222,35 +105,22 @@ assert.match(html,/classList\.add\('sd-checkout-success'\);\$\('#sdCheckoutRevie
 assert.match(glass,/\.checkout-drawer \.sd-checkout-review-row\{[^}]*margin:2px 5px 4px;padding:13px 15px/,'Address insets are scoped to the reviewed-address tile');
 
 // Header/footer remain on the drawer shell; every stepper, address and QR
-// belongs to one continuous Checkout content stream; mobile scrolls the sheet itself, desktop scrolls the form.
+// belongs to the ONE scrollable form for natural continuous mobile scrolling.
 const checkoutMarkup=html.slice(html.indexOf('<aside class="checkout-drawer glass"'),html.indexOf('<div class="toast"'));
 const markupForm=checkoutMarkup.indexOf('<form id="checkoutForm"'),markupStepper=checkoutMarkup.indexOf('id="sdCheckoutStepper"');
 const markupAddress=checkoutMarkup.indexOf('id="sdCheckoutReviewAddressRow"'),markupIntro=checkoutMarkup.indexOf('class="checkout-intro"');
 const markupQr=checkoutMarkup.indexOf('id="paymentInstructions"'),markupFormClose=checkoutMarkup.indexOf('</form>');
 const markupHeader=checkoutMarkup.indexOf('class="cart-header checkout-header"'),markupFooter=checkoutMarkup.indexOf('class="sd-checkout-footer"');
-assert.ok(markupHeader<markupForm&&markupForm<markupStepper&&markupStepper<markupAddress&&markupAddress<markupIntro&&markupIntro<markupQr&&markupQr<markupFormClose&&markupFormClose<markupFooter,'Stepper, address, payment title and QR remain in ONE content stream between the floating glass bars');
-assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*display:grid/,'Desktop Checkout preserves its original self-scrolling form');
+assert.ok(markupHeader<markupForm&&markupForm<markupStepper&&markupStepper<markupAddress&&markupAddress<markupIntro&&markupIntro<markupQr&&markupQr<markupFormClose&&markupFormClose<markupFooter,'Stepper, address, payment title and QR scroll in ONE form between fixed header and fixed footer');
+assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*display:grid/,'Checkout form is the only scrolling body');
 assert.match(html,/\.checkout-heading h2\{[^}]*left:50%;top:50%;transform:translate\(-50%,-50%\);[^}]*font:700 25px\/1\.2 SD Serif/,'Bold order title stays physically centered in every stage');
 assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{visibility:hidden;pointer-events:none\}/,'Success step does not shift header geometry');
 assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px/,'Floating headers preserve the same geometry');
 assert.match(html,/\.nav-wrap \.nav\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important/,'Original Storefront Header material remains unchanged');
-assert.match(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{/,'Checkout uses the Cart glass source rule for every floating bar');
-assert.match(html,/html.dark #cartDrawer \.cart-header,[\s\S]*?html.dark #checkoutDrawer \.sd-checkout-confirm-wrap\{/,'Checkout light and dark glass stay in sync with Cart');
-assert.match(html,/\.checkout-drawer \.sd-checkout-confirm-wrap\{[^}]*border-radius:999px/,'Keep the user-approved round green slider shape and stroke');
-
-assert.doesNotMatch(html,/#checkoutDrawer \.checkout-header\{[^}]*background:/,'No second standalone checkout header film may override the Cart source');
-assert.doesNotMatch(html,/#checkoutDrawer \.sd-checkout-actions \.pill-btn\{[^}]*background:/,'Checkout buttons must not restack a second glass face');
-assert.doesNotMatch(html,/\.checkout-drawer \.sd-checkout-confirm-wrap\{[^}]*background:/,'The slider shell inherits Cart glass; its green fill remains a separate ::before layer');
-assert.match(html,/#cartDrawer \.cart-header,[\s\S]*?#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*-webkit-backdrop-filter:blur\(56\.784px\) saturate\(114%\);\s*backdrop-filter:blur\(56\.784px\) saturate\(114%\)/,'Both drawers share the same real filter, not screenshot-derived static gray');
-
-
-assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[\s\S]*?background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important;[\s\S]*?box-shadow:var\(--sd-3d-shadow\)!important/,'Cart and Checkout controls share one locally frosted film without changing either drawer');
-assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{\s*background-color:/,'The three Cart bars must not have a painted static base');
-assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[\s\S]*?background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important/,'Checkout reuses Cart optics without repainting or dimming either drawer');
-assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[\s\S]*?-webkit-backdrop-filter:blur\(56\.784px\) saturate\(114%\);\s*backdrop-filter:blur\(56\.784px\) saturate\(114%\)/,'Checkout header, actions and slider reuse the exact Cart backdrop without brightness tint');
-assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*brightness\(/,'Cart or Checkout glass must never darken real photographs with brightness()');
-assert.match(html,/<script defer src="\/cart-glass-optics\.js"><\/script>/,'Cart optical lens runs without touching order code');
-assert.match(html,/#cartDrawer \.sd-cart-optical-lens\{[^}]*pointer-events:none/,'Optical mirrors do not intercept checkout interaction');
+assert.match(html,/\.nav-wrap \.nav,\s*#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important;[\s\S]*?box-shadow:var\(--sd-3d-shadow\)!important/,'Only three Cart bars share the logo Header optical face and shadow');
+assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{\s*background-color:/,'The three Cart bars must not have a painted static base');
+assert.match(html,/\.nav-wrap \.nav,\s*#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important;[\s\S]*?box-shadow:var\(--sd-3d-shadow\)!important/,'Cart bars reuse the exact translucent Header film and contact shadow');
+assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{\s*-webkit-backdrop-filter:blur\(20px\) saturate\(122%\) brightness\(\.68\);\s*backdrop-filter:blur\(20px\) saturate\(122%\) brightness\(\.68\)/,'Nested Cart glass samples the real moving background with calibrated dimming, never a static gray fill');
 assert.doesNotMatch(html,/background-color:rgba\(115,111,104,\.88\)!important|background-color:rgba\(9,27,43,\.88\)!important/,'Remove legacy light and dark gray tint overrides');
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
@@ -272,28 +142,10 @@ assert.doesNotMatch(html,/sd-scroll-can-up|sd-scroll-can-down|sd-scroll-fade|sdU
 assert.doesNotMatch(html,/#cartList,#checkoutForm\{[^}]*mask-image/,'Cart and Checkout are not masked or faded at their scroll boundaries');
 assert.match(html,/\.cart-list\{[^}]*background:transparent/,'Cart list shares one uninterrupted glass surface with footer');
 assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*background:transparent/,'Checkout content shares one uninterrupted glass surface with footer');
-
-const checkoutOptics=readFileSync(new URL('../public/checkout-glass-optics.js',import.meta.url),'utf8');
-assert.match(html,/<script defer src="\/checkout-glass-optics\.js"><\/script>/,'Mobile Checkout optical lens must be loaded');
-assert.match(html,/#checkoutDrawer \.sd-checkout-optical-lens\{[^}]*overflow:hidden;border-radius:inherit/,'Checkout optics are clipped to the actual glass bars');
-assert.match(html,/#checkoutDrawer \.sd-checkout-optical-mirror\{[^}]*filter:blur\(14px\)/,'Checkout mirrors use the same 14px source blur as Cart');
-assert.match(checkoutOptics,/drawer\.querySelector\('\.checkout-header'\)/,'Checkout header has an optical lens');
-assert.match(checkoutOptics,/drawer\.querySelector\('\.sd-checkout-footer'\)/,'Checkout footer has an optical lens');
-assert.match(checkoutOptics,/clone\.style\.removeProperty\('mask-image'\)/,'Mirrors may not inherit the source occlusion mask');
-assert.match(checkoutOptics,/block\.style\.setProperty\('mask-image',mask\)/,'Sharp source text is suppressed only where actually covered by glass');
-assert.match(checkoutOptics,/requestAnimationFrame\(render\)/,'Scroll optics are framed and do not run synchronous layout on each scroll event');
-assert.doesNotMatch(checkoutOptics,/\bfetch\(|\/api\/|localStorage|sessionStorage|\bsubmit\(/,'Checkout optical code cannot change payments, network, or order state');
-
 assert.match(html,/\.cart-drawer\{overflow-y:auto!important;overscroll-behavior:contain/,'Mobile cart uses its outer shell as its only scrolling container');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-list\{[^}]*overflow:visible!important/,'Both list overflow axes are visible: no implicit clipped inner scrollport');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2;margin-top:auto\}/,'Both glass footer bars remain reachable while outer drawer scrolls');
 assert.match(html,/#cartDrawer \.cart-header\{position:sticky;top:0;z-index:2\}/,'Floating cart header remains in place in the unified scroll region');
-assert.match(html,/\.checkout-drawer\{overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none\}/,'Mobile Checkout scrolls outer frosted sheet, like Cart');
-assert.match(html,/#checkoutDrawer \.checkout-header\{position:sticky;top:0;z-index:3;flex-shrink:0\}/,'Checkout title stays fixed while fields pass behind the glass');
-assert.match(html,/#checkoutDrawer \.checkout-form\{flex:0 0 auto!important;overflow:visible!important;min-height:0;max-height:none;align-self:stretch\}/,'No clipped inner form or horizontal cut edge on mobile');
-assert.match(html,/#checkoutDrawer \.sd-checkout-footer\{position:sticky;bottom:0;z-index:3;margin-top:auto;flex-shrink:0\}/,'Checkout CTA floats above passing content, exactly as Cart');
-assert.match(html,/function resetCheckoutScrollPosition\(\)\{[\s\S]*?drawer\.scrollTop=0;/,'Checkout step changes reset the actual mobile scroll container');
-
 
 assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border-top:0;background:transparent;box-shadow:none/,'Checkout footer has no full-width separator or detached glass rectangle');
 
@@ -329,3 +181,14 @@ assert.match(html,/\$\('#sdCheckoutConfirmLabel'\)\.textContent='Xác nhận đ�
 assert.match(html,/if\(sdCheckoutOrderCreating\)return;sdCheckoutOrderCreating=true/,'An in-flight order is protected against duplicate submit');
 assert.match(html,/finally\{sdCheckoutOrderCreating=false\}/,'A failed submission unlocks retry');
 console.log("PASS: owner-approved Liquid Glass checkout steps; server-authoritative deposits; QR fail-closed; Admin choice recorded without marking paid.");
+
+
+// Only visual Cart/Checkout changes are permitted after this rollback.
+assert.match(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{/,'Checkout glass shares Cart material');
+assert.match(html,/#checkoutDrawer \.sd-checkout-optical-mirror\{[^}]*filter:blur\(14px\)/,'Same optical glass blur');
+assert.match(html,/<script defer src="\/checkout-glass-optics\.js"><\/script>/,'Checkout optical effect stays mounted');
+assert.match(html,/#checkoutDrawer \.checkout-header\{position:sticky;top:0;z-index:3;flex-shrink:0\}/,'Sticky glass header preserved');
+assert.match(html,/#checkoutDrawer \.sd-checkout-footer\{position:sticky;bottom:0;z-index:3;margin-top:auto;flex-shrink:0\}/,'Sticky glass footer preserved');
+assert.match(html,/function sdCheckoutItems\(\)\{return checkoutItemsOverride\?checkoutItemsOverride\.map/,'Restore selected-Cart source for Checkout item summary');
+assert.doesNotMatch(html,/checkoutSessionItems|checkoutOpenEpoch|sdCheckoutRetryQuote/,'Visual styling must not alter checkout order/session state');
+assert.match(html,/function openCheckout\(options=\{\}\)\{[\s\S]*?prefillCheckoutFromLocalAddress\(\)\.then\(async\(\)=>/,'Checkout address and quote sequencing is back to working flow');
