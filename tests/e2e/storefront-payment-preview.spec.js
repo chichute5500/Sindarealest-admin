@@ -822,6 +822,23 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  expect([focus.headerBlur,focus.subtotalBlur,focus.checkoutBlur].every(x=>x.includes('blur(')),
  'All three Cart bars keep native frosted glass').toBe(true);
  console.log('CART_EIGHT_PRODUCTS_NATIVE_GLASS',JSON.stringify(focus));
+ const cartRapidFrames=await drawer.evaluate(async el=>{
+  const rows=[...el.querySelectorAll('#cartList .cart-row')],frames=[];
+  for(let i=0;i<18;i++){
+   el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*(i%2===0?.92:.08));
+   await new Promise(resolve=>requestAnimationFrame(resolve));
+   frames.push({
+    masked:rows.filter(row=>getComputedStyle(row).maskImage!=='none').length,
+    clones:el.querySelectorAll('[class*="optical-mirror"],[class*="optical-lens"]').length,
+    clipped:rows.filter(row=>getComputedStyle(row).clipPath!=='none').length
+   });
+  }
+  return frames;
+ });
+ expect(cartRapidFrames.every(x=>x.masked===0&&x.clones===0&&x.clipped===0),
+  'No cart source content may disappear on any rapid scroll frame').toBe(true);
+ console.log('CART_NATIVE_GLASS_FAST_SCROLL',JSON.stringify(cartRapidFrames));
+
  await page.screenshot({path:join(output,'390x844-eight-items-real-blur-60-percent.png'),fullPage:false,animations:'disabled'});
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
