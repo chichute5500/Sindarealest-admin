@@ -117,7 +117,7 @@ assert.match(html,/\.checkout-heading h2\{[^}]*left:50%;top:50%;transform:transl
 assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{visibility:hidden;pointer-events:none\}/,'Success step does not shift header geometry');
 assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px/,'Floating headers preserve the same geometry');
 assert.match(html,/\.nav-wrap \.nav\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important/,'Original Storefront Header material remains unchanged');
-assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important;[^}]*box-shadow:var\(--sd-3d-shadow\)!important/,'Cart and Checkout bars share the existing frosted glass film and shadow');
+assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*background:linear-gradient\(145deg,rgba\(255,255,255,\.70\),rgba\(255,255,255,\.55\)\)!important;[^}]*box-shadow:var\(--sd-checkout-optical-shadow,var\(--sd-3d-shadow\)\)!important/,'All Cart and Checkout bars share the same glass film, with action shadows selected by the control wrapper');
 assert.doesNotMatch(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{\s*background-color:/,'The three Cart bars must not have a painted static base');
 assert.match(html,/\.nav-wrap \.nav\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important/,'Original Header glass film remains untouched');
 assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout,\s*#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*backdrop-filter:blur\(56\.784px\) saturate\(114%\)/,'The current approved glass has no old brightness dimming');
@@ -192,6 +192,10 @@ assert.doesNotMatch(html,/Kéo thanh bên dưới để lấy mã đơn|Đơn h�
 assert.match(html,/#checkoutDrawer \.sd-checkout-footer>\.sd-checkout-optical-lens\{inset:auto;border-radius:22px\}/,'Footer optics are clipped to actual action buttons');
 assert.match(html,/<p class="sd-checkout-confirm-note" id="sdCheckoutConfirmNote" hidden><\/p>/,'A legacy hidden compatibility node has no duplicated customer-facing copy');
 
+// The footer is a transparent layout host, not a second pane of dark glass.
+assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border:0;border-top:0;background:transparent;box-shadow:none;outline:0;filter:none;isolation:auto;/,'Checkout footer must never draw an outer border or isolated glass plate');
+assert.match(html,/\.checkout-drawer \.sd-checkout-actions\{--sd-checkout-optical-shadow:inset 0 1px 0 rgba\(255,255,255,\.55\),0 6px 15px rgba\(103,169,205,\.10\);[^}]*border:0;background:transparent;box-shadow:none;outline:0/,'Action wrapper uses a pale control shadow without a dark enclosure');
+assert.doesNotMatch(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-footer\{isolation:isolate\}/,'Do not isolate the whole footer as a compositing surface');
 // Only visual Cart/Checkout changes are permitted after this rollback.
 assert.match(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{/,'Checkout glass shares Cart material');
 assert.match(html,/#checkoutDrawer \.sd-checkout-optical-mirror\{[^}]*filter:blur\(14px\)/,'Same optical glass blur');
