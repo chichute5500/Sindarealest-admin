@@ -22,7 +22,7 @@ const select = "SELECT o.id AS id,o.order_number AS orderNumber,o.status AS stat
  stageAt('shipped')+" AS shippedAt,"+
  stageAt('completed')+" AS completedAt,"+
  // Public warranty milestone exposes only activation date, never code/owner/price.
- " (SELECT MIN(w.starts_at) FROM warranties w WHERE w.order_id=o.id AND w.status='active') AS warrantyAt "+
+ " (SELECT MIN(w.starts_at) FROM warranties w WHERE w.order_id=o.id AND w.status IN ('active','expired')) AS warrantyAt "+
  "FROM orders o JOIN customers c ON c.id=o.customer_id "+
  "LEFT JOIN order_contact_details oc ON oc.order_id=o.id ";
 
