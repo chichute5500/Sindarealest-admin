@@ -5406,7 +5406,7 @@ function sdTrackDate(raw){
 function sdTrackRender(orders){
  const result=$('#sdTrackResults');
  result.innerHTML=orders.map(order=>{
-  let steps=Array.isArray(order.steps)?order.steps.slice(0,6):[];
+  let steps=Array.isArray(order.steps)?order.steps.slice(0,7):[];
   if(order.status!=='cancelled'&&steps.length>=3){
    const confirmed=steps[1],payment=steps[2],completed=confirmed.state==='done'&&payment.state==='done';
    const laterDate=()=>{const values=[confirmed.completedAt,payment.completedAt].filter(Boolean);return values.sort((a,b)=>{const parse=x=>Date.parse(/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(x)?x.replace(' ','T')+'Z':x)||0;return parse(a)-parse(b)}).at(-1)||null};
