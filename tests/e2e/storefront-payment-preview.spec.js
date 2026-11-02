@@ -194,6 +194,15 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   expect(mat.alpha,'Cart glass must be genuinely transparent so the scroll backdrop changes its appearance: '+mat.selector).toBe(0);
   expect(mat.rim).toContain('gradient');
  }
+ // Verify the exact new light-mode film at the browser's computed CSS level.
+ const cartGlassFaces=await page.locator('#cartDrawer').evaluate(drawer=>
+  ['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(sel=>
+   getComputedStyle(drawer.querySelector(sel)).backgroundImage)
+ );
+ for(const face of cartGlassFaces){
+  expect(face).toContain('rgba(255, 255, 255, 0.424)');
+  expect(face).toContain('rgba(255, 255, 255, 0.296)');
+ }
  await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});
  await page.locator('#cartDrawer .cart-subtotal-bar').screenshot({path:join(output,'390x844-cart-subtotal-glass.png'),animations:'disabled'});
  await page.locator('#cartCheckout').screenshot({path:join(output,'390x844-cart-checkout-glass.png'),animations:'disabled'});

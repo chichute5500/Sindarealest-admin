@@ -2226,9 +2226,9 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 #cartDrawer .cart-subtotal-bar,
 #cartDrawer #cartCheckout{
   border:1px solid transparent;
-  /* The cart shell is already a frosted surface. One nearly-clear reflection
-     transmits its moving backdrop without laying a second milky sheet over it. */
-  background:linear-gradient(145deg,rgba(255,255,255,.28),rgba(255,255,255,.12))!important;
+  /* The cart shell is already frosted; one reflective film on each Cart bar
+     transmits 20% less of the moving backdrop than the prior .28/.12 face. */
+  background:linear-gradient(145deg,rgba(255,255,255,.424),rgba(255,255,255,.296))!important;
   box-shadow:var(--sd-3d-shadow)!important;
   -webkit-backdrop-filter:blur(26px) saturate(114%);
   backdrop-filter:blur(26px) saturate(114%);
