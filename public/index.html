@@ -3283,16 +3283,29 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 .checkout-drawer .checkout-fields input[type="hidden"]{display:none}
 .checkout-drawer .checkout-fields input,.checkout-drawer .checkout-fields select{min-width:0}
 .sd-checkout-excess-note{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
-#productOverlay .sd-detail-payment-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:5px 0}
-#productOverlay .sd-detail-payment-option{display:grid;gap:5px;min-width:0;min-height:100px;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--panel);color:var(--ink);text-align:left}
-#productOverlay .sd-detail-payment-option strong{font-size:11px;line-height:1.4}
-#productOverlay .sd-detail-payment-option b{font-size:12px;color:var(--gold)}
-#productOverlay .sd-detail-payment-option small{font-size:10px;line-height:1.45;color:var(--muted)}
+/* Product detail payment cards: a single Liquid Glass style with clear radio state. */
+#productOverlay .sd-detail-payment-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:9px 0 4px}
 #productOverlay .sd-detail-payment-quote{border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow)}
-#productOverlay .sd-detail-payment-option{position:relative;overflow:hidden;border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow)}
+#productOverlay .sd-detail-payment-option{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:8px;min-width:0;min-height:152px;padding:15px 16px;border:1px solid transparent;border-radius:17px;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow);color:var(--ink);text-align:left;cursor:pointer;transition:background .2s ease,box-shadow .2s ease}
 #productOverlay .sd-detail-payment-option::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1.5px;background:var(--sd-3d-rim);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude}
-#productOverlay .sd-detail-payment-option b{color:var(--ink)}
-#productOverlay .sd-detail-payment-option.selected{border:1px solid transparent;background:var(--sd-glass-selected);box-shadow:var(--sd-3d-selected)}
+#productOverlay .sd-detail-payment-option[data-detail-payment-option="full"]{background:linear-gradient(125deg,rgba(129,204,174,.16),rgba(233,207,145,.13)),var(--sd-3d-surface)}
+#productOverlay .sd-detail-payment-option.selected{background:var(--sd-glass-selected);box-shadow:var(--sd-3d-selected)}
+#productOverlay .sd-detail-payment-option[data-detail-payment-option="full"].selected{background:linear-gradient(125deg,rgba(129,204,174,.22),rgba(233,207,145,.11)),var(--sd-glass-selected)}
+#productOverlay .sd-detail-payment-option:focus-visible{outline:2px solid #3f9c80;outline-offset:3px}
+#productOverlay .sd-detail-payment-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;min-width:0}
+#productOverlay .sd-detail-payment-option strong{font-size:14px;line-height:1.4;font-weight:750}
+#productOverlay .sd-detail-payment-radio{position:relative;display:grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(82,126,129,.55);background:rgba(255,255,255,.38);box-shadow:inset 0 1px 3px rgba(0,0,0,.1),0 1px 4px rgba(255,255,255,.35);transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
+#productOverlay .sd-detail-payment-radio::after{content:"";width:5px;height:9px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:translateY(-1px) rotate(45deg) scale(.6);opacity:0;transition:opacity .18s ease,transform .18s ease}
+#productOverlay .sd-detail-payment-option.selected .sd-detail-payment-radio{border-color:#32896e;background:linear-gradient(145deg,#58b99a,#2f9077);box-shadow:0 2px 8px rgba(47,144,119,.28)}
+#productOverlay .sd-detail-payment-option.selected .sd-detail-payment-radio::after{opacity:1;transform:translateY(-1px) rotate(45deg) scale(1)}
+#productOverlay .sd-detail-payment-option b{font-size:16px;font-weight:800;line-height:1.3;color:var(--ink);font-variant-numeric:tabular-nums}
+#productOverlay .sd-detail-payment-option small{font-size:12px;line-height:1.5;color:var(--muted)}
+#productOverlay .sd-detail-payment-best{align-self:flex-start;color:#207d65;font-size:10px;font-weight:800;letter-spacing:.035em;text-transform:uppercase}
+#productOverlay .sd-detail-payment-benefits{display:flex;flex-wrap:wrap;align-items:center;gap:7px 10px}
+#productOverlay .sd-detail-payment-original{font-size:11px;text-decoration:line-through;color:var(--muted)}
+#productOverlay .sd-detail-payment-saving{display:inline-flex;align-items:center;width:max-content;max-width:100%;padding:5px 9px;border-radius:999px;background:rgba(77,174,137,.15);color:#1b755e;font-size:11px;font-weight:800;line-height:1.3}
+html.dark #productOverlay .sd-detail-payment-best,html.dark #productOverlay .sd-detail-payment-saving{color:#a0e4cb}
+@media(prefers-reduced-motion:reduce){#productOverlay .sd-detail-payment-option,#productOverlay .sd-detail-payment-radio,#productOverlay .sd-detail-payment-radio::after{transition:none}}
 .checkout-heading{flex:1 1 auto}
 #checkoutDrawer.sd-checkout-success .checkout-backlink{visibility:hidden;pointer-events:none}
 /* Mobile QR/order title: align to the full drawer's center when the hidden
@@ -4957,14 +4970,24 @@ async function sdDetailLoadPaymentQuote(product){
   box.replaceChildren();
   if(!response.ok||quote.quoteReady!==true){box.textContent=String(quote.reason||'Shop sẽ xác nhận giá trước khi đặt hàng.');return}
   const title=document.createElement('strong');title.textContent='Chọn cách thanh toán';box.append(title);
-  const total=document.createElement('p');total.className='sd-detail-original-price';total.textContent='Giá sản phẩm: '+formatVnd(quote.total);box.append(total);
   const choices=document.createElement('div');choices.className='sd-detail-payment-options';choices.setAttribute('role','radiogroup');choices.setAttribute('aria-label','Chọn cách thanh toán');
   for(const choice of quote.options||[]){
-   const button=document.createElement('button'),name=document.createElement('strong'),amount=document.createElement('b'),detail=document.createElement('small');
+   const button=document.createElement('button'),head=document.createElement('span'),name=document.createElement('strong'),radio=document.createElement('span'),amount=document.createElement('b'),detail=document.createElement('small');
    button.type='button';button.className='sd-detail-payment-option tap-target'+(detailPaymentChoice===choice.value?' selected':'');button.dataset.detailPaymentOption=choice.value;button.setAttribute('role','radio');button.setAttribute('aria-checked',String(detailPaymentChoice===choice.value));
-   name.textContent=choice.value==='deposit'?'Đặt cọc 30%':'Thanh toán hết · giảm 5%';amount.textContent='Chuyển '+formatVnd(choice.amount);
-   detail.textContent=choice.value==='deposit'?'Còn trả khi nhận hàng: '+formatVnd(choice.codExpected):'Giá gốc '+formatVnd(quote.total)+' · Giảm '+formatVnd(choice.discountAmount)+' · Khi nhận hàng: 0₫';
-   button.append(name,amount,detail);choices.append(button);
+   head.className='sd-detail-payment-head';radio.className='sd-detail-payment-radio';radio.setAttribute('aria-hidden','true');
+   name.textContent=choice.value==='deposit'?'Đặt cọc 30%':'Thanh toán hết · giảm 5%';head.append(name,radio);
+   amount.textContent='Chuyển '+formatVnd(choice.amount);button.append(head);
+   if(choice.value==='full'){
+    const best=document.createElement('span'),benefits=document.createElement('span'),original=document.createElement('span'),saving=document.createElement('span');
+    best.className='sd-detail-payment-best';best.textContent='Ưu đãi tốt nhất';
+    benefits.className='sd-detail-payment-benefits';original.className='sd-detail-payment-original';original.textContent=formatVnd(quote.total);
+    saving.className='sd-detail-payment-saving';saving.textContent='Tiết kiệm '+formatVnd(choice.discountAmount);
+    benefits.append(original,saving);detail.textContent='Khi nhận hàng: '+formatVnd(choice.codExpected);
+    button.append(best,amount,benefits,detail);
+   }else{
+    detail.textContent='Còn trả khi nhận hàng: '+formatVnd(choice.codExpected);button.append(amount,detail);
+   }
+   choices.append(button);
   }
   box.append(choices);
   const note=document.createElement('small');note.textContent='Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng.';box.append(note);
