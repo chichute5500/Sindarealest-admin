@@ -64,10 +64,10 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.titleFont).toContain('SD Serif');
  expect(state.headerShift).toBeLessThanOrEqual(1.5);
  expect(state.footerShift).toBeLessThanOrEqual(1.5);
- expect(state.cartHeaderGlass.startsWith(state.headerGlass),'Cart keeps the existing Checkout/Header optical film with its own blue plate').toBe(true);
+ expect(state.cartHeaderGlass,'Cart keeps the logo Header film without duplicate blue paint').toBe(state.headerGlass);
  expect(state.headerGlass).toContain('gradient');
  expect(state.checkoutHeaderRadius).toBe(state.cartHeaderRadius);
- expect(state.cartHeaderShadow.startsWith(state.checkoutHeaderShadow),'Cart adds contact depth without changing Checkout header shadow').toBe(true);
+ expect(state.cartHeaderShadow,'Cart preserves the existing optical Header shadow').toBe(state.checkoutHeaderShadow);
  expect(state.cartTitleWeight).toBeGreaterThanOrEqual(700);
  expect(state.footerGlass,'Footer must blend into the shared glass sheet').toBe('none');
  expect(state.footerBorder,'No horizontal line across bottom checkout').toBe('0px');
@@ -161,7 +161,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   const summary=button.previousElementSibling,subtotal=summary?.querySelector('#cartSubtotal');
   const s=summary?.getBoundingClientRect(),t=subtotal?.getBoundingClientRect(),b=button.getBoundingClientRect(),f=button.closest('.cart-bottom').getBoundingClientRect();
   const mat=el=>getComputedStyle(el);
-  return {separate:summary?.classList.contains('cart-subtotal-bar')&&!button.contains(subtotal),summaryAbove:s&&s.bottom+4<=b.top,subtotalInside:s&&t&&t.top>=s.top&&t.bottom<=s.bottom,buttonInside:f.top<=b.top&&f.bottom>=b.bottom,material:mat(summary).backgroundImage===mat(button).backgroundImage&&mat(button).backgroundImage.includes(mat(document.querySelector('.nav-wrap .nav')).backgroundImage),shadow:mat(summary).boxShadow===mat(button).boxShadow&&mat(button).boxShadow.startsWith(mat(document.querySelector('.nav-wrap .nav')).boxShadow)};
+  return {separate:summary?.classList.contains('cart-subtotal-bar')&&!button.contains(subtotal),summaryAbove:s&&s.bottom+4<=b.top,subtotalInside:s&&t&&t.top>=s.top&&t.bottom<=s.bottom,buttonInside:f.top<=b.top&&f.bottom>=b.bottom,material:mat(summary).backgroundImage===mat(button).backgroundImage&&mat(button).backgroundImage===mat(document.querySelector('.nav-wrap .nav')).backgroundImage,shadow:mat(summary).boxShadow===mat(button).boxShadow&&mat(button).boxShadow===mat(document.querySelector('.nav-wrap .nav')).boxShadow};
  });
  expect(cartBarLayout.separate&&cartBarLayout.summaryAbove&&cartBarLayout.subtotalInside&&cartBarLayout.buttonInside).toBe(true);
  expect(cartBarLayout.material&&cartBarLayout.shadow,'Cart footer bars match the Storefront Header film').toBe(true);
@@ -172,14 +172,14 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    const el=document.querySelector(selector),s=getComputedStyle(el),edge=getComputedStyle(el,'::after');
    const alphaMatch=s.backgroundColor.match(/rgba?\(([^)]+)\)/);
    const alpha=alphaMatch?(alphaMatch[1].split(',')[3]===undefined?1:Number(alphaMatch[1].split(',')[3])):0;
-   return {selector,alpha,backgroundMatches:s.backgroundImage.startsWith(nav.backgroundImage),
-    shadowMatches:s.boxShadow.startsWith(nav.boxShadow),filterMatches:s.backdropFilter===nav.backdropFilter,
+   return {selector,alpha,backgroundMatches:s.backgroundImage===nav.backgroundImage,
+    shadowMatches:s.boxShadow===nav.boxShadow,filterMatches:s.backdropFilter===nav.backdropFilter,
     rim:edge.backgroundImage,overflow:s.overflow};
   });
  });
  for(const mat of cartMaterial){
   expect(mat.backgroundMatches&&mat.shadowMatches&&mat.filterMatches,'Cart glass uses the real logo Header optics: '+mat.selector).toBe(true);
-  expect(mat.alpha,'Opaque blue backing prevents product text ghosting: '+mat.selector).toBeGreaterThanOrEqual(.99);
+  expect(mat.alpha,'Neutral translucent foundation prevents text bleed: '+mat.selector).toBeGreaterThanOrEqual(.85);
   expect(mat.rim).toContain('gradient');
  }
  await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});

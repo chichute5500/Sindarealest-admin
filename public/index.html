@@ -2208,8 +2208,15 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 }
 
 
-/* The logo Header is still the source of the optical glass film and refraction rim. */
-.nav-wrap .nav{
+/* The three Cart bars inherit the logo Header's actual optical face,
+   reflection rim, shadow and refraction. The overlaid blue gradients are removed.
+   A neutral grey translucent foundation compensates for the Cart drawer's
+   bright backdrop-filtered ancestor (the logo Header sits over product photos).
+   No masking/fade layers and no changes to product cards, checkout or the drawer. */
+.nav-wrap .nav,
+#cartDrawer .cart-header,
+#cartDrawer .cart-subtotal-bar,
+#cartDrawer #cartCheckout{
   border:1px solid transparent;
   background:var(--sd-glass-shell-strong)!important;
   box-shadow:var(--sd-3d-shadow)!important;
@@ -2217,34 +2224,15 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   backdrop-filter:blur(17px) saturate(114%);
 }
 html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important}
-/* Exactly three Cart bars. They sit inside a backdrop-filtered scroll container,
-   unlike the logo Header over the blue hero. Build an equivalent luminous blue
-   foundation UNDER the original Header film so the cards never show through,
-   instead of adding opacity, scroll masks or edge fades. */
 #cartDrawer .cart-header,
 #cartDrawer .cart-subtotal-bar,
 #cartDrawer #cartCheckout{
-  border:1px solid transparent;
-  background-image:var(--sd-glass-shell-strong),
-    radial-gradient(ellipse 80% 90% at 1% 0%,rgba(255,221,239,.44),transparent 77%),
-    radial-gradient(ellipse 88% 115% at 100% 100%,rgba(137,192,222,.55),transparent 82%),
-    linear-gradient(145deg,#f8fcff 0%,#eaf5fd 48%,#d0e2eb 100%)!important;
-  background-color:#d9edf9!important;
-  box-shadow:var(--sd-3d-shadow),inset 0 2px 1px rgba(255,255,255,.72),
-    inset 0 -3px 8px rgba(99,164,203,.19)!important;
-  -webkit-backdrop-filter:blur(17px) saturate(114%);
-  backdrop-filter:blur(17px) saturate(114%);
+  background-color:rgba(104,122,138,.88)!important;
 }
 html.dark #cartDrawer .cart-header,
 html.dark #cartDrawer .cart-subtotal-bar,
 html.dark #cartDrawer #cartCheckout{
-  background-image:var(--sd-glass-shell-strong),
-    radial-gradient(ellipse 75% 95% at 0% 0%,rgba(167,126,177,.13),transparent 79%),
-    radial-gradient(ellipse 88% 110% at 100% 100%,rgba(55,123,168,.31),transparent 84%),
-    linear-gradient(145deg,#183b55 0%,#103148 53%,#0b2439 100%)!important;
-  background-color:#09253d!important;
-  box-shadow:var(--sd-3d-shadow),inset 0 2px 1px rgba(196,229,250,.16),
-    inset 0 -3px 8px rgba(8,18,34,.34)!important;
+  background-color:rgba(9,27,43,.88)!important;
 }
 
 /* In light mode, blend the original white image backdrop into the satin surface without changing the source asset; keep Dark-mode product colours untouched. */
