@@ -707,7 +707,16 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage')).toBeVisible();
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
- await assertCheckoutScrollAndHeader(page,true);
+ // Preserve the pre-existing strict header-centering assertion, but defer its
+ // failure so we can still measure the new fast-slider requirement in the same
+ // bounded Preview test. Never silently turn the header assertion green.
+ let qrHeaderAssertionError=null;
+ try{await assertCheckoutScrollAndHeader(page,true)}
+ catch(error){
+  qrHeaderAssertionError=error;
+  console.log('QR_HEADER_CENTERING_UNRESOLVED',error.message);
+  await page.screenshot({path:join(output,'390x844-qr-header-centering-diagnostic.png'),fullPage:false,animations:'disabled'});
+ }
  await expect(page.locator('#paymentInstructions')).toContainText('Thanh toán hết · giảm 5%');
  await expect(page.locator('#paymentInstructions')).toContainText(Math.round(actualCartTotal*.05).toLocaleString('vi-VN'));
  await expect(page.locator('#paymentInstructions')).not.toContainText('Đã thanh toán');
@@ -736,6 +745,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(Math.abs(quickPaint.actual-quickPaint.expected)).toBeLessThan(1);
  expect(Math.abs(quickPaint.painted-quickPaint.expected)).toBeLessThan(2);
  expect(quickPaint.duration).toBe('0s');
+ console.log('FAST_SWIPE_NO_LAG_MEASURED',JSON.stringify(quickPaint));
+ await page.screenshot({path:join(output,'390x844-fast-swipe-green-fill.png'),fullPage:false,animations:'disabled'});
  await page.mouse.up();
  await expect(quickSlider).toHaveValue('0');
  expect(createdOrders.length).toBe(createdBeforeFullSwipe);
@@ -745,7 +756,12 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(writes.at(-1)).toBe('POST /api/orders');
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeVisible();
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
- await assertCheckoutScrollAndHeader(page,false);
+ let orderHeaderAssertionError=null;
+ try{await assertCheckoutScrollAndHeader(page,false)}
+ catch(error){
+  orderHeaderAssertionError=error;
+  console.log('ORDER_HEADER_CENTERING_UNRESOLVED',error.message);
+ }
  const cartFullOrderNumber=(await page.locator('#paymentInstructions .sd-order-reference strong').innerText()).trim();
  await page.screenshot({path:join(output,'390x844-cart-full-order-code.png'),fullPage:false,animations:'disabled'});
  await page.locator('#sdCheckoutDone').click();
@@ -809,6 +825,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(writes.filter(path=>path==='POST /api/orders'),'Exactly two isolated Preview orders should be created').toHaveLength(2);
  expect(writes.every(path=>path==='POST /api/checkout-quote'||path==='POST /api/orders'||path==='POST /api/order-tracking'),'Only the isolated Preview order and public tracking lookup may be written').toBe(true);
  expect(errors,'Preview should have no browser runtime errors').toEqual([]);
+ if(qrHeaderAssertionError)throw qrHeaderAssertionError;
+ if(orderHeaderAssertionError)throw orderHeaderAssertionError;
 });
 
 
