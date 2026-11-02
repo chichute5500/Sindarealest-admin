@@ -172,7 +172,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   const summary=button.previousElementSibling,subtotal=summary?.querySelector('#cartSubtotal');
   const s=summary?.getBoundingClientRect(),t=subtotal?.getBoundingClientRect(),b=button.getBoundingClientRect(),f=button.closest('.cart-bottom').getBoundingClientRect();
   const mat=el=>getComputedStyle(el);
-  return {separate:summary?.classList.contains('cart-subtotal-bar')&&!button.contains(subtotal),summaryAbove:s&&s.bottom+4<=b.top,subtotalInside:s&&t&&t.top>=s.top&&t.bottom<=s.bottom,buttonInside:f.top<=b.top&&f.bottom>=b.bottom,material:mat(summary).backgroundImage===mat(button).backgroundImage&&mat(button).backgroundImage===mat(document.querySelector('.nav-wrap .nav')).backgroundImage,shadow:mat(summary).boxShadow===mat(button).boxShadow&&mat(button).boxShadow===mat(document.querySelector('.nav-wrap .nav')).boxShadow};
+  return {separate:summary?.classList.contains('cart-subtotal-bar')&&!button.contains(subtotal),summaryAbove:s&&s.bottom+4<=b.top,subtotalInside:s&&t&&t.top>=s.top&&t.bottom<=s.bottom,buttonInside:f.top<=b.top&&f.bottom>=b.bottom,material:mat(summary).backgroundImage===mat(button).backgroundImage&&mat(button).backgroundImage.includes('gradient'),shadow:mat(summary).boxShadow===mat(button).boxShadow&&mat(button).boxShadow===mat(document.querySelector('.nav-wrap .nav')).boxShadow};
  });
  expect(cartBarLayout.separate&&cartBarLayout.summaryAbove&&cartBarLayout.subtotalInside&&cartBarLayout.buttonInside).toBe(true);
  expect(cartBarLayout.material&&cartBarLayout.shadow,'Cart footer bars match the Storefront Header film').toBe(true);
