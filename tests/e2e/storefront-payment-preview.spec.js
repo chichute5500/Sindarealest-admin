@@ -376,8 +376,24 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
  await expect(review).toBeHidden();
- // Screenshot the scroll boundary without any opacity or gradient mask.
+ // The previous screenshot exposed sharp "Chờ thanh toán" lettering through
+ // Checkout's white glass. With Cart-matched optics, the covered pixels must
+ // actually blur; a CSS-string parity assertion alone cannot prove that.
+ await expect(page.locator('#checkoutDrawer .sd-checkout-optical-lens')).toHaveCount(2);
  await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
+ await expect.poll(()=>page.locator('#checkoutDrawer').evaluate(drawer=>({
+   mirrors:drawer.querySelectorAll('.sd-checkout-optical-mirror').length,
+   masked:[...drawer.querySelector('#checkoutForm').children].filter(el=>getComputedStyle(el).maskImage.includes('linear-gradient')).length
+ })),{timeout:5000}).toEqual(expect.objectContaining({mirrors:expect.any(Number),masked:expect.any(Number)}));
+ const realOcclusion=await page.locator('#checkoutDrawer').evaluate(drawer=>({
+   mirrorCount:drawer.querySelectorAll('.sd-checkout-optical-mirror').length,
+   maskedBlockCount:[...drawer.querySelector('#checkoutForm').children].filter(el=>getComputedStyle(el).maskImage.includes('linear-gradient')).length,
+   mirrorFilters:[...drawer.querySelectorAll('.sd-checkout-optical-mirror')].map(el=>getComputedStyle(el).filter)
+ }));
+ expect(realOcclusion.mirrorCount,'Checkout must blur real text moving behind its bars').toBeGreaterThan(0);
+ expect(realOcclusion.maskedBlockCount,'Sharp payment lettering must not remain legible under frosted bars').toBeGreaterThan(0);
+ for(const filter of realOcclusion.mirrorFilters)expect(filter).toContain('blur(14px)');
+ console.log('CHECKOUT_REAL_GLASS_OCCLUSION',JSON.stringify(realOcclusion));
  await page.screenshot({path:join(output,'390x844-checkout-qr-mid-scroll-clear.png'),fullPage:false,animations:'disabled'});
  await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'))});
  await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn.');
