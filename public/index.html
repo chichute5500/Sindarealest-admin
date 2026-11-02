@@ -3774,7 +3774,7 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 <script>
 (()=>{
 'use strict';
-const $=s=>document.querySelector(s), $=s=>Array.from(document.querySelectorAll(s));
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 // Shared between account payment top-ups and checkout QR rendering.
 function safePaymentQrUrl(value){if(typeof value!=='string'||!value.trim())return '';try{const url=new URL(value,window.location.origin);if(url.protocol!=='https:'&&url.origin!==window.location.origin)return '';return url.href}catch{return ''}}
 async function sdCopyCheckoutText(value){
