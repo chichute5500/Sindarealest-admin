@@ -280,6 +280,33 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    else await expect(page.locator('html')).not.toHaveClass(/dark/);
    await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
    await assertCheckoutScrollAndHeader(page,width<=390);
+   if(width<=390){
+    // The checkout header, action buttons and slider's unfilled track must
+    // use the same CURRENT computed optical face as the approved Cart bars,
+    // not merely share CSS names. The green slider progress stays unchanged.
+    const syncedGlass=await page.evaluate(()=>{
+     const original=document.querySelector('#cartDrawer .cart-header');
+     const source=getComputedStyle(original);
+     return ['#checkoutDrawer .checkout-header','#sdCheckoutPrev','#checkoutSubmit','#sdCheckoutConfirmWrap'].map(selector=>{
+      const node=document.querySelector(selector),style=getComputedStyle(node);
+      return {selector,
+       face:style.backgroundImage===source.backgroundImage,
+       backdrop:style.backdropFilter===source.backdropFilter,
+       shadow:style.boxShadow===source.boxShadow,
+       hasBrightness:style.backdropFilter.includes('brightness(')};
+     });
+    });
+    for(const bar of syncedGlass){
+     expect(bar.face,'Checkout must transmit the same backdrop as Cart: '+bar.selector).toBe(true);
+     expect(bar.backdrop,'Checkout blur/saturation must match Cart: '+bar.selector).toBe(true);
+     expect(bar.shadow,'Checkout raised glass depth must match Cart: '+bar.selector).toBe(true);
+     expect(bar.hasBrightness,'No brightness-tinted checkout glass: '+bar.selector).toBe(false);
+    }
+    if(width===390){
+     await page.locator('#checkoutDrawer .checkout-header').screenshot({path:join(output,`390x844-${theme}-checkout-header-glass.png`),animations:'disabled'});
+     await page.locator('#checkoutDrawer .sd-checkout-actions').screenshot({path:join(output,`390x844-${theme}-checkout-actions-glass.png`),animations:'disabled'});
+    }
+   }
    await expect(page.locator('#sdCheckoutSelectedAmount')).toContainText(buyNowDeposit.toLocaleString('vi-VN'));
    await expect(page.locator('#sdCheckoutRemaining')).toContainText((buyNowTotal-buyNowDeposit).toLocaleString('vi-VN'));
    await expect(page.locator('#sdCheckoutDiscount')).toContainText('Không áp dụng');
