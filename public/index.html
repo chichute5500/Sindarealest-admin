@@ -2208,12 +2208,8 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 }
 
 
-/* Keep the sticky header frosted, but prevent scrolled page imagery/text from ghosting through the official brand lockup. */
-/* One source of truth for the logo Header's optics, reused by Cart title, subtotal and CTA. */
-.nav-wrap .nav,
-#cartDrawer .cart-header,
-#cartDrawer .cart-subtotal-bar,
-#cartDrawer #cartCheckout{
+/* The logo Header is still the source of the optical glass film and refraction rim. */
+.nav-wrap .nav{
   border:1px solid transparent;
   background:var(--sd-glass-shell-strong)!important;
   box-shadow:var(--sd-3d-shadow)!important;
@@ -2221,13 +2217,34 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   backdrop-filter:blur(17px) saturate(114%);
 }
 html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important}
-/* In a backdrop-filtered scrolling drawer, descendant backdrop blur cannot reliably
-   obscure the moving products on Android. A solid glass foundation sits below
-   the SAME logo-Header face/rim/shadow; it does not fade or mask the card edges. */
+/* Exactly three Cart bars. They sit inside a backdrop-filtered scroll container,
+   unlike the logo Header over the blue hero. Build an equivalent luminous blue
+   foundation UNDER the original Header film so the cards never show through,
+   instead of adding opacity, scroll masks or edge fades. */
 #cartDrawer .cart-header,
 #cartDrawer .cart-subtotal-bar,
 #cartDrawer #cartCheckout{
-  background-color:var(--sd-reference-surface-strong)!important;
+  border:1px solid transparent;
+  background-image:var(--sd-glass-shell-strong),
+    radial-gradient(ellipse 80% 90% at 1% 0%,rgba(255,221,239,.44),transparent 77%),
+    radial-gradient(ellipse 88% 115% at 100% 100%,rgba(137,192,222,.55),transparent 82%),
+    linear-gradient(145deg,#f8fcff 0%,#eaf5fd 48%,#bbd4e5 100%)!important;
+  background-color:#d9edf9!important;
+  box-shadow:var(--sd-3d-shadow),inset 0 2px 1px rgba(255,255,255,.72),
+    inset 0 -3px 8px rgba(99,164,203,.19)!important;
+  -webkit-backdrop-filter:blur(17px) saturate(114%);
+  backdrop-filter:blur(17px) saturate(114%);
+}
+html.dark #cartDrawer .cart-header,
+html.dark #cartDrawer .cart-subtotal-bar,
+html.dark #cartDrawer #cartCheckout{
+  background-image:var(--sd-glass-shell-strong),
+    radial-gradient(ellipse 75% 95% at 0% 0%,rgba(167,126,177,.13),transparent 79%),
+    radial-gradient(ellipse 88% 110% at 100% 100%,rgba(55,123,168,.31),transparent 84%),
+    linear-gradient(145deg,#183b55 0%,#103148 53%,#0b2439 100%)!important;
+  background-color:#09253d!important;
+  box-shadow:var(--sd-3d-shadow),inset 0 2px 1px rgba(196,229,250,.16),
+    inset 0 -3px 8px rgba(8,18,34,.34)!important;
 }
 
 /* In light mode, blend the original white image backdrop into the satin surface without changing the source asset; keep Dark-mode product colours untouched. */

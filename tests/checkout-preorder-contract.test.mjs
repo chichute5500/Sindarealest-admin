@@ -116,8 +116,9 @@ assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*d
 assert.match(html,/\.checkout-heading h2\{[^}]*left:50%;top:50%;transform:translate\(-50%,-50%\);[^}]*font:700 25px\/1\.2 SD Serif/,'Bold order title stays physically centered in every stage');
 assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{visibility:hidden;pointer-events:none\}/,'Success step does not shift header geometry');
 assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px/,'Floating headers preserve the same geometry');
-assert.match(html,/\.nav-wrap \.nav,\s*#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important;[\s\S]*?box-shadow:var\(--sd-3d-shadow\)!important/,'Cart title, subtotal and action share the actual logo Header material rule');
-assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{\s*background-color:var\(--sd-reference-surface-strong\)!important;/,'Nested cart glass has a non-ghosting foundation without edge fading');
+assert.match(html,/\.nav-wrap \.nav\{[\s\S]*?background:var\(--sd-glass-shell-strong\)!important/,'Original Storefront Header material remains unchanged');
+assert.match(html,/#cartDrawer \.cart-header,\s*#cartDrawer \.cart-subtotal-bar,\s*#cartDrawer #cartCheckout\{[\s\S]*?background-image:var\(--sd-glass-shell-strong\),[\s\S]*?background-color:#d9edf9!important/,'Only Cart bars use Header glass film over a light blue solid optical foundation');
+assert.match(html,/html\.dark #cartDrawer \.cart-header,\s*html\.dark #cartDrawer \.cart-subtotal-bar,\s*html\.dark #cartDrawer #cartCheckout\{[\s\S]*?background-color:#09253d!important/,'Cart bars retain dark theme glass');
 assert.match(html,/#cartDrawer \.cart-header h2,#checkoutDrawer \.checkout-heading h2\{[^}]*font:700 25px\/1\.2 SD Serif/,'Both centered heading titles are bold');
 assert.doesNotMatch(html,/\.cart-header\{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:/,'Remove the old cart-wide horizontal header divider');
 assert.match(html,/\.cart-bottom\{border-top:0;padding-top:14px;background:transparent\}/,'Cart bottom has no full-width background seam');
