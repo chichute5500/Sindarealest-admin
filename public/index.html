@@ -3290,7 +3290,7 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 /* Mobile QR/order title: align to the full drawer's center when the hidden
    backlink leaves the sticky header inset. Desktop retains the original geometry.
    The offset is measured by the existing drawer ResizeObserver. */
-@media(max-width:760px){#checkoutDrawer.sd-checkout-success .checkout-heading h2{left:calc(50% + var(--sd-native-glass-pad-left,0px))}}
+@media(max-width:760px){#checkoutDrawer.sd-checkout-success.sd-checkout-from-cart .checkout-heading h2{left:calc(50% + var(--sd-native-glass-pad-left,0px))}}
 #checkoutDrawer.sd-checkout-success .checkout-intro{text-align:center}
 #checkoutDrawer.sd-checkout-success .checkout-intro p{font-size:16px}
 #checkoutDrawer.sd-checkout-success .checkout-intro small{max-width:620px;margin-inline:auto;color:#b42336;font-size:13px;font-weight:700}
@@ -4973,6 +4973,7 @@ function openCheckout(options={}){
  // Closed drawers are hidden inline until their first intentional opening;
  // their full motion CSS is parsed after the drawer markup on a cold reload.
  panel.style.visibility='';backdrop.style.visibility='';
+ panel.classList.toggle('sd-checkout-from-cart',checkoutFromCart);
  panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
