@@ -20,7 +20,9 @@ const select = "SELECT o.id AS id,o.order_number AS orderNumber,o.status AS stat
  paymentAt+" AS paymentAt,"+
  stageAt('processing')+" AS processingAt,"+
  stageAt('shipped')+" AS shippedAt,"+
- stageAt('completed')+" AS completedAt "+
+ stageAt('completed')+" AS completedAt,"+
+ // Public warranty milestone exposes only activation date, never code/owner/price.
+ " (SELECT MIN(w.starts_at) FROM warranties w WHERE w.order_id=o.id AND w.status='active') AS warrantyAt "+
  "FROM orders o JOIN customers c ON c.id=o.customer_id "+
  "LEFT JOIN order_contact_details oc ON oc.order_id=o.id ";
 
@@ -54,6 +56,11 @@ export function publicOrderProgress(row, viaPhone) {
   {title:"Đã gửi hàng",...completedProgress(shipped||deliveryStatus==="failed_returning"||deliveryStatus==="returned"||Boolean(row.shippedAt),row.shippedAt)},
   {title:deliveryStatus==="failed_returning"?"Giao thất bại / Đang hoàn hàng":deliveryStatus==="returned"?"Đã hoàn hàng về Shop":"Giao thành công",...completedProgress(["delivered","failed_returning","returned"].includes(deliveryStatus),deliveryStatus==="delivered"?row.completedAt:row.deliveryAt)}
  ];
+ if(deliveryStatus==="delivered"){
+  const warrantyActive=Boolean(row.warrantyAt);
+  steps.push({title:warrantyActive?"Đã kích hoạt bảo hành":"Chờ kích hoạt bảo hành",
+   ...completedProgress(warrantyActive,warrantyActive?String(row.warrantyAt)+"T00:00:00Z":null)});
+ }
  if(!cancelled){
    // Show exactly one next operational milestone when prior milestones are
    // recorded. Never mark an unperformed milestone "done" to fill a gap.
