@@ -127,7 +127,7 @@ assert.equal(done.status,200);
 const finished=(await done.json()).orders[0];
 validateSafe(finished);
 assert.equal(finished.status,"completed");
-assert.deepEqual(finished.steps.map(s=>s.state),["done","done","done","done","done","done"]);
+assert.deepEqual(finished.steps.map(s=>s.state),["done","done","done","done","done","done","done"]);
 assert.equal(finished.steps[5].completedAt,"2026-10-27T03:00:00Z");
 assert.equal(finished.steps[6].title,"Đã kích hoạt bảo hành");
 assert.equal(finished.steps[6].state,"done");
