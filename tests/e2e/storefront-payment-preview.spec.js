@@ -317,8 +317,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
       &&action!==original;
     }),{timeout:5000}).toBe(true);
     // The native logo Header is the reference for floating controls.
-    // The outer Cart/Checkout sheet retains its Owner-approved frosted background.
-    // Do not remove the outer 24px blur to force nested controls to blur.
+    // The Owner-approved drawer tint and native 24px frost are now rendered on
+    // a behind-content plane, NOT as an ancestor backdrop root. This lets both
+    // headers blur real text/QR while their full drawer stays visually frosted.
     const logoParity=await page.evaluate(()=>{
      const logo=getComputedStyle(document.querySelector('.nav-wrap .nav'));
      const cart=getComputedStyle(document.querySelector('#cartDrawer'));
@@ -326,9 +327,16 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
      const selectors=['#cartDrawer .cart-header','#cartDrawer .cart-subtotal-bar',
       '#cartCheckout','#checkoutDrawer .checkout-header','#sdCheckoutPrev',
       '#checkoutSubmit','#sdCheckoutConfirmWrap'];
+     const tint=[getComputedStyle(document.querySelector('#cartDrawer'),'::before'),
+      getComputedStyle(document.querySelector('#checkoutDrawer'),'::before')];
      return {rootFilters:[cart.backdropFilter,checkout.backdropFilter],
       rootWebkit:[cart.webkitBackdropFilter,checkout.webkitBackdropFilter],
       rootBackgrounds:[cart.backgroundColor,checkout.backgroundColor],
+      tintFilters:tint.map(x=>x.backdropFilter),
+      tintWebkit:tint.map(x=>x.webkitBackdropFilter),
+      tintBackgrounds:tint.map(x=>x.backgroundColor),
+      tintPosition:tint.map(x=>x.position),
+      tintPointerEvents:tint.map(x=>x.pointerEvents),
       match:selectors.map(selector=>{
        const glass=getComputedStyle(document.querySelector(selector));
        return {selector,face:glass.backgroundImage===logo.backgroundImage,
@@ -336,12 +344,16 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
         opacity:glass.opacity};
       })};
     });
-    for(const value of [...logoParity.rootFilters,...logoParity.rootWebkit]){
-     expect(value,'The approved drawer background must remain frosted').toContain('blur(24px)');
+    expect(logoParity.rootFilters).toEqual(['none','none']);
+    expect(logoParity.rootWebkit).toEqual(['none','none']);
+    for(const value of [...logoParity.tintFilters,...logoParity.tintWebkit]){
+     expect(value,'The approved drawer background remains natively frosted').toContain('blur(24px)');
     }
-    for(const value of logoParity.rootBackgrounds){
+    expect(logoParity.tintPosition).toEqual(['fixed','fixed']);
+    expect(logoParity.tintPointerEvents).toEqual(['none','none']);
+    for(const value of logoParity.tintBackgrounds){
      const alpha=Number(value.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/)?.[1]??1);
-     expect(alpha,'The drawer sheet must not become fully transparent').toBeGreaterThanOrEqual(.65);
+     expect(alpha,'The original drawer tint must survive on the behind-content sheet').toBeGreaterThanOrEqual(.65);
     }
     for(const item of logoParity.match){
      expect(item.face,'Real backdrop face equals approved logo Header: '+item.selector).toBe(true);
