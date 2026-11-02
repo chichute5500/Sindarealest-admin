@@ -203,8 +203,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   // Chromium may quantize alpha to 8-bit channels.
   const alphas=[...face.matchAll(/rgba\(255, 255, 255, ([0-9.]+)\)/g)].map(m=>Number(m[1]));
   expect(alphas).toHaveLength(2);
-  expect(Math.abs(alphas[0]-.28)).toBeLessThanOrEqual(.005);
-  expect(Math.abs(alphas[1]-.12)).toBeLessThanOrEqual(.005);
+  expect(Math.abs(alphas[0]-.70)).toBeLessThanOrEqual(.005);
+  expect(Math.abs(alphas[1]-.55)).toBeLessThanOrEqual(.005);
  }
  // Check actual mobile computed filters: values must beat every other CSS selector.
  const cartFilterCascade=await page.evaluate(()=>{
@@ -219,7 +219,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  for(const lens of cartFilterCascade){
   expect(lens.backdrop).toContain('blur(40.56px)');
   if(lens.webkit)expect(lens.webkit).toContain('blur(40.56px)'); // Chromium may omit the vendor alias.
-  expect(lens.background).toContain('rgba(255, 255, 255, 0.28)');
+  expect(lens.background).toContain('rgba(255, 255, 255, 0.7)');
  }
  console.log('CART_THREE_BARS_COMPUTED_CASCADE',JSON.stringify(cartFilterCascade));
  await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});
@@ -637,30 +637,6 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  console.log('CART_FOREGROUND_LAYER_DIAGNOSTIC',JSON.stringify(layering));
 
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
-
- // QA-only compositor alternatives. None of this CSS is included in the shipped page.
- const barSelectors='#cartDrawer .cart-header,#cartDrawer .cart-subtotal-bar,#cartDrawer #cartCheckout';
- const probes=[
-  {name:'current',css:''},
-  {name:'z-layer',css: '#cartDrawer .cart-header,#cartDrawer .cart-bottom{z-index:90!important;isolation:isolate!important}'},
-  {name:'pseudo-lens',css:barSelectors+'{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;isolation:isolate!important}'+
-   '#cartDrawer .cart-header::before,#cartDrawer .cart-subtotal-bar::before,#cartDrawer #cartCheckout::before'+
-   '{content:""!important;position:absolute!important;inset:0!important;z-index:-1!important;border-radius:inherit!important;pointer-events:none!important;'+
-   'background:linear-gradient(145deg,rgba(255,255,255,.28),rgba(255,255,255,.12))!important;'+
-   'backdrop-filter:blur(40.56px) saturate(114%)!important;-webkit-backdrop-filter:blur(40.56px) saturate(114%)!important}'},
-  {name:'strong-face-diagnostic',css:barSelectors+'{background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55))!important}'}
- ];
- for(const probe of probes){
-  const styleNode=probe.css?await page.addStyleTag({content:probe.css}):null;
-  for(const [phase,fraction] of [['top',0],['middle',.5],['bottom',1]]){
-   await drawer.evaluate((el,f)=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*f)},fraction);
-   await page.waitForTimeout(90);
-   await page.screenshot({path:join(output,'QA-CART-GLASS-'+probe.name+'-'+phase+'.png'),fullPage:false,animations:'disabled'});
-  }
-  if(styleNode)await styleNode.evaluate(el=>el.remove());
- }
-
-
 
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
