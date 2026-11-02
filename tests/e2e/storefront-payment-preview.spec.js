@@ -304,6 +304,13 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
     // The checkout header, action buttons and slider's unfilled track must
     // use the same CURRENT computed optical face as the approved Cart bars,
     // not merely share CSS names. The green slider progress stays unchanged.
+    // .pill-btn transitions box-shadow for 300ms on theme switches.
+    // Enforce the settled computed style, not a mid-transition frame.
+    await expect.poll(()=>page.evaluate(()=>{
+     const source=getComputedStyle(document.querySelector('#cartDrawer .cart-header')).boxShadow;
+     return ['#checkoutDrawer .checkout-header','#sdCheckoutPrev','#checkoutSubmit','#sdCheckoutConfirmWrap']
+      .every(sel=>getComputedStyle(document.querySelector(sel)).boxShadow===source);
+    }),{timeout:5000}).toBe(true);
     const syncedGlass=await page.evaluate(()=>{
      const original=document.querySelector('#cartDrawer .cart-header');
      const source=getComputedStyle(original);
