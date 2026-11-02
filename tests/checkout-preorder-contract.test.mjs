@@ -105,14 +105,14 @@ assert.match(html,/classList\.add\('sd-checkout-success'\);\$\('#sdCheckoutRevie
 assert.match(glass,/\.checkout-drawer \.sd-checkout-review-row\{[^}]*margin:2px 5px 4px;padding:13px 15px/,'Address insets are scoped to the reviewed-address tile');
 
 // Header/footer remain on the drawer shell; every stepper, address and QR
-// belongs to the ONE scrollable form for natural continuous mobile scrolling.
+// belongs to one continuous Checkout content stream; mobile scrolls the sheet itself, desktop scrolls the form.
 const checkoutMarkup=html.slice(html.indexOf('<aside class="checkout-drawer glass"'),html.indexOf('<div class="toast"'));
 const markupForm=checkoutMarkup.indexOf('<form id="checkoutForm"'),markupStepper=checkoutMarkup.indexOf('id="sdCheckoutStepper"');
 const markupAddress=checkoutMarkup.indexOf('id="sdCheckoutReviewAddressRow"'),markupIntro=checkoutMarkup.indexOf('class="checkout-intro"');
 const markupQr=checkoutMarkup.indexOf('id="paymentInstructions"'),markupFormClose=checkoutMarkup.indexOf('</form>');
 const markupHeader=checkoutMarkup.indexOf('class="cart-header checkout-header"'),markupFooter=checkoutMarkup.indexOf('class="sd-checkout-footer"');
-assert.ok(markupHeader<markupForm&&markupForm<markupStepper&&markupStepper<markupAddress&&markupAddress<markupIntro&&markupIntro<markupQr&&markupQr<markupFormClose&&markupFormClose<markupFooter,'Stepper, address, payment title and QR scroll in ONE form between fixed header and fixed footer');
-assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*display:grid/,'Checkout form is the only scrolling body');
+assert.ok(markupHeader<markupForm&&markupForm<markupStepper&&markupStepper<markupAddress&&markupAddress<markupIntro&&markupIntro<markupQr&&markupQr<markupFormClose&&markupFormClose<markupFooter,'Stepper, address, payment title and QR remain in ONE content stream between the floating glass bars');
+assert.match(html,/\.checkout-drawer \.checkout-form\{[^}]*overflow-y:auto[^}]*display:grid/,'Desktop Checkout preserves its original self-scrolling form');
 assert.match(html,/\.checkout-heading h2\{[^}]*left:50%;top:50%;transform:translate\(-50%,-50%\);[^}]*font:700 25px\/1\.2 SD Serif/,'Bold order title stays physically centered in every stage');
 assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-backlink\{visibility:hidden;pointer-events:none\}/,'Success step does not shift header geometry');
 assert.match(html,/#cartDrawer \.cart-header,#checkoutDrawer \.checkout-header\{[^}]*border-radius:22px/,'Floating headers preserve the same geometry');
@@ -159,6 +159,12 @@ assert.match(html,/\.cart-drawer\{overflow-y:auto!important;overscroll-behavior:
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-list\{[^}]*overflow:visible!important/,'Both list overflow axes are visible: no implicit clipped inner scrollport');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2;margin-top:auto\}/,'Both glass footer bars remain reachable while outer drawer scrolls');
 assert.match(html,/#cartDrawer \.cart-header\{position:sticky;top:0;z-index:2\}/,'Floating cart header remains in place in the unified scroll region');
+assert.match(html,/\.checkout-drawer\{overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none\}/,'Mobile Checkout scrolls outer frosted sheet, like Cart');
+assert.match(html,/#checkoutDrawer \.checkout-header\{position:sticky;top:0;z-index:3;flex-shrink:0\}/,'Checkout title stays fixed while fields pass behind the glass');
+assert.match(html,/#checkoutDrawer \.checkout-form\{flex:0 0 auto!important;overflow:visible!important;min-height:0;max-height:none;align-self:stretch\}/,'No clipped inner form or horizontal cut edge on mobile');
+assert.match(html,/#checkoutDrawer \.sd-checkout-footer\{position:sticky;bottom:0;z-index:3;margin-top:auto;flex-shrink:0\}/,'Checkout CTA floats above passing content, exactly as Cart');
+assert.match(html,/function resetCheckoutScrollPosition\(\)\{[\s\S]*?drawer\.scrollTop=0;/,'Checkout step changes reset the actual mobile scroll container');
+
 
 assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border-top:0;background:transparent;box-shadow:none/,'Checkout footer has no full-width separator or detached glass rectangle');
 
