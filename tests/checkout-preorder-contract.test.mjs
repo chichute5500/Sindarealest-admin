@@ -183,6 +183,15 @@ assert.match(html,/finally\{sdCheckoutOrderCreating=false\}/,'A failed submissio
 console.log("PASS: owner-approved Liquid Glass checkout steps; server-authoritative deposits; QR fail-closed; Admin choice recorded without marking paid.");
 
 
+// Checkout stage hierarchy: QR is one glass card, not a card inside a
+// separately painted payment panel. The footer is merely a transparent mount.
+assert.match(html,/\.payment-instructions\{margin:0;padding:0;border:0;border-radius:0;background:transparent/,'No outer painted payment stage');
+assert.match(html,/<div class="sd-checkout-qr-head"><span class="sd-payment-stage-label">BƯỚC 1 \/ 2 · THANH TOÁN<\/span><strong>Chuyển khoản ngân hàng<\/strong><small class="sd-payment-stage-subtitle">Chuyển khoản theo thông tin bên dưới<\/small>/,'Step copy is INSIDE bank-transfer card');
+assert.doesNotMatch(html,/add\(transferStage,'p','sd-payment-stage-label'/,'No standalone glass-like step title');
+assert.doesNotMatch(html,/Kéo thanh bên dưới để lấy mã đơn|Đơn hàng chỉ được tạo khi lấy mã ở bước này|Thao tác này không xác nhận tiền/,'Remove redundant slider instruction paragraphs');
+assert.match(html,/#checkoutDrawer \.sd-checkout-footer>\.sd-checkout-optical-lens\{inset:auto;border-radius:22px\}/,'Footer optics are clipped to actual action buttons');
+assert.match(html,/<p class="sd-checkout-confirm-note" id="sdCheckoutConfirmNote" hidden><\/p>/,'A legacy hidden compatibility node has no duplicated customer-facing copy');
+
 // Only visual Cart/Checkout changes are permitted after this rollback.
 assert.match(html,/#checkoutDrawer \.checkout-header,\s*#checkoutDrawer \.sd-checkout-actions \.pill-btn,\s*#checkoutDrawer \.sd-checkout-confirm-wrap\{/,'Checkout glass shares Cart material');
 assert.match(html,/#checkoutDrawer \.sd-checkout-optical-mirror\{[^}]*filter:blur\(14px\)/,'Same optical glass blur');
