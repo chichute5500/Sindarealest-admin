@@ -2253,7 +2253,17 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   #cartDrawer .cart-header{position:sticky;top:0;z-index:2}
   #checkoutDrawer .checkout-header{position:sticky;top:0;z-index:3;flex-shrink:0}
   #checkoutDrawer .checkout-form{flex:0 0 auto!important;overflow:visible!important;min-height:0;max-height:none;align-self:stretch}
-  #checkoutDrawer .sd-checkout-footer{position:sticky;bottom:0;z-index:3;margin-top:auto;flex-shrink:0}
+  #checkoutDrawer .sd-checkout-footer{
+    position:sticky;
+    /* Sticky bottom alone only prevents the footer from moving below the
+       scrollport. At the order-code step, the 14px residual scroll used to
+       pull it UP. The top threshold also pins its natural dock position. */
+    top:calc(100% - var(--sd-checkout-footer-height,73px) - var(--sd-checkout-footer-inset,10px));
+    bottom:0;
+    z-index:3;
+    margin-top:auto;
+    flex-shrink:0;
+  }
 }
 
 
@@ -5655,14 +5665,35 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
  const update=drawer=>{
   const height=drawer.clientHeight;
   if(height<=0)return;
-  const gap=Number.parseFloat(getComputedStyle(drawer).rowGap)||0;
+  const computed=getComputedStyle(drawer);
+  const gap=Number.parseFloat(computed.rowGap)||0;
   const h=height+'px',g=gap+'px';
   if(drawer.style.getPropertyValue('--sd-native-glass-height')!==h)drawer.style.setProperty('--sd-native-glass-height',h);
   if(drawer.style.getPropertyValue('--sd-native-glass-gap')!==g)drawer.style.setProperty('--sd-native-glass-gap',g);
+  if(drawer.id==='checkoutDrawer'){
+   const footer=drawer.querySelector('.sd-checkout-footer');
+   if(footer){
+    const footerHeight=footer.getBoundingClientRect().height;
+    const inset=Number.parseFloat(computed.paddingBottom)||0;
+    const measured=footerHeight+'px',bottomInset=inset+'px';
+    if(footerHeight>0&&drawer.style.getPropertyValue('--sd-checkout-footer-height')!==measured)
+     drawer.style.setProperty('--sd-checkout-footer-height',measured);
+    if(drawer.style.getPropertyValue('--sd-checkout-footer-inset')!==bottomInset)
+     drawer.style.setProperty('--sd-checkout-footer-inset',bottomInset);
+   }
+  }
  };
  if(typeof ResizeObserver==='function'){
-  const observer=new ResizeObserver(entries=>entries.forEach(({target})=>update(target)));
-  drawers.forEach(drawer=>{update(drawer);observer.observe(drawer)});
+  const observer=new ResizeObserver(entries=>entries.forEach(({target})=>{
+   update(target.id==='checkoutDrawer'||target.id==='cartDrawer'?target:target.closest('#checkoutDrawer'));
+  }));
+  drawers.forEach(drawer=>{
+   update(drawer);observer.observe(drawer);
+   if(drawer.id==='checkoutDrawer'){
+    const footer=drawer.querySelector('.sd-checkout-footer');
+    if(footer)observer.observe(footer);
+   }
+  });
  }else drawers.forEach(update);
  window.addEventListener('resize',()=>drawers.forEach(update),{passive:true});
 })();
