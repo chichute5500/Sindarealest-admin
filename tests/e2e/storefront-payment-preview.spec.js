@@ -729,6 +729,13 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(page.locator('#checkoutForm')).toHaveJSProperty('scrollTop',0);
  await expect(page.locator('#paymentInstructions .sd-checkout-qr-head strong')).toBeInViewport();
  await page.screenshot({path:join(output,'390x844-cart-full-qr-opened-at-top.png'),fullPage:false,animations:'disabled'});
+ const qrTitleOffset=await page.locator('#checkoutDrawer .checkout-heading h2').evaluate(title=>{
+  const drawer=document.querySelector('#checkoutDrawer').getBoundingClientRect();
+  const rect=title.getBoundingClientRect();
+  return Math.abs((rect.left+rect.right)/2-(drawer.left+drawer.right)/2);
+ });
+ console.log('PAYMENT_QR_MOBILE_TITLE_CENTER_OFFSET_PX',qrTitleOffset);
+ expect(qrTitleOffset).toBeLessThanOrEqual(2);
  // Preserve the pre-existing strict header-centering assertion, but defer its
  // failure so we can still measure the new fast-slider requirement in the same
  // bounded Preview test. Never silently turn the header assertion green.
