@@ -4820,7 +4820,7 @@ function sdCheckoutSetStep(step){
  [[1,'#sdCheckoutShippingStep'],[2,'#sdCheckoutPaymentStep']].forEach(([n,id])=>$(id).hidden=n!==sdCheckoutStep);
  $('#sdCheckoutReviewAddressRow').hidden=sdCheckoutStep!==2;
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
- $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;
+ $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';resetCheckoutScrollPosition();
  sdCheckoutSummary('#sdCheckoutItemSummary');
  if(sdCheckoutStep===2){
   const f=$('#checkoutForm').elements;
@@ -5207,7 +5207,7 @@ function sdCheckoutAdvanceToOrderCode(){
  $('#sdCheckoutDone').hidden=false;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';
  $('#sdCheckoutStepTitle').textContent='Mã đơn hàng';
  $('#sdCheckoutStepSubtitle').textContent='Lưu mã đơn bên dưới để theo dõi tiến độ. Shop sẽ cập nhật khi đã nhận thanh toán.';
- $('#checkoutForm').scrollTop=0;
+ resetCheckoutScrollPosition();
 }
 async function sdCheckoutFinalizeOrder(){
  if(!sdCheckoutSuccess||sdCheckoutOrderCreated)return;
@@ -5230,6 +5230,13 @@ async function sdCheckoutFinalizeOrder(){
   if(checkoutFromCart){for(const item of items){const key=cartKey(item.id,item.option||'');const left=Number(cart[key]||0)-item.quantity;if(left>0)cart[key]=left;else{delete cart[key];cartUnchecked.delete(key)}}saveCart()}
   checkoutItemsOverride=null;formResetCheckout();renderCart();sdCheckoutAdvanceToOrderCode();
  }catch(error){message.textContent=error.message||'Không thể lấy mã đơn. Vui lòng thử lại.';slider.disabled=false;slider.value='0';$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');slider.setAttribute('aria-valuetext','0%');button.disabled=false;if(label)label.textContent='Xác nhận đã thanh toán';if(button.offsetParent!==null)button.textContent='Lấy mã đơn →'}finally{sdCheckoutOrderCreating=false}
+}
+/* The outer Checkout sheet is the mobile scroll root (Cart parity).
+   Reset the active scroll position on every payment-stage transition. */
+function resetCheckoutScrollPosition(){
+ const form=$('#checkoutForm'),drawer=$('#checkoutDrawer');
+ if(form)form.scrollTop=0;
+ if(drawer)drawer.scrollTop=0;
 }
 function formResetCheckout(){const form=$('#checkoutForm');form.reset();$('#checkoutWard').disabled=true;$('#checkoutWard').innerHTML='<option value="">Chọn tỉnh/thành trước</option>';$('#checkoutProvinceCode').value='';$('#checkoutWardCode').value='';$('#checkoutAddressMessage').textContent=''}
 $('#sdCheckoutConfirmRange').addEventListener('input',event=>{
