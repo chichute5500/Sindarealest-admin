@@ -4871,7 +4871,9 @@ function openCheckout(options={}){
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
  sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
- $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
+ // Do not show a blank Payment address card before asynchronous saved-address hydration.
+ // Keep the original address, quote, selection and order logic unchanged.
+ $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(1);
  if(!checkoutProvinceLoadStarted){
   checkoutProvinceLoadStarted=true;
   void loadCheckoutProvinces();
