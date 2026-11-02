@@ -1,5 +1,5 @@
 /**
- * Six-stage public progress lookup. Tests a disposable production-schema D1
+ * Public progress with automatic post-delivery warranty. Tests a disposable production-schema D1
  * adapter; no network, Production DB, or customer data is touched.
  */
 import assert from "node:assert/strict";
@@ -54,6 +54,10 @@ for(const id of ["progress","done"]){
 }
 statusLog("done","shipped","2026-10-26 02:00:00");
 statusLog("done","completed","2026-10-27 03:00:00");
+// A completed delivery auto-issues warranty in the admin transaction. Expose
+// only activation state/date on public tracking; never the customer or code.
+sql.prepare("INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES('done-item','done','qa-product','QA-SKU','QA ITEM',1,9000000,9000000)").run();
+sql.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) VALUES('done-warranty','done','done-item','SDW-QA1234','QA 12 months',12,'2026-10-27','2027-10-27','active')").run();
 let queries=[];
 const DB={
  prepare(query){
@@ -85,8 +89,10 @@ async function search(term,ip="198.51.100.23",headers={}){
  }),env:{DB,SESSION_SECRET:"test-session-secret-long-enough-1234567890",TURNSTILE_SITE_KEY:"qa-public-site",TURNSTILE_SECRET_KEY:"qa-private-test"}});
 }
 function validateSafe(order,{masked=false}={}){
- assert.equal(order.steps.length,6,"Exactly six public steps");
- assert.deepEqual(order.steps.map(s=>s.title),["Đã gửi đơn","Xác nhận đơn","Đã nhận cọc","Đang làm sản phẩm","Đã gửi hàng","Giao thành công"]);
+ const delivered=order.deliveryStatus==="delivered";
+ assert.equal(order.steps.length,delivered?7:6,"Extra warranty step only for delivered orders");
+ assert.deepEqual(order.steps.slice(0,6).map(s=>s.title),["Đã gửi đơn","Xác nhận đơn","Đã nhận cọc","Đang làm sản phẩm","Đã gửi hàng",order.deliveryStatus==="failed_returning"?"Giao thất bại / Đang hoàn hàng":order.deliveryStatus==="returned"?"Đã hoàn hàng về Shop":"Giao thành công"]);
+ if(delivered)assert.equal(order.steps[6].title,"Đã kích hoạt bảo hành");
  assert.equal(Object.hasOwn(order,"fullName"),false);
  assert.equal(Object.hasOwn(order,"phone"),false);
  assert.equal(Object.hasOwn(order,"total"),false);
@@ -123,6 +129,9 @@ validateSafe(finished);
 assert.equal(finished.status,"completed");
 assert.deepEqual(finished.steps.map(s=>s.state),["done","done","done","done","done","done"]);
 assert.equal(finished.steps[5].completedAt,"2026-10-27T03:00:00Z");
+assert.equal(finished.steps[6].title,"Đã kích hoạt bảo hành");
+assert.equal(finished.steps[6].state,"done");
+assert.equal(finished.steps[6].completedAt,"2026-10-27T00:00:00Z");
 assert.equal(finished.steps[3].completedAt,"2026-10-26T02:00:00Z");
 
 const phone=await search("090 123 4567","198.51.100.26");
@@ -141,6 +150,7 @@ const failed=(await (await search("SD-QA-PROCESS-1111","198.51.100.27")).json())
 assert.equal(failed.deliveryStatus,'failed_returning');
 assert.equal(failed.steps[4].title,'Đã gửi hàng');
 assert.equal(failed.steps[5].title,'Giao thất bại / Đang hoàn hàng');
+assert.equal(failed.steps.length,6,"Failed delivery must never activate or show warranty step");
 assert.equal(failed.steps[5].state,'done');
 assert.equal(failed.steps[5].completedAt,'2026-10-27T04:00:00Z');
 sql.prepare("UPDATE orders SET delivery_status='returned' WHERE id='progress'").run();
@@ -150,6 +160,7 @@ const returned=(await (await search("SD-QA-PROCESS-1111","198.51.100.28")).json(
 assert.equal(returned.deliveryStatus,'returned');
 assert.equal(returned.deliveryStatusLabel,'Đã hoàn hàng về Shop');
 assert.equal(returned.steps[5].title,'Đã hoàn hàng về Shop');
+assert.equal(returned.steps.length,6,"Returned parcel must not have an activated warranty milestone");
 assert.equal(returned.steps[5].completedAt,'2026-10-28T04:00:00Z');
 assert.ok(!JSON.stringify(payload).includes("0901234567"));
 assert.ok(!JSON.stringify(payload).includes("SD-QA-DONE-3333"),"Phone lookup does not enumerate full order IDs");
@@ -165,4 +176,4 @@ assert.equal((await search("SD-QA-DONE-3333","198.51.100.30")).status,429,"Rate-
 assert.equal((await onRequestGet()).status,405);
 assert.deepEqual(publicOrderProgress({orderNumber:"SD-NEW",status:"pending_confirmation",createdAt:"2026-10-27 02:00:00",paymentOption:"deposit"},false).steps.map(s=>s.state),["done","current","upcoming","upcoming","upcoming","upcoming"]);
 sql.close();
-console.log("PASS: six real order stages, submitted date, no premature making date, phone and code lookup, masking and throttling.");
+console.log("PASS: six order stages, seventh automatic warranty milestone only after delivery, no warranty on failed/returned, masking and throttling.");
