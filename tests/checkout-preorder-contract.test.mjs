@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { calculateCheckoutQuote, makeCheckoutTransferReference, checkoutTransferReferenceMatches } from "../functions/_payments.js";
+import { onRequestPost as checkoutQuotePost } from "../functions/api/checkout-quote.js";
 
 const item=(type,unitPrice,quantity=1)=>({fulfillmentType:type,unitPrice,quantity});
 const stock=calculateCheckoutQuote([item("in_stock",4500000)]);
@@ -26,6 +27,54 @@ assert.match(transferReference,/^SD-[A-Z2-9]{8}$/);
 assert.equal(checkoutTransferReferenceMatches(transferReference,"0900000000","QA-WALLET-001"),true);
 assert.equal(checkoutTransferReferenceMatches("SD-INVALID","0900000000","QA-WALLET-001"),false);
 
+// Contract: initial Checkout quote must NOT pay for unrelated QR D1 settings
+// or remote R2 existence checks. Only explicit payment-method selection may do
+// that work. No fake payment receipt or data mutations are allowed in phase 1.
+const quoteReads={prices:0,settings:[],r2Heads:0};
+const previewProduct={id:"qa-wallet-1",sku:"SD-VN-001",title:"Ví da",category:"wallets",price:4500000,published:1,source_price_confirmed:1,stock:20,fulfillment_type:"in_stock"};
+const qrTestKey="qr-00000000-0000-4000-8000-000000000000.png";
+const quoteSettings={
+ show_prices:"1",payment_qr_active:"1",payment_qr_active_key:qrTestKey,
+ payment_qr_bank_name:"VIB",payment_qr_account_number:"123456789",
+ payment_qr_account_name:"QA",payment_qr_instructions:""
+};
+const quoteDB={
+ prepare(sql){
+  if(sql.startsWith("SELECT id,sku,title,category,price,published,source_price_confirmed,stock,fulfillment_type")){
+   return {bind(...ids){return {async all(){quoteReads.prices++;return {results:ids.includes(previewProduct.id)?[previewProduct]:[]}}}}};
+  }
+  if(sql.startsWith("SELECT value FROM settings WHERE key")){
+   return {bind(key){return {async first(){quoteReads.settings.push(key);return {value:quoteSettings[key]??null}}}}};
+  }
+  throw Error("Unexpected read-only Checkout SQL: "+sql);
+ }
+};
+const quoteEnv={DB:quoteDB,IMAGES:{async head(key){quoteReads.r2Heads++;return key===qrTestKey?{key}:null}}};
+const quoteRequest=(choice,quotedTotal)=>new Request("https://preview.test/api/checkout-quote",{
+ method:"POST",headers:{"Content-Type":"application/json"},
+ body:JSON.stringify({items:[{id:previewProduct.id,option:"",quantity:1}],phone:"0900000000",
+  ...(choice?{paymentOption:choice,quotedTotal}:{})})
+});
+const preflightResponse=await checkoutQuotePost({request:quoteRequest(),env:quoteEnv});
+assert.equal(preflightResponse.status,200);
+const preflight=await preflightResponse.json();
+assert.equal(preflight.quoteReady,true);
+assert.equal(preflight.paymentReady,false);
+assert.equal(preflight.options.length,2);
+assert.equal(preflight.total,4500000);
+assert.deepEqual(quoteReads.settings,["show_prices"],"Unselected quote must read only the price visibility gate");
+assert.equal(quoteReads.r2Heads,0,"Unselected quote must not wait for R2 QR head");
+const chosenResponse=await checkoutQuotePost({request:quoteRequest("deposit",4500000),env:quoteEnv});
+assert.equal(chosenResponse.status,200);
+const chosen=await chosenResponse.json();
+assert.equal(chosen.quoteReady,true);
+assert.equal(chosen.paymentReady,true,"QR stays verified on explicit payment choice");
+assert.equal(chosen.paymentOption,"deposit");
+assert.equal(chosen.selectedPaymentAmount,1400000);
+assert.equal(chosen.paymentInstructions.status,"ready");
+assert.equal(quoteReads.r2Heads,1,"Only selected payment performs QR verification");
+assert.equal(quoteReads.settings.filter(x=>x==="payment_qr_active").length,1);
+
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const quote=readFileSync(new URL("../functions/api/checkout-quote.js",import.meta.url),"utf8");
 const create=readFileSync(new URL("../functions/api/orders.js",import.meta.url),"utf8");
@@ -45,6 +94,10 @@ assert.doesNotMatch(html,/\.checkout-drawer\{left:0;right:0;width:100vw;max-widt
 assert.match(html,/#cartDrawer,#checkoutDrawer\{background:var\(--sd-reference-surface\)!important\}/,'Cart and Checkout use the same outer glass material');
 assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{\s*top:calc\(7px \+ env\(safe-area-inset-top\)\);[\s\S]*?border:1px solid var\(--sd-reference-edge\);border-radius:26px;/,'Mobile drawers share inset geometry and 26px corners');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
+const firstStage=quote.indexOf('if(!selectedOption)return json({');
+const qrSettingsQuery=quote.indexOf('const keys=await Promise.all(');
+assert.ok(firstStage>0&&qrSettingsQuery>firstStage,'The preflight response must return before any QR D1 settings or R2 request');
+
 
 const quoteLoadStart=html.indexOf('async function sdCheckoutLoadQuote(){');
 const quoteLoadEnd=html.indexOf('async function sdCheckoutLoadPaymentInstructions(){',quoteLoadStart);
