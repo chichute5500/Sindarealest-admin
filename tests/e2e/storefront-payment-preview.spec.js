@@ -304,12 +304,17 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
     // The checkout header, action buttons and slider's unfilled track must
     // use the same CURRENT computed optical face as the approved Cart bars,
     // not merely share CSS names. The green slider progress stays unchanged.
-    // .pill-btn transitions box-shadow for 300ms on theme switches.
-    // Enforce the settled computed style, not a mid-transition frame.
+    // Theme changes animate shadows; wait until computed face material settles.
+    // Checkout header stays Cart-identical. Bottom actions share the same film
+    // but have their own non-dark optical contact shadow.
     await expect.poll(()=>page.evaluate(()=>{
-     const source=getComputedStyle(document.querySelector('#cartDrawer .cart-header')).boxShadow;
-     return ['#checkoutDrawer .checkout-header','#sdCheckoutPrev','#checkoutSubmit','#sdCheckoutConfirmWrap']
-      .every(sel=>getComputedStyle(document.querySelector(sel)).boxShadow===source);
+     const original=getComputedStyle(document.querySelector('#cartDrawer .cart-header')).boxShadow;
+     const header=getComputedStyle(document.querySelector('#checkoutDrawer .checkout-header')).boxShadow;
+     const action=getComputedStyle(document.querySelector('#sdCheckoutPrev')).boxShadow;
+     return header===original
+      &&['#checkoutSubmit','#sdCheckoutConfirmWrap','#sdCheckoutDone']
+       .every(sel=>getComputedStyle(document.querySelector(sel)).boxShadow===action)
+      &&action!==original;
     }),{timeout:5000}).toBe(true);
     const syncedGlass=await page.evaluate(()=>{
      const original=document.querySelector('#cartDrawer .cart-header');
@@ -319,7 +324,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
       return {selector,
        face:style.backgroundImage===source.backgroundImage,
        backdrop:style.backdropFilter===source.backdropFilter,
-       shadow:style.boxShadow===source.boxShadow,
+       shadow:style.boxShadow===(selector==='#checkoutDrawer .checkout-header'
+        ?source.boxShadow:getComputedStyle(document.querySelector('#sdCheckoutPrev')).boxShadow),
        reflectiveRim:getComputedStyle(node,'::after').backgroundImage===getComputedStyle(original,'::after').backgroundImage,
        radius:parseFloat(style.borderTopLeftRadius),
        hasBrightness:style.backdropFilter.includes('brightness(')};
@@ -328,7 +334,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
     for(const bar of syncedGlass){
      expect(bar.face,'Checkout must transmit the same backdrop as Cart: '+bar.selector).toBe(true);
      expect(bar.backdrop,'Checkout blur/saturation must match Cart: '+bar.selector).toBe(true);
-     expect(bar.shadow,'Checkout raised glass depth must match Cart: '+bar.selector).toBe(true);
+     expect(bar.shadow,'Each checkout surface must use the correct control-level glass shadow: '+bar.selector).toBe(true);
      expect(bar.reflectiveRim,'Checkout reflective rim must match Cart: '+bar.selector).toBe(true);
      expect(bar.radius,'Checkout bars keep rounded glass edges: '+bar.selector).toBeGreaterThanOrEqual(22);
      expect(bar.hasBrightness,'No brightness-tinted checkout glass: '+bar.selector).toBe(false);
@@ -456,9 +462,14 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   const panel=getComputedStyle(drawer.querySelector('#paymentInstructions'));
   const footer=getComputedStyle(drawer.querySelector('.sd-checkout-footer'));
   const panes=[...drawer.querySelectorAll('.sd-checkout-footer>.sd-checkout-optical-lens')];
+  const actions=getComputedStyle(drawer.querySelector('.sd-checkout-actions'));
+  const button=getComputedStyle(drawer.querySelector('#sdCheckoutPrev'));
   return {panelBackground:panel.backgroundColor,footerBackground:footer.backgroundColor,
    panelImage:panel.backgroundImage,footerImage:footer.backgroundImage,
    panelBorder:panel.borderTopWidth,footerBlur:footer.backdropFilter,
+   footerShadow:footer.boxShadow,footerIsolation:footer.isolation,
+   footerOutline:footer.outlineStyle,actionsBackground:actions.backgroundColor,
+   actionsShadow:actions.boxShadow,buttonShadow:button.boxShadow,
    footerOpticalPanes:panes.length};
  });
  expect(qrSurfaces.panelBackground).toBe('rgba(0, 0, 0, 0)');
@@ -467,6 +478,12 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(qrSurfaces.footerImage).toBe('none');
  expect(qrSurfaces.panelBorder).toBe('0px');
  expect(qrSurfaces.footerBlur).toBe('none');
+ expect(qrSurfaces.footerShadow).toBe('none');
+ expect(qrSurfaces.footerIsolation).toBe('auto');
+ expect(qrSurfaces.footerOutline).toBe('none');
+ expect(qrSurfaces.actionsBackground).toBe('rgba(0, 0, 0, 0)');
+ expect(qrSurfaces.actionsShadow).toBe('none');
+ expect(qrSurfaces.buttonShadow).toContain('rgba(103, 169, 205, 0.1)');
  expect(qrSurfaces.footerOpticalPanes).toBe(4);
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-qr-step.png'),fullPage:false,animations:'disabled'});
