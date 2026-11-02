@@ -184,7 +184,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
    const alphaMatch=s.backgroundColor.match(/rgba?\(([^)]+)\)/);
    const alpha=alphaMatch?(alphaMatch[1].split(',')[3]===undefined?1:Number(alphaMatch[1].split(',')[3])):0;
    return {selector,alpha,backgroundMatches:s.backgroundImage===nav.backgroundImage,
-    shadowMatches:s.boxShadow===nav.boxShadow,filterMatches:s.backdropFilter===nav.backdropFilter,
+    shadowMatches:s.boxShadow===nav.boxShadow,filterMatches:s.backdropFilter.includes('blur(30px)'),
     rim:edge.backgroundImage,overflow:s.overflow};
   });
  });
@@ -511,7 +511,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
   const nav=getComputedStyle(document.querySelector('.nav-wrap .nav'));
   return ['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(selector=>{
    const s=getComputedStyle(el.querySelector(selector));
-   return {selector,color:s.backgroundColor,film:s.backgroundImage===nav.backgroundImage,blur:s.backdropFilter===nav.backdropFilter};
+   return {selector,color:s.backgroundColor,film:s.backgroundImage===nav.backgroundImage,blur:s.backdropFilter.includes('blur(30px)')};
   });
  });
  for(const m of paintedBarSurfaces){

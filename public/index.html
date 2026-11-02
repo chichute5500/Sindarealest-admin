@@ -2208,9 +2208,9 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 }
 
 
-/* One optical material, shared with the real logo Header. No artificial tint:
-   the three Cart bars are transparent and respond to the product imagery
-   behind them as the Cart scrolls. Parent drawer/rows are untouched. */
+/* The logo Header and the three Cart bars share the same glass film and rim.
+   The Cart scrolls over high-contrast text rather than photographs, so blur
+   is stronger there. The surface is still transparent: no gray/blue overlay. */
 .nav-wrap .nav,
 #cartDrawer .cart-header,
 #cartDrawer .cart-subtotal-bar,
@@ -2218,8 +2218,16 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   border:1px solid transparent;
   background:var(--sd-glass-shell-strong)!important;
   box-shadow:var(--sd-3d-shadow)!important;
+}
+.nav-wrap .nav{
   -webkit-backdrop-filter:blur(17px) saturate(114%);
   backdrop-filter:blur(17px) saturate(114%);
+}
+#cartDrawer .cart-header,
+#cartDrawer .cart-subtotal-bar,
+#cartDrawer #cartCheckout{
+  -webkit-backdrop-filter:blur(30px) saturate(114%);
+  backdrop-filter:blur(30px) saturate(114%);
 }
 html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important}
 
