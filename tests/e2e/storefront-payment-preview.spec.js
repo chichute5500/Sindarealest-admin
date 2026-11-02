@@ -293,6 +293,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
        face:style.backgroundImage===source.backgroundImage,
        backdrop:style.backdropFilter===source.backdropFilter,
        shadow:style.boxShadow===source.boxShadow,
+       reflectiveRim:getComputedStyle(node,'::after').backgroundImage===getComputedStyle(original,'::after').backgroundImage,
+       radius:parseFloat(style.borderTopLeftRadius),
        hasBrightness:style.backdropFilter.includes('brightness(')};
      });
     });
@@ -300,6 +302,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
      expect(bar.face,'Checkout must transmit the same backdrop as Cart: '+bar.selector).toBe(true);
      expect(bar.backdrop,'Checkout blur/saturation must match Cart: '+bar.selector).toBe(true);
      expect(bar.shadow,'Checkout raised glass depth must match Cart: '+bar.selector).toBe(true);
+     expect(bar.reflectiveRim,'Checkout reflective rim must match Cart: '+bar.selector).toBe(true);
+     expect(bar.radius,'Checkout bars keep rounded glass edges: '+bar.selector).toBeGreaterThanOrEqual(22);
      expect(bar.hasBrightness,'No brightness-tinted checkout glass: '+bar.selector).toBe(false);
     }
     if(width===390){
