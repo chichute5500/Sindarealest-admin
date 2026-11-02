@@ -381,10 +381,11 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  // actually blur; a CSS-string parity assertion alone cannot prove that.
  await expect(page.locator('#checkoutDrawer .sd-checkout-optical-lens')).toHaveCount(2);
  await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
- await expect.poll(()=>page.locator('#checkoutDrawer').evaluate(drawer=>({
-   mirrors:drawer.querySelectorAll('.sd-checkout-optical-mirror').length,
-   masked:[...drawer.querySelector('#checkoutForm').children].filter(el=>getComputedStyle(el).maskImage.includes('linear-gradient')).length
- })),{timeout:5000}).toEqual(expect.objectContaining({mirrors:expect.any(Number),masked:expect.any(Number)}));
+ await expect.poll(()=>page.locator('#checkoutDrawer .sd-checkout-optical-mirror').count(),{timeout:5000})
+  .toBeGreaterThan(0);
+ await expect.poll(()=>page.locator('#checkoutForm').evaluate(form=>
+  [...form.children].filter(el=>getComputedStyle(el).maskImage.includes('linear-gradient')).length
+ ),{timeout:5000}).toBeGreaterThan(0);
  const realOcclusion=await page.locator('#checkoutDrawer').evaluate(drawer=>({
    mirrorCount:drawer.querySelectorAll('.sd-checkout-optical-mirror').length,
    maskedBlockCount:[...drawer.querySelector('#checkoutForm').children].filter(el=>getComputedStyle(el).maskImage.includes('linear-gradient')).length,
