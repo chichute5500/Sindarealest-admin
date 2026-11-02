@@ -2046,8 +2046,14 @@ html.dark .sd-fullscreen-share{
 }
 #cartDrawer::before,#checkoutDrawer::before{
   content:"";
-  position:fixed;
-  inset:0;
+  position:sticky;
+  top:0;
+  display:block;
+  flex:0 0 var(--sd-native-glass-height,0px);
+  width:100%;
+  height:var(--sd-native-glass-height,0px);
+  min-height:0;
+  margin-bottom:calc(-1 * var(--sd-native-glass-height,0px) - var(--sd-native-glass-gap,14px));
   z-index:0;
   border-radius:inherit;
   background:var(--sd-reference-surface);
@@ -2055,6 +2061,10 @@ html.dark .sd-fullscreen-share{
   backdrop-filter:blur(24px) saturate(145%);
   pointer-events:none;
 }
+/* Each native background stays pinned to its scrollport, including fast
+   scrolling. Its negative margin cancels its entire flex footprint. */
+#checkoutDrawer{--sd-native-glass-gap:12px}
+#cartDrawer{--sd-native-glass-gap:14px}
 #cartDrawer>.cart-header,
 #cartDrawer>.cart-list,
 #cartDrawer>.cart-bottom,
@@ -5637,5 +5647,25 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
 </script>
 
 
+<script id="sd-native-drawer-glass-geometry">
+/* Only the drawer size is observed: no scroll event, cloned content, mask,
+   or per-frame paint work. Sticky native backdrop is handled by Chromium. */
+(()=>{
+ const drawers=['cartDrawer','checkoutDrawer'].map(id=>document.getElementById(id)).filter(Boolean);
+ const update=drawer=>{
+  const height=drawer.clientHeight;
+  if(height<=0)return;
+  const gap=Number.parseFloat(getComputedStyle(drawer).rowGap)||0;
+  const h=height+'px',g=gap+'px';
+  if(drawer.style.getPropertyValue('--sd-native-glass-height')!==h)drawer.style.setProperty('--sd-native-glass-height',h);
+  if(drawer.style.getPropertyValue('--sd-native-glass-gap')!==g)drawer.style.setProperty('--sd-native-glass-gap',g);
+ };
+ if(typeof ResizeObserver==='function'){
+  const observer=new ResizeObserver(entries=>entries.forEach(({target})=>update(target)));
+  drawers.forEach(drawer=>{update(drawer);observer.observe(drawer)});
+ }else drawers.forEach(update);
+ window.addEventListener('resize',()=>drawers.forEach(update),{passive:true});
+})();
+</script>
 </body>
 </html>
