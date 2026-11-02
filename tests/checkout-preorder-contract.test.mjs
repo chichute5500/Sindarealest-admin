@@ -76,7 +76,7 @@ assert.match(glass,/\.sd-checkout-confirm-range::-webkit-slider-runnable-track\{
 assert.match(glass,/\.sd-checkout-confirm-range::-webkit-slider-thumb\{box-sizing:border-box;width:56px;height:56px;margin-top:-25px/,'The arrow thumb fills the slider interior height');
 assert.match(glass,/\.sd-checkout-confirm-range::-webkit-slider-thumb\{[^\n]*linear-gradient\(135deg,#a2e6b0,#67bd81\)/,'The arrow thumb itself is green, not glass-white');
 assert.match(glass,/\.dark \.checkout-drawer \.sd-checkout-confirm-range::-webkit-slider-thumb,[^\n]*linear-gradient\(135deg,#328653,#246b42\)/,'The dark theme keeps the thumb green');
-assert.match(html,/function sdCheckoutSyncConfirmFill\(slider\)[\s\S]*wrap\.style\.setProperty\('--sd-confirm-fill',fill\+'px'\)/,'Slider fill is positioned directly from the thumb's input value');
+assert.match(html,/function sdCheckoutSyncConfirmFill\(slider\)[\s\S]*wrap\.style\.setProperty\('--sd-confirm-fill',fill\+'px'\)/,'Slider fill is positioned directly from the thumb input value');
 assert.match(html,/\$\('#sdCheckoutConfirmRange'\)\.addEventListener\('input',[\s\S]*sdCheckoutSyncConfirmFill\(slider\)/,'Slider fill updates synchronously on every input event');
 assert.match(html,/\$\('#checkoutBack'\)\.addEventListener\('click',sdCheckoutReturnToCart\)/,'Header returns directly to Cart from the payment step');
 assert.match(html,/\$\('#sdCheckoutPrev'\)\.addEventListener\('click',sdCheckoutReturnToCart\)/,'Bottom back button returns directly to Cart');
