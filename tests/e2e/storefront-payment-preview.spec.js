@@ -251,19 +251,18 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.locator('#detailBuyNow').click();
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible({timeout:15000});
- // A saved address may already be hydrated from cache. Only the actual
- // province/ward codes are required; a new API request is not.
- const divisionState=await page.locator('#checkoutDrawer').evaluate(drawer=>({
-  province:drawer.querySelector('#checkoutProvince')?.selectedOptions[0]?.dataset.code,
-  ward:drawer.querySelector('#checkoutWard')?.selectedOptions[0]?.dataset.code
- }));
- expect(divisionState.province,'Checkout province must be valid').toMatch(/^\d+$/);
- expect(divisionState.ward,'Checkout ward must be valid').toMatch(/^\d+$/);
  const review=page.locator('#sdCheckoutReviewAddressRow');
  await expect(review).toBeVisible();
  await expect(review.locator('strong')).toHaveText('Địa chỉ nhận hàng');
  await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Khách kiểm tra Preview');
  await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Địa chỉ thử nghiệm Preview');
+ // Saved address hydration is async in the approved Checkout.
+ // Assert the finished codes rather than the initial payment-step paint.
+ await expect.poll(()=>page.locator('#checkoutDrawer').evaluate(drawer=>{
+  const province=drawer.querySelector('#checkoutProvince')?.selectedOptions[0]?.dataset.code;
+  const ward=drawer.querySelector('#checkoutWard')?.selectedOptions[0]?.dataset.code;
+  return /^\d+$/.test(province||'')&&/^\d+$/.test(ward||'');
+ }),{timeout:15000}).toBe(true);
  const addressLayout=await review.evaluate(card=>{
   const b=card.getBoundingClientRect(),drawer=document.querySelector('#checkoutDrawer').getBoundingClientRect(),nav=document.querySelector('#sdCheckoutStepper').getBoundingClientRect(),intro=document.querySelector('.checkout-intro').getBoundingClientRect();
   const heading=getComputedStyle(card.querySelector('strong')),content=getComputedStyle(card.querySelector('p')),surface=getComputedStyle(card);
