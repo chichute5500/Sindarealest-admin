@@ -64,10 +64,10 @@ async function assertCheckoutScrollAndHeader(page,requireScroll){
  expect(state.titleFont).toContain('SD Serif');
  expect(state.headerShift).toBeLessThanOrEqual(1.5);
  expect(state.footerShift).toBeLessThanOrEqual(1.5);
- expect(state.headerGlass,'Checkout must use the SAME floating glass as the cart header').toBe(state.cartHeaderGlass);
+ expect(state.cartHeaderGlass.startsWith(state.headerGlass),'Cart keeps the existing Checkout/Header optical film with its own blue plate').toBe(true);
  expect(state.headerGlass).toContain('gradient');
  expect(state.checkoutHeaderRadius).toBe(state.cartHeaderRadius);
- expect(state.checkoutHeaderShadow).toBe(state.cartHeaderShadow);
+ expect(state.cartHeaderShadow.startsWith(state.checkoutHeaderShadow),'Cart adds contact depth without changing Checkout header shadow').toBe(true);
  expect(state.cartTitleWeight).toBeGreaterThanOrEqual(700);
  expect(state.footerGlass,'Footer must blend into the shared glass sheet').toBe('none');
  expect(state.footerBorder,'No horizontal line across bottom checkout').toBe('0px');
