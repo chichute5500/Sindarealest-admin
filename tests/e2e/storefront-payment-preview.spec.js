@@ -475,6 +475,17 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
  const cards=page.locator('#catalogGrid .product-card').filter({hasText:'Giá:'});
  await expect(cards.nth(3)).toBeVisible({timeout:20000});
+ // Capture the real logo film over three different catalog-image positions.
+ // These are pixel references, not a percentage calculated from CSS strings.
+ const headerPositions=await page.evaluate(()=>{
+  const cards=Array.from(document.querySelectorAll('#catalogGrid .product-card')).slice(0,4);
+  return cards.map(card=>Math.round(Math.max(0,card.getBoundingClientRect().top+scrollY-75)));
+ });
+ for(const [i,y] of [headerPositions[0],headerPositions[1],headerPositions[3]].entries()){
+  await page.evaluate(y=>window.scrollTo({top:y,behavior:'instant'}),y);
+  await page.waitForTimeout(80);
+  await page.screenshot({path:join(output,'390x844-logo-header-product-scroll-'+['top','middle','bottom'][i]+'.png'),fullPage:false,animations:'disabled'});
+ }
  const addButtons=cards.locator('[data-add]');
  const identifiers=await addButtons.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('data-add')));
  const seen=new Set();
@@ -575,4 +586,9 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  expect(endpoint).toBeGreaterThan(midpoint);
  await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
+ await page.setViewportSize({width:360,height:800});
+ await drawer.evaluate(el=>el.scrollTop=0);
+ await page.screenshot({path:join(output,'360x800-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
+ await drawer.evaluate(el=>el.scrollTop=el.scrollHeight-el.clientHeight);
+ await page.screenshot({path:join(output,'360x800-cart-four-products-bottom.png'),fullPage:false,animations:'disabled'});
 });
