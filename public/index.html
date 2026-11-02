@@ -892,13 +892,24 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-caution{color:var(--muted);line-height:1.6;display:block}
 .checkout-drawer .sd-checkout-footer{flex:0 0 auto;display:grid;gap:8px;padding:13px 0 4px;border-top:0;background:transparent;box-shadow:none}
 .checkout-drawer .sd-checkout-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:0}
-.checkout-drawer .sd-checkout-actions .pill-btn{width:100%;min-height:44px}
-.checkout-drawer .sd-checkout-actions #checkoutSubmit{margin:0;max-height:none;height:auto;min-height:44px;font-size:10px;padding:10px 13px}
+/* Keep Checkout's existing two-action layout but give its controls the same
+   translucent face and shadow as the separate Cart bars. */
+#checkoutDrawer .sd-checkout-actions .pill-btn{
+  width:100%;min-height:56px;border:1px solid transparent;border-radius:22px;
+  color:var(--ink);
+  background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55));
+  box-shadow:var(--sd-3d-shadow);
+  -webkit-backdrop-filter:blur(56.784px) saturate(114%);
+  backdrop-filter:blur(56.784px) saturate(114%);
+}
+html.dark #checkoutDrawer .sd-checkout-actions .pill-btn{background:var(--sd-3d-face)}
+.checkout-drawer .sd-checkout-actions #checkoutSubmit{margin:0;max-height:none;height:auto;min-height:56px;font-size:10px;padding:10px 13px}
 .checkout-drawer .sd-checkout-actions #sdCheckoutPrev{font-size:10px}
 .checkout-drawer .sd-checkout-actions button:disabled{opacity:.62;cursor:wait}
 .checkout-drawer.sd-checkout-success .sd-checkout-actions{grid-template-columns:minmax(0,1fr)}
 .checkout-drawer.sd-checkout-success .sd-checkout-actions #sdCheckoutDone{grid-column:1;justify-self:end;width:auto;min-width:150px;max-width:240px}
-.checkout-drawer .sd-checkout-confirm-wrap{--progress:0%;position:relative;grid-column:1/-1;display:grid;place-items:center;min-height:56px;overflow:hidden;border:1px solid var(--sd-reference-edge,var(--line));border-radius:999px;background:var(--sd-reference-surface,var(--glass));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 5px 18px rgba(92,145,185,.12)}
+.checkout-drawer .sd-checkout-confirm-wrap{--progress:0%;position:relative;grid-column:1/-1;display:grid;place-items:center;min-height:56px;overflow:hidden;border:1px solid transparent;border-radius:999px;background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55));box-shadow:var(--sd-3d-shadow);-webkit-backdrop-filter:blur(56.784px) saturate(114%);backdrop-filter:blur(56.784px) saturate(114%)
+html.dark #checkoutDrawer .sd-checkout-confirm-wrap{background:var(--sd-3d-face)}
 .checkout-drawer .sd-checkout-confirm-wrap::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--progress);border-radius:inherit;background:linear-gradient(100deg,#8ed29d,#6dbb81);transition:width 55ms linear;pointer-events:none}
 .dark .checkout-drawer .sd-checkout-confirm-wrap::before{background:linear-gradient(100deg,#328653,#246b42)}
 .checkout-drawer .sd-checkout-confirm-wrap[style*="--progress: 100%"]::before{transition:none}
@@ -1324,13 +1335,17 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 /* One shared floating glass title bar for the Cart and Checkout drawers.
    No secondary full-width header stripe: the rounded bar floats on the SAME parent glass. */
 #cartDrawer .cart-header,#checkoutDrawer .checkout-header{position:relative;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;min-height:58px;gap:12px;padding:6px 10px;border-radius:22px}
-/* Checkout header retains its previous computed material; only the three Cart bars change. */
+/* Checkout title now matches the Cart's actual floating glass bar.
+   Its parent sheet and independently scrolling form are deliberately unchanged. */
 #checkoutDrawer .checkout-header{
-  border:1px solid transparent;background:var(--sd-glass-shell-strong);
+  border:1px solid transparent;
+  background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55));
   box-shadow:var(--sd-3d-shadow);
-  -webkit-backdrop-filter:blur(17px) saturate(114%);
-  backdrop-filter:blur(17px) saturate(114%);
+  -webkit-backdrop-filter:blur(56.784px) saturate(114%);
+  backdrop-filter:blur(56.784px) saturate(114%);
+  isolation:isolate;
 }
+html.dark #checkoutDrawer .checkout-header{background:var(--sd-3d-face)}
 #cartDrawer #cartClose{margin-left:auto;flex:0 0 auto}
 .checkout-heading{display:flex;align-items:center;gap:12px;min-width:0}
 #cartDrawer .cart-header h2,#checkoutDrawer .checkout-heading h2{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font:700 25px/1.2 SD Serif,Georgia,serif;text-align:center;white-space:nowrap;pointer-events:none;max-width:calc(100% - 104px);overflow:hidden;text-overflow:ellipsis}
