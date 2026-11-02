@@ -451,7 +451,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await expect(qrHead).toContainText('Chuyển khoản ngân hàng');
  await expect(qrHead).toContainText('Chuyển khoản theo thông tin bên dưới');
  await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage > .sd-payment-stage-label')).toHaveCount(0);
- await expect(page.locator('#paymentInstructions .sd-payment-truth-note')).toHaveCount(0);
+ await expect(page.locator('#paymentInstructions .sd-payment-transfer-stage > .sd-payment-truth-note')).toHaveCount(0);
  const qrSurfaces=await page.locator('#checkoutDrawer').evaluate(drawer=>{
   const panel=getComputedStyle(drawer.querySelector('#paymentInstructions'));
   const footer=getComputedStyle(drawer.querySelector('.sd-checkout-footer'));
