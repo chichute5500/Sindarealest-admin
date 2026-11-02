@@ -216,7 +216,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  }));
  for(const face of cartGlassFaces.bars){
   expect(face,'Each Cart bar reuses the original Header glass face').toBe(cartGlassFaces.logo);
-  expect(face).toContain('linear-gradient(');
+  expect(face).toContain('radial-gradient(');
  }
  // Check actual mobile computed filters: values must beat every other CSS selector.
  const cartFilterCascade=await page.evaluate(()=>{
@@ -231,7 +231,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  for(const lens of cartFilterCascade){
   expect(lens.backdrop).toContain('blur(17px)');
   if(lens.webkit)expect(lens.webkit).toContain('blur(17px)'); // Chromium may omit the vendor alias.
-  expect(lens.background).toContain('linear-gradient(');
+  expect(lens.background).toContain('radial-gradient(');
  }
  console.log('CART_THREE_BARS_COMPUTED_CASCADE',JSON.stringify(cartFilterCascade));
  await page.locator('#cartDrawer .cart-header').screenshot({path:join(output,'390x844-cart-title-glass.png'),animations:'disabled'});
