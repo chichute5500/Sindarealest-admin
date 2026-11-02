@@ -310,6 +310,38 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
      await page.locator('#checkoutDrawer .checkout-header').screenshot({path:join(output,`390x844-${theme}-checkout-header-glass.png`),animations:'disabled'});
      await page.locator('#checkoutDrawer .sd-checkout-actions').screenshot({path:join(output,`390x844-${theme}-checkout-actions-glass.png`),animations:'disabled'});
     }
+    // Real mid-scroll proof for BOTH themes and narrow Android layouts:
+    // the checkout content must move without shifting or cutting its
+    // Cart-matched glass header and footer. These are actual scroll offsets,
+    // not synthetic scroll events or CSS-string-only visual claims.
+    const checkoutScroll=page.locator('#checkoutForm');
+    const scrollEnd=await checkoutScroll.evaluate(el=>Math.max(0,el.scrollHeight-el.clientHeight));
+    expect(scrollEnd,'Checkout must offer real mobile scrolling').toBeGreaterThan(12);
+    const baseline=await page.locator('#checkoutDrawer').evaluate(el=>({
+     header:el.querySelector('.checkout-header').getBoundingClientRect().top,
+     footer:el.querySelector('.sd-checkout-footer').getBoundingClientRect().top
+    }));
+    const seenOffsets=[];
+    for(const [position,fraction] of [['top',0],['middle',.5],['bottom',1]]){
+     const actual=await checkoutScroll.evaluate((el,ratio)=>{
+      el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*ratio);
+      return el.scrollTop;
+     },fraction);
+     seenOffsets.push(actual);
+     await page.waitForTimeout(60);
+     const locations=await page.locator('#checkoutDrawer').evaluate(el=>({
+      header:el.querySelector('.checkout-header').getBoundingClientRect().top,
+      footer:el.querySelector('.sd-checkout-footer').getBoundingClientRect().top
+     }));
+     expect(Math.abs(locations.header-baseline.header),'Checkout glass header must remain fixed when scrolling').toBeLessThan(2);
+     expect(Math.abs(locations.footer-baseline.footer),'Checkout glass actions must remain fixed when scrolling').toBeLessThan(2);
+     await page.screenshot({path:join(output,`${width}x${height}-${theme}-checkout-cart-glass-scroll-${position}.png`),fullPage:false,animations:'disabled'});
+    }
+    expect(seenOffsets[0]).toBe(0);
+    expect(seenOffsets[1]).toBeGreaterThan(seenOffsets[0]);
+    expect(seenOffsets[2]).toBeGreaterThan(seenOffsets[1]);
+    await checkoutScroll.evaluate(el=>{el.scrollTop=0});
+
    }
    await expect(page.locator('#sdCheckoutSelectedAmount')).toContainText(buyNowDeposit.toLocaleString('vi-VN'));
    await expect(page.locator('#sdCheckoutRemaining')).toContainText((buyNowTotal-buyNowDeposit).toLocaleString('vi-VN'));
