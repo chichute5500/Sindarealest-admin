@@ -3694,7 +3694,7 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 </section>
 <section class="sd-checkout-panel" id="sdCheckoutPaymentStep" hidden>
 <div class="sd-checkout-box"><strong>Sản phẩm trong đơn</strong><div class="sd-checkout-item-list" id="sdCheckoutItemSummary" aria-label="Sản phẩm trong đơn"></div></div>
-<div class="sd-checkout-box" id="sdCheckoutQuoteNotice">Đang kiểm tra tình trạng hàng và giá từ hệ thống…</div>
+<div class="sd-checkout-box" id="sdCheckoutQuoteNotice" role="status" aria-live="polite"><span id="sdCheckoutQuoteText">Đang kiểm tra tình trạng hàng và giá từ hệ thống…</span><button type="button" class="pill-btn tap-target" id="sdCheckoutRetryQuote" hidden>Kiểm tra lại giá</button></div>
 <div class="sd-checkout-options" id="sdCheckoutOptions" role="radiogroup" aria-label="Chọn hình thức thanh toán"></div>
 <div id="sdCheckoutQrMount"></div>
 <div class="sd-checkout-box sd-checkout-qr-wrap" id="sdCheckoutQrWrap" hidden>
@@ -4812,7 +4812,9 @@ function sdCheckoutRefreshChoice(){
 }
 function sdCheckoutRenderQuote(){
  const q=sdCheckoutQuote,ready=q?.quoteReady===true,notice=$('#sdCheckoutQuoteNotice'),options=$('#sdCheckoutOptions'),qrBox=$('#sdCheckoutQrWrap');
- notice.hidden=ready;notice.textContent=ready?'':(q?.reason||'Chưa thể xác minh giá. Bạn vẫn có thể gửi yêu cầu để Shop xác nhận.');
+ notice.hidden=ready;
+ $('#sdCheckoutQuoteText').textContent=ready?'':(q?.reason||'Chưa thể xác minh giá. Bạn vẫn có thể gửi yêu cầu để Shop xác nhận.');
+ $('#sdCheckoutRetryQuote').hidden=ready;
  options.replaceChildren();
  if(ready)for(const choice of q.options||[]){
   const b=document.createElement('button'),radio=document.createElement('span'),details=document.createElement('span'),label=document.createElement('b'),hint=document.createElement('small'),amount=document.createElement('strong');
@@ -4896,7 +4898,8 @@ function openCheckout(options={}){
  const openEpoch=++checkoutOpenEpoch;
  // Never reuse a quote/selection or old error notice from a previous visit.
  $('#sdCheckoutQuoteNotice').hidden=false;
- $('#sdCheckoutQuoteNotice').textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…';
+ $('#sdCheckoutQuoteText').textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…';
+ $('#sdCheckoutRetryQuote').hidden=true;
  $('#sdCheckoutOptions').replaceChildren();
  if(!checkoutProvinceLoadStarted){
   checkoutProvinceLoadStarted=true;
@@ -5318,6 +5321,18 @@ $('#sdCheckoutConfirmRange').addEventListener('change',event=>{
  const label=$('#sdCheckoutConfirmLabel');if(label)label.textContent='Xác nhận đã thanh toán';slider.setAttribute('aria-valuetext','0%');
 });
 $('#sdCheckoutPrev').addEventListener('click',()=>{if(sdCheckoutStep>1)sdCheckoutSetStep(sdCheckoutStep-1);else $('#checkoutBack').click()});
+$('#sdCheckoutRetryQuote').addEventListener('click',async()=>{
+ const button=$('#sdCheckoutRetryQuote'),panel=$('#checkoutDrawer');
+ if(button.disabled||!panel.classList.contains('open')||!sdCheckoutItems().length)return;
+ button.disabled=true;button.hidden=true;
+ $('#sdCheckoutQuoteText').textContent='Đang kiểm tra lại giá và tình trạng hàng…';
+ try{await sdCheckoutLoadQuote()}
+ catch(error){
+  if(!panel.classList.contains('open'))return;
+  sdCheckoutQuote={quoteReady:false,paymentReady:false,reason:error?.message||'Chưa thể kiểm tra giá.',options:[]};
+  sdCheckoutRenderQuote();sdCheckoutRefreshChoice();
+ }finally{button.disabled=false}
+});
 $('#sdCheckoutOptions').addEventListener('click',e=>{const b=e.target.closest('[data-sd-payment-option]');if(!b||!sdCheckoutQuote?.quoteReady)return;sdCheckoutChoice=b.dataset.sdPaymentOption;sdCheckoutRefreshChoice()});$('#sdDetailPaymentQuote').addEventListener('click',e=>{const b=e.target.closest('[data-detail-payment-option]');if(!b)return;detailPaymentChoice=b.dataset.detailPaymentOption;sdDetailUpdatePaymentChoice()});
 document.querySelectorAll('[data-sd-review-step]').forEach(b=>b.addEventListener('click',()=>sdCheckoutSetStep(b.dataset.sdReviewStep)));
 $('#checkoutForm').addEventListener('submit',async e=>{e.preventDefault();const form=e.currentTarget,button=$('#checkoutSubmit'),message=$('#checkoutMessage');
