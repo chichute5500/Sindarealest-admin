@@ -44,6 +44,10 @@
   clone.setAttribute('aria-hidden','true');
   clone.classList.add('sd-checkout-optical-mirror');
   clone.inert=true;
+  // Source blocks are locally masked under the floating bars. Never carry
+  // that mask into their blurred mirror or the text would disappear entirely.
+  clone.style.removeProperty('mask-image');
+  clone.style.removeProperty('-webkit-mask-image');
   clone.querySelectorAll('input,textarea,select').forEach((input,index)=>{
    const original=source.querySelectorAll('input,textarea,select')[index];
    if(original){
