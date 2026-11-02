@@ -4681,7 +4681,15 @@ async function prefillCheckoutFromLocalAddress(){
  }catch{}
 }
 
-function savedCheckoutAddressComplete(saved){return !!saved&&[saved.fullName,saved.phone,saved.province,saved.ward,saved.streetAddress].every(value=>String(value||'').trim())}
+function savedCheckoutAddressComplete(saved){
+ // An address without canonical division IDs cannot skip address validation.
+ // Legacy localStorage entries often contain labels only, leaving both selects
+ // empty while the UI incorrectly jumps straight to Payment.
+ return !!saved&&[saved.fullName,saved.phone,saved.province,saved.ward,saved.streetAddress]
+  .every(value=>String(value||'').trim())
+  &&/^\d{1,12}$/.test(String(saved.provinceCode||''))
+  &&/^\d{1,12}$/.test(String(saved.wardCode||''));
+}
 function checkoutAddressComplete(){const f=$('#checkoutForm')?.elements,province=$('#checkoutProvince'),ward=$('#checkoutWard');return !!f&&!!f.fullName.value.trim()&&!!f.phone.value.trim()&&!!f.streetAddress.value.trim()&&!!province.value&&!!province.selectedOptions[0]?.dataset.code&&!!ward.value&&!!ward.selectedOptions[0]?.dataset.code}
 async function saveCheckoutAddressFromForm(){
  const form=$('#checkoutForm'),f=form?.elements;if(!f)return;
@@ -4909,7 +4917,10 @@ function openCheckout(options={}){
  // Province/ward options can finish loading independently, without blocking
  // the quote. This also avoids the temporarily blank address tile.
  const prefillPromise=prefillCheckoutFromLocalAddress();
- $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(maySkipAddress?2:1);
+ // Always show Address until the actual select controls have been hydrated.
+ // Saved names alone are not proof the province/ward IDs were restored.
+ $('#checkoutSubmit').disabled=maySkipAddress;
+ sdCheckoutSetStep(checkoutAddressComplete()?2:1);
  const loadQuoteSafely=()=>sdCheckoutLoadQuote().catch(error=>{
   if(openEpoch!==checkoutOpenEpoch||!panel.classList.contains('open'))return;
   sdCheckoutQuote={quoteReady:false,reason:error?.message||'Không kiểm tra được giá. Vui lòng thử lại.',options:[]};
