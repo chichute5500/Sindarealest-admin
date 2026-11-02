@@ -150,7 +150,7 @@ assert.deepEqual(
   "Re-applying the index migration must not change any Admin results"
 );
 assert.deepEqual(
-  optimizedRows.map(({delivery_status,cod_received_amount,received_amount,...row})=>row),
+  optimizedRows.map(({delivery_status,cod_received_amount,received_amount,timeline_delivery_failed_at,timeline_delivery_returned_at,timeline_cod_received_at,...row})=>row),
   baselineRows.map(({received_amount,...row})=>row),
   "Unchanged fields, real status dates, joins, row order and nulls must equal the original query"
 );
@@ -175,6 +175,9 @@ assert.equal(a.timeline_confirmed_at,"2026-10-26 13:00:00");
 assert.equal(a.timeline_processing_at,"2026-10-26 14:00:00");
 assert.equal(a.timeline_shipped_at,null);
 assert.equal(a.timeline_completed_at,null);
+assert.equal(a.timeline_delivery_failed_at,null);
+assert.equal(a.timeline_delivery_returned_at,null);
+assert.equal(a.timeline_cod_received_at,null);
 assert.equal(a.timeline_payment_at,"2026-10-26 14:30:00");
 assert.equal(a.received_amount,30000,"legacy COD-completion rows are not Shop-confirmed bank receipts");
 assert.equal(a.cod_received_amount,0,"legacy COD rows are not verified carrier remittances");
