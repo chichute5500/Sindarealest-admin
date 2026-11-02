@@ -1166,6 +1166,13 @@ test('mobile account: partially verified transfer shows exact top-up QR, and ref
  await expect(card).toBeVisible();
  await expect(card.locator('[data-account-payment-topup]')).toContainText('600.000');
  await card.locator('[data-account-payment-topup]').click();
+ await page.waitForTimeout(300);
+ console.log('QA_TOPUP_AFTER_CLICK',JSON.stringify({
+  reads,cardText:(await card.innerText()).slice(-850),
+  panelCount:await card.locator('.local-order-topup').count(),
+  buttons:await card.locator('[data-account-payment-topup]').allTextContents(),
+  statusMessage:await card.locator('.local-order-sync-message').allTextContents()
+ }));
  const panel=card.locator('.local-order-topup');
  await expect(panel).toBeVisible();
  await expect(panel).toContainText('600.000');
