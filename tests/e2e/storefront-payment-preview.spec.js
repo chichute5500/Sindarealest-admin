@@ -597,7 +597,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
   ['clear-9px','none','blur(9px) saturate(114%)']
  ];
  for(const [name,background,filter] of comparisons){
-  await drawer.evaluate(({background,filter})=>{
+  await drawer.evaluate((el,{background,filter})=>{
    for(const selector of ['.cart-header','.cart-subtotal-bar','#cartCheckout']){
     const node=document.querySelector('#cartDrawer '+selector);
     node.style.setProperty('background',background,'important');
