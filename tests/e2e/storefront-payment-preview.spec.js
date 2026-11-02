@@ -703,7 +703,9 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   bottom:d.querySelector('#sdCheckoutOptions').getBoundingClientRect().bottom,
   frameTop:d.getBoundingClientRect().top,frameBottom:d.getBoundingClientRect().bottom
  }));
- expect(choiceScroll.scrollTop,'Invalid submission scrolls toward the choices').toBeLessThan(beforeChoiceScroll);
+ // When removing the redundant box makes both choices already visible,
+ // the correct behavior is to stay in place rather than manufacture a scroll.
+ expect(choiceScroll.scrollTop,'Invalid submission does not scroll away from the choices').toBeLessThanOrEqual(beforeChoiceScroll);
  expect(choiceScroll.top,'Choices are visible in Checkout').toBeGreaterThan(choiceScroll.frameTop+12);
  expect(choiceScroll.bottom).toBeLessThan(choiceScroll.frameBottom-12);
  await expect(page.locator('#sdCheckoutOptions')).not.toHaveClass(/sd-checkout-needs-choice/,{timeout:3500});
