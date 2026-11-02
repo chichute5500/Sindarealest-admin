@@ -101,19 +101,19 @@
   const blocks=[...form.children].filter(el=>el.getClientRects().length>0
    &&getComputedStyle(el).display!=='none');
   const active=new Set(blocks);
+  // Batch geometry reads before all optical positioning writes to avoid
+  // repeated forced reflows across the five frosted surfaces.
+  const rects=lenses.map(group=>group.bar.getBoundingClientRect());
   const footerRect=footer.getBoundingClientRect();
-  const rects=lenses.map(group=>{
-   const r=group.bar.getBoundingClientRect();
-   if(group.mount===footer){
-    const style=group.lens.style;
-    const left=(r.left-footerRect.left)+'px',top=(r.top-footerRect.top)+'px';
-    const width=r.width+'px',height=r.height+'px';
-    if(style.left!==left)style.left=left;
-    if(style.top!==top)style.top=top;
-    if(style.width!==width)style.width=width;
-    if(style.height!==height)style.height=height;
-   }
-   return r;
+  lenses.forEach((group,i)=>{
+   if(group.mount!==footer)return;
+   const r=rects[i],style=group.lens.style;
+   const left=(r.left-footerRect.left)+'px',top=(r.top-footerRect.top)+'px';
+   const width=r.width+'px',height=r.height+'px';
+   if(style.left!==left)style.left=left;
+   if(style.top!==top)style.top=top;
+   if(style.width!==width)style.width=width;
+   if(style.height!==height)style.height=height;
   });
   for(const block of blocks){
    const r=block.getBoundingClientRect();
@@ -132,11 +132,13 @@
      clone=mirrorNode(block,group);
      group.mirrors.set(block,clone);
     }
-    Object.assign(clone.style,{
-     left:(r.left-b.left)+'px',top:(r.top-b.top)+'px',
-     width:r.width+'px',height:r.height+'px',
-     minWidth:r.width+'px',minHeight:r.height+'px'
-    });
+    // Reposition mirrors with a compositor transform, not left/top layout.
+    const style=clone.style;
+    const transform='translate3d('+(r.left-b.left)+'px,'+(r.top-b.top)+'px,0)';
+    if(style.transform!==transform)style.transform=transform;
+    const width=r.width+'px',height=r.height+'px';
+    if(style.width!==width){style.width=width;style.minWidth=width}
+    if(style.height!==height){style.height=height;style.minHeight=height}
     covered.push([b.top-r.top,b.bottom-r.top]);
    });
    const mask=transparentZones(r.height,covered);
