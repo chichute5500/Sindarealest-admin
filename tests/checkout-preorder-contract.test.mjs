@@ -78,6 +78,8 @@ assert.match(html,/@media\(max-width:760px\)\{#checkoutDrawer\.sd-checkout-succe
  'Only cart-origin Checkout needs the measured 13px inset correction on phones; buy-now stays centered');
 assert.match(html,/sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll\(\)/,'QR layout transition resets its scroll position');
 assert.match(html,/panel\.style\.setProperty\('--sd-native-glass-pad-left',getComputedStyle\(panel\)\.paddingLeft\)/,'Native drawer inset is initialized synchronously before Checkout opens');
+assert.match(html,/function sdCheckoutAlignSuccessTitle\(\)[\s\S]*frame\.left\+frame\.width\/2[\s\S]*heading\.left\+heading\.width\/2/,'QR title is positioned from the actual drawer center rather than its moving header wrapper');
+assert.match(html,/sdCheckoutResetQrScroll\(\);sdCheckoutScheduleSuccessTitleAlign\(\)/,'QR stage schedules center correction only after entering success state');
 assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
 assert.doesNotMatch(html,/sdCheckoutOpenBank|Mở ứng dụng ngân hàng/,'Checkout no longer offers a bank-app launch action');
