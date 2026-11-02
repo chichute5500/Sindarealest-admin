@@ -328,6 +328,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
       '#checkoutSubmit','#sdCheckoutConfirmWrap'];
      return {rootFilters:[cart.backdropFilter,checkout.backdropFilter],
       rootWebkit:[cart.webkitBackdropFilter,checkout.webkitBackdropFilter],
+      rootBackgrounds:[cart.backgroundColor,checkout.backgroundColor],
       match:selectors.map(selector=>{
        const glass=getComputedStyle(document.querySelector(selector));
        return {selector,face:glass.backgroundImage===logo.backgroundImage,
@@ -337,6 +338,10 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
     });
     for(const value of [...logoParity.rootFilters,...logoParity.rootWebkit]){
      expect(value,'The approved drawer background must remain frosted').toContain('blur(24px)');
+    }
+    for(const value of logoParity.rootBackgrounds){
+     const alpha=Number(value.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/)?.[1]??1);
+     expect(alpha,'The drawer sheet must not become fully transparent').toBeGreaterThanOrEqual(.65);
     }
     for(const item of logoParity.match){
      expect(item.face,'Real backdrop face equals approved logo Header: '+item.selector).toBe(true);
