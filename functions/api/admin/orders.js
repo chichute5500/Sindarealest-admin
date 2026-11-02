@@ -27,6 +27,9 @@ export async function onRequestGet(context) {
       " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='processing') AS timeline_processing_at," +
       " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='shipped') AS timeline_shipped_at," +
       " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_updated' AND json_extract(a.details_json,'$.status')='completed') AS timeline_completed_at," +
+      " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_delivery_updated' AND json_extract(a.details_json,'$.to')='failed_returning') AS timeline_delivery_failed_at," +
+      " (SELECT MIN(a.created_at) FROM audit_logs a WHERE a.entity_type='order' AND a.entity_id=o.id AND a.action='order_delivery_updated' AND json_extract(a.details_json,'$.to')='returned') AS timeline_delivery_returned_at," +
+      " (SELECT MIN(s.verified_at) FROM order_cod_settlements s WHERE s.order_id=o.id) AS timeline_cod_received_at," +
       // Date of the *first receipt that reached the customer's requested
       // deposit/full amount*; never count the automatically collected COD.
       " (SELECT MIN(pt.verified_at) FROM order_payment_transactions pt WHERE pt.order_id=o.id AND pt.direction='received' AND pt.actor<>'admin_cod_completion'" +
@@ -214,6 +217,9 @@ export async function onRequestPatch(context) {
       "payment_terms_note=CASE WHEN ?=1 THEN ? ELSE payment_terms_note END,updated_at=datetime('now') WHERE id=? AND status=?" +
       (priceChanged ? priceGuardSql : "") + unchangedItemGuardSql +
       (status === "cancelled" ? " AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')" : " AND status<>'cancelled'") +
+      // Preflight check is not enough: do not activate warranty if delivery
+      // failed concurrently before this atomic status transition.
+      (status === "completed" && existing.status !== "completed" ? " AND delivery_status='in_transit'" : "") +
       (status === "shipped" && existing.status !== "shipped"
         ? " AND price_confirmation_required=0 AND payment_terms_confirmed_at IS NOT NULL AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=? AND actor<>'admin_cod_completion')>=?"
         : "");
