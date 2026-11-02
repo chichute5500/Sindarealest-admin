@@ -56,7 +56,7 @@ export function publicOrderProgress(row, viaPhone) {
   {title:"Đã gửi hàng",...completedProgress(shipped||deliveryStatus==="failed_returning"||deliveryStatus==="returned"||Boolean(row.shippedAt),row.shippedAt)},
   {title:deliveryStatus==="failed_returning"?"Giao thất bại / Đang hoàn hàng":deliveryStatus==="returned"?"Đã hoàn hàng về Shop":"Giao thành công",...completedProgress(["delivered","failed_returning","returned"].includes(deliveryStatus),deliveryStatus==="delivered"?row.completedAt:row.deliveryAt)}
  ];
- if(deliveryStatus==="delivered"){
+ if(deliveryStatus==="delivered"&&!cancelled){
   const warrantyActive=Boolean(row.warrantyAt);
   steps.push({title:warrantyActive?"Đã kích hoạt bảo hành":"Chờ kích hoạt bảo hành",
    ...completedProgress(warrantyActive,warrantyActive?String(row.warrantyAt)+"T00:00:00Z":null)});
