@@ -587,6 +587,36 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  expect(endpoint).toBeGreaterThan(midpoint);
  await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
+
+ // The following samples are TEST ONLY: no simulated optical tint ships to shoppers.
+ // Capture 4 materials across real top/middle/bottom cart scrolling contexts.
+ const comparisons=[
+  ['clear-film','none','blur(17px) saturate(114%)'],
+  ['thin-film','linear-gradient(145deg,rgba(255,255,255,.20),rgba(220,245,255,.09))','blur(17px) saturate(114%)'],
+  ['logo-film','var(--sd-glass-shell-strong)','blur(17px) saturate(114%)'],
+  ['clear-9px','none','blur(9px) saturate(114%)']
+ ];
+ for(const [name,background,filter] of comparisons){
+  await drawer.evaluate(({background,filter})=>{
+   for(const selector of ['.cart-header','.cart-subtotal-bar','#cartCheckout']){
+    const node=document.querySelector('#cartDrawer '+selector);
+    node.style.setProperty('background',background,'important');
+    node.style.setProperty('backdrop-filter',filter,'important');
+    node.style.setProperty('-webkit-backdrop-filter',filter,'important');
+   }
+  },{background,filter});
+  for(const [position,fraction] of [['top',0],['middle',.5],['bottom',1]]){
+   await drawer.evaluate(f=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*f)},fraction);
+   await page.waitForTimeout(100);
+   await page.screenshot({path:join(output,'390x844-OPTICAL-TEST-ONLY-'+name+'-'+position+'.png'),fullPage:false,animations:'disabled'});
+  }
+ }
+ await drawer.evaluate(()=>{
+  for(const selector of ['.cart-header','.cart-subtotal-bar','#cartCheckout']){
+   const node=document.querySelector('#cartDrawer '+selector);
+   for(const name of ['background','backdrop-filter','-webkit-backdrop-filter'])node.style.removeProperty(name);
+  }
+ });
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
  await page.screenshot({path:join(output,'360x800-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
