@@ -112,6 +112,8 @@
     if(!frame)frame=requestAnimationFrame(render);
   }
   drawer.addEventListener('scroll',schedule,{passive:true});
+  // Desktop has its own inner list scroll; mobile scrolls the entire drawer.
+  list.addEventListener('scroll',schedule,{passive:true});
   window.addEventListener('resize',schedule,{passive:true});
   new MutationObserver(schedule).observe(drawer,{attributes:true,attributeFilter:['class']});
   new MutationObserver(schedule).observe(list,{childList:true,subtree:true});
