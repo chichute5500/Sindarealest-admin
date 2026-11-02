@@ -2038,7 +2038,9 @@ html.dark .sd-fullscreen-share{
    floating headers: an ancestor backdrop root blocks the inner glass from
    collecting real scrolled product / QR pixels. The drawer color stays intact. */
 #cartDrawer,#checkoutDrawer{
-  background:var(--sd-reference-surface)!important;
+  /* The original surface is painted on ::before after native background blur.
+     Keeping the tint on the ancestor would blur an already-flat tint instead. */
+  background:transparent!important;
   -webkit-backdrop-filter:none!important;
   backdrop-filter:none!important;
 }
@@ -2048,7 +2050,7 @@ html.dark .sd-fullscreen-share{
   inset:0;
   z-index:0;
   border-radius:inherit;
-  background:transparent;
+  background:var(--sd-reference-surface);
   -webkit-backdrop-filter:blur(24px) saturate(145%);
   backdrop-filter:blur(24px) saturate(145%);
   pointer-events:none;
