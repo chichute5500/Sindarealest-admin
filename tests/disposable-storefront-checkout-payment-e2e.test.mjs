@@ -17,6 +17,9 @@ import { onRequestGet as orderPaymentGet } from '../functions/api/order-payment.
 import { onRequestGet as adminPaymentGet, onRequestPost as paymentRequestPost, onRequestPatch as paymentRequestPatch } from '../functions/api/admin/payment-requests.js';
 import { onRequestPost as transactionPost } from '../functions/api/admin/payment-transactions.js';
 import { onRequestPut as qrPut } from '../functions/api/admin/payment-qr.js';
+import { onRequestPost as orderTrackingPost } from '../functions/api/order-tracking.js';
+import { onRequestPatch as deliveryPatch } from '../functions/api/admin/order-delivery.js';
+import { onRequestPost as codPost } from '../functions/api/admin/cod-settlements.js';
 
 const db = new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
@@ -211,5 +214,75 @@ try {
   assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='order_created'").n,2);
   assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='payment_received_verified'").n,1);
   assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='payment_refund_verified'").n,1);
+
+  // Complete the same real-handler life cycle with a disposable deposit order.
+  // No real Shop customer, bank receipt, carrier transaction or Cloudflare request.
+  const depositCheckout={...checkout,phone:'0900000204',paymentOption:'deposit',note:'DISPOSABLE QA COD ORDER'};
+  const depositQuote=await (await expectStatus('Deposit quote before any order write',await invoke(checkoutQuotePost,'/api/checkout-quote','POST',{
+    items:depositCheckout.items,phone:depositCheckout.phone,paymentOption:'deposit',quotedTotal:depositCheckout.quotedTotal
+  }),200)).json();
+  assert.equal(depositQuote.quoteReady,true);
+  assert.equal(depositQuote.selectedPaymentAmount,100000);
+  const depositOrder=await (await expectStatus('Customer confirms deposit QR and creates order code',await invoke(ordersPost,'/api/orders','POST',{
+    ...depositCheckout,transferReference:depositQuote.transferReference,paymentQrImageKey:depositQuote.paymentQrImageKey,
+    paymentBankName:depositQuote.paymentInstructions.bankName,
+    paymentAccountName:depositQuote.paymentInstructions.accountName,
+    paymentAccountNumber:depositQuote.paymentInstructions.accountNumber
+  }),201)).json();
+  const depositId=one('SELECT id FROM orders WHERE order_number=?',depositOrder.orderNumber)?.id;
+  assert.ok(depositId,'New order must exist in the same disposable D1');
+  const depositAdminList=await (await expectStatus('Admin sees the customer deposit order',await invoke(adminOrdersGet,adminPath,'GET',undefined,true),200)).json();
+  assert.ok(depositAdminList.orders.some(o=>o.id===depositId));
+  const depositTrack=async()=> (await (await expectStatus('Customer reads live order tracking',await invoke(orderTrackingPost,'/api/order-tracking','POST',{lookup:depositOrder.orderNumber}),200)).json()).orders[0];
+  const beforeDeposit=await depositTrack();
+  assert.equal(beforeDeposit.deliveryStatus,'not_shipped');
+  await expectStatus('Cannot ship before verified deposit',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'shipped'},true),409);
+  await expectStatus('Admin confirms deposit order terms',await invoke(adminOrdersPatch,adminPath,'PATCH',{
+    id:depositId,status:'confirmed',termsConfirmed:true,paymentTermsNote:'DISPOSABLE QA verified terms'
+  },true),200);
+  await expectStatus('Admin advances deposit order to processing',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'processing'},true),200);
+  await expectStatus('Carrier COD is forbidden before delivery',await invoke(codPost,'/api/admin/cod-settlements','POST',{
+    orderId:depositId,amount:50000,transactionReference:'QA-E2E-PREMATURE-COD'
+  },true),409);
+  const depositRequestId=one("SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' ORDER BY created_at DESC LIMIT 1",depositId)?.id;
+  assert.ok(depositRequestId,'Customer QR request remains pending until actual receipt verification');
+  await expectStatus('Admin verifies the bank deposit',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
+    orderId:depositId,paymentRequestId:depositRequestId,direction:'received',amount:100000,transactionReference:'QA-E2E-DEPOSIT-PAID'
+  },true),201);
+  const afterDeposit=await (await expectStatus('Customer sees verified deposit and COD balance',await invoke(orderPaymentGet,
+    '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();
+  assert.equal(afterDeposit.paymentSummary.netReceivedAmount,100000);
+  assert.equal(afterDeposit.paymentSummary.codRemaining,50000);
+  await expectStatus('Admin dispatches deposit order',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'shipped'},true),200);
+  assert.equal(one('SELECT delivery_status FROM orders WHERE id=?',depositId).delivery_status,'in_transit');
+  assert.equal((await depositTrack()).deliveryStatus,'in_transit');
+  await expectStatus('Cannot COD settle during transit',await invoke(codPost,'/api/admin/cod-settlements','POST',{
+    orderId:depositId,amount:50000,transactionReference:'QA-E2E-COD-IN-TRANSIT'
+  },true),409);
+  await expectStatus('Admin confirms delivery completion',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'completed'},true),200);
+  assert.equal((await depositTrack()).deliveryStatus,'delivered');
+  await expectStatus('Partial carrier remittance cannot mark COD paid',await invoke(codPost,'/api/admin/cod-settlements','POST',{
+    orderId:depositId,amount:40000,transactionReference:'QA-E2E-COD-PARTIAL'
+  },true),409);
+  assert.equal(one('SELECT COUNT(*) n FROM order_cod_settlements WHERE order_id=?',depositId).n,0);
+  await expectStatus('Admin verifies carrier remittance in full',await invoke(codPost,'/api/admin/cod-settlements','POST',{
+    orderId:depositId,amount:50000,transactionReference:'QA-E2E-COD-SETTLED'
+  },true),201);
+  assert.equal(one('SELECT payment_status FROM orders WHERE id=?',depositId).payment_status,'paid');
+  const finalPayment=await (await expectStatus('Customer reads completed payment state',await invoke(orderPaymentGet,
+    '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();
+  assert.equal(finalPayment.paymentSummary.codReceivedAmount,50000);
+  assert.equal(finalPayment.paymentSummary.paidInFull,true);
+  assert.equal((await depositTrack()).status,'completed');
+  await expectStatus('Repeat carrier reconciliation blocked',await invoke(codPost,'/api/admin/cod-settlements','POST',{
+    orderId:depositId,amount:50000,transactionReference:'QA-E2E-COD-SETTLED'
+  },true),409);
+  await expectStatus('Returned shipment cannot be set after completed',await invoke(deliveryPatch,'/api/admin/order-delivery','PATCH',{
+    id:depositId,deliveryStatus:'returned'
+  },true),409);
+  assert.equal(one('SELECT COUNT(*) n FROM order_cod_settlements WHERE order_id=?',depositId).n,1);
+  assert.equal(one("SELECT COUNT(*) n FROM order_payment_transactions WHERE order_id=? AND actor='admin_cod_completion'",depositId).n,0,
+    'COD settlement must never be manufactured as a verified bank receipt');
+  assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
   console.log(JSON.stringify({scope:'DISPOSABLE_SQLITE_ONE_DATABASE_REAL_HANDLERS',productionWrites:0,remoteRequests:0,realTransfers:0,pass:true,checks:trace},null,2));
 }finally{db.close()}

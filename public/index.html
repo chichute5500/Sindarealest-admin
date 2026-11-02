@@ -3287,6 +3287,10 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 #productOverlay .sd-detail-payment-option.selected{border:1px solid transparent;background:var(--sd-glass-selected);box-shadow:var(--sd-3d-selected)}
 .checkout-heading{flex:1 1 auto}
 #checkoutDrawer.sd-checkout-success .checkout-backlink{visibility:hidden;pointer-events:none}
+/* With the return control hidden, the successful QR/order stage is centered
+   against the full drawer frame, not the inner header's inset coordinate.
+   The offset is the measured real drawer inset, not a viewport-specific px. */
+#checkoutDrawer.sd-checkout-success .checkout-heading h2{left:calc(50% + var(--sd-native-glass-pad-left,0px))}
 #checkoutDrawer.sd-checkout-success .checkout-intro{text-align:center}
 #checkoutDrawer.sd-checkout-success .checkout-intro p{font-size:16px}
 #checkoutDrawer.sd-checkout-success .checkout-intro small{max-width:620px;margin-inline:auto;color:#b42336;font-size:13px;font-weight:700}
