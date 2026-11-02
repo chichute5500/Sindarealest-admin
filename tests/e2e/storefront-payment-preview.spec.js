@@ -510,6 +510,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   return Math.round(drawer.scrollTop);
  })).toBe(0);
  await expect(page.locator('#checkoutForm')).toHaveJSProperty('scrollTop',0);
+ await expect(page.locator('#paymentInstructions .sd-checkout-qr-head strong')).toBeInViewport();
  await page.screenshot({path:join(output,'390x844-buy-now-qr-opened-at-top.png'),fullPage:false,animations:'disabled'});
  await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
@@ -724,6 +725,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   return Math.round(drawer.scrollTop);
  })).toBe(0);
  await expect(page.locator('#checkoutForm')).toHaveJSProperty('scrollTop',0);
+ await expect(page.locator('#paymentInstructions .sd-checkout-qr-head strong')).toBeInViewport();
  await page.screenshot({path:join(output,'390x844-cart-full-qr-opened-at-top.png'),fullPage:false,animations:'disabled'});
  // Preserve the pre-existing strict header-centering assertion, but defer its
  // failure so we can still measure the new fast-slider requirement in the same
