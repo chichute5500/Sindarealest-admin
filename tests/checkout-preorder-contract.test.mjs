@@ -45,6 +45,23 @@ assert.doesNotMatch(html,/\.checkout-drawer\{left:0;right:0;width:100vw;max-widt
 assert.match(html,/#cartDrawer,#checkoutDrawer\{background:var\(--sd-reference-surface\)!important\}/,'Cart and Checkout use the same outer glass material');
 assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{\s*top:calc\(7px \+ env\(safe-area-inset-top\)\);[\s\S]*?border:1px solid var\(--sd-reference-edge\);border-radius:26px;/,'Mobile drawers share inset geometry and 26px corners');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
+
+const quoteLoadStart=html.indexOf('async function sdCheckoutLoadQuote(){');
+const quoteLoadEnd=html.indexOf('async function sdCheckoutLoadPaymentInstructions(){',quoteLoadStart);
+const quoteLoadBody=html.slice(quoteLoadStart,quoteLoadEnd);
+assert.match(quoteLoadBody,/signal:controller\.signal/,'Read-only payment quote requests support abort after a bounded wait');
+assert.match(quoteLoadBody,/setTimeout\(\(\)=>controller\.abort\(\),12000\)/,'Slow quote API must not leave an endless pending message');
+assert.match(quoteLoadBody,/if\(epoch!==checkoutOpenEpoch\)return/,'Responses from a closed or replaced checkout session cannot overwrite the current quote');
+assert.match(quoteLoadBody,/sdCheckoutRenderQuote\(\);\s*sdCheckoutRefreshChoice\(\)/,'Quote completion updates actual amount and payment choices without waiting for province/ward API');
+const openCheckoutBody=html.slice(html.indexOf('function openCheckout(options={}){'),html.indexOf('function closeCheckout(',html.indexOf('function openCheckout(options={}){')));
+const prefillIndex=openCheckoutBody.indexOf('const prefillPromise=prefillCheckoutFromLocalAddress()');
+const quoteIndex=openCheckoutBody.indexOf('const quickQuote=maySkipAddress?loadQuoteSafely():null');
+const waitIndex=openCheckoutBody.indexOf('prefillPromise.then(async()=>');
+assert.ok(prefillIndex>=0&&quoteIndex>prefillIndex&&waitIndex>quoteIndex,'Start read-only quote in parallel instead of serially after administrative division loading');
+assert.match(openCheckoutBody,/\$\('#sdCheckoutOptions'\)\.replaceChildren\(\)/,'Do not display stale payment methods from a previous checkout session');
+assert.match(openCheckoutBody,/\$\('#sdCheckoutQuoteNotice'\)\.textContent='Đang kiểm tra tình trạng hàng và giá từ hệ thống…'/,'Waiting state resets cleanly on each checkout open');
+assert.doesNotMatch(openCheckoutBody,/fetch\('\/api\/orders'/,'Prefilling and fetching a quote must not create an order');
+
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
 assert.match(html,/getElementById|querySelector|#sdCheckoutQrImage/);
 assert.match(quote,/paymentReady:false/,"Selecting a method must not mean Shop has confirmed a payment request");
