@@ -343,9 +343,16 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
       })};
     });
     expect(logoParity.rootFilters).toEqual(['none','none']);
-    expect(logoParity.rootWebkit).toEqual(['none','none']);
-    for(const value of [...logoParity.tintFilters,...logoParity.tintWebkit]){
+    // Chromium may omit the legacy vendor property entirely. Only the
+    // standard backdrop-filter is mandatory; check vendor alias if exposed.
+    for(const value of logoParity.rootWebkit)if(value!==undefined){
+     expect(value).toBe('none');
+    }
+    for(const value of logoParity.tintFilters){
      expect(value,'The approved drawer background remains natively frosted').toContain('blur(24px)');
+    }
+    for(const value of logoParity.tintWebkit)if(value!==undefined){
+     expect(value).toContain('blur(24px)');
     }
     expect(logoParity.tintPosition).toEqual(['sticky','sticky']);
     expect(logoParity.tintPointerEvents).toEqual(['none','none']);
