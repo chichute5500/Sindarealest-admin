@@ -11,7 +11,7 @@ const files=['0001_schema.sql','0003_storefront_operations.sql','0004_admin_noti
 const schema=files.map(file=>readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8')).join('\n');
 const session=await createSession(SECRET);
 
-function setup({deposit=2_700_000,net=2_700_000,paymentOption='deposit',orderStatus='shipped'}={}){
+function setup({deposit=2_700_000,net=2_700_000,paymentOption='deposit',orderStatus='shipped',simulateConcurrentDeliveryFailure=false}={}){
  const sql=new DatabaseSync(':memory:');sql.exec('PRAGMA foreign_keys=ON;'+schema);
  sql.prepare("INSERT INTO customers(id,full_name,phone) VALUES('qa-customer','TEST','0000000000')").run();
  sql.prepare("INSERT INTO orders(id,order_number,customer_id,status,delivery_status,payment_status,subtotal,total,price_confirmation_required,payment_terms_confirmed_at) VALUES('qa-order','QA-COD-9000000','qa-customer',?,'in_transit',?,9000000,9000000,0,'2026-10-27')")
@@ -20,16 +20,17 @@ function setup({deposit=2_700_000,net=2_700_000,paymentOption='deposit',orderSta
  sql.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES('qa-checkout','customer','order_created','order','qa-order',?)")
   .run(JSON.stringify({selectedPaymentOption:paymentOption,selectedPaymentAmount:deposit,transferReference:'0000-QA-ABCD'}));
  if(net>0)sql.prepare("INSERT INTO order_payment_transactions(id,order_id,direction,amount,transaction_reference,note,actor) VALUES('qa-deposit','qa-order','received',?,'BANK-QA-1234','BANK DEPOSIT','admin')").run(net);
- const DB={prepare(query){let bound=[];return {bind(...values){bound=values;return this},async first(){return sql.prepare(query).get(...bound)??null},async all(){return {results:sql.prepare(query).all(...bound)}},async run(){const r=sql.prepare(query).run(...bound);return {meta:{changes:r.changes}}},execute(){return sql.prepare(query).run(...bound)}}},async batch(statements){sql.exec('BEGIN IMMEDIATE');try{const out=statements.map(s=>({meta:{changes:s.execute().changes}}));sql.exec('COMMIT');return out}catch(e){sql.exec('ROLLBACK');throw e}}};
+ const DB={prepare(query){let bound=[];return {bind(...values){bound=values;return this},async first(){return sql.prepare(query).get(...bound)??null},async all(){return {results:sql.prepare(query).all(...bound)}},async run(){const r=sql.prepare(query).run(...bound);return {meta:{changes:r.changes}}},execute(){return sql.prepare(query).run(...bound)}}},async batch(statements){if(simulateConcurrentDeliveryFailure)sql.prepare("UPDATE orders SET delivery_status='failed_returning' WHERE id='qa-order'").run();sql.exec('BEGIN IMMEDIATE');try{const out=statements.map(s=>({meta:{changes:s.execute().changes}}));sql.exec('COMMIT');return out}catch(e){sql.exec('ROLLBACK');throw e}}};
  const patch=async()=>patchAdminOrder({request:new Request('https://qa.invalid/api/admin/orders',{method:'PATCH',headers:{Cookie:'sd_admin_session='+session,Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin','Content-Type':'application/json'},body:JSON.stringify({id:'qa-order',status:'completed'})}),env:{DB,ADMIN_PASSWORD:PASSWORD,SESSION_SECRET:SECRET}});
  const state=()=>sql.prepare("SELECT status,delivery_status,payment_status,total FROM orders WHERE id='qa-order'").get();
  const ledger=()=>sql.prepare("SELECT actor,direction,amount FROM order_payment_transactions ORDER BY created_at,id").all();
  const cod=()=>sql.prepare("SELECT * FROM order_cod_settlements WHERE order_id='qa-order'").all();
- return {sql,patch,state,ledger,cod};
+ const warranties=()=>sql.prepare("SELECT * FROM warranties WHERE order_id='qa-order'").all();
+ return {sql,patch,state,ledger,cod,warranties};
 }
 
 {
- const f=setup();const response=await f.patch();assert.equal(response.status,200);assert.equal(f.state().status,'completed');assert.equal(f.state().delivery_status,'delivered');assert.equal(f.state().payment_status,'pending');assert.equal(f.ledger().length,1,'delivery success must not create bank or COD money');assert.equal(f.cod().length,0,'COD settlement is a separate later event');f.sql.close();
+ const f=setup();const response=await f.patch();assert.equal(response.status,200);assert.equal(f.state().status,'completed');assert.equal(f.state().delivery_status,'delivered');assert.equal(f.state().payment_status,'pending');assert.equal(f.ledger().length,1,'delivery success must not create bank or COD money');assert.equal(f.cod().length,0,'COD settlement is a separate later event');assert.equal(f.warranties().length,1,'successful delivery automatically activates warranty');assert.equal(f.warranties()[0].status,'active');f.sql.close();
 }
 {
  const f=setup({net:2_600_000});const response=await f.patch();assert.equal(response.status,409,'an underpaid deposit must not be marked delivered');assert.equal(f.state().status,'shipped');assert.equal(f.state().delivery_status,'in_transit');assert.equal(f.cod().length,0);f.sql.close();
@@ -37,4 +38,23 @@ function setup({deposit=2_700_000,net=2_700_000,paymentOption='deposit',orderSta
 {
  const f=setup({paymentOption:'full',deposit:8_550_000,net:9_000_000});const response=await f.patch();assert.equal(response.status,200,'full-payment orders can complete after verified full amount');assert.equal(f.cod().length,0,'full-payment order never creates COD');f.sql.close();
 }
-console.log('PASS: delivery completion is separate from COD receipt; underpaid orders are blocked; full-payment orders do not create COD.');
+{
+ const f=setup({simulateConcurrentDeliveryFailure:true});
+ const response=await f.patch();
+ assert.equal(response.status,409,'concurrent delivery failure must block completed transition');
+ assert.equal(f.state().status,'shipped');
+ assert.equal(f.state().delivery_status,'failed_returning');
+ assert.equal(f.warranties().length,0,'no warranty when carrier reports failed delivery');
+ assert.equal(f.cod().length,0,'failed delivery never records COD');
+ f.sql.close();
+}
+// Keep Admin mobile progress separate from public warranty and bank settlement.
+const adminHtml=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
+const stages=adminHtml.match(/const orderSteps=\[([\s\S]*?)\n \];/);
+assert.ok(stages,'Admin must render a delivery progress timeline');
+assert.equal((stages[1].match(/\btitle:/g)||[]).length,5,'Admin progress must have five steps');
+for(const label of ['Giao hàng thành công','Giao hàng thất bại','Đã nhận tiền','Đã hoàn hàng','Đối soát tiền COD','timeline_cod_received_at']){
+ assert.ok(adminHtml.includes(label),'Admin delivery/COD progress missing: '+label);
+}
+assert.ok(adminHtml.includes("data-action=\"record-cod-settlement\""),'COD confirmation remains a separate manual Admin action');
+console.log('PASS: delivery success automatically activates warranty, COD stays manual; failed/concurrent delivery issues no warranty; Admin has five stages.');
