@@ -316,6 +316,31 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
        .every(sel=>getComputedStyle(document.querySelector(sel)).boxShadow===action)
       &&action!==original;
     }),{timeout:5000}).toBe(true);
+    // Native Header logo is the reference, not a separate set of painted panes.
+    // Parent drawers must remain outside the backdrop-root chain.
+    const logoParity=await page.evaluate(()=>{
+     const logo=getComputedStyle(document.querySelector('.nav-wrap .nav'));
+     const cart=getComputedStyle(document.querySelector('#cartDrawer'));
+     const checkout=getComputedStyle(document.querySelector('#checkoutDrawer'));
+     const selectors=['#cartDrawer .cart-header','#cartDrawer .cart-subtotal-bar',
+      '#cartCheckout','#checkoutDrawer .checkout-header','#sdCheckoutPrev',
+      '#checkoutSubmit','#sdCheckoutConfirmWrap'];
+     return {rootFilters:[cart.backdropFilter,checkout.backdropFilter],
+      rootWebkit:[cart.webkitBackdropFilter,checkout.webkitBackdropFilter],
+      match:selectors.map(selector=>{
+       const glass=getComputedStyle(document.querySelector(selector));
+       return {selector,face:glass.backgroundImage===logo.backgroundImage,
+        filter:glass.backdropFilter===logo.backdropFilter,
+        opacity:glass.opacity};
+      })};
+    });
+    expect(logoParity.rootFilters).toEqual(['none','none']);
+    expect(logoParity.rootWebkit).toEqual(['none','none']);
+    for(const item of logoParity.match){
+     expect(item.face,'Real backdrop face equals approved logo Header: '+item.selector).toBe(true);
+     expect(item.filter,'Native backdrop blur equals logo Header: '+item.selector).toBe(true);
+     expect(item.opacity,'Real glass remains fully composited: '+item.selector).toBe('1');
+    }
     const syncedGlass=await page.evaluate(()=>{
      const original=document.querySelector('#cartDrawer .cart-header');
      const source=getComputedStyle(original);
