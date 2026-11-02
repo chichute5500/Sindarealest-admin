@@ -668,6 +668,66 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
 
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 
+
+ // QA-only optical mirror: blur only the product pixels physically passing
+ // behind each of the three glass lenses; outside-lens product pixels stay sharp.
+ await drawer.evaluate(shell=>{
+  const rows=[...shell.querySelectorAll('#cartList .cart-row')];
+  const bars=['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(sel=>shell.querySelector(sel));
+  const lenses=bars.map(bar=>{
+   const lens=document.createElement('div');
+   lens.setAttribute('aria-hidden','true');
+   lens.className='qa-product-lens';
+   Object.assign(lens.style,{position:'absolute',inset:'0',zIndex:'0',overflow:'hidden',borderRadius:'inherit',pointerEvents:'none'});
+   for(const child of [...bar.children]){
+    if(getComputedStyle(child).position==='static')child.style.position='relative';
+    child.style.zIndex='3';
+   }
+   bar.style.isolation='isolate';
+   bar.insertBefore(lens,bar.firstChild);
+   return lens;
+  });
+  shell.scrollTop=Math.round((shell.scrollHeight-shell.clientHeight)*.6);
+  for(const row of rows){
+   const r=row.getBoundingClientRect();
+   let topCrop=0,bottomCrop=0;
+   bars.forEach((bar,i)=>{
+    const b=bar.getBoundingClientRect();
+    const width=Math.min(r.right,b.right)-Math.max(r.left,b.left);
+    const height=Math.min(r.bottom,b.bottom)-Math.max(r.top,b.top);
+    if(width<8||height<2)return;
+    const mirror=row.cloneNode(true);
+    mirror.removeAttribute('id');
+    mirror.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
+    mirror.setAttribute('aria-hidden','true');
+    Object.assign(mirror.style,{
+     position:'absolute',
+     left:(r.left-b.left)+'px',top:(r.top-b.top)+'px',
+     width:r.width+'px',height:r.height+'px',
+     minWidth:r.width+'px',minHeight:r.height+'px',
+     margin:'0',pointerEvents:'none',
+     filter:'blur(14px)',WebkitFilter:'blur(14px)',
+     transform:'translateZ(0)'
+    });
+    lenses[i].appendChild(mirror);
+    if(i===0)topCrop=Math.max(topCrop,Math.min(r.height,b.bottom-r.top));
+    else bottomCrop=Math.max(bottomCrop,Math.min(r.height,r.bottom-b.top));
+   });
+   row.style.clipPath='inset('+topCrop+'px 0px '+bottomCrop+'px 0px)';
+  }
+ });
+ await page.waitForTimeout(120);
+ await page.screenshot({path:join(output,'QA-EIGHT-LENS-true-product-blur.png'),fullPage:false,animations:'disabled'});
+ await page.locator('#cartDrawer .cart-subtotal-bar').screenshot({path:join(output,'QA-EIGHT-LENS-true-product-blur-subtotal.png'),animations:'disabled'});
+ await page.locator('#cartDrawer #cartCheckout').screenshot({path:join(output,'QA-EIGHT-LENS-true-product-blur-payment.png'),animations:'disabled'});
+ await drawer.evaluate(shell=>{
+  shell.querySelectorAll('.qa-product-lens').forEach(e=>e.remove());
+  shell.querySelectorAll('#cartList .cart-row').forEach(row=>{row.style.removeProperty('clip-path')});
+  ['.cart-header','.cart-subtotal-bar','#cartCheckout'].forEach(selector=>{
+   const el=shell.querySelector(selector);el.style.removeProperty('isolation');
+   for(const child of el.children){child.style.removeProperty('z-index')}
+  });
+ });
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
  await page.screenshot({path:join(output,'360x800-cart-eight-products-top.png'),fullPage:false,animations:'disabled'});
