@@ -204,7 +204,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  });
  for(const mat of cartMaterial){
   expect(mat.shadowMatches,'Cart preserves original logo Header shadow: '+mat.selector).toBe(true);
-   expect(mat.filterMatches,'Nested drawer must not impersonate the Header filter: '+mat.selector).toBe(false);
+   expect(mat.filterMatches,'Cart uses exactly the native logo Header backdrop filter: '+mat.selector).toBe(true);
   expect(mat.alpha,'Cart glass must be genuinely transparent so the scroll backdrop changes its appearance: '+mat.selector).toBe(0);
   expect(mat.rim).toContain('gradient');
  }
@@ -231,8 +231,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
   return matches;
  });
  for(const lens of cartFilterCascade){
-  expect(lens.backdrop).toContain('blur(56.784px)');
-  if(lens.webkit)expect(lens.webkit).toContain('blur(56.784px)'); // Chromium may omit the vendor alias.
+  expect(lens.backdrop).toContain('blur(17px)');
+  if(lens.webkit)expect(lens.webkit).toContain('blur(17px)'); // Chromium may omit the vendor alias.
   expect(lens.background).toContain('linear-gradient(');
  }
  console.log('CART_THREE_BARS_COMPUTED_CASCADE',JSON.stringify(cartFilterCascade));
@@ -349,7 +349,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
     for(const value of [...logoParity.tintFilters,...logoParity.tintWebkit]){
      expect(value,'The approved drawer background remains natively frosted').toContain('blur(24px)');
     }
-    expect(logoParity.tintPosition).toEqual(['fixed','fixed']);
+    expect(logoParity.tintPosition).toEqual(['sticky','sticky']);
     expect(logoParity.tintPointerEvents).toEqual(['none','none']);
     for(const value of logoParity.tintBackgrounds){
      const alpha=Number(value.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/)?.[1]??1);
@@ -761,7 +761,7 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  for(const result of opticalScores){
   expect(result.main.matches,'Some computed properties remain shared with the logo Header for '+result.selector).toBeGreaterThanOrEqual(3);
    expect(result.rim.matches,'Header and Cart rim computed CSS should match for '+result.selector).toBe(result.rim.total);
-  expect(result.dynamicFilter,'Cart uses the tuned nested glass filter on '+result.selector).toContain('blur(56.784px)');
+  expect(result.dynamicFilter,'Cart shares the approved Header blur on '+result.selector).toContain('blur(17px)');
    expect(result.dynamicFilter,'Do not darken the moving photographic backdrop on '+result.selector).not.toContain('brightness(');
  }
  console.log('CART_LOGO_GLASS_COMPUTED_STYLE_ONLY_NOT_VISUAL_PARITY',JSON.stringify(opticalScores));
@@ -893,6 +893,14 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  expect(cartPlane.planeBackdrop).toContain('blur(24px)');
  expect(cartPlane.planePointerEvents).toBe('none');
  expect(cartPlane.headerBackdrop).toContain('blur(17px)');
+ const cartPlaneHeight=await drawer.evaluate(el=>({
+  client:el.clientHeight,
+  height:parseFloat(getComputedStyle(el).getPropertyValue('--sd-native-glass-height')),
+  gap:parseFloat(getComputedStyle(el).getPropertyValue('--sd-native-glass-gap')),
+  actualGap:parseFloat(getComputedStyle(el).rowGap)
+ }));
+ expect(cartPlaneHeight.height,'The blur sheet remains exactly scrollport-high').toBe(cartPlaneHeight.client);
+ expect(cartPlaneHeight.gap,'The blur sheet leaves no flex spacing').toBe(cartPlaneHeight.actualGap);
  console.log('CART_NATIVE_BACKGROUND_PLANE',JSON.stringify(cartPlane));
 
  await page.screenshot({path:join(output,'390x844-eight-items-real-blur-60-percent.png'),fullPage:false,animations:'disabled'});
