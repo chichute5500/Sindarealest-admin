@@ -402,35 +402,30 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await assertCheckoutScrollAndHeader(page,true);
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeHidden();
  await expect(review).toBeHidden();
- // The previous screenshot exposed sharp "Chờ thanh toán" lettering through
- // Checkout's white glass. With Cart-matched optics, the covered pixels must
- // actually blur; a CSS-string parity assertion alone cannot prove that.
- await expect(page.locator('#checkoutDrawer .sd-checkout-optical-lens')).toHaveCount(5);
- await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2);el.dispatchEvent(new Event('scroll'))});
- await expect.poll(()=>page.locator('#checkoutDrawer').evaluate(drawer=>{
-  const footer=drawer.querySelector('.sd-checkout-footer');
-  return [...footer.querySelectorAll(':scope > .sd-checkout-optical-lens')].every(lens=>{
-   const control=drawer.querySelector('#'+lens.dataset.sdOpticalTarget);
-   const a=lens.getBoundingClientRect(),b=control.getBoundingClientRect();
-   if(!b.width||!b.height)return true;
-   return Math.abs(a.top-b.top)<2&&Math.abs(a.left-b.left)<2
-    &&Math.abs(a.width-b.width)<2&&Math.abs(a.height-b.height)<2;
-  });
- }),{timeout:5000}).toBe(true);
- await expect.poll(()=>page.locator('#checkoutDrawer .sd-checkout-optical-mirror').count(),{timeout:5000})
-  .toBeGreaterThan(0);
- await expect.poll(()=>page.locator('#checkoutForm').evaluate(form=>
-  [...form.children].filter(el=>getComputedStyle(el).maskImage.includes('linear-gradient')).length
- ),{timeout:5000}).toBeGreaterThan(0);
- const realOcclusion=await page.locator('#checkoutDrawer').evaluate(drawer=>({
-   mirrorCount:drawer.querySelectorAll('.sd-checkout-optical-mirror').length,
-   maskedBlockCount:[...drawer.querySelector('#checkoutForm').children].filter(el=>getComputedStyle(el).maskImage.includes('linear-gradient')).length,
-   mirrorFilters:[...drawer.querySelectorAll('.sd-checkout-optical-mirror')].map(el=>getComputedStyle(el).filter)
- }));
- expect(realOcclusion.mirrorCount,'Checkout must blur real text moving behind its bars').toBeGreaterThan(0);
- expect(realOcclusion.maskedBlockCount,'Sharp payment lettering must not remain legible under frosted bars').toBeGreaterThan(0);
- for(const filter of realOcclusion.mirrorFilters)expect(filter).toContain('blur(14px)');
- console.log('CHECKOUT_REAL_GLASS_OCCLUSION',JSON.stringify(realOcclusion));
+ // Optical masking previously hid QR pixels in black bands during rapid scroll.
+ // Native backdrop-filter must never create DOM mirrors or mask the source.
+ await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)/2)});
+ const nativeGlass=await page.locator('#checkoutDrawer').evaluate(async drawer=>{
+  const samples=[];
+  for(let i=0;i<16;i++){
+   drawer.scrollTop=Math.round((drawer.scrollHeight-drawer.clientHeight)*(i%2===0?.85:.12));
+   await new Promise(resolve=>requestAnimationFrame(resolve));
+   const body=[...drawer.querySelector('#checkoutForm').children];
+   samples.push({
+    mirrors:drawer.querySelectorAll('[class*="optical-mirror"],[class*="optical-lens"]').length,
+    masked:body.filter(el=>getComputedStyle(el).maskImage!=='none').length,
+    qrMask:getComputedStyle(drawer.querySelector('#sdCheckoutQrWrap')).maskImage,
+    headerBlur:getComputedStyle(drawer.querySelector('.checkout-header')).backdropFilter,
+    buttonBlur:getComputedStyle(drawer.querySelector('#sdCheckoutConfirmWrap')).backdropFilter
+   });
+  }
+  return samples;
+ });
+ expect(nativeGlass.every(frame=>frame.mirrors===0&&frame.masked===0&&frame.qrMask==='none'),
+  'Fast checkout scroll must never mask the form or QR').toBe(true);
+ expect(nativeGlass.every(frame=>frame.headerBlur.includes('blur(')&&frame.buttonBlur.includes('blur(')),
+  'Glass remains native across every fast-scroll frame').toBe(true);
+ console.log('CHECKOUT_NATIVE_GLASS_FAST_SCROLL',JSON.stringify(nativeGlass));
  await page.screenshot({path:join(output,'390x844-checkout-qr-mid-scroll-clear.png'),fullPage:false,animations:'disabled'});
  await page.locator('#checkoutDrawer').evaluate(el=>{el.scrollTop=0;el.dispatchEvent(new Event('scroll'))});
  await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn.');
@@ -461,7 +456,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const qrSurfaces=await page.locator('#checkoutDrawer').evaluate(drawer=>{
   const panel=getComputedStyle(drawer.querySelector('#paymentInstructions'));
   const footer=getComputedStyle(drawer.querySelector('.sd-checkout-footer'));
-  const panes=[...drawer.querySelectorAll('.sd-checkout-footer>.sd-checkout-optical-lens')];
+  const panes=[...drawer.querySelectorAll('[class*="optical-lens"]')];
   const actions=getComputedStyle(drawer.querySelector('.sd-checkout-actions'));
   const button=getComputedStyle(drawer.querySelector('#sdCheckoutPrev'));
   return {panelBackground:panel.backgroundColor,footerBackground:footer.backgroundColor,
@@ -484,7 +479,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  expect(qrSurfaces.actionsBackground).toBe('rgba(0, 0, 0, 0)');
  expect(qrSurfaces.actionsShadow).toBe('none');
  expect(qrSurfaces.buttonShadow).toContain('rgba(103, 169, 205, 0.1)');
- expect(qrSurfaces.footerOpticalPanes).toBe(4);
+ expect(qrSurfaces.footerOpticalPanes).toBe(0);
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:join(output,'390x844-buy-now-deposit-qr-step.png'),fullPage:false,animations:'disabled'});
  expect(createdOrders).toHaveLength(0);
@@ -810,21 +805,23 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 
 
- // Verify the shipped lens, rather than a manually injected QA workaround.
+ // The actual Cart rows must remain intact when scrolling behind floating bars.
  await drawer.evaluate(el=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*.6)});
- await page.waitForTimeout(160);
- await expect(page.locator('#cartDrawer .sd-cart-optical-lens')).toHaveCount(3);
+ await page.waitForTimeout(100);
  const focus=await drawer.evaluate(el=>({
-  blurredMirrors:el.querySelectorAll('.sd-cart-optical-mirror').length,
-  softMaskedRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).maskImage.includes('linear-gradient')).length,
-  harshClippedRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).clipPath!=='none').length,
-  mirrorFilters:[...el.querySelectorAll('.sd-cart-optical-mirror')].map(row=>getComputedStyle(row).filter)
+   overlays:el.querySelectorAll('[class*="optical-mirror"],[class*="optical-lens"]').length,
+   maskedRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).maskImage!=='none').length,
+   harshClippedRows:[...el.querySelectorAll('#cartList .cart-row')].filter(row=>getComputedStyle(row).clipPath!=='none').length,
+   headerBlur:getComputedStyle(el.querySelector('.cart-header')).backdropFilter,
+   subtotalBlur:getComputedStyle(el.querySelector('.cart-subtotal-bar')).backdropFilter,
+   checkoutBlur:getComputedStyle(el.querySelector('#cartCheckout')).backdropFilter
  }));
- expect(focus.blurredMirrors,'Product content crossing the glass must have an optical mirror').toBeGreaterThan(0);
- expect(focus.softMaskedRows,'Sharp source pixels behind glass must fade rather than hard clip').toBeGreaterThan(0);
- expect(focus.harshClippedRows,'Product cards must never have a rectangular hard clipping seam').toBe(0);
- for(const filter of focus.mirrorFilters)expect(filter).toContain('blur(14px)');
- console.log('CART_EIGHT_PRODUCT_REAL_GLASS_BLUR',JSON.stringify(focus));
+ expect(focus.overlays,'Cart needs no duplicate blurred content').toBe(0);
+ expect(focus.maskedRows,'No sharp source pixels may be erased by dynamic masks').toBe(0);
+ expect(focus.harshClippedRows,'Product cards must never clip').toBe(0);
+ expect([focus.headerBlur,focus.subtotalBlur,focus.checkoutBlur].every(x=>x.includes('blur(')),
+ 'All three Cart bars keep native frosted glass').toBe(true);
+ console.log('CART_EIGHT_PRODUCTS_NATIVE_GLASS',JSON.stringify(focus));
  await page.screenshot({path:join(output,'390x844-eight-items-real-blur-60-percent.png'),fullPage:false,animations:'disabled'});
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
@@ -871,6 +868,6 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  expect(desktopScroll.maxScroll,'Eight-item desktop Cart must have enough rows to scroll').toBeGreaterThan(24);
  expect(desktopScroll.scrollTop).toBeGreaterThan(0);
  await page.waitForTimeout(160);
- await expect(page.locator('#cartDrawer .sd-cart-optical-lens')).toHaveCount(3);
+ await expect(page.locator('#cartDrawer [class*="optical-lens"]')).toHaveCount(0);
  await page.screenshot({path:join(output,'1280x800-cart-eight-items-desktop-list-scrolled.png'),fullPage:false,animations:'disabled'});
 });
