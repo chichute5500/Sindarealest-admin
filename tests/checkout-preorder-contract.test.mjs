@@ -70,8 +70,8 @@ assert.match(html,/const value=sdCheckoutSelected\(\),amount=value\?formatVnd\(v
 assert.match(html,/const remainder=value\?formatVnd\(value.codExpected\):''/,'No COD placeholder before method selection');
 assert.match(html,/const discount=value\?\(value.discountAmount\?/,'Discount appears only after choosing payment');
 assert.match(html,/function sdCheckoutResetQrScroll\(\)[\s\S]*drawer.scrollTop=0;[\s\S]*form.scrollTop=0;/,'QR reset handles mobile drawer and desktop form scrollers');
-assert.match(html,/#checkoutDrawer\.sd-checkout-success \.checkout-heading h2\{left:calc\(50% \+ var\(--sd-native-glass-pad-left,0px\)\)\}/,
- 'The centered title accounts for the measured drawer inset only on QR and order stages');
+assert.match(html,/@media\(max-width:760px\)\{#checkoutDrawer\.sd-checkout-success \.checkout-heading h2\{left:calc\(50% \+ var\(--sd-native-glass-pad-left,0px\)\)\}\}/,
+ 'The measured title centering correction is mobile-only and leaves desktop approved glass unchanged');
 assert.match(html,/sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll\(\)/,'QR layout transition resets its scroll position');
 assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
