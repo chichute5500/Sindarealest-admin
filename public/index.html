@@ -4873,7 +4873,7 @@ function openCheckout(options={}){
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
  // Do not show a blank Payment address card before asynchronous saved-address hydration.
  // Keep the original address, quote, selection and order logic unchanged.
- $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutSetStep(1);
+ $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutRenderQuote();sdCheckoutSetStep(1);
  if(!checkoutProvinceLoadStarted){
   checkoutProvinceLoadStarted=true;
   void loadCheckoutProvinces();
@@ -4881,9 +4881,12 @@ function openCheckout(options={}){
  prefillCheckoutFromLocalAddress().then(async()=>{
   if(!panel.classList.contains('open'))return;
   if(checkoutAddressComplete()){
+   // Render hydrated shipping details and selected products immediately.
+   // A slow quote API must not leave the Payment address/summary blank.
+   sdCheckoutSetStep(2);
    try{await sdCheckoutLoadQuote()}catch(error){sdCheckoutQuote={quoteReady:false,reason:error.message,options:[]};sdCheckoutRenderQuote()}
    if(!panel.classList.contains('open'))return;
-   sdCheckoutSetStep(2);
+   sdCheckoutRefreshChoice();
   }else sdCheckoutSetStep(1);
   $('#checkoutSubmit').disabled=false;
  });
