@@ -614,6 +614,28 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  const endpoint=await drawer.evaluate(el=>el.scrollTop);
  expect(endpoint).toBeGreaterThan(midpoint);
  await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
+
+ const layering=await page.evaluate(()=>{
+  const shell=document.querySelector('#cartDrawer');
+  const bars=['.cart-header','.cart-subtotal-bar','#cartCheckout'].map(sel=>shell.querySelector(sel));
+  const rows=[...shell.querySelectorAll('.cart-row')];
+  const describe=el=>{const s=getComputedStyle(el);return {selector:el.id||String(el.className||'').slice(0,64),position:s.position,zIndex:s.zIndex,transform:s.transform,isolation:s.isolation,opacity:s.opacity,filter:s.filter,backdrop:s.backdropFilter};};
+  const rect=el=>el.getBoundingClientRect();
+  const details=bars.map(bar=>{
+   const b=rect(bar);
+   const tests=rows.map(row=>{
+    const r=rect(row);const left=Math.max(b.left,r.left),right=Math.min(b.right,r.right),top=Math.max(b.top,r.top),bottom=Math.min(b.bottom,r.bottom);
+    if(right-left<20||bottom-top<15)return null;
+    const x=Math.round((left+right)/2),y=Math.round((top+bottom)/2);
+    const stack=document.elementsFromPoint(x,y).slice(0,9).map(el=>({element:el.id||String(el.className||'').slice(0,40),tag:el.tagName,ancestors:[...function*(e){for(let n=e;n&&n!==document.body;n=n.parentElement)yield n.id||String(n.className||'').slice(0,35)}(el)].slice(0,4)}));
+    return {x,y,row:describe(row),stack};
+   }).filter(Boolean);
+   return {bar:describe(bar),parent:describe(bar.parentElement),intersectionSamples:tests};
+  });
+  return {details,list:describe(shell.querySelector('#cartList')),footer:describe(shell.querySelector('.cart-bottom')),drawer:describe(shell)};
+ });
+ console.log('CART_FOREGROUND_LAYER_DIAGNOSTIC',JSON.stringify(layering));
+
  console.log('CART_SCROLL_SCREENSHOT_POSITIONS',JSON.stringify({top:0,middle:midpoint,bottom:endpoint,domFixtureRows:await page.locator('[data-qa-visual-tile]').count(),note:'Images require Owner visual review; computed CSS is not a 95% score'}));
 
 
