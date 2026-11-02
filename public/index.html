@@ -890,26 +890,19 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-review-row p{grid-column:1/-1;font-size:12px;font-weight:500;color:var(--ink);line-height:1.6;margin:0;overflow-wrap:anywhere}
 .checkout-drawer .sd-checkout-review-row button{border:0;background:none;color:var(--gold);font-size:11px;font-weight:650;text-decoration:underline}
 .checkout-drawer .sd-checkout-caution{color:var(--muted);line-height:1.6;display:block}
-.checkout-drawer .sd-checkout-footer{flex:0 0 auto;display:grid;gap:8px;padding:13px 0 4px;border-top:0;background:transparent;box-shadow:none}
+.checkout-drawer .sd-checkout-footer{flex:0 0 auto;display:grid;gap:9px;padding:13px 0 calc(4px + env(safe-area-inset-bottom));border-top:0;background:transparent;box-shadow:none}
 .checkout-drawer .sd-checkout-actions{display:grid;grid-template-columns:1fr 2fr;gap:9px;flex:0 0 auto;margin-top:0}
-/* Keep Checkout's existing two-action layout but give its controls the same
-   translucent face and shadow as the separate Cart bars. */
+/* Checkout keeps its two independent actions; the shared Cart/Checkout
+   optical rule below owns the material for both actions. */
 #checkoutDrawer .sd-checkout-actions .pill-btn{
-  width:100%;min-height:56px;border:1px solid transparent;border-radius:22px;
-  color:var(--ink);
-  background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55));
-  box-shadow:var(--sd-3d-shadow);
-  -webkit-backdrop-filter:blur(56.784px) saturate(114%);
-  backdrop-filter:blur(56.784px) saturate(114%);
+  width:100%;min-height:56px;border-radius:22px;color:var(--ink);
 }
-html.dark #checkoutDrawer .sd-checkout-actions .pill-btn{background:var(--sd-3d-face)}
 .checkout-drawer .sd-checkout-actions #checkoutSubmit{margin:0;max-height:none;height:auto;min-height:56px;font-size:10px;padding:10px 13px}
 .checkout-drawer .sd-checkout-actions #sdCheckoutPrev{font-size:10px}
 .checkout-drawer .sd-checkout-actions button:disabled{opacity:.62;cursor:wait}
 .checkout-drawer.sd-checkout-success .sd-checkout-actions{grid-template-columns:minmax(0,1fr)}
 .checkout-drawer.sd-checkout-success .sd-checkout-actions #sdCheckoutDone{grid-column:1;justify-self:end;width:auto;min-width:150px;max-width:240px}
-.checkout-drawer .sd-checkout-confirm-wrap{--progress:0%;position:relative;grid-column:1/-1;display:grid;place-items:center;min-height:56px;overflow:hidden;border:1px solid transparent;border-radius:999px;background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55));box-shadow:var(--sd-3d-shadow);-webkit-backdrop-filter:blur(56.784px) saturate(114%);backdrop-filter:blur(56.784px) saturate(114%)}
-html.dark #checkoutDrawer .sd-checkout-confirm-wrap{background:var(--sd-3d-face)}
+.checkout-drawer .sd-checkout-confirm-wrap{--progress:0%;position:relative;grid-column:1/-1;display:grid;place-items:center;min-height:56px;overflow:hidden;border-radius:999px}
 .checkout-drawer .sd-checkout-confirm-wrap::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--progress);border-radius:inherit;background:linear-gradient(100deg,#8ed29d,#6dbb81);transition:width 55ms linear;pointer-events:none}
 .dark .checkout-drawer .sd-checkout-confirm-wrap::before{background:linear-gradient(100deg,#328653,#246b42)}
 .checkout-drawer .sd-checkout-confirm-wrap[style*="--progress: 100%"]::before{transition:none}
@@ -1335,17 +1328,8 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 /* One shared floating glass title bar for the Cart and Checkout drawers.
    No secondary full-width header stripe: the rounded bar floats on the SAME parent glass. */
 #cartDrawer .cart-header,#checkoutDrawer .checkout-header{position:relative;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;min-height:58px;gap:12px;padding:6px 10px;border-radius:22px}
-/* Checkout title now matches the Cart's actual floating glass bar.
-   Its parent sheet and independently scrolling form are deliberately unchanged. */
-#checkoutDrawer .checkout-header{
-  border:1px solid transparent;
-  background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55));
-  box-shadow:var(--sd-3d-shadow);
-  -webkit-backdrop-filter:blur(56.784px) saturate(114%);
-  backdrop-filter:blur(56.784px) saturate(114%);
-  isolation:isolate;
-}
-html.dark #checkoutDrawer .checkout-header{background:var(--sd-3d-face)}
+/* Checkout header uses the exact same Cart header geometry and film below.
+   Keep checkout form scrolling independent to protect QR and payment inputs. */
 #cartDrawer #cartClose{margin-left:auto;flex:0 0 auto}
 .checkout-heading{display:flex;align-items:center;gap:12px;min-width:0}
 #cartDrawer .cart-header h2,#checkoutDrawer .checkout-heading h2{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font:700 25px/1.2 SD Serif,Georgia,serif;text-align:center;white-space:nowrap;pointer-events:none;max-width:calc(100% - 104px);overflow:hidden;text-overflow:ellipsis}
@@ -2236,15 +2220,17 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
   -webkit-backdrop-filter:blur(17px) saturate(114%);
   backdrop-filter:blur(17px) saturate(114%);
 }
-/* The drawer itself already filters the page. A second strong, near-opaque
-   shell buries the passing product colours. Keep the same prismatic glass
-   family, but use its more transmissive single-film face on only these bars. */
+/* Cart is the visual source of truth. These *same* CSS declarations now
+   paint Checkout's title, footer actions and green confirmation slider shell.
+   The slider progress/thumb retain their own green layers and behaviour.
+   No new surface is added to either drawer, and neither product nor QR changes. */
 #cartDrawer .cart-header,
 #cartDrawer .cart-subtotal-bar,
-#cartDrawer #cartCheckout{
+#cartDrawer #cartCheckout,
+#checkoutDrawer .checkout-header,
+#checkoutDrawer .sd-checkout-actions .pill-btn,
+#checkoutDrawer .sd-checkout-confirm-wrap{
   border:1px solid transparent;
-  /* Local frosted film only on these three bars: photo remains translucent but
-     scrolling product lettering must not stay legible. 40% stronger blur only. No parent/row changes. */
   background:linear-gradient(145deg,rgba(255,255,255,.70),rgba(255,255,255,.55))!important;
   box-shadow:var(--sd-3d-shadow)!important;
   -webkit-backdrop-filter:blur(56.784px) saturate(114%);
@@ -2264,7 +2250,10 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 }
 html.dark #cartDrawer .cart-header,
 html.dark #cartDrawer .cart-subtotal-bar,
-html.dark #cartDrawer #cartCheckout{
+html.dark #cartDrawer #cartCheckout,
+html.dark #checkoutDrawer .checkout-header,
+html.dark #checkoutDrawer .sd-checkout-actions .pill-btn,
+html.dark #checkoutDrawer .sd-checkout-confirm-wrap{
   background:var(--sd-3d-face)!important;
 }
 html.dark .nav-wrap .nav{background:var(--sd-glass-shell-strong)!important;box-shadow:var(--sd-3d-shadow)!important}
@@ -2676,6 +2665,7 @@ html.dark{
  .sd-fullscreen-share,.pill-btn,.checkout-backlink,.qty-controls button,
  .remove-item,.navlink,.text-link,.contact-link,.product-card,.catalog-card,
  .cart-row,.checkout-drawer .sd-checkout-option,.checkout-drawer .sd-checkout-copy,
+ .checkout-drawer .sd-checkout-confirm-wrap,
  #productOverlay .sd-product-option-chip,#productOverlay .detail-purchase-button,
  #accountDrawer .account-action,#accountDrawer #sdCustomerAuth,
  #accountDrawer .account-guest)::after{
