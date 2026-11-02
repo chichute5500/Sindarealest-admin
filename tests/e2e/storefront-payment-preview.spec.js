@@ -124,7 +124,8 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  await page.addInitScript(()=>localStorage.setItem('sd-shipping-address',JSON.stringify({fullName:'Khách kiểm tra Preview',phone:'0900000000',email:'',province:'Thành phố Hồ Chí Minh',provinceCode:'79',ward:'Phường Bà Rịa',wardCode:'26560',streetAddress:'Địa chỉ thử nghiệm Preview'})));
  // Keep address selection deterministic in the isolated Preview browser run; the payment/order API remains real.
  let divisionRequests=0;
- await page.route('https://provinces.open-api.vn/api/v2/p/**',async route=>{
+ // Intercept /p/ list and /p/<id>?depth=2 as the working order test does.
+ await page.context().route(/^https:\/\/provinces\.open-api\.vn\/api\/v2\/p(?:\/.*)?(?:\?.*)?$/,async route=>{
   divisionRequests++;
   const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, OPTIONS','Access-Control-Allow-Headers':route.request().headers()['access-control-request-headers']||'*','Access-Control-Max-Age':'86400'};
   if(route.request().method()==='OPTIONS'){await route.fulfill({status:204,headers:cors});return}
