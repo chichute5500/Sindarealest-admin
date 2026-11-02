@@ -494,7 +494,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
 });
 
 
-test('four-item mobile cart has one scroll surface without a clipped inner list',async({page})=>{
+test('eight-item mobile cart scrolls product text and photos behind three sticky glass bars',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light'});
  const response=await page.goto(url,{waitUntil:'domcontentloaded'});
@@ -528,24 +528,24 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
    await page.locator('#detailClose').click();
   }
   const lines=await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('sd-cart')||'{}')).length);
-  if(lines>=4)break;
+  if(lines>=8)break;
  }
  await page.locator('#mobileCartNav').click();
  const drawer=page.locator('#cartDrawer'),rows=page.locator('#cartList .cart-row');
  await expect(drawer).toHaveClass(/open/);
  // Catalog pagination/options may expose fewer than four distinct ready-to-add items.
- // The fourth tile is a visual-only DOM fixture for scroll clipping (never a real order).
+ // Any missing rows are DOM-only fixtures for visual scroll QA (never a real order).
  const available=await rows.count();
  expect(available).toBeGreaterThanOrEqual(2);
- if(available<4)await rows.last().evaluate((row,count)=>{
+ if(available<8)await rows.last().evaluate((row,count)=>{
   const list=row.parentElement;
-  for(let i=count;i<4;i++){
+  for(let i=count;i<8;i++){
    const fixture=row.cloneNode(true);fixture.dataset.qaVisualTile='true';
-   fixture.querySelector('.cart-row-copy strong').textContent='Sản phẩm kiểm tra bố cục số '+(i+1);
+   fixture.querySelector('.cart-row-copy strong').textContent='GIÀY DA CÁ SẤU SIÊU CẤP VIP MẪU '+(i+1)+' - THIẾT KẾ ĐẶC BIỆT';
    list.appendChild(fixture);
   }
  },available);
- await expect(rows).toHaveCount(4);
+ await expect(rows).toHaveCount(8);
  // Check the real browser-computed material, including rim, rather than only
  // searching for matching CSS token strings. Geometry and content may differ.
  const opticalScores=await drawer.evaluate(el=>{
@@ -574,7 +574,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
    return {logoHeader:read(document.querySelector('.nav-wrap .nav')),drawer:read(el),cartList:read(el.querySelector('#cartList')),cartHeader:read(el.querySelector('.cart-header')),subtotal:read(el.querySelector('.cart-subtotal-bar')),payment:read(el.querySelector('#cartCheckout'))};
   });
   console.log('CART_GLASS_STACKING_AND_COMPOSITING_DIAGNOSTICS',JSON.stringify(layers));
- // Real four-item carts can contain long luxury product names. Reserve their
+ // Eight-item carts can contain long luxury product names. Reserve their
  // full card height in the visual fixture to reproduce the 390x844 overflow.
  await rows.evaluateAll(nodes=>nodes.forEach(row=>{row.style.minHeight='174px'}));
  await expect(page.locator('#cartDrawer .cart-subtotal-bar #cartSubtotal')).toBeVisible();
@@ -602,18 +602,31 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
  // scrollHeight/2 is NOT the midpoint of the usable scroll range: it usually
  // clamps to the end and made prior middle/end screenshots indistinguishable.
  const maxScroll=await drawer.evaluate(el=>Math.max(0,el.scrollHeight-el.clientHeight));
- expect(maxScroll,'Four-item visual QA must have an actual scroll range').toBeGreaterThan(24);
+ expect(maxScroll,'Eight-item visual QA must have an actual scroll range').toBeGreaterThan(24);
  await drawer.evaluate(el=>el.scrollTop=0);
- await page.screenshot({path:join(output,'390x844-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
+ await page.screenshot({path:join(output,'390x844-cart-eight-products-top.png'),fullPage:false,animations:'disabled'});
  await drawer.evaluate(el=>el.scrollTop=Math.floor((el.scrollHeight-el.clientHeight)/2));
  const midpoint=await drawer.evaluate(el=>el.scrollTop);
  expect(midpoint).toBeGreaterThan(0);
  expect(midpoint).toBeLessThan(maxScroll);
- await page.screenshot({path:join(output,'390x844-cart-four-products-middle.png'),fullPage:false,animations:'disabled'});
+ await page.screenshot({path:join(output,'390x844-cart-eight-products-middle.png'),fullPage:false,animations:'disabled'});
  await drawer.evaluate(el=>el.scrollTop=el.scrollHeight-el.clientHeight);
  const endpoint=await drawer.evaluate(el=>el.scrollTop);
  expect(endpoint).toBeGreaterThan(midpoint);
- await page.screenshot({path:join(output,'390x844-cart-four-products-scrolled.png'),fullPage:false,animations:'disabled'});
+ await page.screenshot({path:join(output,'390x844-cart-eight-products-scrolled.png'),fullPage:false,animations:'disabled'});
+
+ // Eight scroll points expose real images, product names, prices and quantity
+ // controls behind the glass. These are visual-only DOM fixtures, not orders.
+ for(const [index,fraction] of [0,.15,.3,.45,.6,.75,.9,1].entries()){
+  await drawer.evaluate((el,f)=>{el.scrollTop=Math.round((el.scrollHeight-el.clientHeight)*f);},fraction);
+  await page.waitForTimeout(100);
+  await page.screenshot({path:join(output,'390x844-cart-eight-items-position-'+String(index).padStart(2,'0')+'.png'),fullPage:false,animations:'disabled'});
+  if([2,4,6].includes(index)){
+   await page.locator('#cartDrawer .cart-subtotal-bar').screenshot({path:join(output,'390x844-eight-items-subtotal-'+index+'.png'),animations:'disabled'});
+   await page.locator('#cartDrawer #cartCheckout').screenshot({path:join(output,'390x844-eight-items-pay-'+index+'.png'),animations:'disabled'});
+  }
+ }
+
 
  const layering=await page.evaluate(()=>{
   const shell=document.querySelector('#cartDrawer');
@@ -640,7 +653,7 @@ test('four-item mobile cart has one scroll surface without a clipped inner list'
 
  await page.setViewportSize({width:360,height:800});
  await drawer.evaluate(el=>el.scrollTop=0);
- await page.screenshot({path:join(output,'360x800-cart-four-products-top.png'),fullPage:false,animations:'disabled'});
+ await page.screenshot({path:join(output,'360x800-cart-eight-products-top.png'),fullPage:false,animations:'disabled'});
  await drawer.evaluate(el=>el.scrollTop=el.scrollHeight-el.clientHeight);
- await page.screenshot({path:join(output,'360x800-cart-four-products-bottom.png'),fullPage:false,animations:'disabled'});
+ await page.screenshot({path:join(output,'360x800-cart-eight-products-bottom.png'),fullPage:false,animations:'disabled'});
 });
