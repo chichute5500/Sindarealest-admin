@@ -4782,8 +4782,10 @@ function openCart(event){cartReturnFocus=event?.currentTarget||document.activeEl
 function closeCart(restoreFocus=true){const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');if(!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';const target=cartReturnFocus;cartReturnFocus=null;if(restoreFocus&&wasOpen)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';const fallback=$('#cartOpen')||$('#mobileCartNav');(available?target:fallback)?.focus({preventScroll:true})},0)}
 
 let sdCheckoutStep=1,sdCheckoutQuote=null,sdCheckoutChoice="",sdCheckoutSuccess=false,sdCheckoutOrderCreated=false,sdCheckoutOrderCreating=false,checkoutPreselectedChoice="",checkoutOpenEpoch=0;
-let checkoutItemsOverride=null,checkoutFromCart=true;
-function sdCheckoutItems(){return checkoutItemsOverride?checkoutItemsOverride.map(item=>({...item})):selectedCartEntries().map(({id,option,q})=>({id,option,quantity:q}))}
+let checkoutItemsOverride=null,checkoutFromCart=true,checkoutSessionItems=null;
+/* All steps, the quote and final order must use one frozen selection.
+   A cart/catalog refresh must never empty or silently change an open order. */
+function sdCheckoutItems(){return (checkoutSessionItems||[]).map(item=>({...item}))}
 function sdCheckoutSummary(selector){
  const target=$(selector);if(!target)return;target.replaceChildren();
  for(const {id,quantity,option} of sdCheckoutItems()){
@@ -4868,10 +4870,17 @@ function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected(),payment=
 function openCheckout(options={}){
  dismissToast();
  renderCart();
+ checkoutSessionItems=null;
  checkoutItemsOverride=Array.isArray(options.items)?options.items.map(item=>({...item})):null;checkoutFromCart=!checkoutItemsOverride;checkoutPreselectedChoice=['deposit','full'].includes(options.paymentChoice)?options.paymentChoice:'';
  const entries=checkoutItemsOverride?checkoutItemsOverride:selectedCartEntries();
  if(!entries.length){showToast('Chọn ít nhất một sản phẩm trong giỏ để thanh toán.');checkoutItemsOverride=null;checkoutFromCart=true;return}
  const missing=entries.find(({id,option})=>{const p=findProductByKey(id);return productOptionKind(p)&&!option});if(missing){checkoutItemsOverride=null;checkoutFromCart=true;closeCart(false);openDetail(missing.id);focusDetailOption();return}
+ checkoutSessionItems=entries.map(item=>({
+  id:String(item.id||''),
+  option:String(item.option||''),
+  quantity:Number(item.quantity??item.q)
+ })).filter(item=>item.id&&Number.isSafeInteger(item.quantity)&&item.quantity>0);
+ if(!checkoutSessionItems.length){checkoutItemsOverride=null;checkoutFromCart=true;showToast('Không xác định được sản phẩm thanh toán. Vui lòng chọn lại.');return}
  if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('checkout');
  checkoutReturnFocus=document.activeElement;
  closeCart(false);$('#cartDrawer').setAttribute('inert','');
@@ -4925,6 +4934,7 @@ function closeCheckout(restoreFocus=true){
  if(!panel)return;
  const wasOpen=panel.classList.contains('open');
  panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');
+ checkoutOpenEpoch++;checkoutSessionItems=null; // invalidate slow quote responses
  backdrop.classList.remove('open');
  if(!$('#cartDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open')&&!$('#productOverlay').classList.contains('open'))document.body.style.overflow='';
  const target=checkoutReturnFocus;checkoutReturnFocus=null;
