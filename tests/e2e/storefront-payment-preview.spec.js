@@ -672,4 +672,19 @@ test('eight-item mobile cart scrolls product text and photos behind three sticky
  await page.screenshot({path:join(output,'360x800-cart-eight-products-top.png'),fullPage:false,animations:'disabled'});
  await drawer.evaluate(el=>el.scrollTop=el.scrollHeight-el.clientHeight);
  await page.screenshot({path:join(output,'360x800-cart-eight-products-bottom.png'),fullPage:false,animations:'disabled'});
+ // Desktop scrolls the inner Cart list, unlike mobile's outer drawer scroll.
+ // Verify the shipped optical lens survives switching to that scroll root.
+ await page.setViewportSize({width:1280,height:800});
+ const desktopList=page.locator('#cartList');
+ await expect(desktopList).toHaveCSS('overflow-y','auto');
+ const desktopScroll=await desktopList.evaluate(el=>{
+  const maxScroll=Math.max(0,el.scrollHeight-el.clientHeight);
+  el.scrollTop=maxScroll*.5;
+  return {maxScroll,scrollTop:el.scrollTop};
+ });
+ expect(desktopScroll.maxScroll,'Eight-item desktop Cart must have enough rows to scroll').toBeGreaterThan(24);
+ expect(desktopScroll.scrollTop).toBeGreaterThan(0);
+ await page.waitForTimeout(160);
+ await expect(page.locator('#cartDrawer .sd-cart-optical-lens')).toHaveCount(3);
+ await page.screenshot({path:join(output,'1280x800-cart-eight-items-desktop-list-scrolled.png'),fullPage:false,animations:'disabled'});
 });
