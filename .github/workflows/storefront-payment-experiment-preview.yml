@@ -11,6 +11,8 @@ on:
       - feat/storefront-payment-cod-sync-20261101
     paths:
       - 'public/index.html'
+      - 'public/cart-glass-optics.js'
+      - 'public/checkout-glass-optics.js'
       - 'public/admin/index.html'
       - 'functions/**'
       - 'migrations/0018_payment_delivery_settlement.sql'
@@ -26,6 +28,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: storefront-payment-experiment-preview
@@ -118,3 +121,21 @@ jobs:
             echo "Production writes: none"
             echo "Preview D1: additive migration only, after identity comparison"
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Report actual Preview QA result on exact commit
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SD_PREVIEW_QA_RESULT: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feat/storefront-payment-cod-sync-20261101'
+          case "$SD_PREVIEW_QA_RESULT" in
+            success) state=success ;;
+            cancelled|failure|timed_out) state=failure ;;
+            *) state=error ;;
+          esac
+          target="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          payload=$(node -e 'process.stdout.write(JSON.stringify({state:process.argv[1],context:"sindarealest/payment-preview-browser-qa",description:"Guarded Preview deploy and mobile Playwright result",target_url:process.argv[2]}))' "$state" "$target")
+          curl --fail --silent --show-error -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" -d "$payload" "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"
