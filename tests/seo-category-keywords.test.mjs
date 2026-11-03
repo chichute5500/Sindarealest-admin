@@ -110,4 +110,48 @@ assert.deepEqual(readBreadcrumbs(productBody).map(x=>x.name),[
 
 assert.ok(!productBody.includes('"@type":"Offer"'),"Do not invent verified prices");
 assert.ok(!productBody.includes('"@type":"AggregateRating"'),"Do not invent reviews");
+
+// Pagination is crawlable without JavaScript: after eight cards a native
+// category link leads to eight more published products via distinct URL.
+const makeCatalogProduct = n => ({
+  id:"product-"+n,slug:"sku-"+n,sku:"SD-SN"+String(n).padStart(3,"0"),
+  sku_verified:1,title:"Giày mẫu "+n,category:"sneakers",
+  published:1,images_json:"[]",fulfillment_type:"in_stock"
+});
+const fakeRows=Array.from({length:17},(_,i)=>makeCatalogProduct(i+1));
+const pageQueries=[];
+const catalogDb={prepare(sql){
+  pageQueries.push(sql);
+  const query={bind(){return query},async all(){
+    const off=Number(sql.match(/OFFSET (\d+)/)?.[1]||0);
+    return {results:fakeRows.slice(off,off+9)};
+  }};
+  return query;
+}};
+const pageHtml=await storefront({
+  request:new Request(origin+"/sanpham/sneaker?page=2"),
+  env:{DB:catalogDb},
+  next:async()=>new Response(html,{headers:{"Content-Type":"text/html; charset=utf-8"}})
+});
+assert.equal(pageHtml.status,200);
+const pageText=await pageHtml.text();
+assert.ok(pageQueries.some(q=>q.includes("LIMIT 9 OFFSET 8")),"Crawlable page 2 must query the second product group");
+assert.ok(pageText.includes('href="/sanpham/sneaker?page=3"'),"Next page link is a native href");
+assert.ok(pageText.includes('href="/sanpham/sneaker"'),"Previous page 1 has a native href");
+assert.ok(pageText.includes('/sanpham/sneaker/SD-SN009'),"Page 2 contains item nine");
+assert.ok(!pageText.includes('href="/sanpham/sneaker/SD-SN001"'),"Page 2 does not repeat page 1 item");
+assert.ok(pageText.includes('rel="canonical" href="'+origin+'/sanpham/sneaker?page=2"'),"Page 2 canonical is unique");
+assert.ok(pageText.includes("Trang 2"),"Page 2 has distinct title");
+assert.deepEqual(readBreadcrumbs(pageText).map(x=>x.item),[
+  origin+"/",origin+"/sanpham",origin+"/sanpham/sneaker"
+]);
+assert.ok(html.includes("href=\"\${pageHref(n)}\""),"Hydrated pagination maintains real anchor links");
+assert.ok(html.includes("new URLSearchParams(location.search).get('page')"),"SPA respects direct page URL");
+const rejectInvalid=await storefront({
+  request:new Request(origin+"/sanpham/sneaker?page=999"),
+  env:{DB:catalogDb},
+  next:async()=>new Response(html,{headers:{"Content-Type":"text/html; charset=utf-8"}})
+});
+assert.equal(rejectInvalid.status,404,"Out-of-bounds page URLs must not create crawl traps");
+
 console.log("PASS: 15 unique keyword category profiles, canonical URLs and verified category/product BreadcrumbList hierarchies.");
