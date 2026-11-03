@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm ci --no-audit --no-fund
+          npm install --no-audit --no-fund
           npm run check
       - name: Backup via Time Travel bookmark then apply exactly migration 0018
         run: node scripts/apply-production-payment-migration-0018.mjs
