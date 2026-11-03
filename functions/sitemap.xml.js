@@ -55,3 +55,20 @@ export async function onRequestGet({ request, env }) {
     return fallbackSitemap(origin);
   }
 }
+
+/**
+ * Cloudflare Pages invokes GET and HEAD through separate handlers.
+ * A missing HEAD handler previously caused Cloudflare to return 404/noindex
+ * even while GET served a valid XML sitemap. HEAD needs only metadata and
+ * must not perform a D1 read.
+ */
+export function onRequestHead({ request }) {
+  const hostname = new URL(request.url).hostname.toLowerCase();
+  const previewHost = hostname.endsWith(".sindarealest2.pages.dev")
+    && hostname !== "sindarealest2.pages.dev";
+  if (previewHost) return new Response(null, {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" }
+  });
+  return new Response(null, { status: 200, headers: xmlResponse("").headers });
+}

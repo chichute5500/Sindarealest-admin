@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { onRequestGet as sitemap } from "../functions/sitemap.xml.js";
+import { onRequestGet as sitemap, onRequestHead as sitemapHead } from "../functions/sitemap.xml.js";
 
 const DB = {
   prepare(sql) {
@@ -48,3 +48,17 @@ for (const { env, label } of fallbackCases) {
 }
 const preview = await sitemap({ request: new Request("https://test.sindarealest2.pages.dev/sitemap.xml"), env: {} });
 assert.equal(preview.status, 404, "Preview should never expose an indexable sitemap");
+
+const noDbHead = await sitemapHead({
+  request: new Request("https://shop.example/sitemap.xml", { method: "HEAD" }),
+  env: { DB: { prepare() { throw Error("HEAD must never query D1"); } } },
+});
+assert.equal(noDbHead.status, 200, "HEAD should not return Cloudflare 404");
+assert.match(noDbHead.headers.get("Content-Type"), /application\/xml/);
+assert.equal(noDbHead.headers.get("X-Robots-Tag"), null, "Public sitemap HEAD must not be noindex");
+assert.equal(await noDbHead.text(), "", "HEAD must have no body");
+const previewHead = await sitemapHead({
+  request: new Request("https://test.sindarealest2.pages.dev/sitemap.xml", { method: "HEAD" }),
+});
+assert.equal(previewHead.status, 404, "Preview sitemap must remain private for HEAD");
+assert.equal(previewHead.headers.get("X-Robots-Tag"), "noindex, nofollow");
