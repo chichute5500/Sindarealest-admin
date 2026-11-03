@@ -70,6 +70,22 @@ try {
   assert.equal(sitemapHead.headers.get("x-robots-tag"), null);
   assert.equal(await sitemapHead.text(), "");
 
+  // Static sitemap is served by Pages assets rather than a D1-backed Function.
+  const staticSitemapGet = await fetchWithTimeout("/sitemap-pages.xml");
+  assert.equal(staticSitemapGet.status, 200, "Static sitemap must bypass function routing");
+  assert.match(staticSitemapGet.headers.get("content-type") || "", /application\/xml/i);
+  assert.equal(staticSitemapGet.headers.get("x-robots-tag"), null);
+  const staticXml = await staticSitemapGet.text();
+  assert.match(staticXml, /<loc>https:\/\/sindarealest2\.pages\.dev\/sanpham\/sneaker<\/loc>/);
+  assert.equal((staticXml.match(/<url>/g) || []).length, 17);
+
+  const staticSitemapHead = await fetch(new URL("/sitemap-pages.xml", origin), {
+    method: "HEAD", signal: AbortSignal.timeout(2500)
+  });
+  assert.equal(staticSitemapHead.status, 200);
+  assert.match(staticSitemapHead.headers.get("content-type") || "", /application\/xml/i);
+  assert.equal(await staticSitemapHead.text(), "");
+
   const admin = await fetchWithTimeout("/admin/");
   assert.equal(admin.status, 200, "Admin login page should remain reachable through Pages redirect rules");
   assert.match(await admin.text(), /Quản trị SinDarealest/i);
