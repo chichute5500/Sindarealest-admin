@@ -58,9 +58,10 @@ assert.match(adminOrders, /body\?\.paymentStatus !== undefined/, "Admin order PA
 assert.doesNotMatch(adminOrders, /SET status=\?,payment_status=COALESCE/, "order PATCH must never set payment status from a client field");
 const paymentRequestApi = read("../functions/api/admin/payment-requests.js");
 assert.match(paymentRequestApi, /Object\.hasOwn\(body, "amount"\)/, "client-supplied amount must be rejected");
-assert.match(paymentRequestApi, /calculateCheckoutQuote\(\[\{unitPrice:total,quantity:1\}\]\)\.options\[0\]\.amount/, "Admin must use the shared quote for the 30% deposit rounded up to 100k increments");
+assert.match(paymentRequestApi, /calculateCheckoutQuote\(items\.map\(/, "Admin must use item fulfillment type in deposit quotes");
+assert.match(paymentRequestApi, /selected\.selectedPaymentAmount/, "Admin must preserve customer-agreed amount on existing orders");
 assert.doesNotMatch(paymentRequestApi, /fulfillmentTypes\.size !== 1|fulfillmentType === "unclassified"/, "all products remain deliverable under the same two payment methods");
-assert.match(read("../functions/_payments.js"), /Math\.ceil\(\(total\*0\.3\)\/100000\)\*100000/, "shared deposit formula rounds up to 100k increments");
+assert.match(read("../functions/_payments.js"), /fulfillmentType==="in_stock"\?100000:Math\.ceil\(\(total\*0\.3\)\/100000\)\*100000/, "fixed in-stock 100k plus rounded 30% for other fulfillment types");
 assert.match(paymentRequestApi, /shippingBenefit = "free_shipping"/, "full payment alone grants free shipping");
 assert.match(paymentRequestApi, /selectedTerms\?\.shortfall/, "supplemental amount must use the selected checkout terms and verified ledger");
 assert.doesNotMatch(read("../public/admin/index.html"), /data-payment-amount=/, "Admin must not send a client-controlled amount");

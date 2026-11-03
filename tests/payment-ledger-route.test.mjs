@@ -459,7 +459,7 @@ for (const [label, amount] of [
   })));
   const payload = await response.json();
   assert.equal(response.status, 201);
-  assert.equal(payload.amount, 200000, "in-stock deposit also uses 30% rounded up to the next 100,000 VND");
+  assert.equal(payload.amount, 100000, "all in-stock deposits use fixed 100,000 VND");
   assert.equal(payload.shippingBenefit, "standard_shipping");
   assert.equal(payload.freeShippingApplied, false);
 }

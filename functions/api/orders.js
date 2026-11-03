@@ -80,7 +80,7 @@ export async function onRequestPost({ request, env }) {
     const selectedPaymentOption = body.paymentOption == null || body.paymentOption === "" ? "" : String(body.paymentOption);
     if (selectedPaymentOption && !["deposit","full"].includes(selectedPaymentOption)) return fail("Phương thức thanh toán đã chọn không hợp lệ.", 400);
     const serverQuote = calculateCheckoutQuote(items.map(i => ({fulfillmentType:i.fulfillmentType,unitPrice:i.price,quantity:i.quantity})));
-    if (serverQuote.eligible && !selectedPaymentOption) return fail("Vui lòng chọn đặt cọc 30% hoặc thanh toán toàn bộ giảm 5% trước khi gửi đơn.",400);
+    if (serverQuote.eligible && !selectedPaymentOption) return fail("Vui lòng chọn đặt cọc hoặc thanh toán toàn bộ giảm 5% trước khi gửi đơn.",400);
     if (selectedPaymentOption) {
       if (!serverQuote.eligible) return fail("Giá hoặc tình trạng hàng đã thay đổi. Vui lòng kiểm tra lại bước thanh toán.", 409);
       if (!Number.isSafeInteger(body.quotedTotal) || body.quotedTotal !== serverQuote.total) return fail("Giá trị đơn đã thay đổi. Vui lòng xem lại lựa chọn thanh toán.", 409);
@@ -188,7 +188,7 @@ export async function onRequestPost({ request, env }) {
     const writes=await env.DB.batch(statements);
     const paymentReady=paymentRequestWriteIndex>=0&&Number(writes?.[paymentRequestWriteIndex]?.meta?.changes||0)===1;
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
-    const paymentSummary=selectedPaymentOption&&priceKnown?summarizeOrderPayment({total:subtotal,paymentOption:selectedPaymentOption,transactions:[],termsConfirmed:paymentTermsConfirmed,hasPendingRequest:paymentReady}):null;
+    const paymentSummary=selectedPaymentOption&&priceKnown?summarizeOrderPayment({total:subtotal,paymentOption:selectedPaymentOption,agreedAmount:selectedAmount,transactions:[],termsConfirmed:paymentTermsConfirmed,hasPendingRequest:paymentReady}):null;
     const paymentInstructions=paymentReady?{status:"ready",qrImageUrl:"/payment-qr/"+qrSnapshot.key,qrIncludesAmount:false,amount:qrSnapshot.amount,bankName:qrSnapshot.bankName,accountName:qrSnapshot.accountName,accountNumber:qrSnapshot.accountNumber,transferContent:transferReference}:null;
     const message=paymentReady?"Shop đã tiếp nhận đơn. Sẽ bắt đầu làm sản phẩm khi đã nhận được khoản thanh toán.":priceKnown?"QR chuyển khoản chưa sẵn sàng. Shop sẽ gửi hướng dẫn thanh toán sớm.":"Shop đã tiếp nhận yêu cầu. Giá sẽ được xác nhận trước khi gửi hướng dẫn thanh toán.";
     return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", deliveryStatus:"not_shipped", priceConfirmationRequired: !priceKnown, paymentTermsConfirmed, paymentReady, total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, paymentSummary, paymentInstructions, message }, 201);

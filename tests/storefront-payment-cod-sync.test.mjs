@@ -8,6 +8,19 @@ assert.deepEqual(quote.options.map(({value,amount,discountAmount,codExpected})=>
  {value:'full',amount:4_275_000,discountAmount:225_000,codExpected:0},
 ]);
 
+const inStockQuote=calculateCheckoutQuote([{fulfillmentType:'in_stock',unitPrice:4_500_000,quantity:1}]);
+assert.equal(inStockQuote.options[0].amount,100_000);
+assert.equal(inStockQuote.options[0].codExpected,4_400_000);
+assert.equal(inStockQuote.options[0].label,'Đặt cọc 100.000đ');
+const oldAgreement=summarizeOrderPayment({total:4_500_000,paymentOption:'deposit',agreedAmount:1_400_000,termsConfirmed:true,transactions:[{direction:'received',amount:100_000}]});
+assert.equal(oldAgreement.requiredAmount,1_400_000,'historical agreements are never lowered retroactively');
+assert.equal(oldAgreement.shortfall,1_300_000);
+const stockAgreement=summarizeOrderPayment({total:4_500_000,paymentOption:'deposit',agreedAmount:100_000,termsConfirmed:true,transactions:[{direction:'received',amount:100_000}]});
+assert.equal(stockAgreement.requiredAmount,100_000);
+assert.equal(stockAgreement.shortfall,0);
+assert.equal(stockAgreement.codRemaining,4_400_000);
+assert.equal(stockAgreement.eligibleToShip,true);
+
 const state=(paymentOption,bankReceived,codReceivedAmount=0,termsConfirmed=true,transactions=null)=>summarizeOrderPayment({
  total:4_500_000,paymentOption,termsConfirmed,codReceivedAmount,
  transactions:transactions|| (bankReceived?[{direction:'received',amount:bankReceived,actor:'admin'}]:[]),
