@@ -1346,6 +1346,15 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    cart:visible('#cartDrawer'),cartHeader:visible('#cartDrawer .cart-header'),
    checkoutHeader:visible('#checkoutDrawer .checkout-header')};
  });
+ // Headless runner/compositor reference under the same 65-rAF
+ // sampler to avoid falsely blaming CI slowdown on the website.
+ for(const {width,height} of [{width:390,height:844},{width:1280,height:800}]){
+  await page.setViewportSize({width,height});
+  await page.goto('about:blank');
+  const baseline=await sampleFrames();
+  report.push({surface:'blank-baseline',width,mode:'neutral',perf:baseline});
+  console.log('SD_FRAME_RUNNER_BASELINE',JSON.stringify({width,...baseline}));
+ }
  for(const {width,height} of [{width:390,height:844},{width:430,height:932},{width:1280,height:800}]){
   for(const mode of ['light','dark']){
    await page.setViewportSize({width,height});await page.emulateMedia({colorScheme:mode});
