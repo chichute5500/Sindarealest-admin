@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Script,runInNewContext } from 'node:vm';
 import { onRequest as middleware } from '../functions/_middleware.js';
-import { catalogListingPath,isKnownCatalogCategoryRoute,productCategoryRouteSlug } from '../functions/_storefront-route.js';
+import { catalogListingPath,isKnownCatalogCategoryRoute,productCategoryRouteSlug,PRODUCT_CATEGORY_ROUTE_SLUGS } from '../functions/_storefront-route.js';
 import { onRequestGet as sitemap } from '../functions/sitemap.xml.js';
 
 const html='<html><head><title>Trang chủ</title><link rel="canonical" href="https://shop.example/"></head><body>Storefront</body></html>';
