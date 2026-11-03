@@ -1600,3 +1600,62 @@ for(const cfg of [
   console.log('SD_MOBILE_DRAWER_FIXED_VISUAL_QA',JSON.stringify({width:cfg.width,scheme:cfg.scheme,cartFull,finalPath:await page.evaluate(()=>location.pathname+location.hash)}));
  });
 }
+
+
+// Account uses the identical real-pixel frosted plane as Cart.
+// Check actual computed materials, separate cards and touch navigation on the deployed Preview.
+for(const sample of [
+ {width:390,height:844,theme:'light'},
+ {width:390,height:844,theme:'dark'},
+ {width:360,height:800,theme:'light'},
+ {width:430,height:932,theme:'light'}
+]){
+ test('Account native Cart background '+sample.width+' '+sample.theme,async({page})=>{
+  await page.setViewportSize({width:sample.width,height:sample.height});
+  await page.emulateMedia({colorScheme:sample.theme,reducedMotion:'reduce'});
+  const mock=[{id:'qa-account-glass',slug:'qa-account-glass',sku:'QA-ACCOUNT-GLASS',skuVerified:true,title:'Sản phẩm QA',category:'wallets',categoryLabel:'Ví nam',images:['images/brand-emblem.png'],price:4500000,sourcePriceConfirmed:true,fulfillmentType:'in_stock',published:true}];
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mock)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  await page.locator('#mobileCartNav').click();
+  await expect(page.locator('#cartDrawer')).toHaveClass(/\bopen\b/);
+  await page.waitForTimeout(500); // Observe settled Cart slide-in, not the entering transform.
+  const cartBox=await page.locator('#cartDrawer').boundingBox();
+  await page.locator('#mobileAccountNav').click();
+  await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
+  await expect(page.locator('#cartDrawer')).not.toHaveClass(/\bopen\b/);
+  await expect.poll(()=>page.locator('#accountDrawer').evaluate(el=>parseFloat(el.style.getPropertyValue('--sd-native-glass-height'))||0)).toBeGreaterThan(200);
+  const result=await page.evaluate(()=>{
+   const cart=document.querySelector('#cartDrawer'),account=document.querySelector('#accountDrawer');
+   const surface=el=>{
+    const outer=getComputedStyle(el),plane=getComputedStyle(el,'::before');
+    return {root:outer.backgroundColor,rootBlur:outer.backdropFilter,planeColor:plane.backgroundColor,planeBlur:plane.backdropFilter,planeWidth:parseFloat(plane.width),planeHeight:parseFloat(plane.height),nativeHeight:el.clientHeight,nativeWidth:el.clientWidth,planePointer:plane.pointerEvents};
+   };
+   const actions=[...document.querySelectorAll('#accountMenuView>.account-action')];
+   const gaps=actions.slice(1).map((el,i)=>el.getBoundingClientRect().top-actions[i].getBoundingClientRect().bottom);
+   return {cart:surface(cart),account:surface(account),gaps,actions:actions.length,noteExists:!!document.querySelector('#accountMenuView .account-note'),accountFrame:account.getBoundingClientRect().toJSON()};
+  });
+  for(const key of ['root','rootBlur','planeColor','planeBlur','planePointer'])
+   expect(result.account[key],'Account must share Cart '+key).toBe(result.cart[key]);
+  expect(result.account.rootBlur).toBe('none');
+  expect(result.account.planeBlur).toContain('blur(24px)');
+  expect(Math.abs(result.account.planeWidth-result.account.nativeWidth)).toBeLessThanOrEqual(1);
+  expect(Math.abs(result.account.planeHeight-result.account.nativeHeight)).toBeLessThanOrEqual(1);
+  expect(result.actions).toBe(5);
+  expect(result.noteExists).toBe(false);
+  for(const gap of result.gaps)expect(gap,'Each Account card has an independent gap').toBeGreaterThanOrEqual(10);
+  for(const axis of [['x','x'],['y','y'],['width','width'],['height','height']])
+   expect(Math.abs(result.accountFrame[axis[0]]-cartBox[axis[1]])).toBeLessThanOrEqual(1);
+  await page.screenshot({path:join(output,'account-native-cart-glass-'+sample.width+'-'+sample.theme+'.png'),animations:'disabled'});
+  await page.locator('#accountDrawer').evaluate(el=>{el.scrollTop=el.scrollHeight});
+  await page.screenshot({path:join(output,'account-native-cart-glass-scrolled-'+sample.width+'-'+sample.theme+'.png'),animations:'disabled'});
+  await page.locator('#accountClose').click();
+  await expect(page.locator('#accountDrawer')).not.toHaveClass(/\bopen\b/);
+  expect(errors).toEqual([]);
+  console.log('ACCOUNT_NATIVE_GLASS_VISUAL_QA',JSON.stringify({width:sample.width,theme:sample.theme,cart:result.cart,account:result.account,gaps:result.gaps}));
+ });
+}
