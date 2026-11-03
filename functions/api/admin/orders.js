@@ -68,7 +68,7 @@ export async function onRequestGet(context) {
       let order = byId.get(row.id);
       if (!order) {
         order = { ...orderFields, items: [] };
-        order.payment_summary=summarizeOrderPayment({total:order.total,paymentOption:order.customer_payment_option,transactions:[{direction:"received",amount:order.received_amount},{direction:"refunded",amount:order.refunded_amount}],codReceivedAmount:order.cod_received_amount,termsConfirmed:Number(order.price_confirmation_required)===0&&Boolean(order.payment_terms_confirmed_at),hasPendingRequest:Boolean(order.pending_payment_request_id)});
+        order.payment_summary=summarizeOrderPayment({total:order.total,paymentOption:order.customer_payment_option,agreedAmount:order.customer_payment_amount,transactions:[{direction:"received",amount:order.received_amount},{direction:"refunded",amount:order.refunded_amount}],codReceivedAmount:order.cod_received_amount,termsConfirmed:Number(order.price_confirmation_required)===0&&Boolean(order.payment_terms_confirmed_at),hasPendingRequest:Boolean(order.pending_payment_request_id)});
         byId.set(row.id, order);
       }
       if (itemId !== null && itemId !== undefined) {
@@ -150,10 +150,10 @@ export async function onRequestPatch(context) {
 
     let shipmentRequiredAmount=null;
     if (["shipped","completed"].includes(status)) {
-      const checkout=await context.env.DB.prepare("SELECT json_extract(details_json,'$.selectedPaymentOption') AS payment_option FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1").bind(id).first();
+      const checkout=await context.env.DB.prepare("SELECT json_extract(details_json,'$.selectedPaymentOption') AS payment_option,json_extract(details_json,'$.selectedPaymentAmount') AS payment_amount FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1").bind(id).first();
       const transactions=await context.env.DB.prepare("SELECT direction,amount,actor FROM order_payment_transactions WHERE order_id=?").bind(id).all();
       const termsAreConfirmed=Number(existing.price_confirmation_required)===0&&Boolean(existing.payment_terms_confirmed_at);
-      const settlement=summarizeOrderPayment({total:subtotal,paymentOption:checkout?.payment_option,transactions:transactions.results||[],termsConfirmed:termsAreConfirmed});
+      const settlement=summarizeOrderPayment({total:subtotal,paymentOption:checkout?.payment_option,agreedAmount:checkout?.payment_amount,transactions:transactions.results||[],termsConfirmed:termsAreConfirmed});
       if (!termsAreConfirmed || (checkout?.payment_option && !settlement.eligibleToShip) || (!checkout?.payment_option && settlement.netReceivedAmount<subtotal))
         return fail("Đơn chưa nhận đủ khoản thanh toán bắt buộc; chưa thể gửi hàng hoặc xác nhận giao thành công.",409);
       shipmentRequiredAmount=settlement.requiredAmount??subtotal;

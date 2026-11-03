@@ -44,12 +44,13 @@ export async function onRequestPost(context) {
     const total = Number(order.total);
     if (!Number.isSafeInteger(total) || total <= 0 || total > 2000000000) return fail("Tổng tiền đã xác nhận không hợp lệ.", 409);
 
-    const itemRows = await db.prepare("SELECT quantity,line_total FROM order_items WHERE order_id=?").bind(orderId).all();
+    const itemRows = await db.prepare("SELECT quantity,line_total,fulfillment_type FROM order_items WHERE order_id=?").bind(orderId).all();
     const items = itemRows.results || [];
     if (!items.length || items.some(item => item.line_total === null || item.line_total === undefined || (typeof item.line_total === "string" && !item.line_total.trim()) || !Number.isSafeInteger(Number(item.line_total)) || Number(item.line_total) < 0)) return fail("Một hoặc nhiều dòng hàng chưa có giá được xác nhận.", 409);
     const itemTotal = items.reduce((sum, item) => sum + Number(item.line_total), 0);
     if (!Number.isSafeInteger(itemTotal) || itemTotal !== total) return fail("Tổng đơn chưa khớp tổng các dòng hàng đã xác nhận; cần kiểm tra thủ công.", 409);
-    const fulfillmentType = "all_shipped";
+    const types=new Set(items.map(item=>item.fulfillment_type==="in_stock"?"in_stock":item.fulfillment_type==="made_to_order"?"made_to_order":"unclassified"));
+    const fulfillmentType=types.size===1?[...types][0]:"mixed";
 
     const settings = await db.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?,?,?)").bind("payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name").all();
     const cfg = Object.fromEntries((settings.results || []).map(row => [row.key, row.value]));
@@ -68,13 +69,18 @@ export async function onRequestPost(context) {
     const selectedOption=["deposit","full"].includes(selected.selectedPaymentOption)?selected.selectedPaymentOption:null;
     if(paymentOption==="full"&&selectedOption!=="full")return fail("Chỉ áp dụng giảm 5% khi khách đã chọn thanh toán toàn bộ tại checkout.",409);
     if(["deposit","full"].includes(paymentOption)&&selectedOption&&paymentOption!==selectedOption)return fail("Yêu cầu thanh toán phải khớp phương thức khách đã chọn. Không tự đổi phương thức khi khách chuyển thiếu.",409);
-    const selectedTerms=selectedOption?summarizeOrderPayment({total,paymentOption:selectedOption,transactions,termsConfirmed:true}):null;
+    const selectedTerms=selectedOption?summarizeOrderPayment({total,paymentOption:selectedOption,agreedAmount:selected.selectedPaymentAmount,transactions,termsConfirmed:true}):null;
     let amount;
     const installmentType = paymentOption;
     let shippingBenefit = "standard_shipping";
     if (paymentOption === "deposit") {
       if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; hãy chọn thanh toán số dư sau khi Admin đối chiếu.", 409);
-      amount = calculateCheckoutQuote([{unitPrice:total,quantity:1}]).options[0].amount;
+      // Keep the exact amount quoted for historical orders, even if new
+      // in-stock orders now require only 100k.
+      const stored=selectedOption==="deposit"?Number(selected.selectedPaymentAmount):null;
+      const agreed=Number.isSafeInteger(stored)&&stored>0&&stored<=total?stored:null;
+      const quote=calculateCheckoutQuote(items.map(item=>({fulfillmentType:item.fulfillment_type,unitPrice:Number(item.line_total),quantity:1})));
+      amount=agreed??(quote.eligible?quote.options[0].amount:null);
       if (!Number.isSafeInteger(amount) || amount <= 0 || amount > total) return fail("Khoản đặt cọc theo quy định lớn hơn tổng tiền đơn; cần tư vấn thủ công.", 409);
     } else if (paymentOption === "full") {
       if (transactions.length) return fail("Đơn đã có lịch sử giao dịch; không tạo lại yêu cầu thanh toán đủ. Hãy chọn thanh toán số dư.", 409);

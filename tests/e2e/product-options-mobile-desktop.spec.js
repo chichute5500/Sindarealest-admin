@@ -32,7 +32,8 @@ const items=[
  {id:'qa-belt',sku:'QA-BELT-001',title:'Thắt lưng kiểm thử',category:'belts',categoryLabel:'Thắt lưng'},
  {id:'qa-phone',sku:'QA-PHONE-001',title:'Ốp điện thoại kiểm thử',category:'phone-cases',categoryLabel:'Ốp điện thoại'},
  {id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví không size',category:'wallets',categoryLabel:'Ví nam'},
- {id:'qa-boot',sku:'QA-BOOT-001',title:'Giày boot kiểm thử',category:'giay-boot',categoryLabel:'Giày boot'}
+ {id:'qa-boot',sku:'QA-BOOT-001',title:'Giày boot kiểm thử',category:'giay-boot',categoryLabel:'Giày boot'},
+ {id:'qa-sandals',sku:'QA-SANDALS-001',title:'Dép kiểm thử',category:'sandals',categoryLabel:'Dép'}
 ].map(p=>({...p,slug:p.id,skuVerified:true,images:['images/brand-emblem.png'],description:'Mock data, no real purchases',price:100000,sourcePriceConfirmed:true,fulfillmentType:'made_to_order',published:true}));
 for(const cfg of [
  {label:'mobile-light',w:390,h:844,scheme:'light'},
@@ -40,6 +41,30 @@ for(const cfg of [
  {label:'desktop-light',w:1366,h:900,scheme:'light'},
  {label:'desktop-dark',w:1366,h:900,scheme:'dark'}
 ]){
+ test('Sandals require size 38–44 and retain selected size through cart and checkout '+cfg.label,async({page})=>{
+  await page.setViewportSize({width:cfg.w,height:cfg.h});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(items)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+  await page.locator('[data-open-product="qa-sandals"]').first().evaluate(el=>el.click());
+  await expect(page.locator('#detailVariants')).toBeVisible();
+  await expect(page.locator('#sdDetailOptionLabel')).toContainText('Chọn size dép');
+  await expect(page.locator('#detailVariants .sd-product-option-chip')).toHaveCount(7);
+  await page.locator('#detailAdd').click();
+  await expect(page.locator('#sdDetailOptionMessage')).toContainText('Vui lòng chọn');
+  await page.locator('#detailVariants [data-option-value="41"]').click();
+  await expect(page.locator('#sdDetailOption')).toHaveValue('41');
+  await page.locator('#detailAdd').click();
+  await page.locator('#detailClose').click();
+  await page.locator(cfg.w<=760?'#mobileCartNav':'#cartOpen').click();
+  await expect(page.locator('#cartList')).toContainText('Dép kiểm thử');
+  await expect(page.locator('#cartList')).toContainText('Size 41');
+  await page.locator('#cartCheckout').click();
+  await expect(page.locator('#sdCheckoutItemSummary')).toContainText('Size 41');
+  await page.screenshot({path:dir+'/sandals-'+cfg.label+'.png',animations:'disabled'});
+ });
  test('Catalog options and cart responsive '+cfg.label,async({page})=>{
   await page.setViewportSize({width:cfg.w,height:cfg.h});
   await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
