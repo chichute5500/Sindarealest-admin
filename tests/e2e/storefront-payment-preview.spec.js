@@ -1559,30 +1559,36 @@ for(const cfg of [
   await expect(page.locator('#cartDrawer')).toHaveClass(/\bopen\b/);
   await expect(page.locator('#cartList .cart-row')).toHaveCount(5);
   const cartFull=await frame('#cartDrawer');
+  const settledFrame=async selector=>{
+   // An 'open' class is set before the slide-in transition finishes.
+   // Measure only the fully settled visible panel, not its offscreen start position.
+   await expect.poll(async()=>Math.abs((await frame(selector)).x-cartFull.x),{timeout:4000}).toBeLessThanOrEqual(1);
+   equal(cartFull,await frame(selector));
+  };
   expect(cartFull.h).toBeGreaterThan(cfg.height*.6);
   await page.screenshot({path:join(output,'drawer-five-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
   for(let i=5;i>1;i--){
    await page.locator('#cartList [data-remove]').last().click();
    await expect(page.locator('#cartList .cart-row')).toHaveCount(i-1);
   }
-  equal(cartFull,await frame('#cartDrawer'));
+  await settledFrame('#cartDrawer');
   await page.screenshot({path:join(output,'drawer-one-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
   await page.locator('[data-mobile-tab="home"]').click();
   await closed();
   await expect.poll(()=>page.evaluate(()=>location.hash)).toBe('#home');
   await page.locator('#mobileAccountNav').click();
   await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
-  equal(cartFull,await frame('#accountDrawer'));
+  await settledFrame('#accountDrawer');
   await page.screenshot({path:join(output,'drawer-account-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
   await page.locator('[data-mobile-tab="products"]').click();
   await closed();
   await expect.poll(()=>page.evaluate(()=>location.pathname)).toBe('/sanpham');
   await page.locator('#mobileCartNav').click();
   await expect(page.locator('#cartList .cart-row')).toHaveCount(1);
-  equal(cartFull,await frame('#cartDrawer'));
+  await settledFrame('#cartDrawer');
   await page.locator('#cartCheckout').click();
   await expect(page.locator('#checkoutDrawer')).toHaveClass(/\bopen\b/);
-  equal(cartFull,await frame('#checkoutDrawer'));
+  await settledFrame('#checkoutDrawer');
   await page.screenshot({path:join(output,'drawer-checkout-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
   await page.locator('[data-mobile-tab="home"]').click();
   await closed();
