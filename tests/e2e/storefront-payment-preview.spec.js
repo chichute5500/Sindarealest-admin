@@ -1482,6 +1482,32 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    await page.screenshot({path:join(output,'theme-audit-admin-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
   }
  }
+ // A/B diagnostics are browser-only style overrides. They never touch the
+ // deployed CSS, Admin data or approved Liquid Glass design.
+ const perfOverrides=[
+  ['normal',''],
+  ['no-backdrop','*,*::before,*::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'],
+  ['no-shadow','*,*::before,*::after{box-shadow:none!important;text-shadow:none!important}'],
+  ['no-filter','*,*::before,*::after{filter:none!important}'],
+  ['no-gradient','*,*::before,*::after{background-image:none!important}'],
+  ['no-glass-effects','*,*::before,*::after{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;filter:none!important}']
+ ];
+ for(const surface of ['storefront','admin']){
+  await page.setViewportSize({width:1280,height:800});await page.emulateMedia({colorScheme:'light'});
+  await page.goto(surface==='storefront'?url:new URL('/admin/?view=order-detail&orderId=qa-audit-order',url).href,{waitUntil:'domcontentloaded'});
+  if(surface==='storefront'){
+   const welcome=page.locator('#welcomeSplash');
+   if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+   await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  }else await expect(page.locator('.sd-order-step-list .sd-order-step')).toHaveCount(5);
+  const samples=[];
+  for(const [name,css] of perfOverrides){
+   const style=css?await page.addStyleTag({content:css}):null;
+   const sampled=await sampleNormalFrames();samples.push({name,...sampled});
+   if(style)await style.evaluate(el=>el.remove());
+  }
+  console.log('SD_RENDER_COST_AB',JSON.stringify({surface,width:1280,samples}));
+ }
  expect(unexpectedWrites,'Diagnostics must not write real Admin/Production data').toEqual([]);
  expect(errors,'Theme audit must not throw JS errors').toEqual([]);
  console.log('SD_THEME_LAYER_FRAME_AUDIT',JSON.stringify(report));
