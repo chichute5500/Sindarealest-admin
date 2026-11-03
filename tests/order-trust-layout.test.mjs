@@ -18,8 +18,10 @@ assert.match(section, /aria-label="Quy trình đặt hàng gồm bốn bước"/
 for (const label of ['Chọn sản phẩm', 'Xác nhận đơn hàng', 'Đặt cọc & chế tác', 'Nhận hàng & hậu mãi']) {
   assert.ok(grid.includes(label), 'Missing process step: ' + label + '.');
 }
-assert.match(grid, /Đặt cọc <strong>30%<\/strong>/,
-  'The deposit information must remain visible.');
+assert.match(grid, /Hàng có sẵn cọc <strong>100\.000đ<\/strong>/,
+  'Fixed 100k in-stock deposit must remain visible.');
+assert.match(grid, /hàng đặt riêng cọc <strong>30%<\/strong>/,
+  'Made-to-order 30% deposit must remain visible.');
 assert.match(grid, /5–20 ngày/,
   'The estimated production time must remain visible.');
 assert.match(grid, /bảo hành <strong>6–12 tháng<\/strong>/, 'Order overview must not promise a fixed year of coverage.');
