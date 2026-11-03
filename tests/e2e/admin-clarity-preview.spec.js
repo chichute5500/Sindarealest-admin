@@ -53,12 +53,14 @@ test('Admin clarity — mobile dashboards, customers and orders use legible info
    await page.setViewportSize({width,height:width===360?800:width===390?844:932});
    const geometry=await page.evaluate(()=>{
     const rect=selector=>{const el=document.querySelector(selector);if(!el)return null;const r=el.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,top:r.top}};
-    return {code:rect('#main .sd-order-number strong'),badge:rect('#main .sd-order-meta-state'),name:rect('#main .sd-order-buyer-name'),phone:rect('#main .sd-order-buyer-phone'),bodyWidth:document.documentElement.scrollWidth,viewport:innerWidth};
+    return {code:rect('#main .sd-order-number strong'),badge:rect('#main .sd-order-meta-state'),name:rect('#main .sd-order-buyer-name'),phone:rect('#main .sd-order-buyer-phone'),panel:rect('#main .sd-order-overview'),nameLabel:rect('#main .sd-order-buyer-name>span'),phoneLabel:rect('#main .sd-order-buyer-phone>span'),bodyWidth:document.documentElement.scrollWidth,viewport:innerWidth};
    });
    expect(geometry.code&&geometry.badge&&geometry.name&&geometry.phone,'All four order fields exist at '+width).toBeTruthy();
    expect(geometry.badge.x,'Status must sit to the right of order code at '+width).toBeGreaterThan(geometry.code.x);
    expect(Math.abs(geometry.badge.bottom-geometry.code.bottom),'Code and status share the same row at '+width).toBeLessThan(24);
    expect(Math.abs(geometry.name.top-geometry.phone.top),'Customer name and phone share the same row at '+width).toBeLessThan(3);
+   expect(geometry.nameLabel.top-geometry.panel.top,'Customer name label needs top inset at '+width).toBeGreaterThanOrEqual(12);
+   expect(geometry.phoneLabel.top-geometry.panel.top,'Phone label needs top inset at '+width).toBeGreaterThanOrEqual(12);
    expect(geometry.bodyWidth,'No mobile page overflow at '+width).toBeLessThanOrEqual(geometry.viewport+2);
   }
 

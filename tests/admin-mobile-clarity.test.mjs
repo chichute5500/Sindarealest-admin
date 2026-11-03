@@ -57,6 +57,7 @@ assert.match(html,/font-size:clamp\(13px,3.45vw,17px\)/,'Order number is reduced
 assert.match(html,/#main \.sd-order-buyer-info\{display:grid;grid-template-columns:minmax\(0,1.15fr\) minmax\(0,.85fr\)/,'Name and phone share two columns');
 assert.match(html,/#main \.sd-order-buyer-field>strong,#main \.sd-order-buyer-field>a\{font-size:14px/,'Contact values are one size smaller');
 assert.match(html,/#main \.sd-order-buyer-address>strong\{font-size:13px/,'Address is one size smaller');
+assert.match(html,/#main \.sd-order-overview \.panelbody\{padding-top:16px\}/,'Customer information must not touch the top glass edge');
 const customersPage=html.slice(html.indexOf('function customersPage()'),html.indexOf('function warrantiesPage()'));
 assert.ok(customersPage.includes('$'+'{adminCustomerMobileCard(c)}'));
 assert.doesNotMatch(customersPage,/class='customer-mobile-details'/);
