@@ -86,7 +86,7 @@ test('Shared Admin/Storefront JSON responses have no caching and defensive docum
 
 test('Dynamic homepage and category HTML get security headers even when Pages static _headers are bypassed',async()=>{
  const base='<!doctype html><html><head><title>SinDarealest</title></head><body>Trang chủ</body></html>';
- for(const path of ['/','/sanpham']){
+ for(const path of ['/','/sanpham','/tra-cuu-don-hang','/bao-hanh']){
   let calls=0;
   const context={
    request:new Request('https://example.test'+path),
@@ -103,7 +103,7 @@ test('Dynamic homepage and category HTML get security headers even when Pages st
   const html=await r.text();
   assert.match(html,/<title>/);
  }
- assert.equal(count(middleware,'headers:hardenStorefrontHtmlHeaders(headers)'),3,
-  'Every generated homepage/category/product HTML response must use shared header defense');
+ assert.equal(count(middleware,'headers:hardenStorefrontHtmlHeaders(headers)'),4,
+  'Every generated homepage/category/product/support HTML response must use shared header defense');
 });
 console.log('PASS: canonical Admin/Storefront brand tokens, single active Admin theme palette and static/API/dynamic HTML security.');

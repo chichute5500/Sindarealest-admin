@@ -151,6 +151,9 @@ html.sd-theme-overlay-active body .theme-bg,
 html.sd-theme-overlay-active body .nav-wrap .nav,
 html.sd-theme-overlay-active body .mobile-bottom-nav,
 html.sd-theme-overlay-active body .account-drawer,
+html.sd-theme-overlay-active body #accountDrawer .account-action,
+html.sd-theme-overlay-active body #accountDrawer #sdCustomerAuth,
+html.sd-theme-overlay-active body #accountDrawer .account-guest,
 html.sd-theme-overlay-active body .cart-drawer,
 html.sd-theme-overlay-active body .checkout-drawer{transition:none!important}
 /* Approved wallpaper/nav remain frozen through the final dissolve. */

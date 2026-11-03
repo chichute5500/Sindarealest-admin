@@ -73,6 +73,46 @@ export async function onRequest(context) {
     }
     return response;
   }
+  // Independent public support pages reuse the storefront's verified lookup
+  // forms. Serve real 200 HTML without DB reads or copied customer data.
+  const supportMatch=url.pathname.match(/^\/(tra-cuu-don-hang|bao-hanh)\/?$/i);
+  if(supportMatch){
+    if(context.request.method!=="GET"&&context.request.method!=="HEAD")
+      return new Response("Method not allowed",{status:405,headers:{"Allow":"GET, HEAD","Cache-Control":"no-store"}});
+    const path="/"+supportMatch[1].toLowerCase();
+    if(url.pathname!==path)return Response.redirect(new URL(path,url.origin),301);
+    const response=await context.next(new Request(new URL("/index.html",url.origin),{
+      method:context.request.method,headers:context.request.headers
+    }));
+    if(!response.ok||!(response.headers.get("content-type")||"").includes("text/html"))return response;
+    const warranty=path==="/bao-hanh";
+    const heading=warranty?"Kiểm tra bảo hành":"Tra cứu đơn hàng";
+    const title=heading+" | SinDarealest";
+    const description=warranty
+      ?"Kiểm tra thời hạn bảo hành da cá sấu SinDarealest bằng mã bảo hành hoặc số điện thoại và gửi yêu cầu hỗ trợ."
+      :"Tra cứu tiến trình đơn hàng SinDarealest bằng mã đơn hoặc số điện thoại. Thông tin cá nhân được bảo vệ.";
+    let html=await response.text();
+    html=html.replace(/<title>[\s\S]*?<\/title>/i,"<title>"+escapeHtml(title)+"</title>");
+    html=html.replace('<h1 id="sdServiceHeading">Tra cứu đơn hàng</h1>','<h1 id="sdServiceHeading">'+escapeHtml(heading)+'</h1>');
+    html=meta(html,"description",description);
+    html=meta(html,"og:title",title,true);
+    html=meta(html,"og:description",description,true);
+    html=meta(html,"og:url",url.origin+path,true);
+    html=meta(html,"og:image",url.origin+"/og-sindarealest-crisp-20261028.jpg",true);
+    html=meta(html,"og:image:secure_url",url.origin+"/og-sindarealest-crisp-20261028.jpg",true);
+    html=meta(html,"twitter:title",title);
+    html=meta(html,"twitter:description",description);
+    html=meta(html,"twitter:image",url.origin+"/og-sindarealest-crisp-20261028.jpg");
+    const canonical='<link rel="canonical" href="'+escapeHtml(url.origin+path)+'">';
+    html=/<link\s+rel=["']canonical["']/i.test(html)
+      ?html.replace(/<link\s+rel=["']canonical["'][^>]*>/i,canonical)
+      :html.replace("</head>",canonical+"\n</head>");
+    const headers=new Headers(response.headers);
+    headers.set("Content-Type","text/html; charset=utf-8");
+    headers.set("Cache-Control","public, max-age=0, must-revalidate");
+    for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
+    return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
+  }
   // Canonical catalog routes are real server-rendered entry points to the same
   // Storefront app. Never route them through product detail SQL or a blank 404.
   const catalogMatch = url.pathname.match(/^\/sanpham(?:\/([a-z0-9][a-z0-9-]{0,99}))?\/?$/i);

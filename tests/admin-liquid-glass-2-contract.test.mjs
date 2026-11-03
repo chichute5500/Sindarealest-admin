@@ -68,9 +68,11 @@ assert.match(html,/<\/div><nav class="mobiletabs">[\s\S]*?<\/nav>\n<div id="back
   'Dock is a sibling of the scrolling app surface, outside its repaint tree');
 const dockGeometryOwner=html.match(/body:has\(#appView:not\(\.hidden\)\) > \.mobiletabs\{([^}]*)\}/);
 assert.ok(dockGeometryOwner,'Signed-in mobile dock has one direct-body geometry owner');
-assert.match(dockGeometryOwner[1],/top:calc\(100dvh - var\(--sd-dock-height,61px\) - var\(--sd-dock-bottom,18px\) - env\(safe-area-inset-bottom\)\)/,
-  'Dock stays at the visual viewport coordinate when innerHeight briefly changes');
+assert.match(dockGeometryOwner[1],/top:calc\(100svh - var\(--sd-dock-height,61px\) - var\(--sd-dock-bottom,18px\) - env\(safe-area-inset-bottom\)\)/,
+  'Dock position must remain constant as Android browser chrome expands or collapses during swipes');
 assert.doesNotMatch(dockGeometryOwner[1],/bottom:/,'Do not re-anchor the dock to the shifting layout viewport');
+assert.doesNotMatch(dockGeometryOwner[1],/100dvh|100lvh|innerHeight|visualViewport/,'Dock cannot follow dynamic viewport geometry during scroll');
+assert.match(dockGeometryOwner[1],/position:fixed;display:grid/,'Dock must remain fixed outside scrollable content');
 assert.match(dockGeometryOwner[1],/left:max\(14px,calc\(\(100dvw - 520px\)\/2\)\)/,'Dock horizontal position follows the stable visual viewport width');
 assert.match(dockGeometryOwner[1],/width:min\(calc\(100dvw - 28px\),520px\)/,'Dock width follows the stable visual viewport width');
 assert.match(dockGeometryOwner[1],/grid-template-columns:repeat\(5,minmax\(0,1fr\)\);[^}]*transition:none/,

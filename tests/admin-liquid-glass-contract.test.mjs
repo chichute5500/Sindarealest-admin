@@ -77,17 +77,20 @@ has('class="product-description-heading"', 'description and AI action share head
 has('placeholder="Chưa có giá"', 'unknown price is not invented');
 has('aria-label="Nhóm thông tin sản phẩm"', 'product editor tabs have an accessible group label');
 
-// Screen 8 customer cards should be compact on phones without inventing missing totals or profile photos.
-has("class='customer-mobile-summary'", 'compact customer mobile summary');
-has('#main .customer-table .customer-desktop-identity{display:none!important}', 'desktop customer identity stays hidden despite later desktop identity styles when the compact phone card is active');
-has("class='customer-mobile-details'", 'progressively disclosed customer contact/address details');
-has("customer-mobile-last-order", 'last order date based only on server-returned customer data');
-has("#main .customer-table tbody tr:has(.customer-mobile-summary)>td:nth-child(n+2){display:none!important}", 'phone cards avoid repeating the verbose desktop table cells');
-has("class=\"pagehead customer-pagehead\"", 'customer page heading has a scope for compact mobile layout');
-assert.match(adminHtml, /customer-mobile-extra[\\s\\S]*?c\\.email\\|\\|'Chưa cung cấp'[\\s\\S]*?c\\.address\\|\\|'Chưa cung cấp'/,
-  'Email and address remain available in an accessible details disclosure');
-assert.doesNotMatch(adminHtml, /customer-mobile-(?:total|revenue|amount)/,
-  'Customer cards must not invent order totals/revenue that the endpoint does not return');
+// Screen 8 customer cards expose real contact information on first paint.
+has('function adminCustomerMobileCard(c)', 'single customer mobile formatter');
+has('class="customer-mobile-summary"', 'customer identity with one mobile surface');
+has('#main .customer-table .customer-desktop-identity{display:none!important}', 'desktop customer cells stay hidden on mobile');
+has('class="customer-mobile-contact"', 'phone and address are clearly labelled and always visible');
+has('class="customer-mobile-metrics"', 'order count and latest order date remain explicit');
+has('class="customer-mobile-fact"', 'readable contact detail rows');
+has('#main .customer-table tbody tr:has(.customer-mobile-summary)>td:nth-child(n+2){display:none!important}', 'avoid duplicate desktop table cells');
+has('class="pagehead customer-pagehead"', 'customer page heading is scoped for mobile');
+const mobileCardMarkup=adminHtml.slice(adminHtml.indexOf('function adminCustomerMobileCard('),adminHtml.indexOf('function customersPage('));
+assert.match(mobileCardMarkup,/field\('Địa chỉ',esc\(c\.address\|\|'Chưa cung cấp'\)/,'customer address is shown immediately');
+assert.match(mobileCardMarkup,/c\.email\?field\('Email',esc\(c\.email\)\)/,'optional email remains visible when supplied');
+assert.doesNotMatch(mobileCardMarkup,/<details|customer-mobile-details/,'no contact accordion to obscure key information');
+assert.doesNotMatch(adminHtml,/customer-mobile-(?:total|revenue|amount)/,'never invent order revenue or totals');
 
 // Owner-approved order redesign: tappable cards and a focused detail screen.
 for(const token of ['const filteredOrders=orders.filter','id="orderSearchBox"','id="orderStatusFilter"','id="orderPaymentFilter"','id="orderResultSummary"',
@@ -269,13 +272,12 @@ assert.match(dashboardSource, /data-view=\\?"orders\\?"/, 'Dashboard should pres
 assert.match(dashboardSource, /data-view=\\?"customers\\?"/, 'Dashboard should preserve customers navigation');
 assert.match(dashboardSource, /data-action=\\?"backup\\?"/, 'Dashboard should preserve backup action');
 has('.dashboard-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))', 'four-column compact dashboard action layout');
-assert.ok(dashboardSource.includes('dashboard-activity-table'), 'Dashboard should keep the audit table source for desktop and mobile');
-for (const label of ['Thời điểm', 'Thao tác', 'Đối tượng', 'Người thực hiện']) assert.ok(dashboardSource.includes('data-label="' + label + '"'), 'Responsive audit cell should expose the ' + label + ' label');
-has('.dashboard-activity-table table{width:100%;min-width:520px}', 'desktop audit table sizing');
-has('.dashboard-activity-table table{display:block;width:100%;min-width:0!important;border-collapse:separate;border-spacing:0}', 'mobile audit table card layout');
-has('.dashboard-activity-table td::before{content:attr(data-label)', 'mobile audit cards show each field label');
-
-
+assert.ok(dashboardSource.includes('sd-activity-feed'), 'Dashboard uses the readable recent-activity feed');
+for (const token of ['esc(eventLabel(log))','esc(adminAuditSubject(log))','esc(adminAuditActor(log.actor))','esc(adminReadableDate(log.created_at))'])
+ assert.ok(dashboardSource.includes(token),'Every activity feed entry preserves its readable meaning: '+token);
+assert.doesNotMatch(dashboardSource,/esc\(l\.action\)|esc\(l\.entity_id\)/,'Do not show technical actions or raw UUIDs');
+has('.sd-activity-feed{display:grid;gap:10px}', 'readable one-column activity layout');
+has('.sd-activity-entry{display:grid;', 'one clear event per tile, without nested blur');
 
 // Product editor uses accessible tabbed groups while keeping required identity fields visible.
 for (const [id, label] of [

@@ -9,9 +9,12 @@ import { createSession, getCurrentDateInVietnam } from '../functions/_lib.js';
 import { shopWarrantyPolicy, addWarrantyCalendarMonths, isWarrantyCode } from '../functions/_warranty-policy.js';
 import { onRequestPatch as patchOrder } from '../functions/api/admin/orders.js';
 
-assert.deepEqual(shopWarrantyPolicy(1_999_999).durationMonths,6);
-assert.deepEqual(shopWarrantyPolicy(2_000_000).durationMonths,12);
-assert.deepEqual(shopWarrantyPolicy(8_000_000).durationMonths,12);
+assert.equal(shopWarrantyPolicy(1_999_999).durationMonths,6);
+assert.equal(shopWarrantyPolicy(2_000_000).durationMonths,6);
+assert.equal(shopWarrantyPolicy(2_999_999).durationMonths,6);
+assert.equal(shopWarrantyPolicy(3_000_000).durationMonths,6);
+assert.equal(shopWarrantyPolicy(3_000_001).durationMonths,12);
+assert.equal(shopWarrantyPolicy(8_000_000).durationMonths,12);
 assert.throws(()=>shopWarrantyPolicy(null));
 assert.throws(()=>shopWarrantyPolicy(NaN));
 assert.equal(addWarrantyCalendarMonths('2024-08-31',6),'2025-02-28');
@@ -27,17 +30,18 @@ const schema=[
  '0007_order_contact_details.sql','0008_product_sku_verification.sql',
  '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql',
 ].map(file=>readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8')).join('\n');
-function fixture(total, {existingWarranty=false, secondItem=false,simulateCodeCollision=false}={}){
+function fixture(total, {existingWarranty=false, secondItem=false,firstItemPrice=null,simulateCodeCollision=false}={}){
  const sql=new DatabaseSync(':memory:');
  sql.exec('PRAGMA foreign_keys=ON;'+schema);
  sql.prepare('INSERT INTO customers(id,full_name,phone) VALUES(?,?,?)').run('cust','QA TEST','0000000000');
  sql.prepare("INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,payment_terms_confirmed_at) VALUES(?,?,?,?,?,?,0,'2026-10-30')").run('order','SD-QA-1001','cust','pending_confirmation',total,total);
  const fullAmount=total-Math.round(total*0.05);
  sql.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES('checkout','customer','order_created','order','order',?)").run(JSON.stringify({selectedPaymentOption:'full',selectedPaymentAmount:fullAmount}));
+ const firstPrice=secondItem?(firstItemPrice??Math.floor(total/2)):total;
  sql.prepare('INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)')
-   .run('item-a','order','product-a','QA-A','Sản phẩm QA A',1,secondItem?Math.floor(total/2):total,secondItem?Math.floor(total/2):total);
+   .run('item-a','order','product-a','QA-A','Sản phẩm QA A',1,firstPrice,firstPrice);
  if(secondItem)sql.prepare('INSERT INTO order_items(id,order_id,product_id,sku,title,quantity,unit_price,line_total) VALUES(?,?,?,?,?,?,?,?)')
-   .run('item-b','order','product-b','QA-B','Sản phẩm QA B',1,total-Math.floor(total/2),total-Math.floor(total/2));
+   .run('item-b','order','product-b','QA-B','Sản phẩm QA B',1,total-firstPrice,total-firstPrice);
  sql.prepare("INSERT INTO order_payment_transactions(id,order_id,direction,amount,transaction_reference,actor) VALUES('payment','order','received',?,'BANK-QA-RECEIPT','admin')").run(fullAmount);
  if(existingWarranty)sql.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) VALUES('legacy','order','item-a','SDW-LEGACY001','Bảo hành cũ',24,'2026-01-01','2028-01-01','active')").run();
  let beforeBatch=null,collisionPending=simulateCodeCollision,batchCount=0;
@@ -73,7 +77,7 @@ function fixture(total, {existingWarranty=false, secondItem=false,simulateCodeCo
  return {sql,patch,list,state,audits,batchCount:()=>batchCount,setBeforeBatch:fn=>{beforeBatch=fn}};
 }
 
-for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
+for(const [total,months] of [[1_999_999,6],[3_000_000,6],[6_000_000,6],[6_000_002,12],[8_000_000,12]]){
  const f=fixture(total,{secondItem:true});
  assert.equal((await f.patch('confirmed')).status,200,'confirmation succeeds without warranty');
  assert.equal(f.list().length,0,'never activate warranty on confirmed');
@@ -102,6 +106,13 @@ for(const [total,months] of [[1_999_999,6],[2_000_000,12],[8_000_000,12]]){
  assert.equal(f.list().length,2,'no duplicates');
  assert.equal((await f.patch('cancelled')).status,200);
  assert.ok(f.list().every(w=>w.status==='void'),'cancellation voids active warranties');
+ f.sql.close();
+}
+{
+ const f=fixture(4_500_001,{secondItem:true,firstItemPrice:3_000_001});
+ for(const status of ['confirmed','processing','shipped'])assert.equal((await f.patch(status)).status,200);
+ assert.equal((await f.patch('completed')).status,200);
+ assert.deepEqual(f.list().map(w=>w.duration_months),[12,6],'mixed-price order warranty per product');
  f.sql.close();
 }
 {

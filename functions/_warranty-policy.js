@@ -1,11 +1,11 @@
 /**
- * Shop policy is applied to the confirmed order's full subtotal,
- * not the discounted bank-transfer amount.
+ * Shop policy is applied to each confirmed product's unit price,
+ * not the total order value or the discounted bank-transfer amount.
  * Existing warranties are never overwritten or extended.
  */
 export function shopWarrantyPolicy(total) {
   if (!Number.isSafeInteger(total) || total < 0) throw new RangeError("Giá trị đơn hàng chưa hợp lệ để cấp bảo hành.");
-  const durationMonths = total < 2_000_000 ? 6 : 12;
+  const durationMonths = total <= 3_000_000 ? 6 : 12;
   return { durationMonths, policyName: "Bảo hành SinDarealest " + durationMonths + " tháng" };
 }
 

@@ -281,10 +281,10 @@ export async function onRequestPatch(context) {
       throw new Error("Không thể tạo mã bảo hành khác nhau trong cùng đơn.");
     };
     if (activateWarranty) {
-      const policy = shopWarrantyPolicy(subtotal);
       const startsAt = getCurrentDateInVietnam();
-      const endsAt = addWarrantyCalendarMonths(startsAt, policy.durationMonths);
       for (const item of items) {
+        const policy = shopWarrantyPolicy(itemMap.get(item.id).unit_price);
+        const endsAt = addWarrantyCalendarMonths(startsAt, policy.durationMonths);
         const warrantyId = crypto.randomUUID();
         const warrantyCode = nextWarrantyCode();
         const warrantyAuditId = crypto.randomUUID();

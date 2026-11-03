@@ -1512,3 +1512,396 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
  expect(errors,'Theme audit must not throw JS errors').toEqual([]);
  console.log('SD_THEME_LAYER_FRAME_AUDIT',JSON.stringify(report));
 });
+
+
+// Mobile drawer fixed-geometry and main-navigation closure: rendered measurements, never inferred from CI status alone.
+// Products are mocked; no purchase, customer, order or Production D1 write occurs.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:360,height:800,scheme:'light'},
+ {width:430,height:932,scheme:'light'}
+]){
+ test('Mobile Cart/Checkout/Account fixed frame '+cfg.width+' '+cfg.scheme,async({page,context})=>{
+  const mock=Array.from({length:5},(_,i)=>({
+   id:'sd-fixed-drawer-'+i,slug:'sd-fixed-drawer-'+i,
+   sku:'QA-DRAWER-'+i,skuVerified:true,
+   title:'Sản phẩm thử giao diện '+(i+1),category:'wallets',categoryLabel:'Ví nam',
+   images:['images/brand-emblem.png'],price:4500000,sourcePriceConfirmed:true,
+   fulfillmentType:'in_stock',published:true
+  }));
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  await context.addInitScript(items=>{
+   localStorage.setItem('sd-cart',JSON.stringify(Object.fromEntries(items.map(p=>[p.id,1]))));
+  },mock);
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mock)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  const frame=selector=>page.locator(selector).evaluate(el=>{
+   const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};
+  });
+  const equal=(a,b)=>{
+   for(const property of ['x','y','w','h'])
+    expect(Math.abs(a[property]-b[property]),'Same mobile frame: '+property).toBeLessThanOrEqual(1);
+  };
+  const closed=async()=>{
+   for(const id of ['#cartDrawer','#checkoutDrawer','#accountDrawer'])
+    await expect(page.locator(id)).not.toHaveClass(/\bopen\b/);
+   await expect(page.locator('#checkoutBackdrop')).not.toHaveClass(/\bopen\b/);
+   expect(await page.evaluate(()=>document.body.style.overflow)).not.toBe('hidden');
+  };
+  await page.locator('#mobileCartNav').click();
+  await expect(page.locator('#cartDrawer')).toHaveClass(/\bopen\b/);
+  await expect(page.locator('#cartList .cart-row')).toHaveCount(5);
+  // The first Cart opener has an actual slide-in animation as well.
+  // Establish the reference only after its left inset has settled at 7px.
+  await expect.poll(async()=>Math.abs((await frame('#cartDrawer')).x-7),{timeout:4000}).toBeLessThanOrEqual(1);
+  const cartFull=await frame('#cartDrawer');
+  const settledFrame=async selector=>{
+   // An 'open' class is set before the slide-in transition finishes.
+   // Measure only the fully settled visible panel, not its offscreen start position.
+   await expect.poll(async()=>Math.abs((await frame(selector)).x-cartFull.x),{timeout:4000}).toBeLessThanOrEqual(1);
+   equal(cartFull,await frame(selector));
+  };
+  expect(cartFull.h).toBeGreaterThan(cfg.height*.6);
+  await page.screenshot({path:join(output,'drawer-five-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  for(let i=5;i>1;i--){
+   await page.locator('#cartList [data-remove]').last().click();
+   await expect(page.locator('#cartList .cart-row')).toHaveCount(i-1);
+  }
+  await settledFrame('#cartDrawer');
+  await page.screenshot({path:join(output,'drawer-one-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('[data-mobile-tab="home"]').click();
+  await closed();
+  await expect.poll(()=>page.evaluate(()=>location.hash)).toBe('#home');
+  await page.locator('#mobileAccountNav').click();
+  await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
+  await settledFrame('#accountDrawer');
+  await page.screenshot({path:join(output,'drawer-account-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('[data-mobile-tab="products"]').click();
+  await closed();
+  await expect.poll(()=>page.evaluate(()=>location.pathname)).toBe('/sanpham');
+  await page.locator('#mobileCartNav').click();
+  await expect(page.locator('#cartList .cart-row')).toHaveCount(1);
+  await settledFrame('#cartDrawer');
+  await page.locator('#cartCheckout').click();
+  await expect(page.locator('#checkoutDrawer')).toHaveClass(/\bopen\b/);
+  await settledFrame('#checkoutDrawer');
+  await page.screenshot({path:join(output,'drawer-checkout-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('[data-mobile-tab="home"]').click();
+  await closed();
+  await expect.poll(()=>page.evaluate(()=>location.pathname+location.hash)).toBe('/#home');
+  expect(errors,'No mobile drawer JavaScript errors').toEqual([]);
+  console.log('SD_MOBILE_DRAWER_FIXED_VISUAL_QA',JSON.stringify({width:cfg.width,scheme:cfg.scheme,cartFull,finalPath:await page.evaluate(()=>location.pathname+location.hash)}));
+ });
+}
+
+
+// Account uses the identical real-pixel frosted plane as Cart.
+// Check actual computed materials, separate cards and touch navigation on the deployed Preview.
+for(const sample of [
+ {width:390,height:844,theme:'light'},
+ {width:390,height:844,theme:'dark'},
+ {width:360,height:800,theme:'light'},
+ {width:430,height:932,theme:'light'}
+]){
+ test('Account native Cart background '+sample.width+' '+sample.theme,async({page})=>{
+  await page.setViewportSize({width:sample.width,height:sample.height});
+  await page.emulateMedia({colorScheme:sample.theme,reducedMotion:'reduce'});
+  const mock=[{id:'qa-account-glass',slug:'qa-account-glass',sku:'QA-ACCOUNT-GLASS',skuVerified:true,title:'Sản phẩm QA',category:'wallets',categoryLabel:'Ví nam',images:['images/brand-emblem.png'],price:4500000,sourcePriceConfirmed:true,fulfillmentType:'in_stock',published:true}];
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mock)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  await page.locator('#mobileCartNav').click();
+  await expect(page.locator('#cartDrawer')).toHaveClass(/\bopen\b/);
+  await page.waitForTimeout(500); // Observe settled Cart slide-in, not the entering transform.
+  const cartBox=await page.locator('#cartDrawer').boundingBox();
+  await page.locator('#mobileAccountNav').click();
+  await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
+  await expect(page.locator('#cartDrawer')).not.toHaveClass(/\bopen\b/);
+  await expect.poll(()=>page.locator('#accountDrawer').evaluate(el=>parseFloat(el.style.getPropertyValue('--sd-native-glass-height'))||0)).toBeGreaterThan(200);
+  const result=await page.evaluate(()=>{
+   const cart=document.querySelector('#cartDrawer'),account=document.querySelector('#accountDrawer');
+   const surface=el=>{
+    const outer=getComputedStyle(el),plane=getComputedStyle(el,'::before');
+    return {root:outer.backgroundColor,rootBlur:outer.backdropFilter,planeColor:plane.backgroundColor,planeBlur:plane.backdropFilter,planeWidth:parseFloat(plane.width),planeHeight:parseFloat(plane.height),nativeHeight:el.clientHeight,nativeWidth:el.clientWidth,planePointer:plane.pointerEvents};
+   };
+   const actions=[...document.querySelectorAll('#accountMenuView .account-action')];
+   const pair=document.querySelector('#accountMenuView .account-paired-actions');
+   const tiles=[...pair.querySelectorAll('.account-action')],rows=[
+    document.querySelector('#accountAddressAction'),pair,
+    document.querySelector('#accountThemeAction'),document.querySelector('#accountContactAction')
+   ];
+   const gaps=rows.slice(1).map((row,i)=>row.getBoundingClientRect().top-rows[i].getBoundingClientRect().bottom);
+   const pairRects=tiles.map(el=>el.getBoundingClientRect().toJSON());
+   return {cart:surface(cart),account:surface(account),gaps,actions:actions.length,noteExists:!!document.querySelector('#accountMenuView .account-note'),accountFrame:account.getBoundingClientRect().toJSON(),pairRects};
+  });
+  for(const key of ['root','rootBlur','planeColor','planeBlur','planePointer'])
+   expect(result.account[key],'Account must share Cart '+key).toBe(result.cart[key]);
+  expect(result.account.rootBlur).toBe('none');
+  expect(result.account.planeBlur).toContain('blur(24px)');
+  expect(Math.abs(result.account.planeWidth-result.account.nativeWidth)).toBeLessThanOrEqual(1);
+  expect(Math.abs(result.account.planeHeight-result.account.nativeHeight)).toBeLessThanOrEqual(1);
+  expect(result.actions).toBe(5);
+  expect(result.noteExists).toBe(false);
+  expect(result.pairRects).toHaveLength(2);
+  expect(Math.abs(result.pairRects[0].y-result.pairRects[1].y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(result.pairRects[0].width-result.pairRects[1].width)).toBeLessThanOrEqual(1);
+  expect(result.pairRects[1].x).toBeGreaterThan(result.pairRects[0].x+result.pairRects[0].width);
+  for(const gap of result.gaps)expect(gap,'Each Account card has an independent gap').toBeGreaterThanOrEqual(10);
+  for(const axis of [['x','x'],['y','y'],['width','width'],['height','height']])
+   expect(Math.abs(result.accountFrame[axis[0]]-cartBox[axis[1]])).toBeLessThanOrEqual(1);
+  await page.screenshot({path:join(output,'account-native-cart-glass-'+sample.width+'-'+sample.theme+'.png'),animations:'disabled'});
+  await page.locator('#accountDrawer').evaluate(el=>{el.scrollTop=el.scrollHeight});
+  await page.screenshot({path:join(output,'account-native-cart-glass-scrolled-'+sample.width+'-'+sample.theme+'.png'),animations:'disabled'});
+  await page.locator('#accountClose').click();
+  await expect(page.locator('#accountDrawer')).not.toHaveClass(/\bopen\b/);
+  expect(errors).toEqual([]);
+  console.log('ACCOUNT_NATIVE_GLASS_VISUAL_QA',JSON.stringify({width:sample.width,theme:sample.theme,cart:result.cart,account:result.account,gaps:result.gaps}));
+ });
+}
+
+
+// Repeated mode changes on the Account screen: full opaque cover EVERY time,
+// exactly one commit per user gesture and no burst toggles from rapid taps.
+for(const cfg of [{width:390,height:844},{width:360,height:800}]){
+ test('Account theme atomic anti-spam '+cfg.width,async({page})=>{
+  await page.setViewportSize(cfg);
+  await page.emulateMedia({colorScheme:'light'});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:'[]'}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible()){
+   // This fixture enters on a document with Welcome already fading out.
+   // Use the genuine Skip handler, not a coordinate click that main content
+   // can intercept during the welcome exit transition.
+   await page.locator('#skipIntro').evaluate(el=>el.click());
+   await expect(welcome).toHaveCount(0,{timeout:8000});
+  }
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  await page.locator('#mobileAccountNav').click();
+  await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
+  await page.evaluate(()=>{
+   const root=document.documentElement,overlay=document.querySelector('#sdThemeSwitchOverlay');
+   const stats=window.__qaTheme={commits:[],covers:0,lastDark:root.classList.contains('dark')};
+   const monitor=()=>{
+    if(overlay.classList.contains('is-covered'))stats.covers++;
+    const dark=root.classList.contains('dark');
+    if(dark!==stats.lastDark){
+     stats.commits.push({dark,covered:overlay.classList.contains('is-covered'),opacity:getComputedStyle(overlay).opacity});
+     stats.lastDark=dark;
+    }
+   };
+   new MutationObserver(monitor).observe(root,{attributes:true,attributeFilter:['class']});
+   new MutationObserver(monitor).observe(overlay,{attributes:true,attributeFilter:['class']});
+   // Simulate repeated rapid taps through the actual Account action.
+   for(let i=0;i<8;i++)document.querySelector('#accountThemeAction').click();
+  });
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.classList.contains('dark'))).toBe(true);
+  await expect.poll(()=>page.evaluate(()=>!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-dismissing')&& !document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-visible') && !document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-covered'))).toBe(true);
+  const first=await page.evaluate(()=>window.__qaTheme);
+  expect(first.commits).toHaveLength(1);
+  expect(first.commits[0]).toMatchObject({dark:true,covered:true,opacity:'1'});
+  expect(first.covers).toBeGreaterThan(0);
+  await page.screenshot({path:join(output,'account-compact-theme-dark-'+cfg.width+'.png'),animations:'disabled'});
+  // A repeat gesture during cooldown must not switch back or jump to bare paint.
+  await page.locator('#accountThemeAction').evaluate(el=>el.click());
+  expect(await page.evaluate(()=>document.documentElement.classList.contains('dark'))).toBe(true);
+  await page.waitForTimeout(1050);
+  await page.locator('#accountThemeAction').click();
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.classList.contains('dark'))).toBe(false);
+  await expect.poll(()=>page.evaluate(()=>!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-visible')&&!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-covered')&&!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-dismissing'))).toBe(true);
+  const second=await page.evaluate(()=>window.__qaTheme);
+  expect(second.commits).toHaveLength(2);
+  expect(second.commits[1]).toMatchObject({dark:false,covered:true,opacity:'1'});
+  expect(second.covers).toBeGreaterThan(first.covers);
+  await page.screenshot({path:join(output,'account-compact-theme-light-'+cfg.width+'.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+  console.log('ACCOUNT_THEME_ATOMIC_QA',JSON.stringify({viewport:cfg.width,commits:second.commits,covers:second.covers}));
+ });
+}
+
+
+// Product Detail borrows exactly the Cart/Account one-plane native glass.
+// Compare computed pixel material and actual opening/scrolling on isolated Preview.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:360,height:800,scheme:'light'},
+ {width:430,height:932,scheme:'light'},
+ {width:1280,height:800,scheme:'light'}
+]){
+ test('Product Detail native Cart glass '+cfg.width+' '+cfg.scheme,async({page})=>{
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  const mock=[{
+   id:'qa-native-detail-glass',slug:'qa-native-detail-glass',
+   sku:'QA-NATIVE-DETAIL',skuVerified:true,
+   title:'Ví da cá sấu kiểm thử chất liệu kính',category:'wallets',categoryLabel:'Ví nam',
+   images:['images/brand-emblem.png'],price:4500000,sourcePriceConfirmed:true,
+   fulfillmentType:'in_stock',published:true
+  }];
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mock)}));
+  await page.route('**/api/settings',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible()){
+   await page.locator('#skipIntro').evaluate(el=>el.click());
+   await expect(welcome).toHaveCount(0,{timeout:8000});
+  }
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  const product=page.locator('[data-open-product="qa-native-detail-glass"]').first();
+  await expect(product).toHaveCount(1,{timeout:10000});
+  await product.evaluate(el=>el.click());
+  await expect(page.locator('#productOverlay')).toHaveClass(/\bopen\b/);
+  await expect.poll(()=>page.locator('#productOverlay').evaluate(el=>parseFloat(el.style.getPropertyValue('--sd-detail-glass-width'))||0)).toBeGreaterThan(200);
+  const capture=()=>page.evaluate(()=>{
+   const overlay=document.querySelector('#productOverlay'),modal=overlay.querySelector('.detail-modal'),cart=document.querySelector('#cartDrawer');
+   const a=overlay.getBoundingClientRect(),m=modal.getBoundingClientRect();
+   const p=getComputedStyle(overlay,'::before'),cartP=getComputedStyle(cart,'::before');
+   const shell=getComputedStyle(modal),outer=getComputedStyle(overlay);
+   const values={left:parseFloat(p.left),top:parseFloat(p.top),width:parseFloat(p.width),height:parseFloat(p.height)};
+   return {
+    actual:{left:m.left-a.left,top:m.top-a.top,width:m.width,height:m.height},
+    plane:values,
+    film:{color:p.backgroundColor,blur:p.backdropFilter,pointer:p.pointerEvents,z:p.zIndex,radius:p.borderTopLeftRadius},
+    cart:{color:cartP.backgroundColor,blur:cartP.backdropFilter},
+    overlay:{color:outer.backgroundColor,blur:outer.backdropFilter,animation:outer.animationName},
+    shell:{color:shell.backgroundColor,blur:shell.backdropFilter,z:shell.zIndex},
+    scroll:{top:modal.scrollTop,client:modal.clientHeight,total:modal.scrollHeight},
+    content:modal.querySelector('.detail-layout').getBoundingClientRect().toJSON()
+   };
+  });
+  await expect.poll(async()=>{
+   const measure=await capture();
+   return Math.max(...['left','top','width','height'].map(key=>Math.abs(measure.actual[key]-measure.plane[key])));
+  },{timeout:3000,intervals:[50,100,150,300]}).toBeLessThanOrEqual(1);
+  const start=await capture();
+  console.log('PRODUCT_DETAIL_GLASS_GEOMETRY',JSON.stringify({viewport:cfg.width,scheme:cfg.scheme,actual:start.actual,plane:start.plane}));
+  for(const key of ['left','top','width','height'])
+   expect(Math.abs(start.actual[key]-start.plane[key]),'Glass film aligns the live Detail '+key).toBeLessThanOrEqual(1);
+  expect(start.film.color).toBe(start.cart.color);
+  expect(start.film.blur).toBe(start.cart.blur);
+  expect(start.film.blur).toContain('blur(24px)');
+  expect(start.film.pointer).toBe('none');
+  expect(start.overlay.blur).toBe('none');
+  expect(start.overlay.animation).toBe('none'); // An opacity-animated ancestor prevents backdrop blur.
+  expect(start.overlay.color).toBe('rgba(0, 0, 0, 0)');
+  expect(start.shell.blur).toBe('none');
+  expect(start.shell.color).toBe('rgba(0, 0, 0, 0)');
+  expect(start.shell.z).toBe('1');
+  await page.screenshot({path:join(output,'detail-native-cart-glass-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('#productOverlay .detail-modal').evaluate(el=>{el.scrollTop=el.scrollHeight;});
+  await expect.poll(()=>page.locator('#productOverlay .detail-modal').evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
+  const after=await capture();
+  for(const key of ['left','top','width','height'])
+   expect(Math.abs(start.plane[key]-after.plane[key]),'Glass remains pinned while scrolling '+key).toBeLessThanOrEqual(1);
+  await page.screenshot({path:join(output,'detail-native-cart-glass-scrolled-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await expect(page.locator('#detailWarrantyTerm')).toContainText('12 tháng');
+  await expect(page.locator('#detailAdd')).toBeAttached();
+  await expect(page.locator('#detailBuyNow')).toBeAttached();
+  await page.locator('#detailClose').evaluate(el=>el.click());
+  await expect(page.locator('#productOverlay')).not.toHaveClass(/\bopen\b/);
+  expect(errors,'No detail glass runtime errors').toEqual([]);
+  console.log('PRODUCT_DETAIL_NATIVE_GLASS_QA',JSON.stringify({viewport:cfg.width,scheme:cfg.scheme,film:start.film,cart:start.cart,geometry:start.plane,scrollDelta:after.scroll.top-start.scroll.top}));
+ });
+}
+
+
+// Standalone shareable public lookup URLs. Reuse the exact existing form and
+// POST endpoints, with no personal data in links or client-side query storage.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:360,height:800,scheme:'light'}
+]){
+ test('Standalone order/warranty lookup URLs '+cfg.width+' '+cfg.scheme,async({page})=>{
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  let orders=0,warranties=0;
+  await page.route('**/api/products',r=>r.fulfill({status:503,contentType:'application/json',body:'{"error":"Catalog offline in isolated QA"}'}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
+  await page.route('**/api/order-tracking',r=>{orders++;return r.fulfill({status:200,contentType:'application/json',body:'{"orders":[]}'});});
+  await page.route('**/api/warranty-lookup',r=>{warranties++;return r.fulfill({status:200,contentType:'application/json',body:'{"warranties":[]}'});});
+  await page.goto(new URL('/tra-cuu-don-hang',url).href,{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#sdServicePage')).toBeVisible();
+  await expect(page.locator('#sdServiceHeading')).toHaveText('Tra cứu đơn hàng');
+  await expect(page.locator('#sdServiceMount #sdTrackForm')).toBeVisible();
+  await expect(page.locator('#sdServiceMount .sd-track-intro')).toBeHidden();
+  await expect(page.locator('#sdTrackForm')).toHaveCount(1);
+  await expect(page.locator('#warrantyLookupForm')).toHaveCount(1);
+  await expect(page.locator('#home')).toBeHidden();
+  await expect(page.locator('#siteFooter')).toBeHidden();
+  await expect(page.locator('[data-sd-service="orders"]')).toHaveAttribute('aria-current','page');
+  await page.locator('#sdTrackInput').fill('SD-QA-SHARED-123');
+  await page.locator('#sdTrackSubmit').click();
+  await expect(page.locator('#sdTrackMessage')).toContainText('Không tìm thấy đơn phù hợp.');
+  expect(orders).toBe(1);
+  expect(await page.evaluate(()=>location.pathname+location.search)).toBe('/tra-cuu-don-hang');
+  await page.screenshot({path:join(output,'lookup-orders-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  // Navigate using an actual link and verify a fresh direct URL, not a hidden anchor.
+  await page.locator('[data-sd-service="warranty"]').click();
+  await expect(page).toHaveURL(/\/bao-hanh$/);
+  await expect(page.locator('#sdServiceHeading')).toHaveText('Kiểm tra bảo hành');
+  await expect(page.locator('#sdServiceMount #warrantyLookupForm')).toBeVisible();
+  await expect(page.locator('#sdServiceMount>.warranty-help>div:first-child')).toBeHidden();
+  await expect(page.locator('#warrantyLookupForm')).toHaveCount(1);
+  await expect(page.locator('[data-sd-service="warranty"]')).toHaveAttribute('aria-current','page');
+  await page.locator('#warrantyLookupValue').fill('SDW-K7M2');
+  await page.locator('#warrantyLookupSubmit').click();
+  await expect(page.locator('#warrantyMessage')).toContainText('Đã tra cứu xong.');
+  expect(warranties).toBe(1);
+  expect(await page.evaluate(()=>location.pathname+location.search)).toBe('/bao-hanh');
+  await page.screenshot({path:join(output,'lookup-warranty-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.goBack({waitUntil:'domcontentloaded'});
+  await expect(page.locator('#sdServiceHeading')).toHaveText('Tra cứu đơn hàng');
+  await expect(page.locator('#sdServiceMount #sdTrackForm')).toBeVisible();
+  await expect(page.locator('#sdServiceMount .sd-track-intro')).toBeHidden();
+  await page.locator('[data-mobile-tab="home"]').click();
+  await expect.poll(()=>page.evaluate(()=>location.pathname)).toBe('/');
+  await expect(page.locator('#sdServicePage')).toBeHidden();
+  await expect(page.locator('#home')).toBeVisible();
+  expect(errors).toEqual([]);
+  console.log('STANDALONE_LOOKUP_ROUTES_QA',JSON.stringify({width:cfg.width,scheme:cfg.scheme,orderQueries:orders,warrantyQueries:warranties}));
+ });
+}
+
+
+// Owner requirement: entire order assurance section is open by default on all viewports.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:1280,height:800,scheme:'light'}
+]){
+ test('Order reassurance always visible '+cfg.width+' '+cfg.scheme,async({page})=>{
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  await page.route('**/api/products',r=>r.fulfill({status:503,contentType:'application/json',body:'{"error":"Catalog offline in isolated QA"}'}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
+  await page.goto(new URL('/',url).href,{waitUntil:'domcontentloaded'});
+  const section=page.locator('#order'),panel=page.locator('#orderDetailsPanel');
+  await expect(section.locator('#order-title')).toHaveText('Đặt hàng an tâm');
+  await expect(panel).toBeVisible();
+  await expect(section.locator('.order-step')).toHaveCount(4);
+  await expect(section.locator('.order-assurance-footer')).toBeVisible();
+  await expect(page.locator('#orderDetailsToggle')).toHaveCount(0);
+  await section.scrollIntoViewIfNeeded();
+  await page.screenshot({path:join(output,'order-always-visible-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.goto(new URL('/#order',url).href,{waitUntil:'domcontentloaded'});
+  await expect(panel).toBeVisible();
+  await expect(section.locator('.order-step')).toHaveCount(4);
+ });
+}
