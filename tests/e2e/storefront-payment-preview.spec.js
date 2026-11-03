@@ -1372,7 +1372,7 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    report.push({surface:'storefront',width,mode,boot,perf,header:layout.header});
    await page.screenshot({path:join(output,'theme-audit-store-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
    if(width===390){
-    await page.locator('#cartOpen').click();
+    await page.locator('#mobileCartNav').click();
     await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
     await page.waitForTimeout(300);
     const state=await rectInfo();
