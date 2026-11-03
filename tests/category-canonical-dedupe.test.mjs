@@ -51,8 +51,8 @@ runInNewContext(shop.slice(filterStart,filterEnd)+'\nrenderFilters();',ctx,{time
 assert.equal(ctx.selectedCategory,'sneakers');
 assert.equal((html.innerHTML.match(/class="filter-pill/g)||[]).length,4,
  'One All + 3 canonical categories, not two separate sneaker/wallet filters');
-assert.match(html.innerHTML,/<a class="filter-pill tap-target active" href="\/sanpham\/sneaker" data-category="sneakers"[^>]*>Giày Thể Thao · 3<\/button>/);
-assert.match(html.innerHTML,/data-category="vi-nam"[^>]*>Ví Nam · 2<\/button>/);
+assert.match(html.innerHTML,/<a class="filter-pill tap-target active" href="\/sanpham\/sneaker" data-category="sneakers"[^>]*>Giày Thể Thao · 3<\/a>/);
+assert.match(html.innerHTML,/data-category="vi-nam"[^>]*>Ví Nam · 2<\/a>/);
 assert.ok(!html.innerHTML.includes('data-category="giay-the-thao"'));
 assert.ok(!html.innerHTML.includes('data-category="wallets"'));
 assert.match(admin,/const SKU_CATEGORY_ALIASES=[^;]*'giay-the-thao':'sneakers'/);
