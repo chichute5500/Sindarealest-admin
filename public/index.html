@@ -3699,6 +3699,8 @@ html.sd-service-route #sdServiceMount>.warranty-help{width:100%;margin:0}
  };
  const sync=path=>{
   const route=routes[normalize(path)];
+  // Home/Checkout popstate must never detach and reinsert lookup forms.
+  if(!route&&shell.hidden)return false;
   for(const [node,marker] of placeholders)if(marker.parentNode)marker.parentNode.insertBefore(node,marker);
   mount.replaceChildren();
   root.classList.toggle('sd-service-route',Boolean(route));
