@@ -29,5 +29,6 @@ assert.match(source,/!full&&Date\.now\(\)<adminSyncRetryAfter/,"Automatic retrie
 assert.match(source,/adminSyncRetryAfter=lastAdminSync\+adminSyncBackoffMs\(adminSyncFailureStreak\)/);
 assert.match(source,/adminSyncFailureStreak=0;adminSyncRetryAfter=0/,"Success resets the backoff");
 assert.match(source,/setInterval\(\(\)=>\{if\(adminSyncSafe\(\)\)void syncAdminData\(\)\.catch\(\(\)=>\{\}\)\},10000\)/,"10-second order cadence preserved");
+assert.match(source,/const names=adminSyncResourceNames\(view,broad,full\)/,"Apply the scoped list on every automatic refresh");
 assert.ok(!source.includes("const names=broad?['orders','logs','customers','warranties','products','settings','paymentQr']:['orders','logs']"),"No unconditional full-data polling");
 console.log("PASS: view-scoped Admin polling, notifications, manual full refresh, and bounded failure backoff.");
