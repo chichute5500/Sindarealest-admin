@@ -1,107 +1,26 @@
-/* Dedicated customer-login styles: scoped to existing account drawer. */
-#sdCustomerAuth { margin: 12px 0; padding: 14px; border-radius: 15px; border: 1px solid var(--line);
-  background: var(--card-glass); color: var(--ink); }
-#sdCustomerAuth [hidden] { display: none !important; }
-#sdCustomerAuth .sd-auth-heading { font-weight: 700; font-size: 15px; line-height:1.45; margin:0 0 8px; }
-#sdCustomerAuth .sd-auth-caption { font-size: 12px; opacity: .8; margin: 0 0 12px; line-height:1.55; }
-#sdCustomerAuth .sd-auth-provider { display:flex; align-items:center; justify-content:center; gap:9px; width:100%;
-  padding:12px; border:1px solid var(--line); border-radius:13px; margin:8px 0; font:inherit;
-  font-weight:700; font-size:13px; cursor:pointer; background:var(--card-glass); color:var(--ink); }
-#sdCustomerAuth .sd-auth-facebook { background:#1877f2; color:#fff; border-color:#1877f2; }
-#sdCustomerAuth .sd-auth-zalo { background: #0866ef; color:white; border-color:#0866ef; }
-#sdCustomerAuth .sd-auth-email-fields { display:grid; gap:9px; margin-top:12px; }
-#sdCustomerAuth label { display:grid; gap:5px; font-size:12px; font-weight:600; }
-#sdCustomerAuth input { box-sizing:border-box; width:100%; padding:11px; border:1px solid var(--line);
-  border-radius:11px; background:var(--card-glass); color:var(--ink); font:inherit; font-size:14px; }
-#sdCustomerAuth .sd-auth-submit { width:100%; padding:12px; border-radius:12px; background:#30694e;
-  border:0; color:white; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
-#sdCustomerAuth .sd-auth-text-button { font:inherit; font-size:12px; text-decoration:underline;
-  border:0; background:transparent; color:var(--ink); cursor:pointer; }
-#sdCustomerAuth .sd-auth-message {font-size:12px; line-height:1.5; min-height:16px; margin:7px 0 0;}
-#sdCustomerAuth button:focus-visible, #sdCustomerAuth input:focus-visible {outline:2px solid #4e9b7e;outline-offset:3px}
-
-#accountMenuView .account-guest[hidden] { display:none!important; }
-#sdCustomerAuth .sd-auth-provider:disabled { opacity:.55;cursor:not-allowed; }
-
-/* Authentication outcome stays visible above the provider choices.
-   Scoped to Account, with the existing subtle glass palette. */
-#sdCustomerAuth .sd-auth-message:not([hidden]) {
-  position:relative;z-index:0;box-sizing:border-box;
-  padding:12px 13px;margin:0 0 12px;min-height:0;
-  border:1px solid currentColor;border-radius:12px;
-  background:var(--card-glass,rgba(245,247,246,.96));
-  font-size:12px;font-weight:600;line-height:1.55;
-}
-#sdCustomerAuth .sd-auth-message[data-kind="error"] { color:#a54130; }
-#sdCustomerAuth .sd-auth-message[data-kind="success"] { color:#226c4b; }
-
-/* Account cloud status and explicit import stay outside the auth root. */
+/* Google-only customer authentication. Keep approved Account Liquid Glass below. */
+#sdCustomerAuth{margin:12px 0;padding:14px;border-radius:15px;border:1px solid var(--line);background:var(--card-glass);color:var(--ink)}
+#sdCustomerAuth [hidden],#accountMenuView .account-guest[hidden]{display:none!important}
+#sdCustomerAuth .sd-auth-heading{font-weight:700;font-size:15px;line-height:1.45;margin:0 0 8px}
+#sdCustomerAuth .sd-auth-caption{font-size:12px;opacity:.8;margin:0 0 12px;line-height:1.55}
+#sdCustomerAuth .sd-auth-provider{position:relative;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:50px;padding:12px 15px;margin:8px 0;border:1.5px solid transparent;border-radius:14px;background:var(--sd-3d-surface,var(--card-glass));box-shadow:var(--sd-3d-shadow,var(--sd-account-shadow));color:var(--ink);font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms cubic-bezier(.18,.8,.24,1)}
+#sdCustomerAuth .sd-auth-provider:disabled{opacity:.55;cursor:not-allowed}
+#sdCustomerAuth .sd-auth-provider-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;flex:0 0 26px;width:26px;height:26px}
+#sdCustomerAuth .sd-auth-google-mark{background:#fff;border-radius:50%;padding:4px}
+#sdCustomerAuth .sd-auth-provider-icon svg{display:block;flex:none;width:18px;height:18px;aspect-ratio:1/1}
+#sdCustomerAuth .sd-auth-provider-label{display:block;width:100%;padding:0 28px;text-align:center;font-size:14px;font-weight:650;line-height:1.4;white-space:normal}
+#sdCustomerAuth .sd-auth-message{font-size:12px;line-height:1.5;min-height:16px;margin:7px 0 0}
+#sdCustomerAuth .sd-auth-message:not([hidden]){position:relative;z-index:0;box-sizing:border-box;padding:12px 13px;margin:0 0 12px;min-height:0;border:1px solid currentColor;border-radius:12px;background:var(--card-glass,rgba(245,247,246,.96));font-size:12px;font-weight:600;line-height:1.55}
+#sdCustomerAuth .sd-auth-message[data-kind="error"]{color:#a54130}
+#sdCustomerAuth .sd-auth-message[data-kind="success"]{color:#226c4b}
+#sdCustomerAuth button:focus-visible{outline:2px solid #4e9b7e;outline-offset:3px}
 #accountCloudStatus{font-size:12px;line-height:1.55;color:var(--muted);margin:8px 0}
 #accountImportLocal{font-size:12px;min-height:38px;width:100%;margin:6px 0 12px}
 #accountImportLocal[hidden]{display:none!important}
 #accountImportLocal:disabled{opacity:.55;cursor:wait}
-
-/* Sign-in method icons: exact brand-color G on an opaque light disc; neutral email pictogram.
-   Scoped to customer drawer only; no global liquid-glass/theme overrides. */
-#sdCustomerAuth .sd-auth-provider.sd-auth-google,
-#sdCustomerAuth .sd-auth-provider.sd-auth-email {
-  position:relative;
-  box-sizing:border-box;
-  display:flex;align-items:center;justify-content:center;
-  min-height:50px;padding:12px 15px;
-  border:1.5px solid transparent;
-  border-radius:14px;
-  background:var(--sd-3d-surface,var(--card-glass));
-  box-shadow:var(--sd-3d-shadow,var(--sd-account-shadow));
-  color:var(--ink);
-  transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms cubic-bezier(.18,.8,.24,1);
-}
-#sdCustomerAuth .sd-auth-provider-icon {
-  position:absolute;left:14px;top:50%;transform:translateY(-50%);
-  display:inline-flex;align-items:center;justify-content:center;
-  box-sizing:border-box;flex:0 0 26px;width:26px;height:26px;
-}
-#sdCustomerAuth .sd-auth-google-mark {
-  background:#fff;border-radius:50%;padding:4px;
-}
-#sdCustomerAuth .sd-auth-provider-icon svg {
-  display:block;flex:none;width:18px;height:18px;aspect-ratio:1/1;
-}
-#sdCustomerAuth .sd-auth-email-mark svg {width:21px;height:21px}
-#sdCustomerAuth .sd-auth-provider-label {
-  display:block;width:100%;padding:0 28px;
-  text-align:center;font-size:14px;font-weight:650;line-height:1.4;
-  white-space:normal;
-}
-@media(hover:hover) and (pointer:fine){
- #sdCustomerAuth .sd-auth-provider.sd-auth-google:not(:disabled):hover,
- #sdCustomerAuth .sd-auth-provider.sd-auth-email:not(:disabled):hover {
-  box-shadow:var(--sd-3d-shadow,var(--sd-account-shadow));filter:brightness(1.025);
- }
-}
-#sdCustomerAuth .sd-auth-provider.sd-auth-google:not(:disabled):active,
-#sdCustomerAuth .sd-auth-provider.sd-auth-email:not(:disabled):active {
-  transform:translateY(1px) scale(.99);box-shadow:var(--sd-3d-depressed,var(--sd-account-shadow));
-  transition-duration:105ms;
-}
-#sdCustomerAuth .sd-auth-provider.sd-auth-email[aria-expanded="true"] {
-  border-color:transparent;box-shadow:var(--sd-3d-selected,var(--sd-account-shadow));
-}
-#sdCustomerAuth .sd-auth-email-fields[hidden] {display:none!important}
-@media (prefers-reduced-motion:reduce) {
-  #sdCustomerAuth .sd-auth-provider.sd-auth-google,
-  #sdCustomerAuth .sd-auth-provider.sd-auth-email {transition:none}
-}
-
-/* Mailjet OTP and password reset panels: inherit approved Liquid Glass drawer. */
-#sdCustomerAuth .sd-auth-flow{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card-glass)}
-#sdCustomerAuth .sd-auth-flow[hidden],#sdCustomerAuth .sd-auth-flow [hidden]{display:none!important}
-#sdCustomerAuth .sd-auth-flow form{display:grid;gap:10px}
-#sdCustomerAuth .sd-auth-flow input{min-height:44px}
-#sdCustomerAuth .sd-auth-flow .sd-auth-text-button{display:block;margin:10px 0 0;text-align:left}
-#sdCustomerAuth [data-auth-forgot]{display:block;margin:8px 0 0}
-#sdCustomerAuth [data-auth-forgot][hidden]{display:none!important}
-
+@media(hover:hover) and (pointer:fine){#sdCustomerAuth .sd-auth-provider.sd-auth-google:not(:disabled):hover{box-shadow:var(--sd-3d-shadow,var(--sd-account-shadow));filter:brightness(1.025)}}
+#sdCustomerAuth .sd-auth-provider.sd-auth-google:not(:disabled):active{transform:translateY(1px) scale(.99);box-shadow:var(--sd-3d-depressed,var(--sd-account-shadow));transition-duration:105ms}
+@media(prefers-reduced-motion:reduce){#sdCustomerAuth .sd-auth-provider.sd-auth-google{transition:none}}
 
 /* Account card tokens only. The outer drawer's native frosted surface is
    shared with Cart/Checkout in index.html; do not paint a second background. */

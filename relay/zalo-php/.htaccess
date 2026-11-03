@@ -1,3 +1,0 @@
-Options -Indexes
-RewriteEngine On
-RewriteRule ^v1/zalo/me$ zalo-me.php [END,QSD]
