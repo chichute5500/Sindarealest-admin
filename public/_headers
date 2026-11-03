@@ -27,3 +27,8 @@
 /images/theme-croc-albino.webp
   ! Cache-Control
   Cache-Control: public, max-age=0, must-revalidate
+
+# Static Google sitemap diagnostic (no Pages Functions / D1)
+/sitemap-pages.xml
+  Content-Type: application/xml; charset=utf-8
+  Cache-Control: public, max-age=0, must-revalidate
