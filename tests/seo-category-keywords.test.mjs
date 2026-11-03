@@ -72,4 +72,21 @@ const ctx={
 runInNewContext(html.slice(start,end)+"\nrenderFilters()",ctx,{timeout:1000});
 assert.equal(heading.textContent,profiles.sneaker.heading,"SPA heading aligns with server SEO");
 assert.equal(note.textContent,profiles.sneaker.intro,"SPA intro aligns with server SEO");
+// Product pages keep real Admin metadata and only add a category phrase when
+// the public product title/description lack it. Never invent offers or ratings.
+const product={id:"product-1",slug:"san-pham-1",sku:"SD-SN321",sku_verified:1,
+  title:"Giày mẫu SN321",description:"Mẫu thiết kế cá nhân",
+  category:"sneakers",published:1,images_json:"[]"};
+const productHtml=await storefront({
+  request:new Request(origin+"/sanpham/sneaker/SD-SN321"),
+  env:{DB:{prepare(){return {bind(){return {async first(){return product}}}}}}},
+  next:async()=>new Response(html,{headers:{"Content-Type":"text/html; charset=utf-8"}})
+});
+assert.equal(productHtml.status,200);
+const productBody=await productHtml.text();
+assert.ok(productBody.includes("<title>Giày mẫu SN321 – Giày thể thao da cá sấu | SinDarealest</title>"));
+assert.ok(productBody.includes('content="Mẫu thiết kế cá nhân · SKU: SD-SN321 Khám phá Giày thể thao da cá sấu tại SinDarealest."'));
+assert.ok(productBody.includes('rel="canonical" href="'+origin+"/sanpham/sneaker/SD-SN321"+'"'));
+assert.ok(!productBody.includes('"@type":"Offer"'),"Do not invent verified prices");
+assert.ok(!productBody.includes('"@type":"AggregateRating"'),"Do not invent reviews");
 console.log("PASS: 15 unique keyword category profiles, direct SSR tags, visible copy, SPA hydration and canonical URLs.");
