@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { onRequestGet as sitemap, onRequestHead as sitemapHead } from "../functions/sitemap.xml.js";
+import { onRequestGet as robotsTxt } from "../functions/robots.txt.js";
 
 const DB = {
   prepare(sql) {
@@ -62,3 +63,23 @@ const previewHead = await sitemapHead({
 });
 assert.equal(previewHead.status, 404, "Preview sitemap must remain private for HEAD");
 assert.equal(previewHead.headers.get("X-Robots-Tag"), "noindex, nofollow");
+
+
+// Google can discover both the full product sitemap and the independent
+// static catalog sitemap via robots.txt without relying on Search Console.
+const robotsResponse = await robotsTxt({
+  request: new Request("https://sindarealest2.pages.dev/robots.txt"),
+});
+assert.equal(robotsResponse.status, 200);
+const robotsBody = await robotsResponse.text();
+assert.match(robotsBody, /User-agent: \*/);
+assert.match(robotsBody, /^Allow: \/$/m);
+assert.match(robotsBody, /^Disallow: \/admin\/$/m);
+assert.match(robotsBody, /^Disallow: \/api\/$/m);
+const advertised = [...robotsBody.matchAll(/^Sitemap: (.+)$/gm)].map(match => match[1]);
+assert.deepEqual(advertised, [
+  "https://sindarealest2.pages.dev/sitemap.xml",
+  "https://sindarealest2.pages.dev/sitemap-pages.xml",
+]);
+assert.ok(!robotsBody.includes("Disallow: /sitemap"), "Sitemaps must not be blocked");
+console.log("PASS: robots.txt advertises both public sitemaps without changing crawl policy.");
