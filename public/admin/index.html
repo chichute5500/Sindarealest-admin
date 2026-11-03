@@ -2197,6 +2197,7 @@ async function retryCustomers(){try{await loadAdminResource('customers',{force:t
 async function retryWarranties(){try{await loadAdminResource('warranties',{force:true,reloadAfterFlight:true,repaint:true});toast('Đã tải lại dữ liệu bảo hành và hỗ trợ.')}catch(error){render();toast('Không thể tải dữ liệu bảo hành: '+error.message)}}if('serviceWorker'in navigator)navigator.serviceWorker.register('/admin-sw.js').catch(()=>{});
 /* Fast, incremental Admin sync. A full page reload would lose in-progress edits. */
 let adminSyncPromise=null,adminSyncDirty=false,lastAdminSync=Date.now(),lastAdminFullSync=Date.now();
+let adminSyncFailureStreak=0,adminSyncRetryAfter=0;
 const adminLivePaths={
  products:'/api/admin/products',orders:'/api/admin/orders',customers:'/api/admin/customers',
  warranties:'/api/admin/warranties',logs:'/api/admin/audit-logs',
@@ -2217,11 +2218,22 @@ function adminSyncRender(){
  window.scrollTo(0,y);
  adminSyncDirty=false;
 }
+/* Keep the 10s order heartbeat on Dashboard/Orders. Other tabs only
+   refresh their own data every 45s; notifications still poll safely. */
+function adminSyncResourceNames(targetView,broad,full){
+ if(full)return ['products','settings','paymentQr','orders','customers','warranties','logs'];
+ const active=adminResourcesForView(targetView);
+ if(!broad)return active.includes('orders')?['orders','logs']:['logs'];
+ return [...new Set([...active,'logs'])];
+}
+function adminSyncBackoffMs(failures){
+ return Math.min(120000,15000*2**Math.min(3,Math.max(0,failures-1)));
+}
 async function syncAdminData(full=false){
  if(adminSyncPromise){if(!full)return adminSyncPromise;try{await adminSyncPromise}catch{}return syncAdminData(true)}
- if(!adminSyncSafe())return false;
+ if(!adminSyncSafe()||(!full&&Date.now()<adminSyncRetryAfter))return false;
  const broad=full||Date.now()-lastAdminFullSync>=45000;
- const names=broad?['orders','logs','customers','warranties','products','settings','paymentQr']:['orders','logs'];
+ const names=adminSyncResourceNames(view,broad,full);
  adminSyncPromise=(async()=>{
   const results=await Promise.allSettled(names.map(name=>loadAdminResource(name,{force:true,repaint:false})));
   let failures=0;
@@ -2231,6 +2243,10 @@ async function syncAdminData(full=false){
    if(adminResourceState[name].lastChanged)adminSyncDirty=true;
   }
   lastAdminSync=Date.now();if(broad)lastAdminFullSync=lastAdminSync;
+  if(failures){
+   adminSyncFailureStreak=Math.min(4,adminSyncFailureStreak+1);
+   adminSyncRetryAfter=lastAdminSync+adminSyncBackoffMs(adminSyncFailureStreak);
+  }else{adminSyncFailureStreak=0;adminSyncRetryAfter=0}
   adminSyncRender();
   if(full&&failures)throw Error('Một số dữ liệu chưa được cập nhật. Kiểm tra kết nối rồi thử lại.');
   return failures===0;
