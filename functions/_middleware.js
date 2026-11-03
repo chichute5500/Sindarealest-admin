@@ -140,6 +140,13 @@ export async function onRequest(context) {
     const legacyCategories = { vida: "vinam", "giay-tay": "giaytay", "giay-luoi": "giayluoi" };
     categorySlug = legacyCategories[categorySlug] || categorySlug;
     const canonicalPath = categorySlug ? "/sanpham/" + categorySlug : "/sanpham";
+    const rawPage=url.searchParams.get("page");
+    if(rawPage!==null&&(!/^[1-9][0-9]{0,2}$/.test(rawPage)||Number(rawPage)>250))
+      return new Response("Trang không hợp lệ.",{status:404,headers:{"X-Robots-Tag":"noindex, nofollow"}});
+    const requestedPage=rawPage===null?1:Number(rawPage);
+    // Each paginated listing has a distinct, stable canonical URL.
+    const canonicalCatalogUrl=url.origin+canonicalPath+(requestedPage>1?"?page="+requestedPage:"");
+    if(rawPage==="1")return Response.redirect(new URL(canonicalPath,url.origin),301);
     if (url.pathname !== canonicalPath) return Response.redirect(new URL(canonicalPath + url.search, url.origin), 301);
     if (categorySlug && !isKnownCatalogCategoryRoute(categorySlug)) {
       if (!context.env?.DB) return new Response("Danh mục chưa sẵn sàng.", {status:503});
@@ -164,10 +171,12 @@ export async function onRequest(context) {
     const categoryName = Object.hasOwn(catalogLabels,categorySlug)
       ? catalogLabels[categorySlug] : categorySlug;
     const seoProfile = catalogSeoProfile(html, categorySlug || "all");
-    const catalogTitle = seoProfile?.title || (categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest");
-    const catalogDescription = seoProfile?.description || (categorySlug
+    const catalogTitleBase = seoProfile?.title || (categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest");
+    const catalogDescriptionBase = seoProfile?.description || (categorySlug
       ? "Khám phá sản phẩm " + categoryName + " tại SinDarealest. Xem thiết kế và mã SKU chính thức."
       : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.");
+    const catalogTitle=requestedPage>1?catalogTitleBase+" – Trang "+requestedPage:catalogTitleBase;
+    const catalogDescription=requestedPage>1?catalogDescriptionBase+" Trang "+requestedPage+".":catalogDescriptionBase;
     html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(catalogTitle) + "</title>");
     // Give direct-link visitors and crawlers the correct category heading in
     // the initial HTML, before /api/products completes on a slow connection.
@@ -182,7 +191,7 @@ export async function onRequest(context) {
     html = meta(html, "description", catalogDescription);
     html = meta(html, "og:title", catalogTitle, true);
     html = meta(html, "og:description", catalogDescription, true);
-    html = meta(html, "og:url", url.origin + canonicalPath, true);
+    html = meta(html, "og:url", canonicalCatalogUrl, true);
     // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
     // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
     html = meta(html, "og:image", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
@@ -192,7 +201,7 @@ export async function onRequest(context) {
     html = meta(html, "twitter:description", catalogDescription);
     html = meta(html, "twitter:image", url.origin + "/og-sindarealest-crisp-20261028.jpg");
     html = meta(html, "twitter:card", "summary_large_image");
-    const canonicalTag = '<link rel="canonical" href="' + escapeHtml(url.origin + canonicalPath) + '">';
+    const canonicalTag = '<link rel="canonical" href="' + escapeHtml(canonicalCatalogUrl) + '">';
     html = /<link\s+rel=["']canonical["']/i.test(html)
       ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
       : html.replace("</head>", "  " + canonicalTag + "\n</head>");
@@ -201,7 +210,7 @@ export async function onRequest(context) {
       { name: "Tất cả sản phẩm", path: "/sanpham" },
       ...(categorySlug ? [{ name: categoryName, path: canonicalPath }] : [])
     ]);
-    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug});
+    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug,page:requestedPage});
     const headers = new Headers(response.headers);
     headers.set("Content-Type","text/html; charset=utf-8");
     headers.set("Cache-Control","public, max-age=60, s-maxage=300");
