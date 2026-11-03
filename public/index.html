@@ -3239,7 +3239,7 @@ html.dark #productOverlay .detail-price:not([hidden]){color:#f4d5a4}
 .cart-pick{display:grid;place-items:center;align-self:stretch;cursor:pointer}
 .cart-pick input{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
 @media(max-width:760px){.cart-row{grid-template-columns:20px 54px minmax(0,1fr) max-content!important;gap:7px;padding:7px}.cart-row img{width:54px;height:54px}.cart-pick input{width:17px;height:17px}}
-#productOverlay .sd-detail-payment-quote{display:grid;gap:5px;margin:4px 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--glass);font-size:11px;line-height:1.5}
+#productOverlay .sd-detail-payment-quote{display:grid;gap:5px;margin:4px 0 12px;padding:12px 14px;border:1px solid transparent;border-radius:14px;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow);font-size:11px;line-height:1.5}
 #productOverlay .sd-detail-payment-quote strong{font-size:12px}
 #productOverlay .sd-detail-payment-quote p{margin:0;color:var(--ink)}
 #productOverlay .sd-detail-payment-quote small{color:var(--muted)}
@@ -3285,7 +3285,7 @@ html.dark .checkout-drawer .sd-order-production-caution strong{color:#f7d69c}
 .sd-checkout-excess-note{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
 /* Product detail: equal-size, compact Liquid Glass payment choices. */
 #productOverlay .sd-detail-payment-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));grid-auto-rows:1fr;gap:9px;margin:8px 0 4px}
-#productOverlay .sd-detail-payment-quote{border-color:transparent;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow)}
+
 #productOverlay .sd-detail-payment-option{position:relative;display:grid;grid-template-rows:auto minmax(0,1fr) auto;align-items:stretch;gap:7px;min-width:0;min-height:145px;height:100%;padding:12px 14px;border:1px solid transparent;border-radius:17px;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow);color:var(--ink);text-align:left;cursor:pointer;transition:background .2s ease,box-shadow .2s ease}
 #productOverlay .sd-detail-payment-option::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1.5px;background:var(--sd-3d-rim);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude}
 #productOverlay .sd-detail-payment-option[data-detail-payment-option="full"]{background:linear-gradient(125deg,rgba(129,204,174,.16),rgba(233,207,145,.13)),var(--sd-3d-surface)}
