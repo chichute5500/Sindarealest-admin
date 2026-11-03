@@ -413,6 +413,17 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  expect(orderBodies).toHaveLength(1);expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
  expect(saved).toEqual({'qa-shoe::42':1,'qa-wallet':1});
+ await page.evaluate(()=>{
+  const nav=document.getElementById('mobileAccountNav'),account=document.getElementById('accountDrawer');
+  const events=window.__sdAccountTimeline=[];
+  const snap=step=>events.push({step,at:performance.now(),modal:history.state?.__sdStorefrontModal,
+   open:account.classList.contains('open'),inert:account.hasAttribute('inert')});
+  snap('before checkout done');
+  new MutationObserver(()=>snap('account attribute change')).observe(account,{attributes:true,attributeFilter:['class','inert','aria-hidden']});
+  nav.addEventListener('click',()=>snap('account nav capture'),true);
+  nav.addEventListener('click',()=>queueMicrotask(()=>snap('account nav after handlers')));
+  window.addEventListener('popstate',()=>snap('popstate'),true);
+ });
  await page.locator('#sdCheckoutDone').click();await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
  await page.locator('#mobileAccountNav').click();
  const accountDebug=await page.evaluate(()=>({
@@ -426,6 +437,8 @@ test('Buy now and cart selection submit only the intended items',async({page,con
   bodyOverflow:document.body.style.overflow,historyState:history.state
  }));
  console.log('POST_CHECKOUT_ACCOUNT_DIAG',JSON.stringify(accountDebug));
+ console.log('POST_CHECKOUT_ACCOUNT_TIMELINE',JSON.stringify(await page.evaluate(()=>window.__sdAccountTimeline)));
+
  await expect(page.locator('#accountDrawer')).toHaveClass(/open/);
  await expect(page.locator('#accountOrdersAction')).toBeVisible();
  await page.locator('#accountOrdersAction').click();
