@@ -98,10 +98,12 @@ assert.doesNotMatch(styles, /\.order-step:last-child\s*\{|\.order-step:nth-child
 assert.doesNotMatch(styles, /,\s*\}/,
   'Stylesheets must not retain a dangling-comma CSS syntax issue.');
 
-assert.match(section, /class="order-cta order-cta--compact"/, 'Homepage order assurance must use one compact pill CTA rather than a tall split card.');
-assert.match(section, /class="order-cta-label" id="order-title">Đặt hàng an tâm<\/span>/, 'The compact order CTA must carry the accessible section label.');
-assert.match(section, /id="orderDetailsToggle"[^>]*aria-expanded="false"[^>]*aria-controls="orderDetailsPanel"/, 'The compact CTA must keep an accessible expanded/collapsed state.');
-assert.match(html, /#order \.order-cta--compact #orderDetailsToggle\{[^}]*border-radius:999px/, 'The order CTA must use a pill shape.');
+assert.match(section, /class="order-cta order-cta--compact"/, 'Homepage order assurance retains its compact heading layout.');
+assert.match(section, /<h2 class="pill-btn primary order-guide-heading" id="order-title">[\s\S]*?class="order-cta-label">Đặt hàng an tâm<\/span>[\s\S]*?<\/h2>/, 'Order reassurance heading is static and accessible.');
+assert.match(section, /id="orderDetailsPanel" class="order-details-panel">/, 'Four process steps are always rendered, not hidden until click.');
+assert.doesNotMatch(section, /id="orderDetailsToggle"|aria-expanded="false"|class="order-details-panel" hidden/, 'Do not reintroduce click-to-expand.');
+assert.doesNotMatch(html, /ensureOrderGuideOpen|orderDetailsToggle/, 'No old toggle handlers or CSS.');
+assert.match(html, /#order \.order-cta--compact \.order-guide-heading\{[^}]*border-radius:999px/, 'Approved compact pill remains visual, not interactive.');
 assert.match(html, /function dismissToast\(\)/, 'Drawer transitions must be able to clear the global toast.');
 
-console.log('PASS: compact order pill, four-step process, scoped styles, responsive grid, commitments, and standalone Zalo CTA.');
+console.log('PASS: always-visible order assurance, four-step grid, scoped styles, commitments, Zalo CTA.');

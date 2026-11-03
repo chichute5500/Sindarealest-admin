@@ -1300,7 +1300,7 @@ html.dark .glass{background:var(--sd-card-glass);-webkit-backdrop-filter:blur(18
 .service-copy{display:flex;flex-direction:column;align-items:center;gap:5px}.service-text strong{font-size:clamp(10px,1vw,12px);font-weight:600;line-height:1.35;text-align:center;overflow-wrap:anywhere}
 .service-icon{width:24px;height:24px;display:grid;place-items:center}.service-icon svg{width:20px;height:20px}.service:nth-child(n+7){display:none}
 #order{padding-top:16px;padding-bottom:8px}.order-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;border-radius:22px;background:var(--sd-card-glass);border:1px solid var(--sd-glass-edge)}
-.order-cta .section-title{margin:2px 0 0;font-size:clamp(20px,2.5vw,27px)}.order-cta .eyebrow{font-size:10px}.order-cta .pill-btn{flex-shrink:0;min-height:42px}.order-details-panel{padding-top:18px}.order-details-panel[hidden]{display:none!important}
+.order-cta .section-title{margin:2px 0 0;font-size:clamp(20px,2.5vw,27px)}.order-cta .eyebrow{font-size:10px}.order-cta .pill-btn{flex-shrink:0;min-height:42px}.order-details-panel{padding-top:18px}
 .section#collections .section-title{letter-spacing:-.025em}
 .product-card,.catalog-card{background:var(--sd-card-glass);border:1px solid var(--sd-glass-edge);box-shadow:var(--sd-depth-shadow);overflow:hidden}
 .mobile-bottom-nav{padding:7px 8px calc(7px + env(safe-area-inset-bottom))}.mobile-tab{min-width:0;min-height:44px;gap:4px}.mobile-tab svg{width:19px;height:19px;flex-shrink:0}.mobile-tab span{font-size:10px;line-height:1.15}
@@ -1357,10 +1357,10 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 
 /* Keep order assurance to one calm CTA, as in the mobile reference. */
 #order .order-cta--compact{display:flex;align-items:center;justify-content:center;width:100%;min-height:0;margin:0;padding:0;gap:0;border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
-#order .order-cta--compact #orderDetailsToggle{display:flex;align-items:center;justify-content:center;gap:8px;width:min(100%,380px);min-height:42px;padding:9px 18px;border-radius:999px;font-size:12px;line-height:1.25}
+#order .order-cta--compact .order-guide-heading{display:flex;align-items:center;justify-content:center;gap:8px;width:min(100%,380px);min-height:42px;padding:9px 18px;border-radius:999px;font-size:12px;line-height:1.25;margin:0;cursor:default}
 #order .order-cta-icon{display:block;width:16px;height:16px;flex:0 0 auto}
 #order .order-cta-label{font-weight:600}
-@media(max-width:760px){#order .order-cta--compact #orderDetailsToggle{width:100%;min-height:38px;padding:8px 14px;font-size:11px}}
+@media(max-width:760px){#order .order-cta--compact .order-guide-heading{width:100%;min-height:38px;padding:8px 14px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){#order .order-details-panel{scroll-behavior:auto!important}}
 
 /* Visual compare pass 2 — restore more of the pearl/navy liquid-glass depth visible in the supplied references. */
@@ -1400,7 +1400,7 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
   .service-text strong{font-size:clamp(10px,2.8vw,11px);line-height:1.34}
   .service-strip .service-copy{min-height:52px;padding:4px 2px}
   #order{padding-top:18px;padding-bottom:14px}
-  #order .order-cta--compact #orderDetailsToggle{min-height:46px;padding:10px 16px;font-size:11px}
+  #order .order-cta--compact .order-guide-heading{min-height:46px;padding:10px 16px;font-size:11px}
   .section#featured{padding-top:27px}
 }
 @media(max-width:360px){
@@ -1415,11 +1415,11 @@ html.dark .order-cta,html.dark .account-action{background:rgba(7,31,50,.82)}
 /* QA correction: the two-column hero must stay inside the viewport after enlarging the reference proportions. */
 @media(max-width:760px){
   .service-strip>.service{min-height:0;height:auto}
-  #order .order-cta--compact #orderDetailsToggle{min-height:50px}
+  #order .order-cta--compact .order-guide-heading{min-height:50px}
 }
 @media(max-width:360px){
   .service-strip>.service{min-height:0}
-  #order .order-cta--compact #orderDetailsToggle{min-height:44px}
+  #order .order-cta--compact .order-guide-heading{min-height:44px}
 }
 
 
@@ -1888,7 +1888,7 @@ html.dark .sd-fullscreen-brand-copy small{color:#abc3d7}
   .service-text strong{font-size:clamp(9px,2.65vw,10.5px);line-height:1.3;font-weight:700;overflow-wrap:normal}
   #order{padding:16px 0 12px}
   @media(max-width:380px){#order{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}}
-  #order .order-cta--compact #orderDetailsToggle{min-height:42px;font-size:11px;padding:8px 14px;border:1px solid transparent;background:var(--sd-glass-shell);box-shadow:var(--sd-3d-shadow)}
+  #order .order-cta--compact .order-guide-heading{min-height:42px;font-size:11px;padding:8px 14px;border:1px solid transparent;background:var(--sd-glass-shell);box-shadow:var(--sd-3d-shadow)}
   .section#featured{padding-top:18px}
   #featured .eyebrow{display:none!important}
   #featured .section-head{display:flex;flex-direction:row;align-items:end;justify-content:space-between;gap:8px;margin:0 0 13px}
@@ -2748,7 +2748,7 @@ html.dark{
    underneath a translucent face tints the ENTIRE control (wrong). These
    masks exclude the face pixels; pastel light exists only on curved edges. */
 :where(.nav-wrap .nav,.cart-drawer .cart-header,.cart-drawer .cart-subtotal-bar,.checkout-drawer .checkout-header,.service-strip .service-copy,
- #order #orderDetailsToggle,#order .order-step,#order .order-assurance-footer,
+ #order .order-guide-heading,#order .order-step,#order .order-assurance-footer,
  .sd-track-panel,#mobileBottomNav.mobile-bottom-nav,
  #mobileBottomNav .mobile-tab,.icon-btn,.mini-add,.page-btn.page-arrow,
  .slide-controls button,.featured-arrow,.detail-zoom-btn,.detail-gallery-arrow,
@@ -3589,8 +3589,8 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 
 
   <section class="section wrap" id="order" aria-labelledby="order-title">
-    <div class="order-cta order-cta--compact" data-reveal><button type="button" class="pill-btn primary tap-target" id="orderDetailsToggle" aria-expanded="false" aria-controls="orderDetailsPanel"><svg class="order-cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="order-cta-label" id="order-title">Đặt hàng an tâm</span><span class="arrow" aria-hidden="true">→</span></button></div>
-    <div id="orderDetailsPanel" class="order-details-panel" hidden>
+    <div class="order-cta order-cta--compact" data-reveal><h2 class="pill-btn primary order-guide-heading" id="order-title"><svg class="order-cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="order-cta-label">Đặt hàng an tâm</span></h2></div>
+    <div id="orderDetailsPanel" class="order-details-panel">
     <div class="section-head" data-reveal><div><div class="eyebrow">A clear process, a considered result</div><h2 class="section-title">Đặt hàng từng bước rõ ràng</h2></div><p class="section-note">Bốn bước rõ ràng; mọi điều kiện quan trọng được xác nhận trước khi đặt cọc.</p></div>
     <div class="order-steps" role="list" aria-label="Quy trình đặt hàng gồm bốn bước">
       <article class="order-step glass" role="listitem" data-reveal><div class="order-step-top"><span class="order-number" aria-label="Bước 1">01</span><span class="order-icon" aria-hidden="true"><svg viewBox="0 0 24 24" data-order-icon="product" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6.5 8.5h11l1 11h-13l1-11Z"/><path d="M9 8.5v-2a3 3 0 0 1 6 0v2"/></svg></span></div><h3>Chọn sản phẩm</h3><p>Chọn mẫu yêu thích và ghi lại tên mẫu để được tư vấn nhanh.</p></article>
@@ -4259,7 +4259,6 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
  if(location.pathname+location.hash!==destination)
   history.pushState({sdStorefrontHome:true},'',destination);
  setCatalogLandingMode(false);
- if(hash==='#order')ensureOrderGuideOpen();
  // A direct catalog visit defers offscreen featured image fetches until Home is actually opened.
  setActiveNav(section.id==='home'?'home':section.id);
  setMobileMenu(false);
@@ -4282,14 +4281,6 @@ function syncCatalogFromLocation(){
  selectedCategory=value;page=1;renderFilters();renderCatalog();
  setActiveNav('products');
  return true;
-}
-function ensureOrderGuideOpen(){
- const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');
- if(!panel||!button||!panel.hidden)return;
- panel.hidden=false;button.setAttribute('aria-expanded','true');
- const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');
- if(label)label.textContent='Thu gọn quy trình';
- if(arrow)arrow.textContent='↑';
 }
 function navigateCatalog(category='all'){
  if(typeof document!=='undefined'&&document.documentElement.classList.contains('sd-service-route')){location.assign('/sanpham');return}
@@ -5573,10 +5564,8 @@ function sdTrackRender(orders){
  result.hidden=orders.length===0;
 }
 function bindEvents(){
- window.addEventListener('hashchange',()=>{if(location.hash==='#order')ensureOrderGuideOpen()});
- if(location.hash==='#order')ensureOrderGuideOpen();
  const featured=$('#featured');if(featured){featured.addEventListener('pointerdown',pauseFeaturedAutoplay,{passive:true});featured.addEventListener('focusin',pauseFeaturedAutoplay);featured.addEventListener('mouseenter',pauseFeaturedAutoplay)}
- $('#themeToggle').addEventListener('click',toggleTheme);$('#cartOpen').addEventListener('click',()=>toggleStorefrontModal('cart'));$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart));$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBack').addEventListener('click',sdCheckoutReturnToCart);$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'));$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount));$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',navigateAccountContact);$('#accountFavoritesAction')?.addEventListener('click',()=>setAccountView('favorites'));$('#accountFavoritesBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountOrdersAction')?.addEventListener('click',()=>setAccountView('orders'));$('#accountOrdersBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressAction')?.addEventListener('click',()=>setAccountView('address'));$('#accountAddressBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressForm')?.addEventListener('submit',saveAccountAddress);$('#accountAddressProvince')?.addEventListener('change',()=>loadAccountAddressWards());$('#detailFavorite')?.addEventListener('click',()=>{if(currentProduct)toggleFavorite(favoriteKey(currentProduct))});$('#accountFavoritesList')?.addEventListener('click',event=>{const remove=event.target.closest('[data-favorite-remove]');if(remove){toggleFavorite(remove.dataset.favoriteRemove);return}const open=event.target.closest('[data-favorite-open]');if(open){const key=open.dataset.favoriteOpen;closeAccount(false);openDetail(key)}});$('#orderDetailsToggle')?.addEventListener('click',()=>{const panel=$('#orderDetailsPanel'),button=$('#orderDetailsToggle');const open=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',String(open));panel.hidden=!open;const label=button.querySelector('.order-cta-label'),arrow=button.querySelector('.arrow');if(label)label.textContent=open?'Thu gọn quy trình':'Đặt hàng an tâm';if(arrow)arrow.textContent=open?'↑':'→';if(open)panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})});document.addEventListener('keydown',e=>{if(e.key==='Tab'){if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}if($('#sdFullscreenViewer').classList.contains('open')){trapFullscreenTab(e);return}if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}if($('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if($('#accountDrawer').classList.contains('open')){trapAccountTab(e);return}}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))requestStorefrontModalClose('checkout',closeCheckout);else if($('#cartDrawer').classList.contains('open'))requestStorefrontModalClose('cart',closeCart);else if($('#accountDrawer').classList.contains('open'))requestStorefrontModalClose('account',closeAccount)});
+ $('#themeToggle').addEventListener('click',toggleTheme);$('#cartOpen').addEventListener('click',()=>toggleStorefrontModal('cart'));$('#cartClose').addEventListener('click',()=>requestStorefrontModalClose('cart',closeCart));$('#cartCheckout').addEventListener('click',openCheckout);$('#checkoutClose').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBackdrop').addEventListener('click',()=>requestStorefrontModalClose('checkout',closeCheckout));$('#checkoutBack').addEventListener('click',sdCheckoutReturnToCart);$('#accountOpen')?.addEventListener('click',()=>toggleStorefrontModal('account'));$('#accountClose')?.addEventListener('click',()=>requestStorefrontModalClose('account',closeAccount));$('#accountThemeAction')?.addEventListener('click',()=>toggleTheme());$('#accountContactAction')?.addEventListener('click',navigateAccountContact);$('#accountFavoritesAction')?.addEventListener('click',()=>setAccountView('favorites'));$('#accountFavoritesBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountOrdersAction')?.addEventListener('click',()=>setAccountView('orders'));$('#accountOrdersBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressAction')?.addEventListener('click',()=>setAccountView('address'));$('#accountAddressBack')?.addEventListener('click',()=>setAccountView('menu'));$('#accountAddressForm')?.addEventListener('submit',saveAccountAddress);$('#accountAddressProvince')?.addEventListener('change',()=>loadAccountAddressWards());$('#detailFavorite')?.addEventListener('click',()=>{if(currentProduct)toggleFavorite(favoriteKey(currentProduct))});$('#accountFavoritesList')?.addEventListener('click',event=>{const remove=event.target.closest('[data-favorite-remove]');if(remove){toggleFavorite(remove.dataset.favoriteRemove);return}const open=event.target.closest('[data-favorite-open]');if(open){const key=open.dataset.favoriteOpen;closeAccount(false);openDetail(key)}});document.addEventListener('keydown',e=>{if(e.key==='Tab'){if($('#mobileNav').classList.contains('open')){trapMobileMenuTab(e);return}if($('#cartDrawer').classList.contains('open')){trapCartTab(e);return}if($('#sdFullscreenViewer').classList.contains('open')){trapFullscreenTab(e);return}if($('#productOverlay').classList.contains('open')){trapProductTab(e);return}if($('#checkoutDrawer').classList.contains('open')){trapCheckoutTab(e);return}if($('#accountDrawer').classList.contains('open')){trapAccountTab(e);return}}if(e.key!=='Escape')return;if($('#checkoutDrawer').classList.contains('open'))requestStorefrontModalClose('checkout',closeCheckout);else if($('#cartDrawer').classList.contains('open'))requestStorefrontModalClose('cart',closeCart);else if($('#accountDrawer').classList.contains('open'))requestStorefrontModalClose('account',closeAccount)});
 $('#sdTrackForm').addEventListener('submit',async ev=>{
  ev.preventDefault();const button=$('#sdTrackSubmit'),msg=$('#sdTrackMessage'),lookup=$('#sdTrackInput').value.trim();
  const phoneLookup=/^[+0-9().\s/-]+$/.test(lookup)&&/^\d{9,12}$/.test(lookup.replace(/\D/g,''));
@@ -5794,7 +5783,7 @@ $('#paymentInstructions').hidden=true;const items=sdCheckoutItems();if(!items.le
  $('#checkoutDrawer').scrollTop=0;form.scrollTop=0;
  renderPaymentInstructions(preview,'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent=quote.paymentReady?'Chờ thanh toán':'Thông tin đặt hàng';$('#sdCheckoutStepSubtitle').textContent=quote.paymentReady?'Quét QR và chuyển khoản. Đơn hàng chỉ được tạo khi lấy mã đơn.':'Đơn hàng chỉ được tạo khi bạn chọn lấy mã đơn.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#sdCheckoutReviewAddressRow').hidden=true;$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=!$('#sdCheckoutConfirmWrap').hidden;$('#sdCheckoutDone').textContent='Lấy mã đơn →';sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll();sdCheckoutScheduleSuccessTitleAlign();
 }catch(error){message.textContent=error.message||'Chưa thể chuẩn bị thông tin thanh toán.'}finally{button.disabled=false;if(!sdCheckoutSuccess)button.textContent=sdCheckoutSubmitLabel()}});
-$('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&panel?.dataset.stage==='transfer'){void sdCheckoutFinalizeOrder();return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();ensureOrderGuideOpen();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,option=selectedDetailOption(currentProduct);if(!id||option===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){showToast('Chọn đặt cọc 30% hoặc thanh toán hết giảm 5% trước.');$('#sdDetailPaymentQuote')?.scrollIntoView({behavior:'smooth',block:'center'});return}closeDetail(false,false);openCheckout({items:[{id,option,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
+$('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&panel?.dataset.stage==='transfer'){void sdCheckoutFinalizeOrder();return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,option=selectedDetailOption(currentProduct);if(!id||option===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){showToast('Chọn đặt cọc 30% hoặc thanh toán hết giảm 5% trước.');$('#sdDetailPaymentQuote')?.scrollIntoView({behavior:'smooth',block:'center'});return}closeDetail(false,false);openCheckout({items:[{id,option,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
 $('#detailZoom').addEventListener('click',openFullscreenImage);
 $('#detailPrev').addEventListener('click',()=>changeDetailImage(detailIndex-1,true,'right'));
 $('#detailNext').addEventListener('click',()=>changeDetailImage(detailIndex+1,true,'left'));

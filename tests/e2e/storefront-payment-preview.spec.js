@@ -1878,3 +1878,30 @@ for(const cfg of [
   console.log('STANDALONE_LOOKUP_ROUTES_QA',JSON.stringify({width:cfg.width,scheme:cfg.scheme,orderQueries:orders,warrantyQueries:warranties}));
  });
 }
+
+
+// Owner requirement: entire order assurance section is open by default on all viewports.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:1280,height:800,scheme:'light'}
+]){
+ test('Order reassurance always visible '+cfg.width+' '+cfg.scheme,async({page})=>{
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  await page.route('**/api/products',r=>r.fulfill({status:503,contentType:'application/json',body:'{"error":"Catalog offline in isolated QA"}'}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
+  await page.goto(new URL('/',url).href,{waitUntil:'domcontentloaded'});
+  const section=page.locator('#order'),panel=page.locator('#orderDetailsPanel');
+  await expect(section.locator('#order-title')).toHaveText('Đặt hàng an tâm');
+  await expect(panel).toBeVisible();
+  await expect(section.locator('.order-step')).toHaveCount(4);
+  await expect(section.locator('.order-assurance-footer')).toBeVisible();
+  await expect(page.locator('#orderDetailsToggle')).toHaveCount(0);
+  await section.scrollIntoViewIfNeeded();
+  await page.screenshot({path:join(output,'order-always-visible-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.goto(new URL('/#order',url).href,{waitUntil:'domcontentloaded'});
+  await expect(panel).toBeVisible();
+  await expect(section.locator('.order-step')).toHaveCount(4);
+ });
+}
