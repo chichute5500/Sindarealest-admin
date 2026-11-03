@@ -25,6 +25,23 @@ function catalogSeoProfile(html, categorySlug) {
       && typeof profile.intro === "string" ? profile : null;
   } catch { return null; }
 }
+// The same visible catalog hierarchy is expressed as crawler-readable
+// BreadcrumbList JSON-LD. No new D1 read, no invented attributes, no UI changes.
+function appendBreadcrumbList(html, origin, entries) {
+  if (!Array.isArray(entries) || entries.length < 2) return html;
+  const itemListElement = entries.map(({ name, path }, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: String(name || "").slice(0, 200),
+    item: new URL(path, origin).href
+  }));
+  const schema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement
+  }).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  return html.replace("</head>", '  <script type="application/ld+json">' + schema + '</script>\n</head>');
+}
 // Functions-generated HTML bypasses static _headers on some Cloudflare paths.
 // Apply the same minimally restrictive document-level controls on all real
 // storefront HTML responses, without blocking approved inline scripts, Zalo
@@ -179,6 +196,11 @@ export async function onRequest(context) {
     html = /<link\s+rel=["']canonical["']/i.test(html)
       ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
       : html.replace("</head>", "  " + canonicalTag + "\n</head>");
+    html = appendBreadcrumbList(html, url.origin, [
+      { name: "Trang chủ", path: "/" },
+      { name: "Tất cả sản phẩm", path: "/sanpham" },
+      ...(categorySlug ? [{ name: categoryName, path: canonicalPath }] : [])
+    ]);
     html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug});
     const headers = new Headers(response.headers);
     headers.set("Content-Type","text/html; charset=utf-8");
@@ -285,6 +307,22 @@ export async function onRequest(context) {
   html = meta(html, "twitter:image", new URL(imagePath, url.origin).href);
   const canonicalTag = `<link rel="canonical" href="${escapeHtml(canonical)}">`;
   html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
+  // Breadcrumb hierarchy follows the actual catalog and canonical product route.
+  // Keep the original Admin product name, not the keyword-expanded SEO title.
+  const categorySlug = productCategoryRouteSlug(product.category);
+  const categoryLabels = {
+    sneaker: "Giày thể thao", giayluoi: "Giày lười", giaytay: "Giày tây",
+    thatlung: "Thắt lưng", vinam: "Ví nam", vicamtay: "Ví cầm tay",
+    caplaptop: "Cặp – Tab – Laptop", clutch: "Clutch", mu: "Mũ",
+    tuideocheo: "Túi đeo chéo", tuigolf: "Túi golf", tuinu: "Túi nữ",
+    dep: "Dép", daydongho: "Dây đồng hồ", oplung: "Ốp điện thoại"
+  };
+  html = appendBreadcrumbList(html, url.origin, [
+    { name: "Trang chủ", path: "/" },
+    { name: "Tất cả sản phẩm", path: "/sanpham" },
+    { name: categoryLabels[categorySlug] || String(product.category || "Danh mục"), path: "/sanpham/" + categorySlug },
+    { name: product.title, path: canonicalPath }
+  ]);
   // No publicly verified Offer, customer review, or aggregate rating is
   // available here. Declaring Product without one of these causes a Google
   // product-snippet error. Keep a truthful indexable WebPage schema instead
