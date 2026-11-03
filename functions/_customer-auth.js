@@ -1,6 +1,5 @@
 // Isolated customer authentication. Never accept or set sd_admin_session.
 const enc = new TextEncoder();
-export const ZALO_APP_ID = "3933116436838564742";
 export const ORIGIN = "https://sindarealest2.pages.dev";
 export const PREVIEW_ORIGIN = "https://feat-zalo-customer-login-202.sindarealest-admin-preview.pages.dev";
 export const CUSTOMER_COOKIE = "sd_customer_login";
@@ -16,16 +15,9 @@ export function customerOrigin(request) {
   }catch{return null;}
 }
 export const callback = (provider,origin=ORIGIN) => origin + "/api/customer/auth/" + provider + "/callback";
-export const emailTestAllowed = request => customerOrigin(request)===PREVIEW_ORIGIN;
-export const configured = (env, provider) => Boolean(env?.DB && (provider === "zalo" ?
-  typeof env.ZALO_APP_SECRET === "string" && env.ZALO_APP_SECRET.length >= 8 :
-  provider === "google" ?
-    typeof env.GOOGLE_CLIENT_ID === "string" && env.GOOGLE_CLIENT_ID.includes(".apps.googleusercontent.com") &&
-    typeof env.GOOGLE_CLIENT_SECRET === "string" && env.GOOGLE_CLIENT_SECRET.length >= 8 :
-  provider === "facebook" ?
-    typeof env.FACEBOOK_APP_ID === "string" && /^[0-9]{6,32}$/.test(env.FACEBOOK_APP_ID) &&
-    typeof env.FACEBOOK_APP_SECRET === "string" && env.FACEBOOK_APP_SECRET.length >= 16 :
-  provider === "email"));
+export const configured = (env,provider) => Boolean(env?.DB && provider === "google" &&
+  typeof env.GOOGLE_CLIENT_ID === "string" && env.GOOGLE_CLIENT_ID.includes(".apps.googleusercontent.com") &&
+  typeof env.GOOGLE_CLIENT_SECRET === "string" && env.GOOGLE_CLIENT_SECRET.length >= 8);
 export const now = () => Math.floor(Date.now()/1000);
 export function randomToken(length=32) {
   const bytes = new Uint8Array(length);
@@ -33,8 +25,7 @@ export function randomToken(length=32) {
   return Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
 }
 export function randomPkceVerifier() {
-  // Zalo OAuth V4 documents a 43-character verifier containing uppercase,
-  // lowercase and digits. Use 256 bits of browser/worker CSPRNG entropy.
+  // Google OAuth PKCE verifier: 256 bits of browser/worker CSPRNG entropy.
   for (;;) {
     const bytes=new Uint8Array(32);
     crypto.getRandomValues(bytes);
@@ -110,7 +101,7 @@ export async function consumeFlow(env,provider,state,request) {
   return row.verifier;
 }
 export async function beginSession(env,provider,subject,name,email=null) {
-  if (!["zalo","google","facebook"].includes(provider) || !subject || subject.length>255) throw Error("bad identity");
+  if (provider !== "google" || !subject || subject.length>255) throw Error("bad identity");
   const id=crypto.randomUUID(),display=String(name||"Khách hàng").slice(0,100);
   const safeEmail=email?String(email).slice(0,254):null;
   await env.DB.prepare("INSERT OR IGNORE INTO customer_auth_accounts(id,provider,provider_subject,display_name,email) VALUES(?,?,?,?,?)")
@@ -129,40 +120,11 @@ export async function issueSession(env,accountId) {
 export async function getAccount(env,request) {
   const token=cookies(request,CUSTOMER_COOKIE);
   if(!/^[a-f0-9]{64}$/.test(token)||!env?.DB)return null;
-  return env.DB.prepare("SELECT a.id,a.provider,a.display_name,a.email FROM customer_auth_sessions s JOIN customer_auth_accounts a ON a.id=s.account_id LEFT JOIN customer_auth_email_state v ON v.account_id=a.id WHERE s.token_hash=? AND s.expires_at>? AND (a.provider<>'email' OR v.verified_at IS NOT NULL)")
+  return env.DB.prepare("SELECT a.id,a.provider,a.display_name,a.email FROM customer_auth_sessions s JOIN customer_auth_accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>? AND a.provider='google'")
     .bind(await digest(token),now()).first();
 }
 export async function endSession(env,request) {
   const token=cookies(request,CUSTOMER_COOKIE);
   if(/^[a-f0-9]{64}$/.test(token)&&env?.DB)
     await env.DB.prepare("DELETE FROM customer_auth_sessions WHERE token_hash=?").bind(await digest(token)).run();
-}
-// Cloudflare Workers caps each PBKDF2 deriveBits operation at 100,000 iterations.
-// Three domain-separated rounds avoid the runtime's 210,000-iteration exception,
-// retaining 300,000 total KDF iterations. This version is Preview-only until
-// verified Email ownership, recovery and a production-grade password KDF exist.
-export async function passwordHash(password,salt) {
-  if(typeof password!=="string"||typeof salt!=="string"||!salt)throw Error("Invalid password KDF input");
-  let material=enc.encode(password);
-  for(let round=0;round<3;round++){
-    const imported=await crypto.subtle.importKey("raw",material,"PBKDF2",false,["deriveBits"]);
-    material=new Uint8Array(await crypto.subtle.deriveBits({
-      name:"PBKDF2",hash:"SHA-256",
-      salt:enc.encode("sd-customer-email-v2:"+round+":"+salt),
-      iterations:100000
-    },imported,256));
-  }
-  return Array.from(material,b=>b.toString(16).padStart(2,"0")).join("");
-}
-export async function zaloAppSecretProof(accessToken,appSecret) {
-  if(typeof accessToken!=="string" || !accessToken || typeof appSecret!=="string" || !appSecret)
-    throw new Error("Zalo token proof requires secret");
-  const key=await crypto.subtle.importKey("raw",enc.encode(appSecret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
-  const signature=await crypto.subtle.sign("HMAC",key,enc.encode(accessToken));
-  return Array.from(new Uint8Array(signature),b=>b.toString(16).padStart(2,"0")).join("");
-}
-export function equalHash(a,b) {
-  if(typeof a!=="string"||typeof b!=="string"||a.length!==b.length)return false;
-  let diff=0;for(let i=0;i<a.length;i++)diff|=a.charCodeAt(i)^b.charCodeAt(i);
-  return diff===0;
 }

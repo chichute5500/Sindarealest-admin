@@ -5,11 +5,8 @@
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
 import { readFileSync } from "node:fs";
-import { onRequestGet as zaloStart } from "../functions/api/customer/auth/zalo/start.js";
-import { onRequestGet as zaloCallback } from "../functions/api/customer/auth/zalo/callback.js";
 import { onRequestGet as googleStart } from "../functions/api/customer/auth/google/start.js";
 import { onRequestGet as googleCallback } from "../functions/api/customer/auth/google/callback.js";
-import { onRequestPost as email } from "../functions/api/customer/auth/email.js";
 import { onRequestGet as session } from "../functions/api/customer/session.js";
 import { onRequestPost as logout } from "../functions/api/customer/logout.js";
 import { ORIGIN,PREVIEW_ORIGIN } from "../functions/_customer-auth.js";
@@ -52,7 +49,6 @@ const DB={
 };
 const env={
   DB,SESSION_SECRET:"disposable-test-only-secret-".repeat(3),
-  ZALO_APP_SECRET:"disposable-zalo-secret",
   GOOGLE_CLIENT_ID:"test-id.apps.googleusercontent.com",
   GOOGLE_CLIENT_SECRET:"disposable-google-secret"
 };
@@ -67,17 +63,15 @@ const fetchBefore=globalThis.fetch;
 const providerCalls=[];
 globalThis.fetch=async (url,init)=>{
   providerCalls.push({url:String(url),method:init?.method||"GET"});
-  if(String(url).includes("/v4/access_token")||String(url).includes("googleapis.com/token"))
+  if(String(url).includes("googleapis.com/token"))
     return Response.json({access_token:"disposable-access-only"});
-  if(String(url).includes("graph.zalo.me"))
-    return Response.json({id:"555000111",name:"Khách Zalo Thử Nghiệm"});
   if(String(url).includes("openidconnect.googleapis.com"))
     return Response.json({sub:"google-test-sub",name:"Khách Google Thử Nghiệm",email:"disposable@example.test",email_verified:true});
   throw new Error("Unknown URL "+url);
 };
 try{
   for(const [provider,start,cb] of [
-    ["zalo",zaloStart,zaloCallback],["google",googleStart,googleCallback]
+    ["google",googleStart,googleCallback]
   ]){
     const begin=await start({request:makeRequest("/api/customer/auth/"+provider+"/start"),env});
     assert.equal(begin.status,302);
@@ -95,7 +89,7 @@ try{
     assert.equal(accepted.status,302);
     assert.match(accepted.headers.get("Location"),/success/);
     assert.equal(count("customer_auth_flows"),0);
-    assert.equal(count("customer_auth_accounts"),provider==="zalo"?1:2);
+    assert.equal(count("customer_auth_accounts"),1);
     const match=accepted.headers.get("Set-Cookie").match(/sd_customer_login=[a-f0-9]{64}/);
     assert.ok(match,"Has secure cookie");
     const cookie=match[0];
@@ -108,15 +102,6 @@ try{
     const out=await session({request:makeRequest("/api/customer/session",cookie),env});
     assert.equal((await out.json()).authenticated,false);
   }
-  // Abuse guard: each OAuth provider has an atomic per-client 15-minute budget.
-  // One Zalo start was already counted above; 9 more allowed, the 11th rejected.
-  for(let attempt=0;attempt<9;attempt++) {
-    const response=await zaloStart({request:makeRequest("/api/customer/auth/zalo/start"),env});
-    assert.equal(response.status,302);
-  }
-  const blocked=await zaloStart({request:makeRequest("/api/customer/auth/zalo/start"),env});
-  assert.equal(blocked.status,429,"must reject repeated OAuth state creation");
-  assert.equal(count("customer_auth_flows"),9,"blocked attempt did not allocate new D1 state");
   // Preview is a different Pages project. Callback URLs must use its exact host,
   // not hard-code the storefront Production domain.
   // The project root URL is its Production environment, not branch Preview.
@@ -124,10 +109,6 @@ try{
   const projectRootRequest=await googleStart({request:makeRequest(
     "/api/customer/auth/google/start","","GET",null,null,projectProduction),env});
   assert.equal(projectRootRequest.status,503);
-  const emailRoot=await email({request:makeRequest(
-    "/api/customer/auth/email","","POST",{mode:"register",name:"QA",email:"qa@example.test",password:"Password-test-2026!!"},
-    projectProduction,projectProduction),env});
-  assert.equal(emailRoot.status,403,"reject untrusted project Production root before Email processing");
   const previewStart=await googleStart({request:makeRequest(
     "/api/customer/auth/google/start","","GET",null,null,PREVIEW_ORIGIN),env});
   assert.equal(previewStart.status,302);
@@ -141,20 +122,9 @@ try{
   const previewSession=previewCb.headers.get("Set-Cookie").match(/sd_customer_login=[a-f0-9]{64}/)?.[0];
   assert.ok(previewSession);
   assert.equal((await logout({request:makeRequest("/api/customer/logout",previewSession,"POST",null,PREVIEW_ORIGIN,PREVIEW_ORIGIN),env})).status,200);
-  // Email account is isolated from orders, no email-only claim into customer records.
-  const body={mode:"register",name:"Khách Email Thử",email:"qa+mail@example.test",password:"pass_2026!test-safe"};
-  const deniedOnProduction=await email({request:makeRequest("/api/customer/auth/email","","POST",body,ORIGIN),env});
-  assert.equal(deniedOnProduction.status,503,"no public Email signup until verification and recovery");
-  const registered=await email({request:makeRequest("/api/customer/auth/email","","POST",body,PREVIEW_ORIGIN,PREVIEW_ORIGIN),env});
-  assert.equal(registered.status,503,"Email must fail closed without Mailjet secrets");
-  assert.equal(count("customer_auth_accounts"),2,"No unverified account created without Mailjet");
-  const login=await email({request:makeRequest("/api/customer/auth/email","","POST",{...body,mode:"login"},PREVIEW_ORIGIN,PREVIEW_ORIGIN),env});
-  assert.equal(login.status,503,"Email login must remain off without Mailjet");
-  // The separate Mailjet-mocked test exercises successful verified Email flows.
   assert.equal(count("orders"),0,"never create/claim real customer orders");
   assert.equal(count("customers"),0);
   assert.equal(db.prepare("PRAGMA foreign_key_check").all().length,0);
-  assert.ok(providerCalls.some(x=>x.url.includes("graph.zalo.me")));
   assert.ok(providerCalls.some(x=>x.url.includes("openidconnect.googleapis.com")));
-  console.log("DISPOSABLE REAL SQLITE customer auth: Zalo/Google OAuth, replay, CSRF, sessions, logout, Email fail-closed and migration 0014 PASS");
+  console.log("DISPOSABLE REAL SQLITE customer auth: Google-only OAuth, replay, CSRF, sessions, logout and historical schema compatibility PASS");
 }finally{globalThis.fetch=fetchBefore;db.close();}
