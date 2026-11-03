@@ -3179,13 +3179,24 @@ html.dark #productOverlay .sd-product-option-chip{
  transition-duration:105ms;
 }
 html.dark #productOverlay .sd-product-option-chip:active{box-shadow:var(--sd-3d-depressed)}
+/* Clear, single selected-size state; all neutral glass buttons stay unchanged. */
 #productOverlay .sd-product-option-chip.is-selected{
- color:var(--sd-3d-ink);border-color:transparent;background:var(--sd-3d-surface);
- box-shadow:var(--sd-3d-selected);
+ position:relative;color:#104b37;font-weight:850;
+ border-color:rgba(21,134,96,.82);
+ background:linear-gradient(150deg,rgba(205,255,224,.97),rgba(132,231,182,.93));
+ box-shadow:inset 0 1px 3px rgba(24,126,93,.15),0 0 0 1px rgba(23,143,101,.2),0 4px 11px rgba(21,132,97,.19);
 }
 html.dark #productOverlay .sd-product-option-chip.is-selected{
- color:#eaf3fb;border-color:transparent;background:var(--sd-3d-surface);
- box-shadow:var(--sd-3d-selected);
+ color:#f2fff8;border-color:rgba(122,231,180,.92);
+ background:linear-gradient(150deg,rgba(41,128,96,.98),rgba(19,90,75,.97));
+ box-shadow:inset 0 1px 3px rgba(7,46,34,.3),0 0 0 1px rgba(118,231,183,.22),0 4px 11px rgba(3,43,31,.27);
+}
+#productOverlay .sd-product-option-chip.is-selected::before{
+ content:"✓";position:absolute;top:-2px;right:-2px;z-index:2;
+ display:grid;place-items:center;width:13px;height:13px;
+ border:1px solid rgba(255,255,255,.94);border-radius:50%;
+ background:#168861;color:#fff;font:800 10px/1 Arial,sans-serif;
+ box-shadow:0 2px 5px rgba(20,87,63,.25);pointer-events:none;
 }
 #productOverlay .sd-product-option-chip.is-selected:active:not(:disabled),
 html.dark #productOverlay .sd-product-option-chip.is-selected:active:not(:disabled){

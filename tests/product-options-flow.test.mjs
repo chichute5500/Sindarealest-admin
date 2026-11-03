@@ -113,6 +113,12 @@ try {
  assert.ok(html.includes('selectedDetailOption(currentProduct)'));
  assert.match(html,/data-cart-select/);
  assert.ok(html.includes('#productOverlay .detail-variants:not([hidden])'));
+ assert.match(html,/#productOverlay \.sd-product-option-chip\.is-selected\{[^}]*border-color:rgba\(21,134,96,\.82\)/,'Selected size has visible green outline');
+ assert.match(html,/#productOverlay \.sd-product-option-chip\.is-selected::before\{[^}]*content:"✓"/,'Selected size includes unmistakable checkmark');
+ assert.match(html,/html\.dark #productOverlay \.sd-product-option-chip\.is-selected\{[^}]*rgba\(122,231,180,\.92\)/,'Dark theme selection has adequate contrast');
+ assert.match(html,/button\.setAttribute\('aria-pressed',String\(selected\)\);[\s\S]{0,100}button\.classList\.toggle\('is-selected',selected\)/,'Existing size logic updates one selected state');
+
+
  assert.ok(adminHtml.includes("esc(item.title||'Sản phẩm')"));
  console.log('PASS: shoes and sandals require sizes 38–44, server validates, SQLite stores sandal size, Admin receives sizes, no Production writes.');
 } finally {db.close()}
