@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { validateProduct } from '../functions/_lib.js';
 import { normalizeCatalogCategory } from '../functions/_catalog-sku.js';
+import { productCategoryRouteSlug } from '../functions/_storefront-route.js';
 
 assert.equal(normalizeCatalogCategory('Giày Thể Thao'),'sneakers');
 assert.equal(normalizeCatalogCategory('giay-the-thao'),'sneakers');
@@ -44,13 +45,13 @@ const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;
 const ctx={
  products:rows,selectedCategory:'giay-the-thao',categoryLabels:{all:'Tất cả',sneakers:'Giày Thể Thao','vi-nam':'Ví Nam',loafers:'Giày lười'},
  categoryOrder:['all','sneakers','vi-nam','loafers'],displayProductName:v=>String(v).replace(/\p{L}[\p{L}\p{M}\p{N}]*/gu,w=>w[0].toLocaleUpperCase('vi')+w.slice(1)),
- escapeHtml,$:selector=>selector==='#categoryFilters'?html:null
+ escapeHtml,routeSlug:productCategoryRouteSlug,$:selector=>selector==='#categoryFilters'?html:null
 };
 runInNewContext(shop.slice(filterStart,filterEnd)+'\nrenderFilters();',ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,'sneakers');
 assert.equal((html.innerHTML.match(/class="filter-pill/g)||[]).length,4,
  'One All + 3 canonical categories, not two separate sneaker/wallet filters');
-assert.match(html.innerHTML,/data-category="sneakers"[^>]*>Giày Thể Thao · 3<\/button>/);
+assert.match(html.innerHTML,/<a class="filter-pill tap-target active" href="\/sanpham\/sneaker" data-category="sneakers"[^>]*>Giày Thể Thao · 3<\/button>/);
 assert.match(html.innerHTML,/data-category="vi-nam"[^>]*>Ví Nam · 2<\/button>/);
 assert.ok(!html.innerHTML.includes('data-category="giay-the-thao"'));
 assert.ok(!html.innerHTML.includes('data-category="wallets"'));
