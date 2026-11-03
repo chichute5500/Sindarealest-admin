@@ -146,7 +146,7 @@ assert.deepEqual(readBreadcrumbs(pageText).map(x=>x.item),[
   origin+"/",origin+"/sanpham",origin+"/sanpham/sneaker"
 ]);
 assert.ok(html.includes("href=\"\${pageHref(n)}\""),"Hydrated pagination maintains real anchor links");
-assert.ok(html.includes("new URLSearchParams(location.search).get('page')"),"SPA respects direct page URL");
+assert.ok(html.includes("const pageMatch=String(location.search||'').match("),"SPA respects direct page URL without requiring browser-only test globals");
 const rejectInvalid=await storefront({
   request:new Request(origin+"/sanpham/sneaker?page=999"),
   env:{DB:catalogDb},
