@@ -55,6 +55,37 @@ try {
   assert.match(homepage.headers.get("content-type") || "", /text\/html/i);
   assert.match(await homepage.text(), /SinDarealest/i);
 
+  // Test through Wrangler's real Pages router, not just the exported handler:
+  // before the fix GET /sitemap.xml was 200 while HEAD returned 404/noindex.
+  const sitemapGet = await fetchWithTimeout("/sitemap.xml");
+  assert.equal(sitemapGet.status, 200, "Sitemap GET must work when D1 is unavailable");
+  assert.match(sitemapGet.headers.get("content-type") || "", /application\/xml/i);
+  assert.match(await sitemapGet.text(), /<urlset[^>]*sitemaps\.org/);
+
+  const sitemapHead = await fetch(new URL("/sitemap.xml", origin), {
+    method: "HEAD", signal: AbortSignal.timeout(2500)
+  });
+  assert.equal(sitemapHead.status, 200, "Pages router must serve sitemap HEAD with HTTP 200");
+  assert.match(sitemapHead.headers.get("content-type") || "", /application\/xml/i);
+  assert.equal(sitemapHead.headers.get("x-robots-tag"), null);
+  assert.equal(await sitemapHead.text(), "");
+
+  // Static sitemap is served by Pages assets rather than a D1-backed Function.
+  const staticSitemapGet = await fetchWithTimeout("/sitemap-pages.xml");
+  assert.equal(staticSitemapGet.status, 200, "Static sitemap must bypass function routing");
+  assert.match(staticSitemapGet.headers.get("content-type") || "", /application\/xml/i);
+  assert.equal(staticSitemapGet.headers.get("x-robots-tag"), null);
+  const staticXml = await staticSitemapGet.text();
+  assert.match(staticXml, /<loc>https:\/\/sindarealest2\.pages\.dev\/sanpham\/sneaker<\/loc>/);
+  assert.equal((staticXml.match(/<url>/g) || []).length, 17);
+
+  const staticSitemapHead = await fetch(new URL("/sitemap-pages.xml", origin), {
+    method: "HEAD", signal: AbortSignal.timeout(2500)
+  });
+  assert.equal(staticSitemapHead.status, 200);
+  assert.match(staticSitemapHead.headers.get("content-type") || "", /application\/xml/i);
+  assert.equal(await staticSitemapHead.text(), "");
+
   const admin = await fetchWithTimeout("/admin/");
   assert.equal(admin.status, 200, "Admin login page should remain reachable through Pages redirect rules");
   assert.match(await admin.text(), /Quản trị SinDarealest/i);
