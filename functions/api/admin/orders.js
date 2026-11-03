@@ -107,8 +107,8 @@ export async function onRequestPatch(context) {
     if (existing.status === "cancelled" && status !== "cancelled") return fail("Đơn đã hủy không thể mở lại hoặc tiếp tục xử lý.", 409);
     // Terminal delivery cannot be undone from a generic order-status PATCH:
     // reversing it would leave auto-issued warranties on a non-delivered order.
-    if (existing.status === "completed" && status !== "completed")
-      return fail("Đơn đã giao thành công và kích hoạt bảo hành. Không thể quay lại bước trước.",409);
+    if (existing.status === "completed" && !["completed","cancelled"].includes(status))
+      return fail("Đơn đã giao thành công; chỉ được giữ nguyên hoặc hủy theo quy trình ngoại lệ để vô hiệu hóa bảo hành.",409);
     if (existing.status === "shipped" && !["shipped","completed","cancelled"].includes(status))
       return fail("Đơn đang giao không thể quay lại bước xác nhận hoặc làm sản phẩm.",409);
     if (status === "pending_confirmation" && existing.status !== "pending_confirmation")
