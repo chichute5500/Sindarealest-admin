@@ -1512,3 +1512,82 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
  expect(errors,'Theme audit must not throw JS errors').toEqual([]);
  console.log('SD_THEME_LAYER_FRAME_AUDIT',JSON.stringify(report));
 });
+
+
+// Mobile drawer fixed-geometry and main-navigation closure: rendered measurements, never inferred from CI status alone.
+// Products are mocked; no purchase, customer, order or Production D1 write occurs.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:360,height:800,scheme:'light'},
+ {width:430,height:932,scheme:'light'}
+]){
+ test('Mobile Cart/Checkout/Account fixed frame '+cfg.width+' '+cfg.scheme,async({page,context})=>{
+  const mock=Array.from({length:5},(_,i)=>({
+   id:'sd-fixed-drawer-'+i,slug:'sd-fixed-drawer-'+i,
+   sku:'QA-DRAWER-'+i,skuVerified:true,
+   title:'Sản phẩm thử giao diện '+(i+1),category:'wallets',categoryLabel:'Ví nam',
+   images:['images/brand-emblem.png'],price:4500000,sourcePriceConfirmed:true,
+   fulfillmentType:'in_stock',published:true
+  }));
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  await context.addInitScript(items=>{
+   localStorage.setItem('sd-cart',JSON.stringify(Object.fromEntries(items.map(p=>[p.id,1]))));
+  },mock);
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mock)}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  const frame=selector=>page.locator(selector).evaluate(el=>{
+   const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};
+  });
+  const equal=(a,b)=>{
+   for(const property of ['x','y','w','h'])
+    expect(Math.abs(a[property]-b[property]),'Same mobile frame: '+property).toBeLessThanOrEqual(1);
+  };
+  const closed=async()=>{
+   for(const id of ['#cartDrawer','#checkoutDrawer','#accountDrawer'])
+    await expect(page.locator(id)).not.toHaveClass(/\bopen\b/);
+   await expect(page.locator('#checkoutBackdrop')).not.toHaveClass(/\bopen\b/);
+   expect(await page.evaluate(()=>document.body.style.overflow)).not.toBe('hidden');
+  };
+  await page.locator('#mobileCartNav').click();
+  await expect(page.locator('#cartDrawer')).toHaveClass(/\bopen\b/);
+  await expect(page.locator('#cartList .cart-row')).toHaveCount(5);
+  const cartFull=await frame('#cartDrawer');
+  expect(cartFull.h).toBeGreaterThan(cfg.height*.6);
+  await page.screenshot({path:join(output,'drawer-five-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  for(let i=5;i>1;i--){
+   await page.locator('#cartList [data-remove]').last().click();
+   await expect(page.locator('#cartList .cart-row')).toHaveCount(i-1);
+  }
+  equal(cartFull,await frame('#cartDrawer'));
+  await page.screenshot({path:join(output,'drawer-one-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('[data-mobile-tab="home"]').click();
+  await closed();
+  await expect.poll(()=>page.evaluate(()=>location.hash)).toBe('#home');
+  await page.locator('#mobileAccountNav').click();
+  await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
+  equal(cartFull,await frame('#accountDrawer'));
+  await page.screenshot({path:join(output,'drawer-account-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('[data-mobile-tab="products"]').click();
+  await closed();
+  await expect.poll(()=>page.evaluate(()=>location.pathname)).toBe('/sanpham');
+  await page.locator('#mobileCartNav').click();
+  await expect(page.locator('#cartList .cart-row')).toHaveCount(1);
+  equal(cartFull,await frame('#cartDrawer'));
+  await page.locator('#cartCheckout').click();
+  await expect(page.locator('#checkoutDrawer')).toHaveClass(/\bopen\b/);
+  equal(cartFull,await frame('#checkoutDrawer'));
+  await page.screenshot({path:join(output,'drawer-checkout-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('[data-mobile-tab="home"]').click();
+  await closed();
+  await expect.poll(()=>page.evaluate(()=>location.pathname+location.hash)).toBe('/#home');
+  expect(errors,'No mobile drawer JavaScript errors').toEqual([]);
+  console.log('SD_MOBILE_DRAWER_FIXED_VISUAL_QA',JSON.stringify({width:cfg.width,scheme:cfg.scheme,cartFull,finalPath:await page.evaluate(()=>location.pathname+location.hash)}));
+ });
+}

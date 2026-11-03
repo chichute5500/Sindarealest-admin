@@ -2121,9 +2121,9 @@ html.dark .sd-fullscreen-share{
   .account-drawer,.cart-drawer,.checkout-drawer{
     top:calc(7px + env(safe-area-inset-top))!important;
     bottom:auto!important;
-    height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+    height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
     min-height:0!important;
-    max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
+    max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
     overflow-x:hidden!important;
   }
   .account-drawer{overflow-y:auto!important;overscroll-behavior:contain}
@@ -2194,15 +2194,6 @@ html.dark .product-photo img{mix-blend-mode:normal}
 }
 
 
-/* Let the account panel fit its content instead of leaving a large empty drawer below the menu. */
-@media(max-width:760px){
-  .account-drawer{
-    height:auto!important;
-    bottom:auto!important;
-    max-height:calc(100dvh - 96px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
-  }
-}
-
 
 /* 2026-10-21 visual refinement: six benefit tiles stay readable while preserving the satin beneath the glass. */
 /* Container is a quiet glass tray; six individual optical shells do the work. */
@@ -2258,18 +2249,8 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
 }
 
 
-/* Compact populated carts on phones; preserve the empty-cart state and checkout scrolling. */
+/* Preserve the approved internal scroll/sticky header and footer without resizing the Cart sheet. */
 @media(max-width:760px){
-  .cart-drawer:has(.cart-row){
-    height:auto!important;
-    bottom:auto!important;
-    min-height:0!important;
-    /* Keep the Cart's frosted lower edge close to the mobile dock.
-       The former 96px reserve exposed 25.5px of sharp catalog text below it. */
-    max-height:calc(100dvh - 74px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;
-    overflow-y:auto!important;
-    overflow-x:hidden!important;
-  }
   .cart-drawer:has(.cart-row) .cart-list{
     flex:0 0 auto!important;
     max-height:none;
@@ -4091,7 +4072,7 @@ const revealObserver='IntersectionObserver'in window?new IntersectionObserver(en
 }),{threshold:[0,.08],rootMargin:'0px 0px -24px 0px'}):null;
 function preferredGallery(category){const candidates=products.filter(p=>p.category===category&&allImages(p).length>1).sort((a,b)=>allImages(b).length-allImages(a).length);return candidates[0]||preferred(category)}
 function featuredProductCard(p,flag='SELECTED',idx=0){const images=allImages(p);const id=escapeHtml(p.id||p.slug);const price=customerPriceLabel(p);const href=escapeHtml(productHref(p));const count=images.length;const track=count>1?`<span class="feature-track" data-feature-track style="--slide-count:${count};width:${count*100}%">${images.map((src,i)=>`<img class="feature-slide" ${i===0?`src="${escapeHtml(imgPath(src))}"`:`data-src="${escapeHtml(imgPath(src))}"`} alt="${escapeHtml(p.title)} — ảnh ${i+1}" ${i===0?'loading="eager"':'loading="lazy"'} decoding="async" style="flex:0 0 ${100/count}%;width:${100/count}%">`).join('')}</span>`:`<img class="feature-single" src="${escapeHtml(imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1'))}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">`;return `<article class="product-card featured-product-card tap-target" data-reveal style="--reveal-delay:${Math.min(idx,3)*65}ms" data-featured-card data-feature-count="${count}" data-feature-index="0" data-product="${id}"><div class="featured-media"><a class="product-open featured-open" href="${href}" data-open-product="${id}" aria-label="Xem chi tiết ${escapeHtml(p.title)}"><span class="product-photo feature-photo">${track}<span class="photo-shade"></span><span class="product-flag">${escapeHtml(flag)}</span></span></a>${count>1?`<button type="button" class="featured-arrow featured-prev tap-target" data-feature-step="-1" aria-label="Ảnh trước của ${escapeHtml(p.title)}">${arrowIcon('left')}</button><button type="button" class="featured-arrow featured-next tap-target" data-feature-step="1" aria-label="Ảnh tiếp theo của ${escapeHtml(p.title)}">${arrowIcon('right')}</button><span class="featured-image-count" data-feature-count-label>01 / ${String(count).padStart(2,'0')}</span>`:''}</div><div class="product-info"><span class="product-sku">Mã SKU: ${escapeHtml(visibleSku(p)||'Chưa được cung cấp')}</span><a class="featured-title product-title" href="${href}" data-open-product="${id}">${productTitleWithVip(p.title||'Sản phẩm tuyển chọn')}</a><div class="product-card-bottom">${price?`<span class="product-price">Giá: <strong class="product-price-amount">${escapeHtml(price)}</strong></span>`:''}<button class="mini-add quick-add tap-target" data-add="${id}" aria-label="Thêm ${escapeHtml(p.title)} vào giỏ chọn">${iconBag()}</button></div></div></article>`}
-function setupMobileBottomNav(){const nav=$('#mobileBottomNav');if(!nav)return;const tabs=$$('[data-mobile-tab]');const activate=key=>tabs.forEach(tab=>{const active=tab.dataset.mobileTab===key;tab.classList.toggle('is-active',active);if(active)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current')});tabs.forEach(tab=>{if(tab.dataset.mobileTab==='cart'){tab.addEventListener('click',()=>{activate('cart');toggleStorefrontModal('cart')})}else if(tab.dataset.mobileTab==='account'){tab.addEventListener('click',()=>{activate('account');toggleStorefrontModal('account')})}else tab.addEventListener('click',()=>activate(tab.dataset.mobileTab))});if('IntersectionObserver'in window){const targets=[['home',$('#home')],['home',$('#order')],['home',$('#featured')],['home',$('#promise')],['home',$('#collections')],['products',$('#products')],['home',$('#siteFooter')]].filter(([,el])=>el);const observer=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible){const found=targets.find(([,el])=>el===visible.target);if(found)activate(found[0])}},{rootMargin:'-25% 0px -55% 0px',threshold:[0,.1,.25,.5]});targets.forEach(([,el])=>observer.observe(el))}}
+function setupMobileBottomNav(){const nav=$('#mobileBottomNav');if(!nav)return;const tabs=$$('[data-mobile-tab]');const activate=key=>tabs.forEach(tab=>{const active=tab.dataset.mobileTab===key;tab.classList.toggle('is-active',active);if(active)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current')});tabs.forEach(tab=>{if(tab.dataset.mobileTab==='cart'){tab.addEventListener('click',()=>{activate('cart');toggleStorefrontModal('cart')})}else if(tab.dataset.mobileTab==='account'){tab.addEventListener('click',()=>{activate('account');toggleStorefrontModal('account')})}else tab.addEventListener('click',event=>{dismissStorefrontDrawersForNavigation();if(tab.dataset.mobileTab==='products'){event.preventDefault();navigateCatalog('all')}activate(tab.dataset.mobileTab)})});if('IntersectionObserver'in window){const targets=[['home',$('#home')],['home',$('#order')],['home',$('#featured')],['home',$('#promise')],['home',$('#collections')],['products',$('#products')],['home',$('#siteFooter')]].filter(([,el])=>el);const observer=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible){const found=targets.find(([,el])=>el===visible.target);if(found)activate(found[0])}},{rootMargin:'-25% 0px -55% 0px',threshold:[0,.1,.25,.5]});targets.forEach(([,el])=>observer.observe(el))}}
 /* Legacy shoe-art synchronization removed: HERO is HTML/CSS only. */
 function renderFeatured(){
  unbindReveal($('#featuredGrid'));
@@ -4140,6 +4121,9 @@ if(typeof document!=='undefined'&&typeof document.addEventListener==='function')
  if(!section?.closest('main > section:not(#products)'))return;
  event.preventDefault();
  const destination='/'+hash;
+ // The catalog-to-Home capture handler runs before the mobile-tab handler.
+ // Clear the current overlay entry before pushing a new page history entry.
+ dismissStorefrontDrawersForNavigation();
  if(location.pathname+location.hash!==destination)
   history.pushState({sdStorefrontHome:true},'',destination);
  setCatalogLandingMode(false);
@@ -4487,6 +4471,18 @@ function toggleStorefrontModal(type){
  if(activeStorefrontModal()===type){requestStorefrontModalClose(type,()=>closeStorefrontModal(type));return}
  if(type==='cart')openCart();
  else if(type==='account')openAccount();
+}
+/* Dismiss drawers before Home/Product navigation; leave payment and cart data intact. */
+function dismissStorefrontDrawersForNavigation(){
+ const state=history.state&&typeof history.state==='object'&&!Array.isArray(history.state)?history.state:{};
+ if(storefrontModalHistoryType(state)){
+  const next={...state};delete next[SD_MODAL_HISTORY_KEY];
+  history.replaceState(next,'',location.href);
+ }
+ if($('#checkoutDrawer')?.classList.contains('open'))closeCheckout(false);
+ if($('#cartDrawer')?.classList.contains('open'))closeCart(false);
+ if($('#accountDrawer')?.classList.contains('open'))closeAccount(false);
+ if(!$('#productOverlay')?.classList.contains('open'))document.body.style.overflow='';
 }
 function openFullscreenImage(){
  if(!currentProduct||!detailImages.length||!$('#productOverlay').classList.contains('open'))return;
