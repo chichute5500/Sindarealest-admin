@@ -72,6 +72,24 @@ try {
   const realApiText = await realApi.text();
   assert.ok(!realApiText.includes("API_ROUTE_NOT_FOUND"), "API catch-all must not shadow /api/products");
 
+  // Linkable standalone public lookup pages, no customer credentials in URLs.
+  for (const [path,title,formId] of [
+    ["/tra-cuu-don-hang","Tra cứu đơn hàng","sdTrackForm"],
+    ["/bao-hanh","Kiểm tra bảo hành","warrantyLookupForm"]
+  ]) {
+    const response=await fetchWithTimeout(path);
+    assert.equal(response.status,200,path+" must render HTML when shared by Zalo");
+    assert.match(response.headers.get("content-type")||"",/text\/html/i);
+    const html=await response.text();
+    assert.ok(html.includes('<title>'+title+' | SinDarealest</title>'),path+" has an independent server title");
+    assert.ok(html.includes('id="sdServicePage"'),path+" has a dedicated page shell");
+    assert.ok(html.includes('id="'+formId+'"'),path+" uses the original lookup form");
+    assert.match(html,new RegExp('rel="canonical" href="http://127\\.0\\.0\\.1:'+port+path+'"'));
+  }
+  const redirected=await fetch(new URL("/bao-hanh/",origin),{redirect:"manual",signal:AbortSignal.timeout(2500)});
+  assert.equal(redirected.status,301,"Trailing slash canonicalizes support URLs");
+  assert.equal(redirected.headers.get("location"),origin+"/bao-hanh");
+
   const fallbackPage = await fetchWithTimeout("/a-nonexistent-static-page");
   assert.equal(fallbackPage.status, 404, "Unknown document paths must return HTTP 404, not a homepage fallback");
   assert.match(await fallbackPage.text(), /Không tìm thấy trang/);

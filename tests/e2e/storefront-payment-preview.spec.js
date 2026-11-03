@@ -1818,3 +1818,60 @@ for(const cfg of [
   console.log('PRODUCT_DETAIL_NATIVE_GLASS_QA',JSON.stringify({viewport:cfg.width,scheme:cfg.scheme,film:start.film,cart:start.cart,geometry:start.plane,scrollDelta:after.scroll.top-start.scroll.top}));
  });
 }
+
+
+// Standalone shareable public lookup URLs. Reuse the exact existing form and
+// POST endpoints, with no personal data in links or client-side query storage.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:360,height:800,scheme:'light'}
+]){
+ test('Standalone order/warranty lookup URLs '+cfg.width+' '+cfg.scheme,async({page})=>{
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  let orders=0,warranties=0;
+  await page.route('**/api/products',r=>r.fulfill({status:503,contentType:'application/json',body:'{"error":"Catalog offline in isolated QA"}'}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:'{"welcomeEnabled":false}'}));
+  await page.route('**/api/order-tracking',r=>{orders++;return r.fulfill({status:200,contentType:'application/json',body:'{"orders":[]}'});});
+  await page.route('**/api/warranty-lookup',r=>{warranties++;return r.fulfill({status:200,contentType:'application/json',body:'{"warranties":[]}'});});
+  await page.goto(new URL('/tra-cuu-don-hang',url).href,{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#sdServicePage')).toBeVisible();
+  await expect(page.locator('#sdServiceHeading')).toHaveText('Tra cứu đơn hàng');
+  await expect(page.locator('#sdServiceMount #sdTrackForm')).toBeVisible();
+  await expect(page.locator('#sdTrackForm')).toHaveCount(1);
+  await expect(page.locator('#warrantyLookupForm')).toHaveCount(1);
+  await expect(page.locator('#home')).toBeHidden();
+  await expect(page.locator('#siteFooter')).toBeHidden();
+  await expect(page.locator('[data-sd-service="orders"]')).toHaveAttribute('aria-current','page');
+  await page.locator('#sdTrackInput').fill('SD-QA-SHARED-123');
+  await page.locator('#sdTrackSubmit').click();
+  await expect(page.locator('#sdTrackMessage')).toContainText('Không tìm thấy đơn phù hợp.');
+  expect(orders).toBe(1);
+  expect(await page.evaluate(()=>location.pathname+location.search)).toBe('/tra-cuu-don-hang');
+  await page.screenshot({path:join(output,'lookup-orders-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  // Navigate using an actual link and verify a fresh direct URL, not a hidden anchor.
+  await page.locator('[data-sd-service="warranty"]').click();
+  await expect(page).toHaveURL(/\/bao-hanh$/);
+  await expect(page.locator('#sdServiceHeading')).toHaveText('Kiểm tra bảo hành');
+  await expect(page.locator('#sdServiceMount #warrantyLookupForm')).toBeVisible();
+  await expect(page.locator('#warrantyLookupForm')).toHaveCount(1);
+  await expect(page.locator('[data-sd-service="warranty"]')).toHaveAttribute('aria-current','page');
+  await page.locator('#warrantyLookupValue').fill('SDW-K7M2');
+  await page.locator('#warrantyLookupSubmit').click();
+  await expect(page.locator('#warrantyMessage')).toContainText('Đã tra cứu xong.');
+  expect(warranties).toBe(1);
+  expect(await page.evaluate(()=>location.pathname+location.search)).toBe('/bao-hanh');
+  await page.screenshot({path:join(output,'lookup-warranty-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.goBack({waitUntil:'domcontentloaded'});
+  await expect(page.locator('#sdServiceHeading')).toHaveText('Tra cứu đơn hàng');
+  await expect(page.locator('#sdServiceMount #sdTrackForm')).toBeVisible();
+  await page.locator('[data-mobile-tab="home"]').click();
+  await expect.poll(()=>page.evaluate(()=>location.pathname)).toBe('/');
+  await expect(page.locator('#sdServicePage')).toBeHidden();
+  await expect(page.locator('#home')).toBeVisible();
+  expect(errors).toEqual([]);
+  console.log('STANDALONE_LOOKUP_ROUTES_QA',JSON.stringify({width:cfg.width,scheme:cfg.scheme,orderQueries:orders,warrantyQueries:warranties}));
+ });
+}
