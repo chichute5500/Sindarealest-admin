@@ -10,9 +10,9 @@ import { shopWarrantyPolicy, addWarrantyCalendarMonths, isWarrantyCode } from '.
 import { onRequestPatch as patchOrder } from '../functions/api/admin/orders.js';
 
 assert.equal(shopWarrantyPolicy(1_999_999).durationMonths,6);
-assert.equal(shopWarrantyPolicy(2_000_000).durationMonths,12);
-assert.equal(shopWarrantyPolicy(2_999_999).durationMonths,12);
-assert.equal(shopWarrantyPolicy(3_000_000).durationMonths,12);
+assert.equal(shopWarrantyPolicy(2_000_000).durationMonths,6);
+assert.equal(shopWarrantyPolicy(2_999_999).durationMonths,6);
+assert.equal(shopWarrantyPolicy(3_000_000).durationMonths,6);
 assert.equal(shopWarrantyPolicy(3_000_001).durationMonths,12);
 assert.equal(shopWarrantyPolicy(8_000_000).durationMonths,12);
 assert.throws(()=>shopWarrantyPolicy(null));
@@ -77,7 +77,7 @@ function fixture(total, {existingWarranty=false, secondItem=false,firstItemPrice
  return {sql,patch,list,state,audits,batchCount:()=>batchCount,setBeforeBatch:fn=>{beforeBatch=fn}};
 }
 
-for(const [total,months] of [[1_999_999,6],[3_000_000,6],[6_000_000,12],[6_000_002,12],[8_000_000,12]]){
+for(const [total,months] of [[1_999_999,6],[3_000_000,6],[6_000_000,6],[6_000_002,12],[8_000_000,12]]){
  const f=fixture(total,{secondItem:true});
  assert.equal((await f.patch('confirmed')).status,200,'confirmation succeeds without warranty');
  assert.equal(f.list().length,0,'never activate warranty on confirmed');

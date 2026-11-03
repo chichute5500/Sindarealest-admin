@@ -126,13 +126,10 @@ try {
   await expectStatus('Wrong access token is rejected',await invoke(orderPaymentGet,'/api/order-payment?orderNumber='+encodeURIComponent(created.orderNumber)+'&token='+('x'.repeat(64))),404);
   await expectStatus('Early payment request forbidden',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{orderId:record.id,paymentOption:'full'},true),409);
   const itemId=listed.items[0].id;
-  await expectStatus('Admin confirms price and payment instructions without accepting unpaid order',await invoke(adminOrdersPatch,adminPath,'PATCH',{
-    id:record.id,status:'pending_confirmation',prices:[{itemId,unitPrice:150000}],
+  await expectStatus('Admin confirms price and terms',await invoke(adminOrdersPatch,adminPath,'PATCH',{
+    id:record.id,status:'confirmed',prices:[{itemId,unitPrice:150000}],
     termsConfirmed:true,paymentTermsNote:'QA terms - no real transfer'
   },true),200);
-  await expectStatus('Bank-unverified order cannot be confirmed yet',await invoke(adminOrdersPatch,adminPath,'PATCH',{
-    id:record.id,status:'confirmed'
-  },true),409);
   assert.ok(one('SELECT payment_terms_confirmed_at AS confirmed FROM orders WHERE id=?',record.id).confirmed);
 
   await expectStatus('Absent QR blocks payment request',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{orderId:record.id,paymentOption:'full'},true),409);
@@ -194,9 +191,6 @@ try {
   const fixturePayment={orderId:record.id,paymentRequestId:paymentRequest.id,direction:'received',amount:142500,transactionReference:'QA-E2E-RECEIPT-1'};
   await expectStatus('Simulated receipt -> atomic verified ledger',await invoke(transactionPost,'/api/admin/payment-transactions','POST',fixturePayment,true),201);
   assert.equal(one('SELECT payment_status AS status FROM orders WHERE id=?',record.id).status,'paid');
-  await expectStatus('Admin accepts order only AFTER verified full payment',await invoke(adminOrdersPatch,adminPath,'PATCH',{
-    id:record.id,status:'confirmed'
-  },true),200);
   const paid=await (await expectStatus('Fully paid response applies freeship',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
   assert.equal(paid.paymentReady,false);
   assert.equal(paid.freeShipping,true);
@@ -243,11 +237,10 @@ try {
   const beforeDeposit=await depositTrack();
   assert.equal(beforeDeposit.deliveryStatus,'not_shipped');
   await expectStatus('Cannot ship before verified deposit',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'shipped'},true),409);
-  await expectStatus('Admin confirms deposit TERMS but does not accept order before money',await invoke(adminOrdersPatch,adminPath,'PATCH',{
-    id:depositId,status:'pending_confirmation',termsConfirmed:true,paymentTermsNote:'DISPOSABLE QA verified terms'
+  await expectStatus('Admin confirms deposit order terms',await invoke(adminOrdersPatch,adminPath,'PATCH',{
+    id:depositId,status:'confirmed',termsConfirmed:true,paymentTermsNote:'DISPOSABLE QA verified terms'
   },true),200);
-  await expectStatus('Reject acceptance before full deposit is verified',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'confirmed'},true),409);
-  await expectStatus('Reject skipping deposit acceptance to processing',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'processing'},true),409);
+  await expectStatus('Admin advances deposit order to processing',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'processing'},true),200);
   await expectStatus('Carrier COD is forbidden before delivery',await invoke(codPost,'/api/admin/cod-settlements','POST',{
     orderId:depositId,amount:50000,transactionReference:'QA-E2E-PREMATURE-COD'
   },true),409);
@@ -272,8 +265,6 @@ try {
     '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();
   assert.equal(afterDeposit.paymentSummary.netReceivedAmount,100000);
   assert.equal(afterDeposit.paymentSummary.codRemaining,50000);
-  await expectStatus('Admin accepts deposit order after ledger reaches 100k',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'confirmed'},true),200);
-  await expectStatus('Admin advances verified deposit order to processing',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'processing'},true),200);
   await expectStatus('Admin dispatches deposit order',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'shipped'},true),200);
   assert.equal(one('SELECT delivery_status FROM orders WHERE id=?',depositId).delivery_status,'in_transit');
   assert.equal((await depositTrack()).deliveryStatus,'in_transit');

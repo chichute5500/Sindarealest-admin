@@ -105,16 +105,6 @@ export async function onRequestPatch(context) {
     const existing = await context.env.DB.prepare("SELECT id,status,total,price_confirmation_required,payment_terms_confirmed_at,delivery_status FROM orders WHERE id=?").bind(id).first();
     if (!existing) return fail("Không tìm thấy đơn hàng.", 404);
     if (existing.status === "cancelled" && status !== "cancelled") return fail("Đơn đã hủy không thể mở lại hoặc tiếp tục xử lý.", 409);
-    // Terminal delivery cannot be undone from a generic order-status PATCH:
-    // reversing it would leave auto-issued warranties on a non-delivered order.
-    if (existing.status === "completed" && !["completed","cancelled"].includes(status))
-      return fail("Đơn đã giao thành công; chỉ được giữ nguyên hoặc hủy theo quy trình ngoại lệ để vô hiệu hóa bảo hành.",409);
-    if (existing.status === "shipped" && !["shipped","completed","cancelled"].includes(status))
-      return fail("Đơn đang giao không thể quay lại bước xác nhận hoặc làm sản phẩm.",409);
-    if (status === "pending_confirmation" && existing.status !== "pending_confirmation")
-      return fail("Không thể đưa đơn đã được tiếp nhận trở lại trạng thái chờ xác nhận.",409);
-    if (existing.status === "pending_confirmation" && status === "processing")
-      return fail("Cần xác nhận nhận cọc và tiếp nhận đơn trước khi bắt đầu làm sản phẩm.",409);
     // A cancelled order cannot accept a verified receipt while its QR request remains pending.
     // Require explicit QR cancellation before cancelling the order, then recheck at UPDATE time below.
     if (status === "cancelled") {
@@ -157,23 +147,6 @@ export async function onRequestPatch(context) {
     // A repeated save of an already completed order is an idempotent no-op;
     // only the first transition to completed requires an in-transit delivery.
     if (status === "completed" && existing.status !== "completed" && (existing.status !== "shipped" || existing.delivery_status !== "in_transit")) return fail("Chỉ xác nhận giao thành công cho đơn đang được đơn vị vận chuyển giao.",409);
-
-    // The first acceptance is one step: Shop must have verified the required
-    // deposit/full payment in the ledger, not simply clicked "Xác nhận".
-    const enteringConfirmation=existing.status==="pending_confirmation"&&status==="confirmed";
-    let confirmationRequiredAmount=null;
-    if (enteringConfirmation) {
-      const checkout=await context.env.DB.prepare("SELECT json_extract(details_json,'$.selectedPaymentOption') AS payment_option,json_extract(details_json,'$.selectedPaymentAmount') AS payment_amount FROM audit_logs WHERE entity_type='order' AND entity_id=? AND action='order_created' ORDER BY created_at DESC LIMIT 1").bind(id).first();
-      const payments=await context.env.DB.prepare("SELECT direction,amount,actor FROM order_payment_transactions WHERE order_id=?").bind(id).all();
-      const termsReady=(Number(existing.price_confirmation_required)===0&&Boolean(existing.payment_terms_confirmed_at))||termsConfirmed;
-      const settlement=summarizeOrderPayment({total:subtotal,paymentOption:checkout?.payment_option,agreedAmount:checkout?.payment_amount,transactions:payments.results||[],termsConfirmed:termsReady});
-      if(!allPriced||!termsReady||!Number.isSafeInteger(subtotal)||subtotal<=0||
-        (checkout?.payment_option?!settlement.eligibleToShip:settlement.netReceivedAmount<=0))
-        return fail("Chưa xác minh đủ tiền cọc hoặc thanh toán bắt buộc. Nhận cọc trước khi xác nhận đơn.",409);
-      // Historical manual orders may lack a selected checkout option. Require
-      // at least one verified receipt without inventing old deposit terms.
-      confirmationRequiredAmount=settlement.requiredAmount??1;
-    }
 
     let shipmentRequiredAmount=null;
     if (["shipped","completed"].includes(status)) {
@@ -249,11 +222,6 @@ export async function onRequestPatch(context) {
       (status === "completed" && existing.status !== "completed" ? " AND delivery_status='in_transit'" : "") +
       (status === "shipped" && existing.status !== "shipped"
         ? " AND price_confirmation_required=0 AND payment_terms_confirmed_at IS NOT NULL AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=? AND actor<>'admin_cod_completion')>=?"
-        : "") +
-      // Recheck money atomically: a concurrent refund may arrive between the
-      // preflight acceptance check and this D1 write transaction.
-      (enteringConfirmation
-        ? " AND (SELECT COALESCE(SUM(CASE WHEN direction='received' THEN amount ELSE -amount END),0) FROM order_payment_transactions WHERE order_id=? AND actor<>'admin_cod_completion')>=?"
         : "");
     const orderUpdateValues = [
       status,status==="shipped"&&existing.status!=="shipped"?1:0,status==="completed"?1:0,subtotal,subtotal,allPriced?0:1,termsConfirmed?1:0,confirmationAt,
@@ -265,7 +233,6 @@ export async function onRequestPatch(context) {
     // Binding one more ID here previously made every ordinary order save fail (503).
     if (status === "cancelled") orderUpdateValues.push(id);
     if (status === "shipped" && existing.status !== "shipped") orderUpdateValues.push(id,shipmentRequiredAmount);
-    if (enteringConfirmation) orderUpdateValues.push(id,confirmationRequiredAmount);
     statements.push(context.env.DB.prepare(orderUpdateSql).bind(...orderUpdateValues));
     statements.push(...priceStatements);
 

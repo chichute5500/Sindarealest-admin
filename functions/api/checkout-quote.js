@@ -1,4 +1,4 @@
-import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
+import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, readJsonBodyLimited } from "../_lib.js";
 import { calculateCheckoutQuote, validPublicQrImageKey, checkoutTransferSku, makeCheckoutTransferReference } from "../_payments.js";
 import { normalizeProductOption } from "../_product-options.js";
 
@@ -19,12 +19,6 @@ export async function onRequestPost({request,env}) {
     requested.set(id,(requested.get(id)||0)+quantity);
   }
   if([...requested.values()].some(q=>q>50))return fail("Số lượng mỗi sản phẩm vượt giới hạn.");
-  // A quote reads the catalog, settings and R2 QR metadata. Bound automated
-  // abuse before those expensive reads, without asking real buyers for CAPTCHA.
-  try{
-    const limit=await rateLimitPublicRequest(env,request,"checkout_quote",90,900);
-    if(limit.limited)return fail("Bạn đã kiểm tra báo giá quá nhiều lần. Vui lòng thử lại sau 15 phút.",429,{"Retry-After":"900"});
-  }catch{return fail("Báo giá tạm thời chưa khả dụng. Vui lòng thử lại.",503)}
   try{
     const ids=[...requested.keys()];
     const result=await env.DB.prepare("SELECT id,sku,title,category,price,published,source_price_confirmed,stock,fulfillment_type FROM products WHERE id IN ("+ids.map(()=>"?").join(",")+")").bind(...ids).all();
