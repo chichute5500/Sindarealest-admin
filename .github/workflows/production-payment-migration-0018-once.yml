@@ -1,4 +1,4 @@
-name: Production D1 payment delivery migration 0018 (Owner approved once)
+name: Production D1 payment delivery migration 0018 (Owner approved, guarded)
 
 on:
   push:
