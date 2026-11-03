@@ -43,11 +43,25 @@ test('Admin clarity — mobile dashboards, customers and orders use legible info
  if(await order.count()){
   await order.click();
   await expect(page.locator('#main .sd-order-detail-page')).toBeVisible();
-  await expect(page.locator('#main .sd-order-overview-heading .status')).toHaveCount(1);
+  await expect(page.locator('#main .pagehead .sd-order-meta-state')).toHaveCount(1);
+  await expect(page.locator('#main .sd-order-overview .status')).toHaveCount(0);
   await expect(page.locator('#main .sd-order-buyer-name strong')).not.toBeEmpty();
   await expect(page.locator('#main .sd-order-buyer-phone')).toBeVisible();
   await expect(page.locator('#main .sd-order-buyer-address')).toBeVisible();
   await expect(page.locator('#main .pagehead .sd-order-number strong')).toBeVisible();
+  for(const width of [360,390,430]){
+   await page.setViewportSize({width,height:width===360?800:width===390?844:932});
+   const geometry=await page.evaluate(()=>{
+    const rect=selector=>{const el=document.querySelector(selector);if(!el)return null;const r=el.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,top:r.top}};
+    return {code:rect('#main .sd-order-number strong'),badge:rect('#main .sd-order-meta-state'),name:rect('#main .sd-order-buyer-name'),phone:rect('#main .sd-order-buyer-phone'),bodyWidth:document.documentElement.scrollWidth,viewport:innerWidth};
+   });
+   expect(geometry.code&&geometry.badge&&geometry.name&&geometry.phone,'All four order fields exist at '+width).toBeTruthy();
+   expect(geometry.badge.x,'Status must sit to the right of order code at '+width).toBeGreaterThan(geometry.code.x);
+   expect(Math.abs(geometry.badge.bottom-geometry.code.bottom),'Code and status share the same row at '+width).toBeLessThan(24);
+   expect(Math.abs(geometry.name.top-geometry.phone.top),'Customer name and phone share the same row at '+width).toBeLessThan(3);
+   expect(geometry.bodyWidth,'No mobile page overflow at '+width).toBeLessThanOrEqual(geometry.viewport+2);
+  }
+
  }
  expect(errors,'Browser must not throw rendering exceptions').toEqual([]);
 });

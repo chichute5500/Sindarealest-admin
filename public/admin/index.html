@@ -1442,23 +1442,31 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 #main .sd-order-detail-page .panel{min-width:0}
 #main .sd-order-overview .panelbody,#main .sd-order-items .panelbody,#main .sd-order-payment .panelbody,#main .sd-order-next .panelbody{display:grid;gap:10px}
 
-#main .sd-order-overview-heading{display:flex;align-items:center;gap:8px}
-#main .sd-order-overview-heading .status{font-size:12px;font-weight:800;padding:7px 12px}
-#main .sd-order-buyer-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px;min-width:0}
-#main .sd-order-buyer-field{display:grid;align-content:start;gap:5px;min-width:0}
-#main .sd-order-buyer-field>span{font-size:11px;color:var(--muted);font-weight:700}
-#main .sd-order-buyer-field>strong,#main .sd-order-buyer-field>a{font-size:15px;font-weight:750;color:var(--ink);line-height:1.5;overflow-wrap:anywhere}
+/* Order detail only: the real order status is beside the code, not repeated inside the customer card. */
+#main .pagehead:has(+ .sd-order-detail-page){display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"eyebrow back" "heading back" "meta meta";column-gap:10px;row-gap:3px;align-items:start}
+#main .pagehead:has(+ .sd-order-detail-page)>div{display:contents}
+#main .pagehead:has(+ .sd-order-detail-page) .eyebrow{grid-area:eyebrow}
+#main .pagehead:has(+ .sd-order-detail-page) h2{grid-area:heading;min-width:0}
+#main .pagehead:has(+ .sd-order-detail-page)>button{grid-area:back;align-self:start;justify-self:end}
+#main .pagehead:has(+ .sd-order-detail-page)>div>p{grid-area:meta;width:100%;min-width:0;max-width:none;margin:7px 0 0}
+#main .pagehead:has(+ .sd-order-detail-page) .sd-order-meta{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;min-width:0;width:100%}
+#main .pagehead:has(+ .sd-order-detail-page) .sd-order-number{display:grid;gap:3px;flex:1 1 auto;min-width:0}
+#main .pagehead:has(+ .sd-order-detail-page) .sd-order-number>span{font-size:11px;font-weight:700;color:var(--muted)}
+#main .pagehead:has(+ .sd-order-detail-page) .sd-order-number>strong{font-size:clamp(13px,3.45vw,17px);line-height:1.35;letter-spacing:-.01em;color:var(--ink);font-weight:800;overflow-wrap:anywhere;user-select:text}
+#main .pagehead:has(+ .sd-order-detail-page) .sd-order-meta-state{flex:0 0 auto;max-width:42%;padding:6px 9px;font-size:11px;line-height:1.25;font-weight:800;text-align:center;white-space:normal;overflow-wrap:break-word}
+#main .sd-order-buyer-info{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:11px 14px;min-width:0}
+#main .sd-order-buyer-field{display:grid;align-content:start;gap:4px;min-width:0}
+#main .sd-order-buyer-field>span{font-size:10px;color:var(--muted);font-weight:700}
+#main .sd-order-buyer-field>strong,#main .sd-order-buyer-field>a{font-size:14px;font-weight:750;color:var(--ink);line-height:1.45;overflow-wrap:anywhere}
 #main .sd-order-buyer-field>a{text-decoration:underline;text-underline-offset:3px;width:fit-content}
-#main .sd-order-buyer-address{grid-column:1/-1;border-top:1px solid var(--sd-glass-input-edge);padding-top:12px}
-#main .sd-order-buyer-address>strong{font-size:14px;font-weight:650}
-#main .pagehead:has(+ .sd-order-detail-page) .sd-order-number{display:grid;gap:5px;min-width:0;margin-top:9px}
-#main .pagehead:has(+ .sd-order-detail-page) .sd-order-number>span{font-size:12px;font-weight:700;color:var(--muted)}
-#main .pagehead:has(+ .sd-order-detail-page) .sd-order-number>strong{font-size:clamp(16px,4vw,22px);line-height:1.4;letter-spacing:.012em;color:var(--ink);font-weight:850;overflow-wrap:anywhere;user-select:text}
-@media(max-width:520px){#main .sd-order-buyer-info{grid-template-columns:minmax(0,1fr);gap:12px}#main .sd-order-buyer-address{grid-column:auto}#main .sd-order-buyer-field>strong,#main .sd-order-buyer-field>a{font-size:15px}}
+#main .sd-order-buyer-address{grid-column:1/-1;border-top:1px solid var(--sd-glass-input-edge);padding-top:10px}
+#main .sd-order-buyer-address>strong{font-size:13px;font-weight:650}
+@media(max-width:520px){#main .sd-order-buyer-info{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:10px}#main .sd-order-buyer-address{grid-column:1/-1}}
 
 #main .sd-order-overview-total,#main .sd-order-payment-method{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 #main .sd-order-overview-total{padding-top:9px;border-top:1px solid var(--line)}
-#main .sd-order-overview-total strong{font-size:20px}
+#main .sd-order-overview-total{font-size:14px}
+#main .sd-order-overview-total strong{font-size:18px}
 #main .sd-order-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
 #main .sd-order-item:last-child{border-bottom:none}
 #main .sd-order-item>.order-item-thumb{width:54px;height:54px;flex-shrink:0;border-radius:9px;object-fit:cover}
@@ -2514,8 +2522,6 @@ function orderDetailMarkup(order){
  ];
  return `
  <section class="panel sd-order-overview"><div class="panelbody">
-  <div class="sd-order-overview-heading"><span class="status ${order.status==='cancelled'||failed?'off':delivered?'on':'unknown'}">${esc(orderStatusLabel(order.status,order.delivery_status))}</span></div>
-
   <div class="sd-order-buyer-info" aria-label="Thông tin khách hàng">
    <div class="sd-order-buyer-field sd-order-buyer-name"><span>Khách hàng</span><strong>${esc(order.full_name||'Chưa có tên')}</strong></div>
    <div class="sd-order-buyer-field sd-order-buyer-phone"><span>Số điện thoại</span><a href="tel:${esc(String(order.phone||'').replace(/[^+0-9]/g,''))}">${esc(order.phone||'Chưa có số điện thoại')}</a></div>
@@ -2586,7 +2592,7 @@ function orderDetailPage(){
  const order=orders.find(item=>String(item.id)===String(selectedOrderId));
  if(!order)return `${head('Vận hành','Chi tiết đơn hàng','Không tìm thấy đơn hàng trong dữ liệu hiện tại.','<button class="btn" type="button" data-action="back-to-orders">Quay lại đơn hàng</button>')}<section class="panel"><div class="panelbody"><div class="empty">Đơn hàng có thể đã thay đổi hoặc không còn trong dữ liệu hiện tại.</div></div></section>`;
  const id=esc(order.id);
- return `${head('Vận hành','Xử lý đơn hàng','<span class="sd-order-number"><span>Mã đơn hàng</span><strong>'+esc(order.order_number||'Chưa có mã')+'</strong></span>','<button class="btn" type="button" data-action="back-to-orders" data-id="'+id+'">← Đơn hàng</button>')}<div class="order-detail-page sd-order-detail-page" data-order-detail-id="${id}"><div id="orderDetailContent" class="order-detail-page-content">${orderDetailMarkup(order)}</div></div>`;
+ return `${head('Vận hành','Xử lý đơn hàng','<span class="sd-order-meta"><span class="sd-order-number"><span>Mã đơn hàng</span><strong>'+esc(order.order_number||'Chưa có mã')+'</strong></span><span class="sd-order-meta-state status '+(order.status==='cancelled'||['failed_returning','returned'].includes(order.delivery_status)?'off':order.status==='completed'?'on':'unknown')+'">'+esc(orderStatusLabel(order.status,order.delivery_status))+'</span></span>','<button class="btn" type="button" data-action="back-to-orders" data-id="'+id+'">← Đơn hàng</button>')}<div class="order-detail-page sd-order-detail-page" data-order-detail-id="${id}"><div id="orderDetailContent" class="order-detail-page-content">${orderDetailMarkup(order)}</div></div>`;
 }
 function showOrderDetails(id,source=null,clickPoint=null){
 
