@@ -28,8 +28,9 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.match(browserQA,/const strictCycles=process\.env\.SD_THEME_DIAGNOSTIC_VARIANTS==='1'\?1:3/);
  assert.match(browserQA,/for\(let cycle=0;cycle<strictCycles;cycle\+\+\)/);
  assert.match(page,/function applyThemeMode\(mode,animate=true\)/);
- assert.ok(page.includes("sessionStorage.getItem('sd-theme-overlay-seen')==='1'"));
- assert.ok(page.includes("if(shownInSession)animate=false"));
+ assert.doesNotMatch(page,/if\(shownInSession\)animate=false/,'Every manual theme change needs an opaque cover, not a sudden palette flash');
+ assert.doesNotMatch(page,/sessionStorage\.getItem\('sd-theme-overlay-seen'\)/,'No single-use animation gate');
+ assert.match(page,/if\(typeof window\.__sdCancelThemeStage==='function'\|\|now-sdLastManualThemeToggleAt<950\)return/,'Rapid toggles cannot interrupt the active scene or spam changes');
  assert.match(page,/id="sdThemeSwitchOverlay"/);
  assert.match(page,/Đang đổi giao diện/);
  assert.match(page,/const durationMs=200,minimumCoveredAfterCommitMs=0/);

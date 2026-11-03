@@ -1635,9 +1635,15 @@ for(const sample of [
     const outer=getComputedStyle(el),plane=getComputedStyle(el,'::before');
     return {root:outer.backgroundColor,rootBlur:outer.backdropFilter,planeColor:plane.backgroundColor,planeBlur:plane.backdropFilter,planeWidth:parseFloat(plane.width),planeHeight:parseFloat(plane.height),nativeHeight:el.clientHeight,nativeWidth:el.clientWidth,planePointer:plane.pointerEvents};
    };
-   const actions=[...document.querySelectorAll('#accountMenuView>.account-action')];
-   const gaps=actions.slice(1).map((el,i)=>el.getBoundingClientRect().top-actions[i].getBoundingClientRect().bottom);
-   return {cart:surface(cart),account:surface(account),gaps,actions:actions.length,noteExists:!!document.querySelector('#accountMenuView .account-note'),accountFrame:account.getBoundingClientRect().toJSON()};
+   const actions=[...document.querySelectorAll('#accountMenuView .account-action')];
+   const pair=document.querySelector('#accountMenuView .account-paired-actions');
+   const tiles=[...pair.querySelectorAll('.account-action')],rows=[
+    document.querySelector('#accountAddressAction'),pair,
+    document.querySelector('#accountThemeAction'),document.querySelector('#accountContactAction')
+   ];
+   const gaps=rows.slice(1).map((row,i)=>row.getBoundingClientRect().top-rows[i].getBoundingClientRect().bottom);
+   const pairRects=tiles.map(el=>el.getBoundingClientRect().toJSON());
+   return {cart:surface(cart),account:surface(account),gaps,actions:actions.length,noteExists:!!document.querySelector('#accountMenuView .account-note'),accountFrame:account.getBoundingClientRect().toJSON(),pairRects};
   });
   for(const key of ['root','rootBlur','planeColor','planeBlur','planePointer'])
    expect(result.account[key],'Account must share Cart '+key).toBe(result.cart[key]);
@@ -1647,6 +1653,10 @@ for(const sample of [
   expect(Math.abs(result.account.planeHeight-result.account.nativeHeight)).toBeLessThanOrEqual(1);
   expect(result.actions).toBe(5);
   expect(result.noteExists).toBe(false);
+  expect(result.pairRects).toHaveLength(2);
+  expect(Math.abs(result.pairRects[0].y-result.pairRects[1].y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(result.pairRects[0].width-result.pairRects[1].width)).toBeLessThanOrEqual(1);
+  expect(result.pairRects[1].x).toBeGreaterThan(result.pairRects[0].x+result.pairRects[0].width);
   for(const gap of result.gaps)expect(gap,'Each Account card has an independent gap').toBeGreaterThanOrEqual(10);
   for(const axis of [['x','x'],['y','y'],['width','width'],['height','height']])
    expect(Math.abs(result.accountFrame[axis[0]]-cartBox[axis[1]])).toBeLessThanOrEqual(1);
@@ -1657,5 +1667,61 @@ for(const sample of [
   await expect(page.locator('#accountDrawer')).not.toHaveClass(/\bopen\b/);
   expect(errors).toEqual([]);
   console.log('ACCOUNT_NATIVE_GLASS_VISUAL_QA',JSON.stringify({width:sample.width,theme:sample.theme,cart:result.cart,account:result.account,gaps:result.gaps}));
+ });
+}
+
+
+// Repeated mode changes on the Account screen: full opaque cover EVERY time,
+// exactly one commit per user gesture and no burst toggles from rapid taps.
+for(const cfg of [{width:390,height:844},{width:360,height:800}]){
+ test('Account theme atomic anti-spam '+cfg.width,async({page})=>{
+  await page.setViewportSize(cfg);
+  await page.emulateMedia({colorScheme:'light'});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',r=>r.fulfill({status:200,contentType:'application/json',body:'[]'}));
+  await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  await page.locator('#mobileAccountNav').click();
+  await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
+  await page.evaluate(()=>{
+   const root=document.documentElement,overlay=document.querySelector('#sdThemeSwitchOverlay');
+   const stats=window.__qaTheme={commits:[],covers:0,lastDark:root.classList.contains('dark')};
+   const monitor=()=>{
+    if(overlay.classList.contains('is-covered'))stats.covers++;
+    const dark=root.classList.contains('dark');
+    if(dark!==stats.lastDark){
+     stats.commits.push({dark,covered:overlay.classList.contains('is-covered'),opacity:getComputedStyle(overlay).opacity});
+     stats.lastDark=dark;
+    }
+   };
+   new MutationObserver(monitor).observe(root,{attributes:true,attributeFilter:['class']});
+   new MutationObserver(monitor).observe(overlay,{attributes:true,attributeFilter:['class']});
+   // Simulate repeated rapid taps through the actual Account action.
+   for(let i=0;i<8;i++)document.querySelector('#accountThemeAction').click();
+  });
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.classList.contains('dark'))).toBe(true);
+  await expect.poll(()=>page.evaluate(()=>!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-dismissing')&& !document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-visible') && !document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-covered'))).toBe(true);
+  const first=await page.evaluate(()=>window.__qaTheme);
+  expect(first.commits).toHaveLength(1);
+  expect(first.commits[0]).toMatchObject({dark:true,covered:true,opacity:'1'});
+  expect(first.covers).toBeGreaterThan(0);
+  await page.screenshot({path:join(output,'account-compact-theme-dark-'+cfg.width+'.png'),animations:'disabled'});
+  // A repeat gesture during cooldown must not switch back or jump to bare paint.
+  await page.locator('#accountThemeAction').evaluate(el=>el.click());
+  expect(await page.evaluate(()=>document.documentElement.classList.contains('dark'))).toBe(true);
+  await page.waitForTimeout(1050);
+  await page.locator('#accountThemeAction').click();
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.classList.contains('dark'))).toBe(false);
+  await expect.poll(()=>page.evaluate(()=>!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-visible')&&!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-covered')&&!document.querySelector('#sdThemeSwitchOverlay').classList.contains('is-dismissing'))).toBe(true);
+  const second=await page.evaluate(()=>window.__qaTheme);
+  expect(second.commits).toHaveLength(2);
+  expect(second.commits[1]).toMatchObject({dark:false,covered:true,opacity:'1'});
+  expect(second.covers).toBeGreaterThan(first.covers);
+  await page.screenshot({path:join(output,'account-compact-theme-light-'+cfg.width+'.png'),animations:'disabled'});
+  expect(errors).toEqual([]);
+  console.log('ACCOUNT_THEME_ATOMIC_QA',JSON.stringify({viewport:cfg.width,commits:second.commits,covers:second.covers}));
  });
 }
