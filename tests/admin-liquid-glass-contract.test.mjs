@@ -77,17 +77,20 @@ has('class="product-description-heading"', 'description and AI action share head
 has('placeholder="Chưa có giá"', 'unknown price is not invented');
 has('aria-label="Nhóm thông tin sản phẩm"', 'product editor tabs have an accessible group label');
 
-// Screen 8 customer cards should be compact on phones without inventing missing totals or profile photos.
-has("class='customer-mobile-summary'", 'compact customer mobile summary');
-has('#main .customer-table .customer-desktop-identity{display:none!important}', 'desktop customer identity stays hidden despite later desktop identity styles when the compact phone card is active');
-has("class='customer-mobile-details'", 'progressively disclosed customer contact/address details');
-has("customer-mobile-last-order", 'last order date based only on server-returned customer data');
-has("#main .customer-table tbody tr:has(.customer-mobile-summary)>td:nth-child(n+2){display:none!important}", 'phone cards avoid repeating the verbose desktop table cells');
-has("class=\"pagehead customer-pagehead\"", 'customer page heading has a scope for compact mobile layout');
-assert.match(adminHtml, /customer-mobile-extra[\\s\\S]*?c\\.email\\|\\|'Chưa cung cấp'[\\s\\S]*?c\\.address\\|\\|'Chưa cung cấp'/,
-  'Email and address remain available in an accessible details disclosure');
-assert.doesNotMatch(adminHtml, /customer-mobile-(?:total|revenue|amount)/,
-  'Customer cards must not invent order totals/revenue that the endpoint does not return');
+// Screen 8 customer cards expose real contact information on first paint.
+has('function adminCustomerMobileCard(c)', 'single customer mobile formatter');
+has('class="customer-mobile-summary"', 'customer identity with one mobile surface');
+has('#main .customer-table .customer-desktop-identity{display:none!important}', 'desktop customer cells stay hidden on mobile');
+has('class="customer-mobile-contact"', 'phone and address are clearly labelled and always visible');
+has('class="customer-mobile-metrics"', 'order count and latest order date remain explicit');
+has('class="customer-mobile-fact"', 'readable contact detail rows');
+has('#main .customer-table tbody tr:has(.customer-mobile-summary)>td:nth-child(n+2){display:none!important}', 'avoid duplicate desktop table cells');
+has('class="pagehead customer-pagehead"', 'customer page heading is scoped for mobile');
+const mobileCardMarkup=adminHtml.slice(adminHtml.indexOf('function adminCustomerMobileCard('),adminHtml.indexOf('function customersPage('));
+assert.match(mobileCardMarkup,/field\('Địa chỉ',esc\(c\.address\|\|'Chưa cung cấp'\)/,'customer address is shown immediately');
+assert.match(mobileCardMarkup,/c\.email\?field\('Email',esc\(c\.email\)\)/,'optional email remains visible when supplied');
+assert.doesNotMatch(mobileCardMarkup,/<details|customer-mobile-details/,'no contact accordion to obscure key information');
+assert.doesNotMatch(adminHtml,/customer-mobile-(?:total|revenue|amount)/,'never invent order revenue or totals');
 
 // Owner-approved order redesign: tappable cards and a focused detail screen.
 for(const token of ['const filteredOrders=orders.filter','id="orderSearchBox"','id="orderStatusFilter"','id="orderPaymentFilter"','id="orderResultSummary"',
