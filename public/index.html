@@ -3938,7 +3938,8 @@ const deliveryStatusLabels={not_shipped:'Chờ gửi hàng',in_transit:'Đang gi
 const deliveryStatusLabel=value=>deliveryStatusLabels[value]||'Chưa có trạng thái giao hàng';
 const categoryLabels={all:'Tất cả',sneakers:'Giày Thể Thao',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví nam','vi-nam':'Ví nam','vi-cam-tay':'Ví cầm tay','cap-tab-laptop':'Cặp – Tab – Laptop',clutch:'Clutch',mu:'Mũ','tui-deo-cheo':'Túi đeo chéo','tui-golf':'Túi golf','tui-nu':'Túi nữ',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
 // Variant category is defined by catalog metadata, not title.
-function productOptionKind(p){const c=String(p?.category||'').trim().toLocaleLowerCase('vi'),slug=c.replace(/đ/gu,'d').normalize('NFD').replace(/[\u0300-\u036f]/gu,'').replace(/[\s_]+/gu,'-');return ['sneakers','loafers','dress-shoes'].includes(c)||/^(?:giay|shoe|shoes|boot|boots)(?:-|$)/u.test(slug)||['oxford','oxfords','derby','derbies'].includes(slug)?'shoe':c==='belts'?'belt':c==='phone-cases'?'phone':''}
+function isSandalsCategory(p){const c=String(p?.category||'').trim().toLocaleLowerCase('vi'),slug=c.replace(/đ/gu,'d').normalize('NFD').replace(/[\u0300-\u036f]/gu,'').replace(/[\s_]+/gu,'-');return /^(?:dep|sandal|sandals)(?:-|$)/u.test(slug)}
+function productOptionKind(p){const c=String(p?.category||'').trim().toLocaleLowerCase('vi'),slug=c.replace(/đ/gu,'d').normalize('NFD').replace(/[\u0300-\u036f]/gu,'').replace(/[\s_]+/gu,'-');return ['sneakers','loafers','dress-shoes'].includes(c)||/^(?:giay|shoe|shoes|boot|boots)(?:-|$)/u.test(slug)||['oxford','oxfords','derby','derbies'].includes(slug)||isSandalsCategory(p)?'shoe':c==='belts'?'belt':c==='phone-cases'?'phone':''}
 function normalizeProductOption(p,raw){const kind=productOptionKind(p);if(!kind)return raw==null||raw===''?'':null;if(typeof raw!=='string'&&typeof raw!=='number')return null;const v=String(raw).trim().replace(/\s+/gu,' ');if(kind==='shoe')return /^(38|39|40|41|42|43|44)$/.test(v)?v:null;if(kind==='belt')return ['3.5','4.0'].includes(v)?v:null;return v.length>=2&&v.length<=80&&!/[<>\x00-\x1f\x7f]/u.test(v)?v:null}
 function productOptionLabel(p,option){const kind=productOptionKind(p);return kind==='shoe'?'Size '+option:kind==='belt'?'Bản dây '+option+' cm':kind==='phone'?'Dòng điện thoại: '+option:''}
 function focusDetailOption(){
@@ -3953,7 +3954,7 @@ function renderProductOptions(p){
  wrap.hidden=!kind;wrap.replaceChildren();if(!kind)return;
  const label=document.createElement('label');
  label.className='sd-product-option-label';label.id='sdDetailOptionLabel';
- label.textContent=kind==='shoe'?'Chọn size giày *':kind==='belt'?'Chọn bản dây (cm) *':'Dòng điện thoại cần làm ốp *';
+ label.textContent=kind==='shoe'?(isSandalsCategory(p)?'Chọn size dép *':'Chọn size giày *'):kind==='belt'?'Chọn bản dây (cm) *':'Dòng điện thoại cần làm ốp *';
  const msg=document.createElement('small');msg.id='sdDetailOptionMessage';msg.setAttribute('role','status');
  if(kind==='phone'){
   const field=document.createElement('input');

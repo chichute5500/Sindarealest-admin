@@ -1,13 +1,14 @@
 // Product-option rules are catalog-category based, never inferred from a title
 // or trusted from a customer-controlled category in the checkout payload.
-export const SHOE_CATEGORIES = Object.freeze(["sneakers", "loafers", "dress-shoes"]);
+export const SHOE_CATEGORIES = Object.freeze(["sneakers", "loafers", "dress-shoes", "sandals"]);
+// Dép use the same mandatory 38–44 size selection and order-item size storage.
 
 export function productOptionKind(category) {
   const key = String(category ?? "").trim().toLowerCase();
   // New Admin-created shoe categories also need sizes without another deploy.
-  // Normalize Vietnamese names/slugs; do not classify sandals/dép as shoes.
+  // Normalize Vietnamese names/slugs; sandals/dép share shoe sizing.
   const slug = key.replace(/đ/gu, "d").normalize("NFD").replace(/[\u0300-\u036f]/gu, "").replace(/[\s_]+/gu, "-");
-  if (SHOE_CATEGORIES.includes(key) || /^(?:giay|shoe|shoes|boot|boots)(?:-|$)/u.test(slug) || ["oxford", "oxfords", "derby", "derbies"].includes(slug)) return "shoe";
+  if (SHOE_CATEGORIES.includes(key) || /^(?:giay|shoe|shoes|boot|boots|dep|sandal|sandals)(?:-|$)/u.test(slug) || ["oxford", "oxfords", "derby", "derbies"].includes(slug)) return "shoe";
   if (key === "belts") return "belt";
   if (key === "phone-cases") return "phone";
   return "";
