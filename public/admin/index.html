@@ -2867,7 +2867,7 @@ let adminThemeMode='auto';try{adminThemeMode=sessionStorage.getItem('sd-admin-th
   payment_transaction_recorded:'Đã ghi nhận khoản thanh toán',
   backup_created:'Đã tạo bản sao lưu',data_restored:'Đã khôi phục dữ liệu'
  };
- if(Object.hasOwn(labels,action))return labels[action];
+ if(log&&Object.hasOwn(labels,log.action))return labels[action];
  const type=String(log?.entity_type||'');
  const noun=({product:'sản phẩm',order:'đơn hàng',customer:'khách hàng',warranty:'bảo hành',settings:'cài đặt'})[type]||'quản trị';
  if(action.endsWith('_created'))return 'Đã tạo '+noun;
