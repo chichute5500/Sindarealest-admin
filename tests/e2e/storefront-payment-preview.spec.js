@@ -1401,6 +1401,7 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    expect(layout.header.right,'Header does not overflow').toBeLessThanOrEqual(width+1);
    const perf=await sampleFrames();
    const normalPerf=await sampleNormalFrames();
+   expect(normalPerf.sampledFrames).toBe(65);
    expect(perf.documentWidth,'No horizontal document overflow in '+mode+' '+width).toBeLessThanOrEqual(width+2);
    report.push({surface:'storefront',width,mode,boot,perf,normalPerf,header:layout.header});
    await page.screenshot({path:join(output,'theme-audit-store-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
@@ -1476,6 +1477,7 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    if(width<=820){expect(snap.navPos).toBe('fixed');expect(snap.dockBottom).toBeLessThanOrEqual(height+2);}
    const perf=await sampleFrames();
    const normalPerf=await sampleNormalFrames();
+   expect(normalPerf.sampledFrames).toBe(65);
    report.push({surface:'admin',width,mode,perf,normalPerf,snap});
    await page.screenshot({path:join(output,'theme-audit-admin-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
   }
