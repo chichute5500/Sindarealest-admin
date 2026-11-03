@@ -99,6 +99,16 @@ async function main() {
   } catch {
     throw new Error('Migration 0009_fulfillment_and_manual_payments.sql chưa sẵn sàng trên D1. Deploy bị chặn; script chỉ đọc schema và không tự chạy hoặc sửa migration/D1.');
   }
+  // New delivery outcome and COD settlement routes require migration 0018.
+  // This is a read-only deployment gate: never mutate Production D1 here.
+  try {
+    runWrangler(['d1','execute',databaseName,'--remote','--command',
+      'SELECT delivery_status FROM orders LIMIT 0;'],{quiet:true});
+    runWrangler(['d1','execute',databaseName,'--remote','--command',
+      'SELECT amount,transaction_reference,verified_at FROM order_cod_settlements LIMIT 0;'],{quiet:true});
+  } catch {
+    throw new Error('Migration 0018_payment_delivery_settlement.sql thiếu trên Production D1; dừng deploy để tránh lỗi COD/giao hàng.');
+  }
   // Verify Owner-applied Android device table on Production before deploying.
   try {
     runWrangler(['d1','execute',databaseName,'--remote','--command','SELECT token_hash, device_id, fcm_token, expires_at FROM android_admin_devices LIMIT 0;'],{quiet:true});
