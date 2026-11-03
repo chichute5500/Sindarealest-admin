@@ -4286,7 +4286,7 @@ function ensureOrderGuideOpen(){
  if(arrow)arrow.textContent='↑';
 }
 function navigateCatalog(category='all'){
- if(document.documentElement.classList.contains('sd-service-route')){location.assign('/sanpham');return}
+ if(typeof document!=='undefined'&&document.documentElement.classList.contains('sd-service-route')){location.assign('/sanpham');return}
  const key=category==='all'?'all':String(category||'all');
  const path=key==='all'?'/sanpham':'/sanpham/'+routeSlug(key);
  const wasCatalogRoute=/^\/sanpham(?:\/|$)/i.test(location.pathname)&&!location.hash;
