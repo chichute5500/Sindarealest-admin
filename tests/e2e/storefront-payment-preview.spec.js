@@ -1778,13 +1778,18 @@ for(const cfg of [
     plane:values,
     film:{color:p.backgroundColor,blur:p.backdropFilter,pointer:p.pointerEvents,z:p.zIndex,radius:p.borderTopLeftRadius},
     cart:{color:cartP.backgroundColor,blur:cartP.backdropFilter},
-    overlay:{color:outer.backgroundColor,blur:outer.backdropFilter},
+    overlay:{color:outer.backgroundColor,blur:outer.backdropFilter,animation:outer.animationName},
     shell:{color:shell.backgroundColor,blur:shell.backdropFilter,z:shell.zIndex},
     scroll:{top:modal.scrollTop,client:modal.clientHeight,total:modal.scrollHeight},
     content:modal.querySelector('.detail-layout').getBoundingClientRect().toJSON()
    };
   });
+  await expect.poll(async()=>{
+   const measure=await capture();
+   return Math.max(...['left','top','width','height'].map(key=>Math.abs(measure.actual[key]-measure.plane[key])));
+  },{timeout:3000,intervals:[50,100,150,300]}).toBeLessThanOrEqual(1);
   const start=await capture();
+  console.log('PRODUCT_DETAIL_GLASS_GEOMETRY',JSON.stringify({viewport:cfg.width,scheme:cfg.scheme,actual:start.actual,plane:start.plane}));
   for(const key of ['left','top','width','height'])
    expect(Math.abs(start.actual[key]-start.plane[key]),'Glass film aligns the live Detail '+key).toBeLessThanOrEqual(1);
   expect(start.film.color).toBe(start.cart.color);
@@ -1792,6 +1797,7 @@ for(const cfg of [
   expect(start.film.blur).toContain('blur(24px)');
   expect(start.film.pointer).toBe('none');
   expect(start.overlay.blur).toBe('none');
+  expect(start.overlay.animation).toBe('none'); // An opacity-animated ancestor prevents backdrop blur.
   expect(start.overlay.color).toBe('rgba(0, 0, 0, 0)');
   expect(start.shell.blur).toBe('none');
   expect(start.shell.color).toBe('rgba(0, 0, 0, 0)');
