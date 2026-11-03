@@ -6,6 +6,8 @@ on:
     paths:
       - 'public/admin/index.html'
       - 'tests/admin-mobile-clarity.test.mjs'
+      - 'tests/admin-liquid-glass-contract.test.mjs'
+      - 'tests/e2e/admin-clarity-preview.spec.js'
       - 'package.json'
       - 'scripts/verify-admin-clarity-preview.mjs'
       - '.github/workflows/admin-clarity-preview.yml'
@@ -72,7 +74,7 @@ jobs:
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test@1.56.1
           npx playwright install --with-deps chromium
-          npx playwright test tests/e2e/admin-preview.spec.js --reporter=line
+          npx playwright test tests/e2e/admin-preview.spec.js tests/e2e/admin-clarity-preview.spec.js --reporter=line
       - name: Report Preview URL and source to Owner
         if: always()
         run: |
