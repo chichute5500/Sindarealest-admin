@@ -1332,6 +1332,28 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    framesOver50ms:delays.filter(n=>n>50).length,sampledFrames:delays.length,
    documentWidth:document.documentElement.scrollWidth,viewportWidth:innerWidth};
  });
+ const sampleNormalFrames=()=>page.evaluate(async()=>{
+  window.scrollTo({top:0,behavior:'instant'});
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const samples=await new Promise(resolve=>{
+   const records=[];let last=0,seen=0;
+   const tick=now=>{
+    if(last){records.push(now-last);seen++}
+    last=now;
+    if(seen<65){
+     const max=Math.max(0,document.documentElement.scrollHeight-innerHeight);
+     if(seen%2===0)window.scrollTo({top:Math.min(max,seen*12),behavior:'instant'});
+     requestAnimationFrame(tick);
+    }else resolve(records);
+   };
+   requestAnimationFrame(tick);
+  });
+  const sorted=samples.slice().sort((a,b)=>a-b);
+  return {averageFps:Math.round(1000/(samples.reduce((a,b)=>a+b,0)/samples.length)),
+   p95FrameMs:Number(sorted[Math.floor((sorted.length-1)*.95)].toFixed(1)),
+   framesOver50ms:samples.filter(n=>n>50).length,sampledFrames:samples.length,
+   documentWidth:document.documentElement.scrollWidth,viewportWidth:innerWidth};
+ });
  const rectInfo=()=>page.evaluate(()=>{
   const visible=sel=>{
    const node=document.querySelector(sel);
@@ -1352,7 +1374,8 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
   await page.setViewportSize({width,height});
   await page.goto('about:blank');
   const baseline=await sampleFrames();
-  report.push({surface:'blank-baseline',width,mode:'neutral',perf:baseline});
+  const normalPerf=await sampleNormalFrames();
+  report.push({surface:'blank-baseline',width,mode:'neutral',perf:baseline,normalPerf});
   console.log('SD_FRAME_RUNNER_BASELINE',JSON.stringify({width,...baseline}));
  }
  for(const {width,height} of [{width:390,height:844},{width:430,height:932},{width:1280,height:800}]){
@@ -1377,8 +1400,9 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    expect(layout.header.left,'Header stays in viewport').toBeGreaterThanOrEqual(-1);
    expect(layout.header.right,'Header does not overflow').toBeLessThanOrEqual(width+1);
    const perf=await sampleFrames();
+   const normalPerf=await sampleNormalFrames();
    expect(perf.documentWidth,'No horizontal document overflow in '+mode+' '+width).toBeLessThanOrEqual(width+2);
-   report.push({surface:'storefront',width,mode,boot,perf,header:layout.header});
+   report.push({surface:'storefront',width,mode,boot,perf,normalPerf,header:layout.header});
    await page.screenshot({path:join(output,'theme-audit-store-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
    if(width===390){
     await page.locator('#mobileCartNav').click();
@@ -1451,7 +1475,8 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    expect(snap.docWidth,'Admin doc must not horizontally overflow').toBeLessThanOrEqual(width+2);
    if(width<=820){expect(snap.navPos).toBe('fixed');expect(snap.dockBottom).toBeLessThanOrEqual(height+2);}
    const perf=await sampleFrames();
-   report.push({surface:'admin',width,mode,perf,snap});
+   const normalPerf=await sampleNormalFrames();
+   report.push({surface:'admin',width,mode,perf,normalPerf,snap});
    await page.screenshot({path:join(output,'theme-audit-admin-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
   }
  }
