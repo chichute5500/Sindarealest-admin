@@ -22,6 +22,8 @@ assert.match(grid, /Đặt cọc <strong>30%<\/strong>/,
   'The deposit information must remain visible.');
 assert.match(grid, /5–20 ngày/,
   'The estimated production time must remain visible.');
+assert.match(grid, /bảo hành <strong>6–12 tháng<\/strong>/, 'Order overview must not promise a fixed year of coverage.');
+assert.doesNotMatch(grid, /bảo hành <strong>1 năm<\/strong>/);
 assert.doesNotMatch(grid, /order-zalo-cta|zalo\.me\//,
   'Zalo must not be represented as a fifth process step.');
 
