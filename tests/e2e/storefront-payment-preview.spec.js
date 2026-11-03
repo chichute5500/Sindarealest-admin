@@ -1558,6 +1558,9 @@ for(const cfg of [
   await page.locator('#mobileCartNav').click();
   await expect(page.locator('#cartDrawer')).toHaveClass(/\bopen\b/);
   await expect(page.locator('#cartList .cart-row')).toHaveCount(5);
+  // The first Cart opener has an actual slide-in animation as well.
+  // Establish the reference only after its left inset has settled at 7px.
+  await expect.poll(async()=>Math.abs((await frame('#cartDrawer')).x-7),{timeout:4000}).toBeLessThanOrEqual(1);
   const cartFull=await frame('#cartDrawer');
   const settledFrame=async selector=>{
    // An 'open' class is set before the slide-in transition finishes.
