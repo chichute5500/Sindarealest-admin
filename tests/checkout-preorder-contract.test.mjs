@@ -27,6 +27,9 @@ assert.equal(checkoutTransferReferenceMatches(transferReference,"0900000000","QA
 assert.equal(checkoutTransferReferenceMatches("SD-INVALID","0900000000","QA-WALLET-001"),false);
 
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
+const accountCss=readFileSync(new URL("../public/customer-auth.css",import.meta.url),"utf8");
+assert.doesNotMatch(accountCss,/#accountDrawer\s*\{[^}]*\bbackground\s*:/,'Account base must not repaint over the shared Cart frosted plane');
+assert.doesNotMatch(accountCss,/html\.dark #accountDrawer\s*\{[^}]*\bbackground\s*:/,'Dark Account must not have a separate painted background');
 const quote=readFileSync(new URL("../functions/api/checkout-quote.js",import.meta.url),"utf8");
 const create=readFileSync(new URL("../functions/api/orders.js",import.meta.url),"utf8");
 const admin=readFileSync(new URL("../functions/api/admin/orders.js",import.meta.url),"utf8");
