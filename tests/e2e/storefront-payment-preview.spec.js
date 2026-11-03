@@ -1682,7 +1682,13 @@ for(const cfg of [{width:390,height:844},{width:360,height:800}]){
   await page.route('**/api/settings',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
   await page.goto(url,{waitUntil:'domcontentloaded'});
   const welcome=page.locator('#welcomeSplash');
-  if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+  if(await welcome.count()&&await welcome.isVisible()){
+   // This fixture enters on a document with Welcome already fading out.
+   // Use the genuine Skip handler, not a coordinate click that main content
+   // can intercept during the welcome exit transition.
+   await page.locator('#skipIntro').evaluate(el=>el.click());
+   await expect(welcome).toHaveCount(0,{timeout:8000});
+  }
   await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
   await page.locator('#mobileAccountNav').click();
   await expect(page.locator('#accountDrawer')).toHaveClass(/\bopen\b/);
