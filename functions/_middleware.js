@@ -224,7 +224,7 @@ export async function onRequest(context) {
     if (description.length <= 145 && !/cá sấu/i.test(description))
       description = (description + " Khám phá " + productSeo.heading + " tại SinDarealest.").slice(0,270);
   }
-  html = html.replace(/<title>[\\s\\S]*?<\\/title>/i, `<title>${escapeHtml(title)}</title>`);
+  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
   html = meta(html, "description", description);
   html = meta(html, "og:type", "product", true);
   html = meta(html, "og:site_name", "SinDarealest", true);
