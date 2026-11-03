@@ -1374,7 +1374,12 @@ test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin 
    if(width===390){
     await page.locator('#mobileCartNav').click();
     await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
-    await page.waitForTimeout(300);
+    // The approved slide-in is allowed to extend beyond the viewport DURING
+    // motion. Check final resting geometry, not a moving frame at 300ms.
+    await expect.poll(()=>page.locator('#cartDrawer').evaluate(el=>{
+     const r=el.getBoundingClientRect();
+     return Math.max(Math.abs(r.left-7),Math.abs(innerWidth-r.right-7));
+    }),{timeout:7000}).toBeLessThanOrEqual(2);
     const state=await rectInfo();
     const edge=await page.evaluate(()=>{
      const cart=document.querySelector('#cartDrawer'),head=cart?.querySelector('.cart-header');
