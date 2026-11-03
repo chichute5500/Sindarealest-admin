@@ -207,13 +207,24 @@ export async function onRequest(context) {
   const candidateImage = Array.isArray(images) && typeof images[0] === "string" ? images[0] : "";
   const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest-crisp-20261028.jpg";
   const canonical = `${url.origin}${canonicalPath}`;
-  const title = `${product.title} | SinDarealest`;
+  let title = `${product.title} | SinDarealest`;
   const descriptionBase = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim();
-  const description = (isVerifiedCommercialSku(product) ? `${descriptionBase.slice(0, 250)} · SKU: ${product.sku}` : descriptionBase).slice(0, 300);
+  let description = (isVerifiedCommercialSku(product) ? `${descriptionBase.slice(0, 250)} · SKU: ${product.sku}` : descriptionBase).slice(0, 300);
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();
-  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
+  // Preserve real Admin titles/descriptions. For a short, generic product
+  // title, add the matching category context only when absent and supported
+  // by the public category route; never invent product prices or attributes.
+  const productSeo = catalogSeoProfile(html, productCategoryRouteSlug(product.category));
+  if (productSeo?.heading && /da cá sấu/i.test(productSeo.heading)) {
+    const productName = String(product.title || "").trim();
+    if (productName.length <= 48 && !/cá sấu/i.test(productName))
+      title = productName + " – " + productSeo.heading + " | SinDarealest";
+    if (description.length <= 145 && !/cá sấu/i.test(description))
+      description = (description + " Khám phá " + productSeo.heading + " tại SinDarealest.").slice(0,270);
+  }
+  html = html.replace(/<title>[\\s\\S]*?<\\/title>/i, `<title>${escapeHtml(title)}</title>`);
   html = meta(html, "description", description);
   html = meta(html, "og:type", "product", true);
   html = meta(html, "og:site_name", "SinDarealest", true);
