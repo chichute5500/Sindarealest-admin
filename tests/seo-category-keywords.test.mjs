@@ -31,6 +31,13 @@ for(const slug of ["sneaker","giayluoi","giaytay","thatlung","dep","vinam","vica
 assert.ok(html.includes('name="description" content="SinDarealest chuyên thời trang da cá sấu:'));
 assert.ok(html.includes('<title>SinDarealest | Giày, ví, túi và thời trang da cá sấu</title>'));
 
+const readBreadcrumbs = body => {
+  const entries = [...body.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map(match => JSON.parse(match[1]))
+    .filter(schema => schema["@type"] === "BreadcrumbList");
+  assert.equal(entries.length, 1, "Exactly one BreadcrumbList per catalog/product page");
+  return entries[0].itemListElement;
+};
 const origin="https://shop.example";
 const fetchPage=async pathname=>{
   const response=await storefront({
@@ -49,10 +56,17 @@ for(const slug of ["sneaker","giaytay","vinam","thatlung","tuinu","mu"]){
   assert.ok(body.includes('id="catalogSeoNote">'+p.intro+"</p>"),"Server visible SEO introduction missing: "+slug);
   assert.ok(body.includes('rel="canonical" href="'+origin+"/sanpham/"+slug+'"'),"Wrong canonical");
   assert.equal((body.match(/<meta name="description"/g)||[]).length,1,"Description must not be duplicated");
+  const crumbs=readBreadcrumbs(body);
+  assert.deepEqual(crumbs.map(item=>item.position),[1,2,3]);
+  assert.deepEqual(crumbs.map(item=>item.item),[origin+"/",origin+"/sanpham",origin+"/sanpham/"+slug]);
+  assert.deepEqual(crumbs.map(item=>item.name),["Trang chủ","Tất cả sản phẩm",
+    ({sneaker:"Giày thể thao",giaytay:"Giày tây",vinam:"Ví nam",thatlung:"Thắt lưng",tuinu:"Túi nữ",mu:"Mũ"})[slug]]);
+
 }
 const all=await fetchPage("/sanpham");
 assert.ok(all.includes("<title>"+profiles.all.title+"</title>"));
 assert.ok(all.includes('id="catalogSeoNote">'+profiles.all.intro+"</p>"));
+assert.deepEqual(readBreadcrumbs(all).map(x=>x.item),[origin+"/",origin+"/sanpham"]);
 
 const start=html.indexOf("function renderFilters(){");
 const end=html.indexOf("\nfunction foldSearch(",start);
@@ -87,6 +101,13 @@ const productBody=await productHtml.text();
 assert.ok(productBody.includes("<title>Giày mẫu SN321 – Giày thể thao da cá sấu | SinDarealest</title>"));
 assert.ok(productBody.includes('content="Mẫu thiết kế cá nhân · SKU: SD-SN321 Khám phá Giày thể thao da cá sấu tại SinDarealest."'));
 assert.ok(productBody.includes('rel="canonical" href="'+origin+"/sanpham/sneaker/SD-SN321"+'"'));
+assert.deepEqual(readBreadcrumbs(productBody).map(x=>x.item),[
+  origin+"/",origin+"/sanpham",origin+"/sanpham/sneaker",origin+"/sanpham/sneaker/SD-SN321"
+]);
+assert.deepEqual(readBreadcrumbs(productBody).map(x=>x.name),[
+  "Trang chủ","Tất cả sản phẩm","Giày thể thao","Giày mẫu SN321"
+]);
+
 assert.ok(!productBody.includes('"@type":"Offer"'),"Do not invent verified prices");
 assert.ok(!productBody.includes('"@type":"AggregateRating"'),"Do not invent reviews");
-console.log("PASS: 15 unique keyword category profiles, direct SSR tags, visible copy, SPA hydration and canonical URLs.");
+console.log("PASS: 15 unique keyword category profiles, canonical URLs and verified category/product BreadcrumbList hierarchies.");
