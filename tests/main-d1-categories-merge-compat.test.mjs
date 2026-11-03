@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
+import { productCategoryRouteSlug } from "../functions/_storefront-route.js";
 
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const start=html.indexOf("function renderFilters(){");
@@ -29,7 +30,7 @@ const ctx={
  ],
  categoryOrder:["all","sneakers","loafers","dress-shoes","belts","wallets","sandals","watch-straps","phone-cases"],
  categoryLabels:{all:"Tất cả",sneakers:"Sneaker"},
- displayProductName,escapeHtml,selectedCategory:"stale-from-import",
+ displayProductName,escapeHtml,routeSlug:productCategoryRouteSlug,selectedCategory:"stale-from-import",
  $:selector=>selector==="#categoryFilters"?container:null
 };
 function render(){runInNewContext(html.slice(start,end)+"\nrenderFilters();",ctx,{timeout:1000})}
@@ -41,7 +42,7 @@ assert.equal((container.innerHTML.match(/class="filter-pill/g)||[]).length,8,"Ev
 assert.ok(!container.innerHTML.includes("<img src=x"),"Untrusted D1 labels cannot inject markup");
 assert.ok(container.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"),"Escaped untrusted category labels remain readable, regardless of owner-approved title case");
 ctx.selectedCategory="tui-golf";render();
-assert.ok(container.innerHTML.includes('data-category="tui-golf" aria-pressed="true"'),"Dynamic D1 category remains selectable");
+assert.ok(container.innerHTML.includes('href="/sanpham/tuigolf" data-category="tui-golf" aria-current="page"'),"Dynamic D1 category remains linkable and selectable");
 ctx.products=[{category:"imported-after-merge",categoryLabel:"Danh mục tương lai"}];render();
 assert.equal(ctx.selectedCategory,"all","Subsequent D1 import removes stale selection");
 assert.ok(container.innerHTML.includes('data-category="imported-after-merge"'),"Future imported categories appear without source edits");

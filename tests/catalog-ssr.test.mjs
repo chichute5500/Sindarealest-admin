@@ -42,7 +42,7 @@ assert.ok(!full.includes('https://evil.example'),'No remote image host may be in
 assert.ok(!full.includes('<img src=x onerror=alert(1)>'),'Untrusted title is escaped');
 assert.ok(!full.includes('SD-PRIVATE'),'Never include private/unverified details');
 assert.ok(!full.includes('"price"'),'Never expose unverified price');
-assert.ok(statements.every(sql=>sql.startsWith("SELECT ")&&sql.includes("LIMIT 8")),'SSR must use bounded read-only SQL');
+assert.ok(statements.every(sql=>sql.startsWith("SELECT ")&&sql.includes("LIMIT 9")),'SSR must use one bounded read-only query with an eight-card page and one lookahead');
 const category=await renderPublicCatalog(shell,{DB},origin,{categorySlug:"sneaker"});
 assert.ok(category.includes('id="catalogGrid"><article'));
 assert.match(category,/id="catalogGrid"><article[^]*?loading="eager"/,
