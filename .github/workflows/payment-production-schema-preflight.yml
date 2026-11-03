@@ -1,0 +1,66 @@
+name: Payment Sync — Production schema read-only preflight
+
+on:
+  push:
+    branches:
+      - feat/storefront-payment-cod-sync-20261101
+    paths:
+      - '.github/workflows/payment-production-schema-preflight.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: payment-sync-production-schema-readonly
+  cancel-in-progress: false
+
+jobs:
+  verify-schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Read-only verification of current Production D1 migration 0018
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const account=process.env.CLOUDFLARE_ACCOUNT_ID||'';
+          const token=process.env.CLOUDFLARE_API_TOKEN||'';
+          assert.match(account,/^[a-f0-9]{32}$/i,'Missing account ID');
+          assert.ok(token.length>10,'Missing Cloudflare token');
+          const base='https://api.cloudflare.com/client/v4/accounts/'+account;
+          async function api(path,method='GET',payload){
+            const response=await fetch(base+path,{method,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+              ...(payload?{body:JSON.stringify(payload)}:{}),signal:AbortSignal.timeout(15000)});
+            if(!response.ok)throw Error('Cloudflare read-only query HTTP '+response.status);
+            const obj=await response.json();
+            if(obj?.success!==true)throw Error('Cloudflare rejected read-only query');
+            return obj.result;
+          }
+          const project=await api('/pages/projects/sindarealest2');
+          assert.equal(project?.name,'sindarealest2','Wrong Production Pages project');
+          assert.equal(project?.production_branch,'main','Production branch must be main');
+          const binding=project?.deployment_configs?.production?.d1_databases?.DB;
+          const id=binding?.id||binding?.database_id;
+          assert.match(id||'',/^[a-f0-9-]{36}$/i,'Production D1 binding cannot be verified');
+          const database=await api('/d1/database/'+encodeURIComponent(id));
+          assert.equal(database?.name,'sindarealest-db','Unexpected Production database');
+          const query=async sql=>{
+            assert.match(sql,/^(?:SELECT|PRAGMA)\b/i,'Only read-only SELECT/PRAGMA allowed');
+            const results=await api('/d1/database/'+encodeURIComponent(id)+'/query','POST',{sql});
+            assert.ok(Array.isArray(results)&&Array.isArray(results[0]?.results),'Invalid D1 response');
+            return results[0].results;
+          };
+          const column=await query("SELECT name FROM pragma_table_info('orders') WHERE name='delivery_status'");
+          const codTable=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='order_cod_settlements'");
+          const migrationTable=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='d1_migrations'");
+          let recorded=false;
+          if(migrationTable.length)recorded=(await query("SELECT name FROM d1_migrations WHERE name='0018_payment_delivery_settlement.sql'")).length===1;
+          const ready=column.length===1&&codTable.length===1&&recorded;
+          console.log('PRODUCTION_PAYMENT_SCHEMA_PREFLIGHT',JSON.stringify({project:project.name,productionBranch:project.production_branch,databaseName:database.name,deliveryStatusColumn:column.length===1,codTable:codTable.length===1,migration0018Recorded:recorded,ready}));
+          if(!ready)throw Error('BLOCKED: migration 0018 is not verified on Production. Do NOT deploy Payment Sync before separately authorizing and applying this production D1 migration.');
+          NODE
