@@ -1840,6 +1840,7 @@ for(const cfg of [
   await expect(page.locator('#sdServicePage')).toBeVisible();
   await expect(page.locator('#sdServiceHeading')).toHaveText('Tra cứu đơn hàng');
   await expect(page.locator('#sdServiceMount #sdTrackForm')).toBeVisible();
+  await expect(page.locator('#sdServiceMount .sd-track-intro')).toBeHidden();
   await expect(page.locator('#sdTrackForm')).toHaveCount(1);
   await expect(page.locator('#warrantyLookupForm')).toHaveCount(1);
   await expect(page.locator('#home')).toBeHidden();
@@ -1856,6 +1857,7 @@ for(const cfg of [
   await expect(page).toHaveURL(/\/bao-hanh$/);
   await expect(page.locator('#sdServiceHeading')).toHaveText('Kiểm tra bảo hành');
   await expect(page.locator('#sdServiceMount #warrantyLookupForm')).toBeVisible();
+  await expect(page.locator('#sdServiceMount>.warranty-help>div:first-child')).toBeHidden();
   await expect(page.locator('#warrantyLookupForm')).toHaveCount(1);
   await expect(page.locator('[data-sd-service="warranty"]')).toHaveAttribute('aria-current','page');
   await page.locator('#warrantyLookupValue').fill('SDW-K7M2');
@@ -1867,6 +1869,7 @@ for(const cfg of [
   await page.goBack({waitUntil:'domcontentloaded'});
   await expect(page.locator('#sdServiceHeading')).toHaveText('Tra cứu đơn hàng');
   await expect(page.locator('#sdServiceMount #sdTrackForm')).toBeVisible();
+  await expect(page.locator('#sdServiceMount .sd-track-intro')).toBeHidden();
   await page.locator('[data-mobile-tab="home"]').click();
   await expect.poll(()=>page.evaluate(()=>location.pathname)).toBe('/');
   await expect(page.locator('#sdServicePage')).toBeHidden();
