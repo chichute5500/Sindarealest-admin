@@ -58,27 +58,42 @@ function catalogSchema(rows,origin){
   return JSON.stringify({"@context":"https://schema.org","@type":"ItemList",itemListElement:list})
     .replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
 }
-export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=false}={}){
+export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=false,page=1}={}){
   if(typeof html!=="string"||!html.includes('id="catalogGrid"')||!env?.DB)return html;
   const validCategory=categorySlug && Object.entries(PRODUCT_CATEGORY_ROUTE_SLUGS)
     .filter(([,slug])=>slug===categorySlug).map(([key])=>key);
   if(categorySlug&&!validCategory.length)return html;
   try{
+    const pageNumber=Number.isInteger(page)&&page>=1&&page<=250?page:1;
     let sql="SELECT id,slug,sku,sku_verified,title,category,images_json,fulfillment_type FROM products WHERE published=1";
     const args=validCategory||[];
     if(categorySlug)sql+=" AND category IN ("+args.map(()=>"?").join(",")+")";
-    sql+=" ORDER BY created_at DESC,id DESC LIMIT 8";
+    // One bounded query per catalog page: eight cards plus one lookahead.
+    // Numeric OFFSET is derived only from the validated 1..250 page index.
+    sql+=" ORDER BY created_at DESC,id DESC LIMIT 9"+(pageNumber>1?" OFFSET "+((pageNumber-1)*8):"");
     let stmt=env.DB.prepare(sql);
     if(categorySlug)stmt=stmt.bind(...args);
     const result=await stmt.all();
-    const rows=(Array.isArray(result?.results)?result.results:[])
-      .filter(p=>p&&validTitle(p.title)&&canonicalProductPath(p)).slice(0,8);
+    const rawRows=Array.isArray(result?.results)?result.results:[];
+    const hasNext=rawRows.length>8;
+    const rows=rawRows.filter(p=>p&&validTitle(p.title)&&canonicalProductPath(p)).slice(0,8);
     if(!rows.length)return html; // Never output invented/stale products if D1 is unavailable.
     const cards=productCards(rows,origin,{eager:!home});
     html=html.replace('<div class="catalog-grid" id="catalogGrid"></div>',
       '<div class="catalog-grid" id="catalogGrid">'+cards+'</div>');
     if(home)html=html.replace('<div class="featured-grid" id="featuredGrid"></div>',
       '<div class="featured-grid" id="featuredGrid">'+productCards(rows.slice(0,4),origin,{eager:false})+'</div>');
+    // Provide native sequential links in the initial HTML, not JS-only buttons.
+    // Search engines can traverse every product page even when scripts are off.
+    if(!home){
+      const basePath="/sanpham"+(categorySlug?"/"+categorySlug:"");
+      const pageHref=n=>basePath+(n>1?"?page="+n:"");
+      const prev=pageNumber>1?'<a class="page-btn tap-target" href="'+h(pageHref(pageNumber-1))+'" aria-label="Trang trước">'+(pageNumber-1)+'</a>':"";
+      const current='<span class="page-btn active" aria-current="page">'+pageNumber+'</span>';
+      const next=hasNext?'<a class="page-btn tap-target" href="'+h(pageHref(pageNumber+1))+'" aria-label="Trang tiếp theo">'+(pageNumber+1)+'</a>':"";
+      html=html.replace('<nav class="pagination" id="pagination" aria-label="Phân trang sản phẩm"></nav>',
+        '<nav class="pagination" id="pagination" aria-label="Phân trang sản phẩm">'+prev+current+next+'</nav>');
+    }
     // On direct catalog entry the first mobile row is the initial LCP.
     // Discover its validated, public R2 images in <head> before the parser
     // traverses large style/script blocks. Never preload offscreen Home cards.
