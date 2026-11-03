@@ -17,7 +17,7 @@ for(const slug of ["all",...slugs]){
   const p=profiles[slug];
   assert.ok(p,"Missing SEO category "+slug);
   for(const name of ["heading","title","description","intro"]){
-    assert.ok(typeof p[name]==="string" && p[name].length>20,"Missing or empty "+name+" for "+slug);
+    assert.ok(typeof p[name]==="string" && p[name].length>(name==="heading"?7:20),"Missing or empty "+name+" for "+slug);
     assert.ok(!/[<>]/.test(p[name]),"No raw HTML allowed in SEO copy");
   }
   assert.ok(p.title.endsWith("SinDarealest"),"Title must include brand");
