@@ -1,0 +1,81 @@
+name: Admin clarity — isolated mobile Preview
+on:
+  push:
+    branches:
+      - fix/admin-clarity-20261103
+    paths:
+      - 'public/admin/index.html'
+      - 'tests/admin-mobile-clarity.test.mjs'
+      - 'package.json'
+      - 'scripts/verify-admin-clarity-preview.mjs'
+      - '.github/workflows/admin-clarity-preview.yml'
+permissions:
+  contents: read
+concurrency:
+  group: admin-clarity-preview-20261103
+  cancel-in-progress: false
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_TARGET: sindarealest-admin-preview
+      CF_BRANCH_ALIAS: admin-clarity-20261103
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Refuse unexpected source or Production target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/fix/admin-clarity-20261103'
+          test "$CF_TARGET" = 'sindarealest-admin-preview'
+          test "$CF_BRANCH_ALIAS" = 'admin-clarity-20261103'
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Check CSS, source and all regression tests
+        run: |
+          npm install --no-fund --no-audit
+          npm run check
+          npm test
+      - name: Build approved navigation logo
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 scripts/build-logo-asset.py
+          test -s public/images/brand-emblem-nav.webp
+      - name: Guard Preview D1 and R2 isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/admin-clarity-preview.json"
+          curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest2" > "$RUNNER_TEMP/admin-clarity-prod.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/admin-clarity-preview.json" "$RUNNER_TEMP/admin-clarity-prod.json"
+      - name: Deploy exact candidate to isolated Pages Preview
+        run: npx wrangler pages deploy public --project-name "$CF_TARGET" --branch "$CF_BRANCH_ALIAS" --commit-hash "$GITHUB_SHA" --commit-message "Admin clarity QA $GITHUB_SHA"
+      - name: Verify deployed SHA and isolated alias read-only
+        run: node scripts/verify-admin-clarity-preview.mjs
+      - name: Run real-browser Admin Preview login smoke test (no writes)
+        env:
+          ADMIN_TEST_URL: https://admin-clarity-20261103.sindarealest-admin-preview.pages.dev/admin/
+          ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test@1.56.1
+          npx playwright install --with-deps chromium
+          npx playwright test tests/e2e/admin-preview.spec.js --reporter=line
+      - name: Report Preview URL and source to Owner
+        if: always()
+        run: |
+          echo 'Preview: https://admin-clarity-20261103.sindarealest-admin-preview.pages.dev/admin/' >> "$GITHUB_STEP_SUMMARY"
+          echo "Source SHA: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Production code and Production D1/R2 writes: none' >> "$GITHUB_STEP_SUMMARY"
