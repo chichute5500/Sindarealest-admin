@@ -17,7 +17,7 @@ assert.ok(html.includes('src="/customer-email-otp-ui.js?v=email-recovery-2026102
 
 let parsed=0;
 for(const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)){
- if(!match[2].trim()||/type\s*=\s*["'](?:module|application\/ld\+json)/i.test(match[1]))continue;
+ if(!match[2].trim()||/type\s*=\s*["'](?:module|application\/ld\+json|application\/json)/i.test(match[1]))continue;
  new Script(match[2],{filename:"index.html inline script "+(++parsed)});
 }
 assert.ok(parsed>=3,"All storefront inline JS must parse");

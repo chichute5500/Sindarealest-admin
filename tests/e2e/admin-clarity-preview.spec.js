@@ -67,3 +67,49 @@ test('Admin clarity — mobile dashboards, customers and orders use legible info
  }
  expect(errors,'Browser must not throw rendering exceptions').toEqual([]);
 });
+
+
+test('Admin dock stays stationary while scrolling and changing primary tabs on mobile',async({page})=>{
+ if(!adminUrl||!password)throw Error('Isolated Preview credentials not provided');
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.setViewportSize({width:390,height:844});
+ await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
+ await page.goto(adminUrl,{waitUntil:'domcontentloaded'});
+ await expect(page.locator('#loginForm')).toBeVisible();
+ await page.locator('#password').fill(password);
+ await page.locator('#loginForm button[type="submit"]').click();
+ await expect(page.locator('#appView')).toBeVisible({timeout:20000});
+ const dock=page.locator('body > nav.mobiletabs');
+ await expect(dock).toBeVisible();
+ for(const cfg of [
+  {width:360,height:800,scheme:'light'},
+  {width:390,height:844,scheme:'dark'},
+  {width:430,height:932,scheme:'light'}
+ ]){
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  for(const view of ['dashboard','products','orders','customers']){
+   await dock.locator('[data-view="'+view+'"]').click();
+   await expect(dock.locator('[data-view="'+view+'"]')).toHaveClass(/active/);
+   await page.evaluate(()=>{document.querySelector('#main').style.minHeight='1800px';window.scrollTo(0,0)});
+   const initial=await dock.evaluate(el=>{
+    const rect=el.getBoundingClientRect(),style=getComputedStyle(el);
+    return {top:rect.top,height:rect.height,width:rect.width,position:style.position,transform:style.transform};
+   });
+   expect(initial.position).toBe('fixed');
+   expect(initial.transform).toBe('none');
+   for(const y of [350,850,1500,0]){
+    await page.evaluate(y=>{window.scrollTo({top:y,behavior:'instant'})},y);
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const after=await dock.evaluate(el=>{
+     const rect=el.getBoundingClientRect();
+     return {top:rect.top,height:rect.height,width:rect.width};
+    });
+    expect(Math.abs(after.top-initial.top),cfg.width+'px '+view+': dock moved vertically while swiping').toBeLessThanOrEqual(1);
+    expect(after.height,cfg.width+'px '+view+': dock height changed while scrolling').toBe(initial.height);
+    expect(after.width,cfg.width+'px '+view+': dock width changed while scrolling').toBe(initial.width);
+   }
+  }
+ }
+ expect(errors,'Browser must not throw while scrolling or switching tabs').toEqual([]);
+});

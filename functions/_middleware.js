@@ -10,6 +10,38 @@ function meta(html, name, content, property = false) {
   const tag = `<meta ${attr}="${name}" content="${escaped}">`;
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", `  ${tag}\n</head>`);
 }
+// Catalog SEO text lives in the public HTML as static JSON so the initial
+// server response and the existing client-side category navigation share one
+// source of truth. Do not pull keyword copy from untrusted product fields.
+function catalogSeoProfile(html, categorySlug) {
+  const match = html.match(/<script\s+id=["']sd-seo-category-copy["']\s+type=["']application\/json["']>([^<]*)<\/script>/i);
+  if (!match) return null;
+  try {
+    const profiles = JSON.parse(match[1]);
+    const profile = profiles?.[categorySlug];
+    return profile && typeof profile.title === "string"
+      && typeof profile.description === "string"
+      && typeof profile.heading === "string"
+      && typeof profile.intro === "string" ? profile : null;
+  } catch { return null; }
+}
+// The same visible catalog hierarchy is expressed as crawler-readable
+// BreadcrumbList JSON-LD. No new D1 read, no invented attributes, no UI changes.
+function appendBreadcrumbList(html, origin, entries) {
+  if (!Array.isArray(entries) || entries.length < 2) return html;
+  const itemListElement = entries.map(({ name, path }, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: String(name || "").slice(0, 200),
+    item: new URL(path, origin).href
+  }));
+  const schema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement
+  }).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  return html.replace("</head>", '  <script type="application/ld+json">' + schema + '</script>\n</head>');
+}
 // Functions-generated HTML bypasses static _headers on some Cloudflare paths.
 // Apply the same minimally restrictive document-level controls on all real
 // storefront HTML responses, without blocking approved inline scripts, Zalo
@@ -108,6 +140,13 @@ export async function onRequest(context) {
     const legacyCategories = { vida: "vinam", "giay-tay": "giaytay", "giay-luoi": "giayluoi" };
     categorySlug = legacyCategories[categorySlug] || categorySlug;
     const canonicalPath = categorySlug ? "/sanpham/" + categorySlug : "/sanpham";
+    const rawPage=url.searchParams.get("page");
+    if(rawPage!==null&&(!/^[1-9][0-9]{0,2}$/.test(rawPage)||Number(rawPage)>250))
+      return new Response("Trang không hợp lệ.",{status:404,headers:{"X-Robots-Tag":"noindex, nofollow"}});
+    const requestedPage=rawPage===null?1:Number(rawPage);
+    // Each paginated listing has a distinct, stable canonical URL.
+    const canonicalCatalogUrl=url.origin+canonicalPath+(requestedPage>1?"?page="+requestedPage:"");
+    if(rawPage==="1")return Response.redirect(new URL(canonicalPath,url.origin),301);
     if (url.pathname !== canonicalPath) return Response.redirect(new URL(canonicalPath + url.search, url.origin), 301);
     if (categorySlug && !isKnownCatalogCategoryRoute(categorySlug)) {
       if (!context.env?.DB) return new Response("Danh mục chưa sẵn sàng.", {status:503});
@@ -131,21 +170,28 @@ export async function onRequest(context) {
     };
     const categoryName = Object.hasOwn(catalogLabels,categorySlug)
       ? catalogLabels[categorySlug] : categorySlug;
-    const catalogTitle = categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest";
-    const catalogDescription = categorySlug
+    const seoProfile = catalogSeoProfile(html, categorySlug || "all");
+    const catalogTitleBase = seoProfile?.title || (categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest");
+    const catalogDescriptionBase = seoProfile?.description || (categorySlug
       ? "Khám phá sản phẩm " + categoryName + " tại SinDarealest. Xem thiết kế và mã SKU chính thức."
-      : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.";
+      : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.");
+    const catalogTitle=requestedPage>1?catalogTitleBase+" – Trang "+requestedPage:catalogTitleBase;
+    const catalogDescription=requestedPage>1?catalogDescriptionBase+" Trang "+requestedPage+".":catalogDescriptionBase;
     html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(catalogTitle) + "</title>");
     // Give direct-link visitors and crawlers the correct category heading in
     // the initial HTML, before /api/products completes on a slow connection.
     if(categorySlug) html = html.replace(
       '<h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2>',
-      '<h2 class="section-title" id="catalogHeading">' + escapeHtml(categoryName) + '</h2>'
+      '<h2 class="section-title" id="catalogHeading">' + escapeHtml(seoProfile?.heading || categoryName) + '</h2>'
+    );
+    if (seoProfile?.intro) html = html.replace(
+      /(<p class="section-note" id="catalogSeoNote">)[\s\S]*?(<\/p>)/,
+      (_, opening, closing) => opening + escapeHtml(seoProfile.intro) + closing
     );
     html = meta(html, "description", catalogDescription);
     html = meta(html, "og:title", catalogTitle, true);
     html = meta(html, "og:description", catalogDescription, true);
-    html = meta(html, "og:url", url.origin + canonicalPath, true);
+    html = meta(html, "og:url", canonicalCatalogUrl, true);
     // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
     // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
     html = meta(html, "og:image", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
@@ -155,11 +201,16 @@ export async function onRequest(context) {
     html = meta(html, "twitter:description", catalogDescription);
     html = meta(html, "twitter:image", url.origin + "/og-sindarealest-crisp-20261028.jpg");
     html = meta(html, "twitter:card", "summary_large_image");
-    const canonicalTag = '<link rel="canonical" href="' + escapeHtml(url.origin + canonicalPath) + '">';
+    const canonicalTag = '<link rel="canonical" href="' + escapeHtml(canonicalCatalogUrl) + '">';
     html = /<link\s+rel=["']canonical["']/i.test(html)
       ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
       : html.replace("</head>", "  " + canonicalTag + "\n</head>");
-    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug});
+    html = appendBreadcrumbList(html, url.origin, [
+      { name: "Trang chủ", path: "/" },
+      { name: "Tất cả sản phẩm", path: "/sanpham" },
+      ...(categorySlug ? [{ name: categoryName, path: canonicalPath }] : [])
+    ]);
+    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug,page:requestedPage});
     const headers = new Headers(response.headers);
     headers.set("Content-Type","text/html; charset=utf-8");
     headers.set("Cache-Control","public, max-age=60, s-maxage=300");
@@ -227,12 +278,23 @@ export async function onRequest(context) {
   const candidateImage = Array.isArray(images) && typeof images[0] === "string" ? images[0] : "";
   const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest-crisp-20261028.jpg";
   const canonical = `${url.origin}${canonicalPath}`;
-  const title = `${product.title} | SinDarealest`;
+  let title = `${product.title} | SinDarealest`;
   const descriptionBase = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim();
-  const description = (isVerifiedCommercialSku(product) ? `${descriptionBase.slice(0, 250)} · SKU: ${product.sku}` : descriptionBase).slice(0, 300);
+  let description = (isVerifiedCommercialSku(product) ? `${descriptionBase.slice(0, 250)} · SKU: ${product.sku}` : descriptionBase).slice(0, 300);
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();
+  // Preserve real Admin titles/descriptions. For a short, generic product
+  // title, add the matching category context only when absent and supported
+  // by the public category route; never invent product prices or attributes.
+  const productSeo = catalogSeoProfile(html, productCategoryRouteSlug(product.category));
+  if (productSeo?.heading && /da cá sấu/i.test(productSeo.heading)) {
+    const productName = String(product.title || "").trim();
+    if (productName.length <= 48 && !/cá sấu/i.test(productName))
+      title = productName + " – " + productSeo.heading + " | SinDarealest";
+    if (description.length <= 145 && !/cá sấu/i.test(description))
+      description = (description + " Khám phá " + productSeo.heading + " tại SinDarealest.").slice(0,270);
+  }
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
   html = meta(html, "description", description);
   html = meta(html, "og:type", "product", true);
@@ -254,6 +316,22 @@ export async function onRequest(context) {
   html = meta(html, "twitter:image", new URL(imagePath, url.origin).href);
   const canonicalTag = `<link rel="canonical" href="${escapeHtml(canonical)}">`;
   html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
+  // Breadcrumb hierarchy follows the actual catalog and canonical product route.
+  // Keep the original Admin product name, not the keyword-expanded SEO title.
+  const categorySlug = productCategoryRouteSlug(product.category);
+  const categoryLabels = {
+    sneaker: "Giày thể thao", giayluoi: "Giày lười", giaytay: "Giày tây",
+    thatlung: "Thắt lưng", vinam: "Ví nam", vicamtay: "Ví cầm tay",
+    caplaptop: "Cặp – Tab – Laptop", clutch: "Clutch", mu: "Mũ",
+    tuideocheo: "Túi đeo chéo", tuigolf: "Túi golf", tuinu: "Túi nữ",
+    dep: "Dép", daydongho: "Dây đồng hồ", oplung: "Ốp điện thoại"
+  };
+  html = appendBreadcrumbList(html, url.origin, [
+    { name: "Trang chủ", path: "/" },
+    { name: "Tất cả sản phẩm", path: "/sanpham" },
+    { name: categoryLabels[categorySlug] || String(product.category || "Danh mục"), path: "/sanpham/" + categorySlug },
+    { name: product.title, path: canonicalPath }
+  ]);
   // No publicly verified Offer, customer review, or aggregate rating is
   // available here. Declaring Product without one of these causes a Google
   // product-snippet error. Keep a truthful indexable WebPage schema instead
