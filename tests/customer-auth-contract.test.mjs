@@ -27,6 +27,7 @@ class FakeDB{
    throw Error("Unhandled first SQL "+query)
   }
  })}}
+ async batch(){return [{success:true},{results:[{attempts:1}]}]}
 }
 const DB=new FakeDB();
 const env={DB,GOOGLE_CLIENT_ID:"test-client.apps.googleusercontent.com",GOOGLE_CLIENT_SECRET:"test-only-google-secret"};
