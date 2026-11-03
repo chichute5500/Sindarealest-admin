@@ -51,6 +51,20 @@ assert.ok(front.indexOf(verificationTag)>front.indexOf('<head>')&&front.indexOf(
   'Google verification tag must be inside head for Googlebot');
 
 assert.ok(front.includes('href="/sanpham"'));
+
+// Crawlable category navigation exists in the initial HTML, even before
+// loading product data via JavaScript; all 15 canonical categories are linked.
+const staticNav=front.match(/<nav class="filter-pills" id="categoryFilters"[^>]*>([\\s\\S]*?)<\\/nav>/);
+assert.ok(staticNav, "Server HTML must expose category links before JavaScript");
+const staticHrefs=[...staticNav[1].matchAll(/<a class="filter-pill tap-target" href="([^"]+)"[^>]*>/g)].map(m=>m[1]);
+const canonicalCategories=[...new Set(Object.values(PRODUCT_CATEGORY_ROUTE_SLUGS))].map(slug=>'/sanpham/'+slug);
+assert.equal(staticHrefs.length,16,"15 category links plus /sanpham");
+assert.deepEqual(staticHrefs.slice().sort(),['/sanpham',...canonicalCategories].sort());
+assert.equal(new Set(staticHrefs).size,staticHrefs.length, "Do not repeat legacy category URLs");
+assert.match(front,/'<a class="filter-pill tap-target'\\+\\(active\\?' active':'',/);
+assert.ok(front.includes("e.preventDefault();navigateCatalog(b.dataset.category)"),"Normal category clicks retain SPA transition");
+assert.ok(front.includes("e.ctrlKey||e.metaKey||e.shiftKey||e.altKey"),"Modified clicks retain native new-tab behavior");
+
 // Cards have real crawlable links, while normal clicks still open the SPA
 // overlay. Modified clicks must retain browser-native new-tab behavior.
 assert.ok(front.includes('function productHref(p){'));
