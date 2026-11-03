@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
+import { productCategoryRouteSlug } from "../functions/_storefront-route.js";
 
 const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const start=html.indexOf("function renderFilters(){");
@@ -34,7 +35,7 @@ const ctx={
  categoryLabels:{all:"Tất cả",sneakers:"Sneaker",loafers:"Giày lười",belts:"Thắt lưng"},
  categoryOrder:["all","sneakers","loafers","dress-shoes","belts","wallets","sandals","watch-straps","phone-cases"],
  selectedCategory:"missing-from-new-upload",
- escapeHtml,
+ escapeHtml,routeSlug:productCategoryRouteSlug,
  $:selector=>selector==="#categoryFilters"?box:null,
 };
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
@@ -47,7 +48,9 @@ assert.ok(!box.innerHTML.includes("<img src=x"),"Untrusted category labels must 
 assert.ok(box.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"));
 ctx.selectedCategory="vi-cam-tay";
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
-assert.ok(box.innerHTML.includes('class="filter-pill tap-target active" data-category="vi-cam-tay" aria-pressed="true"'),"Wallet categories stay distinct");
+assert.ok(box.innerHTML.includes('class="filter-pill tap-target active" href="/sanpham/vicamtay" data-category="vi-cam-tay" aria-current="page"'),"Wallet category has its canonical link and page semantics");
+assert.match(box.innerHTML,/<a class="filter-pill tap-target" href="\/sanpham\/sneaker" data-category="sneakers"/,"Sneaker category is crawlable");
+assert.ok(!box.innerHTML.includes('aria-pressed='),"Links must use aria-current, not button-only aria-pressed");
 ctx.products=[{category:"new-2027",categoryLabel:"Loại mới"}];
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,"all","Stale filter selection resets");
