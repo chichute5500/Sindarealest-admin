@@ -1303,3 +1303,145 @@ test('mobile account payment refresh: five server statuses, local/Cloud, reload 
  await expect(cloudCard.locator('.local-order-sync-message')).toHaveCount(0);
  await page.screenshot({path:join(output,'390x844-payment-refresh-cloud.png'),fullPage:false,animations:'disabled'});
 });
+
+
+test('theme, layers and frame pacing audit: mobile/desktop Storefront and Admin in light/dark',async({page})=>{
+ test.setTimeout(150000);
+ const errors=[],unexpectedWrites=[],report=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ page.on('request',request=>{
+  const p=new URL(request.url()).pathname;
+  if(p.startsWith('/api/admin/')&&!['GET','HEAD'].includes(request.method()))unexpectedWrites.push(p);
+ });
+ const sampleFrames=()=>page.evaluate(async()=>{
+  const delays=await new Promise(resolve=>{
+   let last=0,seen=0;const samples=[];
+   const frame=now=>{
+    if(last){samples.push(now-last);seen++}
+    last=now;
+    if(seen<65){
+     if(seen%2===0)window.scrollTo({top:Math.max(0,document.documentElement.scrollHeight-innerHeight)*(seen/65),behavior:'instant'});
+     requestAnimationFrame(frame);
+    }else resolve(samples);
+   };
+   requestAnimationFrame(frame);
+  });
+  const sorted=delays.slice().sort((a,b)=>a-b);
+  return {averageFps:Math.round(1000/(delays.reduce((a,b)=>a+b,0)/delays.length)),
+   p95FrameMs:Number(sorted[Math.floor((sorted.length-1)*.95)].toFixed(1)),
+   framesOver50ms:delays.filter(n=>n>50).length,sampledFrames:delays.length,
+   documentWidth:document.documentElement.scrollWidth,viewportWidth:innerWidth};
+ });
+ const rectInfo=()=>page.evaluate(()=>{
+  const visible=sel=>{
+   const node=document.querySelector(sel);
+   if(!node)return null;
+   const rect=node.getBoundingClientRect(),style=getComputedStyle(node);
+   return {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom,width:rect.width,height:rect.height,
+    visible:rect.width>0&&rect.height>0&&style.visibility!=='hidden'&&style.display!=='none',
+    background:style.backgroundColor,blur:style.backdropFilter,
+    overflow:style.overflow,position:style.position,z:style.zIndex};
+  };
+  return {body:visible('body'),header:visible('.nav-wrap .nav'),dock:visible('#mobileNav,#mobileBottomNav'),
+   cart:visible('#cartDrawer'),cartHeader:visible('#cartDrawer .cart-header'),
+   checkoutHeader:visible('#checkoutDrawer .checkout-header')};
+ });
+ for(const {width,height} of [{width:390,height:844},{width:430,height:932},{width:1280,height:800}]){
+  for(const mode of ['light','dark']){
+   await page.setViewportSize({width,height});await page.emulateMedia({colorScheme:mode});
+   const response=await page.goto(url,{waitUntil:'domcontentloaded'});
+   expect(response?.status()).toBe(200);
+   const boot=await page.evaluate(()=>({
+    dark:document.documentElement.classList.contains('dark'),
+    htmlBg:getComputedStyle(document.documentElement).backgroundColor,
+    bodyBg:getComputedStyle(document.body).backgroundColor,
+    meta:[...document.querySelectorAll('meta[name="theme-color"]')].map(x=>x.content)
+   }));
+   expect(boot.dark,'Storefront early theme should match OS before content starts').toBe(mode==='dark');
+   expect(new Set(boot.meta).size,'Browser theme-color tags cannot disagree').toBe(1);
+   const welcome=page.locator('#welcomeSplash');
+   if(await welcome.count()&&await welcome.isVisible())await page.locator('#skipIntro').click();
+   await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+   await expect(page.locator('.nav-wrap .nav')).toBeVisible();
+   const layout=await rectInfo();
+   expect(layout.header.visible).toBe(true);
+   expect(layout.header.left,'Header stays in viewport').toBeGreaterThanOrEqual(-1);
+   expect(layout.header.right,'Header does not overflow').toBeLessThanOrEqual(width+1);
+   const perf=await sampleFrames();
+   expect(perf.documentWidth,'No horizontal document overflow in '+mode+' '+width).toBeLessThanOrEqual(width+2);
+   report.push({surface:'storefront',width,mode,boot,perf,header:layout.header});
+   await page.screenshot({path:join(output,'theme-audit-store-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
+   if(width===390){
+    await page.locator('#cartOpen').click();
+    await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+    await page.waitForTimeout(300);
+    const state=await rectInfo();
+    const edge=await page.evaluate(()=>{
+     const cart=document.querySelector('#cartDrawer'),head=cart?.querySelector('.cart-header');
+     const a=cart?.getBoundingClientRect(),b=head?.getBoundingClientRect();
+     return {left:a?.left,right:a?.right,top:a?.top,bottom:a?.bottom,headTop:b?.top,headBottom:b?.bottom,
+      glass:getComputedStyle(head).backdropFilter,rootGlass:getComputedStyle(cart).backdropFilter};
+    });
+    expect(edge.left).toBeGreaterThanOrEqual(0);
+    expect(edge.right).toBeLessThanOrEqual(width);
+    expect(edge.headTop).toBeGreaterThanOrEqual(edge.top-1);
+    expect(edge.headBottom).toBeLessThanOrEqual(edge.bottom+1);
+    expect(edge.glass,'Keep one glass sheet, no duplicate root blur').toContain('blur(');
+    expect(edge.rootGlass).toBe('none');
+    await page.screenshot({path:join(output,'theme-audit-cart-390-'+mode+'.png'),fullPage:false,animations:'disabled'});
+    await page.locator('#cartClose').click();
+    await expect(page.locator('#cartDrawer')).not.toHaveClass(/open/);
+   }
+  }
+ }
+ // Browser-only fixtures. No Admin session login, D1 requests or mutation.
+ const order={id:'qa-audit-order',order_number:'SD-QA-GLASS-01',status:'completed',delivery_status:'delivered',
+  payment_status:'pending',customer_payment_option:'deposit',full_name:'KHÁCH KIỂM THỬ',phone:'0900000000',
+  address:'Địa chỉ thử nghiệm',total:3500000,subtotal:3500000,
+  price_confirmation_required:0,payment_terms_confirmed_at:'2026-11-03 00:00:00',
+  customer_payment_amount:1100000,customer_payment_remaining_amount:2400000,
+  received_amount:1100000,refunded_amount:0,cod_received_amount:0,
+  payment_summary:{requiredAmount:1100000,netReceivedAmount:1100000,codExpected:2400000,codRemaining:2400000,
+   shortfall:0,overpaidAmount:0,eligibleToShip:true},items:[{id:'qa-item',title:'Sản phẩm QA',sku:'QA-SKU',quantity:1,unitPrice:3500000,lineTotal:3500000}],
+  timeline_confirmed_at:'2026-11-03 00:00:00',timeline_processing_at:'2026-11-03 00:00:01',
+  timeline_shipped_at:'2026-11-03 00:00:02',timeline_completed_at:'2026-11-03 00:00:03'};
+ await page.route('**/api/admin/**',async route=>{
+  if(route.request().method()!=='GET'){unexpectedWrites.push(new URL(route.request().url()).pathname);await route.fulfill({status:403,contentType:'application/json',body:'{"error":"QA read only"}'});return;}
+  const p=new URL(route.request().url()).pathname;
+  const values={'/api/admin/session':{ok:true},'/api/admin/orders':{orders:[order]},
+   '/api/admin/products':{products:[]},'/api/admin/customers':{customers:[]},
+   '/api/admin/audit-logs':{logs:[]},'/api/admin/warranties':{warranties:[],claims:[]},
+   '/api/admin/settings':{},'/api/admin/payment-qr':{active:false,pending:false}};
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(values[p]||{})});
+ });
+ for(const {width,height} of [{width:390,height:844},{width:430,height:932},{width:1280,height:800}]){
+  for(const mode of ['light','dark']){
+   await page.setViewportSize({width,height});await page.emulateMedia({colorScheme:mode});
+   const response=await page.goto(new URL('/admin/?view=order-detail&orderId=qa-audit-order',url).href,{waitUntil:'domcontentloaded'});
+   expect(response?.status()).toBe(200);
+   await expect(page.locator('#loginView')).toHaveClass(/hidden/);
+   await expect(page.locator('.sd-order-step-list .sd-order-step')).toHaveCount(5);
+   const snap=await page.evaluate(()=>{
+    const root=document.documentElement,step=document.querySelector('#main .sd-order-step-list');
+    const box=step.getBoundingClientRect(),bg=getComputedStyle(document.body).backgroundColor;
+    const nav=document.querySelector('.mobiletabs'),dock=nav?.getBoundingClientRect();
+    const c=getComputedStyle(step);
+    return {mode:root.dataset.adminTheme,background:bg,stepX:box.left,stepRight:box.right,
+     stepWidth:box.width,stepBg:c.backgroundColor,docWidth:root.scrollWidth,
+     navPos:getComputedStyle(nav).position,dockTop:dock.top,dockBottom:dock.bottom,
+     dockWidth:dock.width};
+   });
+   expect(snap.mode,'Admin theme applied before body paints').toBe(mode);
+   expect(snap.stepX).toBeGreaterThanOrEqual(-1);
+   expect(snap.stepRight).toBeLessThanOrEqual(width+1);
+   expect(snap.docWidth,'Admin doc must not horizontally overflow').toBeLessThanOrEqual(width+2);
+   if(width<=820){expect(snap.navPos).toBe('fixed');expect(snap.dockBottom).toBeLessThanOrEqual(height+2);}
+   const perf=await sampleFrames();
+   report.push({surface:'admin',width,mode,perf,snap});
+   await page.screenshot({path:join(output,'theme-audit-admin-'+width+'-'+mode+'.png'),fullPage:false,animations:'disabled'});
+  }
+ }
+ expect(unexpectedWrites,'Diagnostics must not write real Admin/Production data').toEqual([]);
+ expect(errors,'Theme audit must not throw JS errors').toEqual([]);
+ console.log('SD_THEME_LAYER_FRAME_AUDIT',JSON.stringify(report));
+});
