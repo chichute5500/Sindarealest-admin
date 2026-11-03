@@ -10,6 +10,21 @@ function meta(html, name, content, property = false) {
   const tag = `<meta ${attr}="${name}" content="${escaped}">`;
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", `  ${tag}\n</head>`);
 }
+// Catalog SEO text lives in the public HTML as static JSON so the initial
+// server response and the existing client-side category navigation share one
+// source of truth. Do not pull keyword copy from untrusted product fields.
+function catalogSeoProfile(html, categorySlug) {
+  const match = html.match(/<script\s+id=["']sd-seo-category-copy["']\s+type=["']application\/json["']>([^<]*)<\/script>/i);
+  if (!match) return null;
+  try {
+    const profiles = JSON.parse(match[1]);
+    const profile = profiles?.[categorySlug];
+    return profile && typeof profile.title === "string"
+      && typeof profile.description === "string"
+      && typeof profile.heading === "string"
+      && typeof profile.intro === "string" ? profile : null;
+  } catch { return null; }
+}
 // Functions-generated HTML bypasses static _headers on some Cloudflare paths.
 // Apply the same minimally restrictive document-level controls on all real
 // storefront HTML responses, without blocking approved inline scripts, Zalo
@@ -91,16 +106,21 @@ export async function onRequest(context) {
     };
     const categoryName = Object.hasOwn(catalogLabels,categorySlug)
       ? catalogLabels[categorySlug] : categorySlug;
-    const catalogTitle = categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest";
-    const catalogDescription = categorySlug
+    const seoProfile = catalogSeoProfile(html, categorySlug || "all");
+    const catalogTitle = seoProfile?.title || (categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest");
+    const catalogDescription = seoProfile?.description || (categorySlug
       ? "Khám phá sản phẩm " + categoryName + " tại SinDarealest. Xem thiết kế và mã SKU chính thức."
-      : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.";
+      : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.");
     html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(catalogTitle) + "</title>");
     // Give direct-link visitors and crawlers the correct category heading in
     // the initial HTML, before /api/products completes on a slow connection.
     if(categorySlug) html = html.replace(
       '<h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2>',
-      '<h2 class="section-title" id="catalogHeading">' + escapeHtml(categoryName) + '</h2>'
+      '<h2 class="section-title" id="catalogHeading">' + escapeHtml(seoProfile?.heading || categoryName) + '</h2>'
+    );
+    if (seoProfile?.intro) html = html.replace(
+      /(<p class="section-note" id="catalogSeoNote">)[\s\S]*?(<\/p>)/,
+      (_, opening, closing) => opening + escapeHtml(seoProfile.intro) + closing
     );
     html = meta(html, "description", catalogDescription);
     html = meta(html, "og:title", catalogTitle, true);
