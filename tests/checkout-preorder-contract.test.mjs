@@ -60,6 +60,7 @@ assert.match(html,/#cartDrawer>\.cart-bottom,\s*#checkoutDrawer>\.sd-checkout-fo
 assert.doesNotMatch(html,/<p class="account-note">/,'Remove redundant Google-sync paragraph from Account menu');
 assert.match(html,/#accountMenuView>\.account-action\+\.account-action\{margin-top:12px\}/,'Account action cards retain a clear 12px gap');
 assert.match(html,/const drawers=\['cartDrawer','checkoutDrawer','accountDrawer'\]/,'Account uses the same native measured backdrop geometry as Cart');
+assert.match(html,/function setupMobileBottomNav\(\)\{[^\n]*const tabs=\$\$\('\[data-mobile-tab\]'\);const activate=key=>tabs\.forEach/,'Mobile dock must bind all four tabs, not only the first matching element');
 assert.match(html,/#productOverlay::before\{[\s\S]*?background:var\(--sd-reference-surface\);[\s\S]*?backdrop-filter:blur\(24px\) saturate\(145%\);[\s\S]*?pointer-events:none;/,'Product Detail uses the exact same native frosted glass material as Cart');
 assert.match(html,/#productOverlay .detail-modal\{[^}]*background:transparent;[^}]*-webkit-backdrop-filter:none;[^}]*backdrop-filter:none;/,'The Detail scroll container must not apply a second blurry tinted surface');
 assert.match(html,/window\.__sdSyncProductDetailGlass\?\.\(\)/,'Detail backdrop geometry is positioned synchronously before rendering on open');
