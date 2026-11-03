@@ -1731,3 +1731,84 @@ for(const cfg of [{width:390,height:844},{width:360,height:800}]){
   console.log('ACCOUNT_THEME_ATOMIC_QA',JSON.stringify({viewport:cfg.width,commits:second.commits,covers:second.covers}));
  });
 }
+
+
+// Product Detail borrows exactly the Cart/Account one-plane native glass.
+// Compare computed pixel material and actual opening/scrolling on isolated Preview.
+for(const cfg of [
+ {width:390,height:844,scheme:'light'},
+ {width:390,height:844,scheme:'dark'},
+ {width:360,height:800,scheme:'light'},
+ {width:430,height:932,scheme:'light'},
+ {width:1280,height:800,scheme:'light'}
+]){
+ test('Product Detail native Cart glass '+cfg.width+' '+cfg.scheme,async({page})=>{
+  await page.setViewportSize({width:cfg.width,height:cfg.height});
+  await page.emulateMedia({colorScheme:cfg.scheme,reducedMotion:'reduce'});
+  const mock=[{
+   id:'qa-native-detail-glass',slug:'qa-native-detail-glass',
+   sku:'QA-NATIVE-DETAIL',skuVerified:true,
+   title:'Ví da cá sấu kiểm thử chất liệu kính',category:'wallets',categoryLabel:'Ví nam',
+   images:['images/brand-emblem.png'],price:4500000,sourcePriceConfirmed:true,
+   fulfillmentType:'in_stock',published:true
+  }];
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/products',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(mock)}));
+  await page.route('**/api/settings',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({welcomeEnabled:false})}));
+  await page.goto(url,{waitUntil:'domcontentloaded'});
+  const welcome=page.locator('#welcomeSplash');
+  if(await welcome.count()&&await welcome.isVisible()){
+   await page.locator('#skipIntro').evaluate(el=>el.click());
+   await expect(welcome).toHaveCount(0,{timeout:8000});
+  }
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
+  const product=page.locator('[data-open-product="qa-native-detail-glass"]').first();
+  await expect(product).toHaveCount(1,{timeout:10000});
+  await product.evaluate(el=>el.click());
+  await expect(page.locator('#productOverlay')).toHaveClass(/\bopen\b/);
+  await expect.poll(()=>page.locator('#productOverlay').evaluate(el=>parseFloat(el.style.getPropertyValue('--sd-detail-glass-width'))||0)).toBeGreaterThan(200);
+  const capture=()=>page.evaluate(()=>{
+   const overlay=document.querySelector('#productOverlay'),modal=overlay.querySelector('.detail-modal'),cart=document.querySelector('#cartDrawer');
+   const a=overlay.getBoundingClientRect(),m=modal.getBoundingClientRect();
+   const p=getComputedStyle(overlay,'::before'),cartP=getComputedStyle(cart,'::before');
+   const shell=getComputedStyle(modal),outer=getComputedStyle(overlay);
+   const values={left:parseFloat(p.left),top:parseFloat(p.top),width:parseFloat(p.width),height:parseFloat(p.height)};
+   return {
+    actual:{left:m.left-a.left,top:m.top-a.top,width:m.width,height:m.height},
+    plane:values,
+    film:{color:p.backgroundColor,blur:p.backdropFilter,pointer:p.pointerEvents,z:p.zIndex,radius:p.borderTopLeftRadius},
+    cart:{color:cartP.backgroundColor,blur:cartP.backdropFilter},
+    overlay:{color:outer.backgroundColor,blur:outer.backdropFilter},
+    shell:{color:shell.backgroundColor,blur:shell.backdropFilter,z:shell.zIndex},
+    scroll:{top:modal.scrollTop,client:modal.clientHeight,total:modal.scrollHeight},
+    content:modal.querySelector('.detail-layout').getBoundingClientRect().toJSON()
+   };
+  });
+  const start=await capture();
+  for(const key of ['left','top','width','height'])
+   expect(Math.abs(start.actual[key]-start.plane[key]),'Glass film aligns the live Detail '+key).toBeLessThanOrEqual(1);
+  expect(start.film.color).toBe(start.cart.color);
+  expect(start.film.blur).toBe(start.cart.blur);
+  expect(start.film.blur).toContain('blur(24px)');
+  expect(start.film.pointer).toBe('none');
+  expect(start.overlay.blur).toBe('none');
+  expect(start.overlay.color).toBe('rgba(0, 0, 0, 0)');
+  expect(start.shell.blur).toBe('none');
+  expect(start.shell.color).toBe('rgba(0, 0, 0, 0)');
+  expect(start.shell.z).toBe('1');
+  await page.screenshot({path:join(output,'detail-native-cart-glass-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await page.locator('#productOverlay .detail-modal').evaluate(el=>{el.scrollTop=el.scrollHeight;});
+  await expect.poll(()=>page.locator('#productOverlay .detail-modal').evaluate(el=>el.scrollTop)).toBeGreaterThan(0);
+  const after=await capture();
+  for(const key of ['left','top','width','height'])
+   expect(Math.abs(start.plane[key]-after.plane[key]),'Glass remains pinned while scrolling '+key).toBeLessThanOrEqual(1);
+  await page.screenshot({path:join(output,'detail-native-cart-glass-scrolled-'+cfg.width+'-'+cfg.scheme+'.png'),animations:'disabled'});
+  await expect(page.locator('#detailWarrantyTerm')).toContainText('12 tháng');
+  await expect(page.locator('#detailAdd')).toBeAttached();
+  await expect(page.locator('#detailBuyNow')).toBeAttached();
+  await page.locator('#detailClose').evaluate(el=>el.click());
+  await expect(page.locator('#productOverlay')).not.toHaveClass(/\bopen\b/);
+  expect(errors,'No detail glass runtime errors').toEqual([]);
+  console.log('PRODUCT_DETAIL_NATIVE_GLASS_QA',JSON.stringify({viewport:cfg.width,scheme:cfg.scheme,film:start.film,cart:start.cart,geometry:start.plane,scrollDelta:after.scroll.top-start.scroll.top}));
+ });
+}

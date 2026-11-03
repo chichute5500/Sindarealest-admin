@@ -60,6 +60,10 @@ assert.match(html,/#cartDrawer>\.cart-bottom,\s*#checkoutDrawer>\.sd-checkout-fo
 assert.doesNotMatch(html,/<p class="account-note">/,'Remove redundant Google-sync paragraph from Account menu');
 assert.match(html,/#accountMenuView>\.account-action\+\.account-action\{margin-top:12px\}/,'Account action cards retain a clear 12px gap');
 assert.match(html,/const drawers=\['cartDrawer','checkoutDrawer','accountDrawer'\]/,'Account uses the same native measured backdrop geometry as Cart');
+assert.match(html,/#productOverlay::before\{[\s\S]*?background:var\(--sd-reference-surface\);[\s\S]*?backdrop-filter:blur\(24px\) saturate\(145%\);[\s\S]*?pointer-events:none;/,'Product Detail uses the exact same native frosted glass material as Cart');
+assert.match(html,/#productOverlay .detail-modal\{[^}]*background:transparent;[^}]*-webkit-backdrop-filter:none;[^}]*backdrop-filter:none;/,'The Detail scroll container must not apply a second blurry tinted surface');
+assert.match(html,/window\.__sdSyncProductDetailGlass\?\.\(\)/,'Detail backdrop geometry is positioned synchronously before rendering on open');
+assert.match(html,/new ResizeObserver\(syncDetailGlass\)\.observe\(panel\)/,'Detail glass follows resize, not scroll');
 assert.match(html,/\.cart-drawer:has\(\.cart-row\) \.cart-bottom\{position:sticky;bottom:0;z-index:2/,'Populated Cart payment bar remains sticky on phones');
 assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{\s*top:calc\(7px \+ env\(safe-area-inset-top\)\);[\s\S]*?border:1px solid var\(--sd-reference-edge\);border-radius:26px;/,'Mobile drawers share inset geometry and 26px corners');
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
