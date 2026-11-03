@@ -47,11 +47,14 @@ const query=async sql=>{
  assert.ok(Array.isArray(results)&&Array.isArray(results[0]?.results),"Unexpected D1 query result");
  return results[0].results;
 };
-const check=async()=>({
- column:(await query("SELECT name FROM pragma_table_info('orders') WHERE name='delivery_status'")).length===1,
- table:(await query("SELECT name FROM sqlite_master WHERE type='table' AND name='order_cod_settlements'")).length===1,
- migration:(await query("SELECT name FROM d1_migrations WHERE name='0018_payment_delivery_settlement.sql'")).length===1
-});
+const check=async()=>{
+ const column=(await query("SELECT name FROM pragma_table_info('orders') WHERE name='delivery_status'")).length===1;
+ const table=(await query("SELECT name FROM sqlite_master WHERE type='table' AND name='order_cod_settlements'")).length===1;
+ // Some older production databases do not have the D1 migration ledger yet.
+ const ledger=(await query("SELECT name FROM sqlite_master WHERE type='table' AND name='d1_migrations'")).length===1;
+ const migration=ledger&&(await query("SELECT name FROM d1_migrations WHERE name='0018_payment_delivery_settlement.sql'")).length===1;
+ return {column,table,ledger,migration};
+};
 const before=await check();
 console.log("PROD_0018_PREFLIGHT",JSON.stringify(before));
 if(before.column||before.table||before.migration){
