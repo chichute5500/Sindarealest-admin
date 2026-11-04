@@ -34,23 +34,30 @@ npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1 l
 npx playwright install --with-deps chromium
 node scripts/qa-storefront-perf-mobile-preview.mjs
 mkdir -p artifacts/perf-mobile-20261104/lighthouse
-for preset in mobile desktop; do
- args=()
- if [ "$preset" = desktop ]; then args+=(--preset=desktop); fi
- npx lighthouse "$preview/" "${args[@]}" --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-$preset.json" --quiet
+# A single Lighthouse navigation has intermittently recorded NO_LCP on BOTH
+# live Production and isolated Preview. Preserve multiple raw attempts instead
+# of manufacturing a zero score or declaring a passing score from one run.
+for attempt in 1 2 3 4; do
+ npx lighthouse "$preview/" --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-mobile-$attempt.json" --quiet
 done
+npx lighthouse "$preview/" --preset=desktop --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-desktop.json" --quiet
 npx lighthouse "https://sindarealest2.pages.dev/" --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=artifacts/perf-mobile-20261104/lighthouse/production-mobile.json --quiet
 node --input-type=module <<'JS'
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const dir='artifacts/perf-mobile-20261104/lighthouse/';
 const get=n=>JSON.parse(readFileSync(dir+n+'.json','utf8'));
-const prod=get('production-mobile'), mobile=get('preview-mobile'),desktop=get('preview-desktop');
+const prod=get('production-mobile'), desktop=get('preview-desktop');
+const mobileReports=[1,2,3,4].map(i=>get('preview-mobile-'+i));
+const validMobile=mobileReports.filter(x=>typeof x.categories.performance.score==='number');
+const mobile=validMobile[0]||mobileReports[0];
 const hasScore=(r,k='performance')=>typeof r.categories[k]?.score==='number';
 const score=(r,k='performance')=>hasScore(r,k)?Math.round(r.categories[k].score*100):null;
 const vitals=r=>Object.fromEntries(['first-contentful-paint','largest-contentful-paint','total-blocking-time','cumulative-layout-shift','speed-index'].map(k=>[k,r.audits[k]?.displayValue||r.audits[k]?.errorMessage||null]));
 console.log('Production mobile',score(prod),vitals(prod));
-console.log('Preview mobile',score(mobile),vitals(mobile));
+for(const [i,report] of mobileReports.entries())
+ console.log('Preview mobile attempt',i+1,score(report),vitals(report));
+console.log('Preview valid attempts',validMobile.length,'of',mobileReports.length);
 console.log('Preview desktop',score(desktop),vitals(desktop));
 // GitHub runner can emit NO_LCP on both Production and Preview mobile.
 // Mark both as INCONCLUSIVE, never convert missing scores to a fake zero.
@@ -60,18 +67,19 @@ for(const s of browser.scenarios.filter(x=>x.name?.startsWith('mobile-'))){
  const nativeLcp=s.metrics.lcpMs??s.metrics.lcp?.at(-1)?.ms??null;
  assert.ok(nativeLcp>0,'Native mobile Chrome must observe LCP: '+s.name);
 }
-if(hasScore(mobile)){
- assert.ok(score(mobile)>=90,'Candidate mobile Performance below the requested 90-point target');
- if(hasScore(prod))assert.ok(score(mobile)>=score(prod)-5,'Mobile Performance regressed >5 points');
- else{
-  assert.equal(prod.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Unexpected Production mobile baseline failure');
-  console.log('INCONCLUSIVE baseline: Production LH mobile NO_LCP on CI runner; candidate has VALID mobile score and Chrome-native LCP.');
- }
-}else{
- assert.equal(prod.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Candidate has no score and Production baseline is valid');
- assert.equal(mobile.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Unexpected candidate Lighthouse failure');
- throw Error('Both mobile Lighthouse scores missing: keep PR Draft, do not release.');
+const noLcp=r=>String(r.audits['largest-contentful-paint']?.errorMessage||'').includes('NO_LCP');
+// Never interpret missing Lighthouse metrics as 0 or declare an invalid run PASS.
+for(const r of mobileReports.filter(x=>!hasScore(x)))
+ assert.ok(noLcp(r),'Unexpected invalid Lighthouse mobile report');
+if(!hasScore(prod))assert.ok(noLcp(prod),'Unexpected invalid Production baseline');
+assert.ok(validMobile.length>=2,
+ 'INCONCLUSIVE: fewer than 2 valid mobile Lighthouse readings; keep PR draft');
+for(const [i,r] of validMobile.entries()){
+ assert.ok(score(r)>=90,'Mobile attempt '+(i+1)+' Performance below 90 ('+score(r)+')');
+ if(hasScore(prod))assert.ok(score(r)>=score(prod)-5,
+  'Mobile attempt '+(i+1)+' materially regressed from Production');
 }
+console.log('PASS: all',validMobile.length,'valid mobile runs >=90 with no Production regression.');
 for(const r of [mobile,desktop]){
  for(const key of ['accessibility','best-practices'])
   assert.ok(score(r,key)>=95,'Preview '+key+' score regressed');
