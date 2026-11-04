@@ -6,7 +6,7 @@ test -n "${CLOUDFLARE_ACCOUNT_ID:-}" && test -n "${CLOUDFLARE_API_TOKEN:-}"
 test "$(git rev-parse HEAD)" = "$PERF_CANDIDATE_SHA"
 git log -1 --format=%s | grep -F '[perf-mobile-qa-candidate]'
 test -s docs/qa/PERF_MOBILE_20261104.trigger
-npm ci --no-fund
+npm install --no-fund
 npm audit --audit-level=high
 npm run check
 npm test
