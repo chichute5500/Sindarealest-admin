@@ -37,9 +37,9 @@ mkdir -p artifacts/perf-mobile-20261104/lighthouse
 for preset in mobile desktop; do
  args=()
  if [ "$preset" = desktop ]; then args+=(--preset=desktop); fi
- npx lighthouse "$preview/" "${args[@]}" --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-$preset.json" --quiet
+ npx lighthouse "$preview/" "${args[@]}" --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-$preset.json" --quiet
 done
-npx lighthouse "https://sindarealest2.pages.dev/" --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=artifacts/perf-mobile-20261104/lighthouse/production-mobile.json --quiet
+npx lighthouse "https://sindarealest2.pages.dev/" --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=artifacts/perf-mobile-20261104/lighthouse/production-mobile.json --quiet
 node --input-type=module <<'JS'
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -56,8 +56,10 @@ console.log('Preview desktop',score(desktop),vitals(desktop));
 // Mark both as INCONCLUSIVE, never convert missing scores to a fake zero.
 // Browser-native PerformanceObserver must independently verify a real LCP.
 const browser=JSON.parse(readFileSync('artifacts/perf-mobile-20261104/browser-qa.json','utf8'));
-for(const s of browser.scenarios.filter(x=>x.name?.startsWith('mobile-')))
- assert.ok(s.metrics.lcpMs>0,'Native mobile Chrome must observe LCP');
+for(const s of browser.scenarios.filter(x=>x.name?.startsWith('mobile-'))){
+ const nativeLcp=s.metrics.lcpMs??s.metrics.lcp?.at(-1)?.ms??null;
+ assert.ok(nativeLcp>0,'Native mobile Chrome must observe LCP: '+s.name);
+}
 if(hasScore(mobile)){
  assert.ok(score(mobile)>=90,'Candidate mobile Performance below the requested 90-point target');
  if(hasScore(prod))assert.ok(score(mobile)>=score(prod)-5,'Mobile Performance regressed >5 points');
