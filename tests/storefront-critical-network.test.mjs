@@ -36,11 +36,11 @@ async function testSessionStartsAfterIdleOrAccountTap(){
  assert.equal(idles.length,1);
  assert.equal(idles[0].options.timeout,2000,"Idle session read must have a fallback timeout");
  clicks.get("accountOpen")();
- await Promise.resolve();await Promise.resolve();
+ await new Promise(resolve=>setImmediate(resolve));
  assert.equal(sessionRequests,1,"Account tap must trigger immediate session verification");
  idles[0].cb();
  assert.equal(sessionRequests,1,"Idle and Account tap must not duplicate requests");
- await Promise.resolve();await Promise.resolve();
+ await new Promise(resolve=>setImmediate(resolve));
  assert.equal(authBridgeCalls,1,"Verified login status still reaches account sync");
 }
 async function testPhoneLookupOnlyFetchesConfigWhenNecessary(){
