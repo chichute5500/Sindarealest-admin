@@ -45,7 +45,7 @@ export function assessImageBackupConfig(pagesPayload, managedPayload, customPayl
 async function readApi(path,{accountId,token}) {
   const url="https://api.cloudflare.com/client/v4/accounts/"+encodeURIComponent(accountId)+path;
   const res=await fetch(url,{headers:{Authorization:"Bearer "+token},signal:AbortSignal.timeout(20000)});
-  if(!res.ok)throw Error("Cloudflare read-only verification unavailable: HTTP "+res.status);
+  if(!res.ok)throw Error("Cloudflare read-only verification unavailable for "+(path.startsWith("/pages/")?"Pages":path.includes("/r2/")?"R2 privacy":"D1 database")+" (HTTP "+res.status+").");
   const payload=await res.json();
   if(payload?.success!==true)throw Error("Cloudflare returned unsuccessful read-only verification.");
   return payload;
@@ -53,13 +53,14 @@ async function readApi(path,{accountId,token}) {
 
 export async function checkCurrentCloudflare(env=process.env) {
   const accountId=env.CLOUDFLARE_ACCOUNT_ID,token=env.CLOUDFLARE_API_TOKEN;
-  if(!accountId || !token) throw Error("Missing Cloudflare read-only verification credentials.");
+  const r2Token=env.CLOUDFLARE_R2_READ_API_TOKEN;
+  if(!accountId || !token || !r2Token) throw Error("Missing Cloudflare Pages/R2 read-only verification credentials.");
   const common={accountId,token};
   const project=await readApi("/pages/projects/sindarealest2",common);
   const root="/r2/buckets/sin-images-backup/domains/";
   const [managed,custom,d1]=await Promise.all([
-    readApi(root+"managed",common),
-    readApi(root+"custom",common),
+    readApi(root+"managed",{accountId,token:r2Token}),
+    readApi(root+"custom",{accountId,token:r2Token}),
     readApi("/d1/database?name=sindarealest-db&per_page=100",common),
   ]);
   const report=assessImageBackupConfig(project,managed,custom,d1);
