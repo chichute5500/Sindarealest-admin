@@ -55,15 +55,20 @@ console.log('Preview desktop',score(desktop),vitals(desktop));
 // GitHub runner can emit NO_LCP on both Production and Preview mobile.
 // Mark both as INCONCLUSIVE, never convert missing scores to a fake zero.
 // Browser-native PerformanceObserver must independently verify a real LCP.
-if(hasScore(prod)&&hasScore(mobile)){
- assert.ok(score(mobile)>=score(prod)-5,'Mobile Performance regressed >5 points');
+const browser=JSON.parse(readFileSync('artifacts/perf-mobile-20261104/browser-qa.json','utf8'));
+for(const s of browser.scenarios.filter(x=>x.name?.startsWith('mobile-')))
+ assert.ok(s.metrics.lcpMs>0,'Native mobile Chrome must observe LCP');
+if(hasScore(mobile)){
+ assert.ok(score(mobile)>=90,'Candidate mobile Performance below the requested 90-point target');
+ if(hasScore(prod))assert.ok(score(mobile)>=score(prod)-5,'Mobile Performance regressed >5 points');
+ else{
+  assert.equal(prod.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Unexpected Production mobile baseline failure');
+  console.log('INCONCLUSIVE baseline: Production LH mobile NO_LCP on CI runner; candidate has VALID mobile score and Chrome-native LCP.');
+ }
 }else{
- assert.equal(prod.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Unexpected Production mobile Lighthouse failure');
- assert.equal(mobile.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Candidate mobile Lighthouse differs from invalid Production baseline');
- const browser=JSON.parse(readFileSync('artifacts/perf-mobile-20261104/browser-qa.json','utf8'));
- for(const s of browser.scenarios.filter(x=>x.name?.startsWith('mobile-')))
-  assert.ok(s.metrics.lcpMs>0,'Native mobile Chrome must observe LCP');
- console.log('INCONCLUSIVE: mobile Lighthouse NO_LCP on both deployments; independently verified Chromium LCP, no invented score.');
+ assert.equal(prod.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Candidate has no score and Production baseline is valid');
+ assert.equal(mobile.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Unexpected candidate Lighthouse failure');
+ throw Error('Both mobile Lighthouse scores missing: keep PR Draft, do not release.');
 }
 for(const r of [mobile,desktop]){
  for(const key of ['accessibility','best-practices'])
