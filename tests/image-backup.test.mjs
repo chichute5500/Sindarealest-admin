@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   imageBackupBindingsReady,
+  markImageBackupCronHeartbeat,
   readImageBackupSettings,
   runImageBackup,
   setImageBackupSettings,
@@ -90,6 +91,9 @@ assert.equal((await readImageBackupSettings(missing)).enabled, false);
 // Both sources must be copied; metadata must be private and source objects unchanged.
 const e = env([obj("product/one.webp", "abc123")], [obj("private-originals/one.jpg", "def456", "photo")]);
 assert.equal((await readImageBackupSettings(e)).enabled, false);
+assert.equal((await readImageBackupSettings(e)).schedulerLastSeenAt, null);
+await markImageBackupCronHeartbeat(e);
+assert.ok((await readImageBackupSettings(e)).schedulerLastSeenAt);
 const first = await runImageBackup(e, { force: true });
 assert.equal(first.state.phase, "idle");
 assert.equal(first.state.scanned, 2);
