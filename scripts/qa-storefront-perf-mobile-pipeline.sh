@@ -70,10 +70,16 @@ console.log('Preview desktop',score(desktop),vitals(desktop));
 // Mark both as INCONCLUSIVE, never convert missing scores to a fake zero.
 // Browser-native PerformanceObserver must independently verify a real LCP.
 const browser=JSON.parse(readFileSync('artifacts/perf-mobile-20261104/browser-qa.json','utf8'));
-for(const s of browser.scenarios.filter(x=>x.name?.startsWith('mobile-'))){
+const nativeNames=['mobile-first-visit','mobile-light','mobile-dark'];
+for(const name of nativeNames){
+ const s=browser.scenarios.find(x=>x.name===name);
+ assert.ok(s?.metrics,'Missing measured browser scenario: '+name);
  const nativeLcp=s.metrics.lcpMs??s.metrics.lcp?.at(-1)?.ms??null;
- assert.ok(nativeLcp>0,'Native mobile Chrome must observe LCP: '+s.name);
+ assert.ok(nativeLcp>0,'Native mobile Chrome must observe LCP: '+name);
 }
+const slowFont=browser.scenarios.find(x=>x.name==='mobile-slow-serif-lcp-guard');
+assert.ok(slowFont?.delayedFonts>0&&slowFont?.stillActive,
+ 'Cold font delay must preserve Welcome until it can paint');
 const noLcp=r=>String(r.audits['largest-contentful-paint']?.errorMessage||'').includes('NO_LCP');
 // Never interpret missing Lighthouse metrics as 0 or declare an invalid run PASS.
 for(const r of mobileReports.filter(x=>!hasScore(x)))
