@@ -99,12 +99,13 @@ try{
      for(const entry of list.getEntries())window.__perfLcp.push({ms:entry.startTime,size:entry.size});
    }).observe({type:"largest-contentful-paint",buffered:true})}catch{}
   });
-  const page=await context.newPage(),errors=[],calls=[];
+  const page=await context.newPage(),errors=[],calls=[],hiddenGalleryLoads=[];
   page.on("pageerror",e=>errors.push(String(e.message||e)));
   page.on("request",request=>{
    const u=new URL(request.url());
    if(u.pathname==="/api/lookup-challenge-config"||u.pathname==="/api/customer/session")
     calls.push(u.pathname);
+   if(u.pathname==="/images/brand-emblem.png")hiddenGalleryLoads.push(u.pathname);
   });
   const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
   assert.equal(response?.status(),200,name+" home must return HTTP 200");
@@ -126,6 +127,7 @@ try{
   assert.notEqual(metrics.hydration,"failed",name+" catalog API hydration failed");
   assert.ok(Number.isFinite(metrics.lcpMs)&&metrics.lcpMs>0,name+" missing browser-native LCP on returning-visitor UI");
   assert.match(metrics.glass,/blur\(/,name+" Glass nav missing");
+  assert.equal(hiddenGalleryLoads.length,0,name+" must not fetch fullscreen-only brand mark before user opens gallery");
   assert.equal(calls.filter(x=>x==="/api/lookup-challenge-config").length,0,
    name+" premature phone challenge config request");
   await page.screenshot({path:"artifacts/perf-mobile-20261104/"+name+".png",animations:"disabled"});
