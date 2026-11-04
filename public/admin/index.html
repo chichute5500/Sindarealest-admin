@@ -3365,7 +3365,9 @@ function paintImageBackupStatus(){
  cadence.value=data.cadence==='weekly'?'weekly':'daily';
  cadence.disabled=!data.configured||imageBackupBusy;
  run.disabled=!data.configured||imageBackupBusy;
- readiness.textContent=data.configured?'Kho sao lưu đã được khai báo, cần kiểm thử thực tế trước khi xác nhận an toàn.':'Chưa sẵn sàng: cần bucket IMAGE_BACKUPS riêng tư, binding và xác minh cấu hình Cloudflare.';
+ const schedulerAt=Date.parse(data.schedulerLastSeenAt||'');
+ const schedulerSeen=Number.isFinite(schedulerAt)&&Date.now()-schedulerAt<3600000;
+ readiness.textContent=!data.configured?'Chưa sẵn sàng: cần bucket IMAGE_BACKUPS riêng tư, binding và xác minh cấu hình Cloudflare.':schedulerSeen?'Cron Worker đã chạy gần đây. Cần kiểm tra bản sao thực tế trước khi PASS.':'Đã khai báo kho, nhưng chưa xác minh Cron Worker chạy trong 60 phút gần nhất. Sao lưu tự động có thể chưa hoạt động.';
  const s=data.state||{};
  const date=value=>{if(!value)return 'Chưa có';const t=Date.parse(value);return Number.isFinite(t)?new Date(t).toLocaleString('vi-VN'): 'Không xác định'};
  const phase=s.phase==='IMAGES'?'ảnh WebP':s.phase==='ORIGINALS'?'ảnh gốc':'không có lượt đang chạy';
