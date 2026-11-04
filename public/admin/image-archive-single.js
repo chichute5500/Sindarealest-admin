@@ -51,11 +51,13 @@ export class SingleImageZipWriter{
   v32(view,0,0x04034b50);v16(view,4,20);v16(view,6,0x800);v16(view,8,0);v16(view,26,label.length);
   header.set(label,30);await this._write(header);
   let total=0,crc=0xffffffff;
+  const firstBytes=new Uint8Array(12);let prefixCount=0;
   const reader=stream.getReader();
   try{
    while(true){
     const {value,done}=await reader.read();if(done)break;
     if(!(value instanceof Uint8Array)||!value.byteLength)continue;
+    if(prefixCount<12){const len=Math.min(12-prefixCount,value.byteLength);firstBytes.set(value.subarray(0,len),prefixCount);prefixCount+=len;}
     total+=value.byteLength;
     if(total>expectedSize)fail("Ảnh R2 lớn hơn kích thước đã xác minh.");
     crc=crcUpdate(crc,value);
@@ -64,6 +66,12 @@ export class SingleImageZipWriter{
    }
   }finally{reader.releaseLock()}
   if(total!==expectedSize)fail("Ảnh R2 không đủ byte, ZIP chưa được hoàn tất.");
+  if(name.startsWith("IMAGES/")||name.startsWith("ORIGINALS/")){
+   // Validate media magic separately from extension without buffering whole image.
+   // The first 12 bytes are accumulated as chunks stream to disk.
+   const mediaKey=name.split("/").slice(1).join("/");
+   if(sniffMedia(firstBytes.subarray(0,prefixCount))!==mediaType(mediaKey))fail("Ảnh R2 không khớp định dạng.");
+  }
   crc=(crc^0xffffffff)>>>0;
   const end=this.offset;
   v32(view,14,crc);v32(view,18,total);v32(view,22,total);
