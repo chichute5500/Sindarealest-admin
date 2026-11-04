@@ -3048,7 +3048,8 @@ function refreshCategoryOptions(){
 const adminModalReturnFocus=new Map();
 let sdAdminModalExitSeq=0;
 function activateAdminModal(backdrop,initialFocusSelector){++sdAdminModalExitSeq;delete backdrop.dataset.sdMotionClosing;backdrop.querySelector('.editor')?.getAnimations().forEach(animation=>animation.cancel());const active=document.activeElement,queuedMotion=adminConsumeRenderMotionIntent();if(!adminModalReturnFocus.has(backdrop.id))adminModalReturnFocus.set(backdrop.id,active instanceof HTMLElement&&!backdrop.contains(active)?active:null);backdrop.classList.remove('hidden');backdrop.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';const surface=backdrop.querySelector('.editor')||backdrop;adminAnimateSurface(surface,queuedMotion||adminOriginMotion(active instanceof Element?active:null));const initial=backdrop.querySelector(initialFocusSelector);if(initial instanceof HTMLElement)initial.focus()}
-function deactivateAdminModal(backdrop,afterHidden){
+function deactivateAdminModal(backdrop){
+ const afterHidden=arguments[1]; // Optional exit completion; retain original modal contract signature.
  const exitSeq=++sdAdminModalExitSeq;
  backdrop.dataset.sdMotionClosing='1';
  backdrop.setAttribute('aria-hidden','true');
