@@ -36,3 +36,15 @@
 - Verify the Cron Worker is not HTTP-accessible (returns 404).
 - Test with *separate disposable R2 buckets* before production; then verify the first production scan with the owner.
 - Never merge/deploy to Production without Owner PASS and real Cloudflare binding validation.
+
+
+## Download ZIP to phone / restore missing photos
+
+- **Admin > Khác > Sao lưu / Khôi phục > Tải ảnh sao lưu về thiết bị (.ZIP)**.
+- This is independent from the optional scheduled IMAGE_BACKUPS R2 bucket. It only needs the existing IMAGES and ORIGINALS bindings on the current environment.
+- Press **Tải toàn bộ ảnh ZIP** to enumerate both R2 buckets. The UI groups objects into multiple uncompressed ZIP parts for Android (at most 27 MiB of raw media per part, 60 images per part, and 32 MiB final ZIP hard limit). Press the same button again for each subsequent part. Verify the phone's Downloads folder contains every part.
+- The **first ZIP part** contains \`product-index.json\` listing SKUs, titles and product image references; every ZIP part contains \`manifest.json\` with image metadata. The existing **Sao lưu JSON** button is still required for order/customer/payment data. ZIP does not replace JSON.
+- Press **Khôi phục ảnh từ ZIP** to choose one part; confirm then re-enter the admin password. Only images **not already present** in the target R2 bucket are uploaded. An atomic If-None-Match: * condition prevents overwrites even if uploads race. Each ZIP part can be retried safely. Restore images first, then use the existing JSON restore if needed.
+- Invalid ZIP archives, mismatched CRC, unsafe object keys, non-media objects, size/count overflows, duplicate records and unauthenticated/cross-origin requests are rejected before writing any R2 objects.
+- Stored ZIP method is deliberately uncompressed (original WebP/JPEG/PNG media is already compressed). Do not extract a ZIP and modify it then attempt to re-upload as a different format. The ZIP restore accepts only archives produced by this app.
+- There is NO real Production photo export or restore QA until an authorized environment with both bindings is verified; use disposable Preview R2 sample objects to test first. Never select Production data to test restoration.
