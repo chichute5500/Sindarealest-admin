@@ -8,7 +8,9 @@ const CADENCE_KEY = "image_backup_cadence_v1";
 const STATE_KEY = "image_backup_state_v1";
 const HEARTBEAT_KEY = "image_backup_cron_heartbeat_v1";
 const LEASE_KEY = "image_backup_lease_v1";
-const BATCH_LIMIT = 64;
+// Free Workers: 50 subrequests per Cron invocation; eight source objects leave
+// head/get/put/head + list + D1/lease overhead under that budget.
+const BATCH_LIMIT = 8;
 const DAY_MS = 86400000;
 const SOURCES = ["IMAGES", "ORIGINALS"];
 
@@ -159,7 +161,7 @@ async function releaseLease(db, lease) {
 
 /**
  * Safe to call from authenticated Admin or from a dedicated cron Worker.
- * Each invocation processes at most 64 objects so Pages is not blocked.
+ * Each invocation processes at most 8 objects so Pages is not blocked.
  * Errors leave the cursor at the last committed page, so retries are idempotent.
  */
 export async function runImageBackup(env, { force = false } = {}) {
