@@ -70,7 +70,7 @@ for(const r of [mobile,desktop]){
   assert.ok(score(r,key)>=95,'Preview '+key+' score regressed');
  // The isolated Preview intentionally sends x-robots-tag:noindex.
  const crawl=r.audits['is-crawlable'];
- assert.ok(crawl?.details?.items?.some(x=>/x-robots-tag:\\s*noindex/i.test(x.source||'')),
+ assert.ok(crawl?.details?.items?.some(x=>/x-robots-tag:\s*noindex/i.test(x.source||'')),
   'Expected SEO crawl exclusion only on isolated Preview');
  for(const row of r.categories.seo.auditRefs){
   if(row.id==='is-crawlable')continue;
