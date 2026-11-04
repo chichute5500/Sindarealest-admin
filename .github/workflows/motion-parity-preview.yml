@@ -1,0 +1,88 @@
+name: Motion parity — isolated preview and QA
+
+on:
+  push:
+    branches:
+      - feat/motion-parity-balanced-20261105
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: motion-parity-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  motion-qa:
+    if: >-
+      github.repository == 'chichute5500/Sindarealest-admin' &&
+      (github.ref_name == 'feat/motion-parity-balanced-20261105' ||
+       github.head_ref == 'feat/motion-parity-balanced-20261105')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci --no-fund
+      - name: Project checks, full smoke tests, motion contract
+        run: |
+          npm run check
+          npm test
+          node tests/motion-parity-contract.test.mjs
+      - name: Install Chromium for isolated browser QA
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Verify mobile open/close, reduced motion, and approved Admin dock
+        env:
+          ADMIN_DOCK_FIXTURE: '1'
+        run: npx playwright test tests/e2e/motion-parity.spec.js tests/e2e/admin-mobile-dock-motion.spec.js
+
+  deploy-isolated-preview:
+    needs: motion-qa
+    if: >-
+      github.repository == 'chichute5500/Sindarealest-admin' &&
+      (github.ref_name == 'feat/motion-parity-balanced-20261105' ||
+       github.head_ref == 'feat/motion-parity-balanced-20261105')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+      PREVIEW_BRANCH: motion-balanced-20261105
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-fund
+      - name: Guard exact non-production Cloudflare target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::Missing Cloudflare token"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::Missing Cloudflare account"; exit 1; }
+          test "$CLOUDFLARE_PAGES_PROJECT" = "sindarealest2" || { echo "::error::Wrong Pages project"; exit 1; }
+          test "$PREVIEW_BRANCH" != main || { echo "::error::Cannot deploy to main"; exit 1; }
+          response="$(curl --fail --silent --show-error \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CLOUDFLARE_PAGES_PROJECT}")"
+          printf '%s' "$response" | jq -e '.success == true and .result.production_branch == "main"' >/dev/null
+      - name: Deploy static & functions to Cloudflare Preview branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public \
+            --project-name "$CLOUDFLARE_PAGES_PROJECT" \
+            --branch "$PREVIEW_BRANCH" \
+            --commit-hash "${GITHUB_SHA}" \
+            --commit-message "Motion QA Preview ${GITHUB_SHA}"
+          echo "Preview alias: https://motion-balanced-20261105.sindarealest2.pages.dev"
+          echo "This workflow never deploys the main branch."
