@@ -1,0 +1,39 @@
+name: Check image backup state in Production D1 (read-only)
+on:
+  push:
+    branches:
+      - feat/automatic-r2-image-backup-20261105
+    paths:
+      - '.github/workflows/check-image-backup-d1-readonly.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check backup settings only; never query customer rows
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feat/automatic-r2-image-backup-20261105"
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID"
+          root="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}"
+          curl --fail --silent --show-error --max-time 20 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$root/pages/projects/sindarealest2" > "$RUNNER_TEMP/pages.json"
+          db_id="$(jq -r '.result.deployment_configs.production.d1_databases.DB.id // .result.deployment_configs.production.d1_databases.DB.database_id // empty' "$RUNNER_TEMP/pages.json")"
+          test -n "$db_id" || { echo "::error::Production D1 binding missing"; exit 1; }
+          jq -n '{sql:"SELECT key,value FROM settings WHERE key IN (\"image_backup_enabled_v1\", \"image_backup_cadence_v1\", \"image_backup_state_v1\", \"image_backup_cron_heartbeat_v1\") ORDER BY key"}' > "$RUNNER_TEMP/q.json"
+          status="$(curl --silent --show-error --max-time 25 -o "$RUNNER_TEMP/result.json" -w '%{http_code}' \
+            -X POST -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json" \
+            --data-binary "@$RUNNER_TEMP/q.json" "$root/d1/database/$db_id/query")"
+          if [ "$status" != "200" ]; then
+            echo "::error::D1 read-only query unavailable, HTTP $status (may require D1 Read permission)";exit 1
+          fi
+          jq -e '.success == true and (.result|type == "array")' "$RUNNER_TEMP/result.json" >/dev/null
+          jq -r '[.result[].results[]?] | {enabled:(map(select(.key=="image_backup_enabled_v1")|.value)|first // "0"), cadence:(map(select(.key=="image_backup_cadence_v1")|.value)|first // "daily"), cronHeartbeat:(map(select(.key=="image_backup_cron_heartbeat_v1")|.value)|first // "none"), lastCompletedAt:((map(select(.key=="image_backup_state_v1")|.value)|first // "{}")|fromjson|.lastCompletedAt // "none"), phase:((map(select(.key=="image_backup_state_v1")|.value)|first // "{}")|fromjson|.phase // "idle")}' "$RUNNER_TEMP/result.json"
+          echo "PASS: Only backup control/status keys read from Production D1. No business writes." >> "$GITHUB_STEP_SUMMARY"
