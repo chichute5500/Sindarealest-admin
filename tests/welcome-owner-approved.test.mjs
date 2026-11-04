@@ -64,3 +64,8 @@ assert.match(html,/if\(valid\)document\.documentElement\.classList\.add\('sd-wel
 assert.match(html,/Promise\.all\(\[serifReady,sansReady\]\)/);
 assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,
  'Welcome dismissal remains Owner-approved');
+
+/* LCP regression: font needed by the Welcome heading must outrank the
+ * auxiliary body font without swapping away from Owner-approved typography. */
+assert.match(html, /rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="high"/);
+assert.match(html, /rel="preload" href="\/fonts\/NotoSans-Regular\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="low"/);
