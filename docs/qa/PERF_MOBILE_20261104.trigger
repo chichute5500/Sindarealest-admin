@@ -17,3 +17,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-05: cold-font LCP root-cause candidate. Preserve original 1050ms minimum Welcome timing; defer auto-close until Serif/fallback heading had two paints plus 400ms on slow devices. Browser QA intercepts/delays Serif font by 1700ms. Do not merge without Lighthouse >=90 repeatable and baseline comparisons.
 
 2026-11-05: reduce cold mobile bytes: fullscreen-only 118KB brand image now hydrates on opening gallery. Add browser GET guard and detail contract. Run against precise SHA, retain Draft until mobile Lighthouse stable PASS.
+
+2026-11-05: SHA-bound push-driven Preview QA after correcting the gallery image tests and Welcome timing test. Strict branch+marker event gate; never deploy Production or touch real D1/R2.
