@@ -57,7 +57,7 @@ assert.equal((category.match(/class="sd-ssr-deferred-img" data-src="/g)||[]).len
  "SSR should defer six far-below-the-fold source downloads until near viewport");
 assert.equal((category.match(/<noscript><img src="/g)||[]).length,6,
  "JS-disabled catalog must still contain all deferred images as fallbacks");
-assert.ok(category.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
+assert.ok(category.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img,#featuredGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
  "No-JS mode must hide the placeholder without doubling the media box");
 // Home catalog is well below the first viewport: avoid fetching the
 // full offscreen grid until visitors scroll near it. The first four
@@ -69,11 +69,11 @@ assert.equal((homeCatalogHtml.match(/class="sd-ssr-deferred-img" data-src="/g)||
  "All below-fold Home catalog SSR photos must defer until near viewport");
 assert.equal((homeCatalogHtml.match(/<noscript><img src="/g)||[]).length,8,
  "Every deferred Home catalog photo needs the no-JS real-image fallback");
-assert.equal((homeFeaturedHtml.match(/class="sd-ssr-deferred-img"/g)||[]).length,0,
- "Visible Home featured cards must retain immediately discoverable src");
-assert.equal((homeFeaturedHtml.match(/<img src="/g)||[]).length,4,
- "Home featured cards must render real images immediately");
-assert.ok(full.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
+assert.equal((homeFeaturedHtml.match(/class="sd-ssr-deferred-img" data-src="/g)||[]).length,4,
+ "Home featured cards below fold must defer image requests");
+assert.equal((homeFeaturedHtml.match(/<noscript><img src="/g)||[]).length,4,
+ "No-JS Home featured cards must still render real images");
+assert.ok(full.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img,#featuredGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
  "No-JS mode must hide deferred Home placeholders to reveal native image fallback");
 const preloadMatches=[...category.matchAll(/<link rel="preload" as="image" href="([^"]+)" fetchpriority="high">/g)];
 assert.deepEqual(preloadMatches.map(x=>x[1]),["/images/test-image.webp"],
@@ -140,3 +140,18 @@ assert.ok(featuredFunction.includes('loading="lazy" fetchpriority="low" decoding
  "Offscreen Home featured products must not compete with Welcome/Hero first paint");
 assert.ok(!featuredFunction.includes('loading="eager"'),
  "No below-fold featured slide should request full R2 photo eagerly");
+
+const observedFeatured=storefront.slice(
+ storefront.indexOf('function activateCatalogImages(){'),
+ storefront.indexOf('/* One-shot reveal:')
+);
+assert.ok(observedFeatured.includes('#featuredGrid .sd-ssr-deferred-img[data-src]'),
+ "SSR featured photos must be observed near the viewport");
+assert.ok(observedFeatured.includes('#featuredGrid .feature-slide:first-child[data-src]'),
+ "Hydrated first feature slide must load when near the viewport");
+assert.ok(observedFeatured.includes('#featuredGrid .feature-single[data-src]'),
+ "Hydrated single feature photo must load when near the viewport");
+assert.match(storefront,/activateCatalogImages\(\);bindReveal\(\$\('#featuredGrid'\)\)/,
+ "Initial featured hydration must bind the image observer");
+assert.doesNotMatch(featuredFunction, /class="feature-slide" src="/,
+ "Offscreen first featured photo may not bypass the observer");
