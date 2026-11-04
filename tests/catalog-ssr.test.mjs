@@ -59,8 +59,22 @@ assert.equal((category.match(/<noscript><img src="/g)||[]).length,6,
  "JS-disabled catalog must still contain all deferred images as fallbacks");
 assert.ok(category.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
  "No-JS mode must hide the placeholder without doubling the media box");
-assert.ok(!full.includes('sd-ssr-deferred-img'),
- "Home SSR should remain unchanged; only direct catalog routes are optimized");
+// Home catalog is well below the first viewport: avoid fetching the
+// full offscreen grid until visitors scroll near it. The first four
+// featured cards still have real image srcs, and no-JS catalog retains
+// every source in <noscript> to avoid blank cards for crawlers/visitors.
+const homeCatalogHtml=full.split('id="catalogGrid">')[1]?.split('</body>')[0]||'';
+const homeFeaturedHtml=full.split('id="featuredGrid">')[1]?.split('id="catalogGrid">')[0]||'';
+assert.equal((homeCatalogHtml.match(/class="sd-ssr-deferred-img" data-src="/g)||[]).length,8,
+ "All below-fold Home catalog SSR photos must defer until near viewport");
+assert.equal((homeCatalogHtml.match(/<noscript><img src="/g)||[]).length,8,
+ "Every deferred Home catalog photo needs the no-JS real-image fallback");
+assert.equal((homeFeaturedHtml.match(/class="sd-ssr-deferred-img"/g)||[]).length,0,
+ "Visible Home featured cards must retain immediately discoverable src");
+assert.equal((homeFeaturedHtml.match(/<img src="/g)||[]).length,4,
+ "Home featured cards must render real images immediately");
+assert.ok(full.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
+ "No-JS mode must hide deferred Home placeholders to reveal native image fallback");
 const preloadMatches=[...category.matchAll(/<link rel="preload" as="image" href="([^"]+)" fetchpriority="high">/g)];
 assert.deepEqual(preloadMatches.map(x=>x[1]),["/images/test-image.webp"],
  "Repeated first-row image sources must use only one preload");
