@@ -14,6 +14,51 @@ const results={sha:expected,base,scenarios:[]};
 const browser=await chromium.launch({headless:true,args:["--no-sandbox"]});
 await mkdir("artifacts/perf-mobile-20261104",{recursive:true});
 try{
+ // Capture the FIRST visit separately. Returning-visitor screenshots bypass
+ // Welcome, but Lighthouse measures a cold navigation and the disappearing
+ // heading can produce NO_LCP on slow throttled devices.
+ {
+  const ctx=await browser.newContext({
+   viewport:{width:390,height:844},colorScheme:"light",deviceScaleFactor:1,serviceWorkers:"block"
+  });
+  await ctx.addInitScript(()=>{
+   window.__firstLcp=[];
+   window.__longTasks=[];
+   try{new PerformanceObserver(list=>{
+    for(const entry of list.getEntries())window.__firstLcp.push({
+     ms:entry.startTime,size:entry.size,
+     element:entry.element?.className||entry.element?.tagName||null
+    });
+   }).observe({type:"largest-contentful-paint",buffered:true})}catch{}
+   try{new PerformanceObserver(list=>{
+    for(const entry of list.getEntries())window.__longTasks.push({
+     ms:entry.startTime,duration:entry.duration
+    });
+   }).observe({type:"longtask",buffered:true})}catch{}
+  });
+  const page=await ctx.newPage(),errors=[];
+  page.on("pageerror",e=>errors.push(String(e.message||e)));
+  const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
+  assert.equal(response?.status(),200,"Fresh mobile entry must load");
+  const introAtStart=await page.locator("#welcomeSplash").isVisible();
+  await page.waitForTimeout(1800);
+  const firstVisit=await page.evaluate(()=>({
+   lcp:window.__firstLcp||[],
+   longTasks:window.__longTasks||[],
+   fontReady:document.documentElement.classList.contains("sd-welcome-font-ready"),
+   serifReady:document.documentElement.classList.contains("sd-welcome-serif-ready"),
+   welcomeVisible:!!document.querySelector("#welcomeSplash")&&
+    getComputedStyle(document.querySelector("#welcomeSplash")).visibility==="visible",
+   firstContentfulPaint:performance.getEntriesByType("paint").find(x=>x.name==="first-contentful-paint")?.startTime??null,
+   transferBytes:performance.getEntriesByType("resource").reduce((sum,e)=>sum+(e.transferSize||0),0)
+  }));
+  assert.ok(introAtStart,"Fresh entry must present Owner-approved Welcome");
+  assert.equal(firstVisit.welcomeVisible,false,"Welcome must finish after approved intro");
+  assert.deepEqual(errors,[],"Fresh mobile entry must have no script errors");
+  await page.screenshot({path:"artifacts/perf-mobile-20261104/mobile-first-visit.png",animations:"disabled"});
+  results.scenarios.push({name:"mobile-first-visit",introAtStart,metrics:firstVisit,errors});
+  await ctx.close();
+ }
  for(const [name,width,scheme] of [
   ["mobile-light",390,"light"],["mobile-dark",390,"dark"],
   ["desktop-light",1280,"light"],["desktop-dark",1280,"dark"]]){
