@@ -2909,6 +2909,24 @@ function productQuickExpected(p,field){
  if(field==='images')return [...(p.images||[])];
  return field==='price'?p.price:p.fulfillmentType||'unclassified';
 }
+/* Server 200 is the success boundary. A later catalog refresh must not turn
+   an already committed write into a false 'save failed' or invite duplicate POSTs. */
+function acceptCommittedProduct(product){
+ if(!product||!product.id)return;
+ const index=products.findIndex(p=>String(p.id)===String(product.id));
+ if(index<0)products.push(product);
+ else products[index]={...products[index],...product};
+ products.sort((a,b)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0)||String(a.sku||'').localeCompare(String(b.sku||'')));
+ productsRevision=null;
+ adminResourceState.products.updatedAt=0;
+}
+function refreshCommittedProducts(){
+ void loadAdminResource('products',{force:true,repaint:true,reloadAfterFlight:true}).catch(()=>{
+  // The confirmed product result already updated the local list. Retry on
+  // the next safe Admin sync rather than claiming the write itself failed.
+  adminResourceState.products.updatedAt=0;
+ });
+}
 async function saveProductQuick(p,field,value){
  return api('/api/admin/products/'+encodeURIComponent(p.id),{
   method:'PATCH',body:JSON.stringify({field,value,expectedValue:productQuickExpected(p,field)})
@@ -2953,7 +2971,7 @@ function beginProductQuickEdit(trigger){
     field==='category'?{category:raw,categoryLabel:products.find(x=>x.category===raw)?.categoryLabel||CAT[raw]||raw}:raw;
   busy=true;
   form.querySelectorAll('button,input,select').forEach(el=>el.disabled=true);
-  try{const result=await saveProductQuick(p,field,value);await loadData();render();toast(result.message||'Đã lưu thay đổi.')}
+  try{const result=await saveProductQuick(p,field,value);acceptCommittedProduct(result.product);render();toast(result.message||'Đã lưu thay đổi.');refreshCommittedProducts()}
   catch(error){toast(error.message||'Không lưu được. Vui lòng thử lại.');form.querySelectorAll('button,input,select').forEach(el=>el.disabled=false)}
   finally{busy=false}
  });
@@ -3349,7 +3367,7 @@ galleryGrid.addEventListener('keydown',e=>{
 async function optimizeUpload(file){if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Ảnh gốc cần là JPEG, PNG hoặc WebP.');if(file.size>20*1024*1024)throw Error('Ảnh gốc vượt giới hạn 20 MB.');let bitmap;try{bitmap=await createImageBitmap(file)}catch{throw Error(`Không đọc được ảnh ${file.name}.`)}const scale=Math.min(1,1800/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));const ctx=canvas.getContext('2d',{alpha:false});ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.88));if(!blob||blob.size>5*1024*1024)throw Error(`Ảnh ${file.name} vượt giới hạn 5 MB sau tối ưu.`);const body=new FormData();body.append('file',blob,'product.webp');body.append('original',file,file.name||'original');return (await api('/api/admin/upload',{method:'POST',body})).url}
 $('#productForm').addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;const b=$('#saveProduct');b.disabled=true;b.textContent='Đang lưu…';b.setAttribute('aria-label','Đang lưu sản phẩm');err($('#saveError'),'');try{syncProductIdentityValidity();const invalidInput=$('#productForm').querySelector(':invalid');if(invalidInput){const panel=invalidInput.closest('[data-product-panel]');if(panel)setProductEditorTab(panel.dataset.productPanel);invalidInput.focus();const fieldLabel=document.querySelector(`label[for="${invalidInput.id}"]`)?.textContent?.trim()||'trường này';throw Error(({pTitle:'Vui lòng nhập tên sản phẩm.',pCategory:'Vui lòng chọn hoặc nhập danh mục.'})[invalidInput.id]||`Vui lòng kiểm tra trường “${fieldLabel}”.`)}const id=$('#pId').value;for(const g of gallery){if(g.file){g.url=await optimizeUpload(g.file);g.file=null;g.temporary=false}}const payload={...(id?{expectedProduct:JSON.parse(JSON.stringify(editing))}:{}),title:$('#pTitle').value.trim(),category:$('#pCategory').value.trim(),categoryLabel:$('#pCategory').value.trim(),// SKU allocation for new products is exclusively server-side; a product edit
 // preserves identifiers and existing stock even though neither is in the form.
-sku:editing?.sku||'',skuVerified:editing?.skuVerified??true,description:$('#pDescription').value,price:$('#pPrice').value===''?null:Number($('#pPrice').value),stock:editing?.stock??null,fulfillmentType:$('#pFulfillmentType').value,published:editing?.published??true,images:gallery.map(g=>g.url)};const result=await api(id?`/api/admin/products/${encodeURIComponent(id)}`:'/api/admin/products',{method:id?'PUT':'POST',body:JSON.stringify(payload)});await loadData();closeEditor(true);render();toast(result.message||'Đã lưu sản phẩm.')}catch(ex){err($('#saveError'),ex.message)}finally{busy=false;b.disabled=false;b.textContent='Lưu';b.setAttribute('aria-label','Lưu sản phẩm')}});
+sku:editing?.sku||'',skuVerified:editing?.skuVerified??true,description:$('#pDescription').value,price:$('#pPrice').value===''?null:Number($('#pPrice').value),stock:editing?.stock??null,fulfillmentType:$('#pFulfillmentType').value,published:editing?.published??true,images:gallery.map(g=>g.url)};const result=await api(id?`/api/admin/products/${encodeURIComponent(id)}`:'/api/admin/products',{method:id?'PUT':'POST',body:JSON.stringify(payload)});acceptCommittedProduct(result.product);closeEditor(true);render();toast(result.message||'Đã lưu sản phẩm.');refreshCommittedProducts()}catch(ex){err($('#saveError'),ex.message)}finally{busy=false;b.disabled=false;b.textContent='Lưu';b.setAttribute('aria-label','Lưu sản phẩm')}});
 $('#deleteProduct').addEventListener('click',async()=>{if(!editing)return;if(!confirm(`Bạn chắc chắn muốn xóa “${editing.title}” (SKU ${editing.sku})? Thao tác này không thể hoàn tác nếu chưa có bản sao lưu.`))return;busy=true;$('#deleteProduct').disabled=true;try{const r=await api(`/api/admin/products/${encodeURIComponent(editing.id)}`,{method:'DELETE'});await loadData();closeEditor(true);render();toast(r.message)}catch(e){err($('#saveError'),e.message)}finally{busy=false;$('#deleteProduct').disabled=false}});
 async function saveWatermarkSettings(e){e.preventDefault();const b=$('#saveWatermarkSettings'),m=$('#watermarkSaveMessage');b.disabled=true;m.textContent='Đang lưu…';try{const payload={watermarkEnabled:$('#watermarkEnabled').checked,watermarkLogoUrl:$('#watermarkLogoUrl').value.trim(),watermarkPosition:$('#watermarkPosition').value,watermarkSize:Number($('#watermarkSize').value),watermarkOpacity:Number($('#watermarkOpacity').value)};const result=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});settings={...settings,...payload};m.textContent=result.message||'Đã lưu cài đặt watermark.';toast(m.textContent)}catch(ex){m.textContent=ex.message;toast(ex.message)}finally{b.disabled=false}}
 async function saveWelcomeSettings(e){e.preventDefault();const b=$('#saveWelcomeSettings'),m=$('#welcomeSaveMessage');b.disabled=true;m.textContent='Đang lưu…';try{const payload={welcomeEnabled:$('#welcomeEnabled').checked,welcomeTitleLine1:$('#welcomeLine1').value.trim(),welcomeTitleLine2:$('#welcomeLine2').value.trim(),welcomeText:$('#welcomeCopy').value.trim()};const result=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});settings={...settings,...payload};m.textContent=result.message||'Đã lưu. Nội dung sẽ áp dụng khi khách tải lại website.';toast(m.textContent)}catch(ex){m.textContent=ex.message}finally{b.disabled=false}}async function savePriceSetting(e){const c=e.target.checked;e.target.disabled=true;try{const r=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify({showPrices:c})});settings.showPrices=r.showPrices;render();toast(r.message)}catch(ex){e.target.checked=!c;toast(ex.message)}finally{if($('#showPrices'))$('#showPrices').disabled=false}}
