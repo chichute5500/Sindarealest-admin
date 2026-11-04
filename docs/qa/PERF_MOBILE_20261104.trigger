@@ -3,3 +3,4 @@ Requires exact candidate SHA; only read-only browser/lighthouse tests after veri
 No Production writes.
 Validated marker using file presence (shallow checkout compatible).
 Runner now uses npm install (repository intentionally has no lockfile).
+QA v2: Browser PerformanceObserver records real LCP; expected Preview noindex is not Production SEO regression.
