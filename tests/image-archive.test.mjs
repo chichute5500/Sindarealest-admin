@@ -43,7 +43,7 @@ const badManifest={...goodManifest,objects:[{...goodManifest.objects[0],key:"../
 const badZip=await makeZip([{name:"manifest.json",data:JSON.stringify(badManifest)},{name:"IMAGES/one.webp",data:webp}]).arrayBuffer();
 assert.throws(()=>parseRestoreArchive(badZip),/không hợp lệ/);
 assert.throws(()=>makeZip([{name:"../evil",data:"abc"}]),/không an toàn/);
-assert.throws(()=>makeZip([{name:"a",data:new Uint8Array(ARCHIVE_LIMIT)}]),/quá lớn/);
+assert.throws(()=>makeZip([{name:"a",data:new Uint8Array(ARCHIVE_LIMIT)}]),/quá lớn|vượt giới hạn/);
 
 class R2{
  constructor(objects=[]){
