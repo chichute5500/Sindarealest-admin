@@ -7,3 +7,4 @@ QA v2: Browser PerformanceObserver records real LCP; expected Preview noindex is
 QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse baseline is NO_LCP.
 2026-11-05: validate deferred Home catalog images plus no-JS fallback; pinned candidate only.
 2026-11-05 candidate: independent preloaded Serif readiness for Welcome LCP; keep intro visual/timing unchanged.
+2026-11-05 candidate: low-priority native lazy loading for below-fold featured product photos; cold mobile Lighthouse regression gate.
