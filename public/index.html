@@ -3554,7 +3554,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   // text, then gets a paint opportunity before the automatic dismissal.
   window.setTimeout(function(){
     if(!titlePaintedAt&&!closed){
-      document.documentElement.classList.add('sd-welcome-font-fallback');
+      revealWelcomeCopy(true);
       noteWelcomeTitlePaint();
     }
   },2600);
