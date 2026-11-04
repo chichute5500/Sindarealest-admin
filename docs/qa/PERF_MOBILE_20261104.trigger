@@ -11,3 +11,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 
 2026-11-05: one SHA-pinned browser/Lighthouse run for true first-visit LCP, deferred featured images, and no-JS fallbacks.
 2026-11-05: verify observed DevTools-throttled Lighthouse mobile/desktop; simulated NO_LCP was not evidence of page regression. Validate cold-visit native LCP by both formats.
+
+2026-11-05: verify actual Welcome font fetch priority and 4 repeated DevTools-throttled mobile runs. NO_LCP substring detection; require >=2 valid scores >=90 before release.
