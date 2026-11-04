@@ -1,0 +1,32 @@
+# OPERATOR TEMPLATE ONLY. Do not deploy with placeholder bucket/database names.
+# Copy this file outside the repo to a private configuration once names are verified.
+name = "sindarealest-image-backup"
+main = "workers/image-backup-worker.js"
+compatibility_date = "2026-11-05"
+
+[triggers]
+# Every 15 minutes checks the schedule selected in the Admin UI and
+# resumes a partially completed backup until both source buckets are scanned.
+crons = ["*/15 * * * *"]
+
+[vars]
+# Must only be changed to "true" AFTER verifying three distinct R2 buckets;
+# IMAGE_BACKUPS MUST have no public access.
+IMAGE_BACKUP_BUCKET_VERIFIED = "false"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "REPLACE_EXISTING_PRODUCTION_D1_NAME"
+database_id = "REPLACE_EXISTING_D1_DATABASE_UUID"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "REPLACE_EXISTING_PUBLIC_IMAGE_BUCKET"
+
+[[r2_buckets]]
+binding = "ORIGINALS"
+bucket_name = "REPLACE_EXISTING_PRIVATE_ORIGINALS_BUCKET"
+
+[[r2_buckets]]
+binding = "IMAGE_BACKUPS"
+bucket_name = "REPLACE_NEW_PRIVATE_BACKUP_BUCKET"
