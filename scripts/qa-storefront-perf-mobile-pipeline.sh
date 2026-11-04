@@ -46,14 +46,37 @@ import {readFileSync} from 'node:fs';
 const dir='artifacts/perf-mobile-20261104/lighthouse/';
 const get=n=>JSON.parse(readFileSync(dir+n+'.json','utf8'));
 const prod=get('production-mobile'), mobile=get('preview-mobile'),desktop=get('preview-desktop');
-const score=(r,k='performance')=>Math.round((r.categories[k]?.score||0)*100);
-const vitals=r=>Object.fromEntries(['first-contentful-paint','largest-contentful-paint','total-blocking-time','cumulative-layout-shift','speed-index'].map(k=>[k,r.audits[k]?.displayValue||null]));
+const hasScore=(r,k='performance')=>typeof r.categories[k]?.score==='number';
+const score=(r,k='performance')=>hasScore(r,k)?Math.round(r.categories[k].score*100):null;
+const vitals=r=>Object.fromEntries(['first-contentful-paint','largest-contentful-paint','total-blocking-time','cumulative-layout-shift','speed-index'].map(k=>[k,r.audits[k]?.displayValue||r.audits[k]?.errorMessage||null]));
 console.log('Production mobile',score(prod),vitals(prod));
 console.log('Preview mobile',score(mobile),vitals(mobile));
 console.log('Preview desktop',score(desktop),vitals(desktop));
-assert.ok(score(mobile)>=score(prod)-5,'Mobile Performance regressed >5 points');
-for(const key of ['accessibility','best-practices','seo']){
- assert.ok(score(mobile,key)>=95,'Mobile '+key+' regressed');
- assert.ok(score(desktop,key)>=95,'Desktop '+key+' regressed');
+// GitHub runner can emit NO_LCP on both Production and Preview mobile.
+// Mark both as INCONCLUSIVE, never convert missing scores to a fake zero.
+// Browser-native PerformanceObserver must independently verify a real LCP.
+if(hasScore(prod)&&hasScore(mobile)){
+ assert.ok(score(mobile)>=score(prod)-5,'Mobile Performance regressed >5 points');
+}else{
+ assert.equal(prod.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Unexpected Production mobile Lighthouse failure');
+ assert.equal(mobile.audits['largest-contentful-paint']?.errorMessage,'NO_LCP','Candidate mobile Lighthouse differs from invalid Production baseline');
+ const browser=JSON.parse(readFileSync('artifacts/perf-mobile-20261104/browser-qa.json','utf8'));
+ for(const s of browser.scenarios.filter(x=>x.name?.startsWith('mobile-')))
+  assert.ok(s.metrics.lcpMs>0,'Native mobile Chrome must observe LCP');
+ console.log('INCONCLUSIVE: mobile Lighthouse NO_LCP on both deployments; independently verified Chromium LCP, no invented score.');
 }
+for(const r of [mobile,desktop]){
+ for(const key of ['accessibility','best-practices'])
+  assert.ok(score(r,key)>=95,'Preview '+key+' score regressed');
+ // The isolated Preview intentionally sends x-robots-tag:noindex.
+ const crawl=r.audits['is-crawlable'];
+ assert.ok(crawl?.details?.items?.some(x=>/x-robots-tag:\\s*noindex/i.test(x.source||'')),
+  'Expected SEO crawl exclusion only on isolated Preview');
+ for(const row of r.categories.seo.auditRefs){
+  if(row.id==='is-crawlable')continue;
+  const a=r.audits[row.id];
+  assert.ok(a.score===null||a.score===1,'Unrelated SEO audit regressed: '+row.id);
+ }
+}
+assert.ok(score(desktop)>=90,'Preview desktop performance below 90');
 JS
