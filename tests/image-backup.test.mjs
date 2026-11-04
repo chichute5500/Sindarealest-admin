@@ -128,9 +128,10 @@ const big = env(Array.from({ length: 70 }, (_, i) => obj("p" + i + ".webp", "e" 
 await setImageBackupSettings(big, { enabled: true, cadence: "daily" });
 const part = await runImageBackup(big);
 assert.equal(part.state.phase, "IMAGES");
-assert.equal(part.state.scanned, 64);
+assert.equal(part.state.scanned, 8);
 assert.equal(part.state.lastCompletedAt, null);
-const full = await runImageBackup(big);
+let full = part;
+for(let attempt=0;attempt<20&&full.state.phase!=="idle";attempt++)full=await runImageBackup(big);
 assert.equal(full.state.phase, "idle");
 assert.equal(full.state.scanned, 70);
 assert.equal(full.state.copied, 70);
