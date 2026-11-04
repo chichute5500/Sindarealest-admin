@@ -130,3 +130,12 @@ assert.match(html, /viewer\.classList\.remove\('open'\);viewer\.setAttribute\('a
 assert.match(html, /if\(\$\('#sdFullscreenViewer'\)\.classList\.contains\('open'\)\)\{trapFullscreenTab\(e\);return\}if\(\$\('#productOverlay'\)\.classList\.contains\('open'\)\)\{trapProductTab\(e\);return\}/, 'Keyboard focus trapping must respect the topmost gallery dialog.');
 
 console.log('Detail gallery and modal accessibility regression tests passed.');
+
+/* Mobile first-paint budget: the fullscreen-only legacy PNG must not be
+ * requested until the user opens the gallery; keep the same exact artwork. */
+assert.match(html, /class="sd-fullscreen-brand-mark"><img data-src="images\\/brand-emblem\\.png" alt="" decoding="async" fetchpriority="low">/,
+ 'Fullscreen-only 118KB brand mark is deferred');
+const fullOpen=html.slice(html.indexOf('function openFullscreenImage(){'),html.indexOf('function clearGalleryTransitionClasses(',html.indexOf('function openFullscreenImage(){')));
+assert.match(fullOpen,/brandMark=viewer\\.querySelector\\('\\.sd-fullscreen-brand-mark img\\[data-src\\]'\\)/);
+assert.match(fullOpen,/brandMark\\.src=brandMark\\.dataset\\.src;brandMark\\.removeAttribute\\('data-src'\\)/,
+ 'Gallery open must hydrate the original fullscreen brand mark');
