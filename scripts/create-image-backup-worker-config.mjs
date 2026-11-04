@@ -11,7 +11,7 @@ export function makeImageBackupWorkerConfig(databaseId) {
   return {
     name:"sindarealest-image-backup",
     main:"workers/image-backup-worker.js",
-    compatibility_date:"2026-11-05",
+    compatibility_date:"2026-10-01",
     workers_dev:false,
     triggers:{crons:["*/15 * * * *"]},
     // Read-only Cloudflare preflight must PASS before generating this gate.
