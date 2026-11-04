@@ -56,7 +56,8 @@ class R2{
   if(this.map.has(key))return null; // emulate conditional atomic If-None-Match
   assert.equal(options.onlyIf.get("If-None-Match"),"*");
   this.putCount++;this.putOptions.push(options);
-  const bytes=Uint8Array.from(data),x={key,data:bytes,size:bytes.length,etag:"new"};
+  const bytes=data instanceof ReadableStream?new Uint8Array(await new Response(data).arrayBuffer()):Uint8Array.from(data);
+  const x={key,data:bytes,size:bytes.length,etag:"new"};
   this.map.set(key,x);return x;
  }
  async delete(){this.deleted++;throw Error("Restore must never delete R2 originals");}
