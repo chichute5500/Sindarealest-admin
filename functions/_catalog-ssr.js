@@ -82,7 +82,7 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     html=html.replace('<div class="catalog-grid" id="catalogGrid"></div>',
       '<div class="catalog-grid" id="catalogGrid">'+cards+'</div>');
     if(home)html=html.replace('<div class="featured-grid" id="featuredGrid"></div>',
-      '<div class="featured-grid" id="featuredGrid">'+productCards(rows.slice(0,4),origin,{eager:false})+'</div>');
+      '<div class="featured-grid" id="featuredGrid">'+productCards(rows.slice(0,4),origin,{eager:false,deferAll:true})+'</div>');
     // Provide native sequential links in the initial HTML, not JS-only buttons.
     // Search engines can traverse every product page even when scripts are off.
     if(!home){
@@ -104,7 +104,7 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     // HTML in source and no-JS has real product descriptions; JS replaces cards from /api/products.
     // In no-JavaScript mode the image fallback replaces the hidden
     // placeholder, so the card displays one photo without layout shifts.
-    const noJsFallback='<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>\n';
+    const noJsFallback='<noscript><style>#catalogGrid .sd-ssr-deferred-img,#featuredGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>\n';
     html=html.replace('</head>',noJsFallback+aboveFoldPreloads+
       '<script type="application/ld+json">'+catalogSchema(rows,origin)+'</script>\n</head>');
     return html;
