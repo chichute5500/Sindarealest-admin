@@ -65,13 +65,13 @@ test('account pane has 180ms exit and 280ms entry without changing the drawer',a
   await page.evaluate(()=>{
    const account=document.querySelector('#accountDrawer');
    account.style.visibility='';account.classList.add('open');account.removeAttribute('inert');
-   setAccountView('favorites');
+   document.querySelector('#accountFavoritesAction').click();
   });
   await expect(page.locator('#accountFavoritesView')).toBeVisible();
   await expect(page.locator('#accountMenuView')).toHaveAttribute('data-sd-motion-leaving','1');
   await page.waitForTimeout(300);
   await expect(page.locator('#accountMenuView')).toBeHidden();
-  await page.evaluate(()=>setAccountView('menu'));
+  await page.locator('#accountFavoritesBack').click();
   await expect(page.locator('#accountMenuView')).toBeVisible();
   await page.waitForTimeout(300);
   await expect(page.locator('#accountFavoritesView')).toBeHidden();
