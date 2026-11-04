@@ -1,4 +1,4 @@
-import { constantTimeTextEqual, fail, json, readBodyBytesLimited, requireAdmin } from "../../_lib.js";
+import { constantTimeTextEqual, fail, json, requireAdmin } from "../../_lib.js";
 import { sniffMedia, validBucket, validMediaKey } from "../../_lib/image-archive.js";
 
 const MAX_IMAGE_BYTES=20*1024*1024;
@@ -67,6 +67,46 @@ export async function onRequestGet(context){
  return fail("Thao tác không hỗ trợ.",400);
 }
 
+/**
+ * Inspect only the first media-signature bytes, then stream directly to R2.
+ * This avoids buffering 20 MB in Pages Functions, including Workers Free.
+ * The stream rejects any payload that exceeds the upload limit.
+ */
+async function verifiedMediaStream(body, expectedType) {
+ if(!body)throw Error("Ảnh không có dữ liệu.");
+ const reader=body.getReader(),initial=[];
+ let checked=0,transferred=0;
+ const signature=new Uint8Array(12);
+ while(checked<12){
+  const item=await reader.read();
+  if(item.done)break;
+  const value=item.value;
+  if(!(value instanceof Uint8Array)||!value.byteLength)continue;
+  transferred+=value.byteLength;
+  if(transferred>MAX_IMAGE_BYTES)throw Error("Ảnh vượt giới hạn 20 MB.");
+  initial.push(value);
+  const take=Math.min(12-checked,value.byteLength);
+  signature.set(value.subarray(0,take),checked);checked+=take;
+ }
+ if(sniffMedia(signature.subarray(0,checked))!==expectedType)
+  throw Error("Tệp ảnh không khớp phần mở rộng hoặc bị hỏng.");
+ const stream=new ReadableStream({
+  start(controller){for(const chunk of initial)controller.enqueue(chunk)},
+  async pull(controller){
+   try{
+    const {value,done}=await reader.read();
+    if(done){controller.close();return}
+    if(!(value instanceof Uint8Array)||!value.byteLength)return;
+    transferred+=value.byteLength;
+    if(transferred>MAX_IMAGE_BYTES)throw Error("Ảnh vượt giới hạn 20 MB.");
+    controller.enqueue(value);
+   }catch(error){controller.error(error);await reader.cancel(error).catch(()=>{});}
+  },
+  cancel(reason){return reader.cancel(reason)},
+ });
+ return {stream,bytesTransferred:()=>transferred};
+}
+
 // Restore ONE already-validated, user-approved media object per request.
 // Browser validates the whole ZIP (including its CRC and manifest) BEFORE
 // calling this endpoint. Server independently validates key + image magic.
@@ -88,13 +128,14 @@ export async function onRequestPost(context){
  let metadata;
  try{metadata=readMetadata(request.headers.get("X-SD-Image-Metadata")||"");}
  catch{return fail("Metadata khôi phục không hợp lệ.",400);}
- const parsed=await readBodyBytesLimited(request,MAX_IMAGE_BYTES);
- if(parsed.error)return fail("Ảnh vượt 20 MB hoặc bị lỗi.",parsed.error==="too_large"?413:400);
- if(!parsed.bytes.length||sniffMedia(parsed.bytes)!==typeForKey(key))
-  return fail("Tệp ảnh không khớp phần mở rộng hoặc bị hỏng.");
+ const declared=Number(request.headers.get("Content-Length")||0);
+ if(!Number.isSafeInteger(declared)||declared>MAX_IMAGE_BYTES)return fail("Ảnh vượt giới hạn 20 MB.",413);
+ let media;
+ try{media=await verifiedMediaStream(request.body,typeForKey(key));}
+ catch(error){return fail(String(error?.message||"Ảnh không hợp lệ.").slice(0,200),400);}
  try{
   if(await store.head(key))return json({ok:true,skipped:1,restored:0});
-  const result=await store.put(key,parsed.bytes,{
+  const result=await store.put(key,media.stream,{
    onlyIf:new Headers({"If-None-Match":"*"}),
    httpMetadata:{contentType:typeForKey(key),
     cacheControl:bucket==="IMAGES"?"public, max-age=31536000, immutable":"private, no-store"},
@@ -102,7 +143,7 @@ export async function onRequestPost(context){
   });
   if(result===null)return json({ok:true,skipped:1,restored:0});
   const verified=await store.head(key);
-  if(!verified||Number(verified.size)!==parsed.bytes.byteLength)throw Error("Size verify failed");
+  if(!verified||Number(verified.size)!==media.bytesTransferred()||verified.size>MAX_IMAGE_BYTES)throw Error("Size verify failed");
   return json({ok:true,restored:1,skipped:0});
  }catch{return fail("Không xác minh được ảnh đã khôi phục. Ảnh hiện có không bị xóa.",503);}
 }
