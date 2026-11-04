@@ -16,7 +16,7 @@
 3. Add the IMAGE_BACKUPS R2 binding to **Pages Production** (and Preview only if testing with disposable buckets). Add an environment variable IMAGE_BACKUP_BUCKET_VERIFIED="true" ONLY after verifying the bucket identities and privacy. Never use real Production buckets for a Preview test.
 4. Create a separate Cloudflare Worker using workers/image-backup-worker.js and the private copy of workers/wrangler.image-backup.example.toml. Fill the three verified bucket names and the existing Production D1 database id. In the Worker configuration, set IMAGE_BACKUP_BUCKET_VERIFIED="true" only after checking all three names. Deploy via Cloudflare Wrangler from an authenticated, authorized environment. Pages Functions alone **cannot run scheduled()**.
 5. Set a Cron Trigger (template: every 15 minutes). The Admin selection daily/weekly controls when a new scan begins; an unfinished scan resumes on each trigger. Default is disabled until the admin enables it explicitly.
-6. Visit Admin > Khác > Sao lưu / Khôi phục > Sao lưu ảnh tự động; verify the readiness state. Select daily/weekly and enable, or use Sao lưu ngay to start and verify a bounded batch. Repeated manual runs resume work safely.
+6. Visit Admin > Khác > Sao lưu / Khôi phục > Sao lưu ảnh tự động; verify the readiness state and the Cron Worker heartbeat (last seen within 60 minutes). Select daily/weekly and enable, or use Sao lưu ngay to start and verify a bounded batch. Repeated manual runs resume work safely.
 7. Check IMAGE_BACKUPS contains both image-backup-v1/images/... and image-backup-v1/originals/...; verify object sizes, then complete an entire scan. Check errors and last successful completion time in the Admin screen before considering production PASS.
 
 ## Operation
