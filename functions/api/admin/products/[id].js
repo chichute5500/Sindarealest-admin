@@ -27,11 +27,13 @@ export async function onRequestPut(context) {
     const checked = validateProduct(body, existing);
     if (checked.error) return fail(checked.error);
     const p = checked.value;
+    // D1 meta.changes includes revision-trigger writes; returned rows identify
+    // the exact product mutation, preserving CAS and honest success responses.
     const result = await context.env.DB.batch([
       context.env.DB.prepare("UPDATE products SET slug=?,sku=?,sku_verified=?,title=?,category=?,category_label=?,description=?,price=?,stock=?,published=?,images_json=?,source_price_confirmed=?,sort_order=?,fulfillment_type=?,updated_at=datetime('now') " +
         "WHERE id=? AND slug IS ? AND sku IS ? AND sku_verified IS ? AND title IS ? AND category IS ? " +
         "AND category_label IS ? AND description IS ? AND price IS ? AND stock IS ? AND published IS ? " +
-        "AND images_json IS ? AND source_price_confirmed IS ? AND sort_order IS ? AND fulfillment_type IS ? AND updated_at IS ?")
+        "AND images_json IS ? AND source_price_confirmed IS ? AND sort_order IS ? AND fulfillment_type IS ? AND updated_at IS ? RETURNING id")
         .bind(p.slug,p.sku,p.skuVerified?1:0,p.title,p.category,p.categoryLabel,p.description,p.price,p.stock,p.published,JSON.stringify(p.images),p.sourcePriceConfirmed?1:0,p.sortOrder,p.fulfillmentType,id,
           row.slug,row.sku,row.sku_verified,row.title,row.category,row.category_label,row.description,row.price,row.stock,
           row.published,row.images_json,row.source_price_confirmed,row.sort_order,row.fulfillment_type,row.updated_at),
@@ -39,7 +41,7 @@ export async function onRequestPut(context) {
       // a false success event into the audit trail.
       context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'product_updated', 'product', ?, ? WHERE changes()=1").bind(crypto.randomUUID(),id,JSON.stringify({ sku:p.sku,title:p.title,published:!!p.published }))
     ]);
-    if (Number(result?.[0]?.meta?.changes) !== 1)
+    if (result?.[0]?.results?.length !== 1)
       return fail("Sản phẩm vừa bị xóa hoặc thay đổi. Hãy tải lại danh sách trước khi lưu.", 409);
     return json({ ok: true, product: toAdminProduct(p), message: "Đã lưu thay đổi sản phẩm." });
   } catch (error) { return genericDbError(error); }
@@ -96,27 +98,28 @@ export async function onRequestPatch(context) {
     if (checked.error) return fail(checked.error, 400);
     const after = checked.value;
     if (field === "published") {
-      updates = context.env.DB.prepare("UPDATE products SET published=?, updated_at=datetime('now') WHERE id=? AND published=?")
+      updates = context.env.DB.prepare("UPDATE products SET published=?, updated_at=datetime('now') WHERE id=? AND published=? RETURNING id")
         .bind(after.published ? 1 : 0, id, row.published);
     } else if (field === "category") {
-      updates = context.env.DB.prepare("UPDATE products SET category=?, category_label=?, updated_at=datetime('now') WHERE id=? AND category=? AND category_label=?")
+      updates = context.env.DB.prepare("UPDATE products SET category=?, category_label=?, updated_at=datetime('now') WHERE id=? AND category=? AND category_label=? RETURNING id")
         .bind(after.category, after.categoryLabel, id, row.category, row.category_label);
     } else if (field === "fulfillmentType") {
-      updates = context.env.DB.prepare("UPDATE products SET fulfillment_type=?, updated_at=datetime(\'now\') WHERE id=? AND fulfillment_type=?")
+      updates = context.env.DB.prepare("UPDATE products SET fulfillment_type=?, updated_at=datetime(\'now\') WHERE id=? AND fulfillment_type=? RETURNING id")
         .bind(after.fulfillmentType, id, row.fulfillment_type);
     } else if (field === "price") {
-      updates = context.env.DB.prepare("UPDATE products SET price=?, source_price_confirmed=?, updated_at=datetime('now') WHERE id=? AND price IS ?")
+      updates = context.env.DB.prepare("UPDATE products SET price=?, source_price_confirmed=?, updated_at=datetime('now') WHERE id=? AND price IS ? RETURNING id")
         .bind(after.price, after.sourcePriceConfirmed ? 1 : 0, id, row.price);
     } else {
-      updates = context.env.DB.prepare("UPDATE products SET images_json=?, updated_at=datetime('now') WHERE id=? AND images_json=?")
+      updates = context.env.DB.prepare("UPDATE products SET images_json=?, updated_at=datetime('now') WHERE id=? AND images_json=? RETURNING id")
         .bind(JSON.stringify(after.images), id, row.images_json);
     }
+    // Confirm the exact product row via RETURNING, not meta.changes.
     const results = await context.env.DB.batch([
       updates,
       context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'product_inline_updated', 'product', ?, ? WHERE changes()=1")
         .bind(crypto.randomUUID(), id, JSON.stringify({ sku: existing.sku, field }))
     ]);
-    if (Number(results?.[0]?.meta?.changes) !== 1)
+    if (results?.[0]?.results?.length !== 1)
       return fail("Dữ liệu đã thay đổi trong lúc chỉnh sửa. Hãy tải lại danh sách.", 409);
     return json({ ok:true, message:"Đã cập nhật sản phẩm.", field, product:toAdminProduct(after) });
   } catch(error) { return genericDbError(error); }
@@ -130,10 +133,10 @@ export async function onRequestDelete(context) {
     const product = await context.env.DB.prepare("SELECT sku,title FROM products WHERE id=? LIMIT 1").bind(id).first();
     if (!product) return fail("Không tìm thấy sản phẩm.", 404);
     const result = await context.env.DB.batch([
-      context.env.DB.prepare("DELETE FROM products WHERE id=?").bind(id),
+      context.env.DB.prepare("DELETE FROM products WHERE id=? RETURNING id").bind(id),
       context.env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?, 'admin', 'product_deleted', 'product', ?, ? WHERE changes()=1").bind(crypto.randomUUID(),id,JSON.stringify({ sku:product.sku,title:product.title }))
     ]);
-    if (Number(result?.[0]?.meta?.changes) !== 1)
+    if (result?.[0]?.results?.length !== 1)
       return fail("Sản phẩm đã bị xóa bởi thao tác khác. Hãy tải lại danh sách.", 409);
     return json({ ok: true, message: "Đã xóa sản phẩm khỏi danh mục." });
   } catch (error) { return genericDbError(error); }
