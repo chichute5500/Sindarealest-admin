@@ -3467,30 +3467,44 @@ async function downloadImageZipPart(){
    const images=await listImageArchiveBucket('IMAGES');
    const originals=await listImageArchiveBucket('ORIGINALS');
    const all=[...images.objects,...originals.objects];
-   if(!all.length)throw Error('Chưa có ảnh hợp lệ để tải. Không tạo tệp ZIP trống.');
+   if(!all.length)throw Error('Chưa có ảnh hợp lệ để tải. Không tạo ZIP trống.');
    imageZipParts=makeImageZipParts(all);imageZipPart=0;
    imageZipSay('Tìm thấy '+all.length+' ảnh; chia thành '+imageZipParts.length+' ZIP. Tệp khác định dạng: '+(images.excluded+originals.excluded)+'.');
   }
-  const part=imageZipPart+1;
-  const files=imageZipParts[imageZipPart];
-  imageZipSay('Đang đóng gói ZIP '+part+'/'+imageZipParts.length+' ('+files.length+' ảnh)…');
-  const response=await fetch('/api/admin/image-archive?mode=download',{
-   method:'POST',credentials:'same-origin',cache:'no-store',
-   headers:{'Content-Type':'application/json'},body:JSON.stringify({part,files})
-  });
-  if(!response.ok){
-   const data=await response.json().catch(()=>({}));
-   if(response.status===401)showLogin();
-   throw Error(data.error||'Không tải được ZIP số '+part+'.');
+  const {makeZip,sniffMedia,validMediaKey}=await import('/admin/image-archive-client.js');
+  const part=imageZipPart+1,files=imageZipParts[imageZipPart];
+  const records=[],contents=[];
+  for(let i=0;i<files.length;i++){
+   const item=files[i];
+   if(!validMediaKey(item.key))throw Error('Tên tệp R2 không an toàn: '+item.key);
+   imageZipSay('Đang lấy ảnh '+(i+1)+'/'+files.length+' để đóng ZIP '+part+'/'+imageZipParts.length+'…');
+   const url='/api/admin/image-archive?mode=object&bucket='+item.bucket+
+    '&key='+encodeURIComponent(item.key)+'&etag='+encodeURIComponent(item.etag);
+   const response=await fetch(url,{credentials:'same-origin',cache:'no-store'});
+   if(!response.ok){
+    const data=await response.json().catch(()=>({}));
+    if(response.status===401)showLogin();
+    throw Error(data.error||'Không tải được ảnh: '+item.key);
+   }
+   const bytes=new Uint8Array(await response.arrayBuffer());
+   if(bytes.length!==item.size||!sniffMedia(bytes))throw Error('Ảnh sai kích thước hoặc không đúng định dạng: '+item.key);
+   const raw=response.headers.get('X-SD-Image-Metadata')||'%7B%7D';
+   let customMetadata;
+   try{customMetadata=JSON.parse(decodeURIComponent(raw))}catch{throw Error('Metadata ảnh không hợp lệ: '+item.key)}
+   records.push({name:item.bucket+'/'+item.key,data:bytes});
+   contents.push({bucket:item.bucket,key:item.key,size:item.size,etag:item.etag,customMetadata});
   }
-  if(!(response.headers.get('Content-Type')||'').includes('application/zip'))
-   throw Error('Máy chủ không trả ZIP hợp lệ.');
-  const zip=await response.blob();
-  if(zip.size<22||zip.size>32*1024*1024)throw Error('ZIP vượt giới hạn hoặc thiếu dữ liệu.');
+  const manifest={format:'sindarealest-image-zip-v1',createdAt:new Date().toISOString(),part,
+   objects:contents,warning:'Tải riêng JSON dữ liệu đơn hàng/khách hàng ở nút Sao lưu JSON.'};
+  const rows=[{name:'manifest.json',data:JSON.stringify(manifest)}];
+  if(part===1)rows.push({name:'product-index.json',data:JSON.stringify({
+   createdAt:new Date().toISOString(),items:products.map(p=>({sku:p.sku,title:p.title,images:p.images||[]}))
+  })});
+  const zip=makeZip([...rows,...records]);
+  if(zip.size<22||zip.size>32*1024*1024)throw Error('ZIP vượt giới hạn 32 MB. Không tải phần không hoàn chỉnh.');
   const url=URL.createObjectURL(zip),a=document.createElement('a');
   a.href=url;a.download='sindarealest-anh-'+new Date().toISOString().slice(0,10)+'-phan-'+part+'-tren-'+imageZipParts.length+'.zip';
-  document.body.append(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
   imageZipPart++;
   imageZipSay('Đã yêu cầu tải ZIP '+part+'/'+imageZipParts.length+' ('+files.length+' ảnh). Kiểm tra thư mục Tải xuống.'+
    (imageZipPart<imageZipParts.length?' Nhấn nút lần nữa để tải phần '+(imageZipPart+1)+'.':' Đã yêu cầu tải hết các phần. Giữ đủ '+imageZipParts.length+' ZIP để khôi phục.'));
@@ -3501,19 +3515,34 @@ async function restoreImageZip(event){
  const file=event.target.files?.[0];event.target.value='';
  if(!file||imageZipBusy)return;
  if(file.size<22||file.size>32*1024*1024){toast('Mỗi ZIP cần dưới 32 MB. Hãy chọn đúng một phần ZIP do Admin tạo.');return}
- if(!window.confirm('Khôi phục ảnh thiếu từ tệp '+file.name+'? Ảnh hiện tại sẽ được giữ nguyên, không ghi đè. Khôi phục dữ liệu đơn hàng/khách hàng JSON là bước riêng.'))return;
+ if(!window.confirm('Khôi phục ảnh thiếu từ tệp '+file.name+'? Ảnh hiện tại được giữ nguyên, không ghi đè. Khôi phục JSON là bước riêng.'))return;
+ let entries;
+ try{
+  const {parseRestoreArchive}=await import('/admin/image-archive-client.js');
+  ({entries}=parseRestoreArchive(await file.arrayBuffer()));
+ }catch(e){toast('ZIP sai định dạng hoặc bị hỏng: '+(e.message||'Không đọc được.'));return}
  const password=await requestRestorePassword(adminLastTap?{type:'origin',x:adminLastTap.x,y:adminLastTap.y}:null);
  if(!password)return;
- imageZipBusy=true;imageZipPaintButton();imageZipSay('Đang kiểm tra CRC và khôi phục ảnh thiếu…');
+ imageZipBusy=true;imageZipPaintButton();
+ let restored=0,skipped=0;
  try{
-  const response=await fetch('/api/admin/image-archive?mode=restore',{method:'POST',credentials:'same-origin',cache:'no-store',
-   headers:{'Content-Type':'application/zip','X-SD-Restore-Password':password},body:file});
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok){if(response.status===401)showLogin();throw Error(data.error||'Khôi phục ảnh thất bại.')}
-  imageZipSay('Hoàn thành ZIP: đã bổ sung '+data.restored+' ảnh thiếu; '+data.skipped+' ảnh đã có được giữ nguyên. Chọn ZIP phần khác để tiếp tục.');
+  for(let i=0;i<entries.length;i++){
+   const item=entries[i];
+   imageZipSay('Đang khôi phục ảnh '+(i+1)+'/'+entries.length+' từ ZIP. Đã bổ sung '+restored+' ảnh; giữ nguyên '+skipped+' ảnh.');
+   const url='/api/admin/image-archive?mode=restore-object&bucket='+item.bucket+'&key='+encodeURIComponent(item.key);
+   const response=await fetch(url,{method:'POST',credentials:'same-origin',cache:'no-store',
+    headers:{'Content-Type':'application/octet-stream','X-SD-Restore-Password':password,
+     'X-SD-Image-Metadata':encodeURIComponent(JSON.stringify(item.customMetadata||{}))},body:item.bytes});
+   const data=await response.json().catch(()=>({}));
+   if(!response.ok){if(response.status===401)showLogin();throw Error(data.error||'Lỗi khôi phục ảnh '+(i+1))}
+   restored+=Number(data.restored||0);skipped+=Number(data.skipped||0);
+  }
+  imageZipSay('Đã xử lý xong ZIP: khôi phục '+restored+' ảnh thiếu; '+skipped+' ảnh đã có được giữ nguyên. Chọn ZIP phần khác để tiếp tục.');
   toast('Đã khôi phục ảnh thiếu, không ghi đè ảnh cũ.');
- }catch(e){imageZipSay('Không thể khôi phục ZIP: '+(e.message||'Lỗi máy chủ.'));toast(e.message||'Khôi phục ZIP thất bại')}
- finally{imageZipBusy=false;imageZipPaintButton()}
+ }catch(e){
+  imageZipSay('Khôi phục chưa hoàn thành: bổ sung '+restored+' ảnh, giữ nguyên '+skipped+' ảnh. '+(e.message||'Lỗi máy chủ.')+' Hãy thử lại cùng ZIP để tiếp tục.');
+  toast(e.message||'Khôi phục ZIP chưa hoàn thành');
+ }finally{imageZipBusy=false;imageZipPaintButton()}
 }
 async function downloadBackup(){try{const d=await api('/api/admin/backup'),blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`sindarealest-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);toast('Đã tạo bản sao lưu dữ liệu D1. Tệp JSON không chứa tệp ảnh trong R2; hãy sao lưu các bucket R2 riêng.')}catch(e){toast(e.message)}}async function requestRestorePassword(originMotion=null){
  return new Promise(resolve=>{
