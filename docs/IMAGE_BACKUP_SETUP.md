@@ -50,3 +50,13 @@
 - There is NO real Production photo export or restore QA until an authorized environment with both bindings is verified; use disposable Preview R2 sample objects to test first. Never select Production data to test restoration.
 
 - To respect **Cloudflare Workers Free 10ms CPU** limits, ZIP creation and parsing run in the browser via `/admin/image-archive-client.js`; `GET /api/admin/image-archive?mode=object` streams R2 image bytes without CPU-heavy CRC, and `POST ?mode=restore-object` restores only a single missing object after fresh Admin password verification. Do not move full ZIP CRC32 into a Pages Function without measuring CPU.
+
+
+## One click = one ZIP (Nov 5)
+
+- Primary button exports **one ZIP containing both optimized WebP and private originals**, plus image manifest and SKU/product index. There is no longer a requirement to tap once per small ZIP part.
+- The browser writes streamed image responses to **Origin Private File System (OPFS)** using FileSystemWritableFileStream seek/write, then triggers one download of the resulting ZIP file. It never buffers all R2 photos in Worker memory.
+- The browser requires sufficient temporary site-storage quota for the full ZIP; the device's browser may limit one-archive size. The safety cap is **2 GiB total** and each R2 image has the existing **20 MiB** size cap. The UI retains a separate **ZIP nhỏ (dự phòng)** fallback for unsupported browsers, large collections, or low quota.
+- A new streaming ZIP reader checks central/local directory consistency, each object's CRC and media magic, and manifest contents **before** any restored objects are sent to R2. It accepts both historic small ZIP parts and the new big ZIP. Restore remains missing-only and requires fresh Admin password verification.
+- The temporary OPFS file is browser-private and can be deleted by clearing site storage; it is not itself a substitute for the user-visible downloaded ZIP. Verify the ZIP has appeared in Android Downloads before deleting site data.
+- **QA gating:** Node tests validate 85-object ZIP, CRC and tamper rejection. Manual mobile QA is required to validate download completion, file visibility on Xiaomi and a read-only/listing test with Preview's isolated R2 bindings before marking real-device PASS.
