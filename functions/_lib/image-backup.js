@@ -6,6 +6,7 @@
 const ENABLED_KEY = "image_backup_enabled_v1";
 const CADENCE_KEY = "image_backup_cadence_v1";
 const STATE_KEY = "image_backup_state_v1";
+const HEARTBEAT_KEY = "image_backup_cron_heartbeat_v1";
 const LEASE_KEY = "image_backup_lease_v1";
 const BATCH_LIMIT = 64;
 const DAY_MS = 86400000;
@@ -60,17 +61,24 @@ export function imageBackupBindingsReady(env) {
 
 export async function readImageBackupSettings(env) {
   if (!env?.DB) throw new Error("Thiếu binding DB.");
-  const [enabled, cadence, stateRaw] = await Promise.all([
+  const [enabled, cadence, stateRaw, cronHeartbeat] = await Promise.all([
     readSetting(env.DB, ENABLED_KEY, "0"),
     readSetting(env.DB, CADENCE_KEY, "daily"),
     readSetting(env.DB, STATE_KEY, "{}"),
+    readSetting(env.DB, HEARTBEAT_KEY, ""),
   ]);
   return {
     enabled: enabled === "1",
     cadence: cadence === "weekly" ? "weekly" : "daily",
     configured: imageBackupBindingsReady(env),
+    schedulerLastSeenAt: cronHeartbeat || null,
     state: safeState(stateRaw),
   };
+}
+
+export async function markImageBackupCronHeartbeat(env) {
+  if (!env?.DB) throw new Error("Thiếu binding DB cho Worker.");
+  await saveSetting(env.DB, HEARTBEAT_KEY, new Date().toISOString());
 }
 
 export async function setImageBackupSettings(env, { enabled, cadence }) {
