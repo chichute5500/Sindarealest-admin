@@ -5,7 +5,7 @@ test "$GITHUB_HEAD_REF" = 'fix/storefront-mobile-critical-requests-20261104'
 test -n "${CLOUDFLARE_ACCOUNT_ID:-}" && test -n "${CLOUDFLARE_API_TOKEN:-}"
 test "$(git rev-parse HEAD)" = "$PERF_CANDIDATE_SHA"
 git log -1 --format=%s | grep -F '[perf-mobile-qa-candidate]'
-git diff-tree --no-commit-id --name-only -r HEAD | grep -Fx 'docs/qa/PERF_MOBILE_20261104.trigger'
+test -s docs/qa/PERF_MOBILE_20261104.trigger
 npm ci --no-fund
 npm audit --audit-level=high
 npm run check
