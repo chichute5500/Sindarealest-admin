@@ -74,13 +74,17 @@ export async function onRequestPost(context) {
       try {
         const store=env[item.bucket];
         if(await store.head(item.key)){skipped++;continue;}
-        await store.put(item.key,item.bytes,{
+        const result=await store.put(item.key,item.bytes,{
+          // If-None-Match is checked atomically by R2 and prevents a concurrent
+          // upload/restore from being overwritten after our initial HEAD.
+          onlyIf:new Headers({"If-None-Match":"*"}),
           httpMetadata:{
             contentType:item.contentType,
             cacheControl:item.bucket==="IMAGES"?"public, max-age=31536000, immutable":"private, no-store",
           },
           customMetadata:item.customMetadata,
         });
+        if(result===null){skipped++;continue;}
         const verified=await store.head(item.key);
         if(!verified||Number(verified.size)!==item.bytes.length)
           throw Error("Không xác minh được bản ảnh khôi phục.");
