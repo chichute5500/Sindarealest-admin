@@ -2,12 +2,12 @@
 # Copy this file outside the repo to a private configuration once names are verified.
 name = "sindarealest-image-backup"
 main = "workers/image-backup-worker.js"
-compatibility_date = "2026-11-05"
+compatibility_date = "2026-10-01"
 
 [triggers]
-# Every 15 minutes checks the schedule selected in the Admin UI and
+# Every 5 minutes checks the schedule selected in the Admin UI and
 # resumes a partially completed backup until both source buckets are scanned.
-crons = ["*/15 * * * *"]
+crons = ["*/5 * * * *"]
 
 [vars]
 # Must only be changed to "true" AFTER verifying three distinct R2 buckets;
