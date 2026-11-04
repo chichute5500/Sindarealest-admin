@@ -1,0 +1,60 @@
+name: Deploy SinDarealest image backup Worker (guarded)
+on:
+  push:
+    branches:
+      - feat/automatic-r2-image-backup-20261105
+    paths:
+      - 'scripts/create-image-backup-worker-config.mjs'
+      - 'tests/image-backup-worker-config.test.mjs'
+      - 'workers/image-backup-worker.js'
+      - 'functions/_lib/image-backup.js'
+      - '.github/workflows/deploy-image-backup-worker.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: sindarealest-image-backup-worker-deployment
+  cancel-in-progress: false
+jobs:
+  deploy:
+    name: Validate then deploy isolated backup Cron Worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_R2_READ_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
+    steps:
+      - name: Enforce exact feature branch and configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/feat/automatic-r2-image-backup-20261105'
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_R2_READ_API_TOKEN"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Validate source and regression tests
+        run: |
+          npm install --no-fund
+          npm run check
+          npm test
+          node tests/image-backup-worker-config.test.mjs
+      - name: Verify real Production Cloudflare bindings and private backup bucket (GET only)
+        run: node scripts/check-image-backup-cloudflare-readonly.mjs
+      - name: Generate temporary, guarded Worker config
+        run: node scripts/create-image-backup-worker-config.mjs
+      - name: Compile Worker without deploying
+        run: npx wrangler deploy --config .wrangler-image-backup.generated.json --dry-run --outdir /tmp/image-backup-worker-bundle
+      - name: Deploy backup Worker, never Pages or Storefront
+        run: npx wrangler deploy --config .wrangler-image-backup.generated.json
+      - name: Confirm Worker deployment command finished
+        run: |
+          echo "Image backup Cron Worker deployed; the Admin enabled toggle in D1 controls whether real backup runs." >> "$GITHUB_STEP_SUMMARY"
+          echo "Production Pages/main was not deployed or modified by this workflow." >> "$GITHUB_STEP_SUMMARY"
