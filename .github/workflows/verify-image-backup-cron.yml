@@ -25,6 +25,6 @@ jobs:
           test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$WORKERS_TOKEN"
           url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/sindarealest-image-backup/schedules"
           curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer ${WORKERS_TOKEN}" "$url" > "$RUNNER_TEMP/backup-cron.json"
-          jq -e '.success == true and ([.result.schedules[]? | select(.cron == "*/15 * * * *")] | length == 1)' "$RUNNER_TEMP/backup-cron.json" >/dev/null
-          echo "PASS: Cloudflare Worker sindarealest-image-backup has exactly one expected every-15-minute Cron Trigger."
+          jq -e '.success == true and ([.result.schedules[]? | select(.cron == "*/5 * * * *")] | length == 1)' "$RUNNER_TEMP/backup-cron.json" >/dev/null
+          echo "PASS: Cloudflare Worker sindarealest-image-backup has exactly one expected every-5-minute Cron Trigger."
           echo "No production D1/R2 records or script were changed." >> "$GITHUB_STEP_SUMMARY"
