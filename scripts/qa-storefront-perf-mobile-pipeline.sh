@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
-test "$GITHUB_HEAD_REF" = 'fix/storefront-mobile-critical-requests-20261104'
+if [ "${GITHUB_EVENT_NAME:-}" = 'push' ]; then
+  test "$GITHUB_REF_NAME" = 'fix/storefront-mobile-critical-requests-20261104'
+elif [ "${GITHUB_EVENT_NAME:-}" = 'pull_request' ]; then
+  test "$GITHUB_HEAD_REF" = 'fix/storefront-mobile-critical-requests-20261104'
+else
+  echo "Unsupported QA event" >&2
+  exit 1
+fi
 test -n "${CLOUDFLARE_ACCOUNT_ID:-}" && test -n "${CLOUDFLARE_API_TOKEN:-}"
 test "$(git rev-parse HEAD)" = "$PERF_CANDIDATE_SHA"
 git log -1 --format=%s | grep -F '[perf-mobile-qa-candidate]'
