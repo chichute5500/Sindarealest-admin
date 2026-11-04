@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import {makeImageBackupWorkerConfig} from "../scripts/create-image-backup-worker-config.mjs";
+assert.throws(()=>makeImageBackupWorkerConfig("test"),/cannot be verified/);
+const config=makeImageBackupWorkerConfig("11111111-2222-3333-4444-555555555555");
+assert.equal(config.name,"sindarealest-image-backup");
+assert.equal(config.compatibility_date,"2026-10-01","Cloudflare compatibility date must not be in the future in UTC.");
+assert.equal(config.workers_dev,false,"Worker must never expose public HTTP");
+assert.deepEqual(config.triggers.crons,["*/5 * * * *"]);
+assert.equal(config.vars.IMAGE_BACKUP_BUCKET_VERIFIED,"true");
+assert.deepEqual(config.r2_buckets.map(x=>x.binding).sort(),["IMAGES","IMAGE_BACKUPS","ORIGINALS"].sort());
+assert.equal(new Set(config.r2_buckets.map(x=>x.bucket_name)).size,3);
+assert.equal(config.d1_databases[0].binding,"DB");
+assert.ok(!JSON.stringify(config).includes("API_TOKEN"));
+console.log("PASS: Worker Cron config is private, non-route, correctly bound and fail-closed for invalid DB IDs.");

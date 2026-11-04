@@ -1,0 +1,30 @@
+name: Verify deployed SinDarealest backup Worker Cron (read-only)
+on:
+  push:
+    branches:
+      - feat/automatic-r2-image-backup-20261105
+    paths:
+      - '.github/workflows/verify-image-backup-cron.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WORKERS_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_DEPLOY_TOKEN }}
+    steps:
+      - name: Verify Worker schedule from Cloudflare (GET only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feat/automatic-r2-image-backup-20261105"
+          test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$WORKERS_TOKEN"
+          url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/sindarealest-image-backup/schedules"
+          curl --fail --silent --show-error --max-time 25 -H "Authorization: Bearer ${WORKERS_TOKEN}" "$url" > "$RUNNER_TEMP/backup-cron.json"
+          jq -e '.success == true and ([.result.schedules[]? | select(.cron == "*/5 * * * *")] | length == 1)' "$RUNNER_TEMP/backup-cron.json" >/dev/null
+          echo "PASS: Cloudflare Worker sindarealest-image-backup has exactly one expected every-5-minute Cron Trigger."
+          echo "No production D1/R2 records or script were changed." >> "$GITHUB_STEP_SUMMARY"

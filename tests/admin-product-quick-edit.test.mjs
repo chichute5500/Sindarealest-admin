@@ -7,7 +7,7 @@ import {onRequestPatch} from '../functions/api/admin/products/[id].js';
 // Real transactional SQLite in memory only: no Production D1, remote API or R2.
 const db=new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
-for(const file of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql'])
+for(const file of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0016_admin_products_revision.sql','0017_admin_audit_revision.sql'])
  db.exec(readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8'));
 const id='qa-quick-edit';
 db.prepare("INSERT INTO products(id,slug,sku,title,category,category_label,description,price,stock,published,images_json,source_price_confirmed,sort_order,sku_verified,fulfillment_type) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
@@ -20,11 +20,11 @@ function dbAdapter(race=false){
   let args=[];
   return {bind(...params){args=params;return this},
    async first(){const row=db.prepare(sql).get(...args)||null;if(race&&sql.startsWith('SELECT * FROM products')&&row)db.prepare("UPDATE products SET price=999999 WHERE id=?").run(id);return row},
-   _run(){return db.prepare(sql).run(...args)}};
+   _run(){const before=db.prepare('SELECT total_changes() AS n').get().n;const rows=/\bRETURNING id\b/i.test(sql)?db.prepare(sql).all(...args):((db.prepare(sql).run(...args)),[]);return {results:rows,meta:{changes:db.prepare('SELECT total_changes() AS n').get().n-before}}}};
  },
  async batch(statements){
   db.exec('BEGIN IMMEDIATE');
-  try{const out=statements.map(stmt=>({meta:{changes:Number(stmt._run().changes)}}));db.exec('COMMIT');return out}
+  try{const out=statements.map(stmt=>stmt._run());db.exec('COMMIT');return out}
   catch(e){db.exec('ROLLBACK');throw e}
  }};
 }
