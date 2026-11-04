@@ -134,10 +134,12 @@ assert.match(html, /if\(\$\('#sdFullscreenViewer'\)\.classList\.contains\('open'
 assert.ok(html.includes('<span class="sd-fullscreen-brand-mark"><img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low"></span>'),
  'Fullscreen-only 118KB brand mark must not request before gallery opens');
 const fullOpen=html.slice(html.indexOf('function openFullscreenImage(){'),html.indexOf('function clearGalleryTransitionClasses(',html.indexOf('function openFullscreenImage(){')));
-assert.ok(fullOpen.includes("brandMark=viewer.querySelector('.sd-fullscreen-brand-mark img[data-src]')"),
- 'Fullscreen brand mark must be discovered on open');
-assert.ok(fullOpen.includes("brandMark.src=brandMark.dataset.src;brandMark.removeAttribute('data-src')"),
- 'Fullscreen brand mark must hydrate its original image on open');
+assert.ok(html.includes('<div class="sd-fullscreen-brand-footer" aria-hidden="true"><img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low">'),
+ 'Fullscreen footer emblem must defer as well; otherwise the initial network request still occurs');
+assert.ok(fullOpen.includes("viewer.querySelectorAll('.sd-fullscreen-brand-mark img[data-src], .sd-fullscreen-brand-footer img[data-src]')"),
+ 'Both gallery emblem instances must load on opening');
+assert.ok(fullOpen.includes("img.src=img.dataset.src;") && fullOpen.includes("img.removeAttribute('data-src');"),
+ 'Gallery opening must activate original images and clear deferred attributes');
 
 console.log('Detail gallery and modal accessibility regression tests passed.');
 
