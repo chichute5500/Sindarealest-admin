@@ -32,7 +32,7 @@ try{
   });
   const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
   assert.equal(response?.status(),200,name+" home must return HTTP 200");
-  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:35000});
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:35000});
   await page.locator("#sdh-title").waitFor({state:"visible",timeout:15000});
   const metrics=await page.evaluate(()=>{
    const root=document.documentElement,nav=document.querySelector(".nav");
@@ -44,6 +44,7 @@ try{
   assert.equal(metrics.dark,scheme==="dark",name+" theme first-paint mismatch");
   assert.ok(metrics.htmlWidth<=metrics.viewport+2,name+" horizontal overflow");
   assert.ok(metrics.cards>0,name+" product cards not rendered");
+  assert.notEqual(metrics.hydration,"failed",name+" catalog API hydration failed");
   assert.match(metrics.glass,/blur\(/,name+" Glass nav missing");
   assert.equal(calls.filter(x=>x==="/api/lookup-challenge-config").length,0,
    name+" premature phone challenge config request");
@@ -56,6 +57,7 @@ try{
    await page.waitForTimeout(1700);
    assert.ok(calls.filter(x=>x==="/api/customer/session").length<=1,
     name+" duplicate initial account session fetch");
+   await page.locator("#accountClose").click({timeout:15000});
    const code=page.locator("#sdTrackInput");
    await code.fill("SDW-ABCD");
    await page.waitForTimeout(250);
