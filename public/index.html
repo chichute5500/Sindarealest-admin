@@ -3808,7 +3808,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   <button type="button" class="sd-fullscreen-arrow sd-fullscreen-next tap-target" id="sdFullscreenNext" aria-label="Ảnh tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <span class="sd-fullscreen-count" id="sdFullscreenCount" aria-live="polite">01 / 01</span>
   <div class="sd-fullscreen-thumbs" id="sdFullscreenThumbs" aria-label="Ảnh sản phẩm"></div>
-  <div class="sd-fullscreen-brand-footer" aria-hidden="true"><img src="images/brand-emblem.png" alt=""><span class="sd-fullscreen-brand-copy"><strong>SinDarealest</strong><small>Thời Trang Da Cá Sấu</small></span></div>
+  <div class="sd-fullscreen-brand-footer" aria-hidden="true"><img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low"><span class="sd-fullscreen-brand-copy"><strong>SinDarealest</strong><small>Thời Trang Da Cá Sấu</small></span></div>
 </div>
 <aside class="account-drawer glass" id="accountDrawer" style="visibility:hidden" role="dialog" aria-modal="true" aria-label="Tài khoản" aria-hidden="true" tabindex="-1" inert>
   <div class="cart-header sd-account-header"><h2 id="accountDrawerTitle" class="sd-account-visually-hidden">Tài khoản</h2><button class="icon-btn tap-target" id="accountClose" aria-label="Đóng tài khoản">×</button></div>
@@ -4643,8 +4643,10 @@ function openFullscreenImage(){
  const viewer=$('#sdFullscreenViewer');
  // Gallery-only 118KB brand PNG should never compete with Welcome/Hero LCP.
  // Preserve the exact image and fetch it only when the fullscreen viewer opens.
- const brandMark=viewer.querySelector('.sd-fullscreen-brand-mark img[data-src]');
- if(brandMark){brandMark.src=brandMark.dataset.src;brandMark.removeAttribute('data-src')}
+ viewer.querySelectorAll('.sd-fullscreen-brand-mark img[data-src], .sd-fullscreen-brand-footer img[data-src]').forEach(img=>{
+   img.src=img.dataset.src;
+   img.removeAttribute('data-src');
+ });
  $('#sdFullscreenTitle').textContent=(currentProduct.title||'Sản phẩm SinDarealest')+(visibleSku(currentProduct)?' · SKU '+visibleSku(currentProduct):'');
  $('#sdFullscreenCount').textContent=String(detailIndex+1).padStart(2,'0')+' / '+String(detailImages.length).padStart(2,'0');
  viewer.removeAttribute('inert');viewer.classList.add('open');viewer.setAttribute('aria-hidden','false');
