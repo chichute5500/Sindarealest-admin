@@ -52,11 +52,38 @@ try{
    firstContentfulPaint:performance.getEntriesByType("paint").find(x=>x.name==="first-contentful-paint")?.startTime??null,
    transferBytes:performance.getEntriesByType("resource").reduce((sum,e)=>sum+(e.transferSize||0),0)
   }));
+  assert.ok(firstVisit.lcp.length>0,"First Welcome visit must record browser-native LCP");
   assert.ok(introAtStart,"Fresh entry must present Owner-approved Welcome");
   assert.equal(firstVisit.welcomeVisible,false,"Welcome must finish after approved intro");
   assert.deepEqual(errors,[],"Fresh mobile entry must have no script errors");
   await page.screenshot({path:"artifacts/perf-mobile-20261104/mobile-first-visit.png",animations:"disabled"});
   results.scenarios.push({name:"mobile-first-visit",introAtStart,metrics:firstVisit,errors});
+  await ctx.close();
+ }
+ // Reproduce cold mobile font stalls without changing approved visual content.
+ // The old fixed 1050ms timer could dismiss Welcome before its Serif heading
+ // painted, causing repeated Lighthouse NO_LCP under slow DevTools throttling.
+ {
+  const ctx=await browser.newContext({viewport:{width:390,height:844},
+   colorScheme:"light",deviceScaleFactor:1,serviceWorkers:"block"});
+  let delayedFonts=0;
+  await ctx.route("**/fonts/NotoSerif-Regular.woff2",async route=>{
+   delayedFonts++;
+   await new Promise(resolve=>setTimeout(resolve,1700));
+   await route.continue();
+  });
+  const page=await ctx.newPage(),errors=[];
+  page.on("pageerror",e=>errors.push(String(e.message||e)));
+  const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
+  assert.equal(response?.status(),200,"Slow-font first visit must load");
+  await page.waitForTimeout(1200);
+  assert.ok(delayedFonts>0,"Cold load must actually delay the Serif font request");
+  const stillActive=await page.locator("#welcomeSplash").evaluate(el=>
+   !el.classList.contains("is-leaving")&&getComputedStyle(el).visibility==="visible");
+  assert.ok(stillActive,"Welcome must not dismiss before slow Serif could paint");
+  await page.waitForFunction(()=>!document.querySelector("#welcomeSplash"),null,{timeout:12000});
+  assert.deepEqual(errors,[],"Slow-font Welcome must not throw");
+  results.scenarios.push({name:"mobile-slow-serif-lcp-guard",delayedFonts,stillActive,errors});
   await ctx.close();
  }
  for(const [name,width,scheme] of [
