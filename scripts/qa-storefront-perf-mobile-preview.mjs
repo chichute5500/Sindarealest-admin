@@ -22,6 +22,10 @@ try{
   });
   await context.addInitScript(()=>{
    try{sessionStorage.setItem("sd-welcome-seen-in-tab","1")}catch{}
+   window.__perfLcp=[];
+   try{new PerformanceObserver(list=>{
+     for(const entry of list.getEntries())window.__perfLcp.push({ms:entry.startTime,size:entry.size});
+   }).observe({type:"largest-contentful-paint",buffered:true})}catch{}
   });
   const page=await context.newPage(),errors=[],calls=[];
   page.on("pageerror",e=>errors.push(String(e.message||e)));
@@ -34,17 +38,21 @@ try{
   assert.equal(response?.status(),200,name+" home must return HTTP 200");
   await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:35000});
   await page.locator("#sdh-title").waitFor({state:"visible",timeout:15000});
+  await page.waitForTimeout(1200);
   const metrics=await page.evaluate(()=>{
    const root=document.documentElement,nav=document.querySelector(".nav");
    return {htmlWidth:document.documentElement.scrollWidth,viewport:innerWidth,
      dark:root.classList.contains("dark"),hydration:root.dataset.catalogHydration||"",
      cards:document.querySelectorAll("#catalogGrid article").length,
-     glass:getComputedStyle(nav).backdropFilter};
+     glass:getComputedStyle(nav).backdropFilter,
+     lcpMs:window.__perfLcp?.at(-1)?.ms??null,
+     firstContentfulPaintMs:performance.getEntriesByType("paint").find(x=>x.name==="first-contentful-paint")?.startTime??null};
   });
   assert.equal(metrics.dark,scheme==="dark",name+" theme first-paint mismatch");
   assert.ok(metrics.htmlWidth<=metrics.viewport+2,name+" horizontal overflow");
   assert.ok(metrics.cards>0,name+" product cards not rendered");
   assert.notEqual(metrics.hydration,"failed",name+" catalog API hydration failed");
+  assert.ok(Number.isFinite(metrics.lcpMs)&&metrics.lcpMs>0,name+" missing browser-native LCP on returning-visitor UI");
   assert.match(metrics.glass,/blur\(/,name+" Glass nav missing");
   assert.equal(calls.filter(x=>x==="/api/lookup-challenge-config").length,0,
    name+" premature phone challenge config request");
