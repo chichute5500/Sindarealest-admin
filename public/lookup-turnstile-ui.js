@@ -7,7 +7,7 @@
   {action:"warranty_lookup",formId:"warrantyLookupForm",inputId:"warrantyLookupValue"}
  ];
  const states=new Map();
- let config=null,loadPromise=null;
+ let config=null,loadPromise=null,configLoadPromise=null;
  const isPhone=value=>{
   const digits=String(value||"").replace(/[^0-9]/g,"");
   return /^[0-9]{9,12}$/.test(digits)&&/^[+0-9() .\/-]+$/.test(String(value||""));
@@ -50,6 +50,13 @@
   async function refresh(){
    if(!isPhone(field.value)){wrapper.hidden=true;return}
    wrapper.hidden=false;
+   // Only phone-number lookup needs Turnstile. Avoid a Worker request on
+   // every normal Storefront visit, including code-based lookups.
+   if(config===null){
+    hint.textContent="Đang chuẩn bị xác minh...";
+    await ensureConfig();
+    if(!isPhone(field.value)){wrapper.hidden=true;return}
+   }
    if(!config?.phoneLookupAvailable||!config.siteKey){
     hint.textContent="Tra cứu bằng số điện thoại hiện yêu cầu xác minh. Hãy dùng mã đơn hoặc mã bảo hành để tiếp tục.";
     return;
@@ -74,12 +81,22 @@
   field.addEventListener("focus",refresh);
   refresh();
  }
- async function init(){
-  try{
-   const r=await fetch("/api/lookup-challenge-config",{cache:"no-store",credentials:"same-origin"});
-   if(!r.ok)throw Error("Configuration unavailable");
-   config=await r.json();
-  }catch{config={phoneLookupAvailable:false,siteKey:""}}
+ function ensureConfig(){
+  if(config!==null)return Promise.resolve(config);
+  if(configLoadPromise)return configLoadPromise;
+  configLoadPromise=(async()=>{
+   try{
+    const r=await fetch("/api/lookup-challenge-config",{cache:"no-store",credentials:"same-origin"});
+    if(!r.ok)throw Error("Configuration unavailable");
+    config=await r.json();
+   }catch{config={phoneLookupAvailable:false,siteKey:""}}
+   return config;
+  })();
+  return configLoadPromise;
+ }
+ function init(){
+  // Install form listeners at DOM-ready, including for pasted phone numbers.
+  // Config is fetched once, only if the phone lookup challenge becomes needed.
   for(const def of definitions)setupField(def);
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
