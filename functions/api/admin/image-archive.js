@@ -1,101 +1,108 @@
-import { constantTimeTextEqual, fail, json, readBodyBytesLimited, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
-import {
-  ARCHIVE_LIMIT, createArchivePart, parseRestoreArchive, validBucket, validMediaKey,
-} from "../../_lib/image-archive.js";
+import { constantTimeTextEqual, fail, json, readBodyBytesLimited, requireAdmin } from "../../_lib.js";
+import { sniffMedia, validBucket, validMediaKey } from "../../_lib/image-archive.js";
 
-function sourceBucket(env,name) { return validBucket(name)?env[name]:null; }
-function notConfigured() { return fail("Kho IMAGES hoặc ORIGINALS chưa được kết nối trong môi trường này.",503); }
-
-// Authenticated, bounded R2 object listing. No public/private R2 URLs are leaked.
-export async function onRequestGet(context) {
-  const auth=await requireAdmin(context);
-  if(auth.response)return auth.response;
-  const {env,request}=context;
-  const url=new URL(request.url);
-  if(url.searchParams.get("mode")!=="scan")return fail("Thao tác không được hỗ trợ.",400);
-  const bucket=url.searchParams.get("bucket");
-  if(!validBucket(bucket))return fail("Kho ảnh không hợp lệ.");
-  const store=sourceBucket(env,bucket);
-  if(!store||typeof store.list!=="function")return notConfigured();
-  const cursor=url.searchParams.get("cursor");
-  if(cursor&&cursor.length>4096)return fail("Dấu trang ảnh quá dài.");
-  try {
-    const page=await store.list({limit:250,...(cursor?{cursor}:{})});
-    if(!page||!Array.isArray(page.objects)||page.objects.length>250)throw Error("R2 listing invalid");
-    const supported=page.objects.filter(o=>validMediaKey(o.key)&&Number.isSafeInteger(o.size)&&
-      o.size>0&&o.size<=20*1024*1024&&typeof o.etag==="string");
-    return json({bucket,objects:supported.map(({key,size,etag})=>({bucket,key,size,etag})),
-      excluded:page.objects.length-supported.length,
-      truncated:!!page.truncated,cursor:page.truncated?page.cursor:null});
-  }catch{return fail("Không đọc được danh sách ảnh R2.",503);}
+const MAX_IMAGE_BYTES=20*1024*1024;
+function sourceBucket(env,name){return validBucket(name)?env[name]:null}
+function notConfigured(){return fail("Kho IMAGES hoặc ORIGINALS chưa được kết nối trong môi trường này.",503)}
+function typeForKey(key){
+ return /\.webp$/i.test(key)?"image/webp":/\.png$/i.test(key)?"image/png":/\.jpe?g$/i.test(key)?"image/jpeg":null;
+}
+function readMetadata(header){
+ if(!header)return {};
+ if(header.length>7000)throw Error("Metadata quá lớn.");
+ let obj;
+ try{obj=JSON.parse(decodeURIComponent(header));}catch{throw Error("Metadata không hợp lệ.");}
+ if(!obj||typeof obj!=="object"||Array.isArray(obj)||JSON.stringify(obj).length>1800)throw Error("Metadata không hợp lệ.");
+ for(const [key,value] of Object.entries(obj)){
+  if(!/^[A-Za-z][A-Za-z0-9_-]{0,59}$/.test(key)||typeof value!=="string"||value.length>1000)throw Error("Metadata không hợp lệ.");
+ }
+ return obj;
 }
 
-// Download one <=32 MiB ZIP part, OR restore one validated ZIP part.
-// Both operations require a signed Admin session + same-origin request.
-// Restore additionally requires a fresh admin password and never overwrites.
-export async function onRequestPost(context) {
-  const auth=await requireAdmin(context);
-  if(auth.response)return auth.response;
-  const {env,request}=context;
-  const mode=new URL(request.url).searchParams.get("mode");
-  if(mode==="download"){
-    if(!env.IMAGES||!env.ORIGINALS)return notConfigured();
-    const parsed=await readJsonBodyLimited(request,64*1024);
-    if(parsed.error)return fail("Danh sách tệp ảnh quá lớn hoặc không hợp lệ.",parsed.error==="too_large"?413:400);
-    try{
-      const zip=await createArchivePart(env,parsed.value);
-      return new Response(zip,{status:200,headers:{
-        "Content-Type":"application/zip",
-        "Content-Disposition":'attachment; filename="sindarealest-images-part-'+parsed.value.part+'.zip"',
-        "Cache-Control":"no-store, private",
-        "X-Content-Type-Options":"nosniff",
-        "X-Frame-Options":"DENY",
-        "Content-Security-Policy":"default-src 'none'; frame-ancestors 'none'",
-      }});
-    }catch(error){return fail(String(error?.message||"Không thể tạo ZIP ảnh.").slice(0,220),400);}
-  }
-  if(mode==="restore"){
-    if(!env.IMAGES||!env.ORIGINALS)return notConfigured();
-    const password=request.headers.get("X-SD-Restore-Password")||"";
-    if(!password||password.length>1024||!constantTimeTextEqual(password,env.ADMIN_PASSWORD)){
-      return fail("Cần xác thực lại mật khẩu quản trị để khôi phục ảnh.",403);
-    }
-    if(!/^(application\/zip|application\/octet-stream)(?:\s*;.*)?$/i.test(request.headers.get("Content-Type")||""))
-      return fail("Chỉ nhận tệp ZIP của SinDarealest.",415);
-    const parsed=await readBodyBytesLimited(request,ARCHIVE_LIMIT);
-    if(parsed.error)return fail("ZIP trống, lỗi hoặc vượt giới hạn 32 MiB.",parsed.error==="too_large"?413:400);
-    let entries;
-    try{({entries}=parseRestoreArchive(parsed.bytes));}
-    catch(error){return fail(String(error?.message||"ZIP không hợp lệ.").slice(0,250));}
-    // FULL validation occurs before the first write. Each R2 key is immutable
-    // from the restore action if it already exists.
-    let restored=0,skipped=0;
-    for(const item of entries){
-      try {
-        const store=env[item.bucket];
-        if(await store.head(item.key)){skipped++;continue;}
-        const result=await store.put(item.key,item.bytes,{
-          // If-None-Match is checked atomically by R2 and prevents a concurrent
-          // upload/restore from being overwritten after our initial HEAD.
-          onlyIf:new Headers({"If-None-Match":"*"}),
-          httpMetadata:{
-            contentType:item.contentType,
-            cacheControl:item.bucket==="IMAGES"?"public, max-age=31536000, immutable":"private, no-store",
-          },
-          customMetadata:item.customMetadata,
-        });
-        if(result===null){skipped++;continue;}
-        const verified=await store.head(item.key);
-        if(!verified||Number(verified.size)!==item.bytes.length)
-          throw Error("Không xác minh được bản ảnh khôi phục.");
-        restored++;
-      }catch{
-        return json({ok:false,restored,skipped,total:entries.length,
-          error:"Khôi phục chưa hoàn thành. Đã giữ nguyên các ảnh sẵn có. Có thể tải lại chính ZIP này để tiếp tục."},503);
-      }
-    }
-    return json({ok:true,restored,skipped,total:entries.length,
-      message:"Đã khôi phục ảnh thiếu; ảnh hiện có không bị ghi đè. Dữ liệu JSON cần khôi phục riêng nếu cần."});
-  }
-  return fail("Thao tác không hỗ trợ.",400);
+// Workers Free 10ms CPU: scanning and streaming objects are server-side;
+// ZIP packaging/CRC and ZIP parsing run in the Admin browser instead.
+export async function onRequestGet(context){
+ const auth=await requireAdmin(context);
+ if(auth.response)return auth.response;
+ const {env,request}=context,url=new URL(request.url);
+ const bucket=url.searchParams.get("bucket");
+ if(!validBucket(bucket))return fail("Kho ảnh không hợp lệ.");
+ const store=sourceBucket(env,bucket);
+ if(!store)return notConfigured();
+ const mode=url.searchParams.get("mode");
+ if(mode==="scan"){
+  const cursor=url.searchParams.get("cursor");
+  if(cursor&&cursor.length>4096)return fail("Dấu trang ảnh quá dài.");
+  try{
+   const page=await store.list({limit:250,...(cursor?{cursor}:{})});
+   if(!page||!Array.isArray(page.objects)||page.objects.length>250)throw Error("R2 listing invalid");
+   const supported=page.objects.filter(o=>validMediaKey(o.key)&&Number.isSafeInteger(o.size)&&
+    o.size>0&&o.size<=MAX_IMAGE_BYTES&&typeof o.etag==="string");
+   return json({bucket,objects:supported.map(({key,size,etag})=>({bucket,key,size,etag})),
+    excluded:page.objects.length-supported.length,truncated:!!page.truncated,cursor:page.truncated?page.cursor:null});
+  }catch{return fail("Không đọc được danh sách ảnh R2.",503);}
+ }
+ if(mode==="object"){
+  const key=url.searchParams.get("key"),expected=url.searchParams.get("etag");
+  if(!validMediaKey(key)||!expected||expected.length>160)return fail("Tệp ảnh không hợp lệ.");
+  try{
+   const obj=await store.get(key);
+   if(!obj)return fail("Ảnh không còn tồn tại trong kho R2.",404);
+   if(!obj.body||obj.etag!==expected)return fail("Ảnh đã thay đổi. Hãy kiểm tra lại danh sách.",409);
+   if(!Number.isSafeInteger(obj.size)||obj.size<1||obj.size>MAX_IMAGE_BYTES)return fail("Ảnh vượt giới hạn 20 MB.",413);
+   const meta=obj.customMetadata||{};
+   const serialized=encodeURIComponent(JSON.stringify(meta));
+   if(serialized.length>7000)return fail("Metadata ảnh vượt giới hạn.",413);
+   return new Response(obj.body,{headers:{
+    "Content-Type":typeForKey(key),
+    "Content-Length":String(obj.size),
+    "X-SD-Image-Metadata":serialized,
+    "Cache-Control":"private, no-store",
+    "X-Content-Type-Options":"nosniff",
+    "X-Frame-Options":"DENY",
+    "Content-Security-Policy":"default-src 'none'; frame-ancestors 'none'",
+   }});
+  }catch{return fail("Không tải được ảnh gốc từ R2.",503);}
+ }
+ return fail("Thao tác không hỗ trợ.",400);
+}
+
+// Restore ONE already-validated, user-approved media object per request.
+// Browser validates the whole ZIP (including its CRC and manifest) BEFORE
+// calling this endpoint. Server independently validates key + image magic.
+// Atomic R2 conditional write guarantees no overwrite under concurrent calls.
+export async function onRequestPost(context){
+ const auth=await requireAdmin(context);
+ if(auth.response)return auth.response;
+ const {request,env}=context,url=new URL(request.url);
+ if(url.searchParams.get("mode")!=="restore-object")return fail("Thao tác không hỗ trợ.",400);
+ const bucket=url.searchParams.get("bucket"),key=url.searchParams.get("key");
+ if(!validBucket(bucket)||!validMediaKey(key))return fail("Khóa ảnh không hợp lệ.");
+ const store=sourceBucket(env,bucket);
+ if(!store)return notConfigured();
+ const password=request.headers.get("X-SD-Restore-Password")||"";
+ if(!password||password.length>1024||!constantTimeTextEqual(password,env.ADMIN_PASSWORD))
+  return fail("Cần xác thực lại mật khẩu quản trị để khôi phục ảnh.",403);
+ if(!/^(application\/octet-stream)(?:\s*;.*)?$/i.test(request.headers.get("Content-Type")||""))
+  return fail("Chỉ nhận dữ liệu ảnh nguyên bản.",415);
+ let metadata;
+ try{metadata=readMetadata(request.headers.get("X-SD-Image-Metadata")||"");}
+ catch{return fail("Metadata khôi phục không hợp lệ.",400);}
+ const parsed=await readBodyBytesLimited(request,MAX_IMAGE_BYTES);
+ if(parsed.error)return fail("Ảnh vượt 20 MB hoặc bị lỗi.",parsed.error==="too_large"?413:400);
+ if(!parsed.bytes.length||sniffMedia(parsed.bytes)!==typeForKey(key))
+  return fail("Tệp ảnh không khớp phần mở rộng hoặc bị hỏng.");
+ try{
+  if(await store.head(key))return json({ok:true,skipped:1,restored:0});
+  const result=await store.put(key,parsed.bytes,{
+   onlyIf:new Headers({"If-None-Match":"*"}),
+   httpMetadata:{contentType:typeForKey(key),
+    cacheControl:bucket==="IMAGES"?"public, max-age=31536000, immutable":"private, no-store"},
+   customMetadata:metadata,
+  });
+  if(result===null)return json({ok:true,skipped:1,restored:0});
+  const verified=await store.head(key);
+  if(!verified||Number(verified.size)!==parsed.bytes.byteLength)throw Error("Size verify failed");
+  return json({ok:true,restored:1,skipped:0});
+ }catch{return fail("Không xác minh được ảnh đã khôi phục. Ảnh hiện có không bị xóa.",503);}
 }
