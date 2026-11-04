@@ -3,6 +3,7 @@ import {makeImageBackupWorkerConfig} from "../scripts/create-image-backup-worker
 assert.throws(()=>makeImageBackupWorkerConfig("test"),/cannot be verified/);
 const config=makeImageBackupWorkerConfig("11111111-2222-3333-4444-555555555555");
 assert.equal(config.name,"sindarealest-image-backup");
+assert.equal(config.compatibility_date,"2026-10-01","Cloudflare compatibility date must not be in the future in UTC.");
 assert.equal(config.workers_dev,false,"Worker must never expose public HTTP");
 assert.deepEqual(config.triggers.crons,["*/15 * * * *"]);
 assert.equal(config.vars.IMAGE_BACKUP_BUCKET_VERIFIED,"true");
