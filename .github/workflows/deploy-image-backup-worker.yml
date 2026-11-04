@@ -52,7 +52,19 @@ jobs:
         run: node scripts/create-image-backup-worker-config.mjs
       - name: Compile Worker without deploying
         run: npx wrangler deploy --config .wrangler-image-backup.generated.json --dry-run --outdir /tmp/image-backup-worker-bundle
+      - name: Require dedicated Workers deployment token
+        shell: bash
+        env:
+          WORKERS_DEPLOY_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_DEPLOY_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$WORKERS_DEPLOY_TOKEN" || {
+            echo "::error::Missing GitHub secret CLOUDFLARE_WORKERS_DEPLOY_TOKEN (Cloudflare Workers product Admin permission needed to create Worker)."
+            exit 1
+          }
       - name: Deploy backup Worker, never Pages or Storefront
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_WORKERS_DEPLOY_TOKEN }}
         run: npx wrangler deploy --config .wrangler-image-backup.generated.json
       - name: Confirm Worker deployment command finished
         run: |
