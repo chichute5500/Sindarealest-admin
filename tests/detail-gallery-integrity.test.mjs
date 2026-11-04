@@ -129,13 +129,15 @@ assert.match(html, /viewer\.removeAttribute\('inert'\);viewer\.classList\.add\('
 assert.match(html, /viewer\.classList\.remove\('open'\);viewer\.setAttribute\('aria-hidden','true'\);viewer\.setAttribute\('inert',''\)/, 'Closing fullscreen gallery must make it inert again.');
 assert.match(html, /if\(\$\('#sdFullscreenViewer'\)\.classList\.contains\('open'\)\)\{trapFullscreenTab\(e\);return\}if\(\$\('#productOverlay'\)\.classList\.contains\('open'\)\)\{trapProductTab\(e\);return\}/, 'Keyboard focus trapping must respect the topmost gallery dialog.');
 
+/* Mobile first-paint budget: defer hidden gallery-only artwork without
+ * changing the original image or the visual design once the viewer opens. */
+assert.ok(html.includes('<span class="sd-fullscreen-brand-mark"><img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low"></span>'),
+ 'Fullscreen-only 118KB brand mark must not request before gallery opens');
+const fullOpen=html.slice(html.indexOf('function openFullscreenImage(){'),html.indexOf('function clearGalleryTransitionClasses(',html.indexOf('function openFullscreenImage(){')));
+assert.ok(fullOpen.includes("brandMark=viewer.querySelector('.sd-fullscreen-brand-mark img[data-src]')"),
+ 'Fullscreen brand mark must be discovered on open');
+assert.ok(fullOpen.includes("brandMark.src=brandMark.dataset.src;brandMark.removeAttribute('data-src')"),
+ 'Fullscreen brand mark must hydrate its original image on open');
+
 console.log('Detail gallery and modal accessibility regression tests passed.');
 
-/* Mobile first-paint budget: the fullscreen-only legacy PNG must not be
- * requested until the user opens the gallery; keep the same exact artwork. */
-assert.match(html, /class="sd-fullscreen-brand-mark"><img data-src="images\\/brand-emblem\\.png" alt="" decoding="async" fetchpriority="low">/,
- 'Fullscreen-only 118KB brand mark is deferred');
-const fullOpen=html.slice(html.indexOf('function openFullscreenImage(){'),html.indexOf('function clearGalleryTransitionClasses(',html.indexOf('function openFullscreenImage(){')));
-assert.match(fullOpen,/brandMark=viewer\\.querySelector\\('\\.sd-fullscreen-brand-mark img\\[data-src\\]'\\)/);
-assert.match(fullOpen,/brandMark\\.src=brandMark\\.dataset\\.src;brandMark\\.removeAttribute\\('data-src'\\)/,
- 'Gallery open must hydrate the original fullscreen brand mark');
