@@ -10,7 +10,7 @@ assert.match(html,/async function consultProduct\(id\)[^\n]*optionText=option\?/
 assert.doesNotMatch(html,/async function consultCart\(\)|id="cartZalo"|\$\('#cartZalo'\)/,'Cart no longer contains the removed Zalo action or handler');
 assert.match(html,/revealObserver\.unobserve\(el\)/,'Reveal observer stops after first show');
 assert.doesNotMatch(html,/el\.classList\.remove\('is-visible'\)/,'Reveal must not hide elements on reverse scroll');
-assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,'Welcome has a shorter delay');
+assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduced\?100:1050\)/,'Welcome keeps its approved ~1s minimum, waiting for first paint on slow phones');
 assert.match(html,/<h2 class="welcome-title">/, 'Welcome is not a competing document H1');
 assert.match(html,/<h1 class="sdh-title" id="sdh-title">/, 'Main Hero remains the primary H1');
 
