@@ -19,7 +19,15 @@ assert.ok(performance.includes('@media(min-width:761px)'));
 assert.ok(performance.includes('@media(max-width:760px)'));
 assert.ok(performance.includes('#welcomeSplash .welcome-texture{filter:none!important;transform:none!important;transition:none!important}'));
 assert.ok(performance.includes('#welcomeSplash .welcome-content>*{animation:none!important;filter:none!important}'));
-assert.ok(html.includes('window.setTimeout(dismiss,reduced?100:1050);'),'Refined Welcome should release about a second after storefront readiness');
+assert.ok(html.includes('},reduced?100:1050);'),'Welcome keeps its original ~1s automatic close deadline');
+assert.ok(html.includes('if(!autoDismissElapsed||!titlePaintedAt||closed)return;'),
+ 'Slow devices must keep Welcome until the title had a paint opportunity');
+assert.ok(html.includes('titlePaintedAt+400-performance.now()'),
+ 'When the font arrives late, allow time for an observable LCP before closing');
+assert.ok(html.includes('window.requestAnimationFrame(function(){'),
+ 'Welcome title paint guard must wait for animation frames');
+assert.match(html,/window\.setTimeout\(function\(\)\{\s*if\(!titlePaintedAt&&!closed\)\{\s*revealWelcomeCopy\(true\)/,
+ 'Hung fonts need a readable fallback instead of blocking Welcome forever');
 assert.match(html, /class="welcome-logo-frame"/, 'Welcome uses a static 3D halo around the brand logo');
 assert.match(performance, /#welcomeSplash \.welcome-logo-frame\{/, 'Welcome material belongs to existing authoritative stylesheet');
 assert.doesNotMatch(html, /A MARK OF DISTINCTION · SINCE YOUR FIRST IMPRESSION/, 'Avoid redundant Welcome copy');
@@ -60,10 +68,10 @@ assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welc
  * but must not wait for the separate Sans font needed by secondary copy. */
 assert.match(performance,/html\.js-enabled\.sd-welcome-serif-ready:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title\{\s*visibility:visible!important;/);
 assert.match(html,/var serifReady=document\.fonts\.load\('400 30px "SD Serif"'/);
-assert.match(html,/if\(valid\)document\.documentElement\.classList\.add\('sd-welcome-serif-ready'\)/);
+assert.match(html,/if\(valid\)\{\s*document\.documentElement\.classList\.add\('sd-welcome-serif-ready'\);\s*noteWelcomeTitlePaint\(\)/);
 assert.match(html,/Promise\.all\(\[serifReady,sansReady\]\)/);
-assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,
- 'Welcome dismissal remains Owner-approved');
+assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduced\?100:1050\)/,
+ 'On fast devices, approved dismissal still starts after 1050ms');
 
 /* LCP regression: font needed by the Welcome heading must outrank the
  * auxiliary body font without swapping away from Owner-approved typography. */
