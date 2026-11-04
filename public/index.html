@@ -3430,6 +3430,23 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   }
   var closed=false;
   var skip=document.getElementById('skipIntro');
+  // Keep the approved ~1s Welcome on fast connections, but do not let a
+  // throttled phone close the intro before its title has actually painted.
+  // Two animation frames follow the font-visible class to allow an LCP candidate.
+  var titlePaintedAt=0,autoDismissElapsed=false;
+  function maybeTimedDismiss(){
+    if(!autoDismissElapsed||!titlePaintedAt||closed)return;
+    window.setTimeout(dismiss,Math.max(0,titlePaintedAt+400-performance.now()));
+  }
+  function noteWelcomeTitlePaint(){
+    window.requestAnimationFrame(function(){
+      window.requestAnimationFrame(function(){
+        if(closed||!s.isConnected)return;
+        titlePaintedAt=performance.now();
+        maybeTimedDismiss();
+      });
+    });
+  }
   // Warm the exact Vietnamese font faces before revealing any welcome copy.
   // Keep the approved intro composition/timing; do not swap text glyphs mid-paint.
   var fontReady=false;
@@ -3437,12 +3454,16 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
     if(fontReady)return;
     fontReady=true;
     document.documentElement.classList.add(fallback?'sd-welcome-font-fallback':'sd-welcome-font-ready');
+    if(fallback)noteWelcomeTitlePaint();
   }
   if(document.fonts&&typeof document.fonts.load==='function'){
     var serifReady=document.fonts.load('400 30px "SD Serif"','Dấu ấn da cá sấu. Tinh tế trong từng chi tiết.')
       .then(function(){
         var valid=document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.');
-        if(valid)document.documentElement.classList.add('sd-welcome-serif-ready');
+        if(valid){
+          document.documentElement.classList.add('sd-welcome-serif-ready');
+          noteWelcomeTitlePaint();
+        }
         return valid;
       },function(){return false});
     var sansReady=document.fonts.load('400 12px "SD Sans"','Chất liệu cao cấp')
@@ -3525,7 +3546,18 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   if(skip)skip.focus({preventScroll:true});
   var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(document.documentElement.classList.contains('sd-catalog-route'))window.setTimeout(dismiss,0);
-  else window.setTimeout(dismiss,reduced?100:1050);
+  else window.setTimeout(function(){
+    autoDismissElapsed=true;
+    maybeTimedDismiss();
+  },reduced?100:1050);
+  // Fail open after prolonged font loading: the visitor still sees readable
+  // text, then gets a paint opportunity before the automatic dismissal.
+  window.setTimeout(function(){
+    if(!titlePaintedAt&&!closed){
+      document.documentElement.classList.add('sd-welcome-font-fallback');
+      noteWelcomeTitlePaint();
+    }
+  },2600);
   fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
     if(!c)return;
     if(c.welcomeEnabled===false)dismiss();
