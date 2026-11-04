@@ -1,0 +1,101 @@
+/* SinDarealest motion parity — preview-only, 2026-11-05.
+   Preserve approved Liquid Glass surfaces, backdrop filters, colours and geometry.
+   Only visibility and composited transforms are changed. */
+:root{--sd-motion-balanced:280ms;--sd-motion-ease:cubic-bezier(.22,.72,.22,1)}
+
+/* The product overlay MUST NOT animate opacity or filter on its parent:
+   a parent opacity animation creates a backdrop root and breaks real glass. */
+#productOverlay{
+  display:flex;
+  visibility:hidden;
+  pointer-events:none;
+  transition:visibility 0s linear var(--sd-motion-balanced);
+}
+#productOverlay.open{
+  visibility:visible;
+  pointer-events:auto;
+  transition:visibility 0s linear 0s;
+}
+#productOverlay>.detail-modal{
+  transform:translate3d(0,12px,0) scale(.986);
+  transition:transform var(--sd-motion-balanced) var(--sd-motion-ease);
+}
+#productOverlay.open>.detail-modal{transform:translate3d(0,0,0) scale(1)}
+
+/* Keep the approved full-screen glass plane and image-swapping animations.
+   Delayed visibility allows a real closing movement without display:none. */
+#sdFullscreenViewer{
+  display:block;
+  visibility:hidden;
+  pointer-events:none;
+  transition:visibility 0s linear var(--sd-motion-balanced);
+}
+#sdFullscreenViewer.open{
+  visibility:visible;
+  pointer-events:auto;
+  transition:visibility 0s linear 0s;
+}
+#sdFullscreenViewer .sd-fullscreen-stage{
+  transform:translate3d(0,10px,0) scale(.990);
+  transition:transform var(--sd-motion-balanced) var(--sd-motion-ease);
+}
+#sdFullscreenViewer.open .sd-fullscreen-stage{transform:translate3d(0,0,0) scale(1)}
+
+/* The mobile menu already slides; make its backdrop EXIT as smoothly as it enters. */
+#mobileNavBackdrop{
+  display:block;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity 240ms ease,visibility 0s linear 240ms;
+}
+#mobileNavBackdrop.open{
+  visibility:visible;
+  pointer-events:auto;
+  transition:opacity 240ms ease,visibility 0s linear 0s;
+}
+
+/* Content changes: animate the entering panel, never the glass-bearing drawer. */
+@keyframes sdMotionPanelIn{
+  from{transform:translate3d(12px,0,0)}
+  to{transform:translate3d(0,0,0)}
+}
+@keyframes sdMotionStepIn{
+  from{transform:translate3d(0,10px,0)}
+  to{transform:translate3d(0,0,0)}
+}
+@keyframes sdMotionPageIn{
+  from{transform:translate3d(0,12px,0)}
+  to{transform:translate3d(0,0,0)}
+}
+#accountDrawer .account-panel-content > :not([hidden]){
+  animation:sdMotionPanelIn var(--sd-motion-balanced) var(--sd-motion-ease);
+}
+#checkoutDrawer.open :is(#sdCheckoutShippingStep,#sdCheckoutPaymentStep):not([hidden]){
+  animation:sdMotionStepIn 260ms var(--sd-motion-ease);
+}
+html.sd-service-route #sdServicePage:not([hidden]),
+html.sd-catalog-route #products{
+  animation:sdMotionPageIn var(--sd-motion-balanced) var(--sd-motion-ease);
+}
+
+/* Editor/tab/login animations apply only to entry. JS handles editor exit. */
+#backdrop .editor-tab-panel:not([hidden]){
+  animation:sdMotionPanelIn 240ms var(--sd-motion-ease);
+}
+#loginView:not(.hidden) .logincard,
+#appView:not(.hidden) > .layout{
+  animation:sdMotionStepIn var(--sd-motion-balanced) var(--sd-motion-ease);
+}
+
+@media(prefers-reduced-motion:reduce){
+  #productOverlay,#productOverlay>.detail-modal,
+  #sdFullscreenViewer,#sdFullscreenViewer .sd-fullscreen-stage,
+  #mobileNavBackdrop{transition:none!important}
+  #accountDrawer .account-panel-content > :not([hidden]),
+  #checkoutDrawer.open :is(#sdCheckoutShippingStep,#sdCheckoutPaymentStep):not([hidden]),
+  html.sd-service-route #sdServicePage:not([hidden]),
+  html.sd-catalog-route #products,
+  #backdrop .editor-tab-panel:not([hidden]),
+  #loginView:not(.hidden) .logincard,
+  #appView:not(.hidden) > .layout{animation:none!important}
+}
