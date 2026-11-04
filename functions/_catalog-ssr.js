@@ -13,7 +13,7 @@ function imageFor(row){
   const image=Array.isArray(items)?items.find(validImage):"";
   return image ? (image.startsWith("/")?image:"/"+image) : "/images/theme-croc-dark.webp";
 }
-function productCards(rows,origin,{eager=false}={}){
+function productCards(rows,origin,{eager=false,deferAll=false}={}){
   return rows.map((p,i)=>{
     const href=canonicalProductPath(p);
     if(!href)return "";
@@ -29,7 +29,7 @@ function productCards(rows,origin,{eager=false}={}){
     // Native loading=lazy still eagerly fetches cards far below the mobile
     // fold. On direct catalog routes defer cards 3-8 through the existing
     // intersection observer, while no-JS visitors keep real image fallbacks.
-    const defer=eager&&i>=2;
+    const defer=deferAll||(eager&&i>=2);
     const img=defer
       ?'<img class="sd-ssr-deferred-img" data-src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async" style="visibility:hidden">'+
        '<noscript><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async"></noscript>'
@@ -78,7 +78,7 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     const hasNext=rawRows.length>8;
     const rows=rawRows.filter(p=>p&&validTitle(p.title)&&canonicalProductPath(p)).slice(0,8);
     if(!rows.length)return html; // Never output invented/stale products if D1 is unavailable.
-    const cards=productCards(rows,origin,{eager:!home});
+    const cards=productCards(rows,origin,{eager:!home,deferAll:home});
     html=html.replace('<div class="catalog-grid" id="catalogGrid"></div>',
       '<div class="catalog-grid" id="catalogGrid">'+cards+'</div>');
     if(home)html=html.replace('<div class="featured-grid" id="featuredGrid"></div>',
@@ -104,7 +104,7 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     // HTML in source and no-JS has real product descriptions; JS replaces cards from /api/products.
     // In no-JavaScript mode the image fallback replaces the hidden
     // placeholder, so the card displays one photo without layout shifts.
-    const noJsFallback=home?"":'<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>\n';
+    const noJsFallback='<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>\n';
     html=html.replace('</head>',noJsFallback+aboveFoldPreloads+
       '<script type="application/ld+json">'+catalogSchema(rows,origin)+'</script>\n</head>');
     return html;
