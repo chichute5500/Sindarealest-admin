@@ -16,7 +16,7 @@ function normalizedError(message) { return new Error(message); }
 
 export function validMediaKey(value) {
   if (typeof value !== "string" || !value || value.length > 768 || /[\\\u0000-\u001f\u007f]/.test(value) ||
-      value.startsWith("/") || value.includes("//") || value.split("/").some(x => x === "." || x === "..")) return false;
+      value.startsWith("/") || value.includes("//") || value.split("/").some(x => !x || x.startsWith("."))) return false;
   return /\.(?:webp|jpg|jpeg|png)$/i.test(value);
 }
 export function validBucket(name) { return name === "IMAGES" || name === "ORIGINALS"; }
