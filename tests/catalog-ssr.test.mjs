@@ -131,3 +131,12 @@ assert.ok(storefront.includes("eager&&idx<2?'high':'low'"),"Hydration keeps firs
 assert.match(storefront,/const dateOrder=timestamp\(b\)\.localeCompare\(timestamp\(a\)\)/);
 assert.match(storefront,/return left<right\?1:left>right\?-1:0;/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");
+
+const featuredFunction=storefront.slice(
+ storefront.indexOf('function featuredProductCard('),
+ storefront.indexOf('function setupMobileBottomNav()')
+);
+assert.ok(featuredFunction.includes('loading="lazy" fetchpriority="low" decoding="async"'),
+ "Offscreen Home featured products must not compete with Welcome/Hero first paint");
+assert.ok(!featuredFunction.includes('loading="eager"'),
+ "No below-fold featured slide should request full R2 photo eagerly");
