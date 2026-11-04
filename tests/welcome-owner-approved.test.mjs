@@ -55,3 +55,12 @@ assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welc
 assert.doesNotMatch(html,/window\.setTimeout\(revealWelcomeCopy,1200\)/);
 assert.match(html,/document\.fonts\.check\('400 30px "SD Serif"'/);
 assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);
+
+/* LCP optimization: the approved Welcome title uses the real Serif font,
+ * but must not wait for the separate Sans font needed by secondary copy. */
+assert.match(performance,/html\.js-enabled\.sd-welcome-serif-ready:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title\{\s*visibility:visible!important;/);
+assert.match(html,/var serifReady=document\.fonts\.load\('400 30px "SD Serif"'/);
+assert.match(html,/if\(valid\)document\.documentElement\.classList\.add\('sd-welcome-serif-ready'\)/);
+assert.match(html,/Promise\.all\(\[serifReady,sansReady\]\)/);
+assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,
+ 'Welcome dismissal remains Owner-approved');
