@@ -1,0 +1,77 @@
+name: Prepare image backup Admin Production readiness flag (guarded)
+on:
+  push:
+    branches:
+      - feat/automatic-r2-image-backup-20261105
+    paths:
+      - '.github/workflows/prepare-image-backup-admin-production.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ensure-flag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_R2_READ_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_READ_API_TOKEN }}
+    steps:
+      - name: Read-only privacy check before configuring Admin
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feat/automatic-r2-image-backup-20261105"
+          test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_R2_READ_API_TOKEN"
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Verify Production bucket identities, D1 and private backup bucket
+        run: node scripts/check-image-backup-cloudflare-readonly.mjs
+      - name: Set only IMAGE_BACKUP_BUCKET_VERIFIED on Pages Production, preserving other bindings and envs
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/sindarealest2"
+          curl --fail --silent --show-error --max-time 25 \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api" > "$RUNNER_TEMP/before.json"
+          jq -e '.success == true and .result.name == "sindarealest2" and .result.production_branch == "main" and
+            .result.deployment_configs.production.r2_buckets.IMAGES.name == "sindarealest-images" and
+            .result.deployment_configs.production.r2_buckets.ORIGINALS.name == "sindarealest-original" and
+            .result.deployment_configs.production.r2_buckets.IMAGE_BACKUPS.name == "sin-images-backup"' "$RUNNER_TEMP/before.json" >/dev/null
+          existing="$(jq -r '.result.deployment_configs.production.env_vars.IMAGE_BACKUP_BUCKET_VERIFIED.value // "UNSET"' "$RUNNER_TEMP/before.json")"
+          if [ "$existing" = "true" ]; then
+            echo "Production backup Admin readiness gate already configured."
+          elif [ "$existing" != "UNSET" ]; then
+            echo "::error::Existing gate value differs; refusing to override.";exit 1
+          else
+            jq -n '{"deployment_configs":{"production":{"env_vars":{"IMAGE_BACKUP_BUCKET_VERIFIED":{"type":"plain_text","value":"true"}}}}}' > "$RUNNER_TEMP/payload.json"
+            curl --fail --silent --show-error --max-time 30 \
+              -X PATCH -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" -H "Content-Type: application/json" \
+              --data-binary "@$RUNNER_TEMP/payload.json" "$api" > "$RUNNER_TEMP/patched.json"
+            jq -e '.success == true' "$RUNNER_TEMP/patched.json" >/dev/null
+            echo "Updated Production backup Admin readiness flag only."
+          fi
+          curl --fail --silent --show-error --max-time 25 \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$api" > "$RUNNER_TEMP/after.json"
+          jq -e '.success == true and
+            .result.deployment_configs.production.env_vars.IMAGE_BACKUP_BUCKET_VERIFIED.type == "plain_text" and
+            .result.deployment_configs.production.env_vars.IMAGE_BACKUP_BUCKET_VERIFIED.value == "true" and
+            .result.deployment_configs.production.r2_buckets.IMAGES.name == "sindarealest-images" and
+            .result.deployment_configs.production.r2_buckets.ORIGINALS.name == "sindarealest-original" and
+            .result.deployment_configs.production.r2_buckets.IMAGE_BACKUPS.name == "sin-images-backup"' "$RUNNER_TEMP/after.json" >/dev/null
+          jq -c -S '(.result.deployment_configs.production.env_vars // {}) |
+            to_entries | map(select(.key != "IMAGE_BACKUP_BUCKET_VERIFIED") | {key,type:.value.type}) | sort_by(.key)' \
+            "$RUNNER_TEMP/before.json" > "$RUNNER_TEMP/keys-before.json"
+          jq -c -S '(.result.deployment_configs.production.env_vars // {}) |
+            to_entries | map(select(.key != "IMAGE_BACKUP_BUCKET_VERIFIED") | {key,type:.value.type}) | sort_by(.key)' \
+            "$RUNNER_TEMP/after.json" > "$RUNNER_TEMP/keys-after.json"
+          cmp -s "$RUNNER_TEMP/keys-before.json" "$RUNNER_TEMP/keys-after.json" || {
+            echo "::error::Other env names/types changed unexpectedly. Stop all production deployments.";exit 1
+          }
+          echo "PASS: verified Cloudflare Pages Production readiness flag and preserved existing R2/other env bindings."
+          echo "Production Pages code and image objects were not modified by this workflow." >> "$GITHUB_STEP_SUMMARY"
