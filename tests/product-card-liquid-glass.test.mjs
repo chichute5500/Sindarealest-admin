@@ -123,9 +123,9 @@ assert.ok(html.includes('id="sd-reference-parity-2026-10-21"'),
 
 assert.ok(html.includes('.brand-symbol,\nhtml.dark .brand-symbol{\n  filter:drop-shadow(0 1px 3px rgba(74,111,139,.16))!important;'),
   "The official brand emblem must retain its source appearance instead of being forced to grayscale or recolored.");
-assert.ok(html.includes('<span class="sd-fullscreen-brand-mark"><img src="images/brand-emblem.png" alt=""></span>'),
+assert.ok(html.includes('<span class="sd-fullscreen-brand-mark"><img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low"></span>'),
   "The fullscreen gallery must use the official brand emblem asset, not a text monogram pretending to be the logo.");
-assert.ok(html.includes('sd-fullscreen-brand-footer') && html.includes('<img src="images/brand-emblem.png" alt=""><span class="sd-fullscreen-brand-copy">'),
+assert.ok(html.includes('sd-fullscreen-brand-footer') && html.includes('<img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low"><span class="sd-fullscreen-brand-copy">'),
   "The fullscreen gallery footer must display the actual emblem asset.");
 assert.ok(html.includes('.sd-fullscreen-viewer{\n  color:var(--ink);\n  background:rgba(231,244,253,.76);'),
   "The light fullscreen viewer must use the reference's bright frosted-glass treatment.");
