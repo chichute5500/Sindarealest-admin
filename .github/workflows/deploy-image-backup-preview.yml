@@ -6,6 +6,9 @@ on:
     paths:
       - 'public/admin/index.html'
       - 'functions/api/admin/image-backup.js'
+      - 'functions/api/admin/image-archive.js'
+      - 'functions/_lib/image-archive.js'
+      - 'tests/image-archive.test.mjs'
       - 'functions/_lib/image-backup.js'
       - 'tests/image-backup.test.mjs'
       - 'tests/admin-route-auth-surface.test.mjs'
