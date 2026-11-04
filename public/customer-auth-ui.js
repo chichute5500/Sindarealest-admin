@@ -105,5 +105,20 @@ if(root){
    await refresh();notify("Đã đăng xuất.","success");
   }catch{notify("Không thể đăng xuất. Vui lòng thử lại.");}
  });
- refresh();
+ // Google session reconciliation remains automatic, but it should not
+ // compete with the first visible Hero/CSS and product data request.
+ // An early Account tap or OAuth return bypasses the idle delay.
+ let initialSessionStarted=false;
+ const ensureInitialSession=()=>{
+  if(initialSessionStarted)return;
+  initialSessionStarted=true;
+  void refresh();
+ };
+ for(const id of ["accountOpen","mobileAccountNav"]){
+  document.getElementById(id)?.addEventListener("click",ensureInitialSession,{once:true});
+ }
+ if(authReturn)ensureInitialSession();
+ else if(typeof window.requestIdleCallback==="function")
+  window.requestIdleCallback(ensureInitialSession,{timeout:2000});
+ else window.setTimeout(ensureInitialSession,1200);
 }
