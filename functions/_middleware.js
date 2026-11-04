@@ -251,6 +251,15 @@ export async function onRequest(context) {
     if (!html.includes('"@type":"Organization"')) {
       html = html.replace("</head>", `  <script type="application/ld+json">${organizationSchema}</script>\n</head>`);
     }
+    // Google Search site-name identity: this is a WebSite, not a Product.
+    // Keep a single stable brand name at the canonical home root.
+    const siteNameSchema = JSON.stringify({
+      "@context": "https://schema.org", "@type": "WebSite",
+      name: "SinDarealest", url: `${url.origin}/`
+    });
+    if (!html.includes('"@type":"WebSite"')) {
+      html = html.replace("</head>", `  <script type="application/ld+json">${siteNameSchema}</script>\n</head>`);
+    }
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
     html = await renderPublicCatalog(html,context.env,url.origin,{home:true});

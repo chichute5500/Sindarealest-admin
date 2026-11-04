@@ -32,6 +32,14 @@ const doc='<html><head><title>Home</title><meta property="og:image" content="/og
 const context=(path,row)=>({request:new Request(site+path),env:{DB:{prepare(){return {bind(){return {first:async()=>row}}}}}},next:async()=>new Response(doc,{headers:{"Content-Type":"text/html"}})});
 const home=await (await middleware(context("/",null))).text();
 assert.ok(home.includes('property="og:image" content="'+site+'/og-sindarealest-crisp-20261028.jpg"'));
+// Google site-name must be supplied by WebSite structured data on the root.
+const schemas = [...home.matchAll(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/g)]
+  .map((match) => JSON.parse(match[1]));
+const webSites = schemas.filter((schema) => schema["@type"] === "WebSite");
+assert.equal(webSites.length, 1, "Homepage must have one WebSite schema, not duplicate site names");
+assert.equal(webSites[0].name, "SinDarealest");
+assert.equal(webSites[0].url, site + "/");
+assert.ok(schemas.some((schema) => schema["@type"] === "Organization"), "Existing Organization schema stays");
 const category=await (await middleware(context("/sanpham/sneaker",null))).text();
 assert.ok(category.includes('property="og:image" content="'+site+'/og-sindarealest-crisp-20261028.jpg"'));
 assert.ok(category.includes('name="twitter:image" content="'+site+'/og-sindarealest-crisp-20261028.jpg"'));
