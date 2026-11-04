@@ -167,10 +167,11 @@ export async function runImageBackup(env, { force = false } = {}) {
       return { skipped: "not-due", ...config };
     }
     if (state.phase === "idle") {
+      const priorCompletedAt = state.lastCompletedAt;
       Object.assign(state, fallbackState(), {
         phase: "IMAGES",
         startedAt: new Date(now).toISOString(),
-        lastCompletedAt: config.state.lastCompletedAt,
+        lastCompletedAt: priorCompletedAt,
       });
     }
     state.lastRunAt = new Date(now).toISOString();
