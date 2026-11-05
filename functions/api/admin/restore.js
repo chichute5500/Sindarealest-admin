@@ -137,8 +137,8 @@ function validateOperations(operations) {
         !str(w.customer_name,120,true) || !str(w.customer_phone,32,true) ||
         !str(w.customer_address,500,true) || !str(w.product_name,180,true) ||
         !integer(w.price,0,2_000_000_000) || !str(w.policy_name,160,true) ||
-        !integer(w.duration_months,1,120) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(w.starts_at||"")) ||
-        !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(w.ends_at||"")) ||
+        !integer(w.duration_months,1,120) || !/^\d{4}-\d{2}-\d{2}$/.test(String(w.starts_at||"")) ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(String(w.ends_at||"")) ||
         !["active","expired","void"].includes(w.status) || !timestamp(w.created_at)) {
       return { error: "Bản sao lưu có phiếu bảo hành trực tiếp không hợp lệ." };
     }
