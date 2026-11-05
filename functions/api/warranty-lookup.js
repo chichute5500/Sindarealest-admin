@@ -43,7 +43,6 @@ function shapeWarranty(row, today, claimToken) {
     startsAt: row.starts_at,
     endsAt: row.ends_at,
     durationMonths: row.duration_months,
-    price: row.price === null || row.price === undefined ? null : Number(row.price),
     status,
     eligible,
     remainingDays,
