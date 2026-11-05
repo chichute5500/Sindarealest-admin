@@ -8,7 +8,7 @@ const session=await createSession(SECRET);
 const id="123e4567-e89b-12d3-a456-426614174000";
 const makeRow=()=>({
  id,warranty_code:"SDW-K7M2",customer_name:"Khách thử",
- customer_phone:"0901234567",customer_address:"Địa chỉ thử 123",
+ customer_phone:"0901234567",customer_address:"Địa chỉ thử 123",customer_contact_reference:"",
  product_name:"Ví da cá sấu",price:1600000,policy_name:"Bảo hành trực tiếp",
  duration_months:6,starts_at:"2026-11-05",ends_at:"2027-05-05",status:"active"
 });
@@ -37,8 +37,8 @@ function makeDB(){
      }else{
        assert.match(sql,/AND status!='void'/);
        [db.row.customer_name,db.row.customer_phone,db.row.customer_address,
-        db.row.product_name,db.row.price,db.row.duration_months,
-        db.row.starts_at,db.row.ends_at]=v.slice(0,8);
+        db.row.customer_contact_reference,db.row.product_name,db.row.price,
+        db.row.duration_months,db.row.starts_at,db.row.ends_at]=v.slice(0,9);
      }
      db.audits.push({sql:statements[1].sql,values:statements[1].values});
      return [{success:true,meta:{changes:1}},{success:true,meta:{changes:2}}];
