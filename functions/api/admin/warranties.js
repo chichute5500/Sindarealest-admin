@@ -100,19 +100,19 @@ async function issueManualWarranty(context, body) {
   const clean = (value, max) => String(value ?? "").trim().slice(0, max);
   const customerName = clean(body.customerName, 120);
   const customerPhone = clean(body.customerPhone, 32);
-  const phoneDigits = customerPhone.replace(/\\D/g, "");
+  const phoneDigits = customerPhone.replace(/\D/g, "");
   const customerAddress = clean(body.customerAddress, 500);
   const productName = clean(body.productName, 180);
   const rawPrice = body.price;
-  const price = (typeof rawPrice === "number" || (typeof rawPrice === "string" && /^\\d+$/.test(rawPrice)))
+  const price = (typeof rawPrice === "number" || (typeof rawPrice === "string" && /^\d+$/.test(rawPrice)))
     ? Number(rawPrice) : NaN;
   const rawMonths = body.durationMonths;
-  const months = (typeof rawMonths === "number" || (typeof rawMonths === "string" && /^\\d+$/.test(rawMonths)))
+  const months = (typeof rawMonths === "number" || (typeof rawMonths === "string" && /^\d+$/.test(rawMonths)))
     ? Number(rawMonths) : NaN;
   const startsAt = clean(body.startsAt, 10);
-  if (customerName.length < 2 || !/^[+0-9().\\s/-]+$/.test(customerPhone) || !/^\\d{9,12}$/.test(phoneDigits) ||
+  if (customerName.length < 2 || !/^[+0-9().\s/-]+$/.test(customerPhone) || !/^\d{9,12}$/.test(phoneDigits) ||
       customerAddress.length < 5 || productName.length < 2 || !Number.isSafeInteger(price) || price < 0 || price > 2_000_000_000 ||
-      !Number.isInteger(months) || months < 1 || months > 120 || !/^\\d{4}-\\d{2}-\\d{2}$/.test(startsAt)) {
+      !Number.isInteger(months) || months < 1 || months > 120 || !/^\d{4}-\d{2}-\d{2}$/.test(startsAt)) {
     return fail("Cần nhập đầy đủ tên, số điện thoại, địa chỉ, sản phẩm, giá, thời hạn 1–120 tháng và ngày bắt đầu hợp lệ.");
   }
   const startDate = new Date(startsAt + "T00:00:00.000Z");
