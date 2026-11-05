@@ -106,6 +106,10 @@ function imageMorph(key,reverse,duration){
      document.querySelector('#sdFullscreenImage'));
  if(!(sourceImage instanceof HTMLImageElement)||!(targetImage instanceof HTMLImageElement))return null;
  if(!sourceImage.isConnected||!targetImage.isConnected)return null;
+ // A clone of an undecoded or failed source paints as an empty tile while
+ // the real destination is hidden. Prefer the glass aperture alone until the
+ // product image is actually decoded, never reveal a blank double-layer.
+ if(!sourceImage.complete||sourceImage.naturalWidth===0)return null;
  const from=rectOf(sourceImage),to=rectOf(targetImage);
  if(!from||!to)return null;
  const asset=(reverse?targetImage:sourceImage).currentSrc||
