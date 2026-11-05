@@ -5312,6 +5312,7 @@ async function sdCheckoutLoadPaymentInstructions(){
  sdCheckoutQuote=data;sdCheckoutChoice=selected.value;return data;
 }
 function sdCheckoutSetStep(step){
+ const sdOldStep=sdCheckoutStep,sdStepTrigger=window.SDSharedMotion?.sourceFromLast();
  sdCheckoutClearChoicePrompt();
  sdCheckoutStep=Math.max(1,Math.min(2,Number(step)||1));
  $('#sdCheckoutStepper').hidden=false;
@@ -5320,6 +5321,10 @@ function sdCheckoutSetStep(step){
  $('#sdCheckoutStepTitle').textContent=captions[sdCheckoutStep-1][0];$('#sdCheckoutStepSubtitle').textContent=captions[sdCheckoutStep-1][1];
  $('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();
  [[1,'#sdCheckoutShippingStep'],[2,'#sdCheckoutPaymentStep']].forEach(([n,id])=>$(id).hidden=n!==sdCheckoutStep);
+ const sdStepPane=sdCheckoutStep===1?$('#sdCheckoutShippingStep'):$('#sdCheckoutPaymentStep');
+ if(sdOldStep!==sdCheckoutStep&&sdStepTrigger&&!$('#checkoutDrawer').dataset.sdCheckoutOpening&&
+    $('#checkoutDrawer').classList.contains('open')&&document.activeElement?.closest('#checkoutDrawer'))
+  window.SDSharedMotion?.open('checkout-step',sdStepPane,sdStepTrigger,460);
  $('#sdCheckoutReviewAddressRow').hidden=sdCheckoutStep!==2;
  document.querySelectorAll('#sdCheckoutStepper [data-sd-step]').forEach(el=>{const n=Number(el.dataset.sdStep);el.classList.toggle('active',n===sdCheckoutStep);el.classList.toggle('past',n<sdCheckoutStep);el.querySelector('b').textContent=n<sdCheckoutStep?'✓':String(n)});
  $('#sdCheckoutPrev').textContent=sdCheckoutStep===1?'Giỏ hàng':'Quay lại';$('#checkoutMessage').textContent='';$('#checkoutForm').scrollTop=0;$('#checkoutDrawer').scrollTop=0;
@@ -5396,14 +5401,14 @@ function openCheckout(options={}){
  // QR-title position must never fall back to 0px for its first paint.
  panel.style.setProperty('--sd-native-glass-pad-left',getComputedStyle(panel).paddingLeft);
  panel.classList.toggle('sd-checkout-from-cart',checkoutFromCart);
- panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
+ panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.dataset.sdCheckoutOpening='1';panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
  sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--sd-confirm-fill','0px');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
  // Do not show a blank Payment address card before asynchronous saved-address hydration.
  // Keep the original address, quote, selection and order logic unchanged.
- $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutRenderQuote();sdCheckoutSetStep(1);window.SDSharedMotion?.open('checkout',panel,sdCheckoutAnchor||$('#cartCheckout'),500);
+ $('#checkoutSubmit').disabled=maySkipAddress;sdCheckoutRenderQuote();sdCheckoutSetStep(1);window.SDSharedMotion?.open('checkout',panel,sdCheckoutAnchor||$('#cartCheckout'),500);delete panel.dataset.sdCheckoutOpening;
  if(!checkoutProvinceLoadStarted){
   checkoutProvinceLoadStarted=true;
   void loadCheckoutProvinces();
