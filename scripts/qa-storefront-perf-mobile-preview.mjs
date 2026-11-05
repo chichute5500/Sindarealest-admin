@@ -271,6 +271,72 @@ try{
   assert.deepEqual(errors,[],"Mobile scroll hydration must not throw");
   await ctx.close();
  }
+ // Confirm the mobile optimization also behaves at the Owner's narrow and
+ // wide phone acceptance widths, not only the default 390px screenshot.
+ for(const [width,scheme] of [[360,"light"],[430,"dark"]]){
+  const ctx=await browser.newContext({viewport:{width,height:844},
+   colorScheme:scheme,deviceScaleFactor:1,serviceWorkers:"block"});
+  await ctx.addInitScript(()=>sessionStorage.setItem("sd-welcome-seen-in-tab","1"));
+  const page=await ctx.newPage(),errors=[];
+  page.on("pageerror",e=>errors.push(String(e.message||e)));
+  const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
+  assert.equal(response?.status(),200,width+"px entry failed");
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:35000});
+  for(const id of ["featured","collections","products"]){
+   const section=page.locator("#"+id);
+   await section.scrollIntoViewIfNeeded({timeout:20000});
+   await page.waitForTimeout(300);
+   const geometry=()=>section.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    return {height:r.height,top:r.top,bottom:r.bottom,viewport:innerHeight,
+     overflow:document.documentElement.scrollWidth-innerWidth,
+     links:el.querySelectorAll("a,button,article").length,
+     visibility:getComputedStyle(el).contentVisibility};
+   });
+   const before=await geometry();
+   await page.waitForTimeout(250);
+   const after=await geometry();
+   assert.equal(after.visibility,"auto",width+"px "+id+" must retain mobile layout isolation");
+   assert.ok(after.height>160&&after.links>0,width+"px "+id+" must render content");
+   assert.ok(after.top<after.viewport&&after.bottom>0,width+"px "+id+" must stay onscreen");
+   assert.ok(after.overflow<=2,width+"px "+id+" introduced horizontal overflow");
+   assert.ok(Math.abs(after.height-before.height)<120,
+    width+"px "+id+" changed section height after scroll (possible jump)");
+   results.scenarios.push({name:"mobile-layout-"+width+"-"+id,metrics:{before,after}});
+  }
+  assert.deepEqual(errors,[],width+"px mobile responsive scroll errors");
+  await page.screenshot({path:"artifacts/perf-mobile-20261104/mobile-layout-"+width+".png",animations:"disabled"});
+  await ctx.close();
+ }
+ // No-JS SSR exists specifically for usable, crawlable product links. Without
+ // script execution there is no Welcome timer, so the splash must never trap
+ // scrolling or cover the real catalog. Verify actual browser CSS behavior.
+ for(const path of ["/","/sanpham"]){
+  const ctx=await browser.newContext({viewport:{width:390,height:844},
+   javaScriptEnabled:false,colorScheme:"light"});
+  const page=await ctx.newPage();
+  const response=await page.goto(base+path,{waitUntil:"domcontentloaded",timeout:45000});
+  assert.equal(response?.status(),200,"No-JS "+path+" route must load");
+  const state=await page.evaluate(()=>{
+   const splash=document.querySelector("#welcomeSplash");
+   const items=[...document.querySelectorAll("#catalogGrid article")];
+   const fallback=items.flatMap(el=>[...el.querySelectorAll("img[src]:not([data-src])")]);
+   return {splashDisplay:splash?getComputedStyle(splash).display:"none",
+    scrollOverflow:getComputedStyle(document.documentElement).overflowY,
+    bodyOverflow:getComputedStyle(document.body).overflowY,
+    height:document.documentElement.scrollHeight,viewport:innerHeight,
+    items:items.length,images:fallback.length,
+    hrefs:items.filter(el=>el.querySelector("a[href^='/sanpham/']")).length};
+  });
+  assert.equal(state.splashDisplay,"none","No-JS Welcome must not cover SSR "+path);
+  assert.notEqual(state.bodyOverflow,"hidden","No-JS body must scroll");
+  assert.notEqual(state.scrollOverflow,"hidden","No-JS HTML must scroll");
+  assert.ok(state.height>state.viewport+200,"No-JS catalog must extend below viewport");
+  assert.ok(state.items>0&&state.images>0&&state.hrefs>0,
+   "No-JS public SSR catalog must keep real linked products and fallback images");
+  results.scenarios.push({name:"no-js-ssr-"+(path==="/"?"home":"catalog"),metrics:state});
+  await ctx.close();
+ }
  const requestContext=await browser.newContext();
  const page=await requestContext.newPage();
  for(const path of ["/sanpham","/tra-cuu-don-hang","/bao-hanh"]){
