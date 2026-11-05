@@ -106,7 +106,7 @@ async function issueManualWarranty(context, body) {
     ? Number(rawMonths) : NaN;
   const startsAt = clean(body.startsAt, 10);
   if (customerName.length < 2 || !/^[+0-9().\\s/-]+$/.test(customerPhone) || !/^\\d{9,12}$/.test(phoneDigits) ||
-      customerAddress.length < 5 || productName.length < 2 || !Number.isSafeInteger(price) || price < 0 ||
+      customerAddress.length < 5 || productName.length < 2 || !Number.isSafeInteger(price) || price < 0 || price > 2_000_000_000 ||
       !Number.isInteger(months) || months < 1 || months > 120 || !/^\\d{4}-\\d{2}-\\d{2}$/.test(startsAt)) {
     return fail("Cần nhập đầy đủ tên, số điện thoại, địa chỉ, sản phẩm, giá, thời hạn 1–120 tháng và ngày bắt đầu hợp lệ.");
   }
