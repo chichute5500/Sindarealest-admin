@@ -49,9 +49,22 @@ function reduced(){
 function resolvedOrigin(candidate){
  return rectOf(candidate)||freshSource();
 }
-function currentRect(src){
+function currentRect(src,preferSnapshot=false){
  if(!src)return null;
- return rectOf(src.element)||rectOf(src);
+ // The captured rectangle is authoritative when OPENING. The trigger can
+ // disappear as soon as the previous drawer is dismissed (Cart -> Checkout).
+ const saved=rectOf(src);
+ if(preferSnapshot&&saved)return saved;
+ const node=src.element;
+ if(node instanceof Element&&node.isConnected){
+  const live=rectOf(node);
+  if(live&&getComputedStyle(node).visibility!=='hidden'&&
+     live.left<innerWidth&&live.top<innerHeight&&
+     live.left+live.width>0&&live.top+live.height>0)return live;
+ }
+ // When the old card scrolled away or is behind a hidden drawer, retract
+ // to the actual tap position instead of chasing its offscreen new geometry.
+ return saved;
 }
 function getSurface(surface){
  return typeof surface==='string'?document.querySelector(surface):surface;
@@ -121,7 +134,7 @@ function open(key,surface,source,ms=DURATION){
  const target=rectOf(el);
  el.style.transition=previousTransition;el.style.transform=previousTransform;
  const actual=origins.get(key);
- return animateBetween(key,el,currentRect(actual)||actual,target,false,null,ms);
+ return animateBetween(key,el,currentRect(actual,true)||actual,target,false,null,ms);
 }
 function close(key,surface,done,source,ms=DURATION){
  const el=getSurface(surface);
