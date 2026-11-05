@@ -105,7 +105,9 @@ assert.ok((await response.text()).includes('id="catalogGrid"><article'),'Middlew
 // authority for LCP/CLS; these tests lock the source-level regression.
 const storefront=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
 assert.match(storefront,/const initialCatalogListing=catalogCategoryFromLocation\(\)!==null;/);
-assert.match(storefront,/if\(!initialCatalogListing\)\{renderFeatured\(\);renderFilters\(\);renderCatalog\(\)\}/);
+assert.match(storefront,/if\(!initialCatalogListing\)\{[\s\S]*?renderFeatured\(\);\s*await yieldPaint\(\);\s*renderFilters\(\);\s*await yieldPaint\(\);\s*renderCatalog\(\);[\s\S]*?\}/,
+  'Home hydrates featured, filters, and catalog in sequence, without a single long task');
+assert.match(storefront,/const initialCatalogListing=catalogCategoryFromLocation\(\)!==null;/);
 assert.match(storefront,/const ssrCards=grid\.querySelectorAll\('article\[data-ssr-product\]'\)/);
 assert.match(storefront,/grid\.replaceChildren\(template\.content\)/);
 assert.match(storefront,/if\(!active&&products\.length&&featured&&!featured\.querySelector\('\[data-featured-card\]'\)\)renderFeatured\(\)/);
