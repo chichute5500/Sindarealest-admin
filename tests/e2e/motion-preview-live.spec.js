@@ -5,7 +5,17 @@ if(!preview)throw new Error('SD_MOTION_PREVIEW_URL is required');
 
 test('actual Preview: product image moves from card without squashing and glass stays native',async({page},testInfo)=>{
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
- await page.goto(preview,{waitUntil:'domcontentloaded',timeout:35000});
+ const response=await page.goto(preview,{waitUntil:'domcontentloaded',timeout:35000});
+ const status=response?.status();
+ const canonical=page.url();
+ const title=await page.title();
+ const markup=await page.content();
+ if(!(await page.locator('#productOverlay').count())){
+  throw new Error('Preview did not serve SinDarealest storefront: '+JSON.stringify({
+   status,url:canonical,title,body:(await page.locator('body').innerText().catch(()=>'' )).slice(0,1400),
+   html:markup.slice(0,2200),contentType:response?.headers()['content-type']
+  }));
+ }
  const welcome=page.locator('#welcomeSplash');
  if(await welcome.count()){
   await page.locator('#skipIntro').click({timeout:15000});
