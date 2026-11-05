@@ -139,5 +139,6 @@ function close(key,surface,done,source,ms=DURATION){
 function popOrigin(key){origins.delete(key)}
 function hasOrigin(key){return origins.has(key)}
 function sourceFromLast(){return freshSource()}
+document.documentElement.classList.add('sd-shared-motion');
 window.SDSharedMotion={open,close,cancel,popOrigin,hasOrigin,sourceFromLast,rectOf,easing:EASE,duration:DURATION};
 })();
