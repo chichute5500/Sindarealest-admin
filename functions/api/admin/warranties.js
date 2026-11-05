@@ -4,12 +4,15 @@ export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   try {
     const result = await context.env.DB.prepare(`SELECT wc.id,wc.order_id AS orderId,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone,wc.warranty_code AS warrantyCode,wc.message,wc.status,wc.admin_note AS adminNote,wc.created_at AS createdAt,a.image_key AS imageKey FROM warranty_claims wc JOIN orders o ON o.id=wc.order_id JOIN customers c ON c.id=wc.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=wc.order_id LEFT JOIN warranty_claim_attachments a ON a.claim_id=wc.id ORDER BY wc.created_at DESC LIMIT 1000`).all();
-    const issued = await context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,w.status AS status,o.order_number AS orderNumber,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id ORDER BY w.created_at DESC LIMIT 1000`).all();
+    const [issued, manualIssued] = await Promise.all([
+      context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,w.status AS status,o.order_number AS orderNumber,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone,'' AS address,NULL AS price,'order' AS source FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id ORDER BY w.created_at DESC LIMIT 1000`).all(),
+      context.env.DB.prepare(`SELECT id,warranty_code AS warrantyCode,policy_name AS policyName,duration_months AS durationMonths,starts_at AS startsAt,ends_at AS endsAt,status,'Mua trực tiếp' AS orderNumber,'' AS sku,0 AS skuVerified,product_name AS title,customer_name AS fullName,customer_phone AS phone,customer_address AS address,price,'manual' AS source FROM manual_warranties ORDER BY created_at DESC LIMIT 1000`).all(),
+    ]);
     const today = getCurrentDateInVietnam();
-    const warranties = (issued.results || []).map((warranty) => ({
+    const warranties = [...(issued.results || []), ...(manualIssued.results || [])].map((warranty) => ({
       ...warranty,
       status: warrantyStatusOnDate(warranty.status, warranty.startsAt, warranty.endsAt, today),
-    }));
+    })).sort((a,b)=>String(b.startsAt).localeCompare(String(a.startsAt)));
     return json({ claims: result.results || [], warranties });
   } catch { return fail("Không đọc được dữ liệu bảo hành. Hãy kiểm tra các migration 0003, 0005 và 0007.", 503); }
 }
@@ -41,6 +44,7 @@ export async function onRequestPost(context) {
   if (parsedBody.error === "too_large") return fail("Thông tin cấp bảo hành vượt giới hạn kích thước.", 413);
   if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Thông tin cấp bảo hành không hợp lệ.");
   const body = parsedBody.value;
+  if (body?.source === "manual") return issueManualWarranty(context, body);
   const orderNumber = String(body?.orderNumber || "").trim().toUpperCase();
   const sku = String(body?.sku || "").trim().toUpperCase();
   const policyName = String(body?.policyName || "").trim().slice(0,160);
@@ -84,4 +88,62 @@ export async function onRequestPost(context) {
       }
     }
   } catch { return fail("Không thể phát hành bảo hành. Hãy kiểm tra migration 0003 và dữ liệu đơn hàng.",503); }
+}
+
+
+async function issueManualWarranty(context, body) {
+  const clean = (value, max) => String(value ?? "").trim().slice(0, max);
+  const customerName = clean(body.customerName, 120);
+  const customerPhone = clean(body.customerPhone, 32);
+  const phoneDigits = customerPhone.replace(/\\D/g, "");
+  const customerAddress = clean(body.customerAddress, 500);
+  const productName = clean(body.productName, 180);
+  const rawPrice = body.price;
+  const price = (typeof rawPrice === "number" || (typeof rawPrice === "string" && /^\\d+$/.test(rawPrice)))
+    ? Number(rawPrice) : NaN;
+  const rawMonths = body.durationMonths;
+  const months = (typeof rawMonths === "number" || (typeof rawMonths === "string" && /^\\d+$/.test(rawMonths)))
+    ? Number(rawMonths) : NaN;
+  const startsAt = clean(body.startsAt, 10);
+  if (customerName.length < 2 || !/^[+0-9().\\s/-]+$/.test(customerPhone) || !/^\\d{9,12}$/.test(phoneDigits) ||
+      customerAddress.length < 5 || productName.length < 2 || !Number.isSafeInteger(price) || price < 0 ||
+      !Number.isInteger(months) || months < 1 || months > 120 || !/^\\d{4}-\\d{2}-\\d{2}$/.test(startsAt)) {
+    return fail("Cần nhập đầy đủ tên, số điện thoại, địa chỉ, sản phẩm, giá, thời hạn 1–120 tháng và ngày bắt đầu hợp lệ.");
+  }
+  const startDate = new Date(startsAt + "T00:00:00.000Z");
+  if (Number.isNaN(startDate.getTime()) || startDate.toISOString().slice(0,10) !== startsAt) return fail("Ngày bắt đầu bảo hành không hợp lệ.");
+  const endDate = new Date(startDate);
+  const day = endDate.getUTCDate();
+  endDate.setUTCDate(1);
+  endDate.setUTCMonth(endDate.getUTCMonth() + months);
+  const lastDay = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 0)).getUTCDate();
+  endDate.setUTCDate(Math.min(day, lastDay));
+  const endsAt = endDate.toISOString().slice(0,10);
+  try {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const id = crypto.randomUUID();
+      const warrantyCode = generateShortWarrantyCode();
+      try {
+        const issued = await context.env.DB.batch([
+          context.env.DB.prepare(
+            "INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status) " +
+            "SELECT ?,?,?,?,?,?,?,'Bảo hành trực tiếp',?,?,?,'active' " +
+            "WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE upper(warranty_code)=?) " +
+            "AND NOT EXISTS (SELECT 1 FROM manual_warranties WHERE upper(warranty_code)=?)"
+          ).bind(id,warrantyCode,customerName,customerPhone,customerAddress,productName,price,months,startsAt,endsAt,warrantyCode,warrantyCode),
+          context.env.DB.prepare(
+            "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+            "SELECT ?, 'admin', 'manual_warranty_issued', 'manual_warranty', ?, ? " +
+            "WHERE EXISTS (SELECT 1 FROM manual_warranties WHERE id=?)"
+          ).bind(crypto.randomUUID(),id,JSON.stringify({customerName,customerPhone,customerAddress,productName,price,months,startsAt,endsAt,warrantyCode}),id),
+        ]);
+        if (!issued[0]?.meta?.changes) return fail("Không thể cấp mã bảo hành trùng. Vui lòng thử lại.",409);
+        return json({ok:true,warrantyCode,message:"Đã tạo phiếu bảo hành độc lập."},201);
+      } catch (error) {
+        if (!isWarrantyCodeCollisionError(error) || attempt === 7) throw error;
+      }
+    }
+  } catch {
+    return fail("Không thể tạo phiếu bảo hành độc lập. Hãy xác nhận migration 0019 đã được áp dụng.",503);
+  }
 }
