@@ -13,7 +13,7 @@ function product() {
     published: true, images: [], description: "", sortOrder: 1,
   };
 }
-function makeDB({ failBatch = false, manualWarrantyExists = false } = {}) {
+function makeDB({ failBatch = false, manualWarrantyExists = false, snapshotWarrantyExists=false } = {}) {
   let batchCalls = 0;
   let statements = [];
   return {
@@ -24,6 +24,8 @@ function makeDB({ failBatch = false, manualWarrantyExists = false } = {}) {
         async first() {
           if (sql === "SELECT id FROM manual_warranties LIMIT 1")
             return manualWarrantyExists ? {id:"test-existing-manual-warranty"} : null;
+          if(sql.includes("FROM warranties WHERE policy_snapshot_json IS NOT NULL UNION ALL"))
+            return snapshotWarrantyExists?{id:"snapshot-existing"}:null;
           throw Error("Unexpected preflight query in restore mock");
         }
       };
@@ -140,6 +142,10 @@ for (const missingOrWrong of ["", "wrong-password"]) {
     "older V2 must be blocked rather than silently erase existing standalone warranties");
   assert.equal(populatedDB.batchCalls, 0,
     "unsafe legacy V2 import must not issue a destructive batch");
+  const snapshotDb=makeDB({snapshotWarrantyExists:true});
+  const deniedSnapshot=await restoreBackup({request:request(legacyV2),env:{...env,DB:snapshotDb}});
+  assert.equal(deniedSnapshot.status,409,"older v2 must never erase an issued policy snapshot");
+  assert.equal(snapshotDb.batchCalls,0);
 }
 
 {

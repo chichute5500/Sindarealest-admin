@@ -120,6 +120,7 @@ export async function onRequestGet(context) {
     });
     const payload = {
       format: "sindarealest-backup-v2",
+      warrantyPolicySnapshotSchema:1,
       createdAt: new Date().toISOString(),
       settings: {
         showPrices: showPrices === "1",

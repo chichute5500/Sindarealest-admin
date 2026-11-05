@@ -1,4 +1,5 @@
 import { normalizeManualWarrantyContact } from "../../_warranty-contact.js";
+import { readWarrantyPolicySnapshot } from "../../_warranty-policy.js";
 import { constantTimeTextEqual, fail, getSetting, json, productInsertStatement, readJsonBodyLimited, requireAdmin, validateProduct } from "../../_lib.js";
 import { validateWatermarkSettingUpdates } from "../../_lib/watermark-settings.js";
 
@@ -131,6 +132,12 @@ function validateOperations(operations) {
   for (const w of warranties) {
     if (!str(w.id,100,true) || !orderIds.has(w.order_id) || !itemIds.has(w.order_item_id) || itemById.get(w.order_item_id)?.order_id !== w.order_id || !str(w.warranty_code,100,true) || !str(w.policy_name,160,true) || !integer(w.duration_months,1,120) || !str(w.starts_at,10,true) || !str(w.ends_at,10,true) || !["active","expired","void"].includes(w.status) || !timestamp(w.created_at)) return { error: "Bản sao lưu có bản ghi bảo hành không hợp lệ hoặc dòng sản phẩm không thuộc đúng đơn hàng." };
     if (warrantyIds.has(w.id) || warrantyCodes.has(w.warranty_code)) return { error: "Bản sao lưu có ID hoặc mã bảo hành trùng." };
+    if(w.policy_snapshot_json!==undefined&&w.policy_snapshot_json!==null){
+      const policy=readWarrantyPolicySnapshot(w.policy_snapshot_json);
+      if(!policy||policy.durationMonths!==w.duration_months||policy.startsAt!==w.starts_at||
+         policy.endsAt!==w.ends_at||policy.policyName!==w.policy_name)
+        return {error:"Bản sao lưu có chính sách bảo hành theo đơn không khớp dữ liệu phiếu."};
+    }
     warrantyIds.add(w.id); warrantyCodes.add(w.warranty_code);
   }
   for (const w of manualWarranties) {
@@ -145,6 +152,13 @@ function validateOperations(operations) {
     }
     if (manualWarrantyIds.has(w.id) || warrantyIds.has(w.id) || warrantyCodes.has(w.warranty_code)) {
       return { error: "Bản sao lưu có ID hoặc mã bảo hành trực tiếp bị trùng." };
+    }
+    if(w.policy_snapshot_json!==undefined&&w.policy_snapshot_json!==null){
+      const policy=readWarrantyPolicySnapshot(w.policy_snapshot_json);
+      let snapshot;try{snapshot=JSON.parse(w.policy_snapshot_json)}catch{}
+      if(!policy||policy.durationMonths!==w.duration_months||policy.startsAt!==w.starts_at||
+         policy.endsAt!==w.ends_at||policy.policyName!==w.policy_name||snapshot?.unitPriceVnd!==w.price)
+        return {error:"Bản sao lưu có chính sách bảo hành trực tiếp không khớp dữ liệu phiếu."};
     }
     manualWarrantyIds.add(w.id);
     warrantyCodes.add(w.warranty_code);
@@ -264,7 +278,17 @@ export async function onRequestPost(context) {
         "Bản sao lưu cũ không chứa phiếu bảo hành mua trực tiếp. Hãy tạo bản sao lưu mới có danh sách phiếu bảo hành trước khi khôi phục.",409
       );
     }
+    // A pre-snapshot backup must never silently erase an already issued, fixed
+    // policy. Do not invent historic wording to repair old backup files.
+    const legacyWithoutPolicy = v2 && backup.warrantyPolicySnapshotSchema!==1;
+    if(legacyWithoutPolicy){
+      const existing=await db.prepare("SELECT id FROM warranties WHERE policy_snapshot_json IS NOT NULL UNION ALL SELECT id FROM manual_warranties WHERE policy_snapshot_json IS NOT NULL LIMIT 1").first();
+      if(existing)return fail("Bản sao lưu cũ không chứa chính sách cố định của các phiếu đã cấp. Hãy sao lưu bản mới trước khi khôi phục.",409);
+    }
     const statements = [];
+    if(legacyWithoutPolicy){
+      statements.push(db.prepare("SELECT CASE WHEN EXISTS(SELECT 1 FROM warranties WHERE policy_snapshot_json IS NOT NULL UNION ALL SELECT 1 FROM manual_warranties WHERE policy_snapshot_json IS NOT NULL) THEN json_extract('{', '$.blocked') ELSE 1 END"));
+    }
     if (legacyWithoutManual) {
       // Recheck INSIDE the atomic D1 batch. Another Admin could issue a manual
       // warranty between our preliminary read and the destructive restore.
@@ -295,8 +319,8 @@ export async function onRequestPost(context) {
       for (const transaction of operations.orderPaymentTransactions) statements.push(db.prepare("INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor,verified_at,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(transaction.id,transaction.order_id,transaction.payment_request_id || null,transaction.direction,transaction.amount,transaction.transaction_reference,transaction.note,transaction.actor,transaction.verified_at,transaction.created_at));
       for (const settlement of operations.orderCodSettlements) statements.push(db.prepare("INSERT INTO order_cod_settlements(id,order_id,amount,transaction_reference,note,actor,verified_at,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(settlement.id,settlement.order_id,settlement.amount,settlement.transaction_reference,settlement.note,settlement.actor,settlement.verified_at,settlement.created_at));
       for (const d of operations.orderItemDetails) statements.push(db.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(d.item_id,d.size));
-      for (const w of operations.warranties) statements.push(db.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.order_id,w.order_item_id,w.warranty_code,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
-      for (const w of operations.manualWarranties) statements.push(db.prepare("INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,customer_contact_reference,product_name,price,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.warranty_code,w.customer_name,w.customer_phone,w.customer_address,normalizeManualWarrantyContact(w.customer_contact_reference),w.product_name,w.price,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
+      for (const w of operations.warranties) statements.push(db.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,created_at,policy_snapshot_json) VALUES(?,?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.order_id,w.order_item_id,w.warranty_code,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at,w.policy_snapshot_json??null));
+      for (const w of operations.manualWarranties) statements.push(db.prepare("INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,customer_contact_reference,product_name,price,policy_name,duration_months,starts_at,ends_at,status,created_at,policy_snapshot_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.warranty_code,w.customer_name,w.customer_phone,w.customer_address,normalizeManualWarrantyContact(w.customer_contact_reference),w.product_name,w.price,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at,w.policy_snapshot_json??null));
       for (const c of operations.claims) statements.push(db.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message,status,admin_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)").bind(c.id,c.order_id,c.customer_id,c.warranty_code,c.message,c.status,c.admin_note,c.created_at,c.updated_at));
       for (const a of operations.warrantyClaimAttachments) statements.push(db.prepare("INSERT INTO warranty_claim_attachments(claim_id,image_key) VALUES(?,?)").bind(a.claim_id,a.image_key));
       for (const l of operations.logs) statements.push(db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES(?,?,?,?,?,?,?)").bind(l.id,l.actor,l.action,l.entity_type,l.entity_id,l.details_json,l.created_at));
