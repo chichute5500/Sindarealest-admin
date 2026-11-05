@@ -43,7 +43,7 @@ test('storefront detail/gallery closes smoothly without changing the glass backd
   expect(during.visibility).toBe('visible');
   expect(during.opacity).toBe('1');
   expect(during.glass).toBe(sample.glass);
-  expect(during.motion).toContain('0.28s');
+  expect(during.motion,'no competing detail scale transition').toBe('0s');
   await expect(detail).toHaveCSS('visibility','hidden',{timeout:1200});
   const gallery=page.locator('#sdFullscreenViewer');
   await page.evaluate(()=>document.querySelector('#sdFullscreenViewer').classList.add('open'));
@@ -138,8 +138,8 @@ test('desktop light and dark retain glass filters and pre-approved drawer transi
    });
    expect(data.glass).toContain('blur(');
    expect(data.detailOpacity).toBe('1');
-   expect(data.detailMotion).toContain('0.28s');
-   expect(data.galleryMotion).toContain('0.28s');
+   expect(data.detailMotion,'detail no longer has background scale').toBe('0s');
+   expect(data.galleryMotion,'gallery stage no longer has background scale').toBe('0s');
    expect(data.cartMotion).toMatch(/[1-9]/);
    expect(data.checkoutMotion).toMatch(/[1-9]/);
   }finally{await context.close()}
@@ -174,7 +174,7 @@ test('source FLIP starts at the tapped card, reverses to it, and keeps native gl
   expect(before.opacity).toBe('1');
   expect(before.duration).toBe(364);
   expect(before.frames[0].clipPath).toContain('inset(');
-  expect(before.frames[1].clipPath).toBe('inset(0px 0px 0px 0px round 19px)');
+  expect(before.frames[1].clipPath).toMatch(/^inset\(0px(?: 0px){0,3} round 19px\)$/);
   expect(before.frames[0].transform).toBeUndefined();
   await page.waitForTimeout(145);
   const reversed=await page.evaluate(()=>{
@@ -228,7 +228,7 @@ test('storefront cart uses a 343ms mask without shrinking photos and text',async
   expect(data.open).toBe(true);
   expect(data.duration,JSON.stringify(data)).toBe(343);
   expect(data.frames[0].clipPath).toContain('inset(');
-  expect(data.frames[1].clipPath).toBe('inset(0px 0px 0px 0px round 19px)');
+  expect(data.frames[1].clipPath).toMatch(/^inset\(0px(?: 0px){0,3} round 19px\)$/);
   expect(data.glass).toContain('blur(');
  }finally{await context.close()}
 });
@@ -241,7 +241,11 @@ test('gallery clips entire glass plane while photo keeps native aspect ratio',as
   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
   const data=await page.evaluate(()=>{
    const source=document.querySelector('#detailMainImage'),viewer=document.querySelector('#sdFullscreenViewer');
-   const frame=document.querySelector('#sdFullscreenFrame');
+   const frame=document.querySelector('#sdFullscreenFrame'),detail=document.querySelector('#productOverlay');
+   // This standalone fixture has no product API data, so explicitly establish
+   // a valid image layout; production computes the same size in sizeFullscreenFrame.
+   detail.classList.add('open');detail.style.visibility='visible';
+   frame.style.width='290px';frame.style.height='390px';
    viewer.classList.add('open');viewer.style.visibility='visible';
    const started=window.SDSharedMotion.open('full-gallery',frame,source,520);
    const motion=viewer.getAnimations().find(a=>a.effect?.getTiming().duration===364);
