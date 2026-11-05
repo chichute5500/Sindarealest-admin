@@ -200,6 +200,9 @@ test('storefront cart uses source-based 490ms composited motion, not delayed fad
  try{
   await motionFixture(page);
   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  // On a true first visit the Welcome splash intentionally prevents all drawers
+  // from rendering. Simulate completing Welcome before tapping the Cart icon.
+  await page.evaluate(()=>document.body.classList.remove('welcome-active'));
   const data=await page.evaluate(()=>{
    const trigger=[document.querySelector('#mobileCartNav'),document.querySelector('#cartOpen')]
     .find(el=>el?.getBoundingClientRect().width>2&&el?.getBoundingClientRect().height>2);
@@ -213,7 +216,7 @@ test('storefront cart uses source-based 490ms composited motion, not delayed fad
     animations:panel.getAnimations().map(a=>({type:a.constructor.name,duration:a.effect?.getTiming()?.duration,
       playbackRate:a.playbackRate,frames:a.effect?.getKeyframes()?.slice(0,2).map(f=>f.transform)})),
     duration:anim?.effect?.getTiming().duration,frames:anim?.effect?.getKeyframes(),
-    glass:getComputedStyle(panel).backdropFilter};
+    glass:getComputedStyle(panel,'::before').backdropFilter};
   });
   expect(data.open).toBe(true);
   expect(data.duration,JSON.stringify(data)).toBe(490);
