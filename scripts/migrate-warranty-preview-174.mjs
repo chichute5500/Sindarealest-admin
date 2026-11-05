@@ -62,7 +62,14 @@ try{
  function execute(args){
    const r=spawnSync(process.execPath,[wrangler,...args,"--config",conf],{
      encoding:"utf8",env:process.env,timeout:180000,maxBuffer:5*1024*1024});
-   if(r.error||r.status!==0)throw Error("WRANGLER_"+args[1]+"_FAILED_"+(r.status??"TIMEOUT"));
+   if(r.error||r.status!==0){
+     const detail=String(r.stderr||r.stdout||r.error?.message||"unknown").slice(-900)
+       .replaceAll(token,"[token]").replaceAll(account,"[account]").replaceAll(db.name,"[db]")
+       .replace(/[a-f0-9]{8}-[a-f0-9-]{27}/ig,"[uuid]")
+       .replace(/https?:\/\/[^\s)]+/g,"[url]")
+       .replace(/(?:[^\s]+\/){2,}[^\s]+/g,"[path]");
+     throw Error("WRANGLER_"+args[1]+"_FAILED_"+(r.status??"TIMEOUT")+": "+detail);
+   }
  }
  if(mode==="backup"){
    mkdirSync("artifacts/pr174-preview-db",{recursive:true});
