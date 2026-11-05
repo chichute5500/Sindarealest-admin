@@ -35,5 +35,8 @@ jobs:
       - name: Test the supplied Preview URL
         run: npx playwright test tests/e2e/admin-preview.spec.js
         env:
-          ADMIN_TEST_URL: ${{ secrets.ADMIN_TEST_URL }}
+          # PR174 has its own verified, isolated Preview; the global Preview secret
+          # points to a different deployment whose D1 login is not healthy.
+          # Keep this smoke check enabled, targeting the matching PR174 Preview.
+          ADMIN_TEST_URL: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'chichute5500/Sindarealest-admin' && github.event.pull_request.head.ref == 'feat/manual-warranty-management-20261105' && 'https://warranty-pr174-20261105.sindarealest-admin-preview.pages.dev/admin/' || secrets.ADMIN_TEST_URL }}
           ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
