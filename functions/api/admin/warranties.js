@@ -1,5 +1,5 @@
 import { fail, getCurrentDateInVietnam, json, readJsonBodyLimited, requireAdmin, warrantyStatusOnDate } from "../../_lib.js";
-import { generateShortWarrantyCode, isWarrantyCodeCollisionError } from "../../_warranty-policy.js";
+import { addWarrantyCalendarMonths, generateShortWarrantyCode, isWarrantyCodeCollisionError } from "../../_warranty-policy.js";
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   try {
@@ -102,55 +102,81 @@ async function issueManualWarranty(context, body) {
   const customerPhone = clean(body.customerPhone, 32);
   const phoneDigits = customerPhone.replace(/\D/g, "");
   const customerAddress = clean(body.customerAddress, 500);
-  const productName = clean(body.productName, 180);
-  const rawPrice = body.price;
-  const price = (typeof rawPrice === "number" || (typeof rawPrice === "string" && /^\d+$/.test(rawPrice)))
-    ? Number(rawPrice) : NaN;
-  const rawMonths = body.durationMonths;
-  const months = (typeof rawMonths === "number" || (typeof rawMonths === "string" && /^\d+$/.test(rawMonths)))
-    ? Number(rawMonths) : NaN;
-  const startsAt = clean(body.startsAt, 10);
-  if (customerName.length < 2 || !/^[+0-9().\s/-]+$/.test(customerPhone) || !/^\d{9,12}$/.test(phoneDigits) ||
-      customerAddress.length < 5 || productName.length < 2 || !Number.isSafeInteger(price) || price < 0 || price > 2_000_000_000 ||
-      !Number.isInteger(months) || months < 1 || months > 120 || !/^\d{4}-\d{2}-\d{2}$/.test(startsAt)) {
-    return fail("Cần nhập đầy đủ tên, số điện thoại, địa chỉ, sản phẩm, giá, thời hạn 1–120 tháng và ngày bắt đầu hợp lệ.");
+  if (customerName.length < 2 || !/^[+0-9().\s/-]+$/.test(customerPhone) ||
+      !/^\d{9,12}$/.test(phoneDigits) || customerAddress.length < 5) {
+    return fail("Cần nhập tên, số điện thoại và địa chỉ khách hàng hợp lệ.");
   }
-  const startDate = new Date(startsAt + "T00:00:00.000Z");
-  if (Number.isNaN(startDate.getTime()) || startDate.toISOString().slice(0,10) !== startsAt) return fail("Ngày bắt đầu bảo hành không hợp lệ.");
-  const endDate = new Date(startDate);
-  const day = endDate.getUTCDate();
-  endDate.setUTCDate(1);
-  endDate.setUTCMonth(endDate.getUTCMonth() + months);
-  const lastDay = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 0)).getUTCDate();
-  endDate.setUTCDate(Math.min(day, lastDay));
-  const endsAt = endDate.toISOString().slice(0,10);
+  // Legacy single-product requests remain valid. A multi-product purchase is
+  // created atomically; no partial set of warranty codes should be issued.
+  if (body.items !== undefined && !Array.isArray(body.items)) return fail("Danh sách sản phẩm không hợp lệ.");
+  const requestedItems = body.items ?? [body];
+  if (!requestedItems.length || requestedItems.length > 10) return fail("Mỗi lần tạo phiếu cần từ 1 đến 10 sản phẩm.");
+  const items = [];
+  for (let index = 0; index < requestedItems.length; index++) {
+    const input = requestedItems[index];
+    if (!input || typeof input !== "object" || Array.isArray(input)) return fail("Sản phẩm " + (index + 1) + " không hợp lệ.");
+    const productName = clean(input.productName, 180);
+    const price = (typeof input.price === "number" ||
+      (typeof input.price === "string" && /^\d+$/.test(input.price))) ? Number(input.price) : NaN;
+    const months = (typeof input.durationMonths === "number" ||
+      (typeof input.durationMonths === "string" && /^\d+$/.test(input.durationMonths)))
+      ? Number(input.durationMonths) : NaN;
+    const startsAt = clean(input.startsAt, 10);
+    if (productName.length < 2 || !Number.isSafeInteger(price) || price < 0 || price > 2_000_000_000 ||
+        !Number.isInteger(months) || months < 1 || months > 120) {
+      return fail("Sản phẩm " + (index + 1) + ": cần nhập tên, giá hợp lệ và thời hạn 1–120 tháng.");
+    }
+    let endsAt;
+    try { endsAt = addWarrantyCalendarMonths(startsAt, months); }
+    catch { return fail("Sản phẩm " + (index + 1) + ": ngày bắt đầu bảo hành không hợp lệ."); }
+    items.push({ productName, price, months, startsAt, endsAt });
+  }
   try {
     for (let attempt = 0; attempt < 8; attempt++) {
-      const id = crypto.randomUUID();
-      const warrantyCode = generateShortWarrantyCode();
+      const codes = items.map(() => generateShortWarrantyCode());
+      if (new Set(codes).size !== codes.length) continue;
+      // Check both existing namespaces before writing all rows in one D1 batch.
+      const placeholders = codes.map(() => "?").join(",");
+      const collisions = await context.env.DB.prepare(
+        "SELECT warranty_code FROM warranties WHERE upper(warranty_code) IN (" + placeholders + ") " +
+        "UNION ALL SELECT warranty_code FROM manual_warranties WHERE upper(warranty_code) IN (" + placeholders + ")"
+      ).bind(...codes, ...codes).all();
+      if ((collisions.results || []).length) continue;
+      const records = items.map((item, index) => ({
+        ...item, id: crypto.randomUUID(), warrantyCode: codes[index],
+      }));
+      const statements = [];
+      for (const record of records) {
+        statements.push(context.env.DB.prepare(
+          "INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status) " +
+          "VALUES(?,?,?,?,?,?,?,'Bảo hành trực tiếp',?,?,?,'active')"
+        ).bind(record.id,record.warrantyCode,customerName,customerPhone,customerAddress,record.productName,
+          record.price,record.months,record.startsAt,record.endsAt));
+        statements.push(context.env.DB.prepare(
+          "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+          "VALUES(?,'admin','manual_warranty_issued','manual_warranty',?,?)"
+        ).bind(crypto.randomUUID(),record.id,JSON.stringify({
+          customerName,customerPhone,productName:record.productName,price:record.price,
+          months:record.months,startsAt:record.startsAt,endsAt:record.endsAt,warrantyCode:record.warrantyCode,
+        })));
+      }
       try {
-        const issued = await context.env.DB.batch([
-          context.env.DB.prepare(
-            "INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status) " +
-            "SELECT ?,?,?,?,?,?,?,'Bảo hành trực tiếp',?,?,?,'active' " +
-            "WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE upper(warranty_code)=?) " +
-            "AND NOT EXISTS (SELECT 1 FROM manual_warranties WHERE upper(warranty_code)=?)"
-          ).bind(id,warrantyCode,customerName,customerPhone,customerAddress,productName,price,months,startsAt,endsAt,warrantyCode,warrantyCode),
-          context.env.DB.prepare(
-            "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
-            "SELECT ?, 'admin', 'manual_warranty_issued', 'manual_warranty', ?, ? " +
-            "WHERE EXISTS (SELECT 1 FROM manual_warranties WHERE id=?)"
-          ).bind(crypto.randomUUID(),id,JSON.stringify({customerName,customerPhone,customerAddress,productName,price,months,startsAt,endsAt,warrantyCode}),id),
-        ]);
-        if (!issued[0]?.meta?.changes) {
-          if (attempt < 7) continue;
-          return fail("Không thể cấp mã bảo hành trùng. Vui lòng thử lại.",409);
-        }
-        return json({ok:true,warrantyCode,message:"Đã tạo phiếu bảo hành độc lập."},201);
+        const result = await context.env.DB.batch(statements);
+        if (result.length !== statements.length || result.some(entry => entry?.meta?.changes !== 1))
+          return fail("Không xác nhận được toàn bộ phiếu bảo hành. Hãy kiểm tra lại danh sách trước khi thử.",503);
+        return json({
+          ok:true, warrantyCode:records[0].warrantyCode,
+          warranties:records.map(({productName,price,months,startsAt,endsAt,warrantyCode}) => ({
+            productName,price,durationMonths:months,startsAt,endsAt,warrantyCode,
+          })),
+          message:"Đã tạo " + records.length + " phiếu bảo hành độc lập cho khách hàng.",
+        },201);
       } catch (error) {
+        // Cloudflare D1 batch rolls back all statements on a failed insert.
         if (!isWarrantyCodeCollisionError(error) || attempt === 7) throw error;
       }
     }
+    return fail("Không thể cấp mã bảo hành không trùng. Hãy thử lại.",409);
   } catch {
     return fail("Không thể tạo phiếu bảo hành độc lập. Hãy xác nhận migration 0019 đã được áp dụng.",503);
   }
