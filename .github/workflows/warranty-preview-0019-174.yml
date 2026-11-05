@@ -4,6 +4,7 @@ on:
     branches: [feat/manual-warranty-management-20261105]
     paths:
       - .github/workflows/warranty-preview-0019-174.yml
+      - .github/workflows/admin-preview-playwright.yml
       - scripts/migrate-warranty-preview-174.mjs
       - scripts/qa-warranty-preview-sql-174.mjs
       - scripts/verify-warranty-preview-174.mjs
