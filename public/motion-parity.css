@@ -14,6 +14,14 @@ html.sd-shared-motion #appView:not(.hidden) > .layout{
   animation:none!important;
 }
 
+/* Shared-element aperture is now the ONLY entry transform. Never squeeze
+   the actual image, text or glass surface (even by a few percent). */
+html.sd-shared-motion #productOverlay>.detail-modal,
+html.sd-shared-motion #sdFullscreenViewer .sd-fullscreen-stage{
+ transform:none!important;
+ transition:none!important;
+}
+
 /* The product overlay MUST NOT animate opacity or filter on its parent:
    a parent opacity animation creates a backdrop root and breaks real glass. */
 #productOverlay{
