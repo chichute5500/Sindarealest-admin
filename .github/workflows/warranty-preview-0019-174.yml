@@ -1,0 +1,120 @@
+name: PR174 guarded preview D1 backup and migration
+on:
+  push:
+    branches: [feat/manual-warranty-management-20261105]
+    paths:
+      - .github/workflows/warranty-preview-0019-174.yml
+      - .github/workflows/admin-preview-playwright.yml
+      - scripts/migrate-warranty-preview-174.mjs
+      - scripts/qa-warranty-preview-sql-174.mjs
+      - scripts/verify-warranty-preview-174.mjs
+      - scripts/cleanup-warranty-preview-174.mjs
+      - functions/_warranty-contact.js
+      - migrations/0020_manual_warranty_contacts.sql
+      - migrations/0021_warranty_policy_snapshots.sql
+      - functions/_warranty-policy.js
+      - functions/api/admin/orders.js
+      - functions/api/admin/backup.js
+      - functions/api/admin/warranties.js
+      - functions/api/admin/restore.js
+      - functions/api/warranty-lookup.js
+      - public/admin/index.html
+      - public/index.html
+      - tests/e2e/warranty-multi-preview-174.spec.js
+      - tests/warranty-manual-lifecycle.test.mjs
+      - tests/warranty-issuance-race.test.mjs
+      - tests/warranty-short-code.test.mjs
+      - tests/restore-safety.test.mjs
+      - tests/disposable-sqlite-integration.test.mjs
+      - package.json
+permissions:
+  contents: read
+concurrency:
+  group: warranty-pr174-preview
+  cancel-in-progress: false
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Verify exact source branch and SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feat/manual-warranty-management-20261105"
+          test "$(git ls-remote origin refs/heads/feat/manual-warranty-management-20261105 | cut -f1)" = "$GITHUB_SHA"
+      - name: Backup verified D1 Preview and never Production
+        run: node scripts/migrate-warranty-preview-174.mjs backup
+      - name: Persist private backup before changing schema
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr174-preview-d1-before-0019-${{ github.run_id }}
+          path: artifacts/pr174-preview-db/
+          if-no-files-found: error
+          retention-days: 7
+  migrate:
+    needs: backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Verify source still current
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feat/manual-warranty-management-20261105"
+          test "$(git ls-remote origin refs/heads/feat/manual-warranty-management-20261105 | cut -f1)" = "$GITHUB_SHA"
+      - name: Apply migrations 0019 and 0020 after successful private backup
+        run: node scripts/migrate-warranty-preview-174.mjs migrate
+
+  deploy:
+    needs: migrate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      ADMIN_TEST_PASSWORD: ${{ secrets.ADMIN_TEST_PASSWORD }}
+      ADMIN_TEST_URL: https://warranty-pr174-20261105.sindarealest-admin-preview.pages.dev/admin/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Limit deploy to exact isolated Pages Preview branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feat/manual-warranty-management-20261105"
+          test "$(git ls-remote origin refs/heads/feat/manual-warranty-management-20261105 | cut -f1)" = "$GITHUB_SHA"
+      - name: Deploy exact PR174 source to isolated Preview (never Production)
+        run: npx wrangler pages deploy public --project-name sindarealest-admin-preview --branch warranty-pr174-20261105 --commit-hash "$GITHUB_SHA" --commit-message "PR174 warranty test preview"
+      - name: Verify deployed Preview branch, SHA, and alias via Cloudflare API
+        run: node scripts/verify-warranty-preview-174.mjs
+      - name: Diagnose isolated D1 manual warranty SQL with self-cleaning QA rows
+        run: node scripts/qa-warranty-preview-sql-174.mjs
+      - name: Browser QA for isolated Admin Preview
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
+          npx playwright install --with-deps chromium
+          npx playwright test tests/e2e/admin-preview.spec.js tests/e2e/warranty-multi-preview-174.spec.js --reporter=line
+      - name: Remove only run-scoped synthetic warranty QA records
+        if: always()
+        run: node scripts/cleanup-warranty-preview-174.mjs

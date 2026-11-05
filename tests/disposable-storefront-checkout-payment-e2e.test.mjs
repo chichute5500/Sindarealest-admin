@@ -27,7 +27,8 @@ const migrations = [
   '0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql',
   '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
   '0007_order_contact_details.sql','0008_product_sku_verification.sql',
-  '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql'
+  '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql',
+  '0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql'
 ];
 for (const migration of migrations)
   db.exec(readFileSync(new URL('../migrations/'+migration,import.meta.url),'utf8'));
