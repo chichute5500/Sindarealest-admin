@@ -79,4 +79,4 @@ assert.match(html, /rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2" as="f
 assert.match(html, /rel="preload" href="\/fonts\/NotoSans-Regular\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="low"/);
 // Lighthouse 13: Hero H1 consumes Serif Bold, which previously began loading at
 // ~1.5s and completed ~4.9s. Prioritize the real face without font substitution.
-assert.match(html,/rel="preload" href="\\/fonts\\/NotoSerif-Bold\\.woff2" as="font" type="font\\/woff2" crossorigin fetchpriority="high"/);
+assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Bold\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="high"/);
