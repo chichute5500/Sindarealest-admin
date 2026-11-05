@@ -387,8 +387,9 @@ test('rapid account view switching leaves one active panel and no inert ghost',a
   await page.evaluate(()=>{
    const drawer=document.querySelector('#accountDrawer');
    drawer.style.visibility='visible';drawer.removeAttribute('inert');drawer.classList.add('open');
-   for(let i=0;i<12;i++)setAccountView(i%2?'menu':'favorites',false);
-   setAccountView('menu',true);
+   for(let i=0;i<12;i++){
+    (i%2?document.querySelector('#accountFavoritesBack'):document.querySelector('#accountFavoritesAction'))?.click();
+   }
   });
   await page.waitForTimeout(420);
   const state=await page.evaluate(()=>{
