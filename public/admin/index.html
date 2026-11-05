@@ -3047,8 +3047,12 @@ function sdAdminHideMorePanel(panel){
 }
 function sdAdminShowMorePanel(panel){
  if(!panel)return;
+ const reversing=panel.dataset.sdMotionClosing==='1'&&window.SDSharedMotion?.hasOrigin('admin-more');
  panel.dataset.sdMotionSeq=String((Number(panel.dataset.sdMotionSeq)||0)+1);
- panel.getAnimations().forEach(a=>a.cancel());delete panel.dataset.sdMotionClosing;
+ // Do not cancel the compositor timeline just as the same control reverses.
+ // Cancelling would briefly restore the full-sized panel and visibly flash.
+ if(!reversing)panel.getAnimations().forEach(a=>a.cancel());
+ delete panel.dataset.sdMotionClosing;
  panel.style.pointerEvents='';panel.classList.remove('hidden');
  window.SDSharedMotion?.open('admin-more',panel,window.SDSharedMotion?.sourceFromLast()||$('#mobileMoreTrigger'),470);
 }
@@ -3070,7 +3074,7 @@ function refreshCategoryOptions(){
 }
 const adminModalReturnFocus=new Map();
 let sdAdminModalExitSeq=0;
-function activateAdminModal(backdrop,initialFocusSelector){++sdAdminModalExitSeq;delete backdrop.dataset.sdMotionClosing;backdrop.querySelector('.editor')?.getAnimations().forEach(animation=>animation.cancel());const active=document.activeElement,queuedMotion=adminConsumeRenderMotionIntent();if(!adminModalReturnFocus.has(backdrop.id))adminModalReturnFocus.set(backdrop.id,active instanceof HTMLElement&&!backdrop.contains(active)?active:null);backdrop.classList.remove('hidden');backdrop.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';const surface=backdrop.querySelector('.editor')||backdrop;const sdSource=window.SDSharedMotion?.sourceFromLast()||(active instanceof Element?active:null);if(!window.SDSharedMotion?.open('admin-editor',surface,sdSource,510))adminAnimateSurface(surface,queuedMotion||adminOriginMotion(active instanceof Element?active:null));const initial=backdrop.querySelector(initialFocusSelector);if(initial instanceof HTMLElement)initial.focus()}
+function activateAdminModal(backdrop,initialFocusSelector){const reversing=backdrop.dataset.sdMotionClosing==='1'&&window.SDSharedMotion?.hasOrigin('admin-editor');++sdAdminModalExitSeq;delete backdrop.dataset.sdMotionClosing;if(!reversing)backdrop.querySelector('.editor')?.getAnimations().forEach(animation=>animation.cancel());const active=document.activeElement,queuedMotion=adminConsumeRenderMotionIntent();if(!adminModalReturnFocus.has(backdrop.id))adminModalReturnFocus.set(backdrop.id,active instanceof HTMLElement&&!backdrop.contains(active)?active:null);backdrop.classList.remove('hidden');backdrop.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';const surface=backdrop.querySelector('.editor')||backdrop;const sdSource=window.SDSharedMotion?.sourceFromLast()||(active instanceof Element?active:null);if(!window.SDSharedMotion?.open('admin-editor',surface,sdSource,510))adminAnimateSurface(surface,queuedMotion||adminOriginMotion(active instanceof Element?active:null));const initial=backdrop.querySelector(initialFocusSelector);if(initial instanceof HTMLElement)initial.focus()}
 function deactivateAdminModal(backdrop){
  if(backdrop.dataset.sdMotionClosing==='1')return;
  const afterHidden=arguments[1]; // Optional exit completion; retain original modal contract signature.
