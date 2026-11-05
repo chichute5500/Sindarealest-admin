@@ -1,5 +1,5 @@
 import { fail, getCurrentDateInVietnam, json, readJsonBodyLimited, requireAdmin } from "../../_lib.js";
-import { addWarrantyCalendarMonths, generateShortWarrantyCode, isWarrantyCodeCollisionError, shopWarrantyPolicy } from "../../_warranty-policy.js";
+import { addWarrantyCalendarMonths, createWarrantyPolicySnapshot, generateShortWarrantyCode, isWarrantyCodeCollisionError, shopWarrantyPolicy } from "../../_warranty-policy.js";
 import { sendAdminPush } from "../../_notifications.js";
 import { summarizeOrderPayment } from "../../_payments.js";
 
@@ -283,20 +283,22 @@ export async function onRequestPatch(context) {
     if (activateWarranty) {
       const startsAt = getCurrentDateInVietnam();
       for (const item of items) {
-        const policy = shopWarrantyPolicy(itemMap.get(item.id).unit_price);
+        const unitPrice=itemMap.get(item.id).unit_price;
+        const policy = shopWarrantyPolicy(unitPrice);
         const endsAt = addWarrantyCalendarMonths(startsAt, policy.durationMonths);
+        const snapshot=createWarrantyPolicySnapshot({unitPrice,durationMonths:policy.durationMonths,startsAt,endsAt,policyName:policy.policyName});
         const warrantyId = crypto.randomUUID();
         const warrantyCode = nextWarrantyCode();
         const warrantyAuditId = crypto.randomUUID();
         const insertIndex = statements.length;
         const plan = {insertIndex,warrantyId,warrantyAuditId,itemId:item.id,policy,startsAt,endsAt,warrantyCode};
         const buildInsert = code => context.env.DB.prepare(
-          "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
-          "SELECT ?,oi.order_id,oi.id,?,?,?,?,?,'active' FROM order_items oi WHERE oi.id=? AND oi.order_id=? " +
+          "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,policy_snapshot_json) " +
+          "SELECT ?,oi.order_id,oi.id,?,?,?,?,?,'active',? FROM order_items oi WHERE oi.id=? AND oi.order_id=? " +
           "AND NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=oi.id) " +
           "AND EXISTS (SELECT 1 FROM audit_logs WHERE id=? AND entity_type='order' AND entity_id=oi.order_id AND action='order_updated') " +
           "AND EXISTS (SELECT 1 FROM orders o WHERE o.id=oi.order_id AND o.status='completed' AND o.total=?)"
-        ).bind(warrantyId,code,policy.policyName,policy.durationMonths,startsAt,endsAt,item.id,id,orderAuditId,subtotal);
+        ).bind(warrantyId,code,policy.policyName,policy.durationMonths,startsAt,endsAt,snapshot,item.id,id,orderAuditId,subtotal);
         const buildAudit = code => context.env.DB.prepare(
           "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
           "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)"

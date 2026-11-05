@@ -22,7 +22,8 @@ const migrationNames = [
   '0004_admin_notifications.sql', '0005_address_warranty_verification.sql',
   '0006_remove_warranty_otp.sql', '0007_order_contact_details.sql',
   '0008_product_sku_verification.sql', '0009_fulfillment_and_manual_payments.sql',
-  '0018_payment_delivery_settlement.sql',
+  '0018_payment_delivery_settlement.sql', '0019_manual_warranties.sql',
+  '0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql',
 ];
 for (const name of migrationNames)
   sql.exec(readFileSync(new URL('../migrations/' + name, import.meta.url), 'utf8'));
@@ -110,7 +111,14 @@ const v2={
     welcomeTitleLine2:'SINDAREALEST',welcomeText:'DỮ LIỆU GIẢ LẬP'},
   products:[qaProduct],
   operations:{customers:[qaCustomer],orders:[qaOrder],orderItems:[qaItem],
-    warranties:[],warrantyClaims:[],auditLogs:[]}
+    warranties:[],warrantyClaims:[],auditLogs:[],
+    manualWarranties:[{
+      id:'qa-manual-warranty',warranty_code:'SDW-QA42',
+      customer_name:'KHÁCH GIẢ LẬP - MUA TRỰC TIẾP',customer_phone:'0000000102',
+      customer_address:'ĐỊA CHỈ QA',product_name:'SẢN PHẨM QA TRỰC TIẾP',
+      price:2800000,policy_name:'Bảo hành trực tiếp',duration_months:6,
+      starts_at:'2026-10-25',ends_at:'2027-04-25',status:'active',created_at:stamp
+    }]}
 };
 
 try {
@@ -128,6 +136,40 @@ try {
   assert.equal(scalar('SELECT full_name FROM order_contact_details').full_name,qaCustomer.full_name);
   assert.equal(scalar("SELECT value FROM settings WHERE key='show_prices'").value,'1');
   assert.equal(rows('PRAGMA foreign_key_check').length,0);
+
+  // A V2 snapshot predating standalone warranties must never silently erase
+  // existing manual warranty codes (and must preserve other live records).
+  const legacyV2=structuredClone(v2);
+  delete legacyV2.operations.manualWarranties;
+  const beforeLegacyBatches=batches;
+  const deniedLegacy=await callRestore(legacyV2);
+  assert.equal(deniedLegacy.status,409,
+    'restoring old V2 without manualWarranties must refuse when live manual warranties exist');
+  assert.match((await deniedLegacy.json()).error,/bảo hành mua trực tiếp/);
+  assert.equal(batches,beforeLegacyBatches,'denied old backup must not start a destructive D1 batch');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,1);
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM orders').n,1);
+
+  // A new manual warranty created after the preflight also blocks the legacy
+  // V2 restore inside its transaction; rollback keeps the new warranty.
+  sql.prepare('DELETE FROM manual_warranties').run();
+  beforeNextBatch=()=>{
+    const row=v2.operations.manualWarranties[0];
+    sql.prepare("INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)")
+      .run(row.id,row.warranty_code,row.customer_name,row.customer_phone,row.customer_address,row.product_name,row.price,row.policy_name,row.duration_months,row.starts_at,row.ends_at,row.status,row.created_at);
+  };
+  const racedLegacy=await callRestore(legacyV2);
+  assert.equal(racedLegacy.status,503,'concurrent manual issuance must abort old V2 restore');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,1);
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM orders').n,1,
+    'rollback must preserve previously existing operational data');
+  sql.prepare('DELETE FROM manual_warranties').run();
+  const emptyLegacy=await callRestore(legacyV2);
+  assert.equal(emptyLegacy.status,200,'old V2 remains usable when no manual warranties exist');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,0);
+  const recovered=await callRestore(v2);
+  assert.equal(recovered.status,200,'complete V2 restore must recreate standalone warranties');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,1);
 
   // An ordinary admin status save submits existing price values. If a second
   // writer reprices before its D1 batch, the stale save must not overwrite

@@ -436,7 +436,7 @@ html{transition:background-color .25s ease,color .25s ease}
 @media(max-width:760px){.mobile-nav{position:fixed!important;top:0!important;bottom:0!important;left:0!important;right:auto!important;width:min(86vw,340px);height:100dvh;max-width:none!important;margin:0!important;padding:calc(24px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom));border-radius:0 24px 24px 0;display:flex!important;flex-direction:column;align-items:stretch;gap:8px;transform:translateX(-105%);opacity:0;visibility:hidden;overflow-y:auto;z-index:101;background:var(--nav-bg);border:1px solid var(--line);box-shadow:0 20px 65px rgba(0,0,0,.25);transition:transform .28s cubic-bezier(.2,.75,.25,1),opacity .25s ease,visibility .25s ease}.mobile-nav.open{display:flex!important;transform:translateX(0);opacity:1;visibility:visible}.mobile-nav .navlink{min-height:48px;border-radius:13px}.menu-btn{display:inline-flex}}
 @media(prefers-reduced-motion:reduce){.mobile-nav,.mobile-nav-backdrop,.theme-bg,.glass{transition:none!important}}
 
-.warranty-help select{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif}.warranty-records{display:grid;gap:10px;margin:12px 0}.warranty-record{display:grid;grid-template-columns:74px minmax(0,1fr);gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--glass)}.warranty-record img{width:74px;height:88px;object-fit:cover;border-radius:9px;background:var(--card-glass)}.warranty-record h4{margin:0 0 5px;font-size:13px}.warranty-record p{margin:3px 0;font-size:10px;line-height:1.5}.warranty-record .warranty-status{display:inline-block;margin-top:4px;border:1px solid var(--line);border-radius:99px;padding:3px 7px;font-size:9px}.warranty-record .warranty-claim-select{display:flex;margin-top:9px;min-height:35px;padding:8px 11px;font-size:9px}.warranty-help [hidden]{display:none!important}
+.warranty-help select{width:100%;min-width:0;border:1px solid var(--line);border-radius:11px;padding:10px 11px;background:var(--glass);color:var(--ink);font:11px/1.5 SD Sans,Arial,sans-serif}.warranty-records{display:grid;gap:10px;margin:12px 0}.warranty-record{display:grid;grid-template-columns:74px minmax(0,1fr);gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--glass);min-width:0}.warranty-record--no-image{grid-template-columns:minmax(0,1fr)}.warranty-record-content{min-width:0;overflow-wrap:anywhere}.warranty-record-detail{display:grid;grid-template-columns:112px minmax(0,1fr);column-gap:9px;align-items:start;min-width:0}.warranty-record .warranty-record-detail{margin:5px 0;font-size:11px;line-height:1.55}.warranty-record-detail strong{font-weight:750;color:var(--ink)}.warranty-record-detail span{min-width:0;overflow-wrap:anywhere}.warranty-record--no-image .warranty-record-detail{grid-template-columns:112px minmax(0,1fr)}@media(max-width:410px){.warranty-record:not(.warranty-record--no-image) .warranty-record-detail{grid-template-columns:minmax(0,1fr);row-gap:1px}}.warranty-record img{width:74px;height:88px;object-fit:cover;border-radius:9px;background:var(--card-glass)}.warranty-record h4{margin:0 0 5px;font-size:13px}.warranty-record p{margin:3px 0;font-size:10px;line-height:1.5}.warranty-policy-proof{margin:12px 0;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:var(--glass)}.warranty-policy-proof>b{display:block;margin-bottom:8px;font-size:12px}.warranty-policy-proof p{font-size:11px;line-height:1.65;overflow-wrap:anywhere;margin:5px 0}.warranty-record .warranty-days-remaining{font-weight:700;color:var(--ink)}.warranty-record .warranty-status{display:inline-block;margin-top:4px;border:1px solid var(--line);border-radius:99px;padding:3px 7px;font-size:9px}.warranty-record .warranty-claim-select{display:flex;margin-top:9px;min-height:35px;padding:8px 11px;font-size:9px}.warranty-help [hidden]{display:none!important}
 
 /* Sequential welcome reveal: mark → brand → message → store entry. */
 .welcome-content>*{animation:none!important}
@@ -5639,15 +5639,39 @@ $('#warrantyLookupForm').addEventListener('submit',async e=>{
  }catch(err){m.textContent=err.message||'Không thể tra cứu bảo hành.'}
  finally{b.disabled=false;b.textContent='Tra cứu bảo hành';if(phoneLookup)window.sdResetPhoneLookupProof?.('warranty_lookup')}
 });
+function renderWarrantyPolicy(policy){
+ const covered=policy&&typeof policy.coverage==='string'?policy.coverage:'Bảo hành các lỗi phát sinh từ quá trình sản xuất và hoàn thiện sản phẩm.';
+ const excluded=policy&&typeof policy.exclusions==='string'?policy.exclusions:'Không áp dụng với hư hỏng do va đập, sử dụng không đúng cách hoặc tác động bên ngoài.';
+ return '<section class="warranty-policy-proof" aria-label="Chính sách bảo hành">'+
+  '<b>Chính sách bảo hành</b>'+
+  '<p><strong>Được bảo hành:</strong> '+escapeHtml(covered)+'</p>'+
+  '<p><strong>Không được bảo hành:</strong> '+escapeHtml(excluded)+'</p>'+
+  '</section>';
+}
 function showWarrantyRecords(records){
  const list=Array.isArray(records)?records:[],container=$('#warrantyRecords'),eligible=list.filter(w=>w.eligible),claimForm=$('#warrantyClaimForm');
  container.innerHTML=list.length?list.map(w=>{
   const image=String(w.image||''),src=image?imgPath(image):'',status=w.status==='active'?'Còn hiệu lực':w.status==='pending'?'Chưa đến ngày bắt đầu':w.status==='invalid'?'Cần kiểm tra thông tin bảo hành':w.status==='expired'?'Đã hết hạn':w.status==='void'?'Đã hủy':String(w.status||'Chưa rõ');
+  const field=(label,value)=>'<p class="warranty-record-detail"><strong>'+escapeHtml(label)+'</strong><span>'+escapeHtml(value)+'</span></p>';
   const claimButton=w.eligible?'<button class="pill-btn primary tap-target warranty-claim-select" type="button" data-claim-warranty="'+escapeHtml(w.claimToken||'')+'" data-claim-label="'+escapeHtml(w.maskedWarrantyCode||'')+'">Gửi yêu cầu cho sản phẩm này</button>':'';
-  return '<article class="warranty-record">'+(src?'<img src="'+escapeHtml(src)+'" alt="'+escapeHtml(w.title||'Sản phẩm bảo hành')+'" loading="lazy">':'<div aria-hidden="true"></div>')+'<div><h4>'+escapeHtml(w.title||'Sản phẩm')+'</h4><p>SKU: '+escapeHtml(w.sku||'Chưa được cung cấp')+' · Size: '+escapeHtml(w.size||'Chưa có dữ liệu')+'</p><p>Mã bảo hành: '+escapeHtml(w.maskedWarrantyCode||'—')+'</p><p>Ngày mua: '+escapeHtml(w.purchasedAt||'—')+'</p><p>Địa chỉ giao hàng: '+escapeHtml(w.maskedAddress||'Chưa có dữ liệu')+'</p><p>Người mua: '+escapeHtml(w.maskedName||'—')+' · Điện thoại: '+escapeHtml(w.maskedPhone||'—')+'</p><p>Đơn hàng: '+escapeHtml(w.maskedOrderNumber||'—')+'</p><p>Thời hạn: '+escapeHtml(w.startsAt||'—')+' → '+escapeHtml(w.endsAt||'—')+' ('+escapeHtml(w.durationMonths||'—')+' tháng)</p><p>'+(w.eligible?'Còn '+escapeHtml(w.remainingDays)+' ngày':'')+'</p><span class="warranty-status">'+escapeHtml(status)+'</span>'+claimButton+'</div></article>'
+  return '<article class="warranty-record'+(src?'':' warranty-record--no-image')+'">'+
+   (src?'<img src="'+escapeHtml(src)+'" alt="'+escapeHtml(w.title||'Sản phẩm bảo hành')+'" loading="lazy">':'')+
+   '<div class="warranty-record-content"><h4>'+escapeHtml(w.title||'Sản phẩm')+'</h4>'+
+   field('SKU:',w.sku||'Chưa được cung cấp')+
+   field('Size:',w.size||'Chưa có dữ liệu')+
+   field('Mã bảo hành:',w.maskedWarrantyCode||'—')+
+   (w.manual?'':field('Ngày mua:',w.purchasedAt||'—'))+
+   field('Địa chỉ giao hàng:',w.maskedAddress||'Chưa có dữ liệu')+
+   field('Người mua:',w.maskedName||'—')+
+   field('Điện thoại:',w.maskedPhone||'—')+
+   field('Đơn hàng:',w.maskedOrderNumber||'—')+
+   field('Thời hạn:',(w.startsAt||'—')+' → '+(w.endsAt||'—')+' ('+(w.durationMonths||'—')+' tháng)')+
+   (w.status==='active'?'<p class="warranty-days-remaining">Còn '+escapeHtml(w.remainingDays)+' ngày bảo hành</p>':'')+
+   renderWarrantyPolicy(w.policy)+
+   '<span class="warranty-status">'+escapeHtml(status)+'</span>'+claimButton+'</div></article>'
  }).join(''):'<p class="checkout-message">Không tìm thấy bản ghi bảo hành phù hợp.</p>';
  $('#warrantyResults').hidden=false;claimForm.hidden=true;$('#claimWarrantyCode').value='';$('#claimWarrantyCodeLabel').textContent='';
- $('#warrantyClaimMessage').textContent=eligible.length?'Kiểm tra thông tin bên trên rồi chọn sản phẩm để gửi yêu cầu.':'Chưa có bảo hành đủ điều kiện để gửi yêu cầu ở thời điểm này.';
+ $('#warrantyClaimMessage').textContent=eligible.length?'Kiểm tra thông tin bên trên rồi chọn sản phẩm để gửi yêu cầu.':list.some(w=>w.manual)?'Phiếu này được cấp trực tiếp. Nếu cần hỗ trợ, vui lòng liên hệ Shop.':'Chưa có bảo hành đủ điều kiện để gửi yêu cầu ở thời điểm này.';
  container.querySelectorAll('[data-claim-warranty]').forEach(button=>button.addEventListener('click',()=>{
   $('#claimWarrantyCode').value=button.dataset.claimWarranty||'';
   $('#claimWarrantyCodeLabel').textContent=button.dataset.claimLabel||'';

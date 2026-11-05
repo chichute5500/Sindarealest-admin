@@ -7,7 +7,7 @@ import { onRequestPatch as patchAdminOrder } from '../functions/api/admin/orders
 
 const SECRET='qa-cod-completion-session-secret-only-long';
 const PASSWORD='qa-cod-completion-password';
-const files=['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql'];
+const files=['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql','0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql'];
 const schema=files.map(file=>readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8')).join('\n');
 const session=await createSession(SECRET);
 
