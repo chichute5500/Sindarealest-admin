@@ -1,0 +1,62 @@
+name: PR174 guarded preview D1 backup and migration
+on:
+  push:
+    branches: [feat/manual-warranty-management-20261105]
+    paths:
+      - .github/workflows/warranty-preview-0019-174.yml
+      - scripts/migrate-warranty-preview-174.mjs
+permissions:
+  contents: read
+concurrency:
+  group: warranty-pr174-preview
+  cancel-in-progress: false
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - name: Verify exact source branch and SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "chichute5500/Sindarealest-admin"
+          test "$GITHUB_REF" = "refs/heads/feat/manual-warranty-management-20261105"
+          test "$(git ls-remote origin refs/heads/feat/manual-warranty-management-20261105 | cut -f1)" = "$GITHUB_SHA"
+      - name: Backup verified D1 Preview and never Production
+        run: node scripts/migrate-warranty-preview-174.mjs backup
+      - name: Persist private backup before changing schema
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr174-preview-d1-before-0019-${{ github.run_id }}
+          path: artifacts/pr174-preview-db/
+          if-no-files-found: error
+          retention-days: 7
+  migrate:
+    needs: backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - name: Verify source still current
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feat/manual-warranty-management-20261105"
+          test "$(git ls-remote origin refs/heads/feat/manual-warranty-management-20261105 | cut -f1)" = "$GITHUB_SHA"
+      - name: Apply only migration 0019 after successful private backup
+        run: node scripts/migrate-warranty-preview-174.mjs migrate
