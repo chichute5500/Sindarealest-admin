@@ -216,7 +216,16 @@ test('storefront cart uses source-based 490ms composited motion, not delayed fad
     animations:panel.getAnimations().map(a=>({type:a.constructor.name,duration:a.effect?.getTiming()?.duration,
       playbackRate:a.playbackRate,frames:a.effect?.getKeyframes()?.slice(0,2).map(f=>f.transform)})),
     duration:anim?.effect?.getTiming().duration,frames:anim?.effect?.getKeyframes(),
-    glass:getComputedStyle(panel,'::before').backdropFilter};
+    glass:getComputedStyle(panel,'::before').backdropFilter,
+    layout:{display:getComputedStyle(panel).display,visibility:getComputedStyle(panel).visibility,
+      transform:getComputedStyle(panel).transform,
+      rect:(()=>{const r=panel.getBoundingClientRect();return{left:r.left,top:r.top,width:r.width,height:r.height}})(),
+      bodyClass:document.body.className,htmlClass:document.documentElement.className},
+    manual:anim?null:(()=>{
+      const started=window.SDSharedMotion.open('qa-cart-diagnostic',panel,trigger,490);
+      return{started,now:panel.getAnimations().map(a=>a.effect?.getTiming()?.duration),
+        rect:window.SDSharedMotion.rectOf(panel),triggerRect:window.SDSharedMotion.rectOf(trigger)};
+    })()};
   });
   expect(data.open).toBe(true);
   expect(data.duration,JSON.stringify(data)).toBe(490);
