@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - feat/motion-parity-balanced-20261105
+  # Make motion-specific Playwright and preview deployment visible on this PR,
+  # not only on push runs that the PR checks UI may omit.
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
 
 permissions:
   contents: read
