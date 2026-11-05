@@ -22,10 +22,14 @@ export async function verifyLookupChallenge(request,env,token,action){
   const response=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{
     method:"POST",
     headers:{"Content-Type":"application/x-www-form-urlencoded"},
-    body:data,signal:AbortSignal.timeout(8000),redirect:"error"
+    body:data,signal:AbortSignal.timeout(8000),redirect:"manual"
   });
   // Cloudflare Siteverify may return a JSON error with HTTP 400. Parse its
   // error code *before* deciding whether the service is unavailable.
+  // Cloudflare Workers explicitly reject redirect:"error" before network I/O.
+  // Use manual and reject any 3xx before sending the secret to another host.
+  if(response.status>=300&&response.status<400)
+    return {ok:false,status:503,reason:"upstream_redirect"};
   let answer;
   try{answer=await response.json()}catch{
     console.warn("Turnstile Siteverify returned a non-JSON response",response.status);

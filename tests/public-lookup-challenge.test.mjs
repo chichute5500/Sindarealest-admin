@@ -20,6 +20,7 @@ try{
   assert.equal(url,"https://challenges.cloudflare.com/turnstile/v0/siteverify");
   assert.equal(options.method,"POST");
   assert.equal(options.headers["Content-Type"],"application/x-www-form-urlencoded");
+  assert.equal(options.redirect,"manual","Cloudflare Workers rejects redirect:error before fetch");
   assert.ok(options.body instanceof URLSearchParams,"Siteverify uses supported URL-encoded form");
   assert.equal(options.body.get("secret"),"private-qa-secret");
   assert.equal(options.body.get("remoteip"),"192.0.2.11");
@@ -49,6 +50,9 @@ try{
   console.warn=()=>{};
   globalThis.fetch=async()=>new Response("<html>unavailable</html>",{status:503,headers:{"Content-Type":"text/html"}});
   assert.deepEqual(await verifyLookupChallenge(req,env,"fake-nonjson-token","order_lookup"),{ok:false,status:503,reason:"non_json"});
+  globalThis.fetch=async()=>new Response(null,{status:302,headers:{Location:"https://not-turnstile.example"}});
+  assert.deepEqual(await verifyLookupChallenge(req,env,"fake-redirect-token","order_lookup"),
+    {ok:false,status:503,reason:"upstream_redirect"},"redirects must never leak the Siteverify secret");
   globalThis.fetch=async()=>new Response(JSON.stringify({success:false,"error-codes":["bad-request"]}),{status:400});
   assert.deepEqual(await verifyLookupChallenge(req,env,"fake-bad-request-token","order_lookup"),{ok:false,status:503,reason:"upstream_bad_request"});
   globalThis.fetch=async()=>{throw Error("network unavailable")};
