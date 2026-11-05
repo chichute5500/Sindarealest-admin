@@ -83,3 +83,35 @@ jobs:
             --commit-message "Motion QA Preview ${GITHUB_SHA}"
           echo "Preview alias: https://motion-balanced-20261105.sindarealest2.pages.dev"
           echo "This workflow never deploys the main branch."
+
+  preview-live-qa:
+    needs: deploy-isolated-preview
+    if: >-
+      github.repository == 'chichute5500/Sindarealest-admin' &&
+      github.ref_name == 'feat/motion-parity-balanced-20261105'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Chromium for read-only visual QA
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Open live Preview, zoom one public product/gallery and inspect geometry
+        env:
+          SD_MOTION_PREVIEW_URL: https://motion-balanced-20261105.sindarealest2.pages.dev/
+        run: npx playwright test tests/e2e/motion-preview-live.spec.js
+      - name: Preserve QA screenshots for Owner inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-preview-visual-qa-${{ github.sha }}
+          path: |
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
