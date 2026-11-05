@@ -233,6 +233,38 @@ try{
   results.scenarios.push({name:"mobile-mosaic-on-approach",requests:requested});
   await context.close();
  }
+ // Below-fold sections are rendered lazily only on the Home mobile route.
+ // Validate that native scrolling reveals fully painted, interactive content
+ // instead of a blank/reserved rectangle or a collapsed grid.
+ {
+  const ctx=await browser.newContext({viewport:{width:390,height:844},
+   colorScheme:"light",serviceWorkers:"block"});
+  await ctx.addInitScript(()=>sessionStorage.setItem("sd-welcome-seen-in-tab","1"));
+  const page=await ctx.newPage(),errors=[];
+  page.on("pageerror",err=>errors.push(String(err.message||err)));
+  const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
+  assert.equal(response?.status(),200,"Home lazy-section QA must load");
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:35000});
+  for(const id of ["featured","collections","products"]){
+   const section=page.locator("#"+id);
+   await section.scrollIntoViewIfNeeded({timeout:20000});
+   await page.waitForTimeout(350);
+   const visible=await section.evaluate(el=>{
+    const rect=el.getBoundingClientRect();
+    return {visibility:getComputedStyle(el).contentVisibility,
+      height:rect.height,inner:el.querySelectorAll("article,a,button").length,
+      viewport:innerHeight,top:rect.top,bottom:rect.bottom};
+   });
+   assert.equal(visible.visibility,"auto",id+" Home should skip offscreen layout only");
+   assert.ok(visible.height>160&&visible.inner>0,
+    id+" must reveal its real interactive content on approach");
+   assert.ok(visible.top<visible.viewport&&visible.bottom>0,
+    id+" must actually enter the viewport without anchor jump");
+   results.scenarios.push({name:"mobile-on-approach-"+id,metrics:visible});
+  }
+  assert.deepEqual(errors,[],"Mobile scroll hydration must not throw");
+  await ctx.close();
+ }
  const requestContext=await browser.newContext();
  const page=await requestContext.newPage();
  for(const path of ["/sanpham","/tra-cuu-don-hang","/bao-hanh"]){
