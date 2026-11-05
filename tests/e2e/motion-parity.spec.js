@@ -163,8 +163,8 @@ test('source FLIP starts at the tapped card, reverses to it, and keeps native gl
    const start=source.getBoundingClientRect();
    overlay.style.visibility='';overlay.removeAttribute('inert');overlay.classList.add('open');
    const glass=getComputedStyle(overlay,'::before').backdropFilter;
-   const active=window.SDSharedMotion.open('qa-product',surface,source,520);
-   const animation=surface.getAnimations().find(a=>a.effect?.getTiming().duration===520);
+   const active=window.SDSharedMotion.open('product-detail',surface,source,520);
+   const animation=overlay.getAnimations().find(a=>a.effect?.getTiming().duration===364);
    return {active,start:{left:start.left,top:start.top,width:start.width,height:start.height},
     glass,opacity:getComputedStyle(overlay).opacity,
     frames:animation?.effect?.getKeyframes(),duration:animation?.effect?.getTiming().duration};
@@ -172,15 +172,15 @@ test('source FLIP starts at the tapped card, reverses to it, and keeps native gl
   expect(before.active).toBe(true);
   expect(before.glass).toContain('blur(');
   expect(before.opacity).toBe('1');
-  expect(before.duration).toBe(520);
-  expect(before.frames[0].transform).toContain('translate3d(');
-  expect(before.frames[0].transform).toContain('scale(');
-  expect(before.frames[1].transform).toBe('none');
+  expect(before.duration).toBe(364);
+  expect(before.frames[0].clipPath).toContain('inset(');
+  expect(before.frames[1].clipPath).toBe('inset(0px 0px 0px 0px round 19px)');
+  expect(before.frames[0].transform).toBeUndefined();
   await page.waitForTimeout(145);
   const reversed=await page.evaluate(()=>{
    const surface=document.querySelector('#productOverlay .detail-modal');
    const before=surface.getBoundingClientRect();
-   const active=window.SDSharedMotion.close('qa-product',surface,()=>{
+   const active=window.SDSharedMotion.close('product-detail',surface,()=>{
     const overlay=document.querySelector('#productOverlay');
     overlay.style.visibility='hidden';overlay.classList.remove('open');
    },null,520);
@@ -194,7 +194,7 @@ test('source FLIP starts at the tapped card, reverses to it, and keeps native gl
  }finally{await context.close()}
 });
 
-test('storefront cart uses source-based 490ms composited motion, not delayed fade',async({browser})=>{
+test('storefront cart uses a 343ms mask without shrinking photos and text',async({browser})=>{
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
  const page=await context.newPage();
  try{
@@ -211,28 +211,50 @@ test('storefront cart uses source-based 490ms composited motion, not delayed fad
    if(!trigger)throw new Error('No visible Cart trigger on mobile');
    trigger.click();
    const panel=document.querySelector('#cartDrawer');
-   const anim=panel.getAnimations().find(a=>a.effect?.getTiming().duration===490);
+   const anim=panel.getAnimations().find(a=>a.effect?.getTiming().duration===343);
    return {open:panel.classList.contains('open'),trigger:trigger.id,
     source:window.SDSharedMotion?.sourceFromLast(),
     hasOrigin:window.SDSharedMotion?.hasOrigin('cart'),
     animations:panel.getAnimations().map(a=>({type:a.constructor.name,duration:a.effect?.getTiming()?.duration,
-      playbackRate:a.playbackRate,frames:a.effect?.getKeyframes()?.slice(0,2).map(f=>f.transform)})),
+      playbackRate:a.playbackRate,frames:a.effect?.getKeyframes()?.slice(0,2).map(f=>f.clipPath)})),
     duration:anim?.effect?.getTiming().duration,frames:anim?.effect?.getKeyframes(),
     glass:getComputedStyle(panel,'::before').backdropFilter,
     layout:{display:getComputedStyle(panel).display,visibility:getComputedStyle(panel).visibility,
       transform:getComputedStyle(panel).transform,
       rect:(()=>{const r=panel.getBoundingClientRect();return{left:r.left,top:r.top,width:r.width,height:r.height}})(),
       bodyClass:document.body.className,htmlClass:document.documentElement.className},
-    manual:anim?null:(()=>{
-      const started=window.SDSharedMotion.open('qa-cart-diagnostic',panel,trigger,490);
-      return{started,now:panel.getAnimations().map(a=>a.effect?.getTiming()?.duration),
-        rect:window.SDSharedMotion.rectOf(panel),triggerRect:window.SDSharedMotion.rectOf(trigger)};
-    })()};
+    contentScale:getComputedStyle(panel).transform};
   });
   expect(data.open).toBe(true);
-  expect(data.duration,JSON.stringify(data)).toBe(490);
-  expect(data.frames[0].transform).toContain('scale(');
-  expect(data.frames[1].transform).toBe('none');
+  expect(data.duration,JSON.stringify(data)).toBe(343);
+  expect(data.frames[0].clipPath).toContain('inset(');
+  expect(data.frames[1].clipPath).toBe('inset(0px 0px 0px 0px round 19px)');
   expect(data.glass).toContain('blur(');
+ }finally{await context.close()}
+});
+
+test('gallery clips entire glass plane while photo keeps native aspect ratio',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage();
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const data=await page.evaluate(()=>{
+   const source=document.querySelector('#detailMainImage'),viewer=document.querySelector('#sdFullscreenViewer');
+   const frame=document.querySelector('#sdFullscreenFrame');
+   viewer.classList.add('open');viewer.style.visibility='visible';
+   const started=window.SDSharedMotion.open('full-gallery',frame,source,520);
+   const motion=viewer.getAnimations().find(a=>a.effect?.getTiming().duration===364);
+   const box=frame.getBoundingClientRect();
+   return {started,frameWidth:box.width,frames:motion?.effect?.getKeyframes(),
+     nativeTransform:getComputedStyle(frame).transform};
+  });
+  expect(data.started).toBe(true);
+  expect(data.frames[0].clipPath).toContain('inset(');
+  expect(data.frames[0].transform).toBeUndefined();
+  expect(data.frameWidth).toBeGreaterThan(100);
+  expect(data.nativeTransform,'image container must not be stretched').not.toContain('matrix3d(');
+  await page.waitForTimeout(450);
+  await expect(page.locator('#sdFullscreenViewer')).toHaveCSS('clip-path','none');
  }finally{await context.close()}
 });
