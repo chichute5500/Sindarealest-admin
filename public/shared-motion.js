@@ -13,6 +13,8 @@ function rectOf(input){
  if(input?.target)node=input.target;
  if(typeof node==='string')node=document.querySelector(node);
  if(node?.nodeType===3)node=node.parentElement;
+ // Body is not a legitimate launch surface for a card/drawer.
+ if(node===document.body||node===document.documentElement)return null;
  if(node instanceof Element){
   const r=node.getBoundingClientRect();
   if(r.width>2&&r.height>2)return{left:r.left,top:r.top,width:r.width,height:r.height,element:node};
