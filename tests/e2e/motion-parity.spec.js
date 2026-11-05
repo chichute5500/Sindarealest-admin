@@ -442,7 +442,13 @@ test('full gallery !important CSS cannot show two photos during zoom, including 
    source.src=src;next.src=src;await Promise.all([source.decode(),next.decode()]);
    detail.classList.add('open');detail.style.visibility='visible';
    viewer.classList.add('open');viewer.style.visibility='visible';
+   // Production calls setFullscreenLayerState with sd-no-transition during
+   // an instant layer choice; reproduce that instead of triggering a separate
+   // 250ms crossfade in this test's manual DOM setup.
+   initial.classList.add('sd-no-transition');next.classList.add('sd-no-transition');
    initial.classList.remove('is-active');next.classList.add('is-active');
+   void initial.offsetWidth;
+   initial.classList.remove('sd-no-transition');next.classList.remove('sd-no-transition');
    document.querySelector('#sdFullscreenFrame').style.cssText='width:285px;height:375px';
    const started=window.SDSharedMotion.open('full-gallery',document.querySelector('#sdFullscreenFrame'),source,520);
    return{started,active:getComputedStyle(next).opacity,activePriority:next.style.getPropertyPriority('opacity'),
