@@ -61,3 +61,19 @@ assert.ok(prior.includes('setupNavSpy();'),'Nav spy should not wait for products
 assert.ok(!html.slice(productsFetch).includes('setupMobileBottomNav();'),
  'Never attach duplicate dock listeners after hydration');
 console.log('PASS: Storefront first-paint and pending-products mobile dock contracts');
+
+/* Cold-home network: the 219KB craft photo and both material thumbnails are
+ * below the first viewport. Preserve their original no-JS sources while
+ * allowing the existing near-viewport image observer to fetch them on demand. */
+for(const [selector,file] of [
+ ['id="craftTileImage"','2c341b173eff94f1.webp'],
+ ['material-photo--dark','theme-croc-dark-tile.webp'],
+ ['material-photo--light','theme-croc-albino-tile.webp']
+]){
+ assert.ok(html.includes(selector)&&html.includes('data-src="images/'+file+'"'),
+  'Mosaic image must remain present and deferred: '+file);
+ assert.ok(html.includes('src="images/'+file+'" loading="lazy"'),
+  'No-JS visitors retain the real artwork: '+file);
+}
+assert.match(html,/#craftTileImage\[data-src\],#materialTile img\.material-photo\[data-src\]/,
+ 'Near-viewport image observer should activate all three mosaic photos');
