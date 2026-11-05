@@ -262,3 +262,42 @@ test('gallery clips entire glass plane while photo keeps native aspect ratio',as
   await expect(page.locator('#sdFullscreenViewer')).toHaveCSS('clip-path','none');
  }finally{await context.close()}
 });
+
+test('detail image morph keeps a single uniform scale and restores original image',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage();
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const result=await page.evaluate(()=>{
+   const source=document.createElement('button');
+   source.style.cssText='position:fixed;left:32px;top:190px;width:155px;height:140px;z-index:100';
+   const img=document.createElement('img');
+   img.src='/images/brand-emblem.png';
+   img.style.cssText='display:block;width:100%;height:100%;object-fit:contain';
+   source.append(img);document.body.append(source);
+   const overlay=document.querySelector('#productOverlay');
+   overlay.classList.add('open');overlay.style.visibility='visible';overlay.removeAttribute('inert');
+   const destination=document.querySelector('#detailMainImage');
+   destination.src=img.src;
+   const started=window.SDSharedMotion.open('product-detail',overlay.querySelector('.detail-modal'),source,520);
+   const clone=document.querySelector('.sd-shared-image-clone');
+   const keyframes=clone?.getAnimations()[0]?.effect?.getKeyframes();
+   return{started,clones:document.querySelectorAll('.sd-shared-image-clone').length,
+    imageTransform:keyframes?.[0]?.transform,
+    parentTransform:overlay.getAnimations().find(a=>a.effect?.getTiming().duration===364)?.effect?.getKeyframes()?.[0]?.transform,
+    imageHidden:destination.style.opacity,
+    originalRect:(()=>{const r=destination.getBoundingClientRect();return{width:r.width,height:r.height}})()};
+  });
+  expect(result.started).toBe(true);
+  expect(result.clones).toBe(1);
+  expect(result.imageTransform).toMatch(/translate3d\([^)]*\) scale\([0-9.]+\)$/);
+  expect(result.imageTransform).not.toMatch(/scaleX|scaleY/);
+  expect(result.parentTransform).toBeUndefined();
+  expect(result.imageHidden).toBe('0');
+  expect(result.originalRect.width).toBeGreaterThan(100);
+  await page.waitForTimeout(450);
+  await expect(page.locator('.sd-shared-image-clone')).toHaveCount(0);
+  expect(await page.locator('#detailMainImage').evaluate(el=>el.style.opacity)).toBe('');
+ }finally{await context.close()}
+});
