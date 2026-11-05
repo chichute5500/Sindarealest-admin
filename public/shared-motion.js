@@ -118,13 +118,14 @@ function open(key,surface,source,ms=DURATION){
 function close(key,surface,done,source,ms=DURATION){
  const el=getSurface(surface);
  if(!el||reduced()){cancel(key);return false}
- const endOrigin=resolvedOrigin(source)||origins.get(key);
+ const endOrigin=rectOf(source)||origins.get(key)||freshSource();
  const destination=currentRect(endOrigin);
  const from=rectOf(el);
  if(!destination||!from){cancel(key);return false}
  return animateBetween(key,el,destination,from,true,done,ms);
 }
 function popOrigin(key){origins.delete(key)}
+function hasOrigin(key){return origins.has(key)}
 function sourceFromLast(){return freshSource()}
-window.SDSharedMotion={open,close,cancel,popOrigin,sourceFromLast,rectOf,easing:EASE,duration:DURATION};
+window.SDSharedMotion={open,close,cancel,popOrigin,hasOrigin,sourceFromLast,rectOf,easing:EASE,duration:DURATION};
 })();
