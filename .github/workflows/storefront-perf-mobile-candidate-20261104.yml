@@ -1,13 +1,10 @@
 name: One-shot Storefront mobile Lighthouse Preview (no Production)
 on:
   # GitHub App file commits emit push checks, not necessarily PR synchronize.
-  # A marker-only push to the exact experimental branch allows bounded QA.
+  # Run exactly once on an intentional marker update, never on every PR synchronize.
+  # This avoids false FAILs on ordinary source commits lacking the candidate marker.
   push:
     branches: [fix/storefront-mobile-critical-requests-20261104]
-    paths: [docs/qa/PERF_MOBILE_20261104.trigger]
-  pull_request:
-    branches: [main]
-    types: [synchronize]
     paths: [docs/qa/PERF_MOBILE_20261104.trigger]
 permissions:
   contents: read
@@ -17,17 +14,17 @@ concurrency:
   cancel-in-progress: true
 jobs:
   preview-qa:
-    if: (github.event_name == 'push' && github.ref_name == 'fix/storefront-mobile-critical-requests-20261104') || (github.event_name == 'pull_request' && github.head_ref == 'fix/storefront-mobile-critical-requests-20261104')
+    if: github.event_name == 'push' && github.ref_name == 'fix/storefront-mobile-critical-requests-20261104'
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      PERF_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      PERF_CANDIDATE_SHA: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v7
         with:
@@ -38,7 +35,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: storefront-mobile-qa-${{ github.event.pull_request.head.sha || github.sha }}
+          name: storefront-mobile-qa-${{ github.sha }}
           path: artifacts/perf-mobile-20261104/
           if-no-files-found: warn
           retention-days: 14
