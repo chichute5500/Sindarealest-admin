@@ -3,19 +3,8 @@
    Only visibility and composited transforms are changed. */
 :root{--sd-motion-balanced:280ms;--sd-motion-ease:cubic-bezier(.22,.72,.22,1)}
 
-/* The original entry-only keyframes were perceptually delayed and competed
-   with the new source-to-destination geometry animations. Keep a single
-   compositor transform owner per element, especially on slower Android GPUs. */
-html.sd-shared-motion #accountDrawer .account-panel-content > :not([hidden]),
-html.sd-shared-motion #checkoutDrawer.open :is(#sdCheckoutShippingStep,#sdCheckoutPaymentStep):not([hidden]),
-html.sd-shared-motion #backdrop .editor-tab-panel:not([hidden]),
-html.sd-shared-motion #loginView:not(.hidden) .logincard,
-html.sd-shared-motion #appView:not(.hidden) > .layout{
-  animation:none!important;
-}
-
-/* Shared-element aperture is now the ONLY entry transform. Never squeeze
-   the actual image, text or glass surface (even by a few percent). */
+/* Shared-element aperture is the ONLY active zoom. The original CSS zoom
+   declarations were removed rather than overridden with a second scale. */
 html.sd-shared-motion #productOverlay>.detail-modal,
 html.sd-shared-motion #sdFullscreenViewer .sd-fullscreen-stage{
  transform:none!important;
@@ -35,12 +24,6 @@ html.sd-shared-motion #sdFullscreenViewer .sd-fullscreen-stage{
   pointer-events:auto;
   transition:visibility 0s linear 0s;
 }
-#productOverlay>.detail-modal{
-  transform:translate3d(0,12px,0) scale(.986);
-  transition:transform var(--sd-motion-balanced) var(--sd-motion-ease);
-}
-#productOverlay.open>.detail-modal{transform:translate3d(0,0,0) scale(1)}
-
 /* Keep the approved full-screen glass plane and image-swapping animations.
    Delayed visibility allows a real closing movement without display:none. */
 #sdFullscreenViewer{
@@ -54,12 +37,6 @@ html.sd-shared-motion #sdFullscreenViewer .sd-fullscreen-stage{
   pointer-events:auto;
   transition:visibility 0s linear 0s;
 }
-#sdFullscreenViewer .sd-fullscreen-stage{
-  transform:translate3d(0,10px,0) scale(.990);
-  transition:transform var(--sd-motion-balanced) var(--sd-motion-ease);
-}
-#sdFullscreenViewer.open .sd-fullscreen-stage{transform:translate3d(0,0,0) scale(1)}
-
 /* The full-screen gallery now grows from the tapped image. Its old parent
    opacity animation would conceal the early frames and create a backdrop root. */
 #sdFullscreenViewer.open{animation:none!important}
@@ -91,10 +68,10 @@ html.sd-shared-motion #sdFullscreenViewer .sd-fullscreen-stage{
   from{transform:translate3d(0,12px,0)}
   to{transform:translate3d(0,0,0)}
 }
-#accountDrawer .account-panel-content > :not([hidden]){
+html:not(.sd-shared-motion) #accountDrawer .account-panel-content > :not([hidden]){
   animation:sdMotionPanelIn var(--sd-motion-balanced) var(--sd-motion-ease);
 }
-#checkoutDrawer.open :is(#sdCheckoutShippingStep,#sdCheckoutPaymentStep):not([hidden]){
+html:not(.sd-shared-motion) #checkoutDrawer.open :is(#sdCheckoutShippingStep,#sdCheckoutPaymentStep):not([hidden]){
   animation:sdMotionStepIn 260ms var(--sd-motion-ease);
 }
 html.sd-service-route #sdServicePage:not([hidden]),
@@ -103,11 +80,11 @@ html.sd-catalog-route #products{
 }
 
 /* Editor/tab/login animations apply only to entry. JS handles editor exit. */
-#backdrop .editor-tab-panel:not([hidden]){
+html:not(.sd-shared-motion) #backdrop .editor-tab-panel:not([hidden]){
   animation:sdMotionPanelIn 240ms var(--sd-motion-ease);
 }
-#loginView:not(.hidden) .logincard,
-#appView:not(.hidden) > .layout{
+html:not(.sd-shared-motion) #loginView:not(.hidden) .logincard,
+html:not(.sd-shared-motion) #appView:not(.hidden) > .layout{
   animation:sdMotionStepIn var(--sd-motion-balanced) var(--sd-motion-ease);
 }
 
