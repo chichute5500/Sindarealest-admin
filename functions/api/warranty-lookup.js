@@ -30,7 +30,7 @@ function shapeWarranty(row, today, claimToken) {
   const code = String(row.warranty_code || "");
   const images = parseImages(row.imagesJson);
   const status = warrantyStatusOnDate(row.status, row.starts_at, row.ends_at, today);
-  const eligible = isWarrantyEligibleOnDate(row.status, row.starts_at, row.ends_at, today);
+  const eligible = !row.manual && isWarrantyEligibleOnDate(row.status, row.starts_at, row.ends_at, today);
   const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
   return {
     claimToken,
@@ -43,6 +43,7 @@ function shapeWarranty(row, today, claimToken) {
     startsAt: row.starts_at,
     endsAt: row.ends_at,
     durationMonths: row.duration_months,
+    price: row.price === null || row.price === undefined ? null : Number(row.price),
     status,
     eligible,
     remainingDays,
@@ -52,7 +53,9 @@ function shapeWarranty(row, today, claimToken) {
     maskedOrderNumber: maskOrderNumber(row.orderNumber)
   };
 }
-const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
+const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson,NULL AS price,0 AS manual FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
+const manualSelectSql = "SELECT mw.id AS warrantyId,mw.warranty_code,mw.duration_months,mw.starts_at,mw.ends_at,mw.status,'' AS sku,0 AS skuVerified,mw.product_name AS title,'' AS size,mw.created_at AS purchasedAt,'' AS orderNumber,mw.customer_name AS fullName,mw.customer_phone AS customerPhone,mw.customer_address AS purchaseAddress,'[]' AS imagesJson,mw.price,1 AS manual FROM manual_warranties mw";
+const manualPhoneSql = "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(mw.customer_phone,''),' ',''),'-',''),'(',''),')',''),'+',''),'.',''),'/','')";
 
 export async function onRequestPost({ request, env }) {
   const origin = request.headers.get("Origin");
@@ -77,7 +80,8 @@ export async function onRequestPost({ request, env }) {
     const isCode = isWarrantyCode(raw);
     let rows = [];
     if (isCode) {
-      const row = await env.DB.prepare(selectSql + " WHERE upper(w.warranty_code)=? LIMIT 1").bind(raw.toUpperCase()).first();
+      let row = await env.DB.prepare(selectSql + " WHERE upper(w.warranty_code)=? LIMIT 1").bind(raw.toUpperCase()).first();
+      if (!row) row = await env.DB.prepare(manualSelectSql + " WHERE upper(mw.warranty_code)=? LIMIT 1").bind(raw.toUpperCase()).first();
       if (!row) return fail("Không tìm thấy thông tin phù hợp. Hãy kiểm tra lại mã hoặc số điện thoại.", 404);
       rows = [row];
     } else {
@@ -89,13 +93,18 @@ export async function onRequestPost({ request, env }) {
         "Tra cứu theo số điện thoại tạm chưa sẵn sàng. Vui lòng dùng mã bảo hành.":
         "Vui lòng hoàn thành xác minh trước khi tra cứu.",proof.status);
       const sql = selectSql + " WHERE " + phoneSql + "=? OR (substr(" + phoneSql + ",1,2)='84' AND '0'||substr(" + phoneSql + ",3)=?) OR (substr(" + phoneSql + ",1,4)='0084' AND '0'||substr(" + phoneSql + ",5)=?) ORDER BY o.created_at DESC LIMIT 25";
-      const result = await env.DB.prepare(sql).bind(phone, phone, phone).all();
-      rows = result.results || [];
+      const [result, manualResult] = await Promise.all([
+        env.DB.prepare(sql).bind(phone, phone, phone).all(),
+        env.DB.prepare(manualSelectSql + " WHERE " + manualPhoneSql + "=? OR (substr(" + manualPhoneSql + ",1,2)='84' AND '0'||substr(" + manualPhoneSql + ",3)=?) OR (substr(" + manualPhoneSql + ",1,4)='0084' AND '0'||substr(" + manualPhoneSql + ",5)=?) ORDER BY mw.created_at DESC LIMIT 25").bind(phone, phone, phone).all(),
+      ]);
+      rows = [...(result.results || []), ...(manualResult.results || [])]
+        .sort((a,b)=>String(b.purchasedAt||"").localeCompare(String(a.purchasedAt||""))).slice(0,25);
       if (!rows.length) return fail("Không tìm thấy thông tin phù hợp. Hãy kiểm tra lại mã hoặc số điện thoại.", 404);
     }
-    const tokenRows = rows.map(row => ({ ...row, claimToken: crypto.randomUUID().replaceAll("-", "") }));
+    const tokenRows = rows.map(row => ({ ...row, claimToken: row.manual ? null : crypto.randomUUID().replaceAll("-", "") }));
     const statements = [env.DB.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%' AND julianday(updated_at)<julianday('now','-15 minutes')")];
     for (const row of tokenRows) {
+      if (!row.claimToken) continue;
       statements.push(env.DB.prepare("INSERT INTO settings(key,value,updated_at) VALUES(?,?,datetime('now')) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind("warranty_lookup:" + row.claimToken, JSON.stringify({ warrantyId: row.warrantyId, warrantyCode: row.warranty_code })));
     }
     await env.DB.batch(statements);
