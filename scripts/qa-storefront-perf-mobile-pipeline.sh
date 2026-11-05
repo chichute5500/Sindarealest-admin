@@ -39,7 +39,10 @@ done
 test "$verified" = true
 npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1 lighthouse@13.6.0
 npx playwright install --with-deps chromium
-node scripts/qa-storefront-perf-mobile-preview.mjs
+# Measure Lighthouse on the isolated, SHA-verified Preview before spawning
+# many Playwright Chromium contexts. This prevents our expanded browser/scroll
+# regression workload from contaminating the first lab CPU sample; never
+# discard any measured Lighthouse score or reduce the strict >=90 gate.
 mkdir -p artifacts/perf-mobile-20261104/lighthouse
 # A single Lighthouse navigation has intermittently recorded NO_LCP on BOTH
 # live Production and isolated Preview. Preserve multiple raw attempts instead
@@ -49,6 +52,8 @@ for attempt in 1 2 3 4; do
 done
 npx lighthouse "$preview/" --preset=desktop --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-desktop.json" --quiet
 npx lighthouse "https://sindarealest2.pages.dev/" --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance --output=json --output-path=artifacts/perf-mobile-20261104/lighthouse/production-mobile.json --quiet
+# Browser checks still run and are mandatory before scoring/acceptance.
+node scripts/qa-storefront-perf-mobile-preview.mjs
 node --input-type=module <<'JS'
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
