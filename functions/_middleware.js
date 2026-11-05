@@ -255,6 +255,10 @@ export async function onRequest(context) {
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
     html = await renderPublicCatalog(html,context.env,url.origin,{home:true});
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
+    // Only the true Home needs both the Welcome Serif and code-only Hero.
+    // Advertise the exact existing resources at HTTP header time, before the
+    // long SSR HTML head is parsed. Keep all font faces and CSS cascade intact.
+    headers.append("Link", '</fonts/NotoSerif-Regular.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </code-hero.css?v=20261026-2>; rel=preload; as=style');
     return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
   }
   // Match the catalog route contract: product-detail HTML is read-only.
