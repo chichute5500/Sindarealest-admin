@@ -286,6 +286,7 @@ test('detail image morph keeps a single uniform scale and restores original imag
    const clone=document.querySelector('.sd-shared-image-clone');
    const keyframes=clone?.getAnimations()[0]?.effect?.getKeyframes();
    return{started,clones:document.querySelectorAll('.sd-shared-image-clone').length,
+    cloneOwner:clone?.parentElement?.id,
     imageTransform:keyframes?.[0]?.transform,
     parentTransform:overlay.getAnimations().find(a=>a.effect?.getTiming().duration===364)?.effect?.getKeyframes()?.[0]?.transform,
     imageHidden:destination.style.opacity,sourceHidden:img.style.opacity,
@@ -293,6 +294,7 @@ test('detail image morph keeps a single uniform scale and restores original imag
   });
   expect(result.started).toBe(true);
   expect(result.clones).toBe(1);
+  expect(result.cloneOwner,'moving pixels must share the glass aperture').toBe('productOverlay');
   expect(result.imageTransform).toMatch(/translate3d\([^)]*\) scale\([0-9.]+\)$/);
   expect(result.imageTransform).not.toMatch(/scaleX|scaleY/);
   expect(result.parentTransform).toBeUndefined();
@@ -653,8 +655,9 @@ test('gallery layer swap during zoom never reveals a second photo or leaves hidd
    first.classList.remove('is-active');second.classList.add('is-active');
    const midway=[first,second].map(img=>getComputedStyle(img).opacity);
    const clones=document.querySelectorAll('.sd-shared-image-clone').length;
+   const cloneOwner=document.querySelector('.sd-shared-image-clone')?.parentElement?.id;
    window.SDSharedMotion.cancel('full-gallery');
-   return{started,original,midway,clones,after:[first,second].map(img=>({
+   return{started,original,midway,clones,cloneOwner,after:[first,second].map(img=>({
     computed:getComputedStyle(img).opacity,inline:img.style.getPropertyValue('opacity'),
     inlineTransition:img.style.getPropertyValue('transition')
    })),ghosts:window.SDSharedMotion.inspect().ghosts};
@@ -663,6 +666,7 @@ test('gallery layer swap during zoom never reveals a second photo or leaves hidd
   expect(result.original).toEqual(['0','0']);
   expect(result.midway,'a decoded incoming layer must remain hidden under the ghost').toEqual(['0','0']);
   expect(result.clones).toBe(1);
+  expect(result.cloneOwner,'fullscreen clone must be clipped with viewer').toBe('sdFullscreenViewer');
   expect(result.after.map(x=>x.inline)).toEqual(['','']);
   expect(result.after.map(x=>x.inlineTransition)).toEqual(['','']);
   expect(result.after.map(x=>x.computed)).toEqual(['0','1']);
