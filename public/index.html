@@ -5225,7 +5225,7 @@ function renderCart(){
  const subtotal=selected.reduce((sum,{p,q})=>sum+(hasConfirmedPublicPrice(p)?Number(p.price)*q:0),0);
  $('#cartSubtotal').textContent=selected.length?(allPriced?formatVnd(subtotal):selected.some(({p})=>hasConfirmedPublicPrice(p))?formatVnd(subtotal)+' (chưa gồm sản phẩm chờ báo giá)':'Chờ báo giá'):'—';
 }
-function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();window.SDSharedMotion?.open('cart',panel,cartReturnFocus||$('#cartOpen'),490);requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
+function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();window.SDSharedMotion?.open('cart',panel,window.SDSharedMotion?.sourceFromLast()||cartReturnFocus||$('#cartOpen'),490);requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
 function closeCart(restoreFocus=true){const sdSkipMotion=arguments[1]===true;const panel=$('#cartDrawer');if(!panel)return;if(!sdSkipMotion&&restoreFocus&&panel.dataset.sdSharedClosing)return;const wasOpen=panel.classList.contains('open');
  if(!sdSkipMotion&&restoreFocus&&wasOpen&&!panel.dataset.sdSharedClosing&&window.SDSharedMotion?.hasOrigin('cart')){
   if(window.SDSharedMotion.close('cart',panel,()=>{panel.style.visibility='hidden';closeCart(true,true)},null,490)){
@@ -5406,7 +5406,7 @@ function openCheckout(options={}){
  const missing=entries.find(({id,option})=>{const p=findProductByKey(id);return productOptionKind(p)&&!option});if(missing){checkoutItemsOverride=null;checkoutFromCart=true;closeCart(false);openDetail(missing.id);focusDetailOption();return}
  if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('checkout');
  checkoutReturnFocus=document.activeElement;
- const sdCheckoutAnchor=window.SDSharedMotion?.rectOf(checkoutReturnFocus)||window.SDSharedMotion?.sourceFromLast();
+ const sdCheckoutAnchor=window.SDSharedMotion?.sourceFromLast()||window.SDSharedMotion?.rectOf(checkoutReturnFocus);
  closeCart(false);$('#cartDrawer').setAttribute('inert','');
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  // Never carry a previous QR's measured title correction into a new Checkout.
@@ -5471,7 +5471,7 @@ function closeCheckout(restoreFocus=true){const sdSkipMotion=arguments[1]===true
 function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
  closeCheckout(false);closeCart(false);closeDetail(false,false);
  if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('account');
- const panel=$('#accountDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';window.SDSharedMotion?.open('account',panel,accountReturnFocus||$('#accountOpen'),490);
+ const panel=$('#accountDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';window.SDSharedMotion?.open('account',panel,window.SDSharedMotion?.sourceFromLast()||accountReturnFocus||$('#accountOpen'),490);
  const close=$('#accountClose');
  const focusClose=()=>{if(!close||!panel.classList.contains('open')||panel.hasAttribute('inert'))return;close.focus({preventScroll:true})};
  // Retry after layout/visibility transitions so opening the drawer cannot leave focus on the bottom-nav trigger.
