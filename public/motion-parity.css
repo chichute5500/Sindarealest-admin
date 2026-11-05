@@ -11,6 +11,15 @@ html.sd-shared-motion #sdFullscreenViewer .sd-fullscreen-stage{
  transition:none!important;
 }
 
+/* The shared-element controller holds .open until its closing animation
+   finishes. The old delayed visibility transition would then expose the
+   full-size dialog/glass again when the clipping animation is removed.
+   Visibility must switch atomically; only the aperture animates. */
+html.sd-shared-motion #productOverlay,
+html.sd-shared-motion #sdFullscreenViewer {
+  transition: none !important;
+}
+
 /* The product overlay MUST NOT animate opacity or filter on its parent:
    a parent opacity animation creates a backdrop root and breaks real glass. */
 #productOverlay{
