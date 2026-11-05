@@ -2354,6 +2354,7 @@ function adminAuditSubject(log){
   const name=String(d.customerName||d.fullName||c?.fullName||'').trim();
   return name?'Khách hàng: '+name:'Khách hàng';
  }
+ if(type==='manual_warranty')return 'Bảo hành trực tiếp: '+String(d.warrantyCode||'').trim();
  if(type==='warranty'||type==='warranty_claim'){
   const code=String(d.warrantyCode||'').trim();
   return code?'Bảo hành: '+code:'Bảo hành';
