@@ -70,7 +70,7 @@ console.log('Preview desktop',score(desktop),vitals(desktop));
 // Mark both as INCONCLUSIVE, never convert missing scores to a fake zero.
 // Browser-native PerformanceObserver must independently verify a real LCP.
 const browser=JSON.parse(readFileSync('artifacts/perf-mobile-20261104/browser-qa.json','utf8'));
-const nativeNames=['mobile-first-visit','mobile-light','mobile-dark'];
+const nativeNames=['mobile-first-visit','mobile-cdp-throttled-cold-visit','mobile-light','mobile-dark'];
 for(const name of nativeNames){
  const s=browser.scenarios.find(x=>x.name===name);
  assert.ok(s?.metrics,'Missing measured browser scenario: '+name);
