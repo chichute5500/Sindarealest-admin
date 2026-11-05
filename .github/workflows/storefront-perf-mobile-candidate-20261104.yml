@@ -13,7 +13,8 @@ permissions:
   contents: read
 concurrency:
   group: storefront-perf-mobile-candidate-20261104
-  cancel-in-progress: false
+  # Never leave obsolete mobile Lighthouse runs blocking the latest SHA.
+  cancel-in-progress: true
 jobs:
   preview-qa:
     if: (github.event_name == 'push' && github.ref_name == 'fix/storefront-mobile-critical-requests-20261104') || (github.event_name == 'pull_request' && github.head_ref == 'fix/storefront-mobile-critical-requests-20261104')
