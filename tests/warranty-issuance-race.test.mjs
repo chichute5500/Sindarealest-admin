@@ -98,4 +98,70 @@ const staleOrderDB = makeDB(true, { orderStatusAtBatch: "shipped" });
 const staleOrder = await post(staleOrderDB);
 assert.equal(staleOrder.status, 409, "warranty issuance must be refused if the order stops being completed after preflight");
 assert.equal(staleOrderDB.calls.batchCount, 1, "the stale order guard must run atomically at insert time");
+
+function makeManualDB({ collideFirstCode = false } = {}) {
+  const calls = { batchCount: 0, statements: [] };
+  return {
+    calls,
+    prepare(sql) {
+      return {
+        sql, values: [],
+        bind(...values) { this.values = values; return this; },
+      };
+    },
+    async batch(statements) {
+      calls.batchCount++;
+      if (collideFirstCode && calls.batchCount === 1) {
+        throw new Error('D1_ERROR: UNIQUE constraint failed: manual_warranties.warranty_code');
+      }
+      calls.statements = statements.map(statement => ({ sql: statement.sql, values: statement.values }));
+      return [{ meta: { changes: 1 } }, { meta: { changes: 1 } }];
+    },
+  };
+}
+async function postManual(DB, overrides = {}) {
+  return issueWarranty({
+    request: new Request("https://shop.example/api/admin/warranties", {
+      method: "POST",
+      headers: {
+        Cookie: "sd_admin_session=" + session,
+        Origin: "https://shop.example",
+        "Sec-Fetch-Site": "same-origin",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        source: "manual",
+        customerName: "Nguyễn Văn A",
+        customerPhone: "0901234567",
+        customerAddress: "123 Đường thử, Đà Lạt, Lâm Đồng",
+        productName: "Ví da cá sấu",
+        price: 2800000,
+        durationMonths: 6,
+        startsAt: "2026-11-05",
+        ...overrides,
+      }),
+    }),
+    env: { DB, ADMIN_PASSWORD: PASSWORD, SESSION_SECRET: SECRET },
+  });
+}
+const invalidManualDB = makeManualDB();
+const invalidManual = await postManual(invalidManualDB, { price: "2800000.5" });
+assert.equal(invalidManual.status, 400, "manual warranty must reject fractional prices");
+assert.equal(invalidManualDB.calls.batchCount, 0, "invalid manual warranty must not write to D1");
+
+const manualDB = makeManualDB();
+const manual = await postManual(manualDB);
+assert.equal(manual.status, 201, "manual warranty must be issuable without any order or SKU");
+const manualResult = await manual.json();
+assert.match(manualResult.warrantyCode, /^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+assert.equal(manualDB.calls.batchCount, 1, "manual warranty and audit record must be written atomically");
+assert.match(manualDB.calls.statements[0].sql, /INSERT INTO manual_warranties[\\s\\S]*NOT EXISTS \\(SELECT 1 FROM warranties[\\s\\S]*NOT EXISTS \\(SELECT 1 FROM manual_warranties/,
+  "manual code must be checked against both order-linked and standalone warranties");
+assert.match(manualDB.calls.statements[1].sql, /INSERT INTO audit_logs[\\s\\S]*WHERE EXISTS \\(SELECT 1 FROM manual_warranties/,
+  "audit entry must only exist when the standalone warranty was inserted");
+
+const manualCollisionDB = makeManualDB({ collideFirstCode: true });
+const manualCollision = await postManual(manualCollisionDB);
+assert.equal(manualCollision.status, 201, "standalone code collision must regenerate a fresh code");
+assert.equal(manualCollisionDB.calls.batchCount, 2);
 console.log("PASS: warranty issuance prevents duplicate issuance, stale order-status races, and non-atomic audit records.");
