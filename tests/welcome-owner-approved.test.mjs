@@ -90,3 +90,9 @@ assert.ok(html.indexOf('rel="preload" href="/code-hero.css') < html.indexOf('<st
  * before Welcome exits; the approved original visual timing remains ~1s. */
 assert.match(html,/if\(!titlePaintedAt&&!closed\)\{\s*revealWelcomeCopy\(true\);\s*noteWelcomeTitlePaint\(\);\s*\}\s*\},950\)/);
 assert.ok(!html.includes('},2600);'),'Do not let the welcome font watchdog hold a throttled mobile for 2.6s');
+
+/* Without JavaScript the splash timer cannot run; public server-rendered
+ * products and their native navigation must never be blocked by Welcome. */
+assert.match(html,/html:not\(\.js-enabled\):has\(body\.welcome-active\)\{overflow:auto!important/);
+assert.match(html,/html:not\(\.js-enabled\) body\.welcome-active\{height:auto!important;min-height:100vh!important;overflow-x:hidden!important;overflow-y:auto!important/);
+assert.match(html,/html:not\(\.js-enabled\) #welcomeSplash\{display:none!important\}/);
