@@ -5899,7 +5899,17 @@ window.addEventListener('resize',sizeFullscreenFrame);
  document.body.addEventListener('click',e=>{const catalogLink=e.target.closest('a[href="/sanpham"]');if(catalogLink){e.preventDefault();navigateCatalog('all');return}const featureStep=e.target.closest('[data-feature-step]');if(featureStep){e.preventDefault();e.stopPropagation();changeFeaturedImage(featureStep.closest('[data-featured-card]'),Number(featureStep.dataset.featureStep));return}const add=e.target.closest('[data-add]');if(add){if(add.id==='detailAdd')return;e.preventDefault();e.stopPropagation();addToCartFromControl(add.dataset.add,add);return}const op=e.target.closest('[data-open-product]');if(op){if(op.tagName==='A'){if(e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault()}openDetail(op.dataset.openProduct);return}const thumb=e.target.closest('[data-thumb]');if(thumb&&currentProduct){changeDetailImage(Number(thumb.dataset.thumb),true);return}const cartPick=e.target.closest('[data-cart-select]');if(cartPick){const p=findProductByKey(cartPick.dataset.cartSelect);if(p){closeCart(false);openDetail(p.id||p.slug);focusDetailOption()}return}const pick=e.target.closest('[data-cart-pick]');if(pick){if(pick.checked)cartUnchecked.delete(pick.dataset.cartPick);else cartUnchecked.add(pick.dataset.cartPick);renderCart();return}const qty=e.target.closest('[data-qty]');if(qty){const id=qty.dataset.id,delta=Number(qty.dataset.qty),productId=cartKeyParts(id).id,total=cartEntries().filter(x=>x.id===productId).reduce((sum,x)=>sum+x.q,0);if(delta>0&&total>=50){showToast('Số lượng tối đa là 50 cho mỗi sản phẩm.');return}cart[id]=Number(cart[id]||0)+delta;if(cart[id]<=0)delete cart[id];saveCart();return}const rem=e.target.closest('[data-remove]');if(rem){delete cart[rem.dataset.remove];cartUnchecked.delete(rem.dataset.remove);saveCart();showToast('Đã xóa sản phẩm khỏi giỏ chọn.')}});
  document.addEventListener('keydown',e=>{const op=e.target.closest&&e.target.closest('[data-open-product]');if(op&&e.target===op&&(e.key==='Enter'||e.key===' ')){e.preventDefault();op.click();return}});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#productOverlay').classList.contains('open')){closeDetail()}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowRight'){changeDetailImage(detailIndex+1,true)}else if($('#productOverlay').classList.contains('open')&&e.key==='ArrowLeft'){changeDetailImage(detailIndex-1,true)}});
 }
-async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year').textContent=new Date().getFullYear();loadCart();loadFavorites();loadOrderHistory();loadLocalShippingAddress();bindEvents();
+const yieldPaint=()=>new Promise(resolve=>{
+ if(typeof requestAnimationFrame==='function')
+  requestAnimationFrame(()=>setTimeout(resolve,0));
+ else setTimeout(resolve,0);
+});
+async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year').textContent=new Date().getFullYear();loadCart();loadFavorites();loadOrderHistory();loadLocalShippingAddress();
+ // The first mobile paint should not share one blocking task with the entire
+ // storefront event bootstrap. Keep critical theme/local data synchronous, then
+ // install handlers immediately after a paint opportunity before /api/products.
+ await yieldPaint();
+ bindEvents();
  // Bottom nav markup follows this script. Bind on DOM ready independently
  // of /api/products so a slow/failed API never disables mobile Cart/Account.
  if(document.readyState==='loading')
@@ -5934,11 +5944,6 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
   // instead of creating one long main-thread task after /api/products.
   // No layout, copy or appearance changes; __sdStorefrontReady still waits
   // until all stages are hydrated and buttons are functional.
-  const yieldPaint=()=>new Promise(resolve=>{
-   if(typeof requestAnimationFrame==='function')
-    requestAnimationFrame(()=>setTimeout(resolve,0));
-   else setTimeout(resolve,0);
-  });
   renderFeatured();
   await yieldPaint();
   renderFilters();
