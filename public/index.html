@@ -775,6 +775,12 @@ html.dark #welcomeSplash .welcome-logo-frame{
    This scope does NOT alter locked Hero, product gallery or the Admin UI. */
 html:has(body.welcome-active){overflow:hidden!important;scroll-behavior:auto!important}
 body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important}
+/* With JavaScript disabled the Welcome timer cannot dismiss itself. Keep
+   public SSR catalog and native links scrollable instead of locking the page.
+   Normal JS visitors retain the exact Owner-approved Welcome and its timing. */
+html:not(.js-enabled):has(body.welcome-active){overflow:auto!important;scroll-behavior:auto!important}
+html:not(.js-enabled) body.welcome-active{height:auto!important;min-height:100vh!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:auto!important}
+html:not(.js-enabled) #welcomeSplash{display:none!important}
 #welcomeSplash{
   position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;
   inset:0!important;width:100vw!important;min-width:100vw!important;
