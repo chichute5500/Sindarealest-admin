@@ -49,7 +49,8 @@ function shapeWarranty(row, today, claimToken) {
     maskedName: maskName(row.fullName),
     maskedPhone: maskPhone(row.customerPhone),
     maskedAddress: maskAddress(row.purchaseAddress),
-    maskedOrderNumber: maskOrderNumber(row.orderNumber)
+    maskedOrderNumber: row.manual ? "Mua trực tiếp" : maskOrderNumber(row.orderNumber),
+    manual: Number(row.manual) === 1
   };
 }
 const selectSql = "SELECT w.id AS warrantyId,w.warranty_code,w.duration_months,w.starts_at,w.ends_at,w.status,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(d.size,'') AS size,o.created_at AS purchasedAt,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS customerPhone,COALESCE(sa.full_address,c.address,'') AS purchaseAddress,p.images_json AS imagesJson,NULL AS price,0 AS manual FROM warranties w JOIN orders o ON o.id=w.order_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id JOIN order_items oi ON oi.id=w.order_item_id LEFT JOIN order_shipping_addresses sa ON sa.order_id=o.id LEFT JOIN order_item_details d ON d.item_id=oi.id LEFT JOIN products p ON p.id=oi.product_id";
