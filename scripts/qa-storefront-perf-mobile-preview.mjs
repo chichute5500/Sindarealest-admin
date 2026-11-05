@@ -105,7 +105,7 @@ try{
   const ctx=await browser.newContext({viewport:{width:390,height:844},
    colorScheme:"light",deviceScaleFactor:1,serviceWorkers:"block"});
   let delayedFonts=0;
-  await ctx.route("**/fonts/NotoSerif-Regular.woff2",async route=>{
+  await ctx.route("**/fonts/NotoSerif-Regular-FirstPaint.woff2",async route=>{
    delayedFonts++;
    await new Promise(resolve=>setTimeout(resolve,1700));
    await route.continue();
