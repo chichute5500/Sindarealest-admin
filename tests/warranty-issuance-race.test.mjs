@@ -16,7 +16,7 @@ function makeDB(inserted, { orderStatusAtBatch = "completed", collideFirstCode =
         bind(...values) { this.values = values; return this; },
         async first() {
           if (sql.includes("FROM orders o JOIN order_items")) {
-            return { orderId: "order-1", status: "completed", itemId: "item-1", existingWarrantyId: null };
+            return { orderId: "order-1", status: "completed", itemId: "item-1", unitPrice: 3_500_000, existingWarrantyId: null };
           }
           return null;
         },
