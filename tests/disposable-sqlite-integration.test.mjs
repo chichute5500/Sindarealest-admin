@@ -110,7 +110,14 @@ const v2={
     welcomeTitleLine2:'SINDAREALEST',welcomeText:'DỮ LIỆU GIẢ LẬP'},
   products:[qaProduct],
   operations:{customers:[qaCustomer],orders:[qaOrder],orderItems:[qaItem],
-    warranties:[],warrantyClaims:[],auditLogs:[]}
+    warranties:[],warrantyClaims:[],auditLogs:[],
+    manualWarranties:[{
+      id:'qa-manual-warranty',warranty_code:'SDW-QA42',
+      customer_name:'KHÁCH GIẢ LẬP - MUA TRỰC TIẾP',customer_phone:'0000000102',
+      customer_address:'ĐỊA CHỈ QA',product_name:'SẢN PHẨM QA TRỰC TIẾP',
+      price:2800000,policy_name:'Bảo hành trực tiếp',duration_months:6,
+      starts_at:'2026-10-25',ends_at:'2027-04-25',status:'active',created_at:stamp
+    }]}
 };
 
 try {
