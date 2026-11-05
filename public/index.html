@@ -4618,6 +4618,7 @@ function clearGalleryTransitionClasses(img){
 function closeFullscreenImage(){
  const sdSkipMotion=arguments[0]===true;
  const viewer=$('#sdFullscreenViewer');if(!viewer.classList.contains('open'))return;
+ if(!sdSkipMotion&&viewer.dataset.sdSharedClosing)return;
  if(!sdSkipMotion&&!viewer.dataset.sdSharedClosing&&window.SDSharedMotion?.hasOrigin('full-gallery')){
   const finish=()=>{viewer.style.visibility='hidden';closeFullscreenImage(true)};
   if(window.SDSharedMotion.close('full-gallery',$('#sdFullscreenFrame'),finish,null,520)){
@@ -4690,6 +4691,7 @@ function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fr
 function closeDetail(fromUrl=false,restoreFocus=true){
  const sdSkipMotion=arguments[2]===true;
  const sdOverlay=$('#productOverlay');
+ if(!sdSkipMotion&&restoreFocus&&sdOverlay?.dataset.sdSharedClosing)return;
  if(!sdSkipMotion&&restoreFocus&&sdOverlay?.classList.contains('open')&&
     !sdOverlay.dataset.sdSharedClosing&&window.SDSharedMotion?.hasOrigin('product-detail')){
   const finish=()=>{sdOverlay.style.visibility='hidden';closeDetail(fromUrl,restoreFocus,true)};
@@ -5207,7 +5209,7 @@ function renderCart(){
  $('#cartSubtotal').textContent=selected.length?(allPriced?formatVnd(subtotal):selected.some(({p})=>hasConfirmedPublicPrice(p))?formatVnd(subtotal)+' (chưa gồm sản phẩm chờ báo giá)':'Chờ báo giá'):'—';
 }
 function openCart(event){cartReturnFocus=event?.currentTarget||document.activeElement;dismissToast();closeCheckout(false);closeAccount(false);closeDetail(false,false);if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('cart');const panel=$('#cartDrawer');panel.style.visibility='';panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';renderCart();window.SDSharedMotion?.open('cart',panel,cartReturnFocus||$('#cartOpen'),490);requestAnimationFrame(()=>{if(panel.classList.contains('open')&&!panel.hasAttribute('inert'))$('#cartClose')?.focus({preventScroll:true})})}
-function closeCart(restoreFocus=true){const sdSkipMotion=arguments[1]===true;const panel=$('#cartDrawer');if(!panel)return;const wasOpen=panel.classList.contains('open');
+function closeCart(restoreFocus=true){const sdSkipMotion=arguments[1]===true;const panel=$('#cartDrawer');if(!panel)return;if(!sdSkipMotion&&restoreFocus&&panel.dataset.sdSharedClosing)return;const wasOpen=panel.classList.contains('open');
  if(!sdSkipMotion&&restoreFocus&&wasOpen&&!panel.dataset.sdSharedClosing&&window.SDSharedMotion?.hasOrigin('cart')){
   if(window.SDSharedMotion.close('cart',panel,()=>{panel.style.visibility='hidden';closeCart(true,true)},null,490)){
    panel.dataset.sdSharedClosing='1';panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');return;
@@ -5423,6 +5425,7 @@ function closeCheckout(restoreFocus=true){const sdSkipMotion=arguments[1]===true
  sdCheckoutClearChoicePrompt();
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  if(!panel)return;
+ if(!sdSkipMotion&&restoreFocus&&panel.dataset.sdSharedClosing)return;
  const wasOpen=panel.classList.contains('open');
  if(!sdSkipMotion&&restoreFocus&&wasOpen&&!panel.dataset.sdSharedClosing&&window.SDSharedMotion?.hasOrigin('checkout')){
   if(window.SDSharedMotion.close('checkout',panel,()=>{panel.style.visibility='hidden';closeCheckout(true,true)},null,500)){
@@ -5457,6 +5460,7 @@ function openAccount(){dismissToast();accountReturnFocus=document.activeElement;
 }
 function closeAccount(restoreFocus=true){const sdSkipMotion=arguments[1]===true;
  const panel=$('#accountDrawer');if(!panel)return;
+ if(!sdSkipMotion&&restoreFocus&&panel.dataset.sdSharedClosing)return;
  const wasOpen=panel.classList.contains('open');
  if(!sdSkipMotion&&restoreFocus&&wasOpen&&!panel.dataset.sdSharedClosing&&window.SDSharedMotion?.hasOrigin('account')){
   if(window.SDSharedMotion.close('account',panel,()=>{panel.style.visibility='hidden';closeAccount(true,true)},null,490)){
@@ -5565,6 +5569,7 @@ function setupArtSlideshow(){
 function setActiveNav(id){$$('[data-nav]').forEach(a=>{const yes=a.dataset.nav===id;a.classList.toggle('active',yes);if(yes)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
 function setMobileMenu(open,sdSkipMotion=false){
  const menu=$('#mobileNav'),backdrop=$('#mobileNavBackdrop'),toggle=$('#menuToggle');
+ if(!sdSkipMotion&&!open&&menu.dataset.sdSharedClosing)return;
  if(!sdSkipMotion&&!open&&menu.classList.contains('open')&&!menu.dataset.sdSharedClosing&&window.SDSharedMotion?.hasOrigin('mobile-menu')){
   if(window.SDSharedMotion.close('mobile-menu',menu,()=>{setMobileMenu(false,true)},null,460)){
    menu.dataset.sdSharedClosing='1';return;
