@@ -179,14 +179,16 @@ test('source FLIP starts at the tapped card, reverses to it, and keeps native gl
   await page.waitForTimeout(145);
   const reversed=await page.evaluate(()=>{
    const surface=document.querySelector('#productOverlay .detail-modal');
+   const before=surface.getBoundingClientRect();
    const active=window.SDSharedMotion.close('qa-product',surface,()=>{
     const overlay=document.querySelector('#productOverlay');
     overlay.style.visibility='hidden';overlay.classList.remove('open');
    },null,520);
-   return {active,backward:surface.getAnimations().find(a=>a.effect?.getTiming().duration===520)?.playbackRate};
+   const after=surface.getBoundingClientRect();
+   return {active,jump:Math.hypot(before.left-after.left,before.top-after.top)};
   });
   expect(reversed.active).toBe(true);
-  expect(reversed.backward).toBe(-1);
+  expect(reversed.jump,'reversing mid-flight must not snap back to full-screen').toBeLessThan(22);
   await expect(page.locator('#productOverlay')).toHaveCSS('visibility','hidden',{timeout:1800});
   expect(errors).toEqual([]);
  }finally{await context.close()}
@@ -199,7 +201,9 @@ test('storefront cart uses source-based 490ms composited motion, not delayed fad
   await motionFixture(page);
   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
   const data=await page.evaluate(()=>{
-   const trigger=document.querySelector('#cartOpen');
+   const trigger=[document.querySelector('#mobileCartNav'),document.querySelector('#cartOpen')]
+    .find(el=>el?.getBoundingClientRect().width>2&&el?.getBoundingClientRect().height>2);
+   if(!trigger)throw new Error('No visible Cart trigger on mobile');
    trigger.click();
    const panel=document.querySelector('#cartDrawer');
    const anim=panel.getAnimations().find(a=>a.effect?.getTiming().duration===490);
