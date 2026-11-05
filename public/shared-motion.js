@@ -123,6 +123,10 @@ function imageMorph(key,reverse,duration){
  const frames=reverse?[{transform:'none'},{transform:compact}]:
     [{transform:compact},{transform:'none'}];
  const opacityBefore=targetImage.style.opacity;
+ const transitionBefore=targetImage.style.transition;
+ // Prevent the legacy 340ms opacity fade from running AFTER the zoom ends.
+ // This is scoped to one image while it has a visible shared-element clone.
+ targetImage.style.transition='none';
  targetImage.style.opacity='0';
  document.body.append(ghost);
  const animation=ghost.animate(frames,{duration,easing:EASE,fill:'both'});
@@ -131,6 +135,10 @@ function imageMorph(key,reverse,duration){
   if(cleaned)return;cleaned=true;
   animation.cancel();ghost.remove();
   targetImage.style.opacity=opacityBefore;
+  // Commit the restored opacity while transitions remain disabled, then put
+  // the original CSS behavior back. No extra 340ms fade or visual pop.
+  void getComputedStyle(targetImage).opacity;
+  targetImage.style.transition=transitionBefore;
  };
  return{animation,cleanup};
 }
