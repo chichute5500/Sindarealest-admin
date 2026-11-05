@@ -77,3 +77,10 @@ for(const [selector,file] of [
 }
 assert.match(html,/#craftTileImage\[data-src\],#materialTile img\.material-photo\[data-src\]/,
  'Near-viewport image observer should activate all three mosaic photos');
+assert.ok(html.includes('id="artSlide" data-src="images/5151ab24330c6931.webp"'),
+ 'First art photo must not download on the cold home viewport');
+assert.ok(html.includes('<noscript><img class="mosaic-photo" src="images/5151ab24330c6931.webp"'),
+ 'No-JS art keeps its original photo');
+assert.ok(html.includes("activateArtFirstSlide();\n   setupArtSlideshow();"),
+ 'Home art photo must activate before slideshow when approaching viewport');
+
