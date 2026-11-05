@@ -74,7 +74,7 @@ try{
  if(mode==="backup"){
    mkdirSync("artifacts/pr174-preview-db",{recursive:true});
    const output="artifacts/pr174-preview-db/d1-before-0019.sql";
-   execute(["d1","export","DB","--remote","--output",output,"--yes"]);
+   execute(["d1","export","DB","--remote","--output",output,"--skip-confirmation"]);
    const contents=readFileSync(output);
    if(contents.length<300||!contents.includes(Buffer.from("CREATE TABLE")))throw Error("D1_SQL_BACKUP_INVALID");
    writeFileSync("artifacts/pr174-preview-db/proof.json",JSON.stringify({
@@ -84,7 +84,7 @@ try{
    },null,2));
    console.log("PASS: isolated exact PR174 Preview D1 verified, full SQL backup made.");
  }else{
-   if(!exists)execute(["d1","migrations","apply","DB","--remote","--yes"]);
+   if(!exists)execute(["d1","migrations","apply","DB","--remote"]);
    const rows=await query("SELECT name FROM pragma_table_info('manual_warranties')");
    const after=(await query("SELECT name FROM d1_migrations WHERE name='0019_manual_warranties.sql'")).length===1;
    const required=["id","warranty_code","customer_name","customer_phone","customer_address","product_name","price","duration_months","starts_at","ends_at"];
