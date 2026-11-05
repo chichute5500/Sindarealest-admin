@@ -89,6 +89,8 @@ jobs:
         run: npx wrangler pages deploy public --project-name sindarealest-admin-preview --branch warranty-pr174-20261105 --commit-hash "$GITHUB_SHA" --commit-message "PR174 warranty test preview"
       - name: Verify deployed Preview branch, SHA, and alias via Cloudflare API
         run: node scripts/verify-warranty-preview-174.mjs
+      - name: Diagnose isolated D1 manual warranty SQL with self-cleaning QA rows
+        run: node scripts/qa-warranty-preview-sql-174.mjs
       - name: Browser QA for isolated Admin Preview
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
