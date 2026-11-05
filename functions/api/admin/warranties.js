@@ -162,8 +162,20 @@ async function issueManualWarranty(context, body) {
       }
       try {
         const result = await context.env.DB.batch(statements);
-        if (result.length !== statements.length || result.some(entry => entry?.meta?.changes !== 1))
-          return fail("Không xác nhận được toàn bộ phiếu bảo hành. Hãy kiểm tra lại danh sách trước khi thử.",503);
+        if (!Array.isArray(result) || result.length !== statements.length ||
+            result.some(entry => entry?.success === false))
+          return fail("Không thể xác nhận việc lưu đầy đủ phiếu bảo hành.",503);
+        // D1 meta.changes may be cumulative, not one per INSERT. Read back the
+        // generated IDs/codes instead of falsely treating a successful batch as 503.
+        const recordIds=records.map(record=>record.id);
+        const saved=await context.env.DB.prepare(
+          "SELECT id,warranty_code FROM manual_warranties WHERE id IN (" +
+          recordIds.map(()=>"?").join(",") + ")"
+        ).bind(...recordIds).all();
+        const savedCodes=new Map((saved.results||[]).map(row=>[row.id,row.warranty_code]));
+        if (savedCodes.size!==records.length ||
+            records.some(record=>savedCodes.get(record.id)!==record.warrantyCode))
+          return fail("Không xác minh được toàn bộ phiếu đã lưu. Vui lòng kiểm tra danh sách bảo hành.",503);
         return json({
           ok:true, warrantyCode:records[0].warrantyCode,
           warranties:records.map(({productName,price,months,startsAt,endsAt,warrantyCode}) => ({

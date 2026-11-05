@@ -100,14 +100,19 @@ assert.equal(staleOrder.status, 409, "warranty issuance must be refused if the o
 assert.equal(staleOrderDB.calls.batchCount, 1, "the stale order guard must run atomically at insert time");
 
 function makeManualDB({ collideFirstCode = false } = {}) {
-  const calls = { batchCount: 0, statements: [], preflightQueries: [] };
+  const calls = { batchCount: 0, statements: [], preflightQueries: [], savedRecords: [] };
   return {
     calls,
     prepare(sql) {
       return {
         sql, values: [],
         bind(...values) { this.values = values; return this; },
-        async all() { calls.preflightQueries.push({sql:this.sql,values:this.values});return {results:[]}; },
+        async all() {
+          if(this.sql.includes("SELECT id,warranty_code FROM manual_warranties WHERE id IN"))
+            return {results:calls.savedRecords};
+          calls.preflightQueries.push({sql:this.sql,values:this.values});
+          return {results:[]};
+        },
       };
     },
     async batch(statements) {
@@ -116,7 +121,10 @@ function makeManualDB({ collideFirstCode = false } = {}) {
         throw new Error('D1_ERROR: UNIQUE constraint failed: manual_warranties.warranty_code');
       }
       calls.statements = statements.map(statement => ({ sql: statement.sql, values: statement.values }));
-      return statements.map(() => ({ meta: { changes: 1 } }));
+      calls.savedRecords=calls.statements.filter(entry=>entry.sql.includes("INSERT INTO manual_warranties")).map(entry=>({
+        id:entry.values[0],warranty_code:entry.values[1],
+      }));
+      return statements.map((_,index) => ({ success:true,meta: { changes: index+1 } }));
     },
   };
 }
@@ -179,6 +187,7 @@ assert.equal(multiResult.warranties[0].durationMonths,6);
 assert.equal(multiResult.warranties[1].durationMonths,12);
 assert.equal(multiDB.calls.batchCount,1,"both product codes and audits must share one transaction");
 assert.equal(multiDB.calls.statements.length,4,"one issue and one audit per product");
+assert.equal(multiDB.calls.savedRecords.length,2,"read-back validates both issued IDs even with cumulative D1 change counts");
 assert.equal(multiDB.calls.preflightQueries[0].values.length,4,"preflight must check both namespaces for both generated codes");
 const invalidSecondDB=makeManualDB();
 const invalidSecond=await postManual(invalidSecondDB,{items:[
