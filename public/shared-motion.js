@@ -90,25 +90,31 @@ function animateBetween(key,surface,sourceRect,destinationRect,reverse,done,ms=D
  const frames=reverse?[{transform:'none'},{transform:start}]:[{transform:start},{transform:'none'}];
  // Pure transforms are GPU-compositable; nothing waits on image decode or network.
  const animation=el.animate(frames,{duration:ms,easing:EASE,fill:'both'});
+ const record={animation,onFinish:done,mode:reverse?'out':'in',cleanup:null};
  let cleaned=false;
  const cleanup=()=>{
   if(cleaned)return;cleaned=true;
   if(running.get(key)?.animation===animation)running.delete(key);
   resetStyle(el,prev);
  };
- running.set(key,{animation,cleanup});
+ record.cleanup=cleanup;running.set(key,record);
  animation.addEventListener('finish',()=>{
-  // Complete the visibility change synchronously with removing fill:both.
-  try{done?.()}finally{animation.cancel();cleanup()}
+  // A gesture during a running animation reverses the same compositor timeline.
+  // Do not reset to either endpoint and produce a visible jump.
+  try{record.onFinish?.()}finally{animation.cancel();cleanup()}
  },{once:true});
  animation.addEventListener('cancel',cleanup,{once:true});
  return true;
 }
 function open(key,surface,source,ms=DURATION){
  const el=getSurface(surface);if(!el)return false;
- cancel(key);
  const origin=resolvedOrigin(source);
  if(origin)origins.set(key,origin);
+ const active=running.get(key);
+ if(active?.mode==='out'&&active.animation?.playState==='running'){
+  active.onFinish=null;active.mode='in';active.animation.reverse();return true;
+ }
+ cancel(key);
  // Force the final layout now; the next frame begins the FLIP transform.
  const previousTransition=el.style.transition,previousTransform=el.style.transform;
  el.style.transition='none';el.style.transform='none';
@@ -120,6 +126,10 @@ function open(key,surface,source,ms=DURATION){
 function close(key,surface,done,source,ms=DURATION){
  const el=getSurface(surface);
  if(!el||reduced()){cancel(key);return false}
+ const active=running.get(key);
+ if(active?.mode==='in'&&active.animation?.playState==='running'){
+  active.onFinish=done;active.mode='out';active.animation.reverse();return true;
+ }
  const endOrigin=rectOf(source)||origins.get(key)||freshSource();
  const destination=currentRect(endOrigin);
  const from=rectOf(el);
