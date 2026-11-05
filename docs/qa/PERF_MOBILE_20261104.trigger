@@ -27,3 +27,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-05: cancel outdated SHA-pinned Lighthouse checks to stop older candidates holding the shared Preview concurrency slot. Re-evaluate Hero Serif Bold preload with modern Lighthouse and 4 cold mobile readings on the latest commit. Keep PR Draft unless quality criteria pass.
 
 2026-11-05: candidate for explicit one-shot QA. Hero NotoSerif-Bold preload (same approved font), 3 below-fold mosaic photos deferred with noscript fallback. Validated source tests; verify mobile scroll-load behavior, 4 valid Lighthouse 13 readings and Desktop. Marker push only, no PR sync CI noise, no Production writes.
+
+2026-11-05: first-paint Noto Serif true outlines proof. Build tiny critical Regular/Bold WOFF2 from original TTF for Welcome/Hero; full Noto font fallback retained for custom text. Production build already runs build-font-assets.py; Preview requires generated files. Browser compare exact glyph metrics; QA cold slow font and scroll deferred imagery. Require >=2 mobile Lighthouse 13 valid >=90, no regression, source and browser PASS. Isolated Preview only, no main writes.
