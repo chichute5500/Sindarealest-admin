@@ -66,6 +66,11 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-fund
+      - name: Generate the approved compact brand emblem for Preview
+        run: |
+          python3 -m pip install --quiet --break-system-packages Pillow
+          python3 scripts/build-logo-asset.py
+          test -s public/images/brand-emblem-nav.webp
       - name: Guard exact non-production Cloudflare target
         shell: bash
         run: |
