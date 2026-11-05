@@ -41,6 +41,10 @@
 }
 #sdFullscreenViewer.open .sd-fullscreen-stage{transform:translate3d(0,0,0) scale(1)}
 
+/* The full-screen gallery now grows from the tapped image. Its old parent
+   opacity animation would conceal the early frames and create a backdrop root. */
+#sdFullscreenViewer.open{animation:none!important}
+
 /* The mobile menu already slides; make its backdrop EXIT as smoothly as it enters. */
 #mobileNavBackdrop{
   display:block;
