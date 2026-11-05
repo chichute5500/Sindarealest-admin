@@ -535,3 +535,63 @@ test('rapid Admin More close → reopen does not cancel active shared element an
   expect(errors).toEqual([]);
  }finally{await context.close()}
 });
+
+test('no full-size glass flash on the first rendered frame after shared detail/gallery close',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  // Capture the actual post-close frames, not only the eventual hidden state.
+  const observations=await page.evaluate(async()=>{
+   const results=[];
+   const source=document.createElement('button');
+   source.textContent='Reference card';
+   source.style.cssText='position:fixed;top:230px;left:25px;width:130px;height:145px';
+   document.body.append(source);
+   for(const [key,selector,target] of [
+    ['product-detail','#productOverlay','.detail-modal'],
+    ['full-gallery','#sdFullscreenViewer','.sd-fullscreen-frame']
+   ]){
+    const el=document.querySelector(selector);
+    const pane=el.querySelector(target);
+    if(key==='full-gallery'){pane.style.width='285px';pane.style.height='375px'}
+    el.style.visibility='visible';el.removeAttribute('inert');el.classList.add('open');
+    window.SDSharedMotion.open(key,pane,source,520);
+    await new Promise(resolve=>setTimeout(resolve,400));
+    const run=[];
+    const ended=new Promise(resolve=>{
+      window.SDSharedMotion.close(key,pane,()=>{
+       el.style.visibility='hidden';el.classList.remove('open');el.setAttribute('inert','');
+       resolve();
+      },null,520);
+    });
+    let tracking=true;
+    const tick=()=>{
+     if(!tracking)return;
+     const style=getComputedStyle(el);
+     run.push({visible:style.visibility==='visible',clip:style.clipPath,
+       legacyTransition:style.transitionDuration,
+       fullUnclipped:style.visibility==='visible'&&style.clipPath==='none'});
+     requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    await ended;
+    await new Promise(resolve=>setTimeout(resolve,80));
+    tracking=false;
+    results.push({key,samples:run.length,exposedFrames:run.filter(x=>x.fullUnclipped).length,
+      last:run.slice(-8),finalVisibility:getComputedStyle(el).visibility});
+    window.SDSharedMotion.reset(key);
+   }
+   return results;
+  });
+  for(const result of observations){
+   expect(result.samples,JSON.stringify(result)).toBeGreaterThan(5);
+   expect(result.exposedFrames,'no unmasked full-screen overlay after retract starts: '+JSON.stringify(result)).toBe(0);
+   expect(result.finalVisibility).toBe('hidden');
+   expect(result.last.at(-1)?.legacyTransition).toBe('0s');
+  }
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
