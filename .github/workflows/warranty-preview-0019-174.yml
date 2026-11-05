@@ -90,4 +90,7 @@ jobs:
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund @playwright/test
           npx playwright install --with-deps chromium
-          npx playwright test tests/e2e/admin-preview.spec.js --reporter=line
+          npx playwright test tests/e2e/admin-preview.spec.js tests/e2e/warranty-multi-preview-174.spec.js --reporter=line
+      - name: Remove only run-scoped synthetic warranty QA records
+        if: always()
+        run: node scripts/cleanup-warranty-preview-174.mjs

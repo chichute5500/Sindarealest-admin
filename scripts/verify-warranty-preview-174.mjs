@@ -9,7 +9,7 @@ const target="warranty-pr174-20261105.sindarealest-admin-preview.pages.dev";
 let verified=false;
 for(let attempt=0;attempt<15;attempt++){
   const r=await fetch("https://api.cloudflare.com/client/v4/accounts/"+account+
-    "/pages/projects/sindarealest-admin-preview/deployments?env=preview&per_page=50",{
+    "/pages/projects/sindarealest-admin-preview/deployments",{
       headers:{Authorization:"Bearer "+token},signal:AbortSignal.timeout(15000)});
   if(!r.ok)throw Error("PAGES_DEPLOYMENTS_HTTP_"+r.status);
   const body=await r.json();

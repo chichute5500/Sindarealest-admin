@@ -1,0 +1,47 @@
+import {test,expect} from "@playwright/test";
+// Intentionally writes only 2 synthetic warranties into independently isolated D1.
+// The workflow always cleans these exact run-scoped records afterward.
+test("PR174 multi-product manual warranty issues two distinct codes",async({page})=>{
+  const url=process.env.ADMIN_TEST_URL, password=process.env.ADMIN_TEST_PASSWORD;
+  const run=process.env.GITHUB_RUN_ID||"";
+  if(!url||!password||!/^\d+$/.test(run))throw Error("Preview URL, authorized Admin password or run ID missing");
+  await page.goto(url,{waitUntil:"domcontentloaded"});
+  await expect(page.locator("#loginForm")).toBeVisible();
+  await page.locator("#password").fill(password);
+  await page.locator('#loginForm button[type="submit"]').click();
+  await expect(page.locator("#appView")).toBeVisible({timeout:20000});
+  await page.goto(new URL("?view=warranties",url).href,{waitUntil:"domcontentloaded"});
+  const disclosure=page.locator("#manualWarrantyDisclosure");
+  await expect(disclosure).toBeVisible({timeout:20000});
+  await disclosure.locator("summary").click();
+  const form=page.locator("#manualWarrantyForm");
+  await expect(form).toBeVisible();
+  await form.locator('[name="customerName"]').fill("PR174 QA "+run);
+  await form.locator('[name="customerPhone"]').fill("0000000000");
+  await form.locator('[name="customerAddress"]').fill("Địa chỉ QA giả lập, không giao hàng");
+  let items=form.locator("[data-manual-warranty-item]");
+  await expect(items).toHaveCount(1);
+  await items.nth(0).locator('[name="productName"]').fill("PR174 QA ví thử");
+  await items.nth(0).locator('[name="price"]').fill("1600000");
+  await items.nth(0).locator('[name="startsAt"]').fill("2026-11-05");
+  await form.locator("#addManualWarrantyItem").click();
+  await expect(items).toHaveCount(2);
+  await items.nth(1).locator('[name="productName"]').fill("PR174 QA túi thử");
+  await items.nth(1).locator('[name="price"]').fill("4500000");
+  await items.nth(1).locator('[name="startsAt"]').fill("2026-11-05");
+  await expect(items.nth(0).locator('[name="durationMonths"]')).toHaveValue("6");
+  await expect(items.nth(1).locator('[name="durationMonths"]')).toHaveValue("12");
+  const responsePromise=page.waitForResponse(r=>
+    new URL(r.url()).pathname==="/api/admin/warranties"&&r.request().method()==="POST",{timeout:25000});
+  await form.locator("#createManualWarrantyBtn").click();
+  const response=await responsePromise;
+  expect(response.status()).toBe(201);
+  const result=await response.json();
+  expect(result.warranties).toHaveLength(2);
+  expect(result.warranties[0].warrantyCode).toMatch(/^SDW-[A-Z2-9]{4}$/);
+  expect(result.warranties[1].warrantyCode).toMatch(/^SDW-[A-Z2-9]{4}$/);
+  expect(result.warranties[0].warrantyCode).not.toBe(result.warranties[1].warrantyCode);
+  await expect(page.locator("#manualWarrantyMessage")).toContainText(result.warranties[0].warrantyCode);
+  await expect(page.locator("#manualWarrantyMessage")).toContainText(result.warranties[1].warrantyCode);
+  console.log("PASS: two independent PR174 warranty codes created via real Preview UI and API; cleanup runs after test.");
+});
