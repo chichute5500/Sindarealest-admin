@@ -93,9 +93,9 @@ function resetStyle(surface,snapshot){
  surface.style.clipPath=snapshot.clipPath;
  surface.style.willChange=snapshot.willChange;
 }
-// Move ONLY the image, never the text or glass. The ghost is a transient,
-// aria-hidden img outside the clipped dialog. Its uniform scale keeps pixels
-// proportional even when the card and detail have different aspect ratios.
+// Move ONLY the image, never the text or glass. The transient aria-hidden
+// clone belongs INSIDE its overlay's aperture: the photo must travel with
+// the clipped glass rather than floating as an isolated rectangular tile.
 function imageMorph(key,reverse,duration){
  if(key!=='product-detail'&&key!=='full-gallery')return null;
  const source=origins.get(key)?.element;
@@ -127,10 +127,11 @@ function imageMorph(key,reverse,duration){
  ghost.dataset.sdMotionKey=key;
  ghost.alt='';ghost.setAttribute('aria-hidden','true');ghost.draggable=false;
  ghost.decoding='async';ghost.src=asset;
- // Above its own modal, below unrelated dialogs, alerts and welcome.
+ // The clone shares the exact clip-path and stacking context of the
+ // growing modal. A document.body clone escapes the aperture and briefly
+ // overlays unrelated product cards during open and reverse-close.
  const root=document.querySelector(key==='product-detail'?'#productOverlay':'#sdFullscreenViewer');
- const z=(Number.parseInt(root&&getComputedStyle(root).zIndex,10)||150)+1;
- ghost.style.cssText='position:fixed;pointer-events:none;user-select:none;z-index:'+z+';'+
+ ghost.style.cssText='position:fixed;pointer-events:none;user-select:none;z-index:3;'+
   'object-fit:contain;object-position:center;transform-origin:center center;'+
   'will-change:transform;left:'+to.left+'px;top:'+to.top+'px;'+
   'width:'+to.width+'px;height:'+to.height+'px';
@@ -161,7 +162,7 @@ function imageMorph(key,reverse,duration){
   image.style.setProperty('transition','none','important');
   image.style.setProperty('opacity','0','important');
  }
- document.body.append(ghost);
+ (root||document.body).append(ghost);
  const animation=ghost.animate(frames,{duration,easing:EASE,fill:'both'});
  let cleaned=false;
  const cleanup=()=>{
