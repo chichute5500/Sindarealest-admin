@@ -404,3 +404,25 @@ test('rapid account view switching leaves one active panel and no inert ghost',a
   expect(errors).toEqual([]);
  }finally{await context.close()}
 });
+
+test('Escape from fullscreen closes gallery only, never the product beneath',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  await page.locator('#skipIntro').click();
+  await expect(page.locator('#welcomeSplash')).toHaveCount(0,{timeout:5000});
+  const outcome=await page.evaluate(()=>{
+   const detail=document.querySelector('#productOverlay'),gallery=document.querySelector('#sdFullscreenViewer');
+   detail.style.visibility='visible';detail.classList.add('open');detail.removeAttribute('inert');
+   gallery.style.visibility='visible';gallery.classList.add('open');gallery.removeAttribute('inert');
+   document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));
+   return{detailOpen:detail.classList.contains('open'),galleryOpen:gallery.classList.contains('open')};
+  });
+  expect(outcome.detailOpen,'Escape must not close the product under full-screen image').toBe(true);
+  expect(outcome.galleryOpen).toBe(false);
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
