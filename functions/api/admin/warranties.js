@@ -1,18 +1,19 @@
 import { fail, getCurrentDateInVietnam, json, readJsonBodyLimited, requireAdmin, warrantyStatusOnDate } from "../../_lib.js";
-import { addWarrantyCalendarMonths, generateShortWarrantyCode, isWarrantyCodeCollisionError } from "../../_warranty-policy.js";
+import { addWarrantyCalendarMonths, createWarrantyPolicySnapshot, generateShortWarrantyCode, isWarrantyCodeCollisionError, readWarrantyPolicySnapshot } from "../../_warranty-policy.js";
 import { normalizeManualWarrantyContact } from "../../_warranty-contact.js";
 export async function onRequestGet(context) {
   const auth = await requireAdmin(context); if (auth.response) return auth.response;
   try {
     const result = await context.env.DB.prepare(`SELECT wc.id,wc.order_id AS orderId,o.order_number AS orderNumber,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone,wc.warranty_code AS warrantyCode,wc.message,wc.status,wc.admin_note AS adminNote,wc.created_at AS createdAt,a.image_key AS imageKey FROM warranty_claims wc JOIN orders o ON o.id=wc.order_id JOIN customers c ON c.id=wc.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=wc.order_id LEFT JOIN warranty_claim_attachments a ON a.claim_id=wc.id ORDER BY wc.created_at DESC LIMIT 1000`).all();
     const [issued, manualIssued] = await Promise.all([
-      context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,w.status AS status,o.order_number AS orderNumber,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone,'' AS address,NULL AS price,'order' AS source FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id ORDER BY w.created_at DESC LIMIT 1000`).all(),
-      context.env.DB.prepare(`SELECT id,warranty_code AS warrantyCode,policy_name AS policyName,duration_months AS durationMonths,starts_at AS startsAt,ends_at AS endsAt,status,'Mua trực tiếp' AS orderNumber,'' AS sku,0 AS skuVerified,product_name AS title,customer_name AS fullName,customer_phone AS phone,customer_address AS address,customer_contact_reference AS contactReference,price,'manual' AS source FROM manual_warranties ORDER BY created_at DESC LIMIT 1000`).all(),
+      context.env.DB.prepare(`SELECT w.id,w.warranty_code AS warrantyCode,w.policy_name AS policyName,w.duration_months AS durationMonths,w.starts_at AS startsAt,w.ends_at AS endsAt,w.status AS status,o.order_number AS orderNumber,oi.sku,oi.sku_verified AS skuVerified,oi.title,COALESCE(oc.full_name,c.full_name) AS fullName,COALESCE(oc.phone,c.phone) AS phone,'' AS address,NULL AS price,w.policy_snapshot_json AS policySnapshotJson,'order' AS source FROM warranties w JOIN orders o ON o.id=w.order_id JOIN order_items oi ON oi.id=w.order_item_id JOIN customers c ON c.id=o.customer_id LEFT JOIN order_contact_details oc ON oc.order_id=o.id ORDER BY w.created_at DESC LIMIT 1000`).all(),
+      context.env.DB.prepare(`SELECT id,warranty_code AS warrantyCode,policy_name AS policyName,duration_months AS durationMonths,starts_at AS startsAt,ends_at AS endsAt,status,'Mua trực tiếp' AS orderNumber,'' AS sku,0 AS skuVerified,product_name AS title,customer_name AS fullName,customer_phone AS phone,customer_address AS address,customer_contact_reference AS contactReference,price,policy_snapshot_json AS policySnapshotJson,'manual' AS source FROM manual_warranties ORDER BY created_at DESC LIMIT 1000`).all(),
     ]);
     const today = getCurrentDateInVietnam();
     const warranties = [...(issued.results || []), ...(manualIssued.results || [])].map((warranty) => ({
       ...warranty,
       status: warrantyStatusOnDate(warranty.status, warranty.startsAt, warranty.endsAt, today),
+      policy:readWarrantyPolicySnapshot(warranty.policySnapshotJson),
     })).sort((a,b)=>String(b.startsAt).localeCompare(String(a.startsAt)));
     return json({ claims: result.results || [], warranties });
   } catch { return fail("Không đọc được dữ liệu bảo hành. Hãy kiểm tra các migration 0003, 0005 và 0007.", 503); }
@@ -48,7 +49,7 @@ async function updateManualWarranty(context, body) {
     return fail("Mã phiếu hoặc thao tác cập nhật không hợp lệ.");
   const db=context.env.DB;
   try {
-    const row=await db.prepare("SELECT id,warranty_code,customer_name,customer_phone,customer_address,customer_contact_reference,product_name,price,policy_name,duration_months,starts_at,ends_at,status FROM manual_warranties WHERE id=? LIMIT 1").bind(id).first();
+    const row=await db.prepare("SELECT id,warranty_code,customer_name,customer_phone,customer_address,customer_contact_reference,product_name,price,policy_name,duration_months,starts_at,ends_at,status,policy_snapshot_json FROM manual_warranties WHERE id=? LIMIT 1").bind(id).first();
     if(!row)return fail("Không tìm thấy phiếu bảo hành trực tiếp.",404);
     if(row.status==="void")return fail("Phiếu đã hủy, không thể sửa hoặc hủy lại.",409);
     let statements, next=null;
@@ -80,6 +81,8 @@ async function updateManualWarranty(context, body) {
       let endsAt;
       try{endsAt=addWarrantyCalendarMonths(startsAt,months)}
       catch{return fail("Ngày bắt đầu bảo hành chưa hợp lệ.")}
+      if(row.policy_snapshot_json&&(price!==row.price||months!==row.duration_months||startsAt!==row.starts_at))
+        return fail("Giá và thời hạn đã cố định lúc cấp phiếu, không thể sửa sau phát hành.",409);
       next={customer_name:customerName,customer_phone:customerPhone,customer_address:customerAddress,
         customer_contact_reference:contactReference,product_name:productName,price,duration_months:months,starts_at:startsAt,ends_at:endsAt};
       if(Object.entries(next).every(([key,value])=>row[key]===value))
@@ -132,10 +135,12 @@ export async function onRequestPost(context) {
   if (Number.isNaN(startDate.getTime()) || startDate.toISOString().slice(0,10) !== startsAt) return fail("Ngày bắt đầu bảo hành không hợp lệ.");
   const endDate = new Date(startDate); const day = endDate.getUTCDate(); endDate.setUTCDate(1); endDate.setUTCMonth(endDate.getUTCMonth()+months); const lastDay = new Date(Date.UTC(endDate.getUTCFullYear(),endDate.getUTCMonth()+1,0)).getUTCDate(); endDate.setUTCDate(Math.min(day,lastDay));
   try {
-    const item = await context.env.DB.prepare(`SELECT o.id AS orderId,o.status,oi.id AS itemId,w.id AS existingWarrantyId FROM orders o JOIN order_items oi ON oi.order_id=o.id LEFT JOIN warranties w ON w.order_item_id=oi.id WHERE o.order_number=? AND upper(oi.sku)=? LIMIT 1`).bind(orderNumber,sku).first();
+    const item = await context.env.DB.prepare(`SELECT o.id AS orderId,o.status,oi.id AS itemId,oi.unit_price AS unitPrice,w.id AS existingWarrantyId FROM orders o JOIN order_items oi ON oi.order_id=o.id LEFT JOIN warranties w ON w.order_item_id=oi.id WHERE o.order_number=? AND upper(oi.sku)=? LIMIT 1`).bind(orderNumber,sku).first();
     if (!item) return fail("Không tìm thấy SKU trong đơn hàng.",404);
     if (item.existingWarrantyId) return fail("Sản phẩm này trong đơn đã có mã bảo hành.",409);
     if (item.status !== "completed") return fail("Chỉ phát hành bảo hành sau khi đơn hàng đã được đánh dấu hoàn tất.",409);
+    if(!Number.isSafeInteger(item.unitPrice)||item.unitPrice<0)return fail("Thiếu đơn giá xác nhận để lưu chính sách bảo hành.",409);
+    const snapshot=createWarrantyPolicySnapshot({unitPrice:item.unitPrice,durationMonths:months,startsAt,endsAt:endDate.toISOString().slice(0,10),policyName});
     // The 4-character code is easier to communicate than the older 24-digit
     // codes. Unique index is the final arbiter. Retry only a code collision;
     // a duplicate order item or status race is not a reason to create another.
@@ -144,11 +149,11 @@ export async function onRequestPost(context) {
       try {
         const issued = await context.env.DB.batch([
           context.env.DB.prepare(
-            "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
-            "SELECT ?,?,?,?,?,?,?,?,'active' WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=?) " +
+            "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,policy_snapshot_json) " +
+            "SELECT ?,?,?,?,?,?,?,?,'active',? WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=?) " +
             "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status='completed') " +
             "AND NOT EXISTS (SELECT 1 FROM manual_warranties WHERE upper(warranty_code)=?)",
-          ).bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10),item.itemId,item.orderId,warrantyCode),
+          ).bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10),snapshot,item.itemId,item.orderId,warrantyCode),
           context.env.DB.prepare(
             "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
             "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)",
@@ -202,7 +207,8 @@ async function issueManualWarranty(context, body) {
     let endsAt;
     try { endsAt = addWarrantyCalendarMonths(startsAt, months); }
     catch { return fail("Sản phẩm " + (index + 1) + ": ngày bắt đầu bảo hành không hợp lệ."); }
-    items.push({ productName, price, months, startsAt, endsAt });
+    const snapshot=createWarrantyPolicySnapshot({unitPrice:price,durationMonths:months,startsAt,endsAt,policyName:"Bảo hành trực tiếp"});
+    items.push({ productName, price, months, startsAt, endsAt, snapshot });
   }
   try {
     for (let attempt = 0; attempt < 8; attempt++) {
@@ -221,10 +227,10 @@ async function issueManualWarranty(context, body) {
       const statements = [];
       for (const record of records) {
         statements.push(context.env.DB.prepare(
-          "INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,customer_contact_reference,product_name,price,policy_name,duration_months,starts_at,ends_at,status) " +
-          "VALUES(?,?,?,?,?,?,?,?,'Bảo hành trực tiếp',?,?,?,'active')"
+          "INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,customer_contact_reference,product_name,price,policy_name,duration_months,starts_at,ends_at,status,policy_snapshot_json) " +
+          "VALUES(?,?,?,?,?,?,?,?,'Bảo hành trực tiếp',?,?,?,'active',?)"
         ).bind(record.id,record.warrantyCode,customerName,customerPhone,customerAddress,contactReference,record.productName,
-          record.price,record.months,record.startsAt,record.endsAt));
+          record.price,record.months,record.startsAt,record.endsAt,record.snapshot));
         statements.push(context.env.DB.prepare(
           "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
           "VALUES(?,'admin','manual_warranty_issued','manual_warranty',?,?)"
