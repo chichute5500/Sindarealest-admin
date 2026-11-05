@@ -6,9 +6,9 @@ const admin=readFileSync('public/admin/index.html','utf8');
 const motion=readFileSync('public/motion-parity.css','utf8');
 const engine=readFileSync('public/shared-motion.js','utf8');
 const {existsSync}=await import('node:fs');
-assert.ok(store.includes('class="brand-symbol" src="images/brand-emblem.png"'),'header must reference the checked-in logo');
-assert.ok(existsSync('public/images/brand-emblem.png'),'header logo must exist on disk');
-assert.ok(!store.includes('brand-emblem-nav.webp'),'do not reintroduce missing legacy logo');
+assert.ok(store.includes('class="brand-symbol" src="images/brand-emblem-nav.webp"'),'header must reference approved compact emblem');
+assert.ok(existsSync('public/images/brand-emblem.png'),'original official emblem source must exist');
+assert.ok(readFileSync('.github/workflows/motion-parity-preview.yml','utf8').includes('python3 scripts/build-logo-asset.py'),'isolated preview must generate compact logo before deploy');
 const cssLinks=/href="\/motion-parity\.css\?v=balanced-20261105"/g;
 for(const [label,html] of [['store',store],['admin',admin]]){
  assert.equal([...html.matchAll(cssLinks)].length,1,label+' loads the motion stylesheet exactly once');
