@@ -200,9 +200,11 @@ test('storefront cart uses source-based 490ms composited motion, not delayed fad
  try{
   await motionFixture(page);
   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
-  // On a true first visit the Welcome splash intentionally prevents all drawers
-  // from rendering. Simulate completing Welcome before tapping the Cart icon.
-  await page.evaluate(()=>document.body.classList.remove('welcome-active'));
+  // Welcome is deliberately a full-screen modal until it is dismissed.
+  // Its CSS guard also uses body:has(#welcomeSplash), so removing only
+  // welcome-active incorrectly leaves every drawer visually suppressed.
+  await page.locator('#skipIntro').click();
+  await expect(page.locator('#welcomeSplash')).toHaveCount(0,{timeout:6000});
   const data=await page.evaluate(()=>{
    const trigger=[document.querySelector('#mobileCartNav'),document.querySelector('#cartOpen')]
     .find(el=>el?.getBoundingClientRect().width>2&&el?.getBoundingClientRect().height>2);
