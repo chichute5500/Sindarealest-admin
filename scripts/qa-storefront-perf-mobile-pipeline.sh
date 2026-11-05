@@ -22,6 +22,8 @@ python3 -m pip install --quiet --break-system-packages Pillow fonttools brotli
 python3 scripts/build-material-thumbnails.py
 python3 scripts/build-logo-asset.py
 python3 scripts/build-font-assets.py
+test -s public/fonts/NotoSerif-Regular-FirstPaint.woff2
+test -s public/fonts/NotoSerif-Bold-FirstPaint.woff2
 test -s public/images/brand-emblem-nav.webp
 base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
 curl -fsS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/perf-preview.json"
