@@ -40,7 +40,7 @@ document.addEventListener('pointerdown',event=>{
  lastInteraction={source:rectOf(node),at:performance.now()};
 },{capture:true,passive:true});
 document.addEventListener('click',event=>{
- if(performance.now()-(lastInteraction?.at??-1)>850)
+ if(!lastInteraction||performance.now()-lastInteraction.at>850)
   lastInteraction={source:rectOf(selectTrigger(event.target)),at:performance.now()};
 },true);
 function reduced(){
