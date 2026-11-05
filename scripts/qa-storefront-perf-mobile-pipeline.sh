@@ -37,7 +37,7 @@ for attempt in 1 2 3 4 5 6; do
  sleep 4
 done
 test "$verified" = true
-npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1 lighthouse@12
+npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1 lighthouse@13.6.0
 npx playwright install --with-deps chromium
 node scripts/qa-storefront-perf-mobile-preview.mjs
 mkdir -p artifacts/perf-mobile-20261104/lighthouse
@@ -45,10 +45,10 @@ mkdir -p artifacts/perf-mobile-20261104/lighthouse
 # live Production and isolated Preview. Preserve multiple raw attempts instead
 # of manufacturing a zero score or declaring a passing score from one run.
 for attempt in 1 2 3 4; do
- npx lighthouse "$preview/" --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-mobile-$attempt.json" --quiet
+ npx lighthouse "$preview/" --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-mobile-$attempt.json" --quiet
 done
-npx lighthouse "$preview/" --preset=desktop --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-desktop.json" --quiet
-npx lighthouse "https://sindarealest2.pages.dev/" --throttling-method=devtools --chrome-flags="--headless --no-sandbox" --only-categories=performance --output=json --output-path=artifacts/perf-mobile-20261104/lighthouse/production-mobile.json --quiet
+npx lighthouse "$preview/" --preset=desktop --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-desktop.json" --quiet
+npx lighthouse "https://sindarealest2.pages.dev/" --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance --output=json --output-path=artifacts/perf-mobile-20261104/lighthouse/production-mobile.json --quiet
 node --input-type=module <<'JS'
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
