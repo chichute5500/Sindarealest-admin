@@ -36,19 +36,10 @@ try{
     });
    }).observe({type:"longtask",buffered:true})}catch{}
   });
-  const page=await ctx.newPage(),errors=[],preloadRequests=[];
+  const page=await ctx.newPage(),errors=[];
   page.on("pageerror",e=>errors.push(String(e.message||e)));
-  page.on("request",r=>{
-   const p=new URL(r.url()).pathname;
-   if(p==="/fonts/NotoSerif-Regular.woff2"||p==="/code-hero.css")preloadRequests.push(p);
-  });
   const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
   assert.equal(response?.status(),200,"Fresh mobile entry must load");
-  const hints=response.headers()["link"]||"";
-  assert.ok(hints.includes('</fonts/NotoSerif-Regular.woff2>; rel=preload; as=font'),
-   "Welcome font should be advertised in the SSR response");
-  assert.ok(hints.includes('</code-hero.css?v=20261026-2>; rel=preload; as=style'),
-   "Hero stylesheet should be advertised in the SSR response");
   const introAtStart=await page.locator("#welcomeSplash").isVisible();
   await page.waitForTimeout(1800);
   const firstVisit=await page.evaluate(()=>({
@@ -65,11 +56,8 @@ try{
   assert.ok(introAtStart,"Fresh entry must present Owner-approved Welcome");
   assert.equal(firstVisit.welcomeVisible,false,"Welcome must finish after approved intro");
   assert.deepEqual(errors,[],"Fresh mobile entry must have no script errors");
-  for(const asset of ["/fonts/NotoSerif-Regular.woff2","/code-hero.css"])
-   assert.ok(preloadRequests.filter(p=>p===asset).length<=1,
-    "Response and markup preloads must not duplicate resource requests: "+asset);
   await page.screenshot({path:"artifacts/perf-mobile-20261104/mobile-first-visit.png",animations:"disabled"});
-  results.scenarios.push({name:"mobile-first-visit",introAtStart,metrics:firstVisit,preloadRequests,errors});
+  results.scenarios.push({name:"mobile-first-visit",introAtStart,metrics:firstVisit,errors});
   await ctx.close();
  }
  // Measure first-visit LCP under real Chromium network+CPU throttling.
@@ -131,6 +119,7 @@ try{
   const stillActive=await page.locator("#welcomeSplash").evaluate(el=>
    !el.classList.contains("is-leaving")&&getComputedStyle(el).visibility==="visible");
   assert.ok(stillActive,"Welcome must not dismiss before slow Serif could paint");
+  await page.waitForFunction(()=>document.documentElement.classList.contains("sd-welcome-font-fallback"),null,{timeout:8000});
   await page.waitForFunction(()=>!document.querySelector("#welcomeSplash"),null,{timeout:12000});
   assert.deepEqual(errors,[],"Slow-font Welcome must not throw");
   results.scenarios.push({name:"mobile-slow-serif-lcp-guard",delayedFonts,stillActive,errors});

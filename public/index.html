@@ -3552,14 +3552,16 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
     autoDismissElapsed=true;
     maybeTimedDismiss();
   },reduced?100:1050);
-  // Fail open after prolonged font loading: the visitor still sees readable
-  // text, then gets a paint opportunity before the automatic dismissal.
+  // Under slow mobile networking, preserve the approved ~1s Welcome instead
+  // of keeping its heading hidden for several seconds. Use the existing
+  // stable Vietnamese system-font fallback only if real Serif has not loaded;
+  // keep the two paint frames + 400ms before exit, with no glyph swap.
   window.setTimeout(function(){
     if(!titlePaintedAt&&!closed){
       revealWelcomeCopy(true);
       noteWelcomeTitlePaint();
     }
-  },2600);
+  },950);
   fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
     if(!c)return;
     if(c.welcomeEnabled===false)dismiss();

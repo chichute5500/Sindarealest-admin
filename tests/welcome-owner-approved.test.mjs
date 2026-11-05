@@ -84,3 +84,9 @@ assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Bold\.woff2" as="font"
 assert.match(html,/rel="preload" href="\/code-hero\.css\?v=20261026-2" as="style" fetchpriority="high"/);
 assert.ok(html.indexOf('rel="preload" href="/code-hero.css') < html.indexOf('<style>'),
   'Preload Hero CSS before the long approved inline CSS, while retaining its original stylesheet cascade');
+
+/* Cold mobile: the original Noto face is still used if ready within ~950ms.
+ * If it is slower, the existing system fallback receives two paint frames
+ * before Welcome exits; the approved original visual timing remains ~1s. */
+assert.match(html,/if\(!titlePaintedAt&&!closed\)\{\s*revealWelcomeCopy\(true\);\s*noteWelcomeTitlePaint\(\);\s*\}\s*\},950\)/);
+assert.ok(!html.includes('},2600);'),'Do not let the welcome font watchdog hold a throttled mobile for 2.6s');
