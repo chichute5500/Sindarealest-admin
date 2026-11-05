@@ -140,28 +140,42 @@ function imageMorph(key,reverse,duration){
  const compact='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+ratio.toFixed(5)+')';
  const frames=reverse?[{transform:'none'},{transform:compact}]:
     [{transform:compact},{transform:'none'}];
- const opacityBefore=targetImage.style.getPropertyValue('opacity');
- const opacityPriority=targetImage.style.getPropertyPriority('opacity');
- const transitionBefore=targetImage.style.getPropertyValue('transition');
- const transitionPriority=targetImage.style.getPropertyPriority('transition');
- // The original gallery marks the active image opacity:1!important, and the
- // detail photo transition:opacity 340ms!important. Normal inline properties
- // do NOT override either rule, resulting in two visible photos/flicker.
- targetImage.style.setProperty('transition','none','important');
- targetImage.style.setProperty('opacity','0','important');
+ // The gallery uses two cross-fade image layers. Its active image can
+ // change asynchronously after decode(), while the shared-element ghost is
+ // travelling. Hide BOTH layers or the newly active one flashes through the
+ // ghost. For detail motion, only the single detail photo needs masking.
+ const visualImages=key==='full-gallery'
+  ? [...document.querySelectorAll('#sdFullscreenViewer .sd-fullscreen-image')]
+      .filter(image=>image instanceof HTMLImageElement)
+  : [targetImage];
+ const hiddenImages=visualImages.map(image=>({
+  image,
+  opacity:image.style.getPropertyValue('opacity'),
+  opacityPriority:image.style.getPropertyPriority('opacity'),
+  transition:image.style.getPropertyValue('transition'),
+  transitionPriority:image.style.getPropertyPriority('transition')
+ }));
+ for(const {image} of hiddenImages){
+  // Gallery styles and detail photo fades have !important rules.
+  image.style.setProperty('transition','none','important');
+  image.style.setProperty('opacity','0','important');
+ }
  document.body.append(ghost);
  const animation=ghost.animate(frames,{duration,easing:EASE,fill:'both'});
  let cleaned=false;
  const cleanup=()=>{
   if(cleaned)return;cleaned=true;
   animation.cancel();ghost.remove();
-  if(opacityBefore)targetImage.style.setProperty('opacity',opacityBefore,opacityPriority);
-  else targetImage.style.removeProperty('opacity');
-  // Commit the restored pixels before re-enabling the original photo
-  // transitions; never animate back through a second 340ms opacity fade.
-  void getComputedStyle(targetImage).opacity;
-  if(transitionBefore)targetImage.style.setProperty('transition',transitionBefore,transitionPriority);
-  else targetImage.style.removeProperty('transition');
+  for(const state of hiddenImages){
+   const {image,opacity,opacityPriority,transition,transitionPriority}=state;
+   if(opacity)image.style.setProperty('opacity',opacity,opacityPriority);
+   else image.style.removeProperty('opacity');
+   // Restore actual pixels before re-enabling the legacy fade. Otherwise a
+   // second 250–340ms opacity transition overlaps the zoom finish.
+   void getComputedStyle(image).opacity;
+   if(transition)image.style.setProperty('transition',transition,transitionPriority);
+   else image.style.removeProperty('transition');
+  }
  };
  return{animation,cleanup};
 }
