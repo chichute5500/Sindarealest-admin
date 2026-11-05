@@ -66,6 +66,10 @@ test("PR174 multi-product manual warranty issues two distinct codes",async({page
     expect(publicJson.warranty.maskedPhone).toBe("000••••00");
     expect(publicJson.warranty.maskedOrderNumber).toBe("Mua trực tiếp");
     expect(publicJson.warranty.purchasedAt).toBe("","Manual issuance date must not be mislabeled purchase date");
+    expect(publicJson.warranty.policy.version).toBe("SD-WARRANTY-2026-11-05-V1");
+    expect(publicJson.warranty.policy.materialRemedy).toContain("gấp 10 lần");
+    expect(publicJson.warranty.policy.exclusions).toContain("va đập");
+    expect(JSON.stringify(publicJson.warranty)).not.toContain("unitPriceVnd");
   }
   // Edit a single product without changing the other product's code.
   const firstRow=page.locator(".issued-warranty-table tbody tr").filter({hasText:result.warranties[0].warrantyCode});
@@ -73,9 +77,9 @@ test("PR174 multi-product manual warranty issues two distinct codes",async({page
   const editForm=page.locator("#editManualWarrantyForm");
   await expect(editForm).toBeVisible();
   await editForm.locator('[name="productName"]').fill("PR174 QA ví đã sửa");
-  await editForm.locator('[name="price"]').fill("1700000");
-  await editForm.locator('[name="durationMonths"]').fill("7");
-  await editForm.locator('[name="startsAt"]').fill("2026-11-06");
+  await expect(editForm.locator('[name="price"]')).toHaveAttribute("readonly","");
+  await expect(editForm.locator('[name="durationMonths"]')).toHaveAttribute("readonly","");
+  await expect(editForm.locator('[name="startsAt"]')).toHaveAttribute("readonly","");
   const editResponsePromise=page.waitForResponse(r=>
     new URL(r.url()).pathname==="/api/admin/warranties"&&r.request().method()==="PATCH",{timeout:25000});
   await editForm.locator("#saveManualWarrantyEdit").click();
@@ -86,8 +90,9 @@ test("PR174 multi-product manual warranty issues two distinct codes",async({page
   const afterEdit=(await (await page.request.get(warrantyEndpoint)).json()).warranties;
   const edited=afterEdit.find(w=>w.warrantyCode===first.warrantyCode);
   expect(edited.title).toBe("PR174 QA ví đã sửa");
-  expect(edited.durationMonths).toBe(7);
-  expect(edited.endsAt).toBe("2027-06-06");
+  expect(edited.durationMonths).toBe(6);
+  expect(edited.endsAt).toBe("2027-05-05");
+  expect(edited.policy.version).toBe("SD-WARRANTY-2026-11-05-V1");
   expect(afterEdit.find(w=>w.warrantyCode===second.warrantyCode).durationMonths).toBe(12);
   // The Admin edit panel must remain usable at common mobile width.
   await page.setViewportSize({width:390,height:844});
@@ -122,6 +127,10 @@ test("PR174 multi-product manual warranty issues two distinct codes",async({page
     productName:"PR174 QA ví đã sửa",price:"1.5",durationMonths:"7",startsAt:"2026-11-06"
   }});
   expect(invalid.status()).toBe(400,"fractional price must not be accepted");
+  const frozen=await page.request.patch(warrantyEndpoint,{data:{source:"manual",action:"update",id:first.id,
+    customerName:"PR174 QA "+run,customerPhone:"0000000000",customerAddress:"Địa chỉ QA giả lập, không giao hàng",
+    productName:"PR174 QA ví đã sửa",price:"1700000",durationMonths:"6",startsAt:"2026-11-05"}});
+  expect(frozen.status()).toBe(409,"issued policy price is immutable");
   console.log("PASS: PR174 Admin create/edit/void, phone-linked records, public SDW lookup, mobile edit, unchanged codes and 4xx protections.");
   console.log("PASS: two independent PR174 warranty codes created via real Preview UI and API; cleanup runs after test.");
 });

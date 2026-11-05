@@ -49,6 +49,7 @@ try{
  mkdirSync(join(dir,"migrations"));
  copyFileSync(new URL("../migrations/0019_manual_warranties.sql",import.meta.url),join(dir,"migrations","0019_manual_warranties.sql"));
  copyFileSync(new URL("../migrations/0020_manual_warranty_contacts.sql",import.meta.url),join(dir,"migrations","0020_manual_warranty_contacts.sql"));
+ copyFileSync(new URL("../migrations/0021_warranty_policy_snapshots.sql",import.meta.url),join(dir,"migrations","0021_warranty_policy_snapshots.sql"));
  const conf=join(dir,"wrangler.toml");
  writeFileSync(conf,[
    'name = "sd-warranty-pr174-preview"',
@@ -88,12 +89,19 @@ try{
    const hasContact=(await query("SELECT name FROM pragma_table_info('manual_warranties')")).some(row=>row.name==="customer_contact_reference");
    const contactRecorded=(await query("SELECT name FROM d1_migrations WHERE name='0020_manual_warranty_contacts.sql'")).length===1;
    if(hasContact!==contactRecorded)throw Error("CONTACT_SCHEMA_AND_LEDGER_MISMATCH");
-   if(!exists||!hasContact)execute(["d1","migrations","apply","DB","--remote"]);
+   const hasPolicy=(await query("SELECT name FROM pragma_table_info('warranties')")).some(row=>row.name==="policy_snapshot_json");
+   const hasManualPolicy=(await query("SELECT name FROM pragma_table_info('manual_warranties')")).some(row=>row.name==="policy_snapshot_json");
+   const policyRecorded=(await query("SELECT name FROM d1_migrations WHERE name='0021_warranty_policy_snapshots.sql'")).length===1;
+   if(hasPolicy!==policyRecorded||hasManualPolicy!==policyRecorded)throw Error("POLICY_SCHEMA_AND_LEDGER_MISMATCH");
+   if(!exists||!hasContact||!hasPolicy)execute(["d1","migrations","apply","DB","--remote"]);
    const rows=await query("SELECT name FROM pragma_table_info('manual_warranties')");
    const after=(await query("SELECT name FROM d1_migrations WHERE name='0019_manual_warranties.sql'")).length===1;
    const contactAfter=(await query("SELECT name FROM d1_migrations WHERE name='0020_manual_warranty_contacts.sql'")).length===1;
    const required=["id","warranty_code","customer_name","customer_phone","customer_address","product_name","price","duration_months","starts_at","ends_at"];
-   if(!after||!contactAfter||required.some(n=>!rows.some(r=>r.name===n))||!rows.some(r=>r.name==="customer_contact_reference"))throw Error("MIGRATION_0019_0020_VERIFICATION_FAILED");
-   console.log("PASS: Preview D1 0019 and 0020 verified, no Production writes.");
+   const policyAfter=(await query("SELECT name FROM d1_migrations WHERE name='0021_warranty_policy_snapshots.sql'")).length===1;
+   const orderPolicy=(await query("SELECT name FROM pragma_table_info('warranties')")).some(row=>row.name==="policy_snapshot_json");
+   if(!after||!contactAfter||!policyAfter||!orderPolicy||required.some(n=>!rows.some(r=>r.name===n))||
+     !rows.some(r=>r.name==="customer_contact_reference")||!rows.some(r=>r.name==="policy_snapshot_json"))throw Error("MIGRATION_0019_0020_0021_VERIFICATION_FAILED");
+   console.log("PASS: Preview D1 0019, 0020, 0021 verified, no Production writes.");
  }
 }finally{rmSync(dir,{recursive:true,force:true});}

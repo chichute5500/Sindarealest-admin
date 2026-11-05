@@ -29,6 +29,7 @@ const schema=[
  '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
  '0007_order_contact_details.sql','0008_product_sku_verification.sql',
  '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql',
+ '0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql',
 ].map(file=>readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8')).join('\n');
 function fixture(total, {existingWarranty=false, secondItem=false,firstItemPrice=null,simulateCodeCollision=false}={}){
  const sql=new DatabaseSync(':memory:');
@@ -93,6 +94,7 @@ for(const [total,months] of [[1_999_999,6],[3_000_000,6],[6_000_000,6],[6_000_00
  assert.equal(issued.length,2);
  for(const w of issued){
    assert.equal(w.duration_months,months);
+   assert.ok(w.policy_snapshot_json&&JSON.parse(w.policy_snapshot_json).materialRemedy.includes('10 lần'),'issued warranty saves the exact material promise');
    assert.equal(w.starts_at,today,'warranty begins at completion date Vietnam');
    assert.equal(w.ends_at,addWarrantyCalendarMonths(today,months));
    assert.equal(w.status,'active');

@@ -112,7 +112,7 @@ for(const name of [
   '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
   '0007_order_contact_details.sql','0008_product_sku_verification.sql',
   '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql',
-  '0019_manual_warranties.sql'
+  '0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql'
 ])sqlite.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
 const insertManual=sqlite.prepare(
   "INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status) VALUES(?,?,?,?,?,?,?,'Bảo hành trực tiếp',?,?,?,?)");

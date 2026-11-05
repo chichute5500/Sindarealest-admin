@@ -2696,16 +2696,16 @@ return statusMatches&&matchesQuery([c.id,c.orderNumber,c.warrantyCode,c.sku,c.ti
 const manualEditorMarkup=manualEditor?[
 '<section class="panel" id="manualWarrantyEditorPanel" style="margin-bottom:14px" aria-label="Chỉnh sửa bảo hành mua trực tiếp">',
 '<div class="panelhead"><h3>Sửa phiếu bảo hành · '+esc(manualEditor.warrantyCode)+'</h3></div>',
-'<p class="tiny muted">Chỉnh sửa dữ liệu khách và sản phẩm; mã SDW giữ nguyên. Hủy phiếu sẽ ngừng hiệu lực nhưng không xóa lịch sử.</p>',
+'<p class="tiny muted">Chỉnh sửa thông tin khách và tên sản phẩm; mã SDW giữ nguyên. Nếu phiếu đã lưu chính sách, giá và thời hạn được khóa để tránh tranh chấp. Hủy phiếu sẽ ngừng hiệu lực nhưng không xóa lịch sử.</p>',
 '<form id="editManualWarrantyForm" class="formgrid" data-id="'+esc(manualEditor.id)+'">',
 '<div class="field"><label for="editMwName">Tên khách hàng *</label><input class="control" id="editMwName" name="customerName" maxlength="120" required value="'+esc(manualEditor.fullName)+'"></div>',
 '<div class="field"><label for="editMwPhone">Số điện thoại *</label><input class="control" id="editMwPhone" name="customerPhone" type="tel" inputmode="tel" maxlength="32" required value="'+esc(manualEditor.phone)+'"></div>',
 '<div class="field span2"><label for="editMwAddress">Địa chỉ *</label><textarea class="control" id="editMwAddress" name="customerAddress" maxlength="500" rows="2" required>'+esc(manualEditor.address)+'</textarea></div>',
 '<div class="field span2"><label for="editMwContact">Nguồn liên hệ mua hàng (chỉ Admin)</label><input class="control" id="editMwContact" name="contactReference" maxlength="300" value="'+esc(manualEditor.contactReference||'')+'" placeholder="Link Facebook hoặc số Zalo"><span class="tiny muted">Dùng để đối chiếu người mua khi bảo hành. Khách không nhìn thấy.</span></div>',
 '<div class="field span2"><label for="editMwProduct">Tên sản phẩm *</label><input class="control" id="editMwProduct" name="productName" maxlength="180" required value="'+esc(manualEditor.title)+'"></div>',
-'<div class="field"><label for="editMwPrice">Giá bán (VNĐ) *</label><input class="control" id="editMwPrice" name="price" type="number" min="0" max="2000000000" step="1" required value="'+esc(manualEditor.price)+'"></div>',
-'<div class="field"><label for="editMwMonths">Thời hạn bảo hành (tháng) *</label><input class="control" id="editMwMonths" name="durationMonths" type="number" min="1" max="120" step="1" required value="'+esc(manualEditor.durationMonths)+'"></div>',
-'<div class="field span2"><label for="editMwStarts">Ngày bắt đầu *</label><input class="control" id="editMwStarts" name="startsAt" type="date" required value="'+esc(manualEditor.startsAt)+'"></div>',
+'<div class="field"><label for="editMwPrice">Giá bán (VNĐ) *</label><input class="control" id="editMwPrice" name="price" type="number" min="0" max="2000000000" step="1" required '+(manualEditor.policy?'readonly aria-readonly="true" ':'')+'value="'+esc(manualEditor.price)+'"></div>',
+'<div class="field"><label for="editMwMonths">Thời hạn bảo hành (tháng) *</label><input class="control" id="editMwMonths" name="durationMonths" type="number" min="1" max="120" step="1" required '+(manualEditor.policy?'readonly aria-readonly="true" ':'')+'value="'+esc(manualEditor.durationMonths)+'"></div>',
+'<div class="field span2"><label for="editMwStarts">Ngày bắt đầu *</label><input class="control" id="editMwStarts" name="startsAt" type="date" required '+(manualEditor.policy?'readonly aria-readonly="true" ':'')+'value="'+esc(manualEditor.startsAt)+'"></div>',
 '<div class="span2" style="display:flex;align-items:center;flex-wrap:wrap;gap:8px"><button id="saveManualWarrantyEdit" class="btn primary" type="submit">Lưu thay đổi</button><button type="button" class="btn" id="closeManualWarrantyEdit">Đóng</button></div>',
 '<p id="editManualWarrantyMessage" class="tiny muted span2" role="status" aria-live="polite"></p>',
 '</form>',
@@ -2716,7 +2716,7 @@ const manualEditorMarkup=manualEditor?[
 '<p class="tiny muted">Không xóa mã SDW; khách vẫn tra cứu được trạng thái Đã hủy.</p>',
 '</div></section>'
 ].join(''):'';
-return `${head('Chăm sóc sau bán','Bảo hành / Yêu cầu hỗ trợ','Bảo hành tự kích hoạt khi Shop xác nhận đơn: dưới 2 triệu 6 tháng, từ 2 triệu 12 tháng.') }
+return `${head('Chăm sóc sau bán','Bảo hành / Yêu cầu hỗ trợ','Bảo hành tự kích hoạt khi giao thành công: đến 3 triệu 6 tháng, trên 3 triệu 12 tháng; chính sách được lưu cố định theo mã SDW.') }
 <section class="panel warranty-toolbar">
 <div class="field"><label for="warrantySearch">Tìm mã bảo hành, SĐT, tên khách hoặc sản phẩm</label><input class="control" id="warrantySearch" type="search" value="${esc(warrantySearch)}" placeholder="Tìm mã, SĐT, khách hàng, sản phẩm…"></div>
 <div class="warranty-filter-row" role="group" aria-label="Lọc yêu cầu hỗ trợ">

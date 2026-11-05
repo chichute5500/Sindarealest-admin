@@ -11,6 +11,10 @@ on:
       - scripts/cleanup-warranty-preview-174.mjs
       - functions/_warranty-contact.js
       - migrations/0020_manual_warranty_contacts.sql
+      - migrations/0021_warranty_policy_snapshots.sql
+      - functions/_warranty-policy.js
+      - functions/api/admin/orders.js
+      - functions/api/admin/backup.js
       - functions/api/admin/warranties.js
       - functions/api/admin/restore.js
       - functions/api/warranty-lookup.js
