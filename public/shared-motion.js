@@ -5,7 +5,8 @@
  */
 (()=>{
 'use strict';
-const EASE='cubic-bezier(.42,0,.58,1)',DURATION=490;
+const EASE='cubic-bezier(.25,.65,.3,1)',DURATION=350;
+const adjustedMs=requested=>Math.max(285,Math.min(375,Math.round(requested*.70)));
 const origins=new Map(),running=new Map();
 let lastInteraction=null;
 function rectOf(input){
@@ -69,6 +70,15 @@ function currentRect(src,preferSnapshot=false){
 function getSurface(surface){
  return typeof surface==='string'?document.querySelector(surface):surface;
 }
+// The detail's glass is a ::before sibling of its content. Clipping only
+// .detail-modal leaves a full-screen glass sheet behind a tiny card (owner
+// screenshot). Clip the WHOLE visual plane so glass and contents grow together.
+function animationSurface(key,surface){
+ const actual=getSurface(surface);
+ if(key==='product-detail')return document.querySelector('#productOverlay')||actual;
+ if(key==='full-gallery')return document.querySelector('#sdFullscreenViewer')||actual;
+ return actual;
+}
 function cancel(key){
  const active=running.get(key);
  if(!active)return;
@@ -80,29 +90,36 @@ function resetStyle(surface,snapshot){
  if(!surface)return;
  surface.style.transition=snapshot.transition;
  surface.style.transform=snapshot.transform;
- surface.style.transformOrigin=snapshot.transformOrigin;
+ surface.style.clipPath=snapshot.clipPath;
  surface.style.willChange=snapshot.willChange;
 }
-function animateBetween(key,surface,sourceRect,destinationRect,reverse,done,ms=DURATION){
- const el=getSurface(surface);
- if(!el||typeof el.animate!=='function'||reduced()||!sourceRect||!destinationRect){
-  done?.();return false;
- }
+// The content keeps its FULL native dimensions. Only a rounded viewing aperture
+// expands. No scaleX/scaleY; photos and text are never stretched or compressed.
+// The aperture is anchored at the selected card's genuine viewport position.
+function aperture(source,target){
+ const cx=source.left+source.width/2-target.left;
+ const cy=source.top+source.height/2-target.top;
+ const w=Math.max(12,Math.min(source.width,target.width*.65));
+ const h=Math.max(12,Math.min(source.height,target.height*.65));
+ const left=Math.max(0,Math.min(target.width-w,cx-w/2));
+ const top=Math.max(0,Math.min(target.height-h,cy-h/2));
+ const right=target.width-left-w,bottom=target.height-top-h;
+ return 'inset('+top.toFixed(2)+'px '+right.toFixed(2)+'px '+bottom.toFixed(2)+'px '+left.toFixed(2)+'px round 19px)';
+}
+function animateBetween(key,surface,sourceRect,destinationRect,reverse,done,requestedMs=DURATION){
+ const el=animationSurface(key,surface);
+ if(!el||typeof el.animate!=='function'||reduced()||!sourceRect||!destinationRect)return false;
  const a=sourceRect,b=destinationRect;
- if(!(b.width>0&&b.height>0&&a.width>0&&a.height>0)){
-  done?.();return false;
- }
+ if(!(b.width>0&&b.height>0&&a.width>0&&a.height>0))return false;
  cancel(key);
- const prev={transition:el.style.transition,transform:el.style.transform,transformOrigin:el.style.transformOrigin,willChange:el.style.willChange};
- el.style.transition='none';el.style.transform='none';el.style.transformOrigin='0 0';el.style.willChange='transform';
- const dx=Math.max(-innerWidth*2,Math.min(innerWidth*2,a.left-b.left));
- const dy=Math.max(-innerHeight*2,Math.min(innerHeight*2,a.top-b.top));
- const sx=Math.max(.07,Math.min(2.2,a.width/b.width));
- const sy=Math.max(.07,Math.min(2.2,a.height/b.height));
- const start='translate3d('+dx+'px,'+dy+'px,0) scale('+sx+','+sy+')';
- const frames=reverse?[{transform:'none'},{transform:start}]:[{transform:start},{transform:'none'}];
- // Pure transforms are GPU-compositable; nothing waits on image decode or network.
- const animation=el.animate(frames,{duration:ms,easing:EASE,fill:'both'});
+ const prev={transition:el.style.transition,transform:el.style.transform,clipPath:el.style.clipPath,willChange:el.style.willChange};
+ // Override any slide or scale only while the aperture runs. The original
+ // classes and their Liquid Glass material are restored unchanged afterward.
+ el.style.transition='none';el.style.transform='none';el.style.clipPath='none';el.style.willChange='clip-path';
+ const mask=aperture(a,b);
+ const full='inset(0px 0px 0px 0px round 19px)';
+ const frames=reverse?[{clipPath:full},{clipPath:mask}]:[{clipPath:mask},{clipPath:full}];
+ const animation=el.animate(frames,{duration:adjustedMs(requestedMs),easing:EASE,fill:'both'});
  const record={animation,onFinish:done,mode:reverse?'out':'in',cleanup:null};
  let cleaned=false;
  const cleanup=()=>{
@@ -112,15 +129,13 @@ function animateBetween(key,surface,sourceRect,destinationRect,reverse,done,ms=D
  };
  record.cleanup=cleanup;running.set(key,record);
  animation.addEventListener('finish',()=>{
-  // A gesture during a running animation reverses the same compositor timeline.
-  // Do not reset to either endpoint and produce a visible jump.
   try{record.onFinish?.()}finally{animation.cancel();cleanup()}
  },{once:true});
  animation.addEventListener('cancel',cleanup,{once:true});
  return true;
 }
 function open(key,surface,source,ms=DURATION){
- const el=getSurface(surface);if(!el)return false;
+ const el=animationSurface(key,surface);if(!el)return false;
  const origin=resolvedOrigin(source);
  if(origin)origins.set(key,origin);
  const active=running.get(key);
@@ -128,7 +143,6 @@ function open(key,surface,source,ms=DURATION){
   active.onFinish=null;active.mode='in';active.animation.reverse();return true;
  }
  cancel(key);
- // Force the final layout now; the next frame begins the FLIP transform.
  const previousTransition=el.style.transition,previousTransform=el.style.transform;
  el.style.transition='none';el.style.transform='none';
  const target=rectOf(el);
@@ -137,7 +151,7 @@ function open(key,surface,source,ms=DURATION){
  return animateBetween(key,el,currentRect(actual,true)||actual,target,false,null,ms);
 }
 function close(key,surface,done,source,ms=DURATION){
- const el=getSurface(surface);
+ const el=animationSurface(key,surface);
  if(!el||reduced()){cancel(key);return false}
  const active=running.get(key);
  if(active?.mode==='in'&&active.animation?.playState==='running'){
@@ -153,5 +167,5 @@ function popOrigin(key){origins.delete(key)}
 function hasOrigin(key){return origins.has(key)}
 function sourceFromLast(){return freshSource()}
 document.documentElement.classList.add('sd-shared-motion');
-window.SDSharedMotion={open,close,cancel,popOrigin,hasOrigin,sourceFromLast,rectOf,easing:EASE,duration:DURATION};
+window.SDSharedMotion={open,close,cancel,popOrigin,hasOrigin,sourceFromLast,rectOf,easing:EASE,duration:DURATION,adjustedMs};
 })();
