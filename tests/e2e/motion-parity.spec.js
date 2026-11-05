@@ -426,3 +426,47 @@ test('Escape from fullscreen closes gallery only, never the product beneath',asy
   expect(errors).toEqual([]);
  }finally{await context.close()}
 });
+
+test('full gallery !important CSS cannot show two photos during zoom, including Next active layer',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const before=await page.evaluate(async()=>{
+   const src='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800"><rect width="600" height="800" fill="#999"/></svg>');
+   const detail=document.querySelector('#productOverlay'),viewer=document.querySelector('#sdFullscreenViewer');
+   const source=document.querySelector('#detailMainImage');
+   const initial=document.querySelector('#sdFullscreenImage'),next=document.querySelector('#sdFullscreenImageNext');
+   source.src=src;next.src=src;await Promise.all([source.decode(),next.decode()]);
+   detail.classList.add('open');detail.style.visibility='visible';
+   viewer.classList.add('open');viewer.style.visibility='visible';
+   initial.classList.remove('is-active');next.classList.add('is-active');
+   document.querySelector('#sdFullscreenFrame').style.cssText='width:285px;height:375px';
+   const started=window.SDSharedMotion.open('full-gallery',document.querySelector('#sdFullscreenFrame'),source,520);
+   return{started,active:getComputedStyle(next).opacity,activePriority:next.style.getPropertyPriority('opacity'),
+    inactive:getComputedStyle(initial).opacity,
+    transitionPriority:next.style.getPropertyPriority('transition'),
+    ghosts:window.SDSharedMotion.inspect().ghosts};
+  });
+  expect(before.started).toBe(true);
+  expect(before.active,'the actual active fullscreen photo must be hidden under the ghost').toBe('0');
+  expect(before.activePriority).toBe('important');
+  expect(before.inactive).toBe('0');
+  expect(before.ghosts).toBe(1);
+  await page.waitForTimeout(460);
+  const after=await page.evaluate(()=>{
+   const next=document.querySelector('#sdFullscreenImageNext');
+   return{active:getComputedStyle(next).opacity,
+     opacityPriority:next.style.getPropertyPriority('opacity'),
+     transitionPriority:next.style.getPropertyPriority('transition'),
+     ghosts:window.SDSharedMotion.inspect().ghosts};
+  });
+  expect(after.active).toBe('1');
+  expect(after.opacityPriority).toBe('');
+  expect(after.transitionPriority).toBe('');
+  expect(after.ghosts).toBe(0);
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
