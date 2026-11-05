@@ -207,11 +207,16 @@ test('storefront cart uses source-based 490ms composited motion, not delayed fad
    trigger.click();
    const panel=document.querySelector('#cartDrawer');
    const anim=panel.getAnimations().find(a=>a.effect?.getTiming().duration===490);
-   return {open:panel.classList.contains('open'),duration:anim?.effect?.getTiming().duration,
-    frames:anim?.effect?.getKeyframes(),glass:getComputedStyle(panel).backdropFilter};
+   return {open:panel.classList.contains('open'),trigger:trigger.id,
+    source:window.SDSharedMotion?.sourceFromLast(),
+    hasOrigin:window.SDSharedMotion?.hasOrigin('cart'),
+    animations:panel.getAnimations().map(a=>({type:a.constructor.name,duration:a.effect?.getTiming()?.duration,
+      playbackRate:a.playbackRate,frames:a.effect?.getKeyframes()?.slice(0,2).map(f=>f.transform)})),
+    duration:anim?.effect?.getTiming().duration,frames:anim?.effect?.getKeyframes(),
+    glass:getComputedStyle(panel).backdropFilter};
   });
   expect(data.open).toBe(true);
-  expect(data.duration).toBe(490);
+  expect(data.duration,JSON.stringify(data)).toBe(490);
   expect(data.frames[0].transform).toContain('scale(');
   expect(data.frames[1].transform).toBe('none');
   expect(data.glass).toContain('blur(');
