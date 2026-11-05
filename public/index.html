@@ -4600,7 +4600,10 @@ function dismissStorefrontDrawersForNavigation(){
 function openFullscreenImage(){
  if(!currentProduct||!detailImages.length||!$('#productOverlay').classList.contains('open'))return;
  if(!restoringStorefrontModalHistory)pushStorefrontModalHistory('gallery');
- clearTimeout(detailTimer);
+ clearTimeout(detailTimer);clearTimeout(detailSwapTimer);clearTimeout(detailAnimationTimer);
+ // Freeze an in-flight detail photo slide at its settled picture before zoom.
+ // Otherwise the gallery can zoom a card that is still sliding underneath.
+ clearGalleryTransitionClasses($('#detailMainImage'));
  // Retire the previous product ghost before a fullscreen ghost is created.
  window.SDSharedMotion?.cancel('product-detail');
  const viewer=$('#sdFullscreenViewer');
