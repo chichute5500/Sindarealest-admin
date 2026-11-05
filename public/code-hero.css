@@ -11,7 +11,7 @@
 .sd-code-hero::before{content:"";position:absolute;pointer-events:none;inset:1px;border-radius:inherit;border:1px solid rgba(255,255,255,.48);z-index:4}
 .sd-code-hero::after{content:"";position:absolute;pointer-events:none;right:22%;top:-26%;width:47%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(94,158,232,.28);transform:rotate(-17deg);z-index:0}
 .sd-code-hero .sdh-copy{position:relative;z-index:3;min-width:0;max-width:580px}
-.sd-code-hero .sdh-title{margin:0;font:700 clamp(39px,4vw,59px)/1.08 'SD FirstPaint','SD Serif',Georgia,serif;letter-spacing:-.05em;color:var(--ink)}
+.sd-code-hero .sdh-title{margin:0;font:700 clamp(39px,4vw,59px)/1.08 'SD Serif',Georgia,serif;letter-spacing:-.05em;color:var(--ink)}
 .sd-code-hero .sdh-title span{display:block;white-space:nowrap}
 .sd-code-hero .sdh-title .sdh-em{color:var(--sdh-tint)}
 .sd-code-hero .sdh-description{max-width:365px;margin:15px 0 0;color:var(--muted);font:400 13px/1.6 'SD Sans',Arial,sans-serif}

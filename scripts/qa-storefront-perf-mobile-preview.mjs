@@ -52,28 +52,6 @@ try{
    firstContentfulPaint:performance.getEntriesByType("paint").find(x=>x.name==="first-contentful-paint")?.startTime??null,
    transferBytes:performance.getEntriesByType("resource").reduce((sum,e)=>sum+(e.transferSize||0),0)
   }));
-  // FirstPaint is cut directly from the original TTF. Prove the browser sees
-  // identical glyph metrics for both approved Welcome and Hero copy.
-  const faceMetrics=await page.evaluate(async()=>{
-   const cvs=document.createElement("canvas"),ctx=cvs.getContext("2d");
-   const checks=[
-    {weight:400,text:"Dấu ấn da cá sấu. Tinh tế trong từng chi tiết."},
-    {weight:700,text:"Phong cách Đẳng cấp từ da cá sấu"}
-   ];
-   const result=[];
-   for(const sample of checks){
-    await document.fonts.load(sample.weight+' 30px "SD FirstPaint"',sample.text);
-    await document.fonts.load(sample.weight+' 30px "SD Serif"',sample.text);
-    ctx.font=sample.weight+' 30px "SD FirstPaint"';
-    const critical=ctx.measureText(sample.text).width;
-    ctx.font=sample.weight+' 30px "SD Serif"';
-    const complete=ctx.measureText(sample.text).width;
-    result.push({critical,complete,delta:Math.abs(critical-complete)});
-   }
-   return result;
-  });
-  for(const item of faceMetrics)assert.ok(item.delta<0.5,
-   "FirstPaint subset must preserve exact Noto text metrics: "+JSON.stringify(item));
   assert.ok(firstVisit.lcp.length>0,"First Welcome visit must record browser-native LCP");
   assert.ok(introAtStart,"Fresh entry must present Owner-approved Welcome");
   assert.equal(firstVisit.welcomeVisible,false,"Welcome must finish after approved intro");
@@ -127,7 +105,7 @@ try{
   const ctx=await browser.newContext({viewport:{width:390,height:844},
    colorScheme:"light",deviceScaleFactor:1,serviceWorkers:"block"});
   let delayedFonts=0;
-  await ctx.route("**/fonts/NotoSerif-Regular-FirstPaint.woff2",async route=>{
+  await ctx.route("**/fonts/NotoSerif-Regular.woff2",async route=>{
    delayedFonts++;
    await new Promise(resolve=>setTimeout(resolve,1700));
    await route.continue();

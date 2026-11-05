@@ -12,13 +12,3 @@ assert.match(source,/original = BASE \/ \(family \+ "\.ttf"\)/,'Source TTF files
 assert.match(source,/options\.layout_features = \["\*"\]/,'Retain OpenType shaping and kerning');
 assert.match(html,/<h2 class="welcome-title">/);
 console.log('PASS: font subsetting safety and semantic Welcome heading');
-
-
-assert.match(source,/FIRST_PAINT_CODEPOINTS/,'Critical Serif uses original glyph coverage');
-for(const family of ['NotoSerif-Regular','NotoSerif-Bold']){
- assert.ok(source.includes('"'+family+'"'),'Critical face must use the exact original TTF '+family);
-}
-assert.match(source,/output = BASE \/ \(family \+ "-FirstPaint\.woff2"\)/,
- 'Build the two real critical font assets for Preview and Production');
-assert.match(html,/NotoSerif-Regular-FirstPaint\.woff2" as="font"/);
-assert.match(html,/NotoSerif-Bold-FirstPaint\.woff2" as="font"/);
