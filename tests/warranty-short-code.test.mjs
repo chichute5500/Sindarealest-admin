@@ -20,6 +20,7 @@ assert.equal(isWarrantyCode('SDW-'+'A'.repeat(24)),true,'previously issued 24-ch
 for (const bad of ['SDW-123','SDW-12345','SDW-0000','SDW-IOI1','SDW-','SDW-7!F2'])
  assert.equal(isWarrantyCode(bad),false,'invalid or ambiguous short-code input: '+bad);
 assert.equal(isWarrantyCodeCollisionError(new Error('D1_ERROR: UNIQUE constraint failed: warranties.warranty_code')),true);
+assert.equal(isWarrantyCodeCollisionError(new Error('D1_ERROR: UNIQUE constraint failed: manual_warranties.warranty_code')),true);
 assert.equal(isWarrantyCodeCollisionError(new Error('UNIQUE constraint failed: warranties.order_item_id')),false);
 assert.equal(isWarrantyCodeCollisionError(new Error('database down')),false);
 
@@ -46,6 +47,7 @@ const DB={
     async first(){
      if(sql.includes('SELECT attempts FROM public_rate_limits'))return {attempts:1};
      if(sql.includes('upper(w.warranty_code)=?'))return String(params[0]).toUpperCase()===code?record:null;
+     if(sql.includes('upper(mw.warranty_code)=?'))return String(params[0]).toUpperCase()===manualRecord.warranty_code?manualRecord:null;
      return null;
     },
     async all(){
