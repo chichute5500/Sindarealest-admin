@@ -21,3 +21,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-05: SHA-bound push-driven Preview QA after correcting the gallery image tests and Welcome timing test. Strict branch+marker event gate; never deploy Production or touch real D1/R2.
 
 2026-11-05: evaluate first-visit mobile LCP with Lighthouse 13.6.0 (Node 22), modern headless and independent CDP 4x-CPU/1.6Mbps native LCP. Distinguish NO_LCP trace artifact from real blank pages; keep all raw attempts and 2-valid-score >=90 gate. Fix slow-font scenario guard bug. Exact experimental SHA only; no Production release.
+
+2026-11-05: regression data from Lighthouse 13: 4/4 valid mobile runs, scores 89/78/78/78; LCP ~5.6-5.7s in 3 runs. Critical Hero H1 requires NotoSerif Bold; font previously began ~1.53s, ended ~4.88s. Candidate preloads the exact original Bold font with high priority without visual/layout changes. Recheck 4 cold mobile Lighthouse runs and native throttled Chromium before PASS.
