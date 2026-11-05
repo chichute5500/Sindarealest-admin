@@ -623,3 +623,46 @@ test('a still-loading product thumbnail never creates a blank ghost or hides act
   expect(await page.evaluate(()=>window.SDSharedMotion.inspect().ghosts)).toBe(0);
  }finally{await context.close()}
 });
+
+
+test('gallery layer swap during zoom never reveals a second photo or leaves hidden pixels',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const result=await page.evaluate(async()=>{
+   const svg='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="700"><rect width="600" height="700" fill="#777"/></svg>');
+   const overlay=document.querySelector('#productOverlay'),viewer=document.querySelector('#sdFullscreenViewer');
+   const detail=document.querySelector('#detailMainImage'),frame=document.querySelector('#sdFullscreenFrame');
+   const first=document.querySelector('#sdFullscreenImage'),second=document.querySelector('#sdFullscreenImageNext');
+   for(const img of [detail,first,second])img.src=svg;
+   await Promise.all([detail,first,second].map(img=>img.decode()));
+   overlay.classList.add('open');overlay.style.visibility='visible';
+   viewer.classList.add('open');viewer.style.visibility='visible';
+   frame.style.width='260px';frame.style.height='320px';
+   const started=window.SDSharedMotion.open('full-gallery',frame,detail,520);
+   const original=[first,second].map(img=>getComputedStyle(img).opacity);
+   // This is the exact async decode race: the incoming gallery photo
+   // becomes active before the shared-element flight finishes.
+   first.classList.remove('is-active');second.classList.add('is-active');
+   const midway=[first,second].map(img=>getComputedStyle(img).opacity);
+   const clones=document.querySelectorAll('.sd-shared-image-clone').length;
+   window.SDSharedMotion.cancel('full-gallery');
+   return{started,original,midway,clones,after:[first,second].map(img=>({
+    computed:getComputedStyle(img).opacity,inline:img.style.getPropertyValue('opacity'),
+    inlineTransition:img.style.getPropertyValue('transition')
+   })),ghosts:window.SDSharedMotion.inspect().ghosts};
+  });
+  expect(result.started).toBe(true);
+  expect(result.original).toEqual(['0','0']);
+  expect(result.midway,'a decoded incoming layer must remain hidden under the ghost').toEqual(['0','0']);
+  expect(result.clones).toBe(1);
+  expect(result.after.map(x=>x.inline)).toEqual(['','']);
+  expect(result.after.map(x=>x.inlineTransition)).toEqual(['','']);
+  expect(result.after.map(x=>x.computed)).toEqual(['0','1']);
+  expect(result.ghosts).toBe(0);
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
