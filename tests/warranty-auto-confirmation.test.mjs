@@ -6,9 +6,18 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import { createSession, getCurrentDateInVietnam } from '../functions/_lib.js';
-import { shopWarrantyPolicy, addWarrantyCalendarMonths, isWarrantyCode } from '../functions/_warranty-policy.js';
+import { shopWarrantyPolicy, addWarrantyCalendarMonths, isWarrantyCode, WARRANTY_POLICY_COPY, createWarrantyPolicySnapshot, readWarrantyPolicySnapshot } from '../functions/_warranty-policy.js';
 import { onRequestPatch as patchOrder } from '../functions/api/admin/orders.js';
 
+const snapshot=JSON.parse(createWarrantyPolicySnapshot({unitPrice:2_800_000,durationMonths:6,startsAt:'2026-11-05',endsAt:'2027-05-05',policyName:'Bảo hành SinDarealest 6 tháng'}));
+assert.equal(snapshot.unitPriceVnd,2_800_000,'private verified unit price is retained for disputes');
+assert.equal(readWarrantyPolicySnapshot(JSON.stringify(snapshot)).durationMonths,6);
+assert.ok(!Object.hasOwn(readWarrantyPolicySnapshot(JSON.stringify(snapshot)),'unitPriceVnd'),'price must never leak through public lookup');
+assert.equal(readWarrantyPolicySnapshot(null),null,'historical warranties must not inherit a new promise');
+const storefront=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+for(const copy of [WARRANTY_POLICY_COPY.coverage,WARRANTY_POLICY_COPY.exclusions,WARRANTY_POLICY_COPY.materialRemedy]){
+ assert.ok(storefront.includes(copy),'product detail must keep wording synchronized with issued policy: '+copy);
+}
 assert.equal(shopWarrantyPolicy(1_999_999).durationMonths,6);
 assert.equal(shopWarrantyPolicy(2_000_000).durationMonths,6);
 assert.equal(shopWarrantyPolicy(2_999_999).durationMonths,6);
@@ -102,6 +111,7 @@ for(const [total,months] of [[1_999_999,6],[3_000_000,6],[6_000_000,6],[6_000_00
    assert.equal(isWarrantyCode(w.warranty_code),true);
  }
  assert.equal(f.audits('warranty_issued').length,2);
+ assert.throws(()=>f.sql.prepare("UPDATE warranties SET duration_months=24 WHERE order_item_id='item-a'").run(),/immutable/,'issued policy duration cannot be edited');
  const retry=await f.patch('completed');
  assert.equal(retry.status,200,'same-state update supported');
  assert.equal((await retry.json()).warrantiesIssued,0,'never issue again');
