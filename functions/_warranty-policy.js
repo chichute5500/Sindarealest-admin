@@ -39,5 +39,5 @@ export function isWarrantyCode(value) {
 
 export function isWarrantyCodeCollisionError(error) {
   const message = String(error?.message || error || "");
-  return /(?:UNIQUE constraint failed|SQLITE_CONSTRAINT_UNIQUE|UNIQUE violation).*warranties\.warranty_code/i.test(message);
+  return /(?:UNIQUE constraint failed|SQLITE_CONSTRAINT_UNIQUE|UNIQUE violation).*(?:manual_)?warranties\.warranty_code/i.test(message);
 }
