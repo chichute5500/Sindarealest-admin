@@ -5,16 +5,21 @@ on:
     paths:
       - .github/workflows/warranty-preview-0019-174.yml
       - scripts/migrate-warranty-preview-174.mjs
+      - scripts/qa-warranty-preview-sql-174.mjs
+      - scripts/verify-warranty-preview-174.mjs
+      - scripts/cleanup-warranty-preview-174.mjs
       - functions/api/admin/warranties.js
+      - functions/api/admin/restore.js
       - functions/api/warranty-lookup.js
       - public/admin/index.html
       - public/index.html
       - tests/e2e/warranty-multi-preview-174.spec.js
       - tests/warranty-manual-lifecycle.test.mjs
-      - package.json
-      - tests/e2e/warranty-multi-preview-174.spec.js
-      - functions/api/admin/warranties.js
       - tests/warranty-issuance-race.test.mjs
+      - tests/warranty-short-code.test.mjs
+      - tests/restore-safety.test.mjs
+      - tests/disposable-sqlite-integration.test.mjs
+      - package.json
 permissions:
   contents: read
 concurrency:
