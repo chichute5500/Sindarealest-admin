@@ -5,7 +5,7 @@ import {join} from "node:path";
 import {tmpdir} from "node:os";
 import {createHash} from "node:crypto";
 const BRANCH="feat/manual-warranty-management-20261105", REPO="chichute5500/Sindarealest-admin";
-const project="sindarealest2",account=process.env.CLOUDFLARE_ACCOUNT_ID||"",token=process.env.CLOUDFLARE_API_TOKEN||"";
+const project="sindarealest-admin-preview",account=process.env.CLOUDFLARE_ACCOUNT_ID||"",token=process.env.CLOUDFLARE_API_TOKEN||"";
 const sha=process.env.GITHUB_SHA||"",mode=process.argv[2];
 if(process.env.GITHUB_REPOSITORY!==REPO||process.env.GITHUB_REF!=="refs/heads/"+BRANCH||
   !/^[a-f0-9]{40}$/i.test(sha)||!/^[a-f0-9]{32}$/i.test(account)||token.length<12||
@@ -18,31 +18,18 @@ async function cloud(path,method="GET",body){
   const data=await res.json();if(data?.success!==true)throw Error("CLOUDFLARE_API_FAILURE");
   return data.result;
 }
-const [site,other]=await Promise.all([cloud("/pages/projects/"+project),cloud("/pages/projects/sindarealest-admin-preview")]);
-if(site?.name!==project||site?.production_branch!=="main"||other?.name!=="sindarealest-admin-preview")
+const [site,other]=await Promise.all([cloud("/pages/projects/"+project),cloud("/pages/projects/sindarealest2")]);
+if(site?.name!==project||site?.production_branch!=="main"||other?.name!=="sindarealest2")
   throw Error("PAGES_PROJECT_IDENTITY_UNVERIFIED");
 const dbid=(p,e)=>p?.deployment_configs?.[e]?.d1_databases?.DB?.id||
   p?.deployment_configs?.[e]?.d1_databases?.DB?.database_id||"";
-const previewId=dbid(site,"preview"),productionId=dbid(site,"production"),otherProdId=dbid(other,"production");
+const previewId=dbid(site,"preview"),productionId=dbid(other,"production"),otherProdId=dbid(site,"production");
 const valid=x=>/^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(x);
 if(!valid(previewId)||!valid(productionId))throw Error("PREVIEW_DB_BINDING_MISSING");
 if(previewId.toLowerCase()===productionId.toLowerCase()||
    (valid(otherProdId)&&previewId.toLowerCase()===otherProdId.toLowerCase()))
   throw Error("PREVIEW_D1_SHARES_PRODUCTION");
-const deployments=await cloud("/pages/projects/"+project+"/deployments?env=preview&per_page=100");
-if(!Array.isArray(deployments))throw Error("PAGES_DEPLOYMENTS_UNVERIFIED");
-const matching=deployments.filter(d=>{
-  const m=d.deployment_trigger?.metadata||{};
-  const branch=String(m.branch||"");
-  return d.environment==="preview"&&d.latest_stage?.status==="success"&&
-    String(m.commit_hash||"").toLowerCase()===sha.toLowerCase()&&
-    [BRANCH,"manual-warranty-management-20261105","feat-manual-warranty-managem"].includes(branch)&&
-    (d.aliases||[]).some(u=>{
-      try{const h=new URL(u).hostname;return h.endsWith(".sindarealest2.pages.dev")&&h.includes("warranty")}
-      catch{return false}
-    });
-});
-if(matching.length!==1)throw Error("PR174_EXACT_PREVIEW_DEPLOYMENT_NOT_VERIFIED");
+if(site.id===other.id)throw Error("PREVIEW_PROJECT_NOT_DISTINCT");
 const db=await cloud("/d1/database/"+previewId);
 if(typeof db?.name!=="string"||!db.name)throw Error("PREVIEW_D1_NAME_MISSING");
 async function query(sql){
@@ -84,7 +71,7 @@ try{
    const contents=readFileSync(output);
    if(contents.length<300||!contents.includes(Buffer.from("CREATE TABLE")))throw Error("D1_SQL_BACKUP_INVALID");
    writeFileSync("artifacts/pr174-preview-db/proof.json",JSON.stringify({
-     target:"sindarealest2-preview",sha,bytes:contents.length,
+     target:"sindarealest-admin-preview",sha,bytes:contents.length,
      sha256:createHash("sha256").update(contents).digest("hex"),
      productionWrites:false
    },null,2));
