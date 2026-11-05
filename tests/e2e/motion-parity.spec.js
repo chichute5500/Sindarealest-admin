@@ -21,6 +21,49 @@ async function motionFixture(page){
  });
 }
 
+test('actual product card click uses its image as one clipped shared element',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ try{
+  await motionFixture(page);
+  await page.route('https://motion-fixture.invalid/api/products',route=>route.fulfill({json:[{
+   id:'qa-motion-card',sku:'SD-SN-QA001',title:'Giày thử nghiệm chuyển động',category:'sneakers',
+   categoryLabel:'Giày thể thao',images:['images/brand-emblem.png'],price:3200000,
+   fulfillmentType:'in_stock',created_at:'2026-11-05T00:00:00Z'
+  }]}));
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  await page.locator('#skipIntro').click();
+  const card=page.locator('#catalogGrid [data-open-product]').first();
+  await expect(card).toBeVisible({timeout:15000});
+  await card.scrollIntoViewIfNeeded();
+  const cardImage=card.locator('img').first();
+  await expect.poll(()=>cardImage.evaluate(img=>img.complete&&img.naturalWidth>0),{timeout:10000}).toBe(true);
+  await card.click();
+  await expect(page.locator('#productOverlay')).toHaveClass(/open/);
+  const mid=await page.evaluate(()=>{
+   const overlay=document.querySelector('#productOverlay'),clone=overlay.querySelector('.sd-shared-image-clone');
+   const realSource=document.querySelector('#catalogGrid [data-open-product] img');
+   const detail=document.querySelector('#detailMainImage');
+   return{cloneCount:document.querySelectorAll('.sd-shared-image-clone').length,
+    parent:clone?.parentElement?.id,
+    originHidden:realSource?.style.opacity,destinationHidden:detail?.style.opacity,
+    mask:overlay.getAnimations().some(a=>a.effect?.getKeyframes().some(k=>k.clipPath?.includes('inset(')))};
+  });
+  expect(mid.cloneCount,JSON.stringify(mid)).toBe(1);
+  expect(mid.parent).toBe('productOverlay');
+  expect(mid.originHidden).toBe('0');
+  expect(mid.destinationHidden).toBe('0');
+  expect(mid.mask).toBe(true);
+  await expect(page.locator('.sd-shared-image-clone')).toHaveCount(0,{timeout:1400});
+  await page.locator('#detailClose').click();
+  await expect(page.locator('#productOverlay')).toBeHidden({timeout:2500});
+  expect(await cardImage.evaluate(img=>img.style.opacity)).toBe('');
+  expect(await page.evaluate(()=>window.SDSharedMotion.inspect().ghosts)).toBe(0);
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
+
 test('storefront detail/gallery closes smoothly without changing the glass backdrop',async({browser})=>{
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
  const page=await context.newPage(),errors=[];
