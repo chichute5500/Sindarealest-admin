@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: motion-parity-${{ github.event.pull_request.head.sha || github.sha }}
+  group: motion-parity-preview-feat-motion-parity-balanced-20261105
   cancel-in-progress: true
 
 jobs:
