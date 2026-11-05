@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 const store=readFileSync('public/index.html','utf8');
 const admin=readFileSync('public/admin/index.html','utf8');
 const motion=readFileSync('public/motion-parity.css','utf8');
+const engine=readFileSync('public/shared-motion.js','utf8');
 const cssLinks=/href="\/motion-parity\.css\?v=balanced-20261105"/g;
 for(const [label,html] of [['store',store],['admin',admin]]){
  assert.equal([...html.matchAll(cssLinks)].length,1,label+' loads the motion stylesheet exactly once');
@@ -24,6 +25,17 @@ assert.match(admin,/deactivateAdminModal\(\$\('#backdrop'\),\(\)=>\{if\(editorEn
 assert.match(admin,/sdAdminHideMorePanel/);
 assert.match(admin,/sdAdminShowMorePanel/);
 assert.match(motion,/--sd-motion-balanced:280ms/);
+
+/* Protect the fixes against reintroducing overlapping CSS transforms or the
+   fullscreen image's stylesheet opacity:1!important overriding the ghost. */
+assert.doesNotMatch(motion,/scale\(\.(?:986|990)\)/);
+assert.match(engine,/setProperty\('opacity','0','important'\)/);
+assert.match(engine,/setProperty\('transition','none','important'\)/);
+assert.match(engine,/querySelector\('#sdFullscreenViewer \.sd-fullscreen-image\.is-active'\)/);
+assert.match(engine,/function reset\(key\)/);
+assert.match(store,/window\.SDSharedMotion\?\.cancel\('product-detail'\)/);
+assert.match(store,/window\.SDSharedMotion\?\.reset\?\.\('full-gallery'\)/);
+
 // Syntax-check all executable inline scripts without loading external dependencies.
 const {Script}=await import('node:vm');
 for(const [name,html] of [['storefront',store],['admin',admin]]){
