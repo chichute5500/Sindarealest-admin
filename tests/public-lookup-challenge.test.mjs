@@ -120,6 +120,7 @@ assert.equal(windowMock.sdPhoneLookupVerified('warranty_lookup'),true);
 windowMock.sdResetPhoneLookupProof('warranty_lookup');
 callbacks.get('warranty_lookup').callback('valid-proof-no-pending');
 assert.equal(warrantyForm.serverSubmits,1,'unprompted CAPTCHA callback does not cause lookup');
+windowMock.sdResetPhoneLookupProof('warranty_lookup');
 warrantyField.input('0901111222');await flush();
 warrantyForm.requestSubmit();
 warrantyField.input('0909999888');
