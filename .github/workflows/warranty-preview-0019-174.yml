@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows/warranty-preview-0019-174.yml
       - scripts/migrate-warranty-preview-174.mjs
+      - tests/e2e/warranty-multi-preview-174.spec.js
 permissions:
   contents: read
 concurrency:

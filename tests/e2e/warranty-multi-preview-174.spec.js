@@ -11,6 +11,10 @@ test("PR174 multi-product manual warranty issues two distinct codes",async({page
   await page.locator('#loginForm button[type="submit"]').click();
   await expect(page.locator("#appView")).toBeVisible({timeout:20000});
   await page.goto(new URL("?view=warranties",url).href,{waitUntil:"domcontentloaded"});
+  const health=await page.request.get(new URL("/api/admin/warranties",url).href);
+  const healthBody=await health.json().catch(()=>({}));
+  console.log("PR174 authenticated warranty GET:",health.status(),String(healthBody?.error||"OK").slice(0,160));
+  expect(health.status(),"Preview Admin warranty-read API must be healthy").toBe(200);
   const disclosure=page.locator("#manualWarrantyDisclosure");
   await expect(disclosure).toBeVisible({timeout:20000});
   await disclosure.locator("summary").click();
@@ -35,8 +39,9 @@ test("PR174 multi-product manual warranty issues two distinct codes",async({page
     new URL(r.url()).pathname==="/api/admin/warranties"&&r.request().method()==="POST",{timeout:25000});
   await form.locator("#createManualWarrantyBtn").click();
   const response=await responsePromise;
-  expect(response.status()).toBe(201);
-  const result=await response.json();
+  const resultBody=await response.json().catch(()=>({}));
+  expect(response.status(),"Warranty issuance API response: "+String(resultBody.error||resultBody.message||"unknown")).toBe(201);
+  const result=resultBody;
   expect(result.warranties).toHaveLength(2);
   expect(result.warranties[0].warrantyCode).toMatch(/^SDW-[A-Z2-9]{4}$/);
   expect(result.warranties[1].warrantyCode).toMatch(/^SDW-[A-Z2-9]{4}$/);
