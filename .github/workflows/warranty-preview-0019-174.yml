@@ -8,6 +8,8 @@ on:
       - scripts/qa-warranty-preview-sql-174.mjs
       - scripts/verify-warranty-preview-174.mjs
       - scripts/cleanup-warranty-preview-174.mjs
+      - functions/_warranty-contact.js
+      - migrations/0020_manual_warranty_contacts.sql
       - functions/api/admin/warranties.js
       - functions/api/admin/restore.js
       - functions/api/warranty-lookup.js
@@ -73,7 +75,7 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF" = "refs/heads/feat/manual-warranty-management-20261105"
           test "$(git ls-remote origin refs/heads/feat/manual-warranty-management-20261105 | cut -f1)" = "$GITHUB_SHA"
-      - name: Apply only migration 0019 after successful private backup
+      - name: Apply migrations 0019 and 0020 after successful private backup
         run: node scripts/migrate-warranty-preview-174.mjs migrate
 
   deploy:

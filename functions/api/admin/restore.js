@@ -1,3 +1,4 @@
+import { normalizeManualWarrantyContact } from "../../_warranty-contact.js";
 import { constantTimeTextEqual, fail, getSetting, json, productInsertStatement, readJsonBodyLimited, requireAdmin, validateProduct } from "../../_lib.js";
 import { validateWatermarkSettingUpdates } from "../../_lib/watermark-settings.js";
 
@@ -135,7 +136,7 @@ function validateOperations(operations) {
   for (const w of manualWarranties) {
     if (!str(w.id,100,true) || !str(w.warranty_code,100,true) ||
         !str(w.customer_name,120,true) || !str(w.customer_phone,32,true) ||
-        !str(w.customer_address,500,true) || !str(w.product_name,180,true) ||
+        !str(w.customer_address,500,true) || normalizeManualWarrantyContact(w.customer_contact_reference)===null || !str(w.product_name,180,true) ||
         !integer(w.price,0,2_000_000_000) || !str(w.policy_name,160,true) ||
         !integer(w.duration_months,1,120) || !/^\d{4}-\d{2}-\d{2}$/.test(String(w.starts_at||"")) ||
         !/^\d{4}-\d{2}-\d{2}$/.test(String(w.ends_at||"")) ||
@@ -295,7 +296,7 @@ export async function onRequestPost(context) {
       for (const settlement of operations.orderCodSettlements) statements.push(db.prepare("INSERT INTO order_cod_settlements(id,order_id,amount,transaction_reference,note,actor,verified_at,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(settlement.id,settlement.order_id,settlement.amount,settlement.transaction_reference,settlement.note,settlement.actor,settlement.verified_at,settlement.created_at));
       for (const d of operations.orderItemDetails) statements.push(db.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(d.item_id,d.size));
       for (const w of operations.warranties) statements.push(db.prepare("INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.order_id,w.order_item_id,w.warranty_code,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
-      for (const w of operations.manualWarranties) statements.push(db.prepare("INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.warranty_code,w.customer_name,w.customer_phone,w.customer_address,w.product_name,w.price,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
+      for (const w of operations.manualWarranties) statements.push(db.prepare("INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,customer_contact_reference,product_name,price,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)").bind(w.id,w.warranty_code,w.customer_name,w.customer_phone,w.customer_address,normalizeManualWarrantyContact(w.customer_contact_reference),w.product_name,w.price,w.policy_name,w.duration_months,w.starts_at,w.ends_at,w.status,w.created_at));
       for (const c of operations.claims) statements.push(db.prepare("INSERT INTO warranty_claims(id,order_id,customer_id,warranty_code,message,status,admin_note,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)").bind(c.id,c.order_id,c.customer_id,c.warranty_code,c.message,c.status,c.admin_note,c.created_at,c.updated_at));
       for (const a of operations.warrantyClaimAttachments) statements.push(db.prepare("INSERT INTO warranty_claim_attachments(claim_id,image_key) VALUES(?,?)").bind(a.claim_id,a.image_key));
       for (const l of operations.logs) statements.push(db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json,created_at) VALUES(?,?,?,?,?,?,?)").bind(l.id,l.actor,l.action,l.entity_type,l.entity_id,l.details_json,l.created_at));

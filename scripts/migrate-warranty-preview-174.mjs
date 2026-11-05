@@ -48,6 +48,7 @@ const dir=mkdtempSync(join(tmpdir(),"warranty-pr174-preview-"));
 try{
  mkdirSync(join(dir,"migrations"));
  copyFileSync(new URL("../migrations/0019_manual_warranties.sql",import.meta.url),join(dir,"migrations","0019_manual_warranties.sql"));
+ copyFileSync(new URL("../migrations/0020_manual_warranty_contacts.sql",import.meta.url),join(dir,"migrations","0020_manual_warranty_contacts.sql"));
  const conf=join(dir,"wrangler.toml");
  writeFileSync(conf,[
    'name = "sd-warranty-pr174-preview"',
@@ -84,11 +85,15 @@ try{
    },null,2));
    console.log("PASS: isolated exact PR174 Preview D1 verified, full SQL backup made.");
  }else{
-   if(!exists)execute(["d1","migrations","apply","DB","--remote"]);
+   const hasContact=(await query("SELECT name FROM pragma_table_info('manual_warranties')")).some(row=>row.name==="customer_contact_reference");
+   const contactRecorded=(await query("SELECT name FROM d1_migrations WHERE name='0020_manual_warranty_contacts.sql'")).length===1;
+   if(hasContact!==contactRecorded)throw Error("CONTACT_SCHEMA_AND_LEDGER_MISMATCH");
+   if(!exists||!hasContact)execute(["d1","migrations","apply","DB","--remote"]);
    const rows=await query("SELECT name FROM pragma_table_info('manual_warranties')");
    const after=(await query("SELECT name FROM d1_migrations WHERE name='0019_manual_warranties.sql'")).length===1;
+   const contactAfter=(await query("SELECT name FROM d1_migrations WHERE name='0020_manual_warranty_contacts.sql'")).length===1;
    const required=["id","warranty_code","customer_name","customer_phone","customer_address","product_name","price","duration_months","starts_at","ends_at"];
-   if(!after||required.some(n=>!rows.some(r=>r.name===n)))throw Error("MIGRATION_0019_VERIFICATION_FAILED");
-   console.log("PASS: Preview D1 0019 verified, no Production writes.");
+   if(!after||!contactAfter||required.some(n=>!rows.some(r=>r.name===n))||!rows.some(r=>r.name==="customer_contact_reference"))throw Error("MIGRATION_0019_0020_VERIFICATION_FAILED");
+   console.log("PASS: Preview D1 0019 and 0020 verified, no Production writes.");
  }
 }finally{rmSync(dir,{recursive:true,force:true});}
