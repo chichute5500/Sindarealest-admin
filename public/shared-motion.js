@@ -108,8 +108,16 @@ function imageMorph(key,reverse,duration){
  const asset=(reverse?targetImage:sourceImage).currentSrc||
    (reverse?targetImage:sourceImage).src||targetImage.src;
  if(!asset)return null;
+ // Never allow two independent product/gallery ghosts to overlap when the
+ // user zooms from detail into fullscreen before the first zoom has finished.
+ for(const [otherKey,active] of running){
+  if(otherKey!==key&&active.imageCleanup){
+   active.imageCleanup();active.imageCleanup=null;active.imageAnimation=null;
+  }
+ }
  const ghost=document.createElement('img');
  ghost.className='sd-shared-image-clone';
+ ghost.dataset.sdMotionKey=key;
  ghost.alt='';ghost.setAttribute('aria-hidden','true');ghost.draggable=false;
  ghost.decoding='async';ghost.src=asset;
  ghost.style.cssText='position:fixed;pointer-events:none;user-select:none;z-index:2147482000;'+
@@ -176,7 +184,7 @@ function animateBetween(key,surface,sourceRect,destinationRect,reverse,done,requ
   if(cleaned)return;cleaned=true;
   if(running.get(key)?.animation===animation)running.delete(key);
   resetStyle(el,prev);
-  record.imageCleanup?.();
+  record.imageCleanup?.();record.imageCleanup=null;record.imageAnimation=null;
  };
  record.cleanup=cleanup;running.set(key,record);
  const image=imageMorph(key,reverse,adjustedMs(requestedMs));
@@ -204,21 +212,37 @@ function open(key,surface,source,ms=DURATION){
  return animateBetween(key,el,currentRect(actual,true)||actual,target,false,null,ms);
 }
 function close(key,surface,done,source,ms=DURATION){
+ const complete=()=>{origins.delete(key);done?.()};
  const el=animationSurface(key,surface);
  if(!el||reduced()){cancel(key);return false}
  const active=running.get(key);
  if(active?.mode==='in'&&active.animation?.playState==='running'){
-  active.onFinish=done;active.mode='out';active.animation.reverse();active.imageAnimation?.reverse();return true;
+  active.onFinish=complete;active.mode='out';active.animation.reverse();active.imageAnimation?.reverse();return true;
  }
  const endOrigin=rectOf(source)||origins.get(key)||freshSource();
  const destination=currentRect(endOrigin);
  const from=rectOf(el);
  if(!destination||!from){cancel(key);return false}
- return animateBetween(key,el,destination,from,true,done,ms);
+ return animateBetween(key,el,destination,from,true,complete,ms);
 }
 function popOrigin(key){origins.delete(key)}
 function hasOrigin(key){return origins.has(key)}
 function sourceFromLast(){return freshSource()}
+function reset(key){cancel(key);origins.delete(key)}
+function inspect(){return{active:[...running.keys()],ghosts:document.querySelectorAll('.sd-shared-image-clone').length}}
+window.addEventListener('pagehide',()=>{
+ for(const key of [...running.keys()])cancel(key);
+ origins.clear();
+});
+document.addEventListener('visibilitychange',()=>{
+ if(!document.hidden)return;
+ // Tab switching must never leave a hidden photo or a stalled backdrop mask.
+ for(const [key,record] of [...running]){
+  const finish=record.mode==='out'?record.onFinish:null;
+  record.onFinish=null;cancel(key);
+  if(finish)finish();
+ }
+});
 document.documentElement.classList.add('sd-shared-motion');
-window.SDSharedMotion={open,close,cancel,popOrigin,hasOrigin,sourceFromLast,rectOf,easing:EASE,duration:DURATION,adjustedMs};
+window.SDSharedMotion={open,close,cancel,reset,popOrigin,hasOrigin,sourceFromLast,rectOf,easing:EASE,duration:DURATION,adjustedMs,inspect};
 })();
