@@ -155,9 +155,9 @@ assert.equal(manual.status, 201, "manual warranty must be issuable without any o
 const manualResult = await manual.json();
 assert.match(manualResult.warrantyCode, /^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
 assert.equal(manualDB.calls.batchCount, 1, "manual warranty and audit record must be written atomically");
-assert.match(manualDB.calls.statements[0].sql, /INSERT INTO manual_warranties[\\s\\S]*NOT EXISTS \\(SELECT 1 FROM warranties[\\s\\S]*NOT EXISTS \\(SELECT 1 FROM manual_warranties/,
+assert.ok(manualDB.calls.statements[0].sql.includes("INSERT INTO manual_warranties") && manualDB.calls.statements[0].sql.includes("NOT EXISTS (SELECT 1 FROM warranties") && manualDB.calls.statements[0].sql.includes("NOT EXISTS (SELECT 1 FROM manual_warranties"),
   "manual code must be checked against both order-linked and standalone warranties");
-assert.match(manualDB.calls.statements[1].sql, /INSERT INTO audit_logs[\\s\\S]*WHERE EXISTS \\(SELECT 1 FROM manual_warranties/,
+assert.ok(manualDB.calls.statements[1].sql.includes("INSERT INTO audit_logs") && manualDB.calls.statements[1].sql.includes("WHERE EXISTS (SELECT 1 FROM manual_warranties"),
   "audit entry must only exist when the standalone warranty was inserted");
 
 const manualCollisionDB = makeManualDB({ collideFirstCode: true });
