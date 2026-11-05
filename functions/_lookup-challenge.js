@@ -26,8 +26,12 @@ export async function verifyLookupChallenge(request,env,token,action){
   });
   // Cloudflare Siteverify may return a JSON error with HTTP 400. Parse its
   // error code *before* deciding whether the service is unavailable.
-  const answer=await response.json();
-  if(!answer||typeof answer!=="object")return {ok:false,status:503};
+  let answer;
+  try{answer=await response.json()}catch{
+    console.warn("Turnstile Siteverify returned a non-JSON response",response.status);
+    return {ok:false,status:503,reason:"non_json"};
+  }
+  if(!answer||typeof answer!=="object")return {ok:false,status:503,reason:"unexpected_response"};
   if(answer.success===true){
     const hostname=new URL(request.url).hostname;
     const match=response.ok&&answer.hostname===hostname&&answer.action===action;
@@ -42,8 +46,15 @@ export async function verifyLookupChallenge(request,env,token,action){
   }
   if(codes.includes("invalid-input-response")||codes.includes("missing-input-response")||
      codes.includes("timeout-or-duplicate"))return {ok:false,status:400};
-  if(!response.ok||codes.includes("internal-error")||codes.includes("bad-request"))
-    return {ok:false,status:503};
+  if(codes.includes("bad-request"))return {ok:false,status:503,reason:"upstream_bad_request"};
+  if(codes.includes("internal-error"))return {ok:false,status:503,reason:"upstream_internal"};
+  if(!response.ok){
+    console.warn("Turnstile Siteverify unexpected HTTP status",response.status,codes.join(","));
+    return {ok:false,status:503,reason:"upstream_http"};
+  }
   return {ok:false,status:400};
- }catch{return {ok:false,status:503}}
+ }catch(error){
+  console.warn("Turnstile Siteverify transport failed",error?.name||"Error");
+  return {ok:false,status:503,reason:"transport"};
+ }
 }

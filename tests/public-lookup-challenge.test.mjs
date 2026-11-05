@@ -44,7 +44,15 @@ try{
     {ok:false,status:503,reason:"configuration"},"invalid secret is a server configuration issue, never a client bypass");
  }finally{console.warn=savedWarn}
 
- globalThis.fetch=async()=>{throw Error("network unavailable")};
- assert.deepEqual(await verifyLookupChallenge(req,env,"fake-valid-token-qa-4","order_lookup"),{ok:false,status:503});
+ const savedConsoleWarn=console.warn;
+ try{
+  console.warn=()=>{};
+  globalThis.fetch=async()=>new Response("<html>unavailable</html>",{status:503,headers:{"Content-Type":"text/html"}});
+  assert.deepEqual(await verifyLookupChallenge(req,env,"fake-nonjson-token","order_lookup"),{ok:false,status:503,reason:"non_json"});
+  globalThis.fetch=async()=>new Response(JSON.stringify({success:false,"error-codes":["bad-request"]}),{status:400});
+  assert.deepEqual(await verifyLookupChallenge(req,env,"fake-bad-request-token","order_lookup"),{ok:false,status:503,reason:"upstream_bad_request"});
+  globalThis.fetch=async()=>{throw Error("network unavailable")};
+  assert.deepEqual(await verifyLookupChallenge(req,env,"fake-valid-token-qa-4","order_lookup"),{ok:false,status:503,reason:"transport"});
+ }finally{console.warn=savedConsoleWarn}
 }finally{globalThis.fetch=originalFetch}
 console.log("PASS: server verified Turnstile proof, bounded tokens, hostname and action, secret privacy and unavailable fail closed.");

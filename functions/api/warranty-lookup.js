@@ -96,7 +96,8 @@ export async function onRequestPost({ request, env }) {
         "Hệ thống xác minh đang gặp lỗi cấu hình. Vui lòng dùng mã bảo hành hoặc liên hệ Shop.":
         proof.status===503?
         "Tra cứu theo số điện thoại tạm chưa sẵn sàng. Vui lòng dùng mã bảo hành.":
-        "Vui lòng hoàn thành xác minh trước khi tra cứu.",proof.status);
+        "Vui lòng hoàn thành xác minh trước khi tra cứu.",proof.status,
+        proof.status===503?{"X-SD-Verify-Status":proof.reason||"unavailable"}:undefined);
       const sql = selectSql + " WHERE " + phoneSql + "=? OR (substr(" + phoneSql + ",1,2)='84' AND '0'||substr(" + phoneSql + ",3)=?) OR (substr(" + phoneSql + ",1,4)='0084' AND '0'||substr(" + phoneSql + ",5)=?) ORDER BY o.created_at DESC LIMIT 25";
       const [result, manualResult] = await Promise.all([
         env.DB.prepare(sql).bind(phone, phone, phone).all(),
