@@ -254,7 +254,22 @@ export async function onRequestPost(context) {
 
   try {
     const db = context.env.DB;
+    // Older v2 exports predate standalone warranties. Without this guard,
+    // restoring one would silently replace all existing manual warranties with [].
+    const legacyWithoutManual = v2 && !Object.hasOwn(backup.operations, "manualWarranties");
+    if (legacyWithoutManual) {
+      const existing = await db.prepare("SELECT id FROM manual_warranties LIMIT 1").first();
+      if (existing) return fail(
+        "Bản sao lưu cũ không chứa phiếu bảo hành mua trực tiếp. Hãy tạo bản sao lưu mới có danh sách phiếu bảo hành trước khi khôi phục.",409
+      );
+    }
     const statements = [];
+    if (legacyWithoutManual) {
+      // Recheck INSIDE the atomic D1 batch. Another Admin could issue a manual
+      // warranty between our preliminary read and the destructive restore.
+      // Invalid JSON raises an SQLite error before any DELETE is executed.
+      statements.push(db.prepare("SELECT CASE WHEN EXISTS (SELECT 1 FROM manual_warranties LIMIT 1) THEN json_extract('{', '$.blocked') ELSE 1 END"));
+    }
     if (operations) statements.push(
       db.prepare("DELETE FROM warranty_claim_attachments"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_upload:%'"), db.prepare("DELETE FROM settings WHERE key LIKE 'warranty_lookup:%'"), db.prepare("DELETE FROM warranty_claim_uploads"),
       db.prepare("DELETE FROM customer_address_details"), db.prepare("DELETE FROM order_shipping_addresses"), db.prepare("DELETE FROM order_item_details"),

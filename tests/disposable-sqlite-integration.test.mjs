@@ -136,6 +136,40 @@ try {
   assert.equal(scalar("SELECT value FROM settings WHERE key='show_prices'").value,'1');
   assert.equal(rows('PRAGMA foreign_key_check').length,0);
 
+  // A V2 snapshot predating standalone warranties must never silently erase
+  // existing manual warranty codes (and must preserve other live records).
+  const legacyV2=structuredClone(v2);
+  delete legacyV2.operations.manualWarranties;
+  const beforeLegacyBatches=batches;
+  const deniedLegacy=await callRestore(legacyV2);
+  assert.equal(deniedLegacy.status,409,
+    'restoring old V2 without manualWarranties must refuse when live manual warranties exist');
+  assert.match((await deniedLegacy.json()).error,/bảo hành mua trực tiếp/);
+  assert.equal(batches,beforeLegacyBatches,'denied old backup must not start a destructive D1 batch');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,1);
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM orders').n,1);
+
+  // A new manual warranty created after the preflight also blocks the legacy
+  // V2 restore inside its transaction; rollback keeps the new warranty.
+  sql.prepare('DELETE FROM manual_warranties').run();
+  beforeNextBatch=()=>{
+    const row=v2.operations.manualWarranties[0];
+    sql.prepare("INSERT INTO manual_warranties(id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)")
+      .run(row.id,row.warranty_code,row.customer_name,row.customer_phone,row.customer_address,row.product_name,row.price,row.policy_name,row.duration_months,row.starts_at,row.ends_at,row.status,row.created_at);
+  };
+  const racedLegacy=await callRestore(legacyV2);
+  assert.equal(racedLegacy.status,503,'concurrent manual issuance must abort old V2 restore');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,1);
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM orders').n,1,
+    'rollback must preserve previously existing operational data');
+  sql.prepare('DELETE FROM manual_warranties').run();
+  const emptyLegacy=await callRestore(legacyV2);
+  assert.equal(emptyLegacy.status,200,'old V2 remains usable when no manual warranties exist');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,0);
+  const recovered=await callRestore(v2);
+  assert.equal(recovered.status,200,'complete V2 restore must recreate standalone warranties');
+  assert.equal(scalar('SELECT COUNT(*) AS n FROM manual_warranties').n,1);
+
   // An ordinary admin status save submits existing price values. If a second
   // writer reprices before its D1 batch, the stale save must not overwrite
   // either item price or confirmed order total, even with unchanged user input.
