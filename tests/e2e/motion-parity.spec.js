@@ -271,6 +271,7 @@ test('detail image morph keeps a single uniform scale and restores original imag
   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
   const result=await page.evaluate(async()=>{
    const source=document.createElement('button');
+   source.id='motionPhotoSource';
    source.style.cssText='position:fixed;left:32px;top:190px;width:155px;height:140px;z-index:100';
    const img=document.createElement('img');
    img.src='/images/brand-emblem.png';
@@ -287,7 +288,7 @@ test('detail image morph keeps a single uniform scale and restores original imag
    return{started,clones:document.querySelectorAll('.sd-shared-image-clone').length,
     imageTransform:keyframes?.[0]?.transform,
     parentTransform:overlay.getAnimations().find(a=>a.effect?.getTiming().duration===364)?.effect?.getKeyframes()?.[0]?.transform,
-    imageHidden:destination.style.opacity,
+    imageHidden:destination.style.opacity,sourceHidden:img.style.opacity,
     originalRect:(()=>{const r=destination.getBoundingClientRect();return{width:r.width,height:r.height}})()};
   });
   expect(result.started).toBe(true);
@@ -296,12 +297,14 @@ test('detail image morph keeps a single uniform scale and restores original imag
   expect(result.imageTransform).not.toMatch(/scaleX|scaleY/);
   expect(result.parentTransform).toBeUndefined();
   expect(result.imageHidden).toBe('0');
+  expect(result.sourceHidden).toBe('0');
   expect(result.originalRect.width).toBeGreaterThan(100);
   await page.waitForTimeout(450);
   await expect(page.locator('.sd-shared-image-clone')).toHaveCount(0);
   expect(await page.locator('#detailMainImage').evaluate(el=>el.style.opacity)).toBe('');
   await expect(page.locator('#detailMainImage')).toHaveCSS('opacity','1');
   expect(await page.locator('#detailMainImage').evaluate(el=>el.style.transition)).toBe('');
+  expect(await page.locator('#motionPhotoSource img').evaluate(el=>el.style.opacity)).toBe('');
  }finally{await context.close()}
 });
 
