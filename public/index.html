@@ -5928,7 +5928,23 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
  // The route sync below owns the one initial category render. On Home we still
  // render featured + catalog as before; Home can be opened later without reload.
  const initialCatalogListing=catalogCategoryFromLocation()!==null;
- if(!initialCatalogListing){renderFeatured();renderFilters();renderCatalog()}
+ if(!initialCatalogListing){
+  // The Home catalog/featured media are well below the first viewport.
+  // Let the browser paint between their verified client-hydration stages
+  // instead of creating one long main-thread task after /api/products.
+  // No layout, copy or appearance changes; __sdStorefrontReady still waits
+  // until all stages are hydrated and buttons are functional.
+  const yieldPaint=()=>new Promise(resolve=>{
+   if(typeof requestAnimationFrame==='function')
+    requestAnimationFrame(()=>setTimeout(resolve,0));
+   else setTimeout(resolve,0);
+  });
+  renderFeatured();
+  await yieldPaint();
+  renderFilters();
+  await yieldPaint();
+  renderCatalog();
+ }
  renderCart();bindReveal(document);initArtSlideshowWhenVisible();const productRoute=location.pathname.match(/^\/sanpham\/[a-z0-9][a-z0-9-]{0,99}\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i)||location.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);const normalizedPath=location.pathname.replace(/\/+$/,'')||'/';if(productRoute){openDetail(decodeURIComponent(productRoute[1]),true)}else{if(location.hash==='#products'&&['/','/index.html'].includes(normalizedPath))history.replaceState(history.state||{},'','/sanpham');if(syncCatalogFromLocation()){window.scrollTo({top:0,behavior:'instant'})}else if(!['/','/index.html','/tra-cuu-don-hang','/bao-hanh'].includes(normalizedPath)){document.body.classList.add('sd-not-found-route');const notFoundView=document.querySelector('#notFoundPage');if(notFoundView)notFoundView.hidden=false;}}
 }
 
