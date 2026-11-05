@@ -93,6 +93,48 @@ function resetStyle(surface,snapshot){
  surface.style.clipPath=snapshot.clipPath;
  surface.style.willChange=snapshot.willChange;
 }
+// Move ONLY the image, never the text or glass. The ghost is a transient,
+// aria-hidden img outside the clipped dialog. Its uniform scale keeps pixels
+// proportional even when the card and detail have different aspect ratios.
+function imageMorph(key,reverse,duration){
+ if(key!=='product-detail'&&key!=='full-gallery')return null;
+ const source=origins.get(key)?.element;
+ const sourceImage=source?.tagName==='IMG'?source:source?.querySelector?.('img');
+ const targetImage=document.querySelector(key==='product-detail'?'#detailMainImage':'#sdFullscreenImage');
+ if(!(sourceImage instanceof HTMLImageElement)||!(targetImage instanceof HTMLImageElement))return null;
+ if(!sourceImage.isConnected||!targetImage.isConnected)return null;
+ const from=rectOf(sourceImage),to=rectOf(targetImage);
+ if(!from||!to)return null;
+ const asset=(reverse?targetImage:sourceImage).currentSrc||
+   (reverse?targetImage:sourceImage).src||targetImage.src;
+ if(!asset)return null;
+ const ghost=document.createElement('img');
+ ghost.className='sd-shared-image-clone';
+ ghost.alt='';ghost.setAttribute('aria-hidden','true');ghost.draggable=false;
+ ghost.decoding='async';ghost.src=asset;
+ ghost.style.cssText='position:fixed;pointer-events:none;user-select:none;z-index:2147482000;'+
+  'object-fit:contain;object-position:center;transform-origin:center center;'+
+  'will-change:transform;left:'+to.left+'px;top:'+to.top+'px;'+
+  'width:'+to.width+'px;height:'+to.height+'px';
+ const dx=(from.left+from.width/2)-(to.left+to.width/2);
+ const dy=(from.top+from.height/2)-(to.top+to.height/2);
+ const ratio=Math.max(.06,Math.min(2.5,Math.min(from.width/to.width,from.height/to.height)));
+ const compact='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+ratio.toFixed(5)+')';
+ const frames=reverse?[{transform:'none'},{transform:compact}]:
+    [{transform:compact},{transform:'none'}];
+ const opacityBefore=targetImage.style.opacity;
+ targetImage.style.opacity='0';
+ document.body.append(ghost);
+ const animation=ghost.animate(frames,{duration,easing:EASE,fill:'both'});
+ let cleaned=false;
+ const cleanup=()=>{
+  if(cleaned)return;cleaned=true;
+  animation.cancel();ghost.remove();
+  targetImage.style.opacity=opacityBefore;
+ };
+ return{animation,cleanup};
+}
+
 // The content keeps its FULL native dimensions. Only a rounded viewing aperture
 // expands. No scaleX/scaleY; photos and text are never stretched or compressed.
 // The aperture is anchored at the selected card's genuine viewport position.
@@ -126,8 +168,11 @@ function animateBetween(key,surface,sourceRect,destinationRect,reverse,done,requ
   if(cleaned)return;cleaned=true;
   if(running.get(key)?.animation===animation)running.delete(key);
   resetStyle(el,prev);
+  record.imageCleanup?.();
  };
  record.cleanup=cleanup;running.set(key,record);
+ const image=imageMorph(key,reverse,adjustedMs(requestedMs));
+ if(image){record.imageAnimation=image.animation;record.imageCleanup=image.cleanup}
  animation.addEventListener('finish',()=>{
   try{record.onFinish?.()}finally{animation.cancel();cleanup()}
  },{once:true});
@@ -140,7 +185,7 @@ function open(key,surface,source,ms=DURATION){
  if(origin)origins.set(key,origin);
  const active=running.get(key);
  if(active?.mode==='out'&&active.animation?.playState==='running'){
-  active.onFinish=null;active.mode='in';active.animation.reverse();return true;
+  active.onFinish=null;active.mode='in';active.animation.reverse();active.imageAnimation?.reverse();return true;
  }
  cancel(key);
  const previousTransition=el.style.transition,previousTransform=el.style.transform;
@@ -155,7 +200,7 @@ function close(key,surface,done,source,ms=DURATION){
  if(!el||reduced()){cancel(key);return false}
  const active=running.get(key);
  if(active?.mode==='in'&&active.animation?.playState==='running'){
-  active.onFinish=done;active.mode='out';active.animation.reverse();return true;
+  active.onFinish=done;active.mode='out';active.animation.reverse();active.imageAnimation?.reverse();return true;
  }
  const endOrigin=rectOf(source)||origins.get(key)||freshSource();
  const destination=currentRect(endOrigin);
