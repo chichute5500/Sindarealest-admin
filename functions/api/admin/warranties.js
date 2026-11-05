@@ -22,6 +22,7 @@ export async function onRequestPatch(context) {
   if (parsedBody.error === "too_large") return fail("Dữ liệu cập nhật bảo hành vượt giới hạn kích thước.", 413);
   if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Dữ liệu cập nhật không hợp lệ.");
   const body = parsedBody.value;
+  if (body.source === "manual") return updateManualWarranty(context,body);
   const id = String(body?.id || ""), status = String(body?.status || ""), note = String(body?.adminNote || "").trim().slice(0,1600);
   if (!id || !["received","reviewing","approved","rejected","resolved"].includes(status)) return fail("Trạng thái yêu cầu không hợp lệ.");
   try {
@@ -36,6 +37,75 @@ export async function onRequestPatch(context) {
     if (!result[0]?.meta?.changes) return fail("Không tìm thấy yêu cầu bảo hành.",404);
     return json({ ok:true,message:"Đã cập nhật yêu cầu hỗ trợ." });
   } catch { return fail("Không thể cập nhật yêu cầu hỗ trợ.",503); }
+}
+
+
+async function updateManualWarranty(context, body) {
+  const id=typeof body.id==="string" ? body.id.trim() : "";
+  const action=body.action==="void" ? "void" : body.action==="update" ? "update" : null;
+  if(!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id)||!action)
+    return fail("Mã phiếu hoặc thao tác cập nhật không hợp lệ.");
+  const db=context.env.DB;
+  try {
+    const row=await db.prepare("SELECT id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,policy_name,duration_months,starts_at,ends_at,status FROM manual_warranties WHERE id=? LIMIT 1").bind(id).first();
+    if(!row)return fail("Không tìm thấy phiếu bảo hành trực tiếp.",404);
+    if(row.status==="void")return fail("Phiếu đã hủy, không thể sửa hoặc hủy lại.",409);
+    let statements, next=null;
+    const original={ warrantyCode:row.warranty_code, status:row.status };
+    if(action==="void"){
+      const reason=typeof body.reason==="string" ? body.reason.trim().slice(0,300) : "";
+      if(reason.length<3)return fail("Cần nhập lý do hủy phiếu (ít nhất 3 ký tự).");
+      statements=[
+        db.prepare("UPDATE manual_warranties SET status='void' WHERE id=? AND status!='void' AND warranty_code=?")
+          .bind(id,row.warranty_code),
+        db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?,'admin','manual_warranty_voided','manual_warranty',?,? WHERE changes()=1")
+          .bind(crypto.randomUUID(),id,JSON.stringify({warrantyCode:row.warranty_code,reason})),
+      ];
+      next={status:"void"};
+    }else{
+      const clean=(value,max)=>typeof value==="string" ? value.trim().slice(0,max) : "";
+      const customerName=clean(body.customerName,120),customerPhone=clean(body.customerPhone,32);
+      const customerAddress=clean(body.customerAddress,500),productName=clean(body.productName,180);
+      const digits=customerPhone.replace(/\D/g,"");
+      const priceRaw=body.price,monthsRaw=body.durationMonths;
+      const price=(typeof priceRaw==="number"||(typeof priceRaw==="string"&&/^\d+$/.test(priceRaw))) ? Number(priceRaw):NaN;
+      const months=(typeof monthsRaw==="number"||(typeof monthsRaw==="string"&&/^\d+$/.test(monthsRaw))) ? Number(monthsRaw):NaN;
+      const startsAt=clean(body.startsAt,10);
+      if(customerName.length<2||!/^[+0-9().\s/-]+$/.test(customerPhone)||!/^\d{9,12}$/.test(digits)||
+        customerAddress.length<5||productName.length<2||!Number.isSafeInteger(price)||price<0||price>2_000_000_000||
+        !Number.isInteger(months)||months<1||months>120)
+        return fail("Tên, SĐT, địa chỉ, sản phẩm, giá hoặc thời hạn bảo hành chưa hợp lệ.");
+      let endsAt;
+      try{endsAt=addWarrantyCalendarMonths(startsAt,months)}
+      catch{return fail("Ngày bắt đầu bảo hành chưa hợp lệ.")}
+      next={customer_name:customerName,customer_phone:customerPhone,customer_address:customerAddress,
+        product_name:productName,price,duration_months:months,starts_at:startsAt,ends_at:endsAt};
+      if(Object.entries(next).every(([key,value])=>row[key]===value))
+        return fail("Không có thay đổi nào để lưu.",409);
+      // Guard against another Admin changing the same record between read and write.
+      statements=[
+        db.prepare("UPDATE manual_warranties SET customer_name=?,customer_phone=?,customer_address=?,product_name=?,price=?,duration_months=?,starts_at=?,ends_at=? WHERE id=? AND status!='void' AND warranty_code=? AND customer_name=? AND customer_phone=? AND product_name=? AND price=? AND duration_months=? AND starts_at=? AND ends_at=?")
+          .bind(customerName,customerPhone,customerAddress,productName,price,months,startsAt,endsAt,
+            id,row.warranty_code,row.customer_name,row.customer_phone,row.product_name,
+            row.price,row.duration_months,row.starts_at,row.ends_at),
+        db.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?,'admin','manual_warranty_updated','manual_warranty',?,? WHERE changes()=1")
+          .bind(crypto.randomUUID(),id,JSON.stringify({
+            warrantyCode:row.warranty_code,fields:Object.entries(next).filter(([key,val])=>row[key]!==val).map(([key])=>key)
+          })),
+      ];
+    }
+    const result=await db.batch(statements);
+    if(!Array.isArray(result)||result.length!==2||result.some(entry=>entry?.success===false))
+      return fail("Không thể xác nhận cập nhật bảo hành.",503);
+    if(Number(result[0]?.meta?.changes)!==1)
+      return fail("Phiếu vừa được thay đổi ở phiên khác hoặc đã hủy. Hãy tải lại.",409);
+    const saved=await db.prepare("SELECT id,warranty_code,customer_name,customer_phone,customer_address,product_name,price,duration_months,starts_at,ends_at,status FROM manual_warranties WHERE id=? LIMIT 1").bind(id).first();
+    if(!saved||saved.warranty_code!==original.warrantyCode||
+       Object.entries(next).some(([key,value])=>saved[key]!==value))
+      return fail("Chưa xác minh được phiếu sau cập nhật. Hãy kiểm tra danh sách trước khi thử lại.",503);
+    return json({ok:true,warrantyCode:original.warrantyCode,status:saved.status,
+      message:action==="void"?"Đã hủy hiệu lực phiếu bảo hành. Mã vẫn được giữ để tra cứu.":"Đã cập nhật phiếu bảo hành. Mã SDW được giữ nguyên."});
+  }catch{return fail("Không thể cập nhật phiếu bảo hành trực tiếp.",503)}
 }
 
 export async function onRequestPost(context) {
