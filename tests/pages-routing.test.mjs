@@ -53,6 +53,9 @@ try {
   const homepage = await fetchWithTimeout("/");
   assert.equal(homepage.status, 200, "Homepage should resolve through Pages assets");
   assert.match(homepage.headers.get("content-type") || "", /text\/html/i);
+  const preloadHeader = homepage.headers.get("link") || "";
+  assert.match(preloadHeader, /<\/fonts\/NotoSerif-Regular\.woff2>; rel=preload; as=font/);
+  assert.match(preloadHeader, /<\/code-hero\.css\?v=20261026-2>; rel=preload; as=style/);
   assert.match(await homepage.text(), /SinDarealest/i);
 
   // Test through Wrangler's real Pages router, not just the exported handler:
