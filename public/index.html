@@ -3679,7 +3679,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
     <div class="section-head" data-reveal><div><div class="eyebrow">Dấu ấn thủ công</div><h2 class="section-title">Tinh hoa nghệ thuật da cá sấu</h2></div><p class="section-note">Chất liệu được tuyển chọn, đường nét được chăm chút, giá trị đến từ những chi tiết có chủ đích.</p></div>
     <div class="mosaic mosaic-compact">
       <article class="mosaic-card art-main" data-reveal>
-        <img class="mosaic-photo" id="artSlide" src="images/5151ab24330c6931.webp" loading="lazy" decoding="async" fetchpriority="low" alt="Sản phẩm sneaker da cá sấu trong bộ sưu tập SinDarealest">
+        <img class="mosaic-photo" id="artSlide" data-src="images/5151ab24330c6931.webp" loading="lazy" decoding="async" fetchpriority="low" alt="Sản phẩm sneaker da cá sấu trong bộ sưu tập SinDarealest"><noscript><img class="mosaic-photo" src="images/5151ab24330c6931.webp" loading="lazy" alt="Sản phẩm sneaker da cá sấu trong bộ sưu tập SinDarealest"></noscript>
         <span class="slide-count" id="artSlideCount" hidden>01 / 01</span>
         <div class="mosaic-content"><div class="mosaic-kicker">The Art of Crocodile Leather</div><h3 class="mosaic-title">Tinh hoa da cá sấu<br>trong từng sản phẩm</h3><p class="mosaic-sub">Vân da độc đáo gặp gỡ phom dáng hiện đại, tạo nên dấu ấn riêng cho từng thiết kế.</p><a class="text-link tap-target" href="/sanpham">Khám phá sản phẩm <span>→</span></a></div>
         <div class="slide-controls" id="artSlideControls" hidden><button type="button" class="tap-target" id="artPrev" aria-label="Ảnh trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="tap-target" id="artPause" aria-label="Tạm dừng tự động chuyển ảnh" aria-pressed="false" title="Tạm dừng tự động chuyển ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><button type="button" class="tap-target" id="artNext" aria-label="Ảnh tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -5482,6 +5482,11 @@ async function consultProduct(id){const p=products.find(x=>(x.id||x.slug)===id)|
 // The handcrafted carousel is on Home only. Do not load/rotate full-resolution
 // photographs while opening /sanpham or while its section is far offscreen.
 let artSlideshowInitialized=false,artSlideObserver=null;
+function activateArtFirstSlide(){
+ const img=$('#artSlide');if(!img||!img.dataset.src)return;
+ img.src=img.dataset.src;
+ img.removeAttribute('data-src');
+}
 function initArtSlideshowWhenVisible(){
  if(artSlideshowInitialized)return;
  const slide=$('#artSlide');if(!slide)return;
@@ -5490,10 +5495,11 @@ function initArtSlideshowWhenVisible(){
   artSlideObserver=new IntersectionObserver(entries=>{
    if(!entries.some(entry=>entry.isIntersecting)||document.documentElement.classList.contains('sd-catalog-route'))return;
    artSlideObserver.disconnect();artSlideObserver=null;
+   activateArtFirstSlide();
    setupArtSlideshow();
   },{rootMargin:'450px 0px'});
   artSlideObserver.observe(slide);
- }else if(!document.documentElement.classList.contains('sd-catalog-route'))setupArtSlideshow();
+ }else if(!document.documentElement.classList.contains('sd-catalog-route')){activateArtFirstSlide();setupArtSlideshow()}
 }
 function setupArtSlideshow(){
  const sneakerProducts=products.filter(p=>p.category==='sneakers');
