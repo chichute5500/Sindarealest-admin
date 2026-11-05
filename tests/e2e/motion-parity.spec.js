@@ -476,3 +476,62 @@ test('full gallery !important CSS cannot show two photos during zoom, including 
   expect(errors).toEqual([]);
  }finally{await context.close()}
 });
+
+test('rapid Admin editor close → reopen reuses compositor timeline without full-size flash',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/admin/',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#appView')).toBeVisible({timeout:15000});
+  await page.locator('.mobiletabs [data-view="products"]').click();
+  await page.locator('[data-action="add"]').first().click();
+  await expect(page.locator('#backdrop')).toBeVisible();
+  const result=await page.evaluate(()=>{
+   const backdrop=document.querySelector('#backdrop'),surface=backdrop.querySelector('.editor');
+   deactivateAdminModal(backdrop);
+   const exiting=surface.getAnimations().find(a=>a.effect?.getTiming().duration>=285&&a.effect?.getTiming().duration<=375);
+   const mid=exiting?.currentTime;
+   activateAdminModal(backdrop,'#editorClose');
+   const reopening=surface.getAnimations().find(a=>a.effect?.getTiming().duration>=285&&a.effect?.getTiming().duration<=375);
+   return{same:exiting===reopening,hidden:backdrop.classList.contains('hidden'),mid,
+    current:reopening?.currentTime,playbackRate:reopening?.playbackRate,clipCount:surface.getAnimations().filter(a=>a.effect?.getKeyframes().some(f=>f.clipPath)).length};
+  });
+  expect(result.same,JSON.stringify(result)).toBe(true);
+  expect(result.hidden).toBe(false);
+  expect(result.clipCount).toBe(1);
+  await page.waitForTimeout(440);
+  await expect(page.locator('#backdrop')).toBeVisible();
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
+
+test('rapid Admin More close → reopen does not cancel active shared element animation',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/admin/',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#appView')).toBeVisible({timeout:15000});
+  const result=await page.evaluate(()=>{
+   const panel=document.querySelector('#mobileMorePanel');
+   sdAdminShowMorePanel(panel);
+   sdAdminHideMorePanel(panel);
+   const exiting=panel.getAnimations().find(a=>a.effect?.getKeyframes().some(f=>f.clipPath));
+   sdAdminShowMorePanel(panel);
+   const reopening=panel.getAnimations().find(a=>a.effect?.getKeyframes().some(f=>f.clipPath));
+   return{same:exiting===reopening,
+    hidden:panel.classList.contains('hidden'),closing:panel.dataset.sdMotionClosing||'',
+    clipCount:panel.getAnimations().filter(a=>a.effect?.getKeyframes().some(f=>f.clipPath)).length};
+  });
+  expect(result.same,JSON.stringify(result)).toBe(true);
+  expect(result.hidden).toBe(false);
+  expect(result.closing).toBe('');
+  expect(result.clipCount).toBe(1);
+  await page.waitForTimeout(440);
+  await expect(page.locator('#mobileMorePanel')).toBeVisible();
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
