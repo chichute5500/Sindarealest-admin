@@ -211,6 +211,14 @@ try{
   await page.waitForTimeout(700);
   assert.deepEqual(requested,[],
    "Craft/material mosaic imagery must not compete with cold Hero font requests");
+  const artSlide=page.locator("#artSlide");
+  assert.equal(await artSlide.getAttribute("src"),null,
+   "Original art image must not fetch before entering the viewport");
+  await artSlide.scrollIntoViewIfNeeded({timeout:15000});
+  await page.waitForFunction(()=>{
+   const img=document.querySelector("#artSlide");
+   return Boolean(img?.currentSrc&&img.complete&&img.naturalWidth>0);
+  },null,{timeout:20000});
   for(const selector of ["#craftTileImage",
    "#materialTile .material-photo--dark","#materialTile .material-photo--light"]){
    await page.locator(selector).scrollIntoViewIfNeeded({timeout:15000});
