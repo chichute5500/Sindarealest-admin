@@ -114,12 +114,18 @@ try{
   page.on("pageerror",e=>errors.push(String(e.message||e)));
   const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
   assert.equal(response?.status(),200,"Slow-font first visit must load");
-  await page.waitForTimeout(1200);
+  // The approved 950ms slow-font watchdog can close the intro after two
+  // paints + 400ms, so do not mistakenly require it to remain after 1200ms
+  // measured from DOMContentLoaded rather than from splash initialization.
+  await page.waitForTimeout(300);
   assert.ok(delayedFonts>0,"Cold load must actually delay the Serif font request");
   const stillActive=await page.locator("#welcomeSplash").evaluate(el=>
    !el.classList.contains("is-leaving")&&getComputedStyle(el).visibility==="visible");
-  assert.ok(stillActive,"Welcome must not dismiss before slow Serif could paint");
+  assert.ok(stillActive,"Welcome must remain until the fallback has a paint opportunity");
   await page.waitForFunction(()=>document.documentElement.classList.contains("sd-welcome-font-fallback"),null,{timeout:8000});
+  const fallbackPaintable=await page.locator("#welcomeSplash .welcome-title").evaluate(el=>
+   getComputedStyle(el).visibility==="visible"&&el.getBoundingClientRect().height>0);
+  assert.ok(fallbackPaintable,"Slow-font fallback heading must become visible before closing");
   await page.waitForFunction(()=>!document.querySelector("#welcomeSplash"),null,{timeout:12000});
   assert.deepEqual(errors,[],"Slow-font Welcome must not throw");
   results.scenarios.push({name:"mobile-slow-serif-lcp-guard",delayedFonts,stillActive,errors});
