@@ -86,13 +86,13 @@ assert.equal(byManualCode.status,200,'standalone warranty code must work on publ
 const manualCodeResponse=await byManualCode.json();
 assert.equal(manualCodeResponse.warranty.title,'Ví da mua trực tiếp');
 assert.equal(manualCodeResponse.warranty.eligible,false,'standalone records do not expose order-dependent claim submission');
-assert.equal(manualCodeResponse.warranty.price,2800000,'standalone warranty price is preserved in lookup data');
+assert.equal(Object.hasOwn(manualCodeResponse.warranty,'price'),false,'private sale price remains Admin-only');
 assert.equal(manualCodeResponse.warranty.maskedPhone,'090••••67');
 const byPhone=await search('090 123 4567','198.51.100.156');
 assert.equal(byPhone.status,200,'phone lookup stays supported');
 const phoneResponse=await byPhone.json();
 assert.equal(phoneResponse.warranties[0].maskedWarrantyCode,'••••M2');
 assert.equal(phoneResponse.warranties.length,2,'phone lookup returns both order-linked and standalone warranties');
-assert.equal(phoneResponse.warranties.find(w=>w.title==='Ví da mua trực tiếp')?.price,2800000,'phone lookup finds standalone warranties');
+assert.ok(phoneResponse.warranties.some(w=>w.title==='Ví da mua trực tiếp'),'phone lookup finds standalone warranties');
 assert.ok(!JSON.stringify(phoneResponse).includes('0901234567'),'phone lookup must mask original phone');
 console.log('PASS: SDW-4, legacy SDW-24, public code or phone lookup, masking and code collision classification.');
