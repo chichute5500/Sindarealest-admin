@@ -62,13 +62,16 @@ test('account pane has 180ms exit and 280ms entry without changing the drawer',a
  try{
   await motionFixture(page);
   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
-  await page.evaluate(()=>{
+  const instant=await page.evaluate(()=>{
    const account=document.querySelector('#accountDrawer');
    account.style.visibility='';account.classList.add('open');account.removeAttribute('inert');
    document.querySelector('#accountFavoritesAction').click();
+   const outgoing=document.querySelector('#accountMenuView');
+   return {leaving:outgoing.dataset.sdMotionLeaving,exitMs:outgoing.getAnimations().at(-1)?.effect?.getTiming()?.duration};
   });
+  expect(instant.leaving).toBe('1');
+  expect(instant.exitMs).toBe(180);
   await expect(page.locator('#accountFavoritesView')).toBeVisible();
-  await expect(page.locator('#accountMenuView')).toHaveAttribute('data-sd-motion-leaving','1');
   await page.waitForTimeout(300);
   await expect(page.locator('#accountMenuView')).toBeHidden();
   await page.locator('#accountFavoritesBack').click();
@@ -113,4 +116,32 @@ test('reduced motion disables supplementary transitions',async({browser})=>{
   const style=await page.locator('#productOverlay>.detail-modal').evaluate(el=>getComputedStyle(el).transitionDuration);
   expect(style).toBe('0s');
  }finally{await context.close()}
+});
+
+test('desktop light and dark retain glass filters and pre-approved drawer transitions',async({browser})=>{
+ for(const colorScheme of ['light','dark']){
+  const context=await browser.newContext({viewport:{width:1280,height:800},colorScheme,reducedMotion:'no-preference',serviceWorkers:'block'});
+  const page=await context.newPage();
+  try{
+   await motionFixture(page);
+   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+   const data=await page.evaluate(()=>{
+    const detail=document.querySelector('#productOverlay');
+    const gallery=document.querySelector('#sdFullscreenViewer');
+    const cart=document.querySelector('#cartDrawer'),checkout=document.querySelector('#checkoutDrawer');
+    return {glass:getComputedStyle(detail,'::before').backdropFilter,
+      detailOpacity:getComputedStyle(detail).opacity,
+      detailMotion:getComputedStyle(detail.querySelector('.detail-modal')).transitionDuration,
+      galleryMotion:getComputedStyle(gallery.querySelector('.sd-fullscreen-stage')).transitionDuration,
+      cartMotion:getComputedStyle(cart).transitionDuration,
+      checkoutMotion:getComputedStyle(checkout).transitionDuration};
+   });
+   expect(data.glass).toContain('blur(');
+   expect(data.detailOpacity).toBe('1');
+   expect(data.detailMotion).toContain('0.28s');
+   expect(data.galleryMotion).toContain('0.28s');
+   expect(data.cartMotion).toMatch(/[1-9]/);
+   expect(data.checkoutMotion).toMatch(/[1-9]/);
+  }finally{await context.close()}
+ }
 });
