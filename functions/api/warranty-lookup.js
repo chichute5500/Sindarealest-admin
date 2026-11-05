@@ -32,7 +32,7 @@ function shapeWarranty(row, today, claimToken) {
   const status = warrantyStatusOnDate(row.status, row.starts_at, row.ends_at, today);
   const policy=readWarrantyPolicySnapshot(row.policySnapshotJson);
   const eligible = !row.manual && isWarrantyEligibleOnDate(row.status, row.starts_at, row.ends_at, today);
-  const remainingDays = eligible ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
+  const remainingDays = status === "active" ? Math.max(0, Math.ceil((Date.parse(row.ends_at + "T00:00:00Z") - Date.parse(today + "T00:00:00Z")) / 86400000)) : 0;
   return {
     claimToken,
     maskedWarrantyCode: code ? "••••" + code.slice(-4).slice(code.length<=8 ? 2 : 0) : "••••",

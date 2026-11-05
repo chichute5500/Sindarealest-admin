@@ -15,6 +15,15 @@ assert.equal(readWarrantyPolicySnapshot(JSON.stringify(snapshot)).durationMonths
 assert.ok(!Object.hasOwn(readWarrantyPolicySnapshot(JSON.stringify(snapshot)),'unitPriceVnd'),'price must never leak through public lookup');
 assert.equal(readWarrantyPolicySnapshot(null),null,'historical warranties must not inherit a new promise');
 const storefront=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+const publicPolicy=storefront.slice(storefront.indexOf('function renderWarrantyPolicy(policy){'),storefront.indexOf('function showWarrantyRecords(records){'));
+for(const banned of ['Phiên bản','Cấp ngày','Căn cứ thời hạn','Áp dụng','Cam kết chất liệu','Thông tin chính sách của phiếu cũ']){
+ assert.ok(!publicPolicy.includes(banned),'public warranty card must not show irrelevant technical copy: '+banned);
+}
+for(const label of ['Chính sách bảo hành','Được bảo hành:','Không được bảo hành:']){
+ assert.ok(publicPolicy.includes(label),'customer warranty policy should be simple: '+label);
+}
+assert.ok(storefront.includes('warranty-record--no-image'),'manual warranty without images must have no blank reserved image column');
+assert.ok(storefront.includes('warranty-days-remaining'),'remaining days must display visibly for active coverage');
 for(const copy of [WARRANTY_POLICY_COPY.coverage,WARRANTY_POLICY_COPY.exclusions,WARRANTY_POLICY_COPY.materialRemedy]){
  assert.ok(storefront.includes(copy),'product detail must keep wording synchronized with issued policy: '+copy);
 }

@@ -33,7 +33,7 @@ const record={
  fullName:'Khách hàng thử',customerPhone:'0901234567',purchaseAddress:'123 Phố thử, Quận Một, TP HCM',imagesJson:'[]'
 };
 const manualRecord={
- warrantyId:'manual-warranty-qa',warranty_code:'SDW-M4N7',duration_months:6,starts_at:'2026-05-01',ends_at:'2026-11-01',status:'active',
+ warrantyId:'manual-warranty-qa',warranty_code:'SDW-M4N7',duration_months:6,starts_at:'2026-05-01',ends_at:'2099-01-01',status:'active',
  sku:'',skuVerified:0,title:'Ví da mua trực tiếp',size:'',purchasedAt:'2026-05-01',orderNumber:'',
  fullName:'Khách mua trực tiếp',customerPhone:'0901234567',purchaseAddress:'Địa chỉ khách mua trực tiếp',imagesJson:'[]',
  price:2800000,manual:1
@@ -88,6 +88,8 @@ assert.equal(byManualCode.status,200,'standalone warranty code must work on publ
 const manualCodeResponse=await byManualCode.json();
 assert.equal(manualCodeResponse.warranty.title,'Ví da mua trực tiếp');
 assert.equal(manualCodeResponse.warranty.eligible,false,'standalone records do not expose order-dependent claim submission');
+assert.equal(manualCodeResponse.warranty.status,'active');
+assert.ok(manualCodeResponse.warranty.remainingDays>0,'manual active warranties must show remaining days even if claim submission is disabled');
 assert.equal(Object.hasOwn(manualCodeResponse.warranty,'price'),false,'private sale price remains Admin-only');
 assert.equal(manualCodeResponse.warranty.maskedPhone,'090••••67');
 assert.equal(manualCodeResponse.warranty.maskedOrderNumber,'Mua trực tiếp');
@@ -169,6 +171,7 @@ assert.equal(codeResult.warranties.length,1);
 assert.equal(codeResult.warranty.title,'Ví mẫu A');
 assert.equal(codeResult.warranty.manual,true);
 assert.equal(codeResult.warranty.eligible,false);
+assert.ok(codeResult.warranty.remainingDays>0,'live manual record with future expiration must show remaining days');
 assert.equal(codeResult.warranty.purchasedAt,'','manual created_at must not be called purchase date');
 assert.ok(!JSON.stringify(codeResult).includes('1600000'),'sale price must remain private');
 const realByPhone=await realSearch('+84 901 234 567','198.51.100.202');
