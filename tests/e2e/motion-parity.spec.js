@@ -299,5 +299,7 @@ test('detail image morph keeps a single uniform scale and restores original imag
   await page.waitForTimeout(450);
   await expect(page.locator('.sd-shared-image-clone')).toHaveCount(0);
   expect(await page.locator('#detailMainImage').evaluate(el=>el.style.opacity)).toBe('');
+  await expect(page.locator('#detailMainImage')).toHaveCSS('opacity','1');
+  expect(await page.locator('#detailMainImage').evaluate(el=>el.style.transition)).toBe('');
  }finally{await context.close()}
 });
