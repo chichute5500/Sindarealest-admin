@@ -53,21 +53,21 @@ assert.match(performance,/#welcomeSplash\.is-leaving \.welcome-content\{[\s\S]*?
 assert.match(performance,/#welcomeSplash\.is-leaving\{\n  transition:opacity \.20s ease \.10s,visibility 0s linear \.30s!important/);
 
 // Cold-cache first-paint guard: wait for the correct Noto Serif/Sans glyphs.
-assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2" as="font" type="font\/woff2"/);
+assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular-FirstPaint\.woff2" as="font" type="font\/woff2"/);
 assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.woff2" as="font" type="font\/woff2"/);
 assert.match(performance,/html\.js-enabled:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title/);
-assert.match(html,/document\.fonts\.load\('400 30px "SD Serif"'/);
+assert.match(html,/document\.fonts\.load\('400 30px "SD FirstPaint"'/);
 assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);
 
 // Only allow first-paint text after successful Noto font readiness.
 assert.doesNotMatch(html,/window\.setTimeout\(revealWelcomeCopy,1200\)/);
-assert.match(html,/document\.fonts\.check\('400 30px "SD Serif"'/);
+assert.match(html,/document\.fonts\.check\('400 30px "SD FirstPaint"'/);
 assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);
 
 /* LCP optimization: the approved Welcome title uses the real Serif font,
  * but must not wait for the separate Sans font needed by secondary copy. */
 assert.match(performance,/html\.js-enabled\.sd-welcome-serif-ready:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title\{\s*visibility:visible!important;/);
-assert.match(html,/var serifReady=document\.fonts\.load\('400 30px "SD Serif"'/);
+assert.match(html,/var serifReady=document\.fonts\.load\('400 30px "SD FirstPaint"'/);
 assert.match(html,/if\(valid\)\{\s*document\.documentElement\.classList\.add\('sd-welcome-serif-ready'\);\s*noteWelcomeTitlePaint\(\)/);
 assert.match(html,/Promise\.all\(\[serifReady,sansReady\]\)/);
 assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduced\?100:1050\)/,
@@ -75,8 +75,14 @@ assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduce
 
 /* LCP regression: font needed by the Welcome heading must outrank the
  * auxiliary body font without swapping away from Owner-approved typography. */
-assert.match(html, /rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="high"/);
+assert.match(html, /rel="preload" href="\/fonts\/NotoSerif-Regular-FirstPaint\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="high"/);
 assert.match(html, /rel="preload" href="\/fonts\/NotoSans-Regular\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="low"/);
 // Lighthouse 13: Hero H1 consumes Serif Bold, which previously began loading at
 // ~1.5s and completed ~4.9s. Prioritize the real face without font substitution.
-assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Bold\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="high"/);
+assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Bold-FirstPaint\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="high"/);
+
+// The first-paint faces retain the exact outlines from the original Noto TTF;
+// complete SD Serif remains available for Owner-customized Welcome copy.
+assert.ok(html.includes("@font-face{font-family:SD FirstPaint;src:url('fonts/NotoSerif-Regular-FirstPaint.woff2')"));
+assert.ok(html.includes("@font-face{font-family:SD FirstPaint;src:url('fonts/NotoSerif-Bold-FirstPaint.woff2')"));
+assert.match(html,/\.welcome-title\{font:400 clamp\([^\n]*SD FirstPaint,SD Serif,Georgia,serif/);
