@@ -140,14 +140,15 @@ function imageMorph(key,reverse,duration){
  const compact='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+ratio.toFixed(5)+')';
  const frames=reverse?[{transform:'none'},{transform:compact}]:
     [{transform:compact},{transform:'none'}];
- // The gallery uses two cross-fade image layers. Its active image can
- // change asynchronously after decode(), while the shared-element ghost is
- // travelling. Hide BOTH layers or the newly active one flashes through the
- // ghost. For detail motion, only the single detail photo needs masking.
- const visualImages=key==='full-gallery'
-  ? [...document.querySelectorAll('#sdFullscreenViewer .sd-fullscreen-image')]
-      .filter(image=>image instanceof HTMLImageElement)
-  : [targetImage];
+ // A true shared-element flight owns its pixels end-to-end. If the
+ // source card/photo remains visible while the ghost departs, the user sees
+ // duplicate imagery. Mask the source and destination together. The gallery
+ // additionally cross-fades two layers; both must stay masked if decode()
+ // switches which one is active before the flight ends.
+ const visualImages=[...new Set(key==='full-gallery'
+  ? [sourceImage,...document.querySelectorAll('#sdFullscreenViewer .sd-fullscreen-image')]
+  : [sourceImage,targetImage])]
+   .filter(image=>image instanceof HTMLImageElement);
  const hiddenImages=visualImages.map(image=>({
   image,
   opacity:image.style.getPropertyValue('opacity'),
