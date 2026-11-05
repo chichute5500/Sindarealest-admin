@@ -3381,6 +3381,18 @@ html.dark #productOverlay .sd-detail-payment-best--muted{color:var(--muted)}
  .checkout-drawer .checkout-fields input,.checkout-drawer .checkout-fields select{padding:9px 8px;font-size:11px}
 }
 
+/* Mobile first-viewport: skip offscreen catalog/collection layout until near scroll.
+   This preserves the existing glass/card CSS, content and hydrated interactions.
+   Direct /sanpham and public service routes retain their exact original layout.
+   Intrinsic heights reserve scroll geometry before the real sections are painted. */
+@media(max-width:760px){
+ @supports(content-visibility:auto){
+  html:not(.sd-catalog-route):not(.sd-service-route) #featured{content-visibility:auto;contain-intrinsic-size:auto 650px}
+  html:not(.sd-catalog-route):not(.sd-service-route) #collections{content-visibility:auto;contain-intrinsic-size:auto 750px}
+  html:not(.sd-catalog-route):not(.sd-service-route) #products{content-visibility:auto;contain-intrinsic-size:auto 1500px}
+ }
+}
+
 /* Public lookup pages share the existing verified forms instead of copying API logic. */
 #sdServicePage[hidden]{display:none!important}
 html.sd-service-route main>section:not(#sdServicePage){display:none!important}
