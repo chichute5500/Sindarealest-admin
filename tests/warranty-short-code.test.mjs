@@ -29,6 +29,12 @@ const record={
  sku:'SKU-123',skuVerified:0,title:'Giày thử nghiệm',size:'42',purchasedAt:'2026-05-01',orderNumber:'SD-QA-123',
  fullName:'Khách hàng thử',customerPhone:'0901234567',purchaseAddress:'123 Phố thử, Quận Một, TP HCM',imagesJson:'[]'
 };
+const manualRecord={
+ warrantyId:'manual-warranty-qa',warranty_code:'SDW-M4N7',duration_months:6,starts_at:'2026-05-01',ends_at:'2026-11-01',status:'active',
+ sku:'',skuVerified:0,title:'Ví da mua trực tiếp',size:'',purchasedAt:'2026-05-01',orderNumber:'',
+ fullName:'Khách mua trực tiếp',customerPhone:'0901234567',purchaseAddress:'Địa chỉ khách mua trực tiếp',imagesJson:'[]',
+ price:2800000,manual:1
+};
 const stored=new Map();
 const DB={
  prepare(sql){
@@ -44,6 +50,7 @@ const DB={
     },
     async all(){
      if(sql.includes('FROM warranties w')&&sql.includes('substr('))return {results:[record]};
+     if(sql.includes('FROM manual_warranties mw')&&sql.includes('substr('))return {results:[manualRecord]};
      return {results:[]};
     },
     async run(){
@@ -72,9 +79,18 @@ assert.equal(shortResponse.warranty.maskedWarrantyCode,'••••M2','short c
 assert.equal(shortResponse.warranty.maskedPhone,'090••••67');
 assert.ok(!JSON.stringify(shortResponse).includes('SDW-K7M2'),'public output must not reveal full short code');
 assert.match(shortResponse.warranty.claimToken,/^[a-f0-9]{32}$/,'valid short-lived claim token');
+const byManualCode=await search('sdw-m4n7','198.51.100.157');
+assert.equal(byManualCode.status,200,'standalone warranty code must work on public lookup');
+const manualCodeResponse=await byManualCode.json();
+assert.equal(manualCodeResponse.warranty.title,'Ví da mua trực tiếp');
+assert.equal(manualCodeResponse.warranty.eligible,false,'standalone records do not expose order-dependent claim submission');
+assert.equal(manualCodeResponse.warranty.price,2800000,'standalone warranty price is preserved in lookup data');
+assert.equal(manualCodeResponse.warranty.maskedPhone,'090••••67');
 const byPhone=await search('090 123 4567','198.51.100.156');
 assert.equal(byPhone.status,200,'phone lookup stays supported');
 const phoneResponse=await byPhone.json();
 assert.equal(phoneResponse.warranties[0].maskedWarrantyCode,'••••M2');
+assert.equal(phoneResponse.warranties.length,2,'phone lookup returns both order-linked and standalone warranties');
+assert.equal(phoneResponse.warranties.find(w=>w.title==='Ví da mua trực tiếp')?.price,2800000,'phone lookup finds standalone warranties');
 assert.ok(!JSON.stringify(phoneResponse).includes('0901234567'),'phone lookup must mask original phone');
 console.log('PASS: SDW-4, legacy SDW-24, public code or phone lookup, masking and code collision classification.');
