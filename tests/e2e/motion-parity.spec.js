@@ -269,7 +269,7 @@ test('detail image morph keeps a single uniform scale and restores original imag
  try{
   await motionFixture(page);
   await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
-  const result=await page.evaluate(()=>{
+  const result=await page.evaluate(async()=>{
    const source=document.createElement('button');
    source.style.cssText='position:fixed;left:32px;top:190px;width:155px;height:140px;z-index:100';
    const img=document.createElement('img');
@@ -280,6 +280,7 @@ test('detail image morph keeps a single uniform scale and restores original imag
    overlay.classList.add('open');overlay.style.visibility='visible';overlay.removeAttribute('inert');
    const destination=document.querySelector('#detailMainImage');
    destination.src=img.src;
+   await Promise.all([img.decode(),destination.decode()]);
    const started=window.SDSharedMotion.open('product-detail',overlay.querySelector('.detail-modal'),source,520);
    const clone=document.querySelector('.sd-shared-image-clone');
    const keyframes=clone?.getAnimations()[0]?.effect?.getKeyframes();
@@ -593,5 +594,32 @@ test('no full-size glass flash on the first rendered frame after shared detail/g
    expect(result.last.at(-1)?.legacyTransition).toBe('0s');
   }
   expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
+
+test('a still-loading product thumbnail never creates a blank ghost or hides actual detail',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage();
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const data=await page.evaluate(()=>{
+   const source=document.createElement('button'),img=document.createElement('img');
+   source.style.cssText='position:fixed;left:31px;top:110px;width:160px;height:144px';
+   img.src='/images/__sd_motion_unloaded_test__.jpg';
+   img.style.cssText='width:100%;height:100%';
+   source.append(img);document.body.append(source);
+   const overlay=document.querySelector('#productOverlay'),photo=document.querySelector('#detailMainImage');
+   overlay.classList.add('open');overlay.style.visibility='visible';
+   const started=window.SDSharedMotion.open('product-detail',overlay.querySelector('.detail-modal'),source,520);
+   return{started,ghosts:document.querySelectorAll('.sd-shared-image-clone').length,
+     hidden:photo.style.opacity,animation:overlay.getAnimations().some(a=>a.effect?.getKeyframes().some(f=>f.clipPath))};
+  });
+  expect(data.started,JSON.stringify(data)).toBe(true);
+  expect(data.ghosts,'empty source image must not make an empty floating tile').toBe(0);
+  expect(data.hidden,'detail image must remain visible while thumbnail loads').toBe('');
+  expect(data.animation).toBe(true);
+  await page.waitForTimeout(420);
+  expect(await page.evaluate(()=>window.SDSharedMotion.inspect().ghosts)).toBe(0);
  }finally{await context.close()}
 });
