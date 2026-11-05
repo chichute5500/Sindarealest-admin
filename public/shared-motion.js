@@ -117,11 +117,11 @@ function open(key,surface,source,ms=DURATION){
 }
 function close(key,surface,done,source,ms=DURATION){
  const el=getSurface(surface);
- if(!el||reduced()){cancel(key);done?.();return false}
+ if(!el||reduced()){cancel(key);return false}
  const endOrigin=resolvedOrigin(source)||origins.get(key);
  const destination=currentRect(endOrigin);
  const from=rectOf(el);
- if(!destination||!from){cancel(key);done?.();return false}
+ if(!destination||!from){cancel(key);return false}
  return animateBetween(key,el,destination,from,true,done,ms);
 }
 function popOrigin(key){origins.delete(key)}
