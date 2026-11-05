@@ -74,14 +74,19 @@ export async function onRequestPost(context) {
           context.env.DB.prepare(
             "INSERT INTO warranties(id,order_id,order_item_id,warranty_code,policy_name,duration_months,starts_at,ends_at,status) " +
             "SELECT ?,?,?,?,?,?,?,?,'active' WHERE NOT EXISTS (SELECT 1 FROM warranties WHERE order_item_id=?) " +
-            "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status='completed')",
-          ).bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10),item.itemId,item.orderId),
+            "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status='completed') " +
+            "AND NOT EXISTS (SELECT 1 FROM manual_warranties WHERE upper(warranty_code)=?)",
+          ).bind(id,item.orderId,item.itemId,warrantyCode,policyName,months,startsAt,endDate.toISOString().slice(0,10),item.itemId,item.orderId,warrantyCode),
           context.env.DB.prepare(
             "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
             "SELECT ?, 'admin', 'warranty_issued', 'warranty', ?, ? WHERE EXISTS (SELECT 1 FROM warranties WHERE id=?)",
           ).bind(crypto.randomUUID(),id,JSON.stringify({ orderNumber,sku,policyName,months,startsAt,endsAt:endDate.toISOString().slice(0,10),warrantyCode }),id),
         ]);
-        if (!issued[0]?.meta?.changes) return fail("Sản phẩm này trong đơn đã được cấp mã bảo hành.",409);
+        if (!issued[0]?.meta?.changes) {
+          const codeCollision = await context.env.DB.prepare("SELECT id FROM manual_warranties WHERE upper(warranty_code)=? LIMIT 1").bind(warrantyCode).first();
+          if (codeCollision) continue;
+          return fail("Sản phẩm này trong đơn đã được cấp mã bảo hành.",409);
+        }
         return json({ ok:true,warrantyCode,message:"Đã phát hành mã bảo hành. Hãy cung cấp mã này cho khách hàng qua kênh liên hệ an toàn." },201);
       } catch (error) {
         if (!isWarrantyCodeCollisionError(error) || attempt===7) throw error;
@@ -137,7 +142,10 @@ async function issueManualWarranty(context, body) {
             "WHERE EXISTS (SELECT 1 FROM manual_warranties WHERE id=?)"
           ).bind(crypto.randomUUID(),id,JSON.stringify({customerName,customerPhone,customerAddress,productName,price,months,startsAt,endsAt,warrantyCode}),id),
         ]);
-        if (!issued[0]?.meta?.changes) return fail("Không thể cấp mã bảo hành trùng. Vui lòng thử lại.",409);
+        if (!issued[0]?.meta?.changes) {
+          if (attempt < 7) continue;
+          return fail("Không thể cấp mã bảo hành trùng. Vui lòng thử lại.",409);
+        }
         return json({ok:true,warrantyCode,message:"Đã tạo phiếu bảo hành độc lập."},201);
       } catch (error) {
         if (!isWarrantyCodeCollisionError(error) || attempt === 7) throw error;
