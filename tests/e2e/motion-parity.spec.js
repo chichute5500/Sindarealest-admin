@@ -145,3 +145,71 @@ test('desktop light and dark retain glass filters and pre-approved drawer transi
   }finally{await context.close()}
  }
 });
+
+test('source FLIP starts at the tapped card, reverses to it, and keeps native glass',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',err=>errors.push(err.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const before=await page.evaluate(()=>{
+   const source=document.createElement('button');
+   source.id='sharedSourceTest';
+   source.textContent='Sản phẩm mẫu';
+   source.style.cssText='position:fixed;left:25px;top:165px;width:145px;height:185px;z-index:120;pointer-events:none';
+   document.body.append(source);
+   const overlay=document.querySelector('#productOverlay'),surface=overlay.querySelector('.detail-modal');
+   const start=source.getBoundingClientRect();
+   overlay.style.visibility='';overlay.removeAttribute('inert');overlay.classList.add('open');
+   const glass=getComputedStyle(overlay,'::before').backdropFilter;
+   const active=window.SDSharedMotion.open('qa-product',surface,source,520);
+   const animation=surface.getAnimations().find(a=>a.effect?.getTiming().duration===520);
+   return {active,start:{left:start.left,top:start.top,width:start.width,height:start.height},
+    glass,opacity:getComputedStyle(overlay).opacity,
+    frames:animation?.effect?.getKeyframes(),duration:animation?.effect?.getTiming().duration};
+  });
+  expect(before.active).toBe(true);
+  expect(before.glass).toContain('blur(');
+  expect(before.opacity).toBe('1');
+  expect(before.duration).toBe(520);
+  expect(before.frames[0].transform).toContain('translate3d(');
+  expect(before.frames[0].transform).toContain('scale(');
+  expect(before.frames[1].transform).toBe('none');
+  await page.waitForTimeout(145);
+  const reversed=await page.evaluate(()=>{
+   const surface=document.querySelector('#productOverlay .detail-modal');
+   const active=window.SDSharedMotion.close('qa-product',surface,()=>{
+    const overlay=document.querySelector('#productOverlay');
+    overlay.style.visibility='hidden';overlay.classList.remove('open');
+   },null,520);
+   return {active,backward:surface.getAnimations().find(a=>a.effect?.getTiming().duration===520)?.playbackRate};
+  });
+  expect(reversed.active).toBe(true);
+  expect(reversed.backward).toBe(-1);
+  await expect(page.locator('#productOverlay')).toHaveCSS('visibility','hidden',{timeout:1800});
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
+
+test('storefront cart uses source-based 490ms composited motion, not delayed fade',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage();
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const data=await page.evaluate(()=>{
+   const trigger=document.querySelector('#cartOpen');
+   trigger.click();
+   const panel=document.querySelector('#cartDrawer');
+   const anim=panel.getAnimations().find(a=>a.effect?.getTiming().duration===490);
+   return {open:panel.classList.contains('open'),duration:anim?.effect?.getTiming().duration,
+    frames:anim?.effect?.getKeyframes(),glass:getComputedStyle(panel).backdropFilter};
+  });
+  expect(data.open).toBe(true);
+  expect(data.duration).toBe(490);
+  expect(data.frames[0].transform).toContain('scale(');
+  expect(data.frames[1].transform).toBe('none');
+  expect(data.glass).toContain('blur(');
+ }finally{await context.close()}
+});
