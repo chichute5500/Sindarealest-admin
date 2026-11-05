@@ -3,6 +3,17 @@
    Only visibility and composited transforms are changed. */
 :root{--sd-motion-balanced:280ms;--sd-motion-ease:cubic-bezier(.22,.72,.22,1)}
 
+/* The original entry-only keyframes were perceptually delayed and competed
+   with the new source-to-destination geometry animations. Keep a single
+   compositor transform owner per element, especially on slower Android GPUs. */
+html.sd-shared-motion #accountDrawer .account-panel-content > :not([hidden]),
+html.sd-shared-motion #checkoutDrawer.open :is(#sdCheckoutShippingStep,#sdCheckoutPaymentStep):not([hidden]),
+html.sd-shared-motion #backdrop .editor-tab-panel:not([hidden]),
+html.sd-shared-motion #loginView:not(.hidden) .logincard,
+html.sd-shared-motion #appView:not(.hidden) > .layout{
+  animation:none!important;
+}
+
 /* The product overlay MUST NOT animate opacity or filter on its parent:
    a parent opacity animation creates a backdrop root and breaks real glass. */
 #productOverlay{
