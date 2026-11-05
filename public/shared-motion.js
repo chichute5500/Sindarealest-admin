@@ -120,7 +120,10 @@ function imageMorph(key,reverse,duration){
  ghost.dataset.sdMotionKey=key;
  ghost.alt='';ghost.setAttribute('aria-hidden','true');ghost.draggable=false;
  ghost.decoding='async';ghost.src=asset;
- ghost.style.cssText='position:fixed;pointer-events:none;user-select:none;z-index:2147482000;'+
+ // Above its own modal, below unrelated dialogs, alerts and welcome.
+ const root=document.querySelector(key==='product-detail'?'#productOverlay':'#sdFullscreenViewer');
+ const z=(Number.parseInt(root&&getComputedStyle(root).zIndex,10)||150)+1;
+ ghost.style.cssText='position:fixed;pointer-events:none;user-select:none;z-index:'+z+';'+
   'object-fit:contain;object-position:center;transform-origin:center center;'+
   'will-change:transform;left:'+to.left+'px;top:'+to.top+'px;'+
   'width:'+to.width+'px;height:'+to.height+'px';
