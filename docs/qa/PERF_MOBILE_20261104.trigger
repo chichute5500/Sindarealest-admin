@@ -25,3 +25,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-05: regression data from Lighthouse 13: 4/4 valid mobile runs, scores 89/78/78/78; LCP ~5.6-5.7s in 3 runs. Critical Hero H1 requires NotoSerif Bold; font previously began ~1.53s, ended ~4.88s. Candidate preloads the exact original Bold font with high priority without visual/layout changes. Recheck 4 cold mobile Lighthouse runs and native throttled Chromium before PASS.
 
 2026-11-05: cancel outdated SHA-pinned Lighthouse checks to stop older candidates holding the shared Preview concurrency slot. Re-evaluate Hero Serif Bold preload with modern Lighthouse and 4 cold mobile readings on the latest commit. Keep PR Draft unless quality criteria pass.
+
+2026-11-05: candidate for explicit one-shot QA. Hero NotoSerif-Bold preload (same approved font), 3 below-fold mosaic photos deferred with noscript fallback. Validated source tests; verify mobile scroll-load behavior, 4 valid Lighthouse 13 readings and Desktop. Marker push only, no PR sync CI noise, no Production writes.
