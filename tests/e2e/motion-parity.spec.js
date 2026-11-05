@@ -303,3 +303,103 @@ test('detail image morph keeps a single uniform scale and restores original imag
   expect(await page.locator('#detailMainImage').evaluate(el=>el.style.transition)).toBe('');
  }finally{await context.close()}
 });
+
+test('rapid product → gallery → close leaves no orphan image, mask, or hidden photo',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  await page.evaluate(async()=>{
+   const svg='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800"><rect width="600" height="800" fill="#828282"/></svg>');
+   const trigger=document.createElement('button');
+   trigger.id='qaMotionTrigger';trigger.style.cssText='position:fixed;left:28px;top:220px;width:120px;height:148px';
+   trigger.innerHTML='<img alt="" style="display:block;width:100%;height:100%">';
+   trigger.querySelector('img').src=svg;
+   document.body.append(trigger);
+   const main=document.querySelector('#detailMainImage'),full=document.querySelector('#sdFullscreenImage');
+   main.src=svg;full.src=svg;
+   await Promise.all([trigger.querySelector('img').decode(),main.decode(),full.decode()]);
+  });
+  for(let iteration=0;iteration<8;iteration++){
+   const state=await page.evaluate(()=>{
+    const src=document.querySelector('#qaMotionTrigger'),overlay=document.querySelector('#productOverlay');
+    const gallery=document.querySelector('#sdFullscreenViewer'),frame=document.querySelector('#sdFullscreenFrame');
+    overlay.style.visibility='visible';overlay.classList.add('open');overlay.removeAttribute('inert');
+    window.SDSharedMotion.open('product-detail',overlay.querySelector('.detail-modal'),src,520);
+    window.SDSharedMotion.cancel('product-detail');
+    gallery.classList.add('open');gallery.style.visibility='visible';gallery.removeAttribute('inert');
+    frame.style.cssText='width:280px;height:370px';
+    window.SDSharedMotion.open('full-gallery',frame,document.querySelector('#detailMainImage'),520);
+    const during=window.SDSharedMotion.inspect();
+    window.SDSharedMotion.cancel('full-gallery');
+    gallery.style.visibility='hidden';gallery.classList.remove('open');gallery.setAttribute('inert','');
+    window.SDSharedMotion.reset('product-detail');
+    overlay.style.visibility='hidden';overlay.classList.remove('open');overlay.setAttribute('inert','');
+    return{during,after:window.SDSharedMotion.inspect(),
+      detailOpacity:document.querySelector('#detailMainImage').style.opacity,
+      fullOpacity:document.querySelector('#sdFullscreenImage').style.opacity,
+      detailClip:overlay.style.clipPath,galleryClip:gallery.style.clipPath};
+   });
+   expect(state.during.ghosts,'at most one ghost for a nested transition').toBeLessThanOrEqual(1);
+   expect(state.after.ghosts,JSON.stringify(state)).toBe(0);
+   expect(state.after.active).toEqual([]);
+   expect(state.detailOpacity).toBe('');
+   expect(state.fullOpacity).toBe('');
+   expect(state.detailClip).toBe('');
+   expect(state.galleryClip).toBe('');
+  }
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
+
+test('switching tabs during zoom cancels animation and restores native photo without flicker',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage();
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  const snap=await page.evaluate(()=>{
+   const overlay=document.querySelector('#productOverlay'),source=document.querySelector('#cartOpen');
+   overlay.style.visibility='visible';overlay.classList.add('open');
+   window.SDSharedMotion.open('product-detail',overlay.querySelector('.detail-modal'),source,520);
+   Object.defineProperty(document,'hidden',{configurable:true,value:true});
+   document.dispatchEvent(new Event('visibilitychange'));
+   return{state:window.SDSharedMotion.inspect(),clip:overlay.style.clipPath,
+     visibility:getComputedStyle(overlay).visibility,
+     hiddenImage:document.querySelector('#detailMainImage').style.opacity};
+  });
+  expect(snap.state.active).toEqual([]);
+  expect(snap.state.ghosts).toBe(0);
+  expect(snap.clip).toBe('');
+  expect(snap.hiddenImage).toBe('');
+ }finally{await context.close()}
+});
+
+test('rapid account view switching leaves one active panel and no inert ghost',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'no-preference',serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ try{
+  await motionFixture(page);
+  await page.goto('https://motion-fixture.invalid/',{waitUntil:'domcontentloaded'});
+  await page.evaluate(()=>{
+   const drawer=document.querySelector('#accountDrawer');
+   drawer.style.visibility='visible';drawer.removeAttribute('inert');drawer.classList.add('open');
+   for(let i=0;i<12;i++)setAccountView(i%2?'menu':'favorites',false);
+   setAccountView('menu',true);
+  });
+  await page.waitForTimeout(420);
+  const state=await page.evaluate(()=>{
+   const ids=['accountMenuView','accountFavoritesView','accountOrdersView','accountAddressView'];
+   return ids.map(id=>{
+    const panel=document.getElementById(id);
+    return{id,hidden:panel.hidden,leaving:panel.dataset.sdMotionLeaving||'',inert:panel.hasAttribute('inert')};
+   });
+  });
+  expect(state.filter(x=>!x.hidden).map(x=>x.id)).toEqual(['accountMenuView']);
+  expect(state.filter(x=>x.leaving||x.inert)).toEqual([]);
+  expect(errors).toEqual([]);
+ }finally{await context.close()}
+});
