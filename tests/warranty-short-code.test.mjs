@@ -88,6 +88,8 @@ assert.equal(manualCodeResponse.warranty.title,'Ví da mua trực tiếp');
 assert.equal(manualCodeResponse.warranty.eligible,false,'standalone records do not expose order-dependent claim submission');
 assert.equal(Object.hasOwn(manualCodeResponse.warranty,'price'),false,'private sale price remains Admin-only');
 assert.equal(manualCodeResponse.warranty.maskedPhone,'090••••67');
+assert.equal(manualCodeResponse.warranty.maskedOrderNumber,'Mua trực tiếp');
+assert.equal(manualCodeResponse.warranty.manual,true);
 const byPhone=await search('090 123 4567','198.51.100.156');
 assert.equal(byPhone.status,200,'phone lookup stays supported');
 const phoneResponse=await byPhone.json();
