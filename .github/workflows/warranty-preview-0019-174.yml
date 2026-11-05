@@ -5,6 +5,13 @@ on:
     paths:
       - .github/workflows/warranty-preview-0019-174.yml
       - scripts/migrate-warranty-preview-174.mjs
+      - functions/api/admin/warranties.js
+      - functions/api/warranty-lookup.js
+      - public/admin/index.html
+      - public/index.html
+      - tests/e2e/warranty-multi-preview-174.spec.js
+      - tests/warranty-manual-lifecycle.test.mjs
+      - package.json
       - tests/e2e/warranty-multi-preview-174.spec.js
       - functions/api/admin/warranties.js
       - tests/warranty-issuance-race.test.mjs
