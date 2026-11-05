@@ -60,6 +60,44 @@ try{
   results.scenarios.push({name:"mobile-first-visit",introAtStart,metrics:firstVisit,errors});
   await ctx.close();
  }
+ // Measure first-visit LCP under real Chromium network+CPU throttling.
+ // Lighthouse has intermittently emitted NO_LCP even when its final screenshot
+ // contains content. This independent native browser trace is not a substitute
+ // for Lighthouse's score; save both to distinguish measurement failures.
+ {
+  const ctx=await browser.newContext({viewport:{width:390,height:844},
+   colorScheme:"light",deviceScaleFactor:1,serviceWorkers:"block"});
+  await ctx.addInitScript(()=>{
+   window.__throttledLcp=[];
+   new PerformanceObserver(list=>{
+    for(const e of list.getEntries())window.__throttledLcp.push({
+     ms:e.startTime,size:e.size,element:e.element?.className||e.element?.tagName||null
+    });
+   }).observe({type:"largest-contentful-paint",buffered:true});
+  });
+  const page=await ctx.newPage(),errors=[];
+  page.on("pageerror",e=>errors.push(String(e.message||e)));
+  const cdp=await ctx.newCDPSession(page);
+  await cdp.send("Network.enable");
+  await cdp.send("Network.emulateNetworkConditions",{
+   offline:false,latency:150,downloadThroughput:200000,uploadThroughput:90000
+  });
+  await cdp.send("Emulation.setCPUThrottlingRate",{rate:4});
+  const r=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:60000});
+  assert.equal(r?.status(),200,"Throttled cold mobile entry should load");
+  await page.waitForFunction(()=>!document.querySelector("#welcomeSplash"),null,{timeout:30000});
+  await page.locator("#sdh-title").waitFor({state:"visible",timeout:15000});
+  await page.waitForTimeout(1200);
+  const metrics=await page.evaluate(()=>({
+   lcp:window.__throttledLcp||[],
+   lcpMs:window.__throttledLcp?.at(-1)?.ms??null,
+   fcpMs:performance.getEntriesByType("paint").find(x=>x.name==="first-contentful-paint")?.startTime??null
+  }));
+  assert.ok(metrics.lcpMs>0,"Native Chrome under 4x CPU/slow network must report LCP");
+  assert.deepEqual(errors,[],"Throttled first visit must have no JS errors");
+  results.scenarios.push({name:"mobile-cdp-throttled-cold-visit",metrics,errors});
+  await ctx.close();
+ }
  // Reproduce cold mobile font stalls without changing approved visual content.
  // The old fixed 1050ms timer could dismiss Welcome before its Serif heading
  // painted, causing repeated Lighthouse NO_LCP under slow DevTools throttling.
