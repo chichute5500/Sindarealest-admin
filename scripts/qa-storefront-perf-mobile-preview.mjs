@@ -192,6 +192,38 @@ try{
   results.scenarios.push({name,metrics,requests:calls,errors});
   await context.close();
  }
+ // The lower mosaic must not steal font bandwidth during the first viewport,
+ // but its original visuals must still load as the visitor approaches it.
+ {
+  const context=await browser.newContext({viewport:{width:390,height:844},
+   colorScheme:"light",serviceWorkers:"block"});
+  await context.addInitScript(()=>sessionStorage.setItem("sd-welcome-seen-in-tab","1"));
+  const page=await context.newPage(),requested=[];
+  const mosaicNames=["2c341b173eff94f1.webp","theme-croc-dark-tile.webp",
+   "theme-croc-albino-tile.webp"];
+  page.on("request",req=>{
+   const path=new URL(req.url()).pathname;
+   if(mosaicNames.some(name=>path.endsWith("/"+name)))requested.push(path);
+  });
+  const r=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
+  assert.equal(r?.status(),200,"Deferred mosaic scenario must load");
+  await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:35000});
+  await page.waitForTimeout(700);
+  assert.deepEqual(requested,[],
+   "Craft/material mosaic imagery must not compete with cold Hero font requests");
+  for(const selector of ["#craftTileImage",
+   "#materialTile .material-photo--dark","#materialTile .material-photo--light"]){
+   await page.locator(selector).scrollIntoViewIfNeeded({timeout:15000});
+   await page.waitForFunction(s=>{
+    const el=document.querySelector(s);
+    return el&&el.currentSrc&&el.complete&&el.naturalWidth>0;
+   },selector,{timeout:20000});
+  }
+  assert.equal(new Set(requested).size,3,
+   "All three mosaic images must load only when the user scrolls near them");
+  results.scenarios.push({name:"mobile-mosaic-on-approach",requests:requested});
+  await context.close();
+ }
  const requestContext=await browser.newContext();
  const page=await requestContext.newPage();
  for(const path of ["/sanpham","/tra-cuu-don-hang","/bao-hanh"]){
