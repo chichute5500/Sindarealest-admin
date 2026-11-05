@@ -5,6 +5,10 @@ const store=readFileSync('public/index.html','utf8');
 const admin=readFileSync('public/admin/index.html','utf8');
 const motion=readFileSync('public/motion-parity.css','utf8');
 const engine=readFileSync('public/shared-motion.js','utf8');
+const {existsSync}=await import('node:fs');
+assert.match(store,/class="brand-symbol" src="images\\/brand-emblem\\.png"/,'header must reference the checked-in logo');
+assert.ok(existsSync('public/images/brand-emblem.png'),'header logo must exist on disk');
+assert.doesNotMatch(store,/brand-emblem-nav\\.webp/,'do not reintroduce missing legacy logo');
 const cssLinks=/href="\/motion-parity\.css\?v=balanced-20261105"/g;
 for(const [label,html] of [['store',store],['admin',admin]]){
  assert.equal([...html.matchAll(cssLinks)].length,1,label+' loads the motion stylesheet exactly once');
