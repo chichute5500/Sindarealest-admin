@@ -100,7 +100,10 @@ function imageMorph(key,reverse,duration){
  if(key!=='product-detail'&&key!=='full-gallery')return null;
  const source=origins.get(key)?.element;
  const sourceImage=source?.tagName==='IMG'?source:source?.querySelector?.('img');
- const targetImage=document.querySelector(key==='product-detail'?'#detailMainImage':'#sdFullscreenImage');
+ const targetImage=key==='product-detail'
+  ? document.querySelector('#detailMainImage')
+  : (document.querySelector('#sdFullscreenViewer .sd-fullscreen-image.is-active')||
+     document.querySelector('#sdFullscreenImage'));
  if(!(sourceImage instanceof HTMLImageElement)||!(targetImage instanceof HTMLImageElement))return null;
  if(!sourceImage.isConnected||!targetImage.isConnected)return null;
  const from=rectOf(sourceImage),to=rectOf(targetImage);
@@ -133,23 +136,28 @@ function imageMorph(key,reverse,duration){
  const compact='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+ratio.toFixed(5)+')';
  const frames=reverse?[{transform:'none'},{transform:compact}]:
     [{transform:compact},{transform:'none'}];
- const opacityBefore=targetImage.style.opacity;
- const transitionBefore=targetImage.style.transition;
- // Prevent the legacy 340ms opacity fade from running AFTER the zoom ends.
- // This is scoped to one image while it has a visible shared-element clone.
- targetImage.style.transition='none';
- targetImage.style.opacity='0';
+ const opacityBefore=targetImage.style.getPropertyValue('opacity');
+ const opacityPriority=targetImage.style.getPropertyPriority('opacity');
+ const transitionBefore=targetImage.style.getPropertyValue('transition');
+ const transitionPriority=targetImage.style.getPropertyPriority('transition');
+ // The original gallery marks the active image opacity:1!important, and the
+ // detail photo transition:opacity 340ms!important. Normal inline properties
+ // do NOT override either rule, resulting in two visible photos/flicker.
+ targetImage.style.setProperty('transition','none','important');
+ targetImage.style.setProperty('opacity','0','important');
  document.body.append(ghost);
  const animation=ghost.animate(frames,{duration,easing:EASE,fill:'both'});
  let cleaned=false;
  const cleanup=()=>{
   if(cleaned)return;cleaned=true;
   animation.cancel();ghost.remove();
-  targetImage.style.opacity=opacityBefore;
-  // Commit the restored opacity while transitions remain disabled, then put
-  // the original CSS behavior back. No extra 340ms fade or visual pop.
+  if(opacityBefore)targetImage.style.setProperty('opacity',opacityBefore,opacityPriority);
+  else targetImage.style.removeProperty('opacity');
+  // Commit the restored pixels before re-enabling the original photo
+  // transitions; never animate back through a second 340ms opacity fade.
   void getComputedStyle(targetImage).opacity;
-  targetImage.style.transition=transitionBefore;
+  if(transitionBefore)targetImage.style.setProperty('transition',transitionBefore,transitionPriority);
+  else targetImage.style.removeProperty('transition');
  };
  return{animation,cleanup};
 }
