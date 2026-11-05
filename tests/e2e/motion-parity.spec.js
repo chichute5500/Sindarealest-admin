@@ -40,7 +40,7 @@ test('storefront detail/gallery closes smoothly without changing the glass backd
   await page.evaluate(()=>document.querySelector('#productOverlay').classList.remove('open'));
   const during=await detail.evaluate(el=>({visibility:getComputedStyle(el).visibility,opacity:getComputedStyle(el).opacity,glass:getComputedStyle(el,'::before').backdropFilter,
     motion:getComputedStyle(el.querySelector('.detail-modal')).transitionDuration}));
-  expect(during.visibility).toBe('visible');
+  expect(during.visibility,'close must hide glass immediately after the clip').toBe('hidden');
   expect(during.opacity).toBe('1');
   expect(during.glass).toBe(sample.glass);
   expect(during.motion,'no competing detail scale transition').toBe('0s');
@@ -494,10 +494,10 @@ test('rapid Admin editor close → reopen reuses compositor timeline without ful
   await expect(page.locator('#backdrop')).toBeVisible();
   const result=await page.evaluate(()=>{
    const backdrop=document.querySelector('#backdrop'),surface=backdrop.querySelector('.editor');
-   deactivateAdminModal(backdrop);
+   document.querySelector('#editorClose').click();
    const exiting=surface.getAnimations().find(a=>a.effect?.getTiming().duration>=285&&a.effect?.getTiming().duration<=375);
    const mid=exiting?.currentTime;
-   activateAdminModal(backdrop,'#editorClose');
+   document.querySelector('[data-action="add"]').click();
    const reopening=surface.getAnimations().find(a=>a.effect?.getTiming().duration>=285&&a.effect?.getTiming().duration<=375);
    return{same:exiting===reopening,hidden:backdrop.classList.contains('hidden'),mid,
     current:reopening?.currentTime,playbackRate:reopening?.playbackRate,clipCount:surface.getAnimations().filter(a=>a.effect?.getKeyframes().some(f=>f.clipPath)).length};
@@ -521,10 +521,11 @@ test('rapid Admin More close → reopen does not cancel active shared element an
   await expect(page.locator('#appView')).toBeVisible({timeout:15000});
   const result=await page.evaluate(()=>{
    const panel=document.querySelector('#mobileMorePanel');
-   sdAdminShowMorePanel(panel);
-   sdAdminHideMorePanel(panel);
+   const trigger=document.querySelector('#mobileMoreTrigger');
+   trigger.click();
+   trigger.click();
    const exiting=panel.getAnimations().find(a=>a.effect?.getKeyframes().some(f=>f.clipPath));
-   sdAdminShowMorePanel(panel);
+   trigger.click();
    const reopening=panel.getAnimations().find(a=>a.effect?.getKeyframes().some(f=>f.clipPath));
    return{same:exiting===reopening,
     hidden:panel.classList.contains('hidden'),closing:panel.dataset.sdMotionClosing||'',
