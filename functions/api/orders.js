@@ -1,6 +1,7 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
 import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment, validPublicQrImageKey, checkoutTransferSku, checkoutTransferReferenceMatches } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
+import { createSepayCheckout } from "../sepay.js";
 import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
@@ -94,37 +95,17 @@ export async function onRequestPost({ request, env }) {
     // verified money to the payment ledger.
     const paymentTermsConfirmed = Boolean(priceKnown && choice);
     const paymentTermsConfirmedAt = paymentTermsConfirmed ? new Date().toISOString() : null;
-    const transferSku=checkoutTransferSku(items.map(item=>({sku:item.sku})));
-    const requestedTransferReference=clean(body?.transferReference,100);
-    if(requestedTransferReference&&(!selectedPaymentOption||!checkoutTransferReferenceMatches(requestedTransferReference,phone,transferSku)))
-      return fail("Nội dung chuyển khoản đã thay đổi. Vui lòng tải lại QR trước khi tiếp tục.",409);
-    let qrSnapshot = null;
-    if (paymentTermsConfirmed) try {
-      const key = await getSetting(env.DB, "payment_qr_active_key", "");
-      if (validPublicQrImageKey(key) && (await getSetting(env.DB, "payment_qr_active", "0")) === "1") {
-        const settings = await env.DB.prepare("SELECT key,value FROM settings WHERE key IN (?,?,?)")
-          .bind("payment_qr_bank_name", "payment_qr_account_number", "payment_qr_account_name").all();
-        const config = Object.fromEntries((settings.results || []).map(row => [row.key, row.value]));
-        if (config.payment_qr_bank_name && config.payment_qr_account_number && config.payment_qr_account_name
-          && typeof env.IMAGES?.head === "function" && await env.IMAGES.head(key)) {
-          qrSnapshot = { id: crypto.randomUUID(), key, bankName:config.payment_qr_bank_name,
-            accountNumber:config.payment_qr_account_number, accountName:config.payment_qr_account_name,
-            amount:choice.amount, installmentType:choice.value,
-            shippingBenefit:choice.value === "full" ? "free_shipping" : "standard_shipping" };
-        }
-      }
-    } catch { qrSnapshot = null; }
-    if(requestedTransferReference&&(!qrSnapshot||qrSnapshot.key!==clean(body?.paymentQrImageKey,100)||
-      qrSnapshot.bankName!==clean(body?.paymentBankName,120)||qrSnapshot.accountName!==clean(body?.paymentAccountName,120)||
-      qrSnapshot.accountNumber!==clean(body?.paymentAccountNumber,40)))
-      return fail("Thông tin QR đã thay đổi hoặc không còn hoạt động. Chưa tạo đơn; vui lòng tải lại QR trước khi tiếp tục.",409);
+    if(selectedPaymentOption&&(!priceKnown||!paymentTermsConfirmed))return fail("Cần có giá đã xác nhận trước khi thanh toán qua SePay.",409);
     const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
-    // Keep the quote-issued transfer memo stable when the matching verified QR
-    // snapshot is still active; without a prepared QR, fall back to the order code.
-    const transferReference = selectedPaymentOption ? (requestedTransferReference||orderNumber) : "";
+    const transferReference = selectedPaymentOption ? orderNumber : "";
+    const sepayCheckout = selectedPaymentOption ? await createSepayCheckout({
+      env, origin:new URL(request.url).origin, invoiceNumber:orderNumber, amount:selectedAmount,
+      description:"SinDarealest " + orderNumber, customerId, accessToken:orderAccessToken
+    }) : null;
+    if(selectedPaymentOption&&!sepayCheckout)return fail("SePay chưa sẵn sàng để nhận thanh toán. Đơn hàng chưa được tạo.",503);
     const statements = [];
 
     // The customer row is a long-lived profile, not an order form. Never
@@ -165,33 +146,20 @@ export async function onRequestPost({ request, env }) {
       if (item.shoeSize) statements.push(env.DB.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(item.id,item.shoeSize));
     }
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, customerPaymentVerified:false })));
-    let paymentRequestWriteIndex=-1;
-    if(qrSnapshot){
-      paymentRequestWriteIndex=statements.length;
+    let sepayWriteIndex=-1;
+    if(sepayCheckout){
+      sepayWriteIndex=statements.length;
       statements.push(env.DB.prepare(
-        "INSERT INTO order_payment_requests(id,order_id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_by) " +
-        "SELECT ?,?,?,?,?,?,?,?,?,?,'pending','customer_checkout' WHERE EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled' AND total=? AND payment_terms_confirmed_at=?) " +
-        "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_active' AND value='1') " +
-        "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_active_key' AND value=?) " +
-        "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_bank_name' AND value=?) " +
-        "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_account_number' AND value=?) " +
-        "AND EXISTS (SELECT 1 FROM settings WHERE key='payment_qr_account_name' AND value=?) " +
-        "AND NOT EXISTS (SELECT 1 FROM order_payment_requests WHERE order_id=? AND status='pending')"
-      ).bind(qrSnapshot.id,orderId,qrSnapshot.installmentType,qrSnapshot.amount,qrSnapshot.shippingBenefit,
-        transferReference,qrSnapshot.key,qrSnapshot.bankName,qrSnapshot.accountNumber,qrSnapshot.accountName,
-        orderId,subtotal,paymentTermsConfirmedAt,qrSnapshot.key,qrSnapshot.bankName,qrSnapshot.accountNumber,qrSnapshot.accountName,orderId));
-      statements.push(env.DB.prepare(
-        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
-        "SELECT ?,'customer','payment_request_created','order',?,? WHERE EXISTS (SELECT 1 FROM order_payment_requests WHERE id=?)"
-      ).bind(crypto.randomUUID(),orderId,JSON.stringify({requestId:qrSnapshot.id,installmentType:qrSnapshot.installmentType,amount:qrSnapshot.amount,shippingBenefit:qrSnapshot.shippingBenefit,reference:transferReference}),qrSnapshot.id));
+        "INSERT INTO sepay_payment_orders(id,order_id,order_invoice_number,installment_type,amount,status) VALUES(?,?,?,?,?,'pending')"
+      ).bind(crypto.randomUUID(),orderId,orderNumber,selectedPaymentOption,selectedAmount));
     }
     const writes=await env.DB.batch(statements);
-    const paymentReady=paymentRequestWriteIndex>=0&&Number(writes?.[paymentRequestWriteIndex]?.meta?.changes||0)===1;
+    const paymentReady=sepayWriteIndex>=0&&Number(writes?.[sepayWriteIndex]?.meta?.changes||0)===1;
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
     const paymentSummary=selectedPaymentOption&&priceKnown?summarizeOrderPayment({total:subtotal,paymentOption:selectedPaymentOption,agreedAmount:selectedAmount,transactions:[],termsConfirmed:paymentTermsConfirmed,hasPendingRequest:paymentReady}):null;
-    const paymentInstructions=paymentReady?{status:"ready",qrImageUrl:"/payment-qr/"+qrSnapshot.key,qrIncludesAmount:false,amount:qrSnapshot.amount,bankName:qrSnapshot.bankName,accountName:qrSnapshot.accountName,accountNumber:qrSnapshot.accountNumber,transferContent:transferReference}:null;
-    const message=paymentReady?"Shop đã tiếp nhận đơn. Sẽ bắt đầu làm sản phẩm khi đã nhận được khoản thanh toán.":priceKnown?"QR chuyển khoản chưa sẵn sàng. Shop sẽ gửi hướng dẫn thanh toán sớm.":"Shop đã tiếp nhận yêu cầu. Giá sẽ được xác nhận trước khi gửi hướng dẫn thanh toán.";
-    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", deliveryStatus:"not_shipped", priceConfirmationRequired: !priceKnown, paymentTermsConfirmed, paymentReady, total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, paymentSummary, paymentInstructions, message }, 201);
+    const paymentInstructions=paymentReady?{status:"ready",provider:"sepay",amount:selectedAmount}:null;
+    const message=paymentReady?"Đơn hàng đã được tạo. Đang chuyển bạn đến SePay để thanh toán; trạng thái sẽ tự cập nhật sau khi SePay xác nhận.":priceKnown?"Hãy liên hệ Shop để xác nhận đơn hàng.":"Shop đã tiếp nhận yêu cầu. Giá sẽ được xác nhận trước khi gửi hướng dẫn thanh toán.";
+    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", deliveryStatus:"not_shipped", priceConfirmationRequired: !priceKnown, paymentTermsConfirmed, paymentReady, paymentProvider:"sepay", total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, paymentSummary, paymentInstructions, sepayCheckout:paymentReady?{url:sepayCheckout.url,fields:sepayCheckout.fields}:null, message }, 201);
   } catch { return fail("Chưa thể lưu đơn hàng. Vui lòng thử lại hoặc liên hệ SinDarealest qua Zalo.", 503); }
 }
 
