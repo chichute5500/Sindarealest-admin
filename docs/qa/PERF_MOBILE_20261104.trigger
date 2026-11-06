@@ -75,3 +75,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 
 2026-11-06: trace-guided perf candidate preserves the storefront's natural document height while Welcome locks the viewport; rerun the pinned cold Mobile four-sample Lighthouse gate on the exact current SHA.
 2026-11-06: cold trace confirmed inherited main visibility change as full-document style/layout hotspot; candidate uses non-inherited opacity plus inert pointer events while Welcome covers the page. Rerun all four strict Mobile Lighthouse attempts.
+
+2026-11-06: first-cold trace isolates a 92ms Mobile Welcome destination focus repaint and a nonessential initial lookup Turnstile UI request. Candidate removes Mobile destination autofocus and lazily loads the challenge UI when phone lookup is used, with submit-time fail-closed loading and one-button resume preserved. Rerun four strict Mobile Lighthouse attempts and Browser phone-lookup checks.

@@ -12,9 +12,7 @@ assert.ok(base.includes('background:transparent'),'First paint must be transpare
 assert.ok(base.includes('border:0;')&&base.includes('backdrop-filter:none;')&&base.includes('box-shadow:none;'));
 assert.ok(!base.includes('background:var(--welcome-panel)'));
 assert.ok(performance.includes('html:has(body.welcome-active){overflow:hidden!important'));
-assert.ok(performance.includes('body.welcome-active{min-height:100dvh!important;overflow:hidden!important'));
-assert.ok(!performance.includes('body.welcome-active{height:100dvh!important'),
- 'Keep the underlying document at its natural content height while Welcome covers and locks the viewport');
+assert.ok(performance.includes('body.welcome-active{height:100dvh!important'));
 assert.ok(performance.includes('height:100dvh!important;max-height:100dvh!important'));
 assert.ok(performance.includes('animation:sdWelcomeLite .36s ease-out both!important'));
 assert.ok(performance.includes('@media(min-width:761px)'));
@@ -113,8 +111,10 @@ assert.ok(welcomeExit.includes('window.requestAnimationFrame(beginFade)') && wel
 assert.ok(welcomeExit.includes('},360);'),
  'Welcome must retain its approved 360ms exit fade');
 
-// Cold Mobile: do not automatically focus during the first mobile layout.
+// Cold Mobile: do not automatically focus Welcome or its destination.
 // Desktop retains autoplay keyboard focus, Mobile's keydown focus trap still
 // moves Tab to the visible skip button on demand.
 assert.match(html,/if\(skip&&window\.matchMedia&&window\.matchMedia\('\(min-width:761px\)'\)\.matches\)\{\s*window\.requestAnimationFrame\(function\(\)\{\s*if\(!closed&&skip\.isConnected\)skip\.focus\(\{preventScroll:true\}\)/);
+assert.match(welcomeExit,/var restoreKeyboardFocus=window\.matchMedia&&window\.matchMedia\('\(min-width:761px\)'\)\.matches;[\s\S]*?if\(restoreKeyboardFocus&&destination&&typeof destination\.focus==='function'\)destination\.focus/,
+ 'Do not focus outside the closing Welcome on Mobile, where focus caused a full-page paint');
 assert.match(html,/if\(!event\.shiftKey&&\(active===last\|\|!s\.contains\(active\)\)\)\{/);
