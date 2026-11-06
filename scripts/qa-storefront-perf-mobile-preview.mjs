@@ -251,7 +251,7 @@ try{
   const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
   assert.equal(response?.status(),200,"Home lazy-section QA must load");
   await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:35000});
-  for(const id of ["featured","collections","products"]){
+  for(const id of ["orderTracking","featured","collections","products","siteFooter"]){
    const section=page.locator("#"+id);
    await section.scrollIntoViewIfNeeded({timeout:20000});
    await page.waitForTimeout(350);
@@ -282,7 +282,7 @@ try{
   const response=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
   assert.equal(response?.status(),200,width+"px entry failed");
   await page.waitForFunction(()=>window.__sdStorefrontReady===true,null,{timeout:35000});
-  for(const id of ["featured","collections","products"]){
+  for(const id of ["orderTracking","featured","collections","products","siteFooter"]){
    const section=page.locator("#"+id);
    await section.scrollIntoViewIfNeeded({timeout:20000});
    await page.waitForTimeout(300);
