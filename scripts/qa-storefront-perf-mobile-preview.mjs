@@ -122,7 +122,7 @@ try{
   const stillActive=await page.locator("#welcomeSplash").evaluate(el=>
    !el.classList.contains("is-leaving")&&getComputedStyle(el).visibility==="visible");
   assert.ok(stillActive,"Welcome must remain until the fallback has a paint opportunity");
-  await page.waitForFunction(()=>document.documentElement.classList.contains("sd-welcome-font-fallback"),null,{timeout:8000});
+  await page.waitForFunction(()=>document.querySelector("#welcomeSplash")?.classList.contains("sd-welcome-font-fallback"),null,{timeout:8000});
   const fallbackPaintable=await page.locator("#welcomeSplash .welcome-title").evaluate(el=>
    getComputedStyle(el).visibility==="visible"&&el.getBoundingClientRect().height>0);
   assert.ok(fallbackPaintable,"Slow-font fallback heading must become visible before closing");
