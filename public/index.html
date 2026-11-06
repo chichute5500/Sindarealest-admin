@@ -390,8 +390,8 @@ html.dark .welcome-splash{background:#061522;color:#edf7ff}html.dark .welcome-te
 .welcome-tagline{font-size:clamp(8px,1.4vw,11px);letter-spacing:.25em;margin-top:13px;max-width:100%;line-height:1.7}
 .welcome-content p{font:italic 14px/1.6 SD Serif,Georgia,serif;margin:24px 0 18px;opacity:.92}
 .welcome-loader{width:112px;height:2px;border-radius:9px;background:var(--welcome-loader-track);overflow:hidden;position:relative}
-.welcome-loader i{position:absolute;inset:0 auto 0 -45%;width:42%;background:linear-gradient(90deg,transparent,#b8d9f4,transparent);animation:welcomeLoading 1.45s ease-in-out infinite}
-@keyframes welcomeLoading{to{left:110%}}
+.welcome-loader i{position:absolute;inset:0 auto 0 0;width:42%;transform:translateX(-107.15%);background:linear-gradient(90deg,transparent,#b8d9f4,transparent);animation:welcomeLoading 1.45s ease-in-out infinite}
+@keyframes welcomeLoading{to{transform:translateX(261.9%)}}
 .welcome-skip{margin-top:25px;border:1px solid var(--welcome-border);border-radius:999px;padding:9px 15px;background:var(--welcome-skip-bg);color:var(--welcome-ink);backdrop-filter:none;-webkit-backdrop-filter:none;font-size:10px;letter-spacing:.03em;transition:background .25s ease,transform .25s ease,color 1s ease,border-color 1s ease}
 .welcome-skip:hover{background:var(--glass);transform:translateY(-1px)}.welcome-skip span{margin-left:12px;color:var(--gold)}html.dark .welcome-skip span{color:#cbe5fa}
 html:not(.dark) .welcome-shade{background:linear-gradient(135deg,rgba(236,246,255,.09),rgba(248,252,255,.14)),radial-gradient(ellipse at center,rgba(255,255,255,.10),rgba(107,157,194,.045) 82%,rgba(75,125,164,.08));transition:background 1s ease}
@@ -3627,7 +3627,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   <div class="welcome-shade" aria-hidden="true"></div>
   <div class="welcome-content">
     <span class="welcome-rule"></span>
-    <div class="welcome-logo-frame"><img src="/logo-ui.webp" srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui-320.webp 320w, /logo-ui.webp 360w" sizes="(max-height:630px) 79px, (max-width:760px) 26vw, 130px" alt="SinDarealest — Premium Crocodile Leather Fashion" class="welcome-logo" decoding="async" fetchpriority="low"></div>
+    <div class="welcome-logo-frame"><img width="360" height="360" src="/logo-ui.webp" srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui-320.webp 320w, /logo-ui.webp 360w" sizes="(max-height:630px) 79px, (max-width:760px) 26vw, 130px" alt="SinDarealest — Premium Crocodile Leather Fashion" class="welcome-logo" decoding="async" fetchpriority="low"></div>
     <div class="welcome-tagline">PREMIUM CROCODILE LEATHER FASHION</div>
     <h2 class="welcome-title"><span id="welcomeTitleLine1">Dấu ấn da cá sấu.</span><br><em id="welcomeTitleLine2">Tinh tế trong từng chi tiết.</em></h2>
     <p id="welcomeText">Mỗi thiết kế là một dấu ấn riêng, được chăm chút từ chất liệu đến từng chi tiết.</p>
@@ -3939,7 +3939,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   <div class="footer-main">
    <section class="footer-story" id="about" aria-labelledby="footer-story-title">
     <div class="footer-story-heading">
-     <a href="#home" class="footer-brand" aria-label="SinDarealest — Trang chủ"><img src="/logo-ui.webp" srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui.webp 360w" sizes="126px" alt="Logo chính thức SinDarealest" loading="lazy" decoding="async" fetchpriority="low"></a>
+     <a href="#home" class="footer-brand" aria-label="SinDarealest — Trang chủ"><img width="360" height="360" src="/logo-ui.webp" srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui.webp 360w" sizes="126px" alt="Logo chính thức SinDarealest" loading="lazy" decoding="async" fetchpriority="low"></a>
      <div class="footer-story-heading-copy">
       <div class="footer-story-eyebrow">Premium Crocodile Leather Fashion</div>
       <h2 id="footer-story-title">Giá trị nằm trong từng chi tiết.</h2>
