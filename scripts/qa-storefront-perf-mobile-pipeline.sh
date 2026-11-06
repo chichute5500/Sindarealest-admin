@@ -94,8 +94,8 @@ const noLcp=r=>String(r.audits['largest-contentful-paint']?.errorMessage||'').in
 for(const r of mobileReports.filter(x=>!hasScore(x)))
  assert.ok(noLcp(r),'Unexpected invalid Lighthouse mobile report');
 if(!hasScore(prod))assert.ok(noLcp(prod),'Unexpected invalid Production baseline');
-assert.ok(validMobile.length>=2,
- 'INCONCLUSIVE: fewer than 2 valid mobile Lighthouse readings; keep PR draft');
+assert.equal(validMobile.length,4,
+ 'INCONCLUSIVE: release gate requires four valid mobile Lighthouse readings; keep PR draft');
 for(const [i,r] of validMobile.entries()){
  assert.ok(score(r)>=90,'Mobile attempt '+(i+1)+' Performance below 90 ('+score(r)+')');
  if(hasScore(prod))assert.ok(score(r)>=score(prod)-5,

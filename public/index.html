@@ -857,8 +857,6 @@ html:not(.js-enabled) #welcomeSplash{display:none!important}
   #welcomeSplash.is-leaving,#welcomeSplash.is-leaving .welcome-content{transition:none!important}
 }
 </style>
-<script src="/material-gallery.js" defer></script>
-
 <style id="sd-checkout-steps-source-backed-2026-10-27">
 /* Source-backed checkout additions: inherit the real glass, light/dark tokens
    and mobile drawer positioning; do not restyle other accepted storefront UI. */
@@ -4239,6 +4237,23 @@ function activateCatalogImages(){
    else{img.src=img.getAttribute('data-src');img.style.visibility='';img.removeAttribute('data-src')}
  });
 }
+function setupMaterialGalleryLoader(){
+ const tile=$('#materialTile');if(!tile)return;
+ let started=false,observer=null;
+ const load=()=>{
+  if(started)return;started=true;observer?.disconnect();
+  const script=document.createElement('script');
+  script.src='/material-gallery.js';script.async=true;
+  script.setAttribute('fetchpriority','low');
+  document.head.append(script);
+ };
+ if('IntersectionObserver'in window){
+  observer=new IntersectionObserver(entries=>{
+   if(entries.some(entry=>entry.isIntersecting))load();
+  },{rootMargin:'250px 0px',threshold:0});
+  observer.observe(tile);
+ }else load();
+}
 /* One-shot reveal: sections stay readable when scrolling back up.
    Release detached product cards on catalog rerender. */
 function unbindReveal(root){if(!revealObserver||!root)return;root.querySelectorAll('[data-reveal-bound]').forEach(el=>revealObserver.unobserve(el))}
@@ -5947,6 +5962,9 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
  bindReveal(document);
  // SSR photos must remain usable even if /api/products takes seconds or fails.
  activateCatalogImages();
+ // The optional rotating material photo script has no first-viewport work.
+ // Fetch and evaluate it only as its tile approaches the viewport.
+ setupMaterialGalleryLoader();
  try{const res=await fetch('/api/products',{cache:'no-store'});if(!res.ok)throw new Error('API sản phẩm trả về HTTP '+res.status);const payload=await res.json();products=Array.isArray(payload)?payload:(payload.products||payload.data||[]);if(!Array.isArray(products))throw new Error('Dữ liệu sản phẩm không hợp lệ');products=products.map(p=>({...p,images:(p.images||[]).map(imgPath)}));normalizeCart();normalizeFavorites();}catch(err){
   // Keep the read-only, current D1-backed server-rendered catalog as a
   // navigable no-JS fallback. Never expose infrastructure instructions to

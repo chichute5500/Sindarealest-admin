@@ -69,3 +69,6 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] Exact focus root cause on prior mobile cold trace: skipIntro.focus during HTML parse forced 69ms reflow. Defer only initial focus by one requestAnimationFrame, preserve keyboard trapping and Welcome approved exit. After full browser, source, Admin, Google PASS and all valid mobile >=90, Owner authorizes merge to main; otherwise Draft.
 
 2026-11-06: [perf-mobile-qa-candidate] Actual first-cold Chrome trace from 9c56c141 shows first-frame skipIntro.focus triggering >200ms full document Layout and ~400ms main-thread RunTask (Mobile 87/92/93/95). New focused fix gates auto-focus to desktop min-width 761px; mobile keyboard Tab trap remains unchanged and Welcome visual/timing/close remains approved. Verify exact SHA source, browser and 4 cold Lighthouse mobile attempts every >=90 before merge to main.
+
+
+2026-11-06: [perf-mobile-qa-candidate] Defer the optional material-gallery.js request/evaluation until #materialTile approaches the viewport; preserve image gallery behavior and verify cold network plus scroll activation. Tighten Lighthouse gate to exactly 4 valid mobile runs, each >=90; Desktop >=90, source/Admin/Google/resource/browser QA PASS. Preview only; no SEO, main, or Production writes.

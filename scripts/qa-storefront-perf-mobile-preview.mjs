@@ -205,11 +205,12 @@ try{
   const context=await browser.newContext({viewport:{width:390,height:844},
    colorScheme:"light",serviceWorkers:"block"});
   await context.addInitScript(()=>sessionStorage.setItem("sd-welcome-seen-in-tab","1"));
-  const page=await context.newPage(),requested=[];
+  const page=await context.newPage(),requested=[],galleryScripts=[];
   const mosaicNames=["2c341b173eff94f1.webp","theme-croc-dark-tile.webp",
    "theme-croc-albino-tile.webp"];
   page.on("request",req=>{
    const path=new URL(req.url()).pathname;
+   if(path==="/material-gallery.js")galleryScripts.push(path);
    if(mosaicNames.some(name=>path.endsWith("/"+name)))requested.push(path);
   });
   const r=await page.goto(base+"/",{waitUntil:"domcontentloaded",timeout:45000});
@@ -218,6 +219,8 @@ try{
   await page.waitForTimeout(700);
   assert.deepEqual(requested,[],
    "Craft/material mosaic imagery must not compete with cold Hero font requests");
+  assert.deepEqual(galleryScripts,[],
+   "Optional material gallery code must stay off the first-viewport critical path");
   const artSlide=page.locator("#artSlide");
   assert.equal(await artSlide.getAttribute("src"),null,
    "Original art image must not fetch before entering the viewport");
@@ -236,6 +239,10 @@ try{
   }
   assert.equal(new Set(requested).size,3,
    "All three mosaic images must load only when the user scrolls near them");
+  await page.waitForFunction(()=>Boolean(document.querySelector('#materialGallery .sd-material-slide')),
+   null,{timeout:20000});
+  assert.equal(galleryScripts.length,1,
+   "Material gallery code must load once when its tile approaches the viewport");
   results.scenarios.push({name:"mobile-mosaic-on-approach",requests:requested});
   await context.close();
  }
