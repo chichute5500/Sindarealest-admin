@@ -83,3 +83,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] First-cold trace maps initial Welcome paint to a 175ms main-thread task including 69ms full-page Layout while main is visibility-hidden behind the Welcome overlay. Candidate additionally removes the hidden main subtree from layout only while Welcome is active; restore it automatically when the approved Welcome closes. Verify first-visit Welcome/cross-route behavior, full page and mobile scroll at 360/430px, direct catalog/service routes, no-JS, Google/Admin/resource checks, Desktop and strict all-four mobile >=90 on Preview; no main/Production writes.
 
 2026-11-06: source-test correction: escape the regex whitespace token once so the layout contract matches source CSS.
+
+2026-11-06: [perf-mobile-qa-candidate] Rolled back hidden-main display:none experiment after confirmed CLS regression (CLS 0.495 and Mobile 63/73/74/72, Desktop 90). Preserve original visibility-only Welcome behavior; no functional/visual regression reaches merge.
