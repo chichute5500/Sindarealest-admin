@@ -3575,7 +3575,11 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   if(skip)skip.addEventListener('click',dismiss);
   document.addEventListener('keydown',keepFocus,true);
   document.addEventListener('focusin',keepFocusInside,true);
-  if(skip)skip.focus({preventScroll:true});
+  // Allow the first layout frame to settle before focusing the Welcome skip
+  // control. Synchronous focus here forces ~69ms full-page layout on cold mobile.
+  if(skip)window.requestAnimationFrame(function(){
+    if(!closed&&skip.isConnected)skip.focus({preventScroll:true});
+  });
   var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(document.documentElement.classList.contains('sd-catalog-route'))window.setTimeout(dismiss,0);
   else window.setTimeout(function(){
