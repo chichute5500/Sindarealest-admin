@@ -97,3 +97,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] Keep renderFeatured synchronous in the VM source harness while browser builds one carousel card per RAF; preserve a single fragment replacement and wait for Promise completion in init.
 
 2026-11-06: [perf-mobile-qa-candidate] Update test contract for bindReveal(grid) after featured card chunking; run exact-SHA Preview QA.
+
+2026-11-06: [perf-mobile-qa-candidate] Re-emit exact-source Preview QA after branch update webhook was not observed; no source or policy change.
