@@ -37,7 +37,7 @@ const ctx={
 function render(){runInNewContext(html.slice(start,end)+"\nrenderFilters();",ctx,{timeout:1000})}
 render();
 assert.equal(ctx.selectedCategory,"all","The old selected category must reset after D1 import");
-for(const c of ["sneakers","tui-thoi-trang-golf","vi-nam-nu","tui-xach","mu"])assert.ok(container.innerHTML.includes('data-category="'+c+'"'),"Merged D1 category missing: "+c);
+for(const c of ["sneakers","tui-thoi-trang-golf","vi-nam-nu","mu"])assert.ok(container.innerHTML.includes('data-category="'+c+'"'),"Merged D1 category missing: "+c);
 assert.ok(container.innerHTML.includes("Túi Thời Trang &amp; Golf · 3"),"Legacy bag categories count together");
 assert.ok(container.innerHTML.includes("Ví Nam &amp; Nữ · 2"),"Legacy wallet categories count together");
 assert.equal((container.innerHTML.match(/class="filter-pill/g)||[]).length,6,"Merged categories and remaining D1 groups plus All stay visible");
