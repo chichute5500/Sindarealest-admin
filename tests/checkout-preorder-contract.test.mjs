@@ -131,7 +131,7 @@ assert.match(html,/sdCheckoutConfirmRange'\)\.setAttribute\('aria-valuetext','0%
 assert.match(html,/sdCheckoutOrderCreated\)return/,'The code stage cannot appear before order creation succeeds');
 assert.match(html,/button\.dataset\.detailPaymentOption=choice\.value/,'Product detail renders selectable deposit and full payment choices');
 assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displays the full-payment discount');
-assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice into checkout');
+assert.match(html,/openCheckout\(\{items:\[\{id,option,sizeOption,imageVariant,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice and selected product variants into checkout');
 assert.match(html,/async function saveCheckoutAddressFromForm\(\)/,'A successfully placed order saves its address for the next order');
 assert.match(html,/function loadLocalShippingAddress\(\)\{if\(accountSyncMode==='cloud'\)/,'Local saved addresses remain available if account sync is guest, loading, or failed');
 assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Success view uses the requested progress message');
