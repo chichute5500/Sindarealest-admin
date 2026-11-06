@@ -6583,10 +6583,11 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
   if(!scheduled){scheduled=true;requestAnimationFrame(flush)}
  };
  const scheduleAll=()=>drawers.forEach(schedule);
- const drawerFor=target=>target.matches?.('#cartDrawer,#checkoutDrawer,#accountDrawer')
-  ?target:target.closest?.('#checkoutDrawer');
+ const update=drawer=>schedule(drawer);
  if(typeof ResizeObserver==='function'){
-  const observer=new ResizeObserver(entries=>entries.forEach(({target})=>schedule(drawerFor(target))));
+  const observer=new ResizeObserver(entries=>entries.forEach(({target})=>{
+   update(target.id==='checkoutDrawer'||target.id==='cartDrawer'||target.id==='accountDrawer'?target:target.closest('#checkoutDrawer'));
+  }));
   drawers.forEach(drawer=>{
    observer.observe(drawer);
    if(drawer.id==='checkoutDrawer'){
