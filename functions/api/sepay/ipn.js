@@ -73,7 +73,7 @@ export async function onRequestPost({request,env}) {
   } catch {
     try {
       const duplicate=await env.DB.prepare("SELECT order_id FROM order_payment_transactions WHERE transaction_reference=? LIMIT 1").bind("SEPAY:"+transactionId).first();
-      if(duplicate)return duplicate.order_id===checkout.order_id?json({ok:true,duplicate:true},200,noStore):fail("Mã giao dịch đã được gắn với hóa đơn khác.",409,noStore);
+      if(duplicate)return duplicate.order_id===checkout?.order_id?json({ok:true,duplicate:true},200,noStore):fail("Mã giao dịch đã được gắn với hóa đơn khác.",409,noStore);
     } catch {}
     return fail("Không thể ghi nhận IPN SePay.",503,noStore);
   }
