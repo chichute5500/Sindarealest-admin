@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
-import { normalizeProductOption, normalizeProductSize, normalizeProductImageVariant, productOptionKind, productOptionLabel } from '../functions/_product-options.js';
-import { createSession, parseImages, parseProductOptions, serializeProductImages } from '../functions/_lib.js';
+import { normalizeProductOption, normalizeProductSize, normalizeProductImageVariant, supportsProductSpecificSize, productOptionKind, productOptionLabel } from '../functions/_product-options.js';
+import { createSession, parseImages, parseProductOptions, serializeProductImages, validateProduct } from '../functions/_lib.js';
 import { onRequestPost as createOrder } from '../functions/api/orders.js';
 import { onRequestPost as quoteCheckout } from '../functions/api/checkout-quote.js';
 import { onRequestGet as adminOrders } from '../functions/api/admin/orders.js';
@@ -32,6 +32,14 @@ assert.equal(productOptionLabel('watch-straps','20-18'),'Kích thước dây: 20
 assert.equal(normalizeProductSize(['20 × 10 × 3 cm'],''),'20 × 10 × 3 cm','A single product size is informational and auto-selected');
 assert.equal(normalizeProductSize(['20 × 10 × 3 cm','22 × 12 × 4 cm'],''),null,'Multiple sizes require customer selection');
 assert.equal(normalizeProductSize(['20 × 10 × 3 cm','22 × 12 × 4 cm'],'22 × 12 × 4 cm'),'22 × 12 × 4 cm');
+assert.equal(supportsProductSpecificSize('vi-nam-nu'),true);
+assert.equal(supportsProductSpecificSize('tui-xach'),true);
+assert.equal(supportsProductSpecificSize('sneakers'),false);
+assert.equal(normalizeProductSize(['41'],'41','sneakers'),null,'Custom size data must not replace footwear sizing');
+const sizeProduct={sku:'QA-SIZE',title:'Ví thử',category:'vi-nam-nu',description:'',price:100000,stock:null,fulfillmentType:'made_to_order',images:[],sizeOptions:['20 × 10 × 3 cm']};
+assert.ok(validateProduct(sizeProduct).value,'Wallets may have product-specific sizes');
+assert.match(validateProduct({...sizeProduct,sku:'QA-SHOE',category:'sneakers'}).error,/chỉ áp dụng cho ví và túi/,'Shoes must retain their existing standard sizes');
+
 const variants=[{image:'images/brown.webp',label:'Nâu'},{image:'images/black.webp',label:'Đen'}];
 assert.equal(normalizeProductImageVariant(variants,''),null,'Multiple selectable images require customer selection');
 assert.equal(normalizeProductImageVariant(variants,'images/black.webp'),'images/black.webp');
@@ -154,5 +162,8 @@ try {
 
 
  assert.ok(adminHtml.includes("esc(item.title||'Sản phẩm')"));
+ assert.ok(adminHtml.includes("id=\"pSizeOptionsField\" hidden"),'The custom-size field starts hidden until a wallet/bag category is selected');
+ assert.ok(adminHtml.includes("['vi-nam-nu','cap-tab-laptop','tui-thoi-trang-golf','tui-xach'].includes(category)"),'Admin limits custom dimensions to wallet and bag categories');
+
  console.log('PASS: shoes and sandals require sizes 38–44, server validates, SQLite stores sandal size, Admin receives sizes, no Production writes.');
 } finally {db.close()}

@@ -429,6 +429,7 @@ export function validateProduct(input, existing = null) {
   }
   const sizeOptions = input.sizeOptions === undefined ? (existing?.sizeOptions || []) : input.sizeOptions;
   if (!Array.isArray(sizeOptions) || sizeOptions.length > 20 || sizeOptions.some((value) => typeof value !== "string" || !value.trim() || value.trim().length > 80 || /[<>\x00-\x1f\x7f]/u.test(value))) return { error: "Kích thước sản phẩm không hợp lệ. Mỗi lựa chọn tối đa 80 ký tự." };
+  if (sizeOptions.length > 0 && !["vi-nam-nu","cap-tab-laptop","tui-thoi-trang-golf","tui-xach"].includes(category)) return { error: "Kích thước riêng chỉ áp dụng cho ví và túi. Giày dùng size chuẩn 38–44." };
   const normalizedSizes = sizeOptions.map((value) => value.trim().replace(/\s+/gu, " "));
   if (new Set(normalizedSizes).size !== normalizedSizes.length) return { error: "Kích thước sản phẩm không được trùng nhau." };
   const imageVariants = input.imageVariants === undefined ? (existing?.imageVariants || []) : input.imageVariants;

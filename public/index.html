@@ -4259,11 +4259,11 @@ function renderProductOptions(p){
  });
  wrap.append(label,field,group,msg);
 }
-function normalizeProductSize(p,raw){const values=Array.isArray(p?.sizeOptions)?p.sizeOptions:[];if(!values.length)return raw==null||raw===''?'':null;if(values.length===1)return raw==null||raw===''||raw===values[0]?values[0]:null;return typeof raw==='string'&&values.includes(raw)?raw:null}
+const customSizeCategoryKeys=new Set(['vi-nam-nu','cap-tab-laptop','tui-thoi-trang-golf','tui-xach']);function supportsProductSpecificSize(p){return customSizeCategoryKeys.has(String(p?.category||'').trim().toLowerCase())}function normalizeProductSize(p,raw){if(!supportsProductSpecificSize(p))return raw==null||raw===''?'':null;const values=Array.isArray(p?.sizeOptions)?p.sizeOptions:[];if(!values.length)return raw==null||raw===''?'':null;if(values.length===1)return raw==null||raw===''||raw===values[0]?values[0]:null;return typeof raw==='string'&&values.includes(raw)?raw:null}
 function normalizeProductImageVariant(p,raw){const values=Array.isArray(p?.imageVariants)?p.imageVariants:[];if(!values.length)return raw==null||raw===''?'':null;if(values.length===1)return raw==null||raw===''||raw===values[0]?.image?values[0].image:null;return typeof raw==='string'&&values.some(item=>item?.image===raw)?raw:null}
-function productHasSelections(p){return !!productOptionKind(p)||(Array.isArray(p?.sizeOptions)&&p.sizeOptions.length>1)||(Array.isArray(p?.imageVariants)&&p.imageVariants.length>1)}
+function productHasSelections(p){return !!productOptionKind(p)||(supportsProductSpecificSize(p)&&Array.isArray(p?.sizeOptions)&&p.sizeOptions.length>1)||(Array.isArray(p?.imageVariants)&&p.imageVariants.length>1)}
 function renderProductCustomOptions(p){
- const wrap=$('#sdDetailCustomVariants');wrap.replaceChildren();const sizes=Array.isArray(p?.sizeOptions)?p.sizeOptions:[],images=Array.isArray(p?.imageVariants)?p.imageVariants:[];
+ const wrap=$('#sdDetailCustomVariants');wrap.replaceChildren();const sizes=supportsProductSpecificSize(p)&&Array.isArray(p?.sizeOptions)?p.sizeOptions:[],images=Array.isArray(p?.imageVariants)?p.imageVariants:[];
  const field=document.createElement('input');field.type='hidden';field.id='sdDetailSizeOption';field.value=sizes.length===1?sizes[0]:'';
  const imageField=document.createElement('input');imageField.type='hidden';imageField.id='sdDetailImageVariant';imageField.value=images.length===1?images[0].image:'';
  const addChoice=(container,value,label,imagePath)=>{

@@ -53,7 +53,7 @@ export async function onRequestPost({ request, env }) {
       const p = byId.get(line.id);
       const option = normalizeProductOption(p.category, line.option);
       const config = parseProductOptions(p.images_json);
-      const sizeOption = normalizeProductSize(config.sizeOptions, line.sizeOption);
+      const sizeOption = normalizeProductSize(config.sizeOptions, line.sizeOption, p.category);
       const imageVariant = normalizeProductImageVariant(config.imageVariants, line.imageVariant);
       if (option === null || sizeOption === null || imageVariant === null) return fail("Vui lòng chọn đúng size, màu hoặc thông tin sản phẩm.", 400);
       const key = JSON.stringify([line.id, option, sizeOption, imageVariant]);

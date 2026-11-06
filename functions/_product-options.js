@@ -1,6 +1,8 @@
 // Product-option rules are catalog-category based, never inferred from a title
 // or trusted from a customer-controlled category in the checkout payload.
 export const SHOE_CATEGORIES = Object.freeze(["sneakers", "loafers", "dress-shoes", "sandals"]);
+export const CUSTOM_SIZE_CATEGORIES = Object.freeze(["vi-nam-nu", "cap-tab-laptop", "tui-thoi-trang-golf", "tui-xach"]);
+export function supportsProductSpecificSize(category) { return CUSTOM_SIZE_CATEGORIES.includes(String(category ?? "").trim().toLowerCase()); }
 // Dép use the same mandatory 38–44 size selection and order-item size storage.
 
 export function productOptionKind(category) {
@@ -40,5 +42,5 @@ export function productOptionLabel(category, option) {
   return "";
 }
 
-export function normalizeProductSize(sizeOptions, value) { const values=Array.isArray(sizeOptions)?sizeOptions:[]; if(!values.length)return value==null||value===""?"":null; if(values.length===1)return value==null||value===""||value===values[0]?values[0]:null; return typeof value==="string"&&values.includes(value)?value:null; }
+export function normalizeProductSize(sizeOptions, value, category) { const values=Array.isArray(sizeOptions)?sizeOptions:[]; if(category!==undefined&&!supportsProductSpecificSize(category))return values.length?null:(value==null||value===""?"":null); if(!values.length)return value==null||value===""?"":null; if(values.length===1)return value==null||value===""||value===values[0]?values[0]:null; return typeof value==="string"&&values.includes(value)?value:null; }
 export function normalizeProductImageVariant(imageVariants, value) { const values=Array.isArray(imageVariants)?imageVariants:[]; if(!values.length)return value==null||value===""?"":null; if(values.length===1)return value==null||value===""||value===values[0]?.image?values[0].image:null; return typeof value==="string"&&values.some(item=>item?.image===value)?value:null; }

@@ -28,7 +28,7 @@ export async function onRequestPost({request,env}) {
       const product=byId.get(String(item.id||"").trim());
       const option=normalizeProductOption(product.category,item?.option??"");
       const config=parseProductOptions(product.images_json);
-      if(option===null||normalizeProductSize(config.sizeOptions,item?.sizeOption??"")===null||normalizeProductImageVariant(config.imageVariants,item?.imageVariant??"")===null)return fail("Vui lòng chọn đúng size, màu hoặc thông tin sản phẩm.",400);
+      if(option===null||normalizeProductSize(config.sizeOptions,item?.sizeOption??"",product.category)===null||normalizeProductImageVariant(config.imageVariants,item?.imageVariant??"")===null)return fail("Vui lòng chọn đúng size, màu hoặc thông tin sản phẩm.",400);
     }
     for(const id of ids){
       const stock=byId.get(id).stock;
