@@ -218,7 +218,7 @@ export async function onRequest(context) {
     return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
   }
   // Serve the exact Google Search Console ownership file at its required root URL.
-  if (url.pathname === "/googleded292a3607df9dd.html") {
+  if (url.pathname === "/googleded292a3607df9dd.html" || url.pathname === "/googleded292a3607df9dd") {
     return new Response("google-site-verification: googleded292a3607df9dd.html", {
       status: 200,
       headers: {
