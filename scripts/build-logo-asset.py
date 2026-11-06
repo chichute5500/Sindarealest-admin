@@ -18,6 +18,22 @@ if dst.stat().st_size >= src.stat().st_size or dst.stat().st_size>140_000:
     raise SystemExit("Compressed brand image exceeds expected budget; abort preview deploy")
 print(f"PASS: original logo unchanged; mobile brand image {src.stat().st_size} -> {dst.stat().st_size} bytes")
 
+# A density-appropriate welcome mark prevents the 360px fallback from being
+# downloaded into its ~105px mobile frame. The source logo remains untouched.
+responsive_dst=Path("public/logo-ui-320.webp")
+with Image.open(src) as image:
+    image=ImageOps.exif_transpose(image)
+    image.thumbnail((320,320),Image.Resampling.LANCZOS)
+    if image.mode not in ("RGBA","RGB"):
+        image=image.convert("RGBA")
+    image.save(responsive_dst,format="WEBP",quality=68,method=6,exact=True)
+if not responsive_dst.is_file() or responsive_dst.stat().st_size>30_000:
+    raise SystemExit("Responsive 320px logo exceeds 30KB budget")
+with Image.open(responsive_dst) as image:
+    if image.size != (320,320):
+        raise SystemExit("Responsive logo variant must be exactly 320x320")
+print(f"PASS: generated 320px welcome logo ({responsive_dst.stat().st_size} bytes)")
+
 # The mobile navigation uses a separate compact brand symbol, not the
 # complete square logo. It must be generated on every Pages build; the old
 # HTML referenced this file although it was missing from the Git tree.
