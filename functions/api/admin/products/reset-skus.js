@@ -1,7 +1,32 @@
 import { fail, genericDbError, json, readJsonBodyLimited, requireAdmin } from "../../../_lib.js";
-import { officialSkuPrefix, normalizeCatalogCategory } from "../../../_catalog-sku.js";
-
-function resolveCategory(value) { return normalizeCatalogCategory(value); }
+// The manual reset endpoint is for unverified/internal codes only. Preserve
+// the established prefixes for legacy categories; newly canonical categories
+// use the new unified prefixes. Verified commercial SKUs are never selected.
+const RESET_SKU_PREFIXES=Object.freeze({
+ sneakers:"SD-SN",loafers:"SD-GL","dress-shoes":"SD-GT",belts:"SD-TL",
+ sandals:"SD-DD","watch-straps":"SD-DH","phone-cases":"SD-OP",
+ wallets:"SD-VN","vi-nam":"SD-VN","vi-cam-tay":"SD-VD",
+ "vi-nam-nu":"SD-VI","cap-tab-laptop":"SD-CA",
+ clutch:"SD-CL","tui-deo-cheo":"SD-DC","tui-golf":"SD-TG",
+ "tui-thoi-trang-golf":"SD-TTG",mu:"SD-MU","tui-nu":"SD-TN","tui-xach":"SD-TX"
+});
+function categorySlug(value){
+ return String(value||"").trim().toLocaleLowerCase("vi").replace(/đ/g,"d")
+  .normalize("NFD").replace(/\p{M}/gu,"")
+  .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+}
+const LEGACY_ALIASES=Object.freeze({
+ "vi-da":"vi-nam",vida:"vi-nam",wallet:"vi-nam",
+ "giay-the-thao":"sneakers","sneaker":"sneakers",
+ "giay-luoi":"loafers","giay-tay":"dress-shoes",
+ "that-lung":"belts","day-dong-ho":"watch-straps",
+ "op-dien-thoai":"phone-cases","oplung":"phone-cases",dep:"sandals"
+});
+function resolveCategory(value) {
+ const slug=categorySlug(value);
+ return Object.hasOwn(RESET_SKU_PREFIXES,slug)?slug:(LEGACY_ALIASES[slug]||null);
+}
+function resetSkuPrefix(category){return RESET_SKU_PREFIXES[category]||null;}
 
 function buildCaseUpdate(db, rows, skuById) {
   const pairs = rows.map((row) => [row.id, skuById.get(row.id)]);
@@ -57,11 +82,11 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Only the 15 owner-approved category prefixes may receive an official SKU.
+    // Use frozen legacy prefixes for historical rows and unified prefixes for canonical new categories.
     const categoryRules = Object.create(null);
     for (const row of categorized) {
       if (!Object.hasOwn(categoryRules, row.categoryKey)) {
-        const prefix=officialSkuPrefix(row.categoryKey);
+        const prefix=resetSkuPrefix(row.categoryKey);
         if(!prefix)return fail(`Danh mục ${row.categoryKey} chưa có tiền tố SKU chính thức.`,400);
         const known={prefix,label:String(row.category_label||row.categoryKey)};
         categoryRules[row.categoryKey] = known;

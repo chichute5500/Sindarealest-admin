@@ -33,10 +33,10 @@ assert.ok(admin.includes("data-image-index") && admin.includes("galleryGrid.addE
 assert.ok(admin.includes("Liquid Glass admin skin"), "Admin should use the matching Liquid Glass visual system");
 assert.ok(admin.includes('<svg viewBox="0 0 24 24" aria-hidden="true">'), "Admin navigation should use consistent line icons");
 assert.ok(middleware.includes("lower(id)=?"), "Product URLs should support immutable IDs");
-assert.ok(products.includes("officialSkuPrefix(body?.category") && products.includes("body.skuVerified=true;"), "New products must automatically receive an official SKU from one of 15 approved prefixes");
+assert.ok(products.includes("officialSkuPrefix(body?.category") && products.includes("body.skuVerified=true;"), "New products must automatically receive an official SKU from one of 12 approved category-group prefixes");
 assert.ok(ai.includes("OPENAI_API_KEY"), "AI key must be read server-side");
 const resetSkus = read("../functions/api/admin/products/reset-skus.js");
-assert.ok(resetSkus.includes("officialSkuPrefix(row.categoryKey)") && resetSkus.includes("sku_verified = 1"), "SKU reset must only allocate approved, verified SKU prefixes");
+assert.ok(resetSkus.includes("resetSkuPrefix(row.categoryKey)") && resetSkus.includes("sku_verified = 1") && resetSkus.includes('"vi-nam-nu":"SD-VI"') && resetSkus.includes('"vi-cam-tay":"SD-VD"'), "SKU reset must only allocate approved, verified SKU prefixes");
 assert.ok(push.includes("requireAdmin"), "Push subscriptions must require admin authentication");
 console.log("PASS: admin upgrade static regression checks.");
 

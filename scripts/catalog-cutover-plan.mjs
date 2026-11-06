@@ -1,4 +1,17 @@
-import { officialSkuPrefix, officialSku } from '../functions/_catalog-sku.js';
+// Archived one-time production cutover plan. Keep its original 15-category
+// mapping frozen so the new storefront/SKU rules cannot rewrite historical plans.
+const LEGACY_PREFIXES=Object.freeze({
+ sneakers:'SD-SN',loafers:'SD-GL','dress-shoes':'SD-GT',belts:'SD-TL',
+ sandals:'SD-DD','watch-straps':'SD-DH','phone-cases':'SD-OP','vi-nam':'SD-VN',
+ 'vi-cam-tay':'SD-VD','cap-tab-laptop':'SD-CA',clutch:'SD-CL',mu:'SD-MU',
+ 'tui-deo-cheo':'SD-DC','tui-golf':'SD-TG','tui-nu':'SD-TN',wallets:'SD-VN'
+});
+const officialSkuPrefix=category=>LEGACY_PREFIXES[String(category||'')]||null;
+const officialSku=(prefix,ordinal)=>{
+ if(!Object.values(LEGACY_PREFIXES).includes(prefix)||!Number.isSafeInteger(ordinal)||ordinal<1||ordinal>999999)
+  throw Error('Unsupported legacy SKU prefix or sequence');
+ return prefix+String(ordinal).padStart(3,'0');
+};
 
 // Pure, repeatable plan: published products only; hidden rows are delete candidates.
 // Stable assignment avoids random catalog shuffling or timestamp edits changing SKU.

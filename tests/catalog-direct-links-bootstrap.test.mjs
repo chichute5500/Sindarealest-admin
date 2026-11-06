@@ -54,7 +54,7 @@ let hidden=false;let filters=0,catalog=0,active='';
 const state={
  location:{pathname:'/sanpham/mu',hash:''},
  products:[{category:'mu'}],
- routeSlug:productCategoryRouteSlug,
+ routeSlug:productCategoryRouteSlug,canonicalCategoryKey:value=>value,
  document:{body:{classList:{remove(c){classes.delete(c)}}},querySelector(){return {
   set hidden(v){hidden=v},
   get hidden(){return hidden}
@@ -72,4 +72,4 @@ assert.equal(state.page,1);
 assert.equal(active,'products');
 assert.equal(filters,1);
 assert.equal(catalog,1);
-console.log('PASS: all 15 catalog direct links render without fake client-side 404; product paths, real missing pages, server routes and history recovery protected.');
+console.log('PASS: all 12 merged catalog links render without fake client-side 404; product paths, real missing pages, server routes and history recovery protected.');

@@ -13,17 +13,19 @@ const fakeContext=path=>({
 });
 assert.equal(catalogListingPath(),'/sanpham');
 assert.equal(catalogListingPath('dress-shoes'),'/sanpham/giaytay');
-assert.equal(catalogListingPath('vi-cam-tay'),'/sanpham/vicamtay');
+assert.equal(catalogListingPath('vi-cam-tay'),'/sanpham/vinamnu');
+assert.equal(catalogListingPath('tui-golf'),'/sanpham/tuithoitrang-golf');
+assert.equal(catalogListingPath('tui-nu'),'/sanpham/tuixach');
 assert.equal(productCategoryRouteSlug('phone-cases'),'oplung');
 assert.ok(isKnownCatalogCategoryRoute('giaytay'));
-for(const [path,canonical] of [['/sanpham','/sanpham'],['/sanpham/giaytay','/sanpham/giaytay'],['/sanpham/vicamtay','/sanpham/vicamtay'],['/sanpham/new-test-bag','/sanpham/new-test-bag']]){
+for(const [path,canonical] of [['/sanpham','/sanpham'],['/sanpham/giaytay','/sanpham/giaytay'],['/sanpham/vinamnu','/sanpham/vinamnu'],['/sanpham/new-test-bag','/sanpham/new-test-bag']]){
  const response=await middleware(fakeContext(path));
  assert.equal(response.status,200,path);
  const text=await response.text();
  assert.ok(text.includes('rel="canonical" href="https://shop.example'+canonical+'"'),path);
  assert.ok(text.includes('Storefront'),path);
 }
-for(const [path,canonical] of [['/sanpham/','/sanpham'],['/sanpham/GIAYTAY','/sanpham/giaytay'],['/sanpham/vida','/sanpham/vinam'],['/sanpham/giay-tay','/sanpham/giaytay']]){
+for(const [path,canonical] of [['/sanpham/','/sanpham'],['/sanpham/GIAYTAY','/sanpham/giaytay'],['/sanpham/vida','/sanpham/vinamnu'],['/sanpham/vinam','/sanpham/vinamnu'],['/sanpham/vicamtay','/sanpham/vinamnu'],['/sanpham/tuigolf','/sanpham/tuithoitrang-golf'],['/sanpham/tuideocheo','/sanpham/tuithoitrang-golf'],['/sanpham/tuinu','/sanpham/tuixach'],['/sanpham/giay-tay','/sanpham/giaytay']]){
  const response=await middleware(fakeContext(path));
  assert.equal(response.status,301,path);
  assert.equal(response.headers.get('location'),'https://shop.example'+canonical,path);
@@ -53,12 +55,12 @@ assert.ok(front.indexOf(verificationTag)>front.indexOf('<head>')&&front.indexOf(
 assert.ok(front.includes('href="/sanpham"'));
 
 // Crawlable category navigation exists in the initial HTML, even before
-// loading product data via JavaScript; all 15 canonical categories are linked.
+// loading product data via JavaScript; all 12 merged catalog groups are linked.
 const staticNav=front.match(/<nav class="filter-pills" id="categoryFilters"[^>]*>([\s\S]*?)<\/nav>/);
 assert.ok(staticNav, "Server HTML must expose category links before JavaScript");
 const staticHrefs=[...staticNav[1].matchAll(/<a class="filter-pill tap-target" href="([^"]+)"[^>]*>/g)].map(m=>m[1]);
 const canonicalCategories=[...new Set(Object.values(PRODUCT_CATEGORY_ROUTE_SLUGS))].map(slug=>'/sanpham/'+slug);
-assert.equal(staticHrefs.length,16,"15 category links plus /sanpham");
+assert.equal(staticHrefs.length,13,"12 category links plus /sanpham");
 assert.deepEqual(staticHrefs.slice().sort(),['/sanpham',...canonicalCategories].sort());
 assert.equal(new Set(staticHrefs).size,staticHrefs.length, "Do not repeat legacy category URLs");
 assert.ok(front.includes('<a class="filter-pill tap-target'),"Dynamic category filters must use semantic links");
@@ -97,15 +99,15 @@ const sample=[
 ];
 const state={
  location:{pathname:'/sanpham/giaytay',hash:''},
- products:sample,routeSlug:productCategoryRouteSlug,
+ products:sample,routeSlug:productCategoryRouteSlug,canonicalCategoryKey:value=>({'vi-cam-tay':'vi-nam-nu'}[value]||value),
  history:{calls:[],pushState(obj,title,path){this.calls.push(path);state.location.pathname=path}},
  selectedCategory:'all',page:2,
  renderFilters(){},renderCatalog(){},setActiveNav(){},$:()=>({scrollIntoView(){}}),
 };
 let ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
 assert.equal(ret,'dress-shoes');
-state.location.pathname='/sanpham/vicamtay';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
-assert.equal(ret,'vi-cam-tay');
+state.location.pathname='/sanpham/vinamnu';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
+assert.equal(ret,'vi-nam-nu');
 state.location.pathname='/sanpham';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
 assert.equal(ret,'all');
 runInNewContext(functions+"\nnavigateCatalog('dress-shoes')",state);
@@ -117,7 +119,7 @@ const searchEnd=front.indexOf('\nfunction renderCatalog(){',searchStart);
 const source=front.slice(searchStart,searchEnd);
 const cases=[
  ['sneaker','sneakers',true],['giaytay','dress-shoes',true],
- ['tuideocheo','tui-deo-cheo',true],['khong-ton-tai','sneakers',false]
+ ['tuithoitrang-golf','tui-thoi-trang-golf',true],['khong-ton-tai','sneakers',false]
 ];
 for(const [term,category,shouldMatch] of cases) {
  const context={
@@ -125,7 +127,7 @@ for(const [term,category,shouldMatch] of cases) {
       id:'sample-1',category,title:'Sản phẩm cá sấu',description:'Đẹp',categoryLabel:'Phụ kiện',
       createdAt:'2026-10-27 01:00:00'
    }],$:(x)=>x==='#catalogSearch'?{value:term}:null,
-   foldSearch:v=>String(v||'').toLowerCase(),visibleSku:()=>'',routeSlug:productCategoryRouteSlug
+   foldSearch:v=>String(v||'').toLowerCase(),visibleSku:()=>'',routeSlug:productCategoryRouteSlug,canonicalCategoryKey:value=>({'vi-cam-tay':'vi-nam-nu','tui-deo-cheo':'tui-thoi-trang-golf'}[value]||value)
  };
   const matched=runInNewContext(source+"\ngetFiltered().map(p=>p.id)",context);
  assert.equal(matched.length,shouldMatch?1:0,term);
@@ -137,6 +139,6 @@ const DB={prepare(){return {async all(){return {results:[
 const response=await sitemap({request:new Request('https://shop.example/sitemap.xml'),env:{DB}});
 assert.equal(response.status,200);
 const xml=await response.text();
-for(const path of ['/sanpham</loc>','/sanpham/giaytay</loc>','/sanpham/vicamtay</loc>','/sanpham/giaytay/SD-GT001</loc>'])
+for(const path of ['/sanpham</loc>','/sanpham/giaytay</loc>','/sanpham/vinamnu</loc>','/sanpham/giaytay/SD-GT001</loc>'])
  assert.ok(xml.includes(path),'Missing sitemap '+path);
 console.log('PASS: catalog routes, category deep links, 301 legacy routes, menu links, history and SEO sitemap.');

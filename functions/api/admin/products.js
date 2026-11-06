@@ -31,7 +31,7 @@ export async function onRequestPost(context) {
   if (parsedBody.error || !parsedBody.value || typeof parsedBody.value !== "object" || Array.isArray(parsedBody.value)) return fail("Biểu mẫu sản phẩm không hợp lệ.");
   const body = parsedBody.value;
   const prefix=officialSkuPrefix(body?.category||body?.categoryLabel);
-  if(!prefix)return fail("Danh mục chưa có tiền tố SKU chính thức. Vui lòng chọn một trong 15 danh mục đã duyệt.",400);
+  if(!prefix)return fail("Danh mục chưa có tiền tố SKU chính thức. Vui lòng chọn một trong 12 danh mục đã duyệt.",400);
   // A blank name asks for the canonical category title; entered titles always
   // take priority. The official number is allocated by the server, never UI.
   const useDefaultProductTitle=!String(body.title??'').trim();
