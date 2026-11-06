@@ -137,7 +137,12 @@ export async function onRequest(context) {
     if (context.request.method !== "GET" && context.request.method !== "HEAD")
       return new Response("Method not allowed", { status: 405 });
     let categorySlug = (catalogMatch[1] || "").toLowerCase();
-    const legacyCategories = { vida: "vinam", "giay-tay": "giaytay", "giay-luoi": "giayluoi" };
+    const legacyCategories = {
+      vida:"vinamnu","vinam":"vinamnu","vicamtay":"vinamnu",
+      "tui-deo-cheo":"tuithoitrang-golf","tuideocheo":"tuithoitrang-golf",
+      tuigolf:"tuithoitrang-golf",clutch:"tuithoitrang-golf",
+      tuinu:"tuixach","giay-tay":"giaytay","giay-luoi":"giayluoi"
+    };
     categorySlug = legacyCategories[categorySlug] || categorySlug;
     const canonicalPath = categorySlug ? "/sanpham/" + categorySlug : "/sanpham";
     const rawPage=url.searchParams.get("page");
@@ -163,9 +168,9 @@ export async function onRequest(context) {
     let html = await response.text();
     const catalogLabels = {
       sneaker: "Giày thể thao (Sneaker)", giayluoi: "Giày lười", giaytay: "Giày tây",
-      thatlung: "Thắt lưng", vinam: "Ví nam", vicamtay: "Ví cầm tay",
-      caplaptop: "Cặp – Tab – Laptop", clutch: "Clutch", mu: "Mũ",
-      tuideocheo: "Túi đeo chéo", tuigolf: "Túi golf", tuinu: "Túi nữ",
+      thatlung: "Thắt lưng", vinamnu: "Ví nam & nữ",
+      caplaptop: "Cặp – Tab – Laptop", "tuithoitrang-golf": "Túi thời trang & golf", mu: "Mũ",
+      tuixach: "Túi xách",
       dep: "Dép", daydongho: "Dây đồng hồ", oplung: "Ốp điện thoại"
     };
     const categoryName = Object.hasOwn(catalogLabels,categorySlug)
