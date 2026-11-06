@@ -63,6 +63,7 @@ async function readCatalog(path="/api/products"){
   const req=new Request("https://shop.example"+path);
   const res=await publicProductsGet({request:req,env});
   assert.equal(res.status,200);
+  assert.equal(res.headers.get("X-Robots-Tag"),"noindex","Crawlable JSON resources must not become Google search results");
   assert.equal(res.headers.get("Cache-Control"),"no-store","Browsers must not reuse stale catalog data");
   return res.json();
 }

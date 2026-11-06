@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { onRequestGet as sitemap, onRequestHead as sitemapHead } from "../functions/sitemap.xml.js";
 import { onRequestGet as robotsTxt } from "../functions/robots.txt.js";
+import { onRequestGet as publicSettings } from "../functions/api/settings.js";
 
 const DB = {
   prepare(sql) {
@@ -76,6 +77,10 @@ assert.match(robotsBody, /User-agent: \*/);
 assert.match(robotsBody, /^Allow: \/$/m);
 assert.match(robotsBody, /^Disallow: \/admin\/$/m);
 assert.match(robotsBody, /^Disallow: \/api\/$/m);
+assert.match(robotsBody, /^Allow: \/api\/products\$/m, "Public product JSON must be crawlable for JS hydration");
+assert.match(robotsBody, /^Allow: \/api\/settings\$/m, "Public display settings must be crawlable");
+assert.doesNotMatch(robotsBody, /^Allow: \/api\/customer/m, "Customer session APIs must remain blocked");
+assert.doesNotMatch(robotsBody, /^Allow: \/api\/admin/m, "Admin APIs must remain blocked");
 const advertised = [...robotsBody.matchAll(/^Sitemap: (.+)$/gm)].map(match => match[1]);
 assert.deepEqual(advertised, [
   "https://sindarealest2.pages.dev/sitemap.xml",
@@ -83,3 +88,12 @@ assert.deepEqual(advertised, [
 ]);
 assert.ok(!robotsBody.includes("Disallow: /sitemap"), "Sitemaps must not be blocked");
 console.log("PASS: robots.txt advertises both public sitemaps without changing crawl policy.");
+
+
+// Public display settings support rendered storefront HTML but should not appear
+// as standalone search results. No production data or network is used here.
+const settingsResponse = await publicSettings({
+  env: { DB: { prepare() { return { bind() { return { async first() { return null; } }; } }; } } }
+});
+assert.equal(settingsResponse.status, 200);
+assert.equal(settingsResponse.headers.get("X-Robots-Tag"), "noindex");
