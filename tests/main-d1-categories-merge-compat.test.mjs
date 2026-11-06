@@ -30,7 +30,7 @@ const ctx={
  ],
  categoryOrder:["all","sneakers","loafers","dress-shoes","belts","vi-nam-nu","tui-thoi-trang-golf","sandals","watch-straps","phone-cases"],
  categoryAliases:{wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"},canonicalCategoryKey:value=>({wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"}[value]||value),
- categoryLabels:{all:"Tất cả",sneakers:"Sneaker"},
+ categoryLabels:{all:"Tất cả",sneakers:"Sneaker","vi-nam-nu":"Ví Nam & Nữ","tui-thoi-trang-golf":"Túi Thời Trang & Golf","tui-xach":"Túi Xách"},
  displayProductName,escapeHtml,routeSlug:productCategoryRouteSlug,selectedCategory:"stale-from-import",
  $:selector=>selector==="#categoryFilters"?container:null
 };
