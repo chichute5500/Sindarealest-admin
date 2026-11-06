@@ -15,7 +15,7 @@ assert.doesNotMatch(html,/el\.classList\.remove\('is-visible'\)/,'Reveal must no
 assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduced\?100:1050\)/,'Welcome keeps its approved ~1s minimum, waiting for first paint on slow phones');
 assert.match(html,/<h2 class="welcome-title">/, 'Welcome is not a competing document H1');
 assert.match(html,/<h1 class="sdh-title" id="sdh-title">/, 'Main Hero remains the primary H1');
-assert.ok(html.includes('srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui.webp 360w" sizes="(max-width:760px) 58vw, 270px"'), 'Welcome logo must select an appropriately sized responsive source');
+assert.ok(html.includes('srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui-320.webp 320w, /logo-ui.webp 360w" sizes="(max-height:630px) 79px, (max-width:760px) 26vw, 130px"'), 'Welcome logo must select an appropriately sized responsive source');
 assert.ok(html.includes('srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui.webp 360w" sizes="126px"'), 'Footer logo must use responsive image sources');
 
 /* On the first parse, drawer markup precedes its full animation CSS. aria-hidden
@@ -36,7 +36,7 @@ assert.match(html,/\.checkout-drawer\{position:fixed;[^\n]*visibility:hidden;poi
 
 const headMarkup=html.slice(0,html.indexOf('</head>'));
 const styleStarts=[...html.matchAll(/<style\b[^>]*>/gi)].map(m=>m.index);
-assert.equal(styleStarts.length,29,'CSS is retained without accidentally dropping an approved rule block');
+assert.equal(styleStarts.length,30,'Critical hero CSS is added while preserving every approved rule block');
 assert.ok(styleStarts.every(offset=>offset<headMarkup.length),
  'All visual CSS must be available before the first header/hero can paint');
 assert.match(headMarkup,/\.brand-copy\{display:flex;flex-direction:column;/,
