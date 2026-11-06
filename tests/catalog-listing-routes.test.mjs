@@ -106,8 +106,8 @@ const state={
 };
 let ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
 assert.equal(ret,'dress-shoes');
-state.location.pathname='/sanpham/vicamtay';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
-assert.equal(ret,'vi-cam-tay');
+state.location.pathname='/sanpham/vinamnu';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",{...state,canonicalCategoryKey:value=>({'vi-cam-tay':'vi-nam-nu'}[value]||value)});
+assert.equal(ret,'vi-nam-nu');
 state.location.pathname='/sanpham';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
 assert.equal(ret,'all');
 runInNewContext(functions+"\nnavigateCatalog('dress-shoes')",state);
@@ -119,7 +119,7 @@ const searchEnd=front.indexOf('\nfunction renderCatalog(){',searchStart);
 const source=front.slice(searchStart,searchEnd);
 const cases=[
  ['sneaker','sneakers',true],['giaytay','dress-shoes',true],
- ['tuideocheo','tui-deo-cheo',true],['khong-ton-tai','sneakers',false]
+ ['tuithoitrang-golf','tui-thoi-trang-golf',true],['khong-ton-tai','sneakers',false]
 ];
 for(const [term,category,shouldMatch] of cases) {
  const context={
@@ -127,7 +127,7 @@ for(const [term,category,shouldMatch] of cases) {
       id:'sample-1',category,title:'Sản phẩm cá sấu',description:'Đẹp',categoryLabel:'Phụ kiện',
       createdAt:'2026-10-27 01:00:00'
    }],$:(x)=>x==='#catalogSearch'?{value:term}:null,
-   foldSearch:v=>String(v||'').toLowerCase(),visibleSku:()=>'',routeSlug:productCategoryRouteSlug
+   foldSearch:v=>String(v||'').toLowerCase(),visibleSku:()=>'',routeSlug:productCategoryRouteSlug,canonicalCategoryKey:value=>({'vi-cam-tay':'vi-nam-nu','tui-deo-cheo':'tui-thoi-trang-golf'}[value]||value)
  };
   const matched=runInNewContext(source+"\ngetFiltered().map(p=>p.id)",context);
  assert.equal(matched.length,shouldMatch?1:0,term);
@@ -139,6 +139,6 @@ const DB={prepare(){return {async all(){return {results:[
 const response=await sitemap({request:new Request('https://shop.example/sitemap.xml'),env:{DB}});
 assert.equal(response.status,200);
 const xml=await response.text();
-for(const path of ['/sanpham</loc>','/sanpham/giaytay</loc>','/sanpham/vicamtay</loc>','/sanpham/giaytay/SD-GT001</loc>'])
+for(const path of ['/sanpham</loc>','/sanpham/giaytay</loc>','/sanpham/vinamnu</loc>','/sanpham/giaytay/SD-GT001</loc>'])
  assert.ok(xml.includes(path),'Missing sitemap '+path);
 console.log('PASS: catalog routes, category deep links, 301 legacy routes, menu links, history and SEO sitemap.');
