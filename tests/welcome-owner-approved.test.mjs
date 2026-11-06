@@ -19,11 +19,20 @@ assert.ok(performance.includes('@media(min-width:761px)'));
 assert.ok(performance.includes('@media(max-width:760px)'));
 assert.ok(performance.includes('#welcomeSplash .welcome-texture{filter:none!important;transform:none!important;transition:none!important}'));
 assert.ok(performance.includes('#welcomeSplash .welcome-content>*{animation:none!important;filter:none!important}'));
-assert.ok(html.includes('window.setTimeout(dismiss,reduced?100:1050);'),'Refined Welcome should release about a second after storefront readiness');
+assert.ok(html.includes('},reduced?100:1050);'),'Welcome keeps its original ~1s automatic close deadline');
+assert.ok(html.includes('if(!autoDismissElapsed||!titlePaintedAt||closed)return;'),
+ 'Slow devices must keep Welcome until the title had a paint opportunity');
+assert.ok(html.includes('titlePaintedAt+400-performance.now()'),
+ 'When the font arrives late, allow time for an observable LCP before closing');
+assert.ok(html.includes('window.requestAnimationFrame(function(){'),
+ 'Welcome title paint guard must wait for animation frames');
+assert.match(html,/window\.setTimeout\(function\(\)\{\s*if\(!titlePaintedAt&&!closed\)\{\s*revealWelcomeCopy\(true\)/,
+ 'Hung fonts need a readable fallback instead of blocking Welcome forever');
 assert.match(html, /class="welcome-logo-frame"/, 'Welcome uses a static 3D halo around the brand logo');
 assert.match(performance, /#welcomeSplash \.welcome-logo-frame\{/, 'Welcome material belongs to existing authoritative stylesheet');
 assert.doesNotMatch(html, /A MARK OF DISTINCTION · SINCE YOUR FIRST IMPRESSION/, 'Avoid redundant Welcome copy');
-assert.ok(html.includes('    },360);\n  }\n  window.__sdDismissWelcome'),'Closing overlay must match approved 360ms dismissal');
+assert.ok(html.includes('      },360);') && html.includes('window.__sdDismissWelcome=dismiss;'),
+ 'Closing overlay must still use its approved 360ms dismissal');
 assert.match(html,/\.welcome-texture--dark\{[^\n]*filter:none\}/);
 assert.match(html,/\.welcome-texture--light\{[^\n]*filter:none\}/);
 assert.ok(html.includes('<section class="sd-code-hero wrap" id="home"'),'Owner-approved separate HERO must remain');
@@ -37,7 +46,9 @@ assert.match(html,/if\(document\.readyState==='loading'\)/,
 assert.match(html,/document\.addEventListener\('DOMContentLoaded',dismiss,\{once:true\}\)/);
 assert.doesNotMatch(html,/window\.__sdStorefrontReady=true;\s*dismiss\(\);\s*\},2400\)/,
  'No 2.4-second network fallback delay when public SSR is already available');
-assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);\n    void document\.body\.offsetHeight;\n    s\.classList\.add\('is-leaving'\)/);
+assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);/);
+assert.match(html,/window\.requestAnimationFrame\(beginFade\)/,
+ 'Paint-separated exit must preserve the locked-page release before fading');
 assert.match(html,/init\(\)\.then\(finishStorefrontStartup,finishStorefrontStartup\)/);
 
 // During the approved 360ms exit, text must clear before the backdrop fades.
@@ -47,7 +58,7 @@ assert.match(performance,/#welcomeSplash\.is-leaving\{\n  transition:opacity \.2
 // Cold-cache first-paint guard: wait for the correct Noto Serif/Sans glyphs.
 assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2" as="font" type="font\/woff2"/);
 assert.match(html,/rel="preload" href="\/fonts\/NotoSans-Regular\.woff2" as="font" type="font\/woff2"/);
-assert.match(performance,/html\.js-enabled:not\(\.sd-welcome-font-ready\):not\(\.sd-welcome-font-fallback\) #welcomeSplash \.welcome-title/);
+assert.ok(performance.includes('html.js-enabled #welcomeSplash:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-title'));
 assert.match(html,/document\.fonts\.load\('400 30px "SD Serif"'/);
 assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);
 
@@ -55,3 +66,59 @@ assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welc
 assert.doesNotMatch(html,/window\.setTimeout\(revealWelcomeCopy,1200\)/);
 assert.match(html,/document\.fonts\.check\('400 30px "SD Serif"'/);
 assert.match(html,/classList\.add\(fallback\?'sd-welcome-font-fallback':'sd-welcome-font-ready'\)/);
+
+/* LCP optimization: the approved Welcome title uses the real Serif font,
+ * but must not wait for the separate Sans font needed by secondary copy. */
+assert.ok(performance.includes('html.js-enabled #welcomeSplash.sd-welcome-serif-ready:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-title{'));
+assert.match(html,/var serifReady=document\.fonts\.load\('400 30px "SD Serif"'/);
+assert.ok(html.includes("s.classList.add('sd-welcome-serif-ready')"));
+assert.match(html,/Promise\.all\(\[serifReady,sansReady\]\)/);
+assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduced\?100:1050\)/,
+ 'On fast devices, approved dismissal still starts after 1050ms');
+
+/* LCP regression: font needed by the Welcome heading must outrank the
+ * auxiliary body font without swapping away from Owner-approved typography. */
+assert.match(html, /rel="preload" href="\/fonts\/NotoSerif-Regular\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="high"/);
+assert.match(html, /rel="preload" href="\/fonts\/NotoSans-Regular\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="low"/);
+// Lighthouse 13: Hero H1 consumes Serif Bold, which previously began loading at
+// ~1.5s and completed ~4.9s. Prioritize Welcome Serif Regular before Bold;
+// keep the same exact Hero font face and defer only its network priority.
+assert.match(html,/rel="preload" href="\/fonts\/NotoSerif-Bold\.woff2" as="font" type="font\/woff2" crossorigin fetchpriority="low"/);
+assert.match(html,/rel="preload" href="\/code-hero\.css\?v=20261026-2" as="style" fetchpriority="high"/);
+assert.ok(html.indexOf('rel="preload" href="/code-hero.css') < html.indexOf('<style>'),
+  'Preload Hero CSS before the long approved inline CSS, while retaining its original stylesheet cascade');
+
+/* Cold mobile: the original Noto face is still used if ready within ~950ms.
+ * If it is slower, the existing system fallback receives two paint frames
+ * before Welcome exits; the approved original visual timing remains ~1s. */
+assert.match(html,/if\(!titlePaintedAt&&!closed\)\{\s*revealWelcomeCopy\(true\);\s*noteWelcomeTitlePaint\(\);\s*\}\s*\},950\)/);
+assert.ok(!html.includes('},2600);'),'Do not let the welcome font watchdog hold a throttled mobile for 2.6s');
+
+/* Without JavaScript the splash timer cannot run; public server-rendered
+ * products and their native navigation must never be blocked by Welcome. */
+assert.match(html,/html:not\(\.js-enabled\):has\(body\.welcome-active\)\{overflow:auto!important/);
+assert.match(html,/html:not\(\.js-enabled\) body\.welcome-active\{height:auto!important;min-height:100vh!important;overflow-x:hidden!important;overflow-y:auto!important/);
+assert.match(html,/html:not\(\.js-enabled\) #welcomeSplash\{display:none!important\}/);
+
+// The Welcome exit must not synchronously force a full-page reflow.
+// Keep the same approved 360ms fade after a browser paint opportunity.
+const welcomeExit=html.slice(html.indexOf('  function dismiss(){'),html.indexOf('  window.__sdDismissWelcome=dismiss;'));
+assert.ok(welcomeExit.includes("document.body.classList.remove('welcome-active');"));
+assert.ok(!welcomeExit.includes('void document.body.offsetHeight'),
+ 'Welcome closing may not force a synchronous layout flush');
+assert.ok(welcomeExit.includes('window.requestAnimationFrame(beginFade)') && welcomeExit.includes('s.classList.add(\'is-leaving\')'),
+ 'Welcome must use a painted frame before the original leave transition');
+assert.ok(welcomeExit.includes('},360);'),
+ 'Welcome must retain its approved 360ms exit fade');
+
+// Cold Mobile: do not automatically focus Welcome or its destination.
+// Desktop retains autoplay keyboard focus, Mobile's keydown focus trap still
+// moves Tab to the visible skip button on demand.
+assert.match(html,/if\(skip&&window\.matchMedia&&window\.matchMedia\('\(min-width:761px\)'\)\.matches\)\{\s*window\.requestAnimationFrame\(function\(\)\{\s*if\(!closed&&skip\.isConnected\)skip\.focus\(\{preventScroll:true\}\)/);
+assert.match(welcomeExit,/var restoreKeyboardFocus=window\.matchMedia&&window\.matchMedia\('\(min-width:761px\)'\)\.matches;[\s\S]*?if\(restoreKeyboardFocus&&destination&&typeof destination\.focus==='function'\)destination\.focus/,
+ 'Do not focus outside the closing Welcome on Mobile, where focus caused a full-page paint');
+assert.match(html,/if\(!event\.shiftKey&&\(active===last\|\|!s\.contains\(active\)\)\)\{/);
+
+assert.ok(html.includes("s.classList.add(fallback?'sd-welcome-font-fallback':'sd-welcome-font-ready')"), 'Font readiness class is scoped to the Welcome subtree');
+assert.ok(html.includes("s.classList.add('sd-welcome-serif-ready')"), 'Serif readiness is scoped to the Welcome subtree');
+assert.ok(!html.includes("document.documentElement.classList.add('sd-welcome-serif-ready')"), 'Font state must not invalidate styles across the entire document');

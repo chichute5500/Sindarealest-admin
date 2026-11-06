@@ -12,7 +12,13 @@ test('Owner-controlled material photos are config-driven and have no manual cont
  assert.equal(config.intervalMs,1500);
  assert.match(page,/id="materialTile"[^>]+data-reveal/);
  assert.match(page,/id="materialGallery" aria-hidden="true"/);
- assert.match(page,/src="\/material-gallery.js" defer/);
+ assert.doesNotMatch(page,/src="\/material-gallery.js" defer/,
+  'The optional gallery script must not execute in the first-viewport critical path');
+ assert.match(page,/function setupMaterialGalleryLoader\(\)/);
+ assert.match(page,/script\.src='\/material-gallery\.js';script\.async=true/);
+ assert.match(page,/\},\{rootMargin:'250px 0px',threshold:0\}\)/,
+  'Load gallery code only as its tile approaches the viewport');
+ assert.match(page,/setupMaterialGalleryLoader\(\);/);
  assert.match(page,/href="\/material-gallery.css"/);
  assert.match(js,/setInterval\(\(\)=>\{/);
  assert.match(js,/\},1500\)/);

@@ -57,10 +57,24 @@ assert.equal((category.match(/class="sd-ssr-deferred-img" data-src="/g)||[]).len
  "SSR should defer six far-below-the-fold source downloads until near viewport");
 assert.equal((category.match(/<noscript><img src="/g)||[]).length,6,
  "JS-disabled catalog must still contain all deferred images as fallbacks");
-assert.ok(category.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
+assert.ok(category.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img,#featuredGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
  "No-JS mode must hide the placeholder without doubling the media box");
-assert.ok(!full.includes('sd-ssr-deferred-img'),
- "Home SSR should remain unchanged; only direct catalog routes are optimized");
+// Home catalog is well below the first viewport: avoid fetching the
+// full offscreen grid until visitors scroll near it. The first four
+// featured cards still have real image srcs, and no-JS catalog retains
+// every source in <noscript> to avoid blank cards for crawlers/visitors.
+const homeCatalogHtml=full.split('id="catalogGrid">')[1]?.split('</body>')[0]||'';
+const homeFeaturedHtml=full.split('id="featuredGrid">')[1]?.split('id="catalogGrid">')[0]||'';
+assert.equal((homeCatalogHtml.match(/class="sd-ssr-deferred-img" data-src="/g)||[]).length,8,
+ "All below-fold Home catalog SSR photos must defer until near viewport");
+assert.equal((homeCatalogHtml.match(/<noscript><img src="/g)||[]).length,8,
+ "Every deferred Home catalog photo needs the no-JS real-image fallback");
+assert.equal((homeFeaturedHtml.match(/class="sd-ssr-deferred-img" data-src="/g)||[]).length,4,
+ "Home featured cards below fold must defer image requests");
+assert.equal((homeFeaturedHtml.match(/<noscript><img src="/g)||[]).length,4,
+ "No-JS Home featured cards must still render real images");
+assert.ok(full.includes('<noscript><style>#catalogGrid .sd-ssr-deferred-img,#featuredGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>'),
+ "No-JS mode must hide deferred Home placeholders to reveal native image fallback");
 const preloadMatches=[...category.matchAll(/<link rel="preload" as="image" href="([^"]+)" fetchpriority="high">/g)];
 assert.deepEqual(preloadMatches.map(x=>x[1]),["/images/test-image.webp"],
  "Repeated first-row image sources must use only one preload");
@@ -91,7 +105,8 @@ assert.ok((await response.text()).includes('id="catalogGrid"><article'),'Middlew
 // authority for LCP/CLS; these tests lock the source-level regression.
 const storefront=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
 assert.match(storefront,/const initialCatalogListing=catalogCategoryFromLocation\(\)!==null;/);
-assert.match(storefront,/if\(!initialCatalogListing\)\{renderFeatured\(\);renderFilters\(\);renderCatalog\(\)\}/);
+assert.match(storefront,/if\(!initialCatalogListing\)\{[\s\S]*?await yieldPaint\(\);[\s\S]*?await renderFeatured\(\);\s*await yieldPaint\(\);\s*renderFilters\(\);\s*await yieldPaint\(\);\s*renderCatalog\(\);[\s\S]*?\}/,
+  'Home hydrates featured, filters, and catalog in sequence, without a single long task');
 assert.match(storefront,/const ssrCards=grid\.querySelectorAll\('article\[data-ssr-product\]'\)/);
 assert.match(storefront,/grid\.replaceChildren\(template\.content\)/);
 assert.match(storefront,/if\(!active&&products\.length&&featured&&!featured\.querySelector\('\[data-featured-card\]'\)\)renderFeatured\(\)/);
@@ -117,3 +132,26 @@ assert.ok(storefront.includes("eager&&idx<2?'high':'low'"),"Hydration keeps firs
 assert.match(storefront,/const dateOrder=timestamp\(b\)\.localeCompare\(timestamp\(a\)\)/);
 assert.match(storefront,/return left<right\?1:left>right\?-1:0;/);
 console.log("PASS: bounded catalog SSR, escaping, no-JS, no D1 writes, route middleware integration.");
+
+const featuredFunction=storefront.slice(
+ storefront.indexOf('function featuredProductCard('),
+ storefront.indexOf('function setupMobileBottomNav()')
+);
+assert.ok(featuredFunction.includes('loading="lazy" fetchpriority="low" decoding="async"'),
+ "Offscreen Home featured products must not compete with Welcome/Hero first paint");
+assert.ok(!featuredFunction.includes('loading="eager"'),
+ "No below-fold featured slide should request full R2 photo eagerly");
+
+const observedFeatured=storefront.slice(
+ storefront.indexOf('function activateCatalogImages(){'),
+ storefront.indexOf('/* One-shot reveal:')
+);
+assert.ok(observedFeatured.includes('#featuredGrid .sd-ssr-deferred-img[data-src]'),
+ "SSR featured photos must be observed near the viewport");
+assert.ok(observedFeatured.includes('#featuredGrid .feature-slide:first-child[data-src]'),
+ "Hydrated first feature slide must load when near the viewport");
+assert.ok(observedFeatured.includes('#featuredGrid .feature-single[data-src]'),
+ "Hydrated single feature photo must load when near the viewport");
+assert.ok(storefront.includes("if(typeof activateCatalogImages==='function')activateCatalogImages();")&&storefront.includes('bindReveal(grid);setupFeaturedAutoplay();'), 'Initial featured hydration binds image activation and reveal observers');
+assert.doesNotMatch(featuredFunction, /class="feature-slide" src="/,
+ "Offscreen first featured photo may not bypass the observer");

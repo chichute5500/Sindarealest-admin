@@ -10,7 +10,7 @@ assert.match(html,/async function consultProduct\(id\)[^\n]*optionText=option\?/
 assert.doesNotMatch(html,/async function consultCart\(\)|id="cartZalo"|\$\('#cartZalo'\)/,'Cart no longer contains the removed Zalo action or handler');
 assert.match(html,/revealObserver\.unobserve\(el\)/,'Reveal observer stops after first show');
 assert.doesNotMatch(html,/el\.classList\.remove\('is-visible'\)/,'Reveal must not hide elements on reverse scroll');
-assert.match(html,/window\.setTimeout\(dismiss,reduced\?100:1050\)/,'Welcome has a shorter delay');
+assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduced\?100:1050\)/,'Welcome keeps its approved ~1s minimum, waiting for first paint on slow phones');
 assert.match(html,/<h2 class="welcome-title">/, 'Welcome is not a competing document H1');
 assert.match(html,/<h1 class="sdh-title" id="sdh-title">/, 'Main Hero remains the primary H1');
 
@@ -61,3 +61,26 @@ assert.ok(prior.includes('setupNavSpy();'),'Nav spy should not wait for products
 assert.ok(!html.slice(productsFetch).includes('setupMobileBottomNav();'),
  'Never attach duplicate dock listeners after hydration');
 console.log('PASS: Storefront first-paint and pending-products mobile dock contracts');
+
+/* Cold-home network: the 219KB craft photo and both material thumbnails are
+ * below the first viewport. Preserve their original no-JS sources while
+ * allowing the existing near-viewport image observer to fetch them on demand. */
+for(const [selector,file] of [
+ ['id="craftTileImage"','2c341b173eff94f1.webp'],
+ ['material-photo--dark','theme-croc-dark-tile.webp'],
+ ['material-photo--light','theme-croc-albino-tile.webp']
+]){
+ assert.ok(html.includes(selector)&&html.includes('data-src="images/'+file+'"'),
+  'Mosaic image must remain present and deferred: '+file);
+ assert.ok(html.includes('src="images/'+file+'" loading="lazy"'),
+  'No-JS visitors retain the real artwork: '+file);
+}
+assert.match(html,/#craftTileImage\[data-src\],#materialTile img\.material-photo\[data-src\]/,
+ 'Near-viewport image observer should activate all three mosaic photos');
+assert.ok(html.includes('id="artSlide" data-src="images/5151ab24330c6931.webp"'),
+ 'First art photo must not download on the cold home viewport');
+assert.ok(html.includes('<noscript><img class="mosaic-photo" src="images/5151ab24330c6931.webp"'),
+ 'No-JS art keeps its original photo');
+assert.ok(html.includes("activateArtFirstSlide();\n   setupArtSlideshow();"),
+ 'Home art photo must activate before slideshow when approaching viewport');
+

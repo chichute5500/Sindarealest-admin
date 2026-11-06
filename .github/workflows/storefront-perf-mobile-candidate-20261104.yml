@@ -1,0 +1,46 @@
+name: One-shot Storefront mobile Lighthouse Preview (no Production)
+on:
+  # GitHub App file commits emit push checks, not necessarily PR synchronize.
+  # Run exactly once on an intentional marker update, never on every PR synchronize.
+  # This avoids false FAILs on ordinary source commits lacking the candidate marker.
+  push:
+    branches: [fix/storefront-mobile-critical-requests-20261104]
+    paths: [docs/qa/PERF_MOBILE_20261104.trigger]
+permissions:
+  contents: read
+concurrency:
+  group: storefront-perf-mobile-candidate-20261104
+  # Never leave obsolete mobile Lighthouse runs blocking the latest SHA.
+  cancel-in-progress: true
+jobs:
+  preview-qa:
+    if: github.event_name == 'push' && github.ref_name == 'fix/storefront-mobile-critical-requests-20261104'
+    runs-on: ubuntu-24.04 # Playwright 1.56.1 supports Jammy/Noble; ubuntu-latest changed to unsupported 26.04
+    timeout-minutes: 40
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PERF_CANDIDATE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Guard exact candidate and run isolated Preview tests
+        run: bash scripts/qa-storefront-perf-mobile-pipeline.sh
+      - name: Save bound evidence, even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storefront-mobile-qa-${{ github.sha }}
+          path: artifacts/perf-mobile-20261104/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Confirm no Production deployment
+        if: always()
+        run: |
+          echo "Only separate sindarealest-admin-preview is an allowed deployment target." >> "$GITHUB_STEP_SUMMARY"
+          echo "Main and Production D1/R2 remain untouched." >> "$GITHUB_STEP_SUMMARY"

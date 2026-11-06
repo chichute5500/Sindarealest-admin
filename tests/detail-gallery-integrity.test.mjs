@@ -129,4 +129,17 @@ assert.match(html, /viewer\.removeAttribute\('inert'\);viewer\.classList\.add\('
 assert.match(html, /viewer\.classList\.remove\('open'\);viewer\.setAttribute\('aria-hidden','true'\);viewer\.setAttribute\('inert',''\)/, 'Closing fullscreen gallery must make it inert again.');
 assert.match(html, /if\(\$\('#sdFullscreenViewer'\)\.classList\.contains\('open'\)\)\{trapFullscreenTab\(e\);return\}if\(\$\('#productOverlay'\)\.classList\.contains\('open'\)\)\{trapProductTab\(e\);return\}/, 'Keyboard focus trapping must respect the topmost gallery dialog.');
 
+/* Mobile first-paint budget: defer hidden gallery-only artwork without
+ * changing the original image or the visual design once the viewer opens. */
+assert.ok(html.includes('<span class="sd-fullscreen-brand-mark"><img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low"></span>'),
+ 'Fullscreen-only 118KB brand mark must not request before gallery opens');
+const fullOpen=html.slice(html.indexOf('function openFullscreenImage(){'),html.indexOf('function clearGalleryTransitionClasses(',html.indexOf('function openFullscreenImage(){')));
+assert.ok(html.includes('<div class="sd-fullscreen-brand-footer" aria-hidden="true"><img data-src="images/brand-emblem.png" alt="" decoding="async" fetchpriority="low">'),
+ 'Fullscreen footer emblem must defer as well; otherwise the initial network request still occurs');
+assert.ok(fullOpen.includes("viewer.querySelectorAll('.sd-fullscreen-brand-mark img[data-src], .sd-fullscreen-brand-footer img[data-src]')"),
+ 'Both gallery emblem instances must load on opening');
+assert.ok(fullOpen.includes("img.src=img.dataset.src;") && fullOpen.includes("img.removeAttribute('data-src');"),
+ 'Gallery opening must activate original images and clear deferred attributes');
+
 console.log('Detail gallery and modal accessibility regression tests passed.');
+
