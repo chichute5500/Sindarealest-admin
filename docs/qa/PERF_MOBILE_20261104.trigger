@@ -74,3 +74,4 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] Defer the optional material-gallery.js request/evaluation until #materialTile approaches the viewport; preserve image gallery behavior and verify cold network plus scroll activation. Tighten Lighthouse gate to exactly 4 valid mobile runs, each >=90; Desktop >=90, source/Admin/Google/resource/browser QA PASS. Preview only; no SEO, main, or Production writes.
 
 2026-11-06: trace-guided perf candidate preserves the storefront's natural document height while Welcome locks the viewport; rerun the pinned cold Mobile four-sample Lighthouse gate on the exact current SHA.
+2026-11-06: cold trace confirmed inherited main visibility change as full-document style/layout hotspot; candidate uses non-inherited opacity plus inert pointer events while Welcome covers the page. Rerun all four strict Mobile Lighthouse attempts.
