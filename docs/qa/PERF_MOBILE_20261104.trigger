@@ -63,3 +63,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: exact candidate retry after restoring required SHA-guard commit subject marker; no code changes.
 
 2026-11-06: [perf-mobile-qa-candidate] Rolled back #orderTracking/#siteFooter content-visibility after regression first Mobile 76 (other 93/93/93). New focused Welcome exit removes forced synchronous body offsetHeight and separates page unlock from the exact approved 360ms fade with two animation frames. Preserve focus, first-visit timing, visual contracts, no Production writes. Require every valid cold Mobile >=90 plus browser scroll/Welcome, source/Admin/Google PASS before main merge.
+
+2026-11-06: [perf-mobile-qa-candidate] Source and complete regression unit tests PASS at 38b7689f after updating the explicit Owner 360ms fade test to the equivalent frame-separated implementation. Pin full Preview browser/Lighthouse QA to this SHA; all valid mobile >=90, no main writes before PASS.
