@@ -1,4 +1,4 @@
-import { fail, fromRow, genericDbError, json, readJsonBodyLimited, requireAdmin, toAdminProduct, validateProduct } from "../../../_lib.js";
+import { fail, fromRow, genericDbError, json, readJsonBodyLimited, requireAdmin, serializeProductImages, toAdminProduct, validateProduct } from "../../../_lib.js";
 
 export async function onRequestPut(context) {
   const auth = await requireAdmin(context);
@@ -17,7 +17,7 @@ export async function onRequestPut(context) {
     const expected = body.expectedProduct;
     const fields = ["id","slug","sku","skuVerified","title","category","categoryLabel",
       "description","price","stock","published","images","sourcePriceConfirmed",
-      "sortOrder","fulfillmentType"];
+      "sortOrder","fulfillmentType","sizeOptions","imageVariants"];
     const current = toAdminProduct(existing);
     if (!expected || typeof expected !== "object" || Array.isArray(expected) ||
         fields.some(key => !Object.hasOwn(expected,key)))
@@ -34,7 +34,7 @@ export async function onRequestPut(context) {
         "WHERE id=? AND slug IS ? AND sku IS ? AND sku_verified IS ? AND title IS ? AND category IS ? " +
         "AND category_label IS ? AND description IS ? AND price IS ? AND stock IS ? AND published IS ? " +
         "AND images_json IS ? AND source_price_confirmed IS ? AND sort_order IS ? AND fulfillment_type IS ? AND updated_at IS ? RETURNING id")
-        .bind(p.slug,p.sku,p.skuVerified?1:0,p.title,p.category,p.categoryLabel,p.description,p.price,p.stock,p.published,JSON.stringify(p.images),p.sourcePriceConfirmed?1:0,p.sortOrder,p.fulfillmentType,id,
+        .bind(p.slug,p.sku,p.skuVerified?1:0,p.title,p.category,p.categoryLabel,p.description,p.price,p.stock,p.published,serializeProductImages(p),p.sourcePriceConfirmed?1:0,p.sortOrder,p.fulfillmentType,id,
           row.slug,row.sku,row.sku_verified,row.title,row.category,row.category_label,row.description,row.price,row.stock,
           row.published,row.images_json,row.source_price_confirmed,row.sort_order,row.fulfillment_type,row.updated_at),
       // If the product disappeared after the preflight SELECT, do not write

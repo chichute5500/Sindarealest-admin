@@ -1,6 +1,6 @@
-import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, readJsonBodyLimited } from "../_lib.js";
+import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, parseProductOptions, readJsonBodyLimited } from "../_lib.js";
 import { calculateCheckoutQuote, validPublicQrImageKey, checkoutTransferSku, makeCheckoutTransferReference } from "../_payments.js";
-import { normalizeProductOption } from "../_product-options.js";
+import { normalizeProductOption, normalizeProductSize, normalizeProductImageVariant } from "../_product-options.js";
 
 const NO_STORE={"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"};
 
@@ -15,18 +15,20 @@ export async function onRequestPost({request,env}) {
   const requested=new Map();
   for(const item of entries){
     const id=String(item?.id||"").trim(),quantity=Number(item?.quantity);
-    if(!id||id.length>100||!Number.isInteger(quantity)||quantity<1||quantity>50||(item?.option!=null&&typeof item.option!=="string"))return fail("Sản phẩm, lựa chọn hoặc số lượng không hợp lệ.");
+    if(!id||id.length>100||!Number.isInteger(quantity)||quantity<1||quantity>50||(item?.option!=null&&typeof item.option!=="string")||(item?.sizeOption!=null&&typeof item.sizeOption!=="string")||(item?.imageVariant!=null&&typeof item.imageVariant!=="string"))return fail("Sản phẩm, lựa chọn hoặc số lượng không hợp lệ.");
     requested.set(id,(requested.get(id)||0)+quantity);
   }
   if([...requested.values()].some(q=>q>50))return fail("Số lượng mỗi sản phẩm vượt giới hạn.");
   try{
     const ids=[...requested.keys()];
-    const result=await env.DB.prepare("SELECT id,sku,title,category,price,published,source_price_confirmed,stock,fulfillment_type FROM products WHERE id IN ("+ids.map(()=>"?").join(",")+")").bind(...ids).all();
+    const result=await env.DB.prepare("SELECT id,sku,title,category,price,published,source_price_confirmed,stock,fulfillment_type,images_json FROM products WHERE id IN ("+ids.map(()=>"?").join(",")+")").bind(...ids).all();
     const byId=new Map((result.results||[]).map(p=>[p.id,p]));
     if(ids.some(id=>!byId.has(id)||Number(byId.get(id).published)!==1))return fail("Sản phẩm đã thay đổi. Vui lòng tải lại trang.",409);
     for(const item of entries){
-      const option=normalizeProductOption(byId.get(String(item.id||"").trim()).category,item?.option??"");
-      if(option===null)return fail("Vui lòng chọn đúng size, bản dây hoặc dòng điện thoại cho sản phẩm.",400);
+      const product=byId.get(String(item.id||"").trim());
+      const option=normalizeProductOption(product.category,item?.option??"");
+      const config=parseProductOptions(product.images_json);
+      if(option===null||normalizeProductSize(config.sizeOptions,item?.sizeOption??"")===null||normalizeProductImageVariant(config.imageVariants,item?.imageVariant??"")===null)return fail("Vui lòng chọn đúng size, màu hoặc thông tin sản phẩm.",400);
     }
     for(const id of ids){
       const stock=byId.get(id).stock;
