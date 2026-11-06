@@ -11,7 +11,7 @@ const gridMatch = section.match(/<div class="order-steps"[^>]*>([\s\S]*?)\n    <
 assert.ok(gridMatch, 'The four process steps must be inside one shared grid.');
 const grid = gridMatch[1];
 
-assert.equal((grid.match(/<article class="order-step\b/g) || []).length, 4,
+assert.equal((grid.match(/<div class="order-step\b/g) || []).length, 4,
   'The process must contain exactly four steps, not six cards.');
 assert.equal((grid.match(/<div class="order-step glass" role="listitem"/g) || []).length, 4,
   'Each step must use listitem on a generic container.');
