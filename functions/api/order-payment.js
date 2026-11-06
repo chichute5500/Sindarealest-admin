@@ -30,7 +30,8 @@ export async function paymentDetailsForOrder(order,env){
     const ledger=await env.DB.prepare("SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount ELSE 0 END),0) AS received_amount,COALESCE(SUM(CASE WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN amount ELSE 0 END),0) AS refunded_amount FROM order_payment_transactions WHERE order_id=?").bind(order.id).first();
     const cod=await env.DB.prepare("SELECT COALESCE(SUM(amount),0) AS amount FROM order_cod_settlements WHERE order_id=?").bind(order.id).first();
     const requestRow = await env.DB.prepare("SELECT id,installment_type,amount,shipping_benefit,transfer_reference,qr_image_key,bank_name,account_number,account_name,status,created_at FROM order_payment_requests WHERE order_id=? ORDER BY CASE WHEN status='pending' THEN 0 ELSE 1 END, created_at DESC, id DESC LIMIT 1").bind(order.id).first();
-    const paymentSummary=summarizeOrderPayment({total:order.total,paymentOption:checkout.selectedPaymentOption,agreedAmount:checkout.selectedPaymentAmount,transactions:[{direction:'received',amount:ledger?.received_amount},{direction:'refunded',amount:ledger?.refunded_amount}],codReceivedAmount:cod?.amount,termsConfirmed:Number(order.price_confirmation_required)===0&&Boolean(order.payment_terms_confirmed_at),hasPendingRequest:requestRow?.status==='pending'});
+    const sepayRow = await env.DB.prepare("SELECT id,order_invoice_number,installment_type,amount,status,transaction_id,transaction_reference,created_at FROM sepay_payment_orders WHERE order_id=? ORDER BY created_at DESC,id DESC LIMIT 1").bind(order.id).first();
+    const paymentSummary=summarizeOrderPayment({total:order.total,paymentOption:checkout.selectedPaymentOption,agreedAmount:checkout.selectedPaymentAmount,transactions:[{direction:'received',amount:ledger?.received_amount},{direction:'refunded',amount:ledger?.refunded_amount}],codReceivedAmount:cod?.amount,termsConfirmed:Number(order.price_confirmation_required)===0&&Boolean(order.payment_terms_confirmed_at),hasPendingRequest:requestRow?.status==='pending'||sepayRow?.status==='pending'});
     const rawOrderTotal = order.total === null || order.total === undefined || (typeof order.total === "string" && !order.total.trim()) ? null : Number(order.total);
     const payableOrderTotalReady = Number(order.price_confirmation_required) === 0
       && Boolean(order.payment_terms_confirmed_at)
@@ -43,6 +44,21 @@ export async function paymentDetailsForOrder(order,env){
     };
     if (order.status === "cancelled" || !payableOrderTotalReady) {
       return json({ ok:true, ...base, paymentReady:false, message:"Đơn đang chờ SinDarealest xác nhận giá và điều kiện. Vui lòng chưa chuyển khoản." },200,PRIVATE_PAYMENT_HEADERS);
+    }
+    if(sepayRow){
+      const gatewayPaid=sepayRow.status==="paid";
+      const enoughForChoice=paymentSummary.shortfall===0;
+      return json({
+        ok:true,...base,paymentReady:false,paymentProvider:"sepay",
+        installmentType:sepayRow.installment_type,amount:null,
+        gatewayStatus:sepayRow.status,transactionReference:gatewayPaid?sepayRow.transaction_reference:"",
+        createdAt:sepayRow.created_at,
+        message:gatewayPaid||enoughForChoice
+          ?"SePay đã xác nhận khoản thanh toán. Trạng thái đơn đã được đồng bộ tự động."
+          :sepayRow.status==="pending"
+            ?"Đang chờ SePay xác nhận giao dịch. Trang này sẽ cập nhật khi Shop nhận được IPN."
+            :"Yêu cầu thanh toán SePay đã kết thúc. Vui lòng liên hệ SinDarealest để được hỗ trợ."
+      },200,PRIVATE_PAYMENT_HEADERS);
     }
     if (!requestRow || !validPublicQrImageKey(requestRow.qr_image_key)) {
       return json({ ok:true, ...base, paymentReady:false, message:"Chưa có yêu cầu thanh toán được SinDarealest tạo. Vui lòng liên hệ tư vấn." },200,PRIVATE_PAYMENT_HEADERS);
