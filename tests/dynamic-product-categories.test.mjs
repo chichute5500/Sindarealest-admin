@@ -33,22 +33,23 @@ const ctx={
  displayProductName:productNameDisplay,
  products:rows,
  categoryLabels:{all:"Tất cả",sneakers:"Sneaker",loafers:"Giày lười",belts:"Thắt lưng"},
- categoryOrder:["all","sneakers","loafers","dress-shoes","belts","wallets","sandals","watch-straps","phone-cases"],
+ categoryOrder:["all","sneakers","loafers","dress-shoes","belts","vi-nam-nu","sandals","watch-straps","phone-cases","cap-tab-laptop","tui-thoi-trang-golf","mu","tui-xach"],
+ canonicalCategoryKey:value=>({wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"}[String(value||"").toLowerCase()]||String(value||"").toLowerCase()),
  selectedCategory:"missing-from-new-upload",
  escapeHtml,routeSlug:productCategoryRouteSlug,
  $:selector=>selector==="#categoryFilters"?box:null,
 };
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,"all","Stale selection resets when catalog changes");
-for(const c of ["sneakers","loafers","belts","tui-golf","tui-deo-cheo","tui-nu","cap-tab-laptop","clutch","mu","vi-nam","vi-cam-tay"])
+for(const c of ["sneakers","loafers","belts","tui-thoi-trang-golf","tui-xach","cap-tab-laptop","mu","vi-nam-nu"])
  assert.ok(box.innerHTML.includes('data-category="'+c+'"'),"Missing category: "+c);
-assert.match(box.innerHTML,/Túi Golf · 2/,"Title-cased category count accurate");
-assert.equal((box.innerHTML.match(/class="filter-pill/g)||[]).length,13,"One all filter plus twelve distinct published groups");
+assert.match(box.innerHTML,/Túi Thời Trang &amp; Golf · 4/,"Legacy bag category counts combined");
+assert.equal((box.innerHTML.match(/class="filter-pill/g)||[]).length,10,"One all filter plus nine published groups including merged categories");
 assert.ok(!box.innerHTML.includes("<img src=x"),"Untrusted category labels must be escaped");
 assert.ok(box.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"));
 ctx.selectedCategory="vi-cam-tay";
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
-assert.ok(box.innerHTML.includes('class="filter-pill tap-target active" href="/sanpham/vicamtay" data-category="vi-cam-tay" aria-current="page"'),"Wallet category has its canonical link and page semantics");
+assert.ok(box.innerHTML.includes('class="filter-pill tap-target active" href="/sanpham/vinamnu" data-category="vi-nam-nu" aria-current="page"'),"Wallet category has its canonical link and page semantics");
 assert.match(box.innerHTML,/<a class="filter-pill tap-target" href="\/sanpham\/sneaker" data-category="sneakers"/,"Sneaker category is crawlable");
 assert.ok(!box.innerHTML.includes('aria-pressed='),"Links must use aria-current, not button-only aria-pressed");
 ctx.products=[{category:"new-2027",categoryLabel:"Loại mới"}];
@@ -77,7 +78,7 @@ const snippets=html.slice(shuffleStart,shuffleEnd)+"\n"+html.slice(filterStart,f
 const featuredBox={innerHTML:''},searchBox={value:''};
 const deterministicMath=Object.create(Math);deterministicMath.random=()=>0;
 const productCtx={
- products:sampleCatalog,categoryOrder:ctx.categoryOrder,
+ products:sampleCatalog,categoryOrder:ctx.categoryOrder,canonicalCategoryKey:ctx.canonicalCategoryKey,
  $:s=>s==='#catalogSearch'?searchBox:s==='#featuredGrid'?featuredBox:null,
  visibleSku:p=>p.sku||'',foldSearch:v=>String(v||'').toLocaleLowerCase('vi'),
  unbindReveal(){},bindReveal(){},setupFeaturedAutoplay(){},
