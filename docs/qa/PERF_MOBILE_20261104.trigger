@@ -61,3 +61,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] Reduce first cold-layout task by isolating below-first-viewport Home #orderTracking and #siteFooter (with intrinsic-height fallback). Extend mobile 360/390/430 scroll QA and SSR tests; keep owner-approved visuals/behavior and strict all-valid >=90 Lighthouse gate. Run pinned Preview only. Owner authorized merge to main after full PASS.
 
 2026-11-06: exact candidate retry after restoring required SHA-guard commit subject marker; no code changes.
+
+2026-11-06: [perf-mobile-qa-candidate] Rolled back #orderTracking/#siteFooter content-visibility after regression first Mobile 76 (other 93/93/93). New focused Welcome exit removes forced synchronous body offsetHeight and separates page unlock from the exact approved 360ms fade with two animation frames. Preserve focus, first-visit timing, visual contracts, no Production writes. Require every valid cold Mobile >=90 plus browser scroll/Welcome, source/Admin/Google PASS before main merge.
