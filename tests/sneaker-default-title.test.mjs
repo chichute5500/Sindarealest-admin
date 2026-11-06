@@ -4,11 +4,13 @@ import {createSession,slugify} from '../functions/_lib.js';
 import {onRequestPost} from '../functions/api/admin/products.js';
 import {DEFAULT_PRODUCT_CATEGORY_NAMES,OFFICIAL_SKU_PREFIXES,defaultProductTitle} from '../functions/_catalog-sku.js';
 
-assert.equal(Object.keys(DEFAULT_PRODUCT_CATEGORY_NAMES).length,15);
+assert.equal(Object.keys(DEFAULT_PRODUCT_CATEGORY_NAMES).length,12);
 assert.deepEqual(Object.keys(DEFAULT_PRODUCT_CATEGORY_NAMES).sort(),Object.keys(OFFICIAL_SKU_PREFIXES).sort());
 assert.equal(defaultProductTitle('Giày thể thao','SD-SN001'),'Giày Thể Thao VIP Da Cá Sấu Mẫu #001');
 assert.equal(defaultProductTitle('loafers','SD-GL025'),'Giày Lười VIP Da Cá Sấu Mẫu #025');
-assert.equal(defaultProductTitle('tui-nu','SD-TN1000'),'Túi Nữ VIP Da Cá Sấu Mẫu #1000');
+assert.equal(defaultProductTitle('tui-xach','SD-TX1000'),'Túi Xách VIP Da Cá Sấu Mẫu #1000');
+assert.equal(defaultProductTitle('vi-cam-tay','SD-VI001'),'Ví Nam & Nữ VIP Da Cá Sấu Mẫu #001');
+assert.equal(defaultProductTitle('clutch','SD-TTG001'),'Túi Thời Trang & Golf VIP Da Cá Sấu Mẫu #001');
 for(const [category,prefix] of Object.entries(OFFICIAL_SKU_PREFIXES)){
  assert.equal(defaultProductTitle(category,prefix+'001'),DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' VIP Da Cá Sấu Mẫu #001');
  assert.equal(defaultProductTitle(category,prefix+'025'),DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' VIP Da Cá Sấu Mẫu #025');
@@ -83,11 +85,11 @@ assert.equal(result.body.product.title,'Giày Lười Da Cá Sấu Riêng','Cust
 
 const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
 assert.ok(admin.includes('id="productCategoryGrid" class="product-category-grid"'),
- 'The category picker renders its own 15-item visual table, not browser-native datalist');
+ 'The category picker renders its own 12-item visual table, not browser-native datalist');
 assert.ok(admin.includes('id="productCategoryToggle"'),
  'The category field has a keyboard-accessible open/close control');
 assert.ok(admin.includes("const official=Object.entries(DEFAULT_PRODUCT_LABELS)"),
- 'The grid always lists all 15 official categories');
+ 'The grid always lists all 12 official categories');
 assert.ok(admin.includes("productCategoryInput.dispatchEvent(new Event('input',{bubbles:true}))"),
  'Selecting an option triggers category-linked title and product guidance updates');
 assert.ok(admin.includes("productCategoryInput.value=button.dataset.categoryLabel"),
@@ -97,7 +99,7 @@ assert.ok(admin.includes("productCategoryInput.addEventListener('click'"),
 assert.ok(admin.includes('inputmode="none" placeholder="Chọn danh mục"'),
  'Do not obscure category choices with Android keyboard when tapping');
 assert.ok(admin.includes("const extras=[...new Set(products.map(p=>skuCategory(p.category)||p.category)"),
- 'Preserve historical categories alongside the official 15 options');
+ 'Preserve historical categories alongside the official 12 options');
 assert.ok(admin.includes("refreshCategoryOptions();"),'Reload the category grid when Admin data changes');
 assert.ok(!admin.includes("$('#categoryOptions').innerHTML"),'No stale datalist should remain');
 assert.ok(!admin.includes('list="categoryOptions"'),
@@ -117,4 +119,4 @@ assert.ok(!admin.includes('autoSneakerTitle:'),'Do not override a custom title b
 assert.ok(admin.includes("title:$('#pTitle').value.trim(),category:"),'Submit blank name; server determines final title');
 assert.ok(admin.includes('if(/^SD-SN\\d{3,6}$/.test(sku))')===false,'Remove sneaker-only default logic');
 assert.equal(admin.split('</style>').length-1,1,'Keep Owner-approved single stylesheet');
-console.log('PASS: all 15 categories have grey-only default title, custom names protected, server SKU numbering and concurrent retry align.');
+console.log('PASS: all 12 categories have grey-only default title, custom names protected, server SKU numbering and concurrent retry align.');
