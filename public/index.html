@@ -3546,18 +3546,30 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
     closed=true;
     document.removeEventListener('keydown',keepFocus,true);
     document.removeEventListener('focusin',keepFocusInside,true);
-    // Release the locked page geometry BEFORE fading the still-opaque splash.
+    // Release page geometry before the fade, without a forced synchronous
+    // full-document layout. A painted frame separates the geometry change
+    // from the original 360ms fade, keeping the approved visual transition.
     document.body.classList.remove('welcome-active');
-    void document.body.offsetHeight;
-    s.classList.add('is-leaving');
     var destination=document.querySelector('.brand');
-    if(destination&&typeof destination.focus==='function')destination.focus({preventScroll:true});
     s.setAttribute('aria-hidden','true');
     s.setAttribute('inert','');
-    window.setTimeout(function(){
-      if(s&&s.parentNode)s.parentNode.removeChild(s);
-      document.body.classList.remove('welcome-active');
-    },360);
+    function beginFade(){
+      if(!s.isConnected)return;
+      s.classList.add('is-leaving');
+      window.setTimeout(function(){
+        if(s&&s.parentNode)s.parentNode.removeChild(s);
+        document.body.classList.remove('welcome-active');
+      },360);
+    }
+    if(typeof window.requestAnimationFrame==='function'){
+      window.requestAnimationFrame(function(){
+        if(destination&&typeof destination.focus==='function')destination.focus({preventScroll:true});
+        window.requestAnimationFrame(beginFade);
+      });
+    }else{
+      if(destination&&typeof destination.focus==='function')destination.focus({preventScroll:true});
+      beginFade();
+    }
   }
   window.__sdDismissWelcome=dismiss;
   if(skip)skip.addEventListener('click',dismiss);
