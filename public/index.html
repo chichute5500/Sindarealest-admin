@@ -4278,7 +4278,7 @@ function setupMobileBottomNav(){const nav=$('#mobileBottomNav');if(!nav||nav.dat
 // Bind after mobile dock markup is parsed; do not depend on product/API startup timing.
 window.__sdBindMobileBottomNav=setupMobileBottomNav;
 /* Legacy shoe-art synchronization removed: HERO is HTML/CSS only. */
-async function renderFeatured(){
+function renderFeatured(){
  const grid=$('#featuredGrid');
  unbindReveal(grid);
  const flags=['SIGNATURE','CRAFT','ACCESSORY','ESSENTIAL'];
@@ -4296,18 +4296,37 @@ async function renderFeatured(){
   if(choices.length===4)break;
  }
  if(choices.length<4)for(const p of shuffled){include(p);if(choices.length===4)break}
- // Build each complete featured card in its own paint-separated task. Product
- // image arrays can contain many carousel slides; parsing all four at once
- // caused a variable cold-start main-thread task on throttled mobile.
- const fragment=document.createDocumentFragment();
- for(let i=0;i<choices.length;i++){
-  const template=document.createElement('template');
-  template.innerHTML=featuredProductCard(choices[i],flags[i]||'SELECTED',i);
-  fragment.appendChild(template.content);
-  if(i+1<choices.length)await yieldPaint();
+ const finish=()=>{
+  if(typeof activateCatalogImages==='function')activateCatalogImages();
+  bindReveal(grid);setupFeaturedAutoplay();
+ };
+ // Preserve the synchronous DOM-less source contract used by the category unit harness.
+ if(typeof document==='undefined'||typeof requestAnimationFrame!=='function'){
+  grid.innerHTML=choices.map((p,i)=>featuredProductCard(p,flags[i]||'SELECTED',i)).join('');
+  finish();
+  return Promise.resolve();
  }
- grid.replaceChildren(fragment);
- if(typeof activateCatalogImages==='function')activateCatalogImages();bindReveal(grid);setupFeaturedAutoplay();
+ // Parse one complete carousel card per frame, then swap the fragment once.
+ // The previous single HTML build could occupy the cold mobile main thread
+ // while expanding every image in four featured product carousels.
+ const fragment=document.createDocumentFragment();
+ let index=0;
+ return new Promise(resolve=>{
+  const buildNext=()=>{
+   const template=document.createElement('template');
+   template.innerHTML=featuredProductCard(choices[index],flags[index]||'SELECTED',index);
+   fragment.appendChild(template.content);
+   index++;
+   if(index<choices.length){
+    window.requestAnimationFrame(buildNext);
+    return;
+   }
+   grid.replaceChildren(fragment);
+   finish();
+   resolve();
+  };
+  buildNext();
+ });
 }
 function changeFeaturedImage(card,step=1){if(!card)return;const track=card.querySelector('[data-feature-track]');const count=Number(card.dataset.featureCount||0);if(!track||count<2)return;const base=Number(card.dataset.featureRequestIndex??card.dataset.featureIndex??0);const index=(base+step+count)%count;card.dataset.featureRequestIndex=String(index);const requestId=String(Number(card.dataset.featureRequestId||0)+1);card.dataset.featureRequestId=requestId;const commit=()=>{if(card.dataset.featureRequestId!==requestId)return;card.dataset.featureIndex=String(index);track.style.transform=`translate3d(${-index*100/count}%,0,0)`;const label=card.querySelector('[data-feature-count-label]');if(label)label.textContent=String(index+1).padStart(2,'0')+' / '+String(count).padStart(2,'0');const ahead=track.children[(index+1)%count];if(ahead&&ahead.dataset.src&&!ahead.dataset.preloading){ahead.dataset.preloading='1';const preload=new Image();preload.onload=()=>{ahead.dataset.preloaded='1';delete ahead.dataset.preloading};preload.onerror=()=>{delete ahead.dataset.preloading};preload.src=ahead.dataset.src}};const target=track.children[index];if(target&&target.dataset.src&&!target.getAttribute('src')){target.onload=()=>{target.onload=null;target.dataset.loaded='1';commit()};target.onerror=()=>{target.onerror=null;commit()};target.src=target.dataset.src;delete target.dataset.src;return}commit()}
 let featuredPausedUntil=0, featuredAutoplayPaused=false;
