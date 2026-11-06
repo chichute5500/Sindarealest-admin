@@ -12,7 +12,7 @@ const RESET_SKU_PREFIXES=Object.freeze({
 });
 function categorySlug(value){
  return String(value||"").trim().toLocaleLowerCase("vi").replace(/đ/g,"d")
-  .normalize("NFD").replace(/[\\u0300-\\u036f]/g,"")
+  .normalize("NFD").replace(/\p{M}/gu,"")
   .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
 }
 const LEGACY_ALIASES=Object.freeze({
