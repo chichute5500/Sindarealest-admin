@@ -24,7 +24,7 @@ export async function onRequestPost({request,env}) {
   let checkout=null;
   try {
     checkout=await env.DB.prepare(
-      "SELECT id,order_id,amount,status FROM sepay_payment_orders WHERE order_invoice_number=? LIMIT 1"
+      "SELECT id,order_id,amount,status,transaction_id FROM sepay_payment_orders WHERE order_invoice_number=? LIMIT 1"
     ).bind(invoice).first();
     if(!checkout)return fail("Không tìm thấy hóa đơn SePay.",404,noStore);
     if(Number(checkout.amount)!==transactionAmount)return fail("Số tiền không khớp hóa đơn đã tạo.",409,noStore);
