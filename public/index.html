@@ -723,25 +723,25 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
 <style id="sd-welcome-desktop-mobile-performance-2026-10-25">
 /* First paint: never expose fallback-font Vietnamese diacritics.
    The logo/background and loader remain visible while Noto fonts warm up. */
-html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-title,
-html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash #welcomeText,
-html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-overline,
-html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-tagline,
-html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-points,
-html.js-enabled:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-footnote{
+html.js-enabled #welcomeSplash:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-title,
+html.js-enabled #welcomeSplash:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeText,
+html.js-enabled #welcomeSplash:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-overline,
+html.js-enabled #welcomeSplash:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-tagline,
+html.js-enabled #welcomeSplash:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-points,
+html.js-enabled #welcomeSplash:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-footnote{
   visibility:hidden!important;
 }
 /* The LCP heading needs only SD Serif. Reveal it as soon as that exact
    preloaded font is ready instead of waiting for unrelated SD Sans.
    This does NOT flash replacement glyphs or change Welcome's layout/timing. */
-html.js-enabled.sd-welcome-serif-ready:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) #welcomeSplash .welcome-title{
+html.js-enabled #welcomeSplash.sd-welcome-serif-ready:not(.sd-welcome-font-ready):not(.sd-welcome-font-fallback) .welcome-title{
   visibility:visible!important;
 }
 
 /* If font downloads fail, render Vietnamese text using system fonts, not
    the less reliable fallback serif. */
-html.sd-welcome-font-fallback #welcomeSplash .welcome-title,
-html.sd-welcome-font-fallback #welcomeSplash #welcomeText{
+#welcomeSplash.sd-welcome-font-fallback .welcome-title,
+#welcomeSplash.sd-welcome-font-fallback #welcomeText{
   font-family:system-ui,Arial,sans-serif!important;
 }
 /* Refined mobile-first Welcome stage, without a moving glass backdrop.
@@ -3470,7 +3470,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   function revealWelcomeCopy(fallback){
     if(fontReady)return;
     fontReady=true;
-    document.documentElement.classList.add(fallback?'sd-welcome-font-fallback':'sd-welcome-font-ready');
+    s.classList.add(fallback?'sd-welcome-font-fallback':'sd-welcome-font-ready');
     if(fallback)noteWelcomeTitlePaint();
   }
   if(document.fonts&&typeof document.fonts.load==='function'){
@@ -3478,7 +3478,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
       .then(function(){
         var valid=document.fonts.check('400 30px "SD Serif"','Dấu ấn da cá sấu.');
         if(valid){
-          document.documentElement.classList.add('sd-welcome-serif-ready');
+          s.classList.add('sd-welcome-serif-ready');
           noteWelcomeTitlePaint();
         }
         return valid;
