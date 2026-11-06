@@ -7,6 +7,7 @@
   {action:"warranty_lookup",formId:"warrantyLookupForm",inputId:"warrantyLookupValue"}
  ];
  const states=new Map();
+ const clearPending=state=>{state.pendingValue="";state.pendingSubmit=false};
  let config=null,loadPromise=null,configLoadPromise=null;
  const isPhone=value=>{
   const digits=String(value||"").replace(/[^0-9]/g,"");
@@ -21,7 +22,7 @@
  window.sdPhoneLookupRequiresVerification=isPhone;
  window.sdResetPhoneLookupProof=action=>{
   const current=states.get(action);if(!current)return;
-  current.token="";current.when=0;
+  current.token="";current.when=0;clearPending(current);
   try{if(current.widgetId!==null&&window.turnstile)window.turnstile.reset(current.widgetId)}catch{}
  };
  function loadScript(){
@@ -46,23 +47,40 @@
   mount.className="sd-phone-challenge-widget";
   wrapper.append(hint,mount);
   form.insertBefore(wrapper,form.querySelector('[role="status"]')||null);
-  states.set(def.action,{token:"",when:0,widgetId:null,busy:false});
+  const state={token:"",when:0,widgetId:null,busy:false,pendingValue:"",pendingSubmit:false};
+  states.set(def.action,state);
+  // A single deliberate submit queues the phone lookup until CAPTCHA success.
+  // Capturing runs before the existing Storefront submit handler, ensuring
+  // it cannot send an unverified request or demand a second button press.
+  form.addEventListener("submit",event=>{
+   if(!isPhone(field.value)||validToken(def.action)){clearPending(state);return}
+   event.preventDefault();
+   event.stopImmediatePropagation();
+   state.pendingValue=field.value.trim();
+   state.pendingSubmit=true;
+   const status=form.querySelector('[role="status"]');
+   if(status)status.textContent="Hoàn tất xác minh bên dưới, hệ thống sẽ tự tra cứu.";
+   refresh();
+  },true);
   async function refresh(){
-   if(!isPhone(field.value)){wrapper.hidden=true;return}
+   if(!isPhone(field.value)){wrapper.hidden=true;clearPending(state);return}
    wrapper.hidden=false;
    // Only phone-number lookup needs Turnstile. Avoid a Worker request on
    // every normal Storefront visit, including code-based lookups.
    if(config===null){
     hint.textContent="Đang chuẩn bị xác minh...";
     await ensureConfig();
-    if(!isPhone(field.value)){wrapper.hidden=true;return}
+    if(!isPhone(field.value)){wrapper.hidden=true;clearPending(state);return}
    }
    if(!config?.phoneLookupAvailable||!config.siteKey){
+    clearPending(state);
     hint.textContent="Tra cứu bằng số điện thoại hiện yêu cầu xác minh. Hãy dùng mã đơn hoặc mã bảo hành để tiếp tục.";
+    const status=form.querySelector('[role="status"]');
+    if(status)status.textContent=hint.textContent;
     return;
    }
-   hint.textContent="Xác minh để tra cứu bằng số điện thoại.";
-   const state=states.get(def.action);
+   hint.textContent=state.pendingSubmit?
+    "Hoàn tất xác minh để hệ thống tự tra cứu.":"Xác minh để tra cứu bằng số điện thoại.";
    if(state.widgetId!==null||state.busy)return;
    state.busy=true;
    try{
@@ -70,14 +88,29 @@
     state.widgetId=api.render(mount,{
      sitekey:config.siteKey,
      theme:"auto",action:def.action,
-     callback:token=>{state.token=String(token);state.when=Date.now();hint.textContent="Đã xác minh. Bạn có thể tra cứu.";},
-     "expired-callback":()=>{state.token="";hint.textContent="Mã xác minh đã hết hạn. Vui lòng xác minh lại.";},
-     "error-callback":()=>{state.token="";hint.textContent="Chưa thể xác minh. Hãy thử lại hoặc dùng mã đơn/mã bảo hành.";}
+     callback:token=>{
+      state.token=String(token);state.when=Date.now();
+      const shouldSubmit=state.pendingSubmit&&
+        field.value.trim()===state.pendingValue&&isPhone(field.value)&&Boolean(validToken(def.action));
+      clearPending(state);
+      hint.textContent=shouldSubmit?"Đã xác minh. Đang tra cứu…":"Đã xác minh. Bạn có thể tra cứu.";
+      if(shouldSubmit)form.requestSubmit();
+     },
+     "expired-callback":()=>{state.token="";state.when=0;clearPending(state);hint.textContent="Mã xác minh đã hết hạn. Vui lòng xác minh lại.";},
+     "error-callback":()=>{state.token="";state.when=0;clearPending(state);hint.textContent="Chưa thể xác minh. Hãy thử lại hoặc dùng mã đơn/mã bảo hành.";}
     });
-   }catch{hint.textContent="Không tải được xác minh. Bạn có thể tra cứu bằng mã đơn hoặc mã bảo hành."}
+   }catch{
+    clearPending(state);
+    hint.textContent="Không tải được xác minh. Bạn có thể tra cứu bằng mã đơn hoặc mã bảo hành.";
+    const status=form.querySelector('[role="status"]');
+    if(status)status.textContent=hint.textContent;
+   }
    finally{state.busy=false}
   }
-  field.addEventListener("input",refresh);
+  field.addEventListener("input",()=>{
+   if(state.pendingSubmit&&field.value.trim()!==state.pendingValue)clearPending(state);
+   refresh();
+  });
   field.addEventListener("focus",refresh);
   refresh();
  }

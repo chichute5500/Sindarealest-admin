@@ -52,7 +52,7 @@ async function testPhoneLookupOnlyFetchesConfigWhenNecessary(){
  for(const [id,field] of Object.entries(fields)){
   field.addEventListener=(type,callback)=>handlers.set(id+":"+type,callback);
  }
- const form={querySelector:()=>null,insertBefore(){}};
+ const form={querySelector:()=>null,insertBefore(){},addEventListener(){}};
  const document={
   readyState:"complete",
   getElementById:id=>fields[id]||(["sdTrackForm","warrantyLookupForm"].includes(id)?form:null),
