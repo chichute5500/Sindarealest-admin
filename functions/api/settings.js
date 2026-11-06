@@ -23,7 +23,7 @@ export async function onRequestGet({ env }) {
       welcomeTitleLine2: settings.welcome_title_line_2,
       welcomeText: settings.welcome_text,
       ...normalizeWatermarkSettings(settings),
-    });
+    }, 200, { "X-Robots-Tag": "noindex" });
   } catch {
     return fail("Không đọc được cài đặt hiển thị.", 503);
   }

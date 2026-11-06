@@ -58,7 +58,7 @@ export async function onRequestGet(context) {
       const product = fromRow(row, { publicView: true, showPrices });
       const skuVerified = isExplicitlyVerifiedSku(row);
       return { ...product, sku: skuVerified ? product.sku : null, skuVerified };
-    }));
+    }), 200, { "X-Robots-Tag": "noindex" });
     if (cacheKey) {
       // Cache API writes may consume the whole serialized catalog. In Pages,
       // waitUntil keeps that work alive without making the customer wait for it.
