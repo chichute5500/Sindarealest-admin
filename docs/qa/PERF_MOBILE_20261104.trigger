@@ -59,3 +59,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] CI-only rerun on pinned ubuntu-24.04 after github ubuntu-latest switched to ubuntu26.04 incompatible with Playwright 1.56.1; preserve first-run DevTools trace, full browser QA and >=90 mobile all-valid gate; main/Production unchanged.
 
 2026-11-06: [perf-mobile-qa-candidate] Reduce first cold-layout task by isolating below-first-viewport Home #orderTracking and #siteFooter (with intrinsic-height fallback). Extend mobile 360/390/430 scroll QA and SSR tests; keep owner-approved visuals/behavior and strict all-valid >=90 Lighthouse gate. Run pinned Preview only. Owner authorized merge to main after full PASS.
+
+2026-11-06: exact candidate retry after restoring required SHA-guard commit subject marker; no code changes.
