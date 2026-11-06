@@ -32,7 +32,18 @@
 <link rel="canonical" href="/">
 <link rel="preload" href="/fonts/NotoSerif-Regular.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
 
-<link rel="preload" href="/code-hero.css?v=20261026-2" as="style" fetchpriority="high">
+<link rel="preload" href="/code-hero.css?v=20261026-2" as="style" fetchpriority="high" onload="this.onload=null;this.rel='stylesheet'">
+<style id="sd-code-hero-critical">
+/* Keep above-the-fold hero geometry stable while the versioned full sheet loads. */
+.sd-code-hero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,49fr) minmax(0,51fr);align-items:center;gap:0;min-height:0;height:420px;margin-block:12px 18px;padding:24px clamp(22px,3.2vw,48px);overflow:hidden;box-sizing:border-box;border:1px solid var(--line);border-radius:26px;color:var(--ink)}
+.sd-code-hero .sdh-copy{position:relative;z-index:3;min-width:0;max-width:580px}
+.sd-code-hero .sdh-title{margin:0;font:700 clamp(39px,4vw,59px)/1.08 'SD Serif',Georgia,serif;letter-spacing:-.05em;color:var(--ink)}
+.sd-code-hero .sdh-title span{display:block;white-space:nowrap}
+.sd-code-hero .sdh-visual{position:relative;z-index:1;width:100%;height:100%;min-width:0}
+@media(max-width:1100px) and (min-width:761px){.sd-code-hero{height:395px;padding-inline:25px;grid-template-columns:minmax(0,47fr) minmax(0,53fr)}.sd-code-hero .sdh-title{font-size:clamp(34px,4.3vw,48px)}}
+@media(max-width:760px){.sd-code-hero{width:calc(100% - 26px);max-width:calc(100% - 26px);grid-template-columns:minmax(0,54fr) minmax(0,46fr);height:clamp(236px,66vw,270px);min-height:0;margin:10px auto 13px;padding:13px 11px 13px 13px;border-radius:21px}.sd-code-hero .sdh-title{font-size:clamp(23px,6.7vw,26px);line-height:1.08;letter-spacing:-.045em}.sd-code-hero .sdh-visual{height:100%}}
+@media(max-width:370px){.sd-code-hero{grid-template-columns:minmax(0,56fr) minmax(0,44fr);padding-left:11px;padding-right:7px}.sd-code-hero .sdh-title{font-size:22px}}
+</style>
 <link rel="preload" href="/fonts/NotoSerif-Bold.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
 <link rel="preload" href="/fonts/NotoSans-Regular.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
 <style id="sd-material-gallery-inline">
@@ -907,7 +918,7 @@ body:has(#welcomeSplash) #checkoutBackdrop{display:none!important;visibility:hid
 #sdFullscreenViewer .sd-fullscreen-image.sd-no-transition{transition:none!important;animation:none!important}
 @media(prefers-reduced-motion:reduce){#sdFullscreenViewer .sd-fullscreen-image{transition:none!important}}
 </style>
-<link rel="stylesheet" href="/code-hero.css?v=20261026-2">
+<noscript><link rel="stylesheet" href="/code-hero.css?v=20261026-2"></noscript>
 <style id="sd-welcome-desktop-mobile-performance-2026-10-25">
 /* First paint: never expose fallback-font Vietnamese diacritics.
    The logo/background and loader remain visible while Noto fonts warm up. */
@@ -6535,43 +6546,57 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
 
 
 <script id="sd-native-drawer-glass-geometry">
-/* Only the drawer size is observed: no scroll event, cloned content, mask,
-   or per-frame paint work. Sticky native backdrop is handled by Chromium. */
+/* Read drawer geometry as one batch, then write all CSS variables together. */
 (()=>{
  const drawers=['cartDrawer','checkoutDrawer','accountDrawer'].map(id=>document.getElementById(id)).filter(Boolean);
- const update=drawer=>{
+ const dirty=new Set();
+ let scheduled=false;
+ const measure=drawer=>{
   const height=drawer.clientHeight;
-  if(height<=0)return;
+  if(height<=0)return null;
   const computed=getComputedStyle(drawer);
   const gap=Number.parseFloat(computed.rowGap)||0;
-  const h=height+'px',g=gap+'px',w=drawer.clientWidth+'px';
+  const width=drawer.clientWidth;
   const pt=(Number.parseFloat(computed.paddingTop)||0)+'px';
   const pl=(Number.parseFloat(computed.paddingLeft)||0)+'px';
   const footer=drawer.id==='checkoutDrawer'?drawer.querySelector('.sd-checkout-footer'):null;
   const footerHeight=footer?footer.getBoundingClientRect().height:0;
   const values=[
-   ['--sd-native-glass-height',h],['--sd-native-glass-gap',g],
-   ['--sd-native-glass-width',w],['--sd-native-glass-pad-top',pt],
+   ['--sd-native-glass-height',height+'px'],['--sd-native-glass-gap',gap+'px'],
+   ['--sd-native-glass-width',width+'px'],['--sd-native-glass-pad-top',pt],
    ['--sd-native-glass-pad-left',pl]
   ];
   if(footerHeight>0)values.push(['--sd-checkout-footer-height',footerHeight+'px']);
-  // Read all geometry before writing CSS variables to avoid a forced layout.
-  for(const [name,value] of values)
-   if(drawer.style.getPropertyValue(name)!==value)drawer.style.setProperty(name,value);
+  return {drawer,values};
  };
+ const flush=()=>{
+  scheduled=false;
+  const targets=[...dirty];dirty.clear();
+  const snapshots=targets.filter(drawer=>drawer.isConnected).map(measure).filter(Boolean);
+  for(const {drawer,values} of snapshots)
+   for(const [name,value] of values)
+    if(drawer.style.getPropertyValue(name)!==value)drawer.style.setProperty(name,value);
+ };
+ const schedule=drawer=>{
+  if(!drawer||!drawer.isConnected)return;
+  dirty.add(drawer);
+  if(!scheduled){scheduled=true;requestAnimationFrame(flush)}
+ };
+ const scheduleAll=()=>drawers.forEach(schedule);
+ const drawerFor=target=>target.matches?.('#cartDrawer,#checkoutDrawer,#accountDrawer')
+  ?target:target.closest?.('#checkoutDrawer');
  if(typeof ResizeObserver==='function'){
-  const observer=new ResizeObserver(entries=>entries.forEach(({target})=>{
-   update(target.id==='checkoutDrawer'||target.id==='cartDrawer'||target.id==='accountDrawer'?target:target.closest('#checkoutDrawer'));
-  }));
+  const observer=new ResizeObserver(entries=>entries.forEach(({target})=>schedule(drawerFor(target))));
   drawers.forEach(drawer=>{
-   update(drawer);observer.observe(drawer);
+   observer.observe(drawer);
    if(drawer.id==='checkoutDrawer'){
     const footer=drawer.querySelector('.sd-checkout-footer');
     if(footer)observer.observe(footer);
    }
   });
- }else drawers.forEach(update);
- window.addEventListener('resize',()=>drawers.forEach(update),{passive:true});
+ }
+ scheduleAll();
+ window.addEventListener('resize',scheduleAll,{passive:true});
  // The detail panel has its own independent scrollbar. Measure its border box
  // once on open and resize; don't tie its frosted film to scroll positions.
  const overlay=document.getElementById('productOverlay');
