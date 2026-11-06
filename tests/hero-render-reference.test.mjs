@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
-const css=readFileSync(new URL('../public/code-hero.css',import.meta.url),'utf8');
+const sourceCss=readFileSync(new URL('../public/code-hero.css',import.meta.url),'utf8');
+const css=html.match(/<style id="sd-code-hero-inline">([\\s\\S]*?)<\\/style>/)?.[1];
+assert.ok(css,'Critical code-only Hero CSS must be available inline at first paint');
+assert.equal(css.trim(),sourceCss.trim(),'Inline Hero CSS must exactly match the source asset');
 const hero=html.match(/<section class="sd-code-hero wrap" id="home"[\s\S]*?<\/section>/)?.[0];
 assert.ok(hero,'Code-only Hero must be the live home section');
 assert.match(hero,/<h1 class="sdh-title" id="sdh-title">/);
