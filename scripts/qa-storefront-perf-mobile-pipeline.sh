@@ -48,7 +48,11 @@ mkdir -p artifacts/perf-mobile-20261104/lighthouse
 # live Production and isolated Preview. Preserve multiple raw attempts instead
 # of manufacturing a zero score or declaring a passing score from one run.
 for attempt in 1 2 3 4; do
- npx lighthouse "$preview/" --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-mobile-$attempt.json" --quiet
+ # Save the actual first-cold-run DevTools trace to identify long tasks,
+ # not merely compare averaged scores or attribute CPU spikes by guesswork.
+ assets_flag=()
+ if [ "$attempt" -eq 1 ]; then assets_flag=(--save-assets); fi
+ npx lighthouse "$preview/" --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-mobile-$attempt.json" "${assets_flag[@]}" --quiet
 done
 npx lighthouse "$preview/" --preset=desktop --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance,accessibility,best-practices,seo --output=json --output-path="artifacts/perf-mobile-20261104/lighthouse/preview-desktop.json" --quiet
 npx lighthouse "https://sindarealest2.pages.dev/" --throttling-method=devtools --chrome-flags="--headless=new --no-sandbox" --only-categories=performance --output=json --output-path=artifacts/perf-mobile-20261104/lighthouse/production-mobile.json --quiet
