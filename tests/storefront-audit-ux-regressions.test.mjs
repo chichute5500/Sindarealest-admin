@@ -16,6 +16,9 @@ assert.match(html,/autoDismissElapsed=true;\s*maybeTimedDismiss\(\);\s*\},reduce
 assert.match(html,/<h2 class="welcome-title">/, 'Welcome is not a competing document H1');
 assert.match(html,/<h1 class="sdh-title" id="sdh-title">/, 'Main Hero remains the primary H1');
 assert.ok(html.includes('srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui-320.webp 320w, /logo-ui.webp 360w" sizes="(max-height:630px) 79px, (max-width:760px) 26vw, 130px"'), 'Welcome logo must select an appropriately sized responsive source');
+assert.match(html,/<img width="360" height="360" src="\/logo-ui\.webp"[^>]*class="welcome-logo"/,'Welcome logo reserves its intrinsic square dimensions');
+assert.match(html,/\.welcome-loader i\{[^}]*transform:translateX\(-107\.15%\)[^}]*animation:welcomeLoading/,'Welcome loader uses a compositor-friendly transform');
+assert.match(html,/@keyframes welcomeLoading\{to\{transform:translateX\(261\.9%\)\}\}/,'Welcome loader sweep retains its full track travel');
 assert.ok(html.includes('srcset="/logo-ui-128.webp 128w, /logo-ui-192.webp 192w, /logo-ui-224.webp 224w, /logo-ui.webp 360w" sizes="126px"'), 'Footer logo must use responsive image sources');
 
 /* On the first parse, drawer markup precedes its full animation CSS. aria-hidden
