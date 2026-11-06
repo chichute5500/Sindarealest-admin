@@ -3575,11 +3575,15 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
   if(skip)skip.addEventListener('click',dismiss);
   document.addEventListener('keydown',keepFocus,true);
   document.addEventListener('focusin',keepFocusInside,true);
-  // Allow the first layout frame to settle before focusing the Welcome skip
-  // control. Synchronous focus here forces ~69ms full-page layout on cold mobile.
-  if(skip)window.requestAnimationFrame(function(){
-    if(!closed&&skip.isConnected)skip.focus({preventScroll:true});
-  });
+  // Cold Mobile: programmatic focus before the first complete layout creates a
+  // long >200ms reflow. Do not autofocus the Welcome button at phone widths.
+  // Keyboard Tab remains trapped inside Welcome via keepFocus(), and desktop
+  // retains the exact original auto-focus behavior after first paint.
+  if(skip&&window.matchMedia&&window.matchMedia('(min-width:761px)').matches){
+    window.requestAnimationFrame(function(){
+      if(!closed&&skip.isConnected)skip.focus({preventScroll:true});
+    });
+  }
   var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(document.documentElement.classList.contains('sd-catalog-route'))window.setTimeout(dismiss,0);
   else window.setTimeout(function(){
