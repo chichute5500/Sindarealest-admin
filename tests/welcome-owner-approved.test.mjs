@@ -96,3 +96,14 @@ assert.ok(!html.includes('},2600);'),'Do not let the welcome font watchdog hold 
 assert.match(html,/html:not\(\.js-enabled\):has\(body\.welcome-active\)\{overflow:auto!important/);
 assert.match(html,/html:not\(\.js-enabled\) body\.welcome-active\{height:auto!important;min-height:100vh!important;overflow-x:hidden!important;overflow-y:auto!important/);
 assert.match(html,/html:not\(\.js-enabled\) #welcomeSplash\{display:none!important\}/);
+
+// The Welcome exit must not synchronously force a full-page reflow.
+// Keep the same approved 360ms fade after a browser paint opportunity.
+const welcomeExit=html.slice(html.indexOf('  function dismiss(){'),html.indexOf('  window.__sdDismissWelcome=dismiss;'));
+assert.ok(welcomeExit.includes("document.body.classList.remove('welcome-active');"));
+assert.ok(!welcomeExit.includes('void document.body.offsetHeight'),
+ 'Welcome closing may not force a synchronous layout flush');
+assert.ok(welcomeExit.includes('window.requestAnimationFrame(beginFade)') && welcomeExit.includes('s.classList.add(\'is-leaving\')'),
+ 'Welcome must use a painted frame before the original leave transition');
+assert.ok(welcomeExit.includes('},360);'),
+ 'Welcome must retain its approved 360ms exit fade');
