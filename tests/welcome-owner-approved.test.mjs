@@ -31,7 +31,8 @@ assert.match(html,/window\.setTimeout\(function\(\)\{\s*if\(!titlePaintedAt&&!cl
 assert.match(html, /class="welcome-logo-frame"/, 'Welcome uses a static 3D halo around the brand logo');
 assert.match(performance, /#welcomeSplash \.welcome-logo-frame\{/, 'Welcome material belongs to existing authoritative stylesheet');
 assert.doesNotMatch(html, /A MARK OF DISTINCTION · SINCE YOUR FIRST IMPRESSION/, 'Avoid redundant Welcome copy');
-assert.ok(html.includes('    },360);\n  }\n  window.__sdDismissWelcome'),'Closing overlay must match approved 360ms dismissal');
+assert.ok(html.includes('      },360);') && html.includes('window.__sdDismissWelcome=dismiss;'),
+ 'Closing overlay must still use its approved 360ms dismissal');
 assert.match(html,/\.welcome-texture--dark\{[^\n]*filter:none\}/);
 assert.match(html,/\.welcome-texture--light\{[^\n]*filter:none\}/);
 assert.ok(html.includes('<section class="sd-code-hero wrap" id="home"'),'Owner-approved separate HERO must remain');
@@ -45,7 +46,9 @@ assert.match(html,/if\(document\.readyState==='loading'\)/,
 assert.match(html,/document\.addEventListener\('DOMContentLoaded',dismiss,\{once:true\}\)/);
 assert.doesNotMatch(html,/window\.__sdStorefrontReady=true;\s*dismiss\(\);\s*\},2400\)/,
  'No 2.4-second network fallback delay when public SSR is already available');
-assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);\n    void document\.body\.offsetHeight;\n    s\.classList\.add\('is-leaving'\)/);
+assert.match(html,/document\.body\.classList\.remove\('welcome-active'\);/);
+assert.match(html,/window\.requestAnimationFrame\(beginFade\)/,
+ 'Paint-separated exit must preserve the locked-page release before fading');
 assert.match(html,/init\(\)\.then\(finishStorefrontStartup,finishStorefrontStartup\)/);
 
 // During the approved 360ms exit, text must clear before the backdrop fades.
