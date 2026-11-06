@@ -101,3 +101,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] Re-emit exact-source Preview QA after branch update webhook was not observed; no source or policy change.
 
 2026-11-06: [perf-mobile-qa-candidate] Repair malformed catalog SSR observer assertion; verify current implementation and strict mobile release gate on exact SHA.
+
+2026-11-06: [perf-mobile-qa-candidate] Avoid newline-sensitive featured observer contract; run updated exact-SHA Preview.
