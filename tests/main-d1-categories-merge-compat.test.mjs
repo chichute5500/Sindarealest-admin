@@ -28,7 +28,8 @@ const ctx={
   {category:"mu",categoryLabel:"Mũ"},
   {category:"bags-x",categoryLabel:'<img src=x onerror=alert(1)>'}
  ],
- categoryOrder:["all","sneakers","loafers","dress-shoes","belts","wallets","sandals","watch-straps","phone-cases"],
+ categoryOrder:["all","sneakers","loafers","dress-shoes","belts","vi-nam-nu","tui-thoi-trang-golf","sandals","watch-straps","phone-cases"],
+ categoryAliases:{wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"},canonicalCategoryKey:value=>({wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"}[value]||value),
  categoryLabels:{all:"Tất cả",sneakers:"Sneaker"},
  displayProductName,escapeHtml,routeSlug:productCategoryRouteSlug,selectedCategory:"stale-from-import",
  $:selector=>selector==="#categoryFilters"?container:null
@@ -36,15 +37,16 @@ const ctx={
 function render(){runInNewContext(html.slice(start,end)+"\nrenderFilters();",ctx,{timeout:1000})}
 render();
 assert.equal(ctx.selectedCategory,"all","The old selected category must reset after D1 import");
-for(const c of ["sneakers","tui-golf","clutch","vi-nam","vi-cam-tay","mu"])assert.ok(container.innerHTML.includes('data-category="'+c+'"'),"D1 hotfix category missing: "+c);
-assert.ok(container.innerHTML.includes("Túi Golf · 2"),"Existing D1 category counts preserved with Owner-approved capitalization");
-assert.equal((container.innerHTML.match(/class="filter-pill/g)||[]).length,8,"Every distinct imported category plus All stays visible");
+for(const c of ["sneakers","tui-thoi-trang-golf","vi-nam-nu","tui-xach","mu"])assert.ok(container.innerHTML.includes('data-category="'+c+'"'),"Merged D1 category missing: "+c);
+assert.ok(container.innerHTML.includes("Túi Thời Trang &amp; Golf · 3"),"Legacy bag categories count together");
+assert.ok(container.innerHTML.includes("Ví Nam &amp; Nữ · 2"),"Legacy wallet categories count together");
+assert.equal((container.innerHTML.match(/class="filter-pill/g)||[]).length,6,"Merged categories and remaining D1 groups plus All stay visible");
 assert.ok(!container.innerHTML.includes("<img src=x"),"Untrusted D1 labels cannot inject markup");
 assert.ok(container.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"),"Escaped untrusted category labels remain readable, regardless of owner-approved title case");
-ctx.selectedCategory="tui-golf";render();
-assert.ok(container.innerHTML.includes('href="/sanpham/tuigolf" data-category="tui-golf" aria-current="page"'),"Dynamic D1 category remains linkable and selectable");
+ctx.selectedCategory="tui-thoi-trang-golf";render();
+assert.ok(container.innerHTML.includes('href="/sanpham/tuithoitrang-golf" data-category="tui-thoi-trang-golf" aria-current="page"'),"Merged D1 bag category remains linkable and selectable");
 ctx.products=[{category:"imported-after-merge",categoryLabel:"Danh mục tương lai"}];render();
 assert.equal(ctx.selectedCategory,"all","Subsequent D1 import removes stale selection");
 assert.ok(container.innerHTML.includes('data-category="imported-after-merge"'),"Future imported categories appear without source edits");
-assert.ok(!container.innerHTML.includes('data-category="tui-golf"'),"Old D1 categories disappear after import");
+assert.ok(!container.innerHTML.includes('data-category="tui-thoi-trang-golf"'),"Old merged D1 category disappears after import");
 console.log("PASS: main 31f395a dynamic D1 category hotfix remains compatible with Owner-PASS integrated Storefront.");
