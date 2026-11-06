@@ -10,11 +10,7 @@ function getConfig(env) {
   if(merchantId.length>100||merchantSecret.length>500||ipnSecret.length>500) return null;
   return {mode,merchantId,merchantSecret,ipnSecret};
 }
-export function parseVndAmount(value) {
-  const raw=String(value??"").trim();if(!/^\\d+(?:\\.0+)?$/.test(raw))return null;
-  const amount=Number(raw);return Number.isSafeInteger(amount)&&amount>0&&amount<=2_000_000_000?amount:null;
-}
-export function sepayPaymentReady(env) { return Boolean(getConfig(env)); }
+xport function sepayPaymentReady(env) { return Boolean(getConfig(env)); }
 export function sepayIpnSecret(env) { return getConfig(env)?.ipnSecret||""; }
 export function constantTimeSecretMatch(actual,expected) {
   const a=encoder.encode(String(actual||"")),b=encoder.encode(String(expected||""));
