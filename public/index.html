@@ -3929,7 +3929,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 
   <section class="section wrap" id="products">
     <div class="section-head" data-reveal><div><div class="eyebrow">Khám phá bộ sưu tập</div><h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2></div><p class="section-note" id="catalogSeoNote">Khám phá các thiết kế theo danh mục. Liên hệ để được tư vấn biến thể và thông tin sản phẩm.</p></div>
-    <div class="catalog-tools" data-reveal><label class="search-field"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.2 4.2"/></svg><input id="catalogSearch" type="search" aria-label="Tìm theo tên sản phẩm hoặc mã SKU" placeholder="Tìm sản phẩm hoặc mã SKU…" autocomplete="off"></label><nav class="filter-pills" id="categoryFilters" aria-label="Danh mục sản phẩm"><a class="filter-pill tap-target" href="/sanpham">Tất cả</a><a class="filter-pill tap-target" href="/sanpham/sneaker">Giày thể thao</a><a class="filter-pill tap-target" href="/sanpham/giayluoi">Giày lười</a><a class="filter-pill tap-target" href="/sanpham/giaytay">Giày tây</a><a class="filter-pill tap-target" href="/sanpham/thatlung">Thắt lưng</a><a class="filter-pill tap-target" href="/sanpham/dep">Dép</a><a class="filter-pill tap-target" href="/sanpham/daydongho">Dây đồng hồ</a><a class="filter-pill tap-target" href="/sanpham/oplung">Ốp điện thoại</a><a class="filter-pill tap-target" href="/sanpham/vinam">Ví nam</a><a class="filter-pill tap-target" href="/sanpham/vicamtay">Ví cầm tay</a><a class="filter-pill tap-target" href="/sanpham/caplaptop">Cặp–Tab–Laptop</a><a class="filter-pill tap-target" href="/sanpham/clutch">Clutch</a><a class="filter-pill tap-target" href="/sanpham/mu">Mũ</a><a class="filter-pill tap-target" href="/sanpham/tuideocheo">Túi đeo chéo</a><a class="filter-pill tap-target" href="/sanpham/tuigolf">Túi golf</a><a class="filter-pill tap-target" href="/sanpham/tuinu">Túi nữ</a></nav></div>
+    <div class="catalog-tools" data-reveal><label class="search-field"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.2 4.2"/></svg><input id="catalogSearch" type="search" aria-label="Tìm theo tên sản phẩm hoặc mã SKU" placeholder="Tìm sản phẩm hoặc mã SKU…" autocomplete="off"></label><nav class="filter-pills" id="categoryFilters" aria-label="Danh mục sản phẩm"><a class="filter-pill tap-target" href="/sanpham">Tất cả</a><a class="filter-pill tap-target" href="/sanpham/sneaker">Giày thể thao</a><a class="filter-pill tap-target" href="/sanpham/giayluoi">Giày lười</a><a class="filter-pill tap-target" href="/sanpham/giaytay">Giày tây</a><a class="filter-pill tap-target" href="/sanpham/thatlung">Thắt lưng</a><a class="filter-pill tap-target" href="/sanpham/dep">Dép</a><a class="filter-pill tap-target" href="/sanpham/daydongho">Dây đồng hồ</a><a class="filter-pill tap-target" href="/sanpham/oplung">Ốp điện thoại</a><a class="filter-pill tap-target" href="/sanpham/vinamnu">Ví nam &amp; nữ</a><a class="filter-pill tap-target" href="/sanpham/caplaptop">Cặp–Tab–Laptop</a><a class="filter-pill tap-target" href="/sanpham/tuithoitrang-golf">Túi thời trang &amp; golf</a><a class="filter-pill tap-target" href="/sanpham/mu">Mũ</a><a class="filter-pill tap-target" href="/sanpham/tuixach">Túi xách</a></nav></div>
     <div class="catalog-grid" id="catalogGrid"></div><nav class="pagination" id="pagination" aria-label="Phân trang sản phẩm"></nav><div class="page-summary" id="pageSummary" role="status" aria-live="polite" aria-atomic="true"></div>
   </section>
 </main>
@@ -4187,7 +4187,10 @@ const LOCAL_ADDRESS_KEY='sd-shipping-address';
 function paymentReceiptLabel(summary){if(!summary||typeof summary!=='object'||!Number.isSafeInteger(summary.requiredAmount))return 'Chờ Shop xác nhận số tiền';const received=Number.isSafeInteger(summary.netReceivedAmount)?summary.netReceivedAmount:0;if(received<=0)return 'Shop chưa xác nhận nhận tiền';if(Number(summary.overpaidAmount)>0)return 'Shop đã nhận dư';if(Number(summary.shortfall)>0)return 'Shop đã nhận thiếu';return 'Shop đã nhận đủ tiền'}
 const deliveryStatusLabels={not_shipped:'Chờ gửi hàng',in_transit:'Đang giao',delivered:'Giao thành công',failed_returning:'Giao thất bại / Đang hoàn hàng',returned:'Đã hoàn hàng về Shop'};
 const deliveryStatusLabel=value=>deliveryStatusLabels[value]||'Chưa có trạng thái giao hàng';
-const categoryLabels={all:'Tất cả',sneakers:'Giày Thể Thao',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng',wallets:'Ví nam','vi-nam':'Ví nam','vi-cam-tay':'Ví cầm tay','cap-tab-laptop':'Cặp – Tab – Laptop',clutch:'Clutch',mu:'Mũ','tui-deo-cheo':'Túi đeo chéo','tui-golf':'Túi golf','tui-nu':'Túi nữ',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
+const categoryLabels={all:'Tất cả',sneakers:'Giày Thể Thao',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng','vi-nam-nu':'Ví nam & nữ','cap-tab-laptop':'Cặp – Tab – Laptop','tui-thoi-trang-golf':'Túi thời trang & golf',mu:'Mũ','tui-xach':'Túi xách',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
+const categoryAliases=Object.freeze({sneaker:'sneakers','giay-the-thao':'sneakers','giay-luoi':'loafers','giay-tay':'dress-shoes','that-lung':'belts',wallets:'vi-nam-nu','vi-nam':'vi-nam-nu','vi-cam-tay':'vi-nam-nu',vida:'vi-nam-nu','vi-nam-nu':'vi-nam-nu','cap-tab-laptop':'cap-tab-laptop','cap-tap-laptop':'cap-tab-laptop',clutch:'tui-thoi-trang-golf','tui-deo-cheo':'tui-thoi-trang-golf','tui-golf':'tui-thoi-trang-golf','tui-thoi-trang-golf':'tui-thoi-trang-golf','tui-nu':'tui-xach','tui-xach':'tui-xach',dep:'sandals','day-dong-ho':'watch-straps','op-dien-thoai':'phone-cases'});
+function canonicalCategoryKey(value){const key=String(value||'').trim().toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return categoryAliases[key]||key}
+
 // Variant category is defined by catalog metadata, not title.
 function isSandalsCategory(p){const c=String(p?.category||'').trim().toLocaleLowerCase('vi'),slug=c.replace(/đ/gu,'d').normalize('NFD').replace(/[\u0300-\u036f]/gu,'').replace(/[\s_]+/gu,'-');return /^(?:dep|sandal|sandals)(?:-|$)/u.test(slug)}
 function productOptionKind(p){const c=String(p?.category||'').trim().toLocaleLowerCase('vi'),slug=c.replace(/đ/gu,'d').normalize('NFD').replace(/[\u0300-\u036f]/gu,'').replace(/[\s_]+/gu,'-');return ['sneakers','loafers','dress-shoes'].includes(c)||/^(?:giay|shoe|shoes|boot|boots)(?:-|$)/u.test(slug)||['oxford','oxfords','derby','derbies'].includes(slug)||isSandalsCategory(p)?'shoe':c==='belts'?'belt':c==='phone-cases'?'phone':''}
@@ -4264,8 +4267,8 @@ function selectedDetailOption(p){
  if(msg)msg.textContent=productOptionKind(p)==='phone'?'Vui lòng nhập dòng điện thoại (2–80 ký tự).':'Vui lòng chọn đúng size hoặc bản dây.';
  focusDetailOption();return null;
 }
-const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','vi-nam','vi-cam-tay','sandals','watch-straps','phone-cases','cap-tab-laptop','clutch','mu','tui-deo-cheo','tui-golf','tui-nu'];
-const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","giay-the-thao":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vinam","vi-nam":"vinam","vi-cam-tay":"vicamtay","cap-tab-laptop":"caplaptop","clutch":"clutch","mu":"mu","tui-deo-cheo":"tuideocheo","tui-golf":"tuigolf","tui-nu":"tuinu","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung"});function routeSlug(value){const key=String(value||'').trim().toLocaleLowerCase('en');if(Object.prototype.hasOwnProperty.call(productCategoryRouteSlugs,key))return productCategoryRouteSlugs[key];return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
+const categoryOrder=['all','sneakers','loafers','dress-shoes','belts','vi-nam-nu','sandals','watch-straps','phone-cases','cap-tab-laptop','tui-thoi-trang-golf','mu','tui-xach'];
+const productCategoryRouteSlugs=Object.freeze({"sneakers":"sneaker","giay-the-thao":"sneaker","loafers":"giayluoi","dress-shoes":"giaytay","belts":"thatlung","wallets":"vinamnu","vi-nam":"vinamnu","vi-cam-tay":"vinamnu","vi-nam-nu":"vinamnu","cap-tab-laptop":"caplaptop","clutch":"tuithoitrang-golf","tui-deo-cheo":"tuithoitrang-golf","tui-golf":"tuithoitrang-golf","tui-thoi-trang-golf":"tuithoitrang-golf","mu":"mu","tui-nu":"tuixach","tui-xach":"tuixach","sandals":"dep","watch-straps":"daydongho","phone-cases":"oplung"});function routeSlug(value){const key=String(value||'').trim().toLocaleLowerCase('en');if(Object.prototype.hasOwnProperty.call(productCategoryRouteSlugs,key))return productCategoryRouteSlugs[key];return String(value||'san-pham').toLocaleLowerCase('vi').replace(/đ/g,'d').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,100)||'san-pham'}
 const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const imgPath=x=>String(x||'').replace(/^\.\//,'');
 function dismissToast(){const t=$('#toast');if(t)t.classList.remove('show','toast-detail-context');clearTimeout(toastTimer)}
@@ -4541,7 +4544,9 @@ function catalogCategoryFromLocation(){
  const slug=String(match[1]||'').toLowerCase();
  if(!slug)return 'all';
  const found=products.find(p=>routeSlug(p.category)===slug);
- return found?found.category:null;
+ if(found)return canonicalCategoryKey(found.category);
+ const alias=Object.entries(productCategoryRouteSlugs).find(([key,value])=>value===slug);
+ return alias?canonicalCategoryKey(alias[0]):null;
 }
 // Return from catalog to Welcome-free home with SPA History navigation.
 // Do not reload the HTML document: its Welcome lifecycle belongs to page load.
@@ -4640,16 +4645,15 @@ function renderFilters(){
   const counts=Object.create(null),labels=Object.create(null);
   for(const p of products){
     const raw=String(p.category||'').trim();
-    const c=raw==='giay-the-thao'?'sneakers':raw==='wallets'?'vi-nam':raw;
+    const c=canonicalCategoryKey(raw);
     if(!c||c==='all')continue;
     counts[c]=(counts[c]||0)+1;
-    if(!labels[c])labels[c]=String(p.categoryLabel||categoryLabels[c]||c).trim()||c;
+    if(!labels[c])labels[c]=String(categoryLabels[c]||p.categoryLabel||c).trim()||c;
   }
   const extras=Object.keys(counts).filter(c=>!categoryOrder.includes(c))
     .sort((a,b)=>labels[a].localeCompare(labels[b],'vi'));
   const visible=['all',...categoryOrder.filter(c=>c!=='all'&&counts[c]),...extras];
-  if(selectedCategory==='giay-the-thao')selectedCategory='sneakers';
-  if(selectedCategory==='wallets')selectedCategory='vi-nam';
+  selectedCategory=canonicalCategoryKey(selectedCategory);
   if(selectedCategory!=='all'&&!counts[selectedCategory])selectedCategory='all';
   // The same server-readable copy is used after SPA navigation, keeping
   // visible headings/intro aligned with the canonical route's SEO metadata.
@@ -4700,7 +4704,7 @@ function getFiltered(){
  // Newly created products must appear at the top for ALL and category/search.
  // Use the immutable D1 created_at timestamp, not Admin sort_order or update time.
  const matches=orderedSessionProducts().filter(p=>
-  (selectedCategory==='all'||(p.category==='giay-the-thao'?'sneakers':p.category==='wallets'?'vi-nam':p.category)===selectedCategory)&&
+  (selectedCategory==='all'||canonicalCategoryKey(p.category)===selectedCategory)&&
   // Search both human labels and canonical URL slugs (e.g. sneaker,
   // giaytay, tuideocheo), not only product titles or descriptions.
   (!q||foldSearch((p.title||'')+' '+visibleSku(p)+' '+(p.categoryLabel||'')+' '+(p.category||'')+' '+routeSlug(p.category)+' '+(p.description||'')).includes(q)));
