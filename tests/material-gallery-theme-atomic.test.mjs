@@ -19,7 +19,9 @@ test('Owner-controlled material photos are config-driven and have no manual cont
  assert.match(page,/\},\{rootMargin:'250px 0px',threshold:0\}\)/,
   'Load gallery code only as its tile approaches the viewport');
  assert.match(page,/setupMaterialGalleryLoader\(\);/);
- assert.match(page,/href="\/material-gallery.css"/);
+ const inlineCss=page.match(/<style id="sd-material-gallery-inline">([\s\S]*?)<\/style>/)?.[1];
+ assert.ok(inlineCss,'Material/theme CSS remains present in the first-paint stylesheet set');
+ assert.equal(inlineCss.trim(),css.trim(),'Inline Material CSS must exactly match its source asset');
  assert.match(js,/setInterval\(\(\)=>\{/);
  assert.match(js,/\},1500\)/);
  assert.doesNotMatch(js,/createElement\(['"]button['"]\)/);

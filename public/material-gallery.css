@@ -170,7 +170,7 @@ html.sd-theme-overlay-active body .mobile-bottom-nav{transition:none!important}
   html.sd-theme-repaint-isolated body :is(
     .glass,.glass-soft,.nav,.mobile-bottom-nav,.product-card,.account-drawer,
     .cart-drawer,.checkout-drawer,.sdh-glass-card,.search-field,.mosaic-card,
-    .contact-link,.order-step,.service-strip,.service-copy,.footer,.custom-text,
+    .contact-link,.service-strip,.service-copy,.footer,.custom-text,
     .custom-image,.detail-modal,.detail-image-stage,.sd-fullscreen-viewer,
     .promise-tag,.product-overlay-panel,.cart-row,.nav-wrap
   ){

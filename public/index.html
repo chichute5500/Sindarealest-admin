@@ -31,11 +31,199 @@
 <meta name="twitter:image" content="https://sindarealest2.pages.dev/og-sindarealest-crisp-20261028.jpg">
 <link rel="canonical" href="/">
 <link rel="preload" href="/fonts/NotoSerif-Regular.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
+
 <link rel="preload" href="/code-hero.css?v=20261026-2" as="style" fetchpriority="high">
 <link rel="preload" href="/fonts/NotoSerif-Bold.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
 <link rel="preload" href="/fonts/NotoSans-Regular.woff2" as="font" type="font/woff2" crossorigin fetchpriority="low">
-<link rel="stylesheet" href="/material-gallery.css">
-<link rel="stylesheet" href="/customer-auth.css?v=google-only-20261104">
+<style id="sd-material-gallery-inline">
+/* Owner-requested smooth 580ms crossfade in the material tile only. */
+#materialTile .sd-material-gallery{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+#materialTile .sd-material-slide{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  object-fit:cover;opacity:0;filter:none;transform:none;
+  transition:opacity .58s cubic-bezier(.42,0,.58,1)!important
+}
+#materialTile .sd-material-slide.is-visible{opacity:1}
+#materialTile.has-real-material-gallery .material-photo{opacity:0!important;visibility:hidden!important}
+#materialTile.has-real-material-gallery .mosaic-content{z-index:1}
+
+/* Keep photo pixels clear: do not cover a real hide with a full-tile light or
+   dark wash. The old pseudo-overlays stay available for fallback art only. */
+html body #materialTile.has-real-material-gallery::before,
+html body #materialTile.has-real-material-gallery::after{
+  background:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  transition:none!important;
+}
+html body #materialTile.has-real-material-gallery .mosaic-content{
+  color:#fff!important;
+  text-shadow:0 1px 3px rgba(0,0,0,.94),0 1px 8px rgba(0,0,0,.72);
+}
+/* The original Light/Dark fallback caption washes remain only for legacy
+   placeholder material art; real leather photos are explicitly kept unwashed. */
+#materialTile::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(242,249,255,.78),rgba(242,249,255,.16));
+  opacity:0;transition:opacity .22s ease-out!important;
+}
+#materialTile::after{
+  background:linear-gradient(90deg,rgba(0,0,0,.62),rgba(0,0,0,.16))!important;
+  opacity:1;transition:opacity .22s ease-out!important;
+}
+html:not(.dark) #materialTile::before{opacity:1}
+html:not(.dark) #materialTile::after{opacity:0}
+
+/* Fast theme response: restore the approved 220ms visual blend for strict A/B QA,
+   keep the unchanged 80ms start / 300ms finish / 220±25ms duration gate.
+   Avoid forced layout, full-screen filter and hundreds
+   of costly box-shadow/backdrop-filter transitions on catalog cards. */
+html body .theme-bg{
+  transition:opacity .22s ease-out!important;
+  transition-delay:0s!important;
+  will-change:opacity;
+}
+html body .nav-wrap .nav,
+html body .mobile-bottom-nav{
+  transition-property:background-color,border-color,color!important;
+  transition-duration:.22s!important;
+  transition-timing-function:ease-out!important;
+  transition-delay:0s!important;
+}
+html.theme-transitioning body .theme-bg{
+  transition:opacity .22s ease-out!important;
+}
+html.theme-transitioning body .nav-wrap .nav,
+html.theme-transitioning body .mobile-bottom-nav{
+  transition-property:background-color,border-color,color!important;
+  transition-duration:.22s!important;
+  transition-timing-function:ease-out!important;
+}
+/* All other surfaces switch immediately; no expensive paint-heavy shadow or
+   blur animation across the product catalog. */
+html.theme-transitioning body :is(
+  .glass,.glass-soft,.product-card,.promise,.promise-tag,
+  .mosaic-card,.custom-text,.footer,.contact-link,.search-field,
+  .cart-drawer,.account-drawer,.checkout-drawer
+){
+  transition:none!important;
+}
+html.theme-transitioning body #materialTile .material-photo{
+  transition:opacity .22s ease-out!important;
+}
+/* No full-viewport background/text repaint on every animation frame.
+   The fixed theme-bg layers and navbar perform the approved 220ms fade;
+   html/body palette changes immediately, preserving the existing appearance. */
+html.theme-transitioning,html.theme-transitioning body{
+  transition:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  #materialTile .sd-material-slide,
+  #materialTile::before,#materialTile::after{transition:none!important}
+}
+
+
+/* Android WebView safe static sheet. Never animate full-viewport clip-path or
+   gradient masks in front of multiple backdrop-filter panels: expensive GPU
+   tiling can display partially repainted horizontal bands and heavy flashes. */
+#sdThemeSwitchOverlay{
+  position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;
+  box-sizing:border-box;padding:24px;text-align:center;isolation:isolate;
+  background-color:#061522;color:#f7f4ef;
+  opacity:0;visibility:hidden;pointer-events:none;transition:none;
+}
+#sdThemeSwitchOverlay[data-origin="light"]{background-color:#eaf3fb;color:#173449}
+#sdThemeSwitchOverlay[data-origin="dark"]{background-color:#061522;color:#f7f4ef}
+#sdThemeSwitchOverlay.is-preparing,
+#sdThemeSwitchOverlay.is-visible,
+#sdThemeSwitchOverlay.is-covered,
+#sdThemeSwitchOverlay.is-dismissing{visibility:visible;pointer-events:auto}
+#sdThemeSwitchOverlay.is-visible{
+  opacity:1;transition:opacity .08s ease-in-out;
+}
+#sdThemeSwitchOverlay.is-covered{
+  opacity:1;transition:none;
+}
+#sdThemeSwitchOverlay.is-dismissing{
+  opacity:0;pointer-events:none;transition:opacity .10s ease-out;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-content{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:13px;max-width:min(88vw,460px);position:relative;
+  font-family:"SD Sans",Arial,sans-serif;
+  opacity:0;transform:translateY(5px);
+  transition:opacity .18s ease-out,transform .23s ease-out;
+}
+#sdThemeSwitchOverlay.is-visible .sd-theme-switch-content,
+#sdThemeSwitchOverlay.is-covered .sd-theme-switch-content{
+  opacity:1;transform:translateY(0);
+}
+#sdThemeSwitchOverlay.is-dismissing .sd-theme-switch-content{
+  opacity:0;transition:opacity .16s ease-in;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-brand{
+  font-family:"SD Serif",Georgia,serif;font-size:clamp(19px,4.5vw,28px);
+  letter-spacing:.17em;font-weight:500;color:#d7b67d;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-rule{
+  width:72px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#d9b77b,transparent);
+}
+#sdThemeSwitchOverlay .sd-theme-switch-message{
+  font-size:clamp(14px,3.8vw,17px);letter-spacing:.07em;font-weight:600;color:#f7f4ef;
+}
+#sdThemeSwitchOverlay .sd-theme-switch-note{
+  font-size:12px;letter-spacing:.04em;color:rgba(247,244,239,.67);
+}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-brand{color:#906b3f}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-rule{
+  background:linear-gradient(90deg,transparent,#a67e4a,transparent);
+}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-message{color:#173449}
+#sdThemeSwitchOverlay[data-origin="light"] .sd-theme-switch-note{color:#547083}
+/* All elements underlying the opaque sheet commit directly to the target.
+   Switching hundreds of independent transitions is what caused flicker. */
+html.sd-theme-overlay-active,
+html.sd-theme-overlay-active body{transition:none!important;}
+html.sd-theme-overlay-active body .theme-bg,
+html.sd-theme-overlay-active body .nav-wrap .nav,
+html.sd-theme-overlay-active body .mobile-bottom-nav,
+html.sd-theme-overlay-active body .account-drawer,
+html.sd-theme-overlay-active body #accountDrawer .account-action,
+html.sd-theme-overlay-active body #accountDrawer #sdCustomerAuth,
+html.sd-theme-overlay-active body #accountDrawer .account-guest,
+html.sd-theme-overlay-active body .cart-drawer,
+html.sd-theme-overlay-active body .checkout-drawer{transition:none!important}
+/* Approved wallpaper/nav remain frozen through the final dissolve. */
+html.sd-theme-overlay-active body .theme-bg,
+html.sd-theme-overlay-active body .nav-wrap .nav,
+html.sd-theme-overlay-active body .mobile-bottom-nav{transition:none!important}
+@media(prefers-reduced-motion:reduce){
+  #sdThemeSwitchOverlay,#sdThemeSwitchOverlay .sd-theme-switch-content{transition:none!important}
+}
+
+/* Mobile theme-switch raster isolation. Applied ONLY behind the fully opaque
+   transition screen and removed before revealing the approved Liquid Glass. */
+@media(max-width:760px){
+  html.sd-theme-repaint-isolated body :is(
+    .glass,.glass-soft,.nav,.mobile-bottom-nav,.product-card,.account-drawer,
+    .cart-drawer,.checkout-drawer,.sdh-glass-card,.search-field,.mosaic-card,
+    .contact-link,.service-strip,.service-copy,.footer,.custom-text,
+    .custom-image,.detail-modal,.detail-image-stage,.sd-fullscreen-viewer,
+    .promise-tag,.product-overlay-panel,.cart-row,.nav-wrap
+  ){
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  html.sd-theme-repaint-isolated body .theme-bg{filter:none!important}
+  html.sd-theme-overlay-active body .sd-code-hero .sdh-cta--zalo::before{
+    animation-play-state:paused!important;
+  }
+}
+
+</style>
+<link rel="preload" href="/customer-auth.css?v=google-only-20261104" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/customer-auth.css?v=google-only-20261104"></noscript>
 <script type="module" src="/customer-auth-ui.js?v=google-only-20261104"></script>
 <title>SinDarealest | Giày, ví, túi và thời trang da cá sấu</title>
 <script id="sd-seo-category-copy" type="application/json">{"all":{"heading":"Tất cả sản phẩm","title":"Sản phẩm da cá sấu: giày, ví, túi | SinDarealest","description":"Khám phá bộ sưu tập thời trang da cá sấu SinDarealest: giày nam, ví, thắt lưng, túi và phụ kiện. Xem mẫu và tư vấn đặt theo yêu cầu.","intro":"Khám phá thiết kế giày, ví, túi và phụ kiện tại SinDarealest. Chọn danh mục để xem sản phẩm phù hợp."},"sneaker":{"heading":"Giày thể thao da cá sấu","title":"Giày thể thao da cá sấu nam | SinDarealest","description":"Khám phá giày thể thao da cá sấu nam tại SinDarealest. Xem các mẫu sneaker, chi tiết thiết kế và tư vấn đặt sản phẩm theo yêu cầu.","intro":"Khám phá những mẫu sneaker da cá sấu dành cho nam, kết hợp phong cách năng động và dấu ấn riêng."},"giayluoi":{"heading":"Giày lười da cá sấu","title":"Giày lười da cá sấu nam | SinDarealest","description":"Xem các mẫu giày lười da cá sấu nam tại SinDarealest. Tìm hiểu kiểu dáng, chi tiết sản phẩm và tư vấn lựa chọn theo phong cách của bạn.","intro":"Giày lười da cá sấu hướng đến sự linh hoạt khi phối đồ, từ trang phục hằng ngày đến các dịp gặp gỡ."},"giaytay":{"heading":"Giày tây da cá sấu","title":"Giày tây da cá sấu nam | SinDarealest","description":"Khám phá giày tây da cá sấu nam của SinDarealest. Tham khảo thiết kế giày lịch lãm, thông tin sản phẩm và tư vấn đặt theo yêu cầu.","intro":"Các thiết kế giày tây da cá sấu dành cho phong cách chỉn chu, lịch lãm và cá tính."},"thatlung":{"heading":"Thắt lưng da cá sấu","title":"Thắt lưng da cá sấu nam, dây nịt | SinDarealest","description":"Khám phá thắt lưng da cá sấu nam, dây nịt da cá sấu tại SinDarealest. Xem mẫu, chi tiết phụ kiện và tư vấn lựa chọn theo nhu cầu.","intro":"Thắt lưng da cá sấu và dây nịt dành cho người chú trọng vẻ đẹp của chất liệu và từng chi tiết."},"dep":{"heading":"Dép da cá sấu","title":"Dép da cá sấu nam | SinDarealest","description":"Tham khảo các mẫu dép da cá sấu nam tại SinDarealest. Khám phá thiết kế, hình ảnh sản phẩm và nhận tư vấn phù hợp với phong cách sử dụng.","intro":"Dép da cá sấu với những lựa chọn kiểu dáng phù hợp phong cách thoải mái, tinh tế."},"daydongho":{"heading":"Dây đồng hồ da cá sấu","title":"Dây đồng hồ da cá sấu | SinDarealest","description":"Khám phá dây đồng hồ da cá sấu tại SinDarealest. Xem mẫu dây và liên hệ tư vấn về kích thước, kiểu dáng phù hợp với đồng hồ của bạn.","intro":"Khám phá dây đồng hồ da cá sấu và lựa chọn kiểu dáng phù hợp với chiếc đồng hồ yêu thích."},"oplung":{"heading":"Ốp điện thoại da cá sấu","title":"Ốp điện thoại da cá sấu | SinDarealest","description":"Tìm hiểu các mẫu ốp điện thoại da cá sấu tại SinDarealest. Xem thiết kế, hình ảnh và liên hệ tư vấn theo dòng máy sử dụng.","intro":"Những mẫu ốp điện thoại mang phong cách da cá sấu, được lựa chọn theo từng dòng máy."},"vinam":{"heading":"Ví da cá sấu nam","title":"Ví da cá sấu nam, ví cá sấu thật | SinDarealest","description":"Khám phá ví da cá sấu nam tại SinDarealest. Tham khảo ví gập, chi tiết thiết kế, màu sắc và nhận tư vấn để chọn mẫu phù hợp.","intro":"Ví da cá sấu nam với những lựa chọn về kiểu dáng, đường nét và chi tiết sử dụng hằng ngày."},"vicamtay":{"heading":"Ví cầm tay da cá sấu","title":"Ví cầm tay da cá sấu | SinDarealest","description":"Xem các mẫu ví cầm tay da cá sấu tại SinDarealest. Khám phá kiểu dáng, hình ảnh và thông tin thiết kế để tìm phụ kiện phù hợp.","intro":"Ví cầm tay da cá sấu tạo điểm nhấn gọn gàng cho phong cách cá nhân."},"caplaptop":{"heading":"Cặp laptop da cá sấu","title":"Cặp laptop, túi công sở da cá sấu | SinDarealest","description":"Khám phá cặp laptop, túi công sở và phụ kiện mang phong cách da cá sấu tại SinDarealest. Xem mẫu cặp, thiết kế và kích thước.","intro":"Cặp laptop và phụ kiện công sở dành cho nhu cầu mang theo thiết bị với phong cách riêng."},"clutch":{"heading":"Clutch da cá sấu","title":"Túi clutch da cá sấu, ví dự tiệc | SinDarealest","description":"Khám phá túi clutch da cá sấu tại SinDarealest. Xem mẫu túi cầm tay, kiểu dáng và chi tiết sản phẩm cho những dịp cần điểm nhấn.","intro":"Clutch da cá sấu với thiết kế cầm tay tinh gọn, tạo điểm nhấn khi phối trang phục."},"mu":{"heading":"Mũ thời trang và phụ kiện","title":"Mũ thời trang và phụ kiện | SinDarealest","description":"Khám phá danh mục mũ thời trang và phụ kiện của SinDarealest. Xem thiết kế, hình ảnh và chi tiết từng sản phẩm.","intro":"Các mẫu mũ và phụ kiện thời trang bổ sung nét cá tính cho phong cách SinDarealest."},"tuideocheo":{"heading":"Túi đeo chéo da cá sấu","title":"Túi đeo chéo da cá sấu | SinDarealest","description":"Xem các mẫu túi đeo chéo da cá sấu tại SinDarealest. Khám phá kiểu dáng, hình ảnh và chi tiết túi để lựa chọn theo nhu cầu.","intro":"Túi đeo chéo da cá sấu kết hợp tính tiện dụng cùng dấu ấn thiết kế riêng."},"tuigolf":{"heading":"Túi golf da cá sấu","title":"Túi golf da cá sấu, phụ kiện golf | SinDarealest","description":"Khám phá túi golf da cá sấu và phụ kiện golf tại SinDarealest. Tham khảo hình ảnh, thiết kế và thông tin sản phẩm.","intro":"Túi golf và phụ kiện dành cho người yêu thích sự chỉn chu trong phong cách thể thao."},"tuinu":{"heading":"Túi da cá sấu nữ","title":"Túi da cá sấu nữ, túi xách nữ | SinDarealest","description":"Khám phá túi da cá sấu nữ tại SinDarealest. Xem mẫu túi xách, thiết kế, màu sắc và liên hệ tư vấn lựa chọn theo phong cách.","intro":"Túi da cá sấu nữ với những lựa chọn thiết kế cho phong cách thanh lịch và cá tính."}}</script>
@@ -6359,20 +6547,17 @@ init().then(finishStorefrontStartup,finishStorefrontStartup);
   const h=height+'px',g=gap+'px',w=drawer.clientWidth+'px';
   const pt=(Number.parseFloat(computed.paddingTop)||0)+'px';
   const pl=(Number.parseFloat(computed.paddingLeft)||0)+'px';
-  for(const [name,value] of [
+  const footer=drawer.id==='checkoutDrawer'?drawer.querySelector('.sd-checkout-footer'):null;
+  const footerHeight=footer?footer.getBoundingClientRect().height:0;
+  const values=[
    ['--sd-native-glass-height',h],['--sd-native-glass-gap',g],
    ['--sd-native-glass-width',w],['--sd-native-glass-pad-top',pt],
    ['--sd-native-glass-pad-left',pl]
-  ])if(drawer.style.getPropertyValue(name)!==value)drawer.style.setProperty(name,value);
-  if(drawer.id==='checkoutDrawer'){
-   const footer=drawer.querySelector('.sd-checkout-footer');
-   if(footer){
-    const footerHeight=footer.getBoundingClientRect().height;
-    const measured=footerHeight+'px';
-    if(footerHeight>0&&drawer.style.getPropertyValue('--sd-checkout-footer-height')!==measured)
-     drawer.style.setProperty('--sd-checkout-footer-height',measured);
-   }
-  }
+  ];
+  if(footerHeight>0)values.push(['--sd-checkout-footer-height',footerHeight+'px']);
+  // Read all geometry before writing CSS variables to avoid a forced layout.
+  for(const [name,value] of values)
+   if(drawer.style.getPropertyValue(name)!==value)drawer.style.setProperty(name,value);
  };
  if(typeof ResizeObserver==='function'){
   const observer=new ResizeObserver(entries=>entries.forEach(({target})=>{
