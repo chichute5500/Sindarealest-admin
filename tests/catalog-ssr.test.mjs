@@ -153,6 +153,6 @@ assert.ok(observedFeatured.includes('#featuredGrid .feature-slide:first-child[da
 assert.ok(observedFeatured.includes('#featuredGrid .feature-single[data-src]'),
  "Hydrated single feature photo must load when near the viewport");
 assert.match(storefront,/if\(typeof activateCatalogImages==='function'\)activateCatalogImages\(\);bindReveal\(\$\('#featuredGrid'\)\)/,
- "Initial featured hydration must bind the image observer");
+assert.match(storefront,/if\\(typeof activateCatalogImages==='function'\\)activateCatalogImages\\(\\);\\s*bindReveal\\(grid\\)/,
 assert.doesNotMatch(featuredFunction, /class="feature-slide" src="/,
  "Offscreen first featured photo may not bypass the observer");
