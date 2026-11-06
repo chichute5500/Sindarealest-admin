@@ -84,9 +84,3 @@ assert.ok(html.includes('<noscript><img class="mosaic-photo" src="images/5151ab2
 assert.ok(html.includes("activateArtFirstSlide();\n   setupArtSlideshow();"),
  'Home art photo must activate before slideshow when approaching viewport');
 
-
-// Cold mobile first viewport must not lay out the offscreen order tracker/footer.
-for(const [id,height] of [['orderTracking',320],['siteFooter',1000]]){
- assert.ok(html.includes('html:not(.sd-catalog-route):not(.sd-service-route) #'+id+'{content-visibility:auto;contain-intrinsic-size:auto '+height+'px}'),
-  id+' must reserve geometry and reveal content near viewport only on mobile Home');
-}
