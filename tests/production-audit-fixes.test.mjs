@@ -20,7 +20,7 @@ assert.doesNotMatch(store,/class="theme-watermark"/,
   'An invisible full-screen decorative watermark must not steal LCP or network bandwidth');
 assert.doesNotMatch(store,/@keyframes sdLiquidGlassDrift/,
   'Do not animate a full-viewport background transform: Lighthouse attributed CLS 1.0 to it');
-assert.match(store,/html\.js-enabled body\.welcome-active main\{visibility:hidden!important\}\\s*html\.js-enabled body\.welcome-active main\{display:none!important\}/,
+assert.match(store,/html\.js-enabled body\.welcome-active main\{visibility:hidden!important\}\s*html\.js-enabled body\.welcome-active main\{display:none!important\}/,
   'Background storefront layout must stay visually hidden under the opaque Welcome splash');
 assert.match(store,/height:min\(700px,calc\(100dvh - 16px\)\)!important;/,
   'Mobile Welcome must reserve its centered content box to prevent first-paint shifts');
