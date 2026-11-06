@@ -15,7 +15,7 @@ concurrency:
 jobs:
   preview-qa:
     if: github.event_name == 'push' && github.ref_name == 'fix/storefront-mobile-critical-requests-20261104'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Playwright 1.56.1 supports Jammy/Noble; ubuntu-latest changed to unsupported 26.04
     timeout-minutes: 40
     env:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
