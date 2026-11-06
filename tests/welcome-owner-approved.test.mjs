@@ -53,10 +53,10 @@ assert.match(html,/init\(\)\.then\(finishStorefrontStartup,finishStorefrontStart
 
 // During the approved 360ms exit, text must clear before the backdrop fades.
 assert.match(performance,/#welcomeSplash\.is-leaving \.welcome-content\{[\s\S]*?opacity:0!important;/);
-assert.match(performance,/#welcomeSplash\\.is-leaving\\{\\n  transition:opacity \\.20s ease \\.10s!important/);
-assert.doesNotMatch(performance,/#welcomeSplash(?:\\.is-leaving)?\\{[^}]*visibility\\s*[^;}]*transition/i,
+assert.match(performance,/#welcomeSplash\.is-leaving\{\n  transition:opacity \.20s ease \.10s!important/);
+assert.doesNotMatch(performance,/#welcomeSplash(?:\.is-leaving)?\{[^}]*visibility\s*[^;}]*transition/i,
  'Welcome fade must not animate visibility; opacity ends before the inert splash is removed');
-assert.match(performance,/#welcomeSplash\\.is-leaving\\{opacity:0!important;pointer-events:none!important\\}/,
+assert.match(performance,/#welcomeSplash\.is-leaving\{opacity:0!important;pointer-events:none!important\}/,
  'The transparent Welcome layer cannot intercept input during its final cleanup frame');
 
 // Cold-cache first-paint guard: wait for the correct Noto Serif/Sans glyphs.
