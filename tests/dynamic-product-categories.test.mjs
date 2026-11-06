@@ -32,7 +32,7 @@ const productNameDisplay=runInNewContext(html.slice(categoryNameStart,categoryNa
 const ctx={
  displayProductName:productNameDisplay,
  products:rows,
- categoryLabels:{all:"Tất cả",sneakers:"Sneaker",loafers:"Giày lười",belts:"Thắt lưng"},
+ categoryLabels:{all:"Tất cả",sneakers:"Sneaker",loafers:"Giày lười",belts:"Thắt lưng","vi-nam-nu":"Ví Nam & Nữ","tui-thoi-trang-golf":"Túi Thời Trang & Golf","tui-xach":"Túi Xách"},
  categoryOrder:["all","sneakers","loafers","dress-shoes","belts","vi-nam-nu","sandals","watch-straps","phone-cases","cap-tab-laptop","tui-thoi-trang-golf","mu","tui-xach"],
  canonicalCategoryKey:value=>({wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"}[String(value||"").toLowerCase()]||String(value||"").toLowerCase()),
  selectedCategory:"missing-from-new-upload",
