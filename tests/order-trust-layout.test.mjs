@@ -13,6 +13,10 @@ const grid = gridMatch[1];
 
 assert.equal((grid.match(/<article class="order-step\b/g) || []).length, 4,
   'The process must contain exactly four steps, not six cards.');
+assert.equal((grid.match(/<div class="order-step glass" role="listitem"/g) || []).length, 4,
+  'Each step must use listitem on a generic container.');
+assert.doesNotMatch(grid, /<article\\b[^>]*role="listitem"/,
+  'Do not override native article semantics with listitem roles.');
 assert.match(section, /aria-label="Quy trình đặt hàng gồm bốn bước"/,
   'The process must have an accessible name.');
 for (const label of ['Chọn sản phẩm', 'Xác nhận đơn hàng', 'Đặt cọc & chế tác', 'Nhận hàng & hậu mãi']) {
