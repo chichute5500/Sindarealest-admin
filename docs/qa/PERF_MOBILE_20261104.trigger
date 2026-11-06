@@ -77,3 +77,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: cold trace confirmed inherited main visibility change as full-document style/layout hotspot; candidate uses non-inherited opacity plus inert pointer events while Welcome covers the page. Rerun all four strict Mobile Lighthouse attempts.
 
 2026-11-06: first-cold trace isolates a 92ms Mobile Welcome destination focus repaint and a nonessential initial lookup Turnstile UI request. Candidate removes Mobile destination autofocus and lazily loads the challenge UI when phone lookup is used, with submit-time fail-closed loading and one-button resume preserved. Rerun four strict Mobile Lighthouse attempts and Browser phone-lookup checks.
+
+2026-11-06: [perf-mobile-qa-candidate] First-cold trace maps post-/api/products normalization continuation to a long task before Home featured rendering. Add a paint yield before below-fold Home hydration; no appearance/data changes. Run exact-SHA four-valid-mobile >=90, Desktop, source, Admin, Google, resource guard, welcome, phone lookup and scroll QA; Preview only, keep main untouched.

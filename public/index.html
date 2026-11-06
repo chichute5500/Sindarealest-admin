@@ -5983,6 +5983,9 @@ async function init(){setThemeIcon();syncThemeMeta();setupSystemTheme();$('#year
  // render featured + catalog as before; Home can be opened later without reload.
  const initialCatalogListing=catalogCategoryFromLocation()!==null;
  if(!initialCatalogListing){
+  // Yield after product normalization so the response continuation does not
+  // also render the below-fold Home sections in the same microtask.
+  await yieldPaint();
   // The Home catalog/featured media are well below the first viewport.
   // Let the browser paint between their verified client-hydration stages
   // instead of creating one long main-thread task after /api/products.
