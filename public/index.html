@@ -5279,7 +5279,7 @@ function sdCheckoutResetQrScroll(){
  // persistent scroll listener or interference with later manual scrolling.
  requestAnimationFrame(()=>{reset();requestAnimationFrame(reset)});
 }
-function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected(),payment=sdCheckoutQuote?.paymentInstructions;return selected?{paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total,...(sdCheckoutQuote?.transferReference?{transferReference:sdCheckoutQuote.transferReference,paymentQrImageKey:sdCheckoutQuote.paymentQrImageKey,paymentBankName:payment?.bankName,paymentAccountName:payment?.accountName,paymentAccountNumber:payment?.accountNumber}:{})}:{}}
+function sdCheckoutPaymentPayload(){const selected=sdCheckoutSelected();return selected?{paymentOption:selected.value,quotedTotal:sdCheckoutQuote.total}:{}}
 
 function sdCheckoutReturnToCart(){
  // Cart checkout has a real cart history entry: return without losing selection.
@@ -5616,6 +5616,17 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  const orderNumber=String(result?.orderNumber||''),summary=result?.paymentSummary||{},payment=result?.paymentInstructions,qrUrl=safePaymentQrUrl(payment?.qrImageUrl),amount=payment?.amount;
  const ready=result?.paymentReady===true&&result?.paymentTermsConfirmed===true&&payment?.status==='ready'&&payment?.qrIncludesAmount===false&&Number.isSafeInteger(amount)&&amount>0&&amount<=2000000000&&!!qrUrl&&!!String(payment?.bankName||'').trim()&&!!String(payment?.accountName||'').trim()&&!!String(payment?.accountNumber||'').trim()&&!!String(payment?.transferContent||'').trim();
  const add=(parent,tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;parent.append(node);return node};
+ const sepayReady=deferOrderCode&&result?.paymentProvider==="sepay"&&result?.paymentReady===true&&result?.paymentInstructions?.provider==="sepay";
+ if(sepayReady){
+  add(panel,"h3","","Thanh toán qua SePay");
+  add(panel,"p","sd-sepay-intro","Sau khi tạo đơn, SePay sẽ mở trang thanh toán và tạo QR đúng số tiền. Shop chỉ ghi nhận đã thanh toán khi nhận được IPN xác thực từ SePay.");
+  const amount=Number(result.paymentInstructions.amount);
+  if(Number.isSafeInteger(amount)&&amount>0)add(panel,"p","sd-sepay-amount","Số tiền thanh toán: "+formatVnd(amount));
+  $("#sdCheckoutConfirmWrap").hidden=true;$("#sdCheckoutConfirmNote").hidden=true;$("#sdCheckoutConfirmRange").disabled=true;
+  $("#sdCheckoutDone").hidden=false;$("#sdCheckoutDone").textContent="Tạo đơn & thanh toán →";
+  $("#sdCheckoutConfirmLabel").textContent="Tạo đơn & thanh toán";
+  return;
+ }
  const transferStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-transfer-stage'):panel;
  const orderStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-order-stage'):panel;
  if(deferOrderCode){orderStage.hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--sd-confirm-fill','0px');$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=false;if(!ready)add(transferStage,'h3','','Shop chưa có QR chuyển khoản');}
@@ -5708,6 +5719,17 @@ async function sdCheckoutFinalizeOrder(){
   let result={};try{result=await response.json()}catch{}
   if(!response.ok)throw Error(result.error||'Chưa thể lấy mã đơn. Vui lòng thử lại.');
   sdCheckoutOrderCreated=true;await saveCheckoutAddressFromForm();
+  if(result.paymentProvider==='sepay'&&result.paymentReady===true&&result.sepayCheckout?.url&&result.sepayCheckout?.fields){
+   rememberOrderRequest(result,items);
+   await saveCheckoutAddressFromForm();
+   if(checkoutFromCart){for(const item of items){const key=cartKey(item.id,item.option||'');const left=Number(cart[key]||0)-item.quantity;if(left>0)cart[key]=left;else{delete cart[key];cartUnchecked.delete(key)}}saveCart()}
+   checkoutItemsOverride=null;formResetCheckout();renderCart();
+   const gateway=new URL(result.sepayCheckout.url);
+   if(gateway.protocol!=='https:'||!['pay.sepay.vn','sandbox.pay.sepay.vn'].includes(gateway.hostname))throw Error('Địa chỉ thanh toán SePay không hợp lệ.');
+   const paymentForm=document.createElement('form');paymentForm.method='POST';paymentForm.action=gateway.toString();paymentForm.hidden=true;
+   for(const [name,value] of Object.entries(result.sepayCheckout.fields)){if(!/^[a-z_]{1,40}$/.test(name))throw Error('Thông tin biểu mẫu thanh toán không hợp lệ.');const input=document.createElement('input');input.type='hidden';input.name=name;input.value=String(value);paymentForm.append(input)}
+   document.body.append(paymentForm);paymentForm.submit();return;
+  }
   renderPaymentInstructions(result,result.orderAccessToken||'',{deferOrderCode:true});
   rememberOrderRequest(result,items);
   if(checkoutFromCart){for(const item of items){const key=cartKey(item.id,item.option||'');const left=Number(cart[key]||0)-item.quantity;if(left>0)cart[key]=left;else{delete cart[key];cartUnchecked.delete(key)}}saveCart()}
@@ -5761,10 +5783,10 @@ $('#paymentInstructions').hidden=true;const items=sdCheckoutItems();if(!items.le
  if(sdCheckoutQuote?.quoteReady===true)await sdCheckoutLoadPaymentInstructions();
  const selected=sdCheckoutSelected(),quote=sdCheckoutQuote||{},choice=selected||null;
  const summary=choice?{total:quote.total,paymentOption:choice.value,requiredAmount:choice.amount,discountAmount:choice.discountAmount||0,netReceivedAmount:0,shortfall:choice.amount,overpaidAmount:0,codRemaining:choice.codExpected,codReceivedAmount:0}:{};
- const preview={paymentReady:quote.paymentReady===true,paymentTermsConfirmed:Boolean(choice),paymentInstructions:quote.paymentInstructions||null,paymentSummary:summary,message:quote.reason||'Thông tin thanh toán đã sẵn sàng. Đơn hàng chỉ được tạo khi bạn lấy mã đơn.'};
+ const preview={paymentReady:quote.paymentReady===true,paymentTermsConfirmed:Boolean(choice),paymentInstructions:quote.paymentInstructions||null,paymentProvider:quote.paymentProvider||'',paymentSummary:summary,message:quote.reason||'Thông tin thanh toán đã sẵn sàng.'};
  // Remove the old payment-choice scroll position before mounting QR content.
  $('#checkoutDrawer').scrollTop=0;form.scrollTop=0;
- renderPaymentInstructions(preview,'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent=quote.paymentReady?'Chờ thanh toán':'Thông tin đặt hàng';$('#sdCheckoutStepSubtitle').textContent=quote.paymentReady?'Quét QR và chuyển khoản. Đơn hàng chỉ được tạo khi lấy mã đơn.':'Đơn hàng chỉ được tạo khi bạn chọn lấy mã đơn.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#sdCheckoutReviewAddressRow').hidden=true;$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=!$('#sdCheckoutConfirmWrap').hidden;$('#sdCheckoutDone').textContent='Lấy mã đơn →';sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll();sdCheckoutScheduleSuccessTitleAlign();
+ renderPaymentInstructions(preview,'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent=quote.paymentProvider==='sepay'?'Thanh toán qua SePay':quote.paymentReady?'Chờ thanh toán':'Thông tin đặt hàng';$('#sdCheckoutStepSubtitle').textContent=quote.paymentProvider==='sepay'?'SePay sẽ mở trang thanh toán và tạo QR đúng số tiền.':'Đơn hàng chỉ được tạo khi bạn tiếp tục.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#sdCheckoutReviewAddressRow').hidden=true;$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=!$('#sdCheckoutConfirmWrap').hidden;$('#sdCheckoutDone').textContent=quote.paymentProvider==='sepay'?'Tạo đơn & thanh toán →':'Lấy mã đơn →';sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll();sdCheckoutScheduleSuccessTitleAlign();
 }catch(error){message.textContent=error.message||'Chưa thể chuẩn bị thông tin thanh toán.'}finally{button.disabled=false;if(!sdCheckoutSuccess)button.textContent=sdCheckoutSubmitLabel()}});
 $('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&panel?.dataset.stage==='transfer'){void sdCheckoutFinalizeOrder();return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,option=selectedDetailOption(currentProduct);if(!id||option===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){showToast('Chọn đặt cọc 30% hoặc thanh toán hết giảm 5% trước.');$('#sdDetailPaymentQuote')?.scrollIntoView({behavior:'smooth',block:'center'});return}closeDetail(false,false);openCheckout({items:[{id,option,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
 $('#detailZoom').addEventListener('click',openFullscreenImage);
