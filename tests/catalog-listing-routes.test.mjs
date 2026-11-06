@@ -13,17 +13,19 @@ const fakeContext=path=>({
 });
 assert.equal(catalogListingPath(),'/sanpham');
 assert.equal(catalogListingPath('dress-shoes'),'/sanpham/giaytay');
-assert.equal(catalogListingPath('vi-cam-tay'),'/sanpham/vicamtay');
+assert.equal(catalogListingPath('vi-cam-tay'),'/sanpham/vinamnu');
+assert.equal(catalogListingPath('tui-golf'),'/sanpham/tuithoitrang-golf');
+assert.equal(catalogListingPath('tui-nu'),'/sanpham/tuixach');
 assert.equal(productCategoryRouteSlug('phone-cases'),'oplung');
 assert.ok(isKnownCatalogCategoryRoute('giaytay'));
-for(const [path,canonical] of [['/sanpham','/sanpham'],['/sanpham/giaytay','/sanpham/giaytay'],['/sanpham/vicamtay','/sanpham/vicamtay'],['/sanpham/new-test-bag','/sanpham/new-test-bag']]){
+for(const [path,canonical] of [['/sanpham','/sanpham'],['/sanpham/giaytay','/sanpham/giaytay'],['/sanpham/vinamnu','/sanpham/vinamnu'],['/sanpham/new-test-bag','/sanpham/new-test-bag']]){
  const response=await middleware(fakeContext(path));
  assert.equal(response.status,200,path);
  const text=await response.text();
  assert.ok(text.includes('rel="canonical" href="https://shop.example'+canonical+'"'),path);
  assert.ok(text.includes('Storefront'),path);
 }
-for(const [path,canonical] of [['/sanpham/','/sanpham'],['/sanpham/GIAYTAY','/sanpham/giaytay'],['/sanpham/vida','/sanpham/vinam'],['/sanpham/giay-tay','/sanpham/giaytay']]){
+for(const [path,canonical] of [['/sanpham/','/sanpham'],['/sanpham/GIAYTAY','/sanpham/giaytay'],['/sanpham/vida','/sanpham/vinamnu'],['/sanpham/vinam','/sanpham/vinamnu'],['/sanpham/vicamtay','/sanpham/vinamnu'],['/sanpham/tuigolf','/sanpham/tuithoitrang-golf'],['/sanpham/tuideocheo','/sanpham/tuithoitrang-golf'],['/sanpham/tuinu','/sanpham/tuixach'],['/sanpham/giay-tay','/sanpham/giaytay']]){
  const response=await middleware(fakeContext(path));
  assert.equal(response.status,301,path);
  assert.equal(response.headers.get('location'),'https://shop.example'+canonical,path);
@@ -53,12 +55,12 @@ assert.ok(front.indexOf(verificationTag)>front.indexOf('<head>')&&front.indexOf(
 assert.ok(front.includes('href="/sanpham"'));
 
 // Crawlable category navigation exists in the initial HTML, even before
-// loading product data via JavaScript; all 15 canonical categories are linked.
+// loading product data via JavaScript; all 12 merged catalog groups are linked.
 const staticNav=front.match(/<nav class="filter-pills" id="categoryFilters"[^>]*>([\s\S]*?)<\/nav>/);
 assert.ok(staticNav, "Server HTML must expose category links before JavaScript");
 const staticHrefs=[...staticNav[1].matchAll(/<a class="filter-pill tap-target" href="([^"]+)"[^>]*>/g)].map(m=>m[1]);
 const canonicalCategories=[...new Set(Object.values(PRODUCT_CATEGORY_ROUTE_SLUGS))].map(slug=>'/sanpham/'+slug);
-assert.equal(staticHrefs.length,16,"15 category links plus /sanpham");
+assert.equal(staticHrefs.length,13,"12 category links plus /sanpham");
 assert.deepEqual(staticHrefs.slice().sort(),['/sanpham',...canonicalCategories].sort());
 assert.equal(new Set(staticHrefs).size,staticHrefs.length, "Do not repeat legacy category URLs");
 assert.ok(front.includes('<a class="filter-pill tap-target'),"Dynamic category filters must use semantic links");
