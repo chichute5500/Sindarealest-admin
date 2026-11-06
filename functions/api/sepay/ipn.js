@@ -21,8 +21,9 @@ export async function onRequestPost({request,env}) {
   if(payload.order?.order_status!=="CAPTURED"||payload.transaction?.transaction_status!=="APPROVED"||
      payload.transaction?.transaction_type!=="PAYMENT"||payload.order?.order_currency!=="VND"||
      payload.transaction?.transaction_currency!=="VND"||!orderAmount||orderAmount!==transactionAmount)return fail("Trạng thái hoặc số tiền IPN không khớp.",409,noStore);
+  let checkout=null;
   try {
-    const checkout=await env.DB.prepare(
+    checkout=await env.DB.prepare(
       "SELECT id,order_id,amount,status FROM sepay_payment_orders WHERE order_invoice_number=? LIMIT 1"
     ).bind(invoice).first();
     if(!checkout)return fail("Không tìm thấy hóa đơn SePay.",404,noStore);
