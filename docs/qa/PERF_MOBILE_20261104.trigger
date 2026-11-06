@@ -55,3 +55,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-05: [perf-mobile-qa-candidate] Measurement-isolation test: two exact-SHA runs after expanded Playwright browser QA showed only Lighthouse attempt #1 TBT 880/720ms and the later 3 mobile attempts 90-260ms, all Browser QA PASS. Execute Lighthouse before expanded multi-context Playwright, retain all raw scores and browser assertions and original >=90 each gate. Test no-JS CSS and 360/430px remained unchanged. Preview-only, no Production writes.
 
 2026-11-06: [perf-mobile-qa-candidate] Merge current main warranty/Turnstile fixes into PR169 with no Production writes; isolate remaining first-cold mobile TBT and save Chrome DevTools first-sample trace on exact SHA. Do not lower strict mobile >=90 gate or change Owner-approved UI/SEO; QA isolated Preview only.
+
+2026-11-06: [perf-mobile-qa-candidate] CI-only rerun on pinned ubuntu-24.04 after github ubuntu-latest switched to ubuntu26.04 incompatible with Playwright 1.56.1; preserve first-run DevTools trace, full browser QA and >=90 mobile all-valid gate; main/Production unchanged.
