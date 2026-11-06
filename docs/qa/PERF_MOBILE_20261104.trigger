@@ -91,3 +91,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] Retry exact-SHA mobile trace after initial trigger commit lacked the required commit-message marker; no source or threshold change.
 
 2026-11-06: [perf-mobile-qa-candidate] Use string assertions for the scoped font CSS selectors after fixing regex escaping; rerun exact current source.
+
+2026-11-06: [perf-mobile-qa-candidate] Split featured carousel card construction into paint-separated fragments; update slow-font check to observe the scoped Welcome state. Preserve content and visual output; verify strict cold-run mobile gate.
