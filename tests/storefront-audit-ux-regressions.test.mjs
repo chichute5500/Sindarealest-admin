@@ -4,6 +4,8 @@ const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
 assert.equal([...html.matchAll(/<main\b/g)].length,1,'Only one main landmark is present.');
 assert.match(html,/<div id="notFoundPage" class="not-found-page"/,'Retain 404 UX without a second main');
 assert.match(html,/id="orderDetailsPanel" class="order-details-panel">/,'Order guide is visible from initial HTML.');
+assert.equal([...html.matchAll(/<div class="order-step glass" role="listitem"/g)].length,4,'Order steps use listitem roles on allowed generic containers');
+assert.doesNotMatch(html,/<article\b[^>]*\brole="listitem"/,'Do not override native article semantics with listitem roles');
 assert.doesNotMatch(html,/ensureOrderGuideOpen|orderDetailsToggle/,'Order guide does not need click-to-expand.');
 assert.match(html,/#detailOrderLink'\)\.addEventListener\('click',[^\n]*location\.hash='order'/,'Product detail link still scrolls to order guide.');
 assert.match(html,/async function consultProduct\(id\)[^\n]*optionText=option\?/,'Zalo product message includes selected variant');
