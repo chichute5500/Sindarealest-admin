@@ -217,6 +217,17 @@ export async function onRequest(context) {
     for (const key of ["Content-Length","Content-Encoding","ETag"]) headers.delete(key);
     return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
   }
+  // Serve the exact Google Search Console ownership file at its required root URL.
+  if (url.pathname === "/googleded292a3607df9dd.html") {
+    return new Response("google-site-verification: googleded292a3607df9dd.html", {
+      status: 200,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=300",
+        "X-Content-Type-Options": "nosniff"
+      }
+    });
+  }
   const legacyMatch = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   const modernMatch = url.pathname.match(/^\/sanpham\/([a-z0-9][a-z0-9-]{0,99})\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
   if (!legacyMatch && !modernMatch) {
