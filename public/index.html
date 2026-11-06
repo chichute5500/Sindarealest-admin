@@ -774,7 +774,7 @@ html.dark #welcomeSplash .welcome-logo-frame{
    physical browser viewport, without the double scrollbar in desktop Chrome.
    This scope does NOT alter locked Hero, product gallery or the Admin UI. */
 html:has(body.welcome-active){overflow:hidden!important;scroll-behavior:auto!important}
-body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important}
+body.welcome-active{min-height:100dvh!important;overflow:hidden!important;overscroll-behavior:none!important}
 /* With JavaScript disabled the Welcome timer cannot dismiss itself. Keep
    public SSR catalog and native links scrollable instead of locking the page.
    Normal JS visitors retain the exact Owner-approved Welcome and its timing. */

@@ -12,7 +12,9 @@ assert.ok(base.includes('background:transparent'),'First paint must be transpare
 assert.ok(base.includes('border:0;')&&base.includes('backdrop-filter:none;')&&base.includes('box-shadow:none;'));
 assert.ok(!base.includes('background:var(--welcome-panel)'));
 assert.ok(performance.includes('html:has(body.welcome-active){overflow:hidden!important'));
-assert.ok(performance.includes('body.welcome-active{height:100dvh!important'));
+assert.ok(performance.includes('body.welcome-active{min-height:100dvh!important;overflow:hidden!important'));
+assert.ok(!performance.includes('body.welcome-active{height:100dvh!important'),
+ 'Keep the underlying document at its natural content height while Welcome covers and locks the viewport');
 assert.ok(performance.includes('height:100dvh!important;max-height:100dvh!important'));
 assert.ok(performance.includes('animation:sdWelcomeLite .36s ease-out both!important'));
 assert.ok(performance.includes('@media(min-width:761px)'));
