@@ -99,14 +99,14 @@ const sample=[
 ];
 const state={
  location:{pathname:'/sanpham/giaytay',hash:''},
- products:sample,routeSlug:productCategoryRouteSlug,
+ products:sample,routeSlug:productCategoryRouteSlug,canonicalCategoryKey:value=>({'vi-cam-tay':'vi-nam-nu'}[value]||value),
  history:{calls:[],pushState(obj,title,path){this.calls.push(path);state.location.pathname=path}},
  selectedCategory:'all',page:2,
  renderFilters(){},renderCatalog(){},setActiveNav(){},$:()=>({scrollIntoView(){}}),
 };
 let ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
 assert.equal(ret,'dress-shoes');
-state.location.pathname='/sanpham/vinamnu';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",{...state,canonicalCategoryKey:value=>({'vi-cam-tay':'vi-nam-nu'}[value]||value)});
+state.location.pathname='/sanpham/vinamnu';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
 assert.equal(ret,'vi-nam-nu');
 state.location.pathname='/sanpham';ret=runInNewContext(functions+"\ncatalogCategoryFromLocation()",state);
 assert.equal(ret,'all');
