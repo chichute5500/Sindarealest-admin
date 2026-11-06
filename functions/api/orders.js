@@ -1,7 +1,7 @@
-import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
+import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, parseProductOptions, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
 import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment, validPublicQrImageKey, checkoutTransferSku, checkoutTransferReferenceMatches } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
-import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
+import { normalizeProductOption, normalizeProductSize, normalizeProductImageVariant, productOptionKind, productOptionLabel } from "../_product-options.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
 const phoneOk = (value) => {
@@ -35,14 +35,14 @@ export async function onRequestPost({ request, env }) {
   const totalsById = new Map();
   for (const item of body.items) {
     const id = clean(item?.id, 100), quantity = Number(item?.quantity);
-    if (!id || !Number.isInteger(quantity) || quantity < 1 || quantity > 50 || (item?.option != null && typeof item.option !== "string")) return fail("Sản phẩm, lựa chọn hoặc số lượng không hợp lệ.");
-    requested.push({ id, quantity, option: item?.option ?? "" });
+    if (!id || !Number.isInteger(quantity) || quantity < 1 || quantity > 50 || (item?.option != null && typeof item.option !== "string") || (item?.sizeOption != null && typeof item.sizeOption !== "string") || (item?.imageVariant != null && typeof item.imageVariant !== "string")) return fail("Sản phẩm, lựa chọn hoặc số lượng không hợp lệ.");
+    requested.push({ id, quantity, option: item?.option ?? "", sizeOption: item?.sizeOption ?? "", imageVariant: item?.imageVariant ?? "" });
     totalsById.set(id, (totalsById.get(id) || 0) + quantity);
   }
   if ([...totalsById.values()].some(q => q > 50)) return fail("Số lượng mỗi sản phẩm tối đa là 50.");
   try {
     const ids = [...totalsById.keys()];
-    const rows = await env.DB.prepare(`SELECT id,sku,sku_verified,title,category,price,stock,published,source_price_confirmed,fulfillment_type FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
+    const rows = await env.DB.prepare(`SELECT id,sku,sku_verified,title,category,price,stock,published,source_price_confirmed,fulfillment_type,images_json FROM products WHERE id IN (${ids.map(() => "?").join(",")})`).bind(...ids).all();
     const byId = new Map((rows.results || []).map(p => [p.id, p]));
     if (byId.size !== ids.length || ids.some(id => !byId.has(id) || Number(byId.get(id).published) !== 1)) return fail("Một hoặc nhiều sản phẩm không còn khả dụng. Vui lòng tải lại danh mục.", 409);
     for (const id of ids) { const product = byId.get(id), stock = product.stock; if (stock !== null && stock !== undefined && totalsById.get(id) > Number(stock)) return fail(`Số lượng yêu cầu của ${Number(product.sku_verified) === 1 ? "SKU " + product.sku : "sản phẩm " + product.title} vượt tồn kho đã ghi nhận. Vui lòng liên hệ cửa hàng để xác nhận.`, 409); }
@@ -52,16 +52,21 @@ export async function onRequestPost({ request, env }) {
     for (const line of requested) {
       const p = byId.get(line.id);
       const option = normalizeProductOption(p.category, line.option);
-      if (option === null) return fail("Vui lòng chọn đúng size, bản dây hoặc dòng điện thoại cho sản phẩm.", 400);
-      const key = JSON.stringify([line.id, option]);
+      const config = parseProductOptions(p.images_json);
+      const sizeOption = normalizeProductSize(config.sizeOptions, line.sizeOption, p.category);
+      const imageVariant = normalizeProductImageVariant(config.imageVariants, line.imageVariant);
+      if (option === null || sizeOption === null || imageVariant === null) return fail("Vui lòng chọn đúng size, màu hoặc thông tin sản phẩm.", 400);
+      const key = JSON.stringify([line.id, option, sizeOption, imageVariant]);
       const previous = selected.get(key);
       if (previous) previous.quantity += line.quantity;
-      else selected.set(key, { id: line.id, option, quantity: line.quantity });
+      else selected.set(key, { id: line.id, option, sizeOption, imageVariant, quantity: line.quantity });
     }
     const showPrices = (await getSetting(env.DB, "show_prices", "0")) === "1";
     const items = [...selected.values()].map(line => {
       const p = byId.get(line.id), quantity = line.quantity;
-      const suffix = productOptionLabel(p.category, line.option);
+      const config = parseProductOptions(p.images_json);
+      const imageChoice = config.imageVariants.find(item => item.image === line.imageVariant);
+      const suffix = [productOptionLabel(p.category, line.option), line.sizeOption, imageChoice?.label ? "Màu " + imageChoice.label : ""].filter(Boolean).join(" · ");
       const rawPrice = p.price;
       const candidatePrice = rawPrice === null || rawPrice === undefined || (typeof rawPrice === "string" && !rawPrice.trim())
         ? null
@@ -70,7 +75,7 @@ export async function onRequestPost({ request, env }) {
         && Number.isSafeInteger(candidatePrice) && candidatePrice >= 0
         ? candidatePrice
         : null;
-      return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, fulfillmentType: normalizeFulfillmentType(p.fulfillment_type), title: p.title + (suffix ? " · " + suffix : ""), shoeSize: productOptionKind(p.category) === "shoe" ? line.option : "", quantity, price: confirmedPrice };
+      return { id: crypto.randomUUID(), productId: p.id, sku: p.sku, skuVerified: Number(p.sku_verified) === 1, fulfillmentType: normalizeFulfillmentType(p.fulfillment_type), title: p.title + (suffix ? " · " + suffix : ""), shoeSize: line.sizeOption || (productOptionKind(p.category) === "shoe" || productOptionKind(p.category) === "watch" ? line.option : ""), imageVariant: line.imageVariant, quantity, price: confirmedPrice };
     });
     const priceKnown = items.every(i => Number.isSafeInteger(i.price) && i.price >= 0);
     const subtotal = priceKnown ? items.reduce((sum, i) => sum + i.price * i.quantity, 0) : null;
@@ -164,7 +169,7 @@ export async function onRequestPost({ request, env }) {
       // warranty lookups receive shoe size without a Production D1 migration.
       if (item.shoeSize) statements.push(env.DB.prepare("INSERT INTO order_item_details(item_id,size) VALUES(?,?)").bind(item.id,item.shoeSize));
     }
-    statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, customerPaymentVerified:false })));
+    statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, itemSelections: items.map(item => ({ itemId: item.id, imageVariant: item.imageVariant || "" })), selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, customerPaymentVerified:false })));
     let paymentRequestWriteIndex=-1;
     if(qrSnapshot){
       paymentRequestWriteIndex=statements.length;

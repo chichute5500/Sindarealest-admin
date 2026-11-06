@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
-import { normalizeProductOption, productOptionKind, productOptionLabel } from '../functions/_product-options.js';
-import { createSession } from '../functions/_lib.js';
+import { normalizeProductOption, normalizeProductSize, normalizeProductImageVariant, supportsProductSpecificSize, productOptionKind, productOptionLabel } from '../functions/_product-options.js';
+import { createSession, parseImages, parseProductOptions, serializeProductImages, validateProduct } from '../functions/_lib.js';
 import { onRequestPost as createOrder } from '../functions/api/orders.js';
 import { onRequestPost as quoteCheckout } from '../functions/api/checkout-quote.js';
 import { onRequestGet as adminOrders } from '../functions/api/admin/orders.js';
@@ -25,6 +25,30 @@ for(const category of ['sandals','sandal','Dép','dep','dep-quai-ngang']){
 assert.equal(productOptionLabel('sandals','41'),'Size 41');
 assert.equal(normalizeProductOption('belts','3.5'),'3.5');
 assert.equal(normalizeProductOption('belts','4.0'),'4.0');
+assert.equal(productOptionKind('watch-straps'),'watch');
+assert.equal(normalizeProductOption('watch-straps','20-18'),'20-18');
+for(const invalid of ['20','20-18 mm','20/18','20-180'])assert.equal(normalizeProductOption('watch-straps',invalid),null);
+assert.equal(productOptionLabel('watch-straps','20-18'),'Kích thước dây: 20-18 mm');
+assert.equal(normalizeProductSize(['20 × 10 × 3 cm'],''),'20 × 10 × 3 cm','A single product size is informational and auto-selected');
+assert.equal(normalizeProductSize(['20 × 10 × 3 cm','22 × 12 × 4 cm'],''),null,'Multiple sizes require customer selection');
+assert.equal(normalizeProductSize(['20 × 10 × 3 cm','22 × 12 × 4 cm'],'22 × 12 × 4 cm'),'22 × 12 × 4 cm');
+assert.equal(supportsProductSpecificSize('vi-nam-nu'),true);
+assert.equal(supportsProductSpecificSize('tui-xach'),true);
+assert.equal(supportsProductSpecificSize('sneakers'),false);
+assert.equal(normalizeProductSize(['41'],'41','sneakers'),null,'Custom size data must not replace footwear sizing');
+const sizeProduct={sku:'QA-SIZE',title:'Ví thử',category:'vi-nam-nu',description:'',price:100000,stock:null,fulfillmentType:'made_to_order',images:[],sizeOptions:['20 × 10 × 3 cm']};
+assert.ok(validateProduct(sizeProduct).value,'Wallets may have product-specific sizes');
+assert.match(validateProduct({...sizeProduct,sku:'QA-SHOE',category:'sneakers'}).error,/chỉ áp dụng cho ví và túi/,'Shoes must retain their existing standard sizes');
+
+const variants=[{image:'images/brown.webp',label:'Nâu'},{image:'images/black.webp',label:'Đen'}];
+assert.equal(normalizeProductImageVariant(variants,''),null,'Multiple selectable images require customer selection');
+assert.equal(normalizeProductImageVariant(variants,'images/black.webp'),'images/black.webp');
+assert.equal(normalizeProductImageVariant(variants,'images/unknown.webp'),null);
+const serializedImages=serializeProductImages({images:['images/front.webp','/media/12345678-1234-1234-1234-123456789012.webp',...variants.map(item=>item.image)],sizeOptions:['20 × 10 × 3 cm','22 × 12 × 4 cm'],imageVariants:variants});
+assert.deepEqual(parseImages(serializedImages),['images/front.webp','/media/12345678-1234-1234-1234-123456789012.webp','images/brown.webp','images/black.webp']);
+assert.deepEqual(parseProductOptions(serializedImages),{sizeOptions:['20 × 10 × 3 cm','22 × 12 × 4 cm'],imageVariants:variants});
+
+
 assert.equal(normalizeProductOption('belts','3.0'),null);
 assert.equal(normalizeProductOption('phone-cases','iPhone 16 Pro  Max'),'iPhone 16 Pro Max');
 assert.equal(normalizeProductOption('phone-cases',''),null);
@@ -62,6 +86,14 @@ for(let i=0;i<categories.length;i++){
  db.prepare('INSERT INTO products(id,slug,sku,title,category,category_label,price,stock,published,source_price_confirmed,fulfillment_type) VALUES(?,?,?,?,?,?,100000,10,1,1,?)')
    .run('opt-'+i,'opt-'+i,'OPT-'+i,title,category,title,'made_to_order');
 }
+const productMetadata=serializeProductImages({
+ images:['images/wallet-brown.webp','images/wallet-black.webp'],
+ sizeOptions:['20 × 10 × 3 cm','22 × 12 × 4 cm'],
+ imageVariants:[{image:'images/wallet-brown.webp',label:'Nâu'},{image:'images/wallet-black.webp',label:'Đen'}]
+});
+db.prepare('INSERT INTO products(id,slug,sku,title,category,category_label,price,stock,published,images_json,source_price_confirmed,fulfillment_type) VALUES(?,?,?,?,?,?,800000,10,1,?,1,?)')
+ .run('opt-custom','opt-custom','OPT-CUSTOM','Ví mẫu','vi-nam-nu','Ví nam & nữ',productMetadata,'made_to_order');
+
 const env={DB,ADMIN_PASSWORD:'FAKE_QA_PASSWORD_NOT_REAL',SESSION_SECRET:'QA-NONPRODUCTION-ONLY-SESSION-SECRET-123456'};
 const body={fullName:'KHACH HANG GIA LAP',phone:'0900000000',address:'Địa chỉ QA giả lập, không giao hàng',items:[]};
 const endpoint='https://qa.invalid/api/orders';
@@ -79,6 +111,9 @@ try {
  assert.equal((await quote([item(6,1,'41')])).status,200,'Payment quote accepts valid sandal size');
  assert.equal((await quote([item(3,1,'4.5')])).status,400,'Payment quote must reject invalid belt width');
  assert.equal((await quote([item(4)])).status,400,'Payment quote must reject missing phone model');
+ assert.equal((await quote([{id:'opt-custom',quantity:1,option:'',sizeOption:'',imageVariant:''}])).status,400,'Payment quote must require the size and selected image for a multi-size product');
+ assert.equal((await quote([{id:'opt-custom',quantity:1,option:'',sizeOption:'22 × 12 × 4 cm',imageVariant:'images/unknown.webp'}])).status,400,'Payment quote must reject an image not configured for the product');
+ db.exec('DELETE FROM public_rate_limits');
  assert.equal((await quote([item(0,1,'42'),item(0,1,'43'),item(3,1,'4.0'),item(4,1,'Samsung Galaxy S25')])).status,200,'Payment quote accepts valid size-specific items');
  const overLimit=await invoke([item(0,40,'42'),item(0,11,'43')]);
  assert.equal(overLimit.status,400,'The 50-piece limit applies to a product across all its sizes');
@@ -103,6 +138,13 @@ try {
  const payload=await admin.json();
  assert.deepEqual(payload.orders[0].items.map(x=>x.title),saved.map(x=>x.title),'Admin receives the exact selected size / belt width / phone model');
  assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
+ db.exec('DELETE FROM public_rate_limits');
+ const customOrder=await invoke([{id:'opt-custom',quantity:1,option:'',sizeOption:'22 × 12 × 4 cm',imageVariant:'images/wallet-black.webp'}]);
+ assert.equal(customOrder.status,201,await customOrder.text());
+ const customItem=db.prepare("SELECT id,title FROM order_items WHERE product_id='opt-custom'").get();
+ assert.equal(customItem.title,'Ví mẫu · 22 × 12 × 4 cm · Màu Đen');
+ const selections=JSON.parse(db.prepare("SELECT details_json FROM audit_logs WHERE entity_type='order' ORDER BY rowid DESC LIMIT 1").get().details_json).itemSelections;
+ assert.equal(selections[0].imageVariant,'images/wallet-black.webp','Order audit snapshot must retain the exact selected product image');
 
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const adminHtml=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
@@ -120,5 +162,8 @@ try {
 
 
  assert.ok(adminHtml.includes("esc(item.title||'Sản phẩm')"));
+ assert.ok(adminHtml.includes("id=\"pSizeOptionsField\" hidden"),'The custom-size field starts hidden until a wallet/bag category is selected');
+ assert.ok(adminHtml.includes("['vi-nam-nu','cap-tab-laptop','tui-thoi-trang-golf','tui-xach'].includes(category)"),'Admin limits custom dimensions to wallet and bag categories');
+
  console.log('PASS: shoes and sandals require sizes 38–44, server validates, SQLite stores sandal size, Admin receives sizes, no Production writes.');
 } finally {db.close()}
