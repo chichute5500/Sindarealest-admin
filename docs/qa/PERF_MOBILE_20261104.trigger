@@ -89,3 +89,5 @@ QA v3: valid candidate Performance >=90 is accepted when Production Lighthouse b
 2026-11-06: [perf-mobile-qa-candidate] Scope Welcome Serif/fallback readiness state to #welcomeSplash to avoid document-wide style invalidation seen in first-cold trace; preserve typography, timing, transition and page layout. Run full exact-SHA Preview/browser/Lighthouse and strict all-four mobile >=90 gate; no Production/main writes.
 
 2026-11-06: [perf-mobile-qa-candidate] Retry exact-SHA mobile trace after initial trigger commit lacked the required commit-message marker; no source or threshold change.
+
+2026-11-06: [perf-mobile-qa-candidate] Use string assertions for the scoped font CSS selectors after fixing regex escaping; rerun exact current source.
