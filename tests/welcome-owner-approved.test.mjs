@@ -110,3 +110,7 @@ assert.ok(welcomeExit.includes('window.requestAnimationFrame(beginFade)') && wel
  'Welcome must use a painted frame before the original leave transition');
 assert.ok(welcomeExit.includes('},360);'),
  'Welcome must retain its approved 360ms exit fade');
+
+// Cold Mobile: initial keyboard focus must be deferred to the first frame,
+// rather than forcing a full-page layout synchronously during HTML parse.
+assert.match(html,/if\(skip\)window\.requestAnimationFrame\(function\(\)\{\s*if\(!closed&&skip\.isConnected\)skip\.focus\(\{preventScroll:true\}\)/);
