@@ -1,300 +1,125 @@
 /**
- * Integration E2E on ONE disposable in-memory D1-compatible SQLite database.
- * Calls the real Cloudflare Pages handlers in order, with real migrations.
- * No Cloudflare credentials, remote API calls, real bank payments or Production writes.
- * Simulated "received" and "refunded" are ONLY invented ledger fixtures.
+ * Disposable end-to-end checkout -> SePay IPN lifecycle.
+ * Uses one in-memory SQLite database and fake sandbox credentials only.
+ * No Cloudflare credentials, real bank transfers, or Production writes.
  */
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
-import { createSession } from '../functions/_lib.js';
-import { hashOrderAccessToken } from '../functions/_payments.js';
-import { onRequestGet as productsGet } from '../functions/api/products.js';
 import { onRequestPost as ordersPost } from '../functions/api/orders.js';
 import { onRequestPost as checkoutQuotePost } from '../functions/api/checkout-quote.js';
-import { onRequestGet as adminOrdersGet, onRequestPatch as adminOrdersPatch } from '../functions/api/admin/orders.js';
 import { onRequestGet as orderPaymentGet } from '../functions/api/order-payment.js';
-import { onRequestGet as adminPaymentGet, onRequestPost as paymentRequestPost, onRequestPatch as paymentRequestPatch } from '../functions/api/admin/payment-requests.js';
-import { onRequestPost as transactionPost } from '../functions/api/admin/payment-transactions.js';
-import { onRequestPut as qrPut } from '../functions/api/admin/payment-qr.js';
-import { onRequestPost as orderTrackingPost } from '../functions/api/order-tracking.js';
-import { onRequestPatch as deliveryPatch } from '../functions/api/admin/order-delivery.js';
-import { onRequestPost as codPost } from '../functions/api/admin/cod-settlements.js';
+import { onRequestPost as receiveIpn } from '../functions/api/sepay/ipn.js';
+import { hashOrderAccessToken } from '../functions/_payments.js';
 
-const db = new DatabaseSync(':memory:');
+const db=new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
-const migrations = [
+for(const migration of [
   '0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql',
   '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
   '0007_order_contact_details.sql','0008_product_sku_verification.sql',
-  '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql'
-];
-for (const migration of migrations)
-  db.exec(readFileSync(new URL('../migrations/'+migration,import.meta.url),'utf8'));
+  '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql',
+  '0019_sepay_payment_gateway.sql'
+]) db.exec(readFileSync(new URL('../migrations/'+migration,import.meta.url),'utf8'));
 const DB={
-  prepare(sql) {
+  prepare(sql){
     let args=[];
-    const stmt={
+    return {
       bind(...params){args=params;return this},
       async first(){return db.prepare(sql).get(...args)||null},
       async all(){return {results:db.prepare(sql).all(...args)}},
       async run(){const result=db.prepare(sql).run(...args);return {success:true,meta:{changes:Number(result.changes)}}},
       execute(){
-        if (/^\s*(?:SELECT|WITH|PRAGMA)\b/i.test(sql)) return {success:true,results:db.prepare(sql).all(...args),meta:{changes:0}};
-        const result=db.prepare(sql).run(...args);
-        return {success:true,meta:{changes:Number(result.changes)}};
+        if(/^\\s*(?:SELECT|WITH|PRAGMA)\\b/i.test(sql))return {success:true,results:db.prepare(sql).all(...args),meta:{changes:0}};
+        const result=db.prepare(sql).run(...args);return {success:true,meta:{changes:Number(result.changes)}};
       }
     };
-    return stmt;
   },
-  async batch(statements) {
+  async batch(statements){
     db.exec('BEGIN IMMEDIATE');
-    try {const results=statements.map(x=>x.execute());db.exec('COMMIT');return results}
+    try{const results=statements.map(statement=>statement.execute());db.exec('COMMIT');return results}
     catch(error){db.exec('ROLLBACK');throw error}
   }
 };
-const SESSION_SECRET='E2E_DISPOSABLE_NOT_A_REAL_SECRET_32_PLUS';
-const session=await createSession(SESSION_SECRET);
-const qrKey='qr-550e8400-e29b-41d4-a716-446655440000.png';
-const fakeObjects=new Map([[qrKey,{size:67}]]);
 const env={
-  DB,IMAGES:{head:async key=>fakeObjects.get(key)||null},
-  ADMIN_PASSWORD:'E2E_ONLY_NOT_PRODUCTION',SESSION_SECRET
+  DB,SESSION_SECRET:'DISPOSABLE_TEST_SECRET_32_CHARS_LONG',
+  SEPAY_ENV:'sandbox',SEPAY_MERCHANT_ID:'MERCHANT_TEST',
+  SEPAY_MERCHANT_SECRET_KEY:'MERCHANT_SECRET_TEST',
+  SEPAY_IPN_SECRET_KEY:'IPN_SECRET_TEST'
 };
-const root='https://qa.invalid';
-const request=(path,method='GET',body,admin=false,origin=root)=>new Request(root+path,{
-  method,headers:{
-    Origin:origin,'Sec-Fetch-Site':'same-origin',
-    ...(admin?{Cookie:'sd_admin_session='+session}:{}),
-    ...(body===undefined?{}:{'Content-Type':'application/json'})
-  },...(body===undefined?{}:{body:JSON.stringify(body)})
+const root='https://shop.example';
+const request=(path,method='GET',body,headers={})=>new Request(root+path,{
+  method,headers:{Origin:root,'Sec-Fetch-Site':'same-origin',...headers,
+    ...(body===undefined?{}:{'Content-Type':'application/json'})},
+  ...(body===undefined?{}:{body:JSON.stringify(body)})
 });
-const invoke=(handler,path,method='GET',body,admin=false,origin=root)=>
-  handler({env,request:request(path,method,body,admin,origin)});
-const one=(text,...args)=>db.prepare(text).get(...args);
-const trace=[];
-async function expectStatus(label,response,predicted) {
-  const status=response.status;
-  trace.push({step:label,http:status,result:status===predicted?'PASS':'FAIL'});
-  if(status!==predicted)throw Error(label+' expected '+predicted+' got '+status+' '+await response.text());
-  return response;
-}
+const invoke=(handler,path,method='GET',body,extraEnv=env,headers={})=>
+  handler({env:extraEnv,request:request(path,method,body,headers)});
 const productId='00000000-1111-4222-8333-000000000085';
-try {
-  db.prepare("INSERT INTO products(id,slug,sku,sku_verified,title,category,category_label,price,stock,published,source_price_confirmed,fulfillment_type) VALUES(?,?,'QA-ORDER-001',1,'Ví giả lập QA','wallets','Ví',150000,5,1,1,'in_stock')")
-    .run(productId,'e2e-qa-wallet');
-  db.prepare("UPDATE settings SET value='1' WHERE key='show_prices'").run();
-  const catalog=await (await expectStatus('Public catalog',await invoke(productsGet,'/api/products'),200)).json();
-  assert.equal(catalog.length,1);
-  assert.equal(catalog[0].price,150000);
-  assert.equal(catalog[0].skuVerified,true);
+db.prepare("INSERT INTO products(id,slug,sku,sku_verified,title,category,category_label,price,stock,published,source_price_confirmed,fulfillment_type) VALUES(?,?,'QA-ORDER-001',1,'Ví giả lập QA','wallets','Ví',150000,5,1,1,'in_stock')")
+  .run(productId,'e2e-qa-wallet');
+db.prepare("UPDATE settings SET value='1' WHERE key='show_prices'").run();
 
-  const checkout={
-    fullName:'KHACH HANG QA (KHONG CO THAT)',phone:'0900000000',
-    address:'Dia chi thu nghiem, KHONG GIAO HANG',
-    note:'DISPOSABLE QA ONLY — khong xu ly thuc te',
-    paymentOption:'full',quotedTotal:150000,
-    items:[{id:productId,quantity:1}]
-  };
-  const noMethod={...checkout};delete noMethod.paymentOption;delete noMethod.quotedTotal;
-  await expectStatus('Reject priced checkout without a selected payment method',await invoke(ordersPost,'/api/orders','POST',noMethod),400);
-  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,0,'method selection is required before creating a priced order');
-  await expectStatus('Reject cross-origin checkout',await invoke(ordersPost,'/api/orders','POST',checkout,false,'https://evil.invalid'),403);
-  const created=await (await expectStatus('Checkout POST -> D1 order',await invoke(ordersPost,'/api/orders','POST',checkout),201)).json();
-  assert.ok(created.orderNumber.startsWith('SD-'));
-  assert.match(created.orderAccessToken,/^[a-f0-9]{64}$/);
-  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,1);
-  const record=one('SELECT id,public_access_token_hash FROM orders WHERE order_number=?',created.orderNumber);
-  assert.equal(record.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
-  assert.ok(!JSON.stringify(record).includes(created.orderAccessToken),'Raw capability token must not be persisted');
-  assert.equal(one('SELECT title FROM order_items WHERE order_id=?',record.id).title,'Ví giả lập QA');
-  assert.equal(one('SELECT full_name FROM order_contact_details WHERE order_id=?',record.id).full_name,checkout.fullName);
-  const adminPath='/api/admin/orders';
-  await expectStatus('Admin denies missing session',await invoke(adminOrdersGet,adminPath),401);
-  await expectStatus('Admin denies CSRF cross-origin',await invoke(adminOrdersGet,adminPath,'GET',undefined,true,'https://evil.invalid'),403);
-  const adminList=await (await expectStatus('Admin receives same order',await invoke(adminOrdersGet,adminPath,'GET',undefined,true),200)).json();
-  const listed=adminList.orders.find(x=>x.order_number===created.orderNumber);
-  assert.ok(listed);
-  assert.equal(listed.items.length,1);
-  assert.equal(listed.items[0].sku,'QA-ORDER-001');
-  assert.equal(listed.items[0].unitPrice,150000);
-  assert.equal(listed.phone,checkout.phone);
+const checkout={fullName:'QA TEST (NO REAL CUSTOMER)',phone:'0900000000',
+  address:'Disposable integration test',note:'Sandbox only',
+  paymentOption:'full',quotedTotal:150000,items:[{id:productId,quantity:1}]};
+const quote=await (await invoke(checkoutQuotePost,'/api/checkout-quote','POST',{
+  items:checkout.items,paymentOption:'full',quotedTotal:checkout.quotedTotal
+})).json();
+assert.equal(quote.paymentReady,true);
+assert.equal(quote.paymentProvider,'sepay');
+assert.equal(quote.selectedPaymentAmount,142500);
+assert.equal('paymentQrImageKey' in quote,false,'Static QR is no longer part of checkout');
 
-  const tokenQuery='?orderNumber='+encodeURIComponent(created.orderNumber)+'&token='+created.orderAccessToken;
-  const beforeTerms=await (await expectStatus('Unconfirmed order payment fails closed',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
-  assert.equal(beforeTerms.paymentReady,false);
-  await expectStatus('Wrong access token is rejected',await invoke(orderPaymentGet,'/api/order-payment?orderNumber='+encodeURIComponent(created.orderNumber)+'&token='+('x'.repeat(64))),404);
-  await expectStatus('Early payment request forbidden',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{orderId:record.id,paymentOption:'full'},true),409);
-  const itemId=listed.items[0].id;
-  await expectStatus('Admin confirms price and terms',await invoke(adminOrdersPatch,adminPath,'PATCH',{
-    id:record.id,status:'confirmed',prices:[{itemId,unitPrice:150000}],
-    termsConfirmed:true,paymentTermsNote:'QA terms - no real transfer'
-  },true),200);
-  assert.ok(one('SELECT payment_terms_confirmed_at AS confirmed FROM orders WHERE id=?',record.id).confirmed);
+const createdResponse=await invoke(ordersPost,'/api/orders','POST',checkout);
+assert.equal(createdResponse.status,201,await createdResponse.clone().text());
+const created=await createdResponse.json();
+assert.equal(created.paymentProvider,'sepay');
+assert.equal(created.paymentReady,true);
+assert.equal(created.paymentInstructions.provider,'sepay');
+assert.equal(created.paymentInstructions.amount,142500);
+assert.equal(created.sepayCheckout.url,'https://sandbox.pay.sepay.vn/v1/checkout/init');
+assert.ok(created.sepayCheckout.fields.signature);
+const order=db.prepare('SELECT id,public_access_token_hash FROM orders WHERE order_number=?').get(created.orderNumber);
+assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
+const gateway=db.prepare('SELECT order_invoice_number,amount,status FROM sepay_payment_orders WHERE order_id=?').get(order.id);
+assert.deepEqual(gateway,{order_invoice_number:created.orderNumber,amount:142500,status:'pending'});
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0,
+  'New checkout does not create a manual QR payment request');
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?').get(order.id).n,0,
+  'Creating checkout never records money received');
 
-  await expectStatus('Absent QR blocks payment request',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{orderId:record.id,paymentOption:'full'},true),409);
-  await expectStatus('Reject browser-controlled amount',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{orderId:record.id,paymentOption:'full',amount:1},true),400);
-  await expectStatus('Reject unverified QR activation',await invoke(qrPut,'/api/admin/payment-qr','PUT',{action:'activate',verified:false},true),400);
-  db.prepare("INSERT INTO settings(key,value) VALUES('payment_qr_pending_key',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(qrKey);
-  await expectStatus('Admin saves bank draft',await invoke(qrPut,'/api/admin/payment-qr','PUT',{
-    action:'save-draft',bankName:'QA BANK (NO REAL BANK)',accountNumber:'0000000000',
-    accountName:'TEST ACCOUNT ONLY',instructions:'SIMULATED'
-  },true),200);
-  await expectStatus('Admin verifies and activates QR',await invoke(qrPut,'/api/admin/payment-qr','PUT',{action:'activate',verified:true},true),200);
-  const paymentRequest=await (await expectStatus('Admin creates server-priced full payment request',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{
-    orderId:record.id,paymentOption:'full'
-  },true),201)).json();
-  assert.equal(paymentRequest.amount,142500);
-  assert.equal(paymentRequest.freeShippingEligible,true);
-  assert.equal(paymentRequest.freeShippingApplied,false);
-  await expectStatus('Duplicate pending QR request rejected',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{
-    orderId:record.id,paymentOption:'full'
-  },true),409);
-  const publicPending=await (await expectStatus('Public token returns active QR after Admin approval',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
-  assert.equal(publicPending.paymentReady,true);
-  assert.equal(publicPending.amount,142500);
-  assert.equal(publicPending.freeShipping,false);
-  assert.match(publicPending.qrImageUrl,/^\/payment-qr\/qr-/);
-  const checkoutWithActiveQr={...checkout,phone:'0900000103'};
-  const ordersBeforeQr=one('SELECT COUNT(*) AS n FROM orders').n;
-  const quoteBeforeOrder=await (await expectStatus('Verified QR quote is read-only before an order exists',await invoke(checkoutQuotePost,'/api/checkout-quote','POST',{
-    items:checkoutWithActiveQr.items,phone:checkoutWithActiveQr.phone,paymentOption:checkoutWithActiveQr.paymentOption,quotedTotal:checkoutWithActiveQr.quotedTotal
-  }),200)).json();
-  assert.equal(quoteBeforeOrder.paymentReady,true);
-  assert.equal(quoteBeforeOrder.paymentInstructions.amount,142500);
-  assert.match(quoteBeforeOrder.transferReference,/^SD-[A-Z2-9]{8}$/);
-  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,ordersBeforeQr,'Showing the QR does not create an order');
-  const selectedInstructions=quoteBeforeOrder.paymentInstructions;
-  const checkoutWithPreparedQr={...checkoutWithActiveQr,transferReference:quoteBeforeOrder.transferReference,paymentQrImageKey:quoteBeforeOrder.paymentQrImageKey,
-    paymentBankName:selectedInstructions.bankName,paymentAccountName:selectedInstructions.accountName,paymentAccountNumber:selectedInstructions.accountNumber};
-  await expectStatus('Changed QR snapshot cannot finalize a paid-reference order',await invoke(ordersPost,'/api/orders','POST',{...checkoutWithPreparedQr,paymentBankName:'CHANGED BANK'}),409);
-  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,ordersBeforeQr,'A stale QR snapshot must not create an order');
-  const direct=await (await expectStatus('Finalize creates a QR request only after order-code confirmation',await invoke(ordersPost,'/api/orders','POST',checkoutWithPreparedQr),201)).json();
-  assert.equal(direct.paymentReady,true);
-  assert.equal(direct.paymentTermsConfirmed,true);
-  assert.equal(direct.paymentInstructions.amount,142500);
-  assert.equal(direct.paymentInstructions.transferContent,quoteBeforeOrder.transferReference,'The transfer content shown before finalization must remain stable on the order');
-  const directRecord=one('SELECT id FROM orders WHERE order_number=?',direct.orderNumber);
-  assert.equal(one("SELECT created_by AS actor FROM order_payment_requests WHERE order_id=? AND status='pending'",directRecord.id).actor,'customer_checkout');
-  assert.equal(one("SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?",directRecord.id).n,0,'Creating a QR request must never record money as received');
-  const directPublic=await (await expectStatus('Order token returns checkout QR immediately',await invoke(orderPaymentGet,'/api/order-payment?orderNumber='+encodeURIComponent(direct.orderNumber)+'&token='+direct.orderAccessToken),200)).json();
-  assert.equal(directPublic.paymentReady,true);
-  assert.equal(directPublic.amount,142500);
-  fakeObjects.delete(qrKey);
-  const stale=await (await expectStatus('Missing QR object fails closed',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
-  assert.equal(stale.paymentReady,false);
-  fakeObjects.set(qrKey,{size:67});
+const tokenQuery='?orderNumber='+encodeURIComponent(created.orderNumber)+'&token='+created.orderAccessToken;
+const pending=await (await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery)).json();
+assert.equal(pending.paymentProvider,'sepay');
+assert.equal(pending.gatewayStatus,'pending');
+assert.equal(pending.paymentReady,false);
 
-  await expectStatus('Unverified browser cannot mark paid',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:record.id,paymentRequestId:paymentRequest.id,direction:'received',amount:142500,transactionReference:'QA-E2E-RECEIPT-1'
-  }),401);
-  const fixturePayment={orderId:record.id,paymentRequestId:paymentRequest.id,direction:'received',amount:142500,transactionReference:'QA-E2E-RECEIPT-1'};
-  await expectStatus('Simulated receipt -> atomic verified ledger',await invoke(transactionPost,'/api/admin/payment-transactions','POST',fixturePayment,true),201);
-  assert.equal(one('SELECT payment_status AS status FROM orders WHERE id=?',record.id).status,'paid');
-  const paid=await (await expectStatus('Fully paid response applies freeship',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
-  assert.equal(paid.paymentReady,false);
-  assert.equal(paid.freeShipping,true);
-  await expectStatus('Duplicate bank reference rejected',await invoke(transactionPost,'/api/admin/payment-transactions','POST',fixturePayment,true),409);
-  await expectStatus('Refund above net receipts rejected',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:record.id,direction:'refunded',amount:150001,transactionReference:'QA-E2E-REFUND-OVER'
-  },true),409);
-  await expectStatus('Simulated refund -> ledger',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:record.id,direction:'refunded',amount:142500,transactionReference:'QA-E2E-REFUND-1',
-    note:'Accounting-only test. No money moved.'
-  },true),201);
-  assert.equal(one('SELECT payment_status AS status FROM orders WHERE id=?',record.id).status,'refunded');
-  const paymentAdmin=await (await expectStatus('Admin ledger totals',await invoke(adminPaymentGet,'/api/admin/payment-requests?orderId='+record.id,'GET',undefined,true),200)).json();
-  assert.equal(paymentAdmin.summary.netReceivedAmount,0);
-  assert.equal(paymentAdmin.transactions.length,2);
-  const afterRefund=await (await expectStatus('Refund removes paid-only freeship',await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery),200)).json();
-  assert.equal(afterRefund.freeShipping,false);
-  await expectStatus('Cancel settled order',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:record.id,status:'cancelled'},true),200);
-  await expectStatus('Cancelled order cannot get new QR',await invoke(paymentRequestPost,'/api/admin/payment-requests','POST',{orderId:record.id,paymentOption:'full'},true),409);
-  assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
-  assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='order_created'").n,2);
-  assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='payment_received_verified'").n,1);
-  assert.equal(one("SELECT COUNT(*) AS n FROM audit_logs WHERE action='payment_refund_verified'").n,1);
+const payload={
+  timestamp:1794000000,notification_type:'ORDER_PAID',
+  order:{id:'gateway-order-qa',order_status:'CAPTURED',order_currency:'VND',
+    order_amount:'142500.00',order_invoice_number:created.orderNumber},
+  transaction:{id:'gateway-transaction-qa',transaction_id:'TX-QA-001',
+    transaction_type:'PAYMENT',transaction_status:'APPROVED',
+    transaction_amount:'142500.00',transaction_currency:'VND',
+    transaction_date:'2026-11-07 00:00:00'}
+};
+const ipnRequest=()=>request('/api/sepay/ipn','POST',payload,{'X-Secret-Key':env.SEPAY_IPN_SECRET_KEY});
+const ipnEnv={...env,DB};
+const firstIpn=await receiveIpn({env:ipnEnv,request:ipnRequest()});
+assert.equal(firstIpn.status,200,await firstIpn.clone().text());
+assert.equal((await firstIpn.json()).received,true);
+const repeatedIpn=await receiveIpn({env:ipnEnv,request:ipnRequest()});
+assert.equal(repeatedIpn.status,200);
+assert.equal((await repeatedIpn.json()).duplicate,true);
+const rejectedIpn=await receiveIpn({env:ipnEnv,request:request('/api/sepay/ipn','POST',payload,{'X-Secret-Key':'wrong'})});
+assert.equal(rejectedIpn.status,401);
 
-  // Complete the same real-handler life cycle with a disposable deposit order.
-  // No real Shop customer, bank receipt, carrier transaction or Cloudflare request.
-  const depositCheckout={...checkout,phone:'0900000204',paymentOption:'deposit',note:'DISPOSABLE QA COD ORDER'};
-  const depositQuote=await (await expectStatus('Deposit quote before any order write',await invoke(checkoutQuotePost,'/api/checkout-quote','POST',{
-    items:depositCheckout.items,phone:depositCheckout.phone,paymentOption:'deposit',quotedTotal:depositCheckout.quotedTotal
-  }),200)).json();
-  assert.equal(depositQuote.quoteReady,true);
-  assert.equal(depositQuote.selectedPaymentAmount,100000);
-  const depositOrder=await (await expectStatus('Customer confirms deposit QR and creates order code',await invoke(ordersPost,'/api/orders','POST',{
-    ...depositCheckout,transferReference:depositQuote.transferReference,paymentQrImageKey:depositQuote.paymentQrImageKey,
-    paymentBankName:depositQuote.paymentInstructions.bankName,
-    paymentAccountName:depositQuote.paymentInstructions.accountName,
-    paymentAccountNumber:depositQuote.paymentInstructions.accountNumber
-  }),201)).json();
-  const depositId=one('SELECT id FROM orders WHERE order_number=?',depositOrder.orderNumber)?.id;
-  assert.ok(depositId,'New order must exist in the same disposable D1');
-  const depositAdminList=await (await expectStatus('Admin sees the customer deposit order',await invoke(adminOrdersGet,adminPath,'GET',undefined,true),200)).json();
-  assert.ok(depositAdminList.orders.some(o=>o.id===depositId));
-  const depositTrack=async()=> (await (await expectStatus('Customer reads live order tracking',await invoke(orderTrackingPost,'/api/order-tracking','POST',{lookup:depositOrder.orderNumber}),200)).json()).orders[0];
-  const beforeDeposit=await depositTrack();
-  assert.equal(beforeDeposit.deliveryStatus,'not_shipped');
-  await expectStatus('Cannot ship before verified deposit',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'shipped'},true),409);
-  await expectStatus('Admin confirms deposit order terms',await invoke(adminOrdersPatch,adminPath,'PATCH',{
-    id:depositId,status:'confirmed',termsConfirmed:true,paymentTermsNote:'DISPOSABLE QA verified terms'
-  },true),200);
-  await expectStatus('Admin advances deposit order to processing',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'processing'},true),200);
-  await expectStatus('Carrier COD is forbidden before delivery',await invoke(codPost,'/api/admin/cod-settlements','POST',{
-    orderId:depositId,amount:50000,transactionReference:'QA-E2E-PREMATURE-COD'
-  },true),409);
-  const depositRequestId=one("SELECT id FROM order_payment_requests WHERE order_id=? AND status='pending' ORDER BY created_at DESC LIMIT 1",depositId)?.id;
-  assert.ok(depositRequestId,'Customer QR request remains pending until actual receipt verification');
-  await expectStatus('Admin verifies first PARTIAL deposit',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:depositId,paymentRequestId:depositRequestId,direction:'received',amount:40000,transactionReference:'QA-E2E-DEPOSIT-PARTIAL'
-  },true),201);
-  const topup=await (await expectStatus('Customer reads exact shortfall on SAME pending QR',await invoke(orderPaymentGet,
-    '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();
-  assert.equal(topup.paymentReady,true);
-  assert.equal(topup.additionalPayment,true);
-  assert.equal(topup.paymentSummary.shortfall,60000);
-  assert.equal(topup.amount,60000,'Never ask for original 100k again after receiving verified 40k');
-  assert.equal(topup.transferReference,depositQuote.transferReference,'Same order and original bank transfer memo');
-  assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,3,'Topup view must not create an extra order');
-  assert.equal(one('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?',depositId).n,1,'Topup reuses the pending request');
-  await expectStatus('Admin verifies remaining PARTIAL deposit',await invoke(transactionPost,'/api/admin/payment-transactions','POST',{
-    orderId:depositId,paymentRequestId:depositRequestId,direction:'received',amount:60000,transactionReference:'QA-E2E-DEPOSIT-REMAIN'
-  },true),201);
-  const afterDeposit=await (await expectStatus('Customer sees verified deposit and COD balance',await invoke(orderPaymentGet,
-    '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();
-  assert.equal(afterDeposit.paymentSummary.netReceivedAmount,100000);
-  assert.equal(afterDeposit.paymentSummary.codRemaining,50000);
-  await expectStatus('Admin dispatches deposit order',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'shipped'},true),200);
-  assert.equal(one('SELECT delivery_status FROM orders WHERE id=?',depositId).delivery_status,'in_transit');
-  assert.equal((await depositTrack()).deliveryStatus,'in_transit');
-  await expectStatus('Cannot COD settle during transit',await invoke(codPost,'/api/admin/cod-settlements','POST',{
-    orderId:depositId,amount:50000,transactionReference:'QA-E2E-COD-IN-TRANSIT'
-  },true),409);
-  await expectStatus('Admin confirms delivery completion',await invoke(adminOrdersPatch,adminPath,'PATCH',{id:depositId,status:'completed'},true),200);
-  assert.equal((await depositTrack()).deliveryStatus,'delivered');
-  await expectStatus('Partial carrier remittance cannot mark COD paid',await invoke(codPost,'/api/admin/cod-settlements','POST',{
-    orderId:depositId,amount:40000,transactionReference:'QA-E2E-COD-PARTIAL'
-  },true),409);
-  assert.equal(one('SELECT COUNT(*) n FROM order_cod_settlements WHERE order_id=?',depositId).n,0);
-  await expectStatus('Admin verifies carrier remittance in full',await invoke(codPost,'/api/admin/cod-settlements','POST',{
-    orderId:depositId,amount:50000,transactionReference:'QA-E2E-COD-SETTLED'
-  },true),201);
-  assert.equal(one('SELECT payment_status FROM orders WHERE id=?',depositId).payment_status,'paid');
-  const finalPayment=await (await expectStatus('Customer reads completed payment state',await invoke(orderPaymentGet,
-    '/api/order-payment?orderNumber='+encodeURIComponent(depositOrder.orderNumber)+'&token='+depositOrder.orderAccessToken),200)).json();
-  assert.equal(finalPayment.paymentSummary.codReceivedAmount,50000);
-  assert.equal(finalPayment.paymentSummary.paidInFull,true);
-  assert.equal((await depositTrack()).status,'completed');
-  await expectStatus('Repeat carrier reconciliation blocked',await invoke(codPost,'/api/admin/cod-settlements','POST',{
-    orderId:depositId,amount:50000,transactionReference:'QA-E2E-COD-SETTLED'
-  },true),409);
-  await expectStatus('Returned shipment cannot be set after completed',await invoke(deliveryPatch,'/api/admin/order-delivery','PATCH',{
-    id:depositId,deliveryStatus:'returned'
-  },true),409);
-  assert.equal(one('SELECT COUNT(*) n FROM order_cod_settlements WHERE order_id=?',depositId).n,1);
-  assert.equal(one("SELECT COUNT(*) n FROM order_payment_transactions WHERE order_id=? AND actor='admin_cod_completion'",depositId).n,0,
-    'COD settlement must never be manufactured as a verified bank receipt');
-  assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
-  console.log(JSON.stringify({scope:'DISPOSABLE_SQLITE_ONE_DATABASE_REAL_HANDLERS',productionWrites:0,remoteRequests:0,realTransfers:0,pass:true,checks:trace},null,2));
-}finally{db.close()}
+const paid=await (await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery)).json();
+assert.equal(paid.gatewayStatus,'paid');
+assert.equal(paid.paymentSummary.netReceivedAmount,142500);
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?').get(order.id).n,1,
+  'Repeated IPN delivery is idempotent');
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0);
+assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
+console.log('PASS: sandbox checkout, SePay IPN settlement, duplicate delivery, and no static checkout QR.');
