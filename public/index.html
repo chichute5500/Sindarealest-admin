@@ -5724,7 +5724,7 @@ async function sdCheckoutFinalizeOrder(){
    if(checkoutFromCart){for(const item of items){const key=cartKey(item.id,item.option||'');const left=Number(cart[key]||0)-item.quantity;if(left>0)cart[key]=left;else{delete cart[key];cartUnchecked.delete(key)}}saveCart()}
    checkoutItemsOverride=null;formResetCheckout();renderCart();
    const gateway=new URL(result.sepayCheckout.url);
-   if(gateway.protocol!=='https:'||!['pay.sepay.vn','sandbox.pay.sepay.vn'].includes(gateway.hostname))throw Error('Địa chỉ thanh toán SePay không hợp lệ.');
+   if(gateway.protocol!=='https:'||!['pay.sepay.vn','pay-sandbox.sepay.vn'].includes(gateway.hostname))throw Error('Địa chỉ thanh toán SePay không hợp lệ.');
    const paymentForm=document.createElement('form');paymentForm.method='POST';paymentForm.action=gateway.toString();paymentForm.hidden=true;
    for(const [name,value] of Object.entries(result.sepayCheckout.fields)){if(!/^[a-z_]{1,40}$/.test(name))throw Error('Thông tin biểu mẫu thanh toán không hợp lệ.');const input=document.createElement('input');input.type='hidden';input.name=name;input.value=String(value);paymentForm.append(input)}
    document.body.append(paymentForm);paymentForm.submit();return;
