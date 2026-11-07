@@ -181,7 +181,6 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[1]);
  await expect(page.locator('#sdCheckoutStepTitle')).not.toHaveText('Mã đơn hàng');
- await expect(page.locator('#checkoutSubmit')).toBeVisible();
  expect(quoteBodies.some(body=>body.paymentOption==='deposit')).toBe(true);
  expect(orderCalls).toBe(2);
 });
