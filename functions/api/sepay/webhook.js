@@ -29,7 +29,7 @@ export async function onRequestPost({request,env}) {
     const bank=loadSepayBankConfig(env);
     if(!bank||String(payload.accountNumber||"").replace(/\s+/g,"")!==bank.accountNumber)return accepted();
     const checkout=await env.DB.prepare(
-      "SELECT id,amount,status,payload_json FROM sepay_checkout_intents WHERE transfer_reference=? LIMIT 1"
+      "SELECT id,amount,status,payload_json FROM sepay_checkout_intents WHERE REPLACE(transfer_reference,'-','')=? LIMIT 1"
     ).bind(invoice).first();
     if(!checkout||checkout.status!=="pending")return accepted();
     const transactionReference="SEPAY-BANK:"+transactionId;

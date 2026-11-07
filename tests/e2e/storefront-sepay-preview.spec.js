@@ -14,7 +14,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  const origin=new URL(url).origin;
  const orderNumber='SD-PREVIEW-001',checkoutIntentId='preview-intent-00000000-0000-4000-8000-000000000001';
  const accessToken='p'.repeat(64);
- const transferReference='SP-0123456789ABCDEF';
+ const transferReference='SP0123456789ABCDEF';
  let paymentChecks=0,paidStatusChecks=0,paymentReceived=false;
  const products=[{
   id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví QA SePay',category:'wallets',
@@ -135,6 +135,9 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
  paymentReceived=true;
  await expect.poll(()=>paidStatusChecks,{timeout:10000}).toBeGreaterThan(0);
+ await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toBeVisible({timeout:10000});
+ await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toContainText('Thanh toán thành công');
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions')).toContainText(orderNumber);
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');

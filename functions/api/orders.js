@@ -101,7 +101,7 @@ export async function onRequestPost({ request, env }) {
     // Keep the bank memo separate from the public order code. Customers see
     // the public code only after SePay confirms the selected payment amount.
     const transferReference = selectedPaymentOption
-      ? `SP-${crypto.randomUUID().replaceAll("-", "").slice(0, 16).toUpperCase()}`
+      ? `SP${crypto.randomUUID().replaceAll("-", "").slice(0, 16).toUpperCase()}`
       : "";
     const sepayBank=selectedPaymentOption?loadSepayBankConfig(env):null;
     const sepayPayment=selectedPaymentOption?createSepayVietQr({env,bank:sepayBank,amount:selectedAmount,reference:transferReference}):null;
