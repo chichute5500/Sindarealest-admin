@@ -61,11 +61,11 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
    paymentChecks++;
    await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},body:JSON.stringify({
     ok:true,orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',
-    priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:paymentChecks<=1,
-    paymentProvider:'sepay',gatewayStatus:paymentChecks>1?'paid':'pending',
-    ...(paymentChecks<=1?{amount:100000,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount=100000&des='+transferReference,qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferReference}:{}),
+    priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:paymentChecks<=2,
+    paymentProvider:'sepay',gatewayStatus:paymentChecks>2?'paid':'pending',
+    ...(paymentChecks<=2?{amount:100000,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount=100000&des='+transferReference,qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferReference}:{}),
     paymentSummary:{paymentOption:'deposit',total:100000,requiredAmount:100000,
-      netReceivedAmount:paymentChecks>1?100000:0,shortfall:paymentChecks>1?0:100000,codRemaining:0}
+      netReceivedAmount:paymentChecks>2?100000:0,shortfall:paymentChecks>2?0:100000,codRemaining:0}
    })});return;
   }
   if(requestUrl.origin===origin){
@@ -124,7 +124,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).not.toBeVisible();
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
- await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(1);
+ await expect.poll(()=>paymentChecks,{timeout:20000}).toBeGreaterThan(2);
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions')).toContainText(orderNumber);
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
