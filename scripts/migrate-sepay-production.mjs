@@ -69,7 +69,7 @@ async function main(){
   assert.equal(ledgerExists.length,1,"Production migration ledger missing; refusing to infer schema history");
   const ledgerRows=await query("SELECT name FROM d1_migrations");
   const ledger=new Set(ledgerRows.map(row=>String(row.name)));
-  const allMigrations=readdirSync(resolve("migrations")).filter(name=>/^\\d{4}_.+\\.sql$/.test(name)).sort();
+  const allMigrations=readdirSync(resolve("migrations")).filter(name=>/^\d{4}_.+\.sql$/.test(name)).sort();
   assert.ok(targetMigrations.every(name=>allMigrations.includes(name)),"Target SePay migration files are missing");
   const unrelatedPending=allMigrations.filter(name=>!targetMigrations.includes(name)&&!ledger.has(name));
   assert.deepEqual(unrelatedPending,[],"Production has unapplied non-SePay migrations; refusing to run them: "+unrelatedPending.join(", "));
