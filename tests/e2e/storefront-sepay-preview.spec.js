@@ -85,7 +85,8 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
   await route.fallback();
  });
 
- const response=await page.goto(url,{waitUntil:'domcontentloaded'});
+ const previewUrl=new URL(url);previewUrl.searchParams.set('qa',process.env.GITHUB_SHA||String(Date.now()));
+ const response=await page.goto(previewUrl.toString(),{waitUntil:'domcontentloaded'});
  expect(response?.status()).toBe(200);
  const welcome=page.locator('#welcomeSplash');if(await welcome.count())await page.locator('#skipIntro').click();
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:20000});
@@ -118,7 +119,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect.poll(()=>orderCalls).toBe(1);
  expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  expect(orderBodies[0].paymentOption).toBe('deposit');
- await expect(page).toHaveURL(url);
+ await expect(page).toHaveURL(previewUrl.toString());
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).not.toBeVisible();
