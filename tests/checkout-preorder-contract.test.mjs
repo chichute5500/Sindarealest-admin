@@ -45,7 +45,7 @@ assert.ok(html.includes('id="sdCheckoutItemSummary"'),'Payment step shows the ex
 assert.doesNotMatch(html,/id="sdCheckoutReviewStep"/,'Checkout has no duplicate review page');
 assert.match(html,/sd-order-reference/,'Order number is prominent after QR');
 assert.match(html,/orderStage\.hidden=true/,'The public order number stage stays hidden before payment confirmation');
-assert.match(html,/Number\(data\.paymentSummary\?\.shortfall\)===0\)sdCheckoutAdvanceToOrderCode\(\)/,'The order number appears only when the server confirms the selected amount');
+assert.match(html,/Number\(data\.paymentSummary\?\.shortfall\)===0\)sdCheckoutAdvanceToOrderCode\(true\)/,'The order number appears only when the server confirms the selected amount');
 assert.ok(create.includes('`SP-${crypto.randomUUID()'),'SePay receives a separate transfer reference, not the public order number');
 assert.match(readFileSync(new URL('../functions/api/sepay/webhook.js',import.meta.url),'utf8'),/SP-\[A-Z0-9\]\{16\}/,'The bank webhook resolves the private transfer reference');
 assert.match(html,/sd-payment-transfer-stage[\s\S]*sd-payment-order-stage/,'QR transfer and order reference are separate customer-visible stages');
@@ -120,8 +120,8 @@ assert.match(glass,/sd-checkout-choice-alert \.34s ease-in-out 6/,'Both choices 
 assert.doesNotMatch(html,/Hãy chọn một trong hai cách thanh toán\./,'The previous bottom-of-button warning is removed');
 assert.match(html,/Xác nhận đã thanh toán/,'The slider uses the owner-requested confirmation copy');
 assert.match(html,/Tiến hành thanh toán →/,'The payment step uses a clear payment action label');
-assert.match(html,/function sdCheckoutAdvanceToOrderCode\(\)/,'The finalized order reveals its order-code stage');
-const confirmFlow=html.match(/function sdCheckoutAdvanceToOrderCode\(\)\{([\s\S]*?)\n\}/)?.[1]||'';
+assert.match(html,/function sdCheckoutAdvanceToOrderCode\(paymentConfirmed=false\)/,'The finalized order reveals its order-code stage');
+const confirmFlow=html.match(/function sdCheckoutAdvanceToOrderCode\(paymentConfirmed=false\)\{([\s\S]*?)\n\}/)?.[1]||'';
 assert.doesNotMatch(confirmFlow,/\bfetch\s*\(/,'The slider cannot write or refresh a payment receipt');
 assert.doesNotMatch(confirmFlow,/paymentSummary|netReceivedAmount|payment_status|payment-transactions/,'The slider cannot mutate payment truth');
 assert.match(html,/async function sdCheckoutFinalizeOrder\(\)[\s\S]*fetch\('\/api\/orders'/,'The explicit QR action creates the internal payment order');
