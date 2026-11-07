@@ -79,13 +79,15 @@ assert.equal(created.paymentReady,true);
 assert.equal(created.paymentInstructions.provider,'sepay');
 assert.equal(created.paymentInstructions.amount,142500);
 assert.equal(created.paymentInstructions.qrIncludesAmount,true);
+assert.match(created.transferReference,/^SP-[A-Z0-9]{16}$/);
+assert.notEqual(created.transferReference,created.orderNumber,'bank memo is separate from the public order code');
 assert.match(created.paymentInstructions.qrImageUrl,/vietqr\.app\/img/);
 assert.match(created.paymentInstructions.qrImageUrl,/amount=142500/);
 assert.match(created.paymentInstructions.qrImageUrl,/des=/);
 const order=db.prepare('SELECT id,public_access_token_hash FROM orders WHERE order_number=?').get(created.orderNumber);
 assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
 const gateway=db.prepare('SELECT order_invoice_number,amount,status FROM sepay_payment_orders WHERE order_id=?').get(order.id);
-assert.equal(gateway.order_invoice_number,created.orderNumber);
+assert.equal(gateway.order_invoice_number,created.transferReference);
 assert.equal(gateway.amount,142500);
 assert.equal(gateway.status,'pending');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0,
@@ -101,7 +103,7 @@ assert.equal(pending.paymentReady,true);
 assert.equal(pending.qrIncludesAmount,true);
 
 const payload={id:92704,gateway:'Vietcombank',transactionDate:'2026-11-07 00:00:00',accountNumber:env.SEPAY_QR_BANK_ACCOUNT,
-  subAccount:'',code:created.orderNumber,content:created.orderNumber+' chuyen tien',transferType:'in',description:'QA transfer',transferAmount:142500,accumulated:1000000,referenceCode:'FT-QA-001'};
+  subAccount:'',code:created.transferReference,content:created.transferReference+' chuyen tien',transferType:'in',description:'QA transfer',transferAmount:142500,accumulated:1000000,referenceCode:'FT-QA-001'};
 const webhookRequest=(override={})=>{
   const raw=JSON.stringify(payload),timestamp=String(Math.floor(Date.now()/1000));
   return crypto.subtle.importKey('raw',new TextEncoder().encode(env.SEPAY_WEBHOOK_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']).then(async key=>{

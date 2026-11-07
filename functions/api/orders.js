@@ -100,9 +100,13 @@ export async function onRequestPost({ request, env }) {
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
-    const transferReference = selectedPaymentOption ? orderNumber : "";
+    // Keep the bank memo separate from the public order code. Customers see
+    // the public code only after SePay confirms the selected payment amount.
+    const transferReference = selectedPaymentOption
+      ? `SP-${crypto.randomUUID().replaceAll("-", "").slice(0, 16).toUpperCase()}`
+      : "";
     const sepayBank=selectedPaymentOption?loadSepayBankConfig(env):null;
-    const sepayPayment=selectedPaymentOption?createSepayVietQr({env,bank:sepayBank,amount:selectedAmount,reference:orderNumber}):null;
+    const sepayPayment=selectedPaymentOption?createSepayVietQr({env,bank:sepayBank,amount:selectedAmount,reference:transferReference}):null;
     if(selectedPaymentOption&&!sepayPayment)return fail("QR SePay chưa sẵn sàng. Cần bật webhook bảo mật và xác minh tài khoản nhận tiền trong cấu hình QR trước khi tạo đơn.",503);
     const statements = [];
 
@@ -149,7 +153,7 @@ export async function onRequestPost({ request, env }) {
       sepayWriteIndex=statements.length;
       statements.push(env.DB.prepare(
         "INSERT INTO sepay_payment_orders(id,order_id,order_invoice_number,installment_type,amount,status) VALUES(?,?,?,?,?,'pending')"
-      ).bind(crypto.randomUUID(),orderId,orderNumber,selectedPaymentOption,selectedAmount));
+      ).bind(crypto.randomUUID(),orderId,transferReference,selectedPaymentOption,selectedAmount));
     }
     const writes=await env.DB.batch(statements);
     const paymentReady=sepayWriteIndex>=0&&Number(writes?.[sepayWriteIndex]?.meta?.changes||0)===1;

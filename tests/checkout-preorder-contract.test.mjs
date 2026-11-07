@@ -44,6 +44,10 @@ assert.ok(html.includes('id="sdCheckoutStepper"')&&html.includes('id="sdCheckout
 assert.ok(html.includes('id="sdCheckoutItemSummary"'),'Payment step shows the exact products and quantities before the order is sent');
 assert.doesNotMatch(html,/id="sdCheckoutReviewStep"/,'Checkout has no duplicate review page');
 assert.match(html,/sd-order-reference/,'Order number is prominent after QR');
+assert.match(html,/orderStage\.hidden=true/,'The public order number stage stays hidden before payment confirmation');
+assert.match(html,/Number\(data\.paymentSummary\?\.shortfall\)===0\)sdCheckoutAdvanceToOrderCode\(\)/,'The order number appears only when the server confirms the selected amount');
+assert.ok(create.includes('`SP-${crypto.randomUUID()'),'SePay receives a separate transfer reference, not the public order number');
+assert.match(readFileSync(new URL('../functions/api/sepay/webhook.js',import.meta.url),'utf8'),/SP-\[A-Z0-9\]\{16\}/,'The bank webhook resolves the private transfer reference');
 assert.match(html,/sd-payment-transfer-stage[\s\S]*sd-payment-order-stage/,'QR transfer and order reference are separate customer-visible stages');
 assert.match(html,/Nhận cọc & xác nhận đơn/,'Order tracking combines deposit receipt and order confirmation into one milestone');
 assert.match(html,/data-account-orders-refresh/,'Linked order cards can reload server-confirmed payment state');
@@ -120,14 +124,14 @@ assert.match(html,/function sdCheckoutAdvanceToOrderCode\(\)/,'The finalized ord
 const confirmFlow=html.match(/function sdCheckoutAdvanceToOrderCode\(\)\{([\s\S]*?)\n\}/)?.[1]||'';
 assert.doesNotMatch(confirmFlow,/\bfetch\s*\(/,'The slider cannot write or refresh a payment receipt');
 assert.doesNotMatch(confirmFlow,/paymentSummary|netReceivedAmount|payment_status|payment-transactions/,'The slider cannot mutate payment truth');
-assert.match(html,/async function sdCheckoutFinalizeOrder\(\)[\s\S]*fetch\('\/api\/orders'/,'Only the completed slider creates the order');
+assert.match(html,/async function sdCheckoutFinalizeOrder\(\)[\s\S]*fetch\('\/api\/orders'/,'The explicit QR action creates the internal payment order');
 const checkoutSubmit=html.match(/\$\('#checkoutForm'\)\.addEventListener\('submit',[\s\S]*?(?=\$\('#detailOrderLink')/)?.[0]||'';
 assert.match(checkoutSubmit,/sdCheckoutLoadPaymentInstructions/,'The payment step prepares a read-only QR quote');
 assert.doesNotMatch(checkoutSubmit,/fetch\('\/api\/orders'/,'Opening the QR does not create an order');
 assert.match(create,/createSepayVietQr\(/,'Finalization creates a server-generated dynamic SePay VietQR');
 assert.doesNotMatch(create,/sepayCheckout|pay-sandbox\.sepay\.vn|paymentForm\.submit/,'Finalization renders the QR inline instead of submitting hosted checkout');
 assert.doesNotMatch(create,/payment_qr_active|paymentQrImageKey|requestedTransferReference|qrSnapshot/,'New checkout cannot accept or depend on a static QR snapshot');
-assert.match(html,/progress>=100\?'Đang lấy mã đơn'/,'The slider changes to the requested loading label at completion');
+assert.match(html,/sdCheckoutStartPaymentPolling\(orderNumber,token\)/,'The checkout polls SePay until the payment is confirmed');
 assert.match(html,/sdCheckoutConfirmRange'\)\.setAttribute\('aria-valuetext','0%'\)/,'Reopening checkout resets the slider accessibility value');
 assert.match(html,/sdCheckoutOrderCreated\)return/,'The code stage cannot appear before order creation succeeds');
 assert.match(html,/button\.dataset\.detailPaymentOption=choice\.value/,'Product detail renders selectable deposit and full payment choices');
@@ -135,7 +139,7 @@ assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displ
 assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice into checkout');
 assert.match(html,/async function saveCheckoutAddressFromForm\(\)/,'A successfully placed order saves its address for the next order');
 assert.match(html,/function loadLocalShippingAddress\(\)\{if\(accountSyncMode==='cloud'\)/,'Local saved addresses remain available if account sync is guest, loading, or failed');
-assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Success view uses the requested progress message');
+assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Paid view uses the requested progress message');
 assert.match(html,/sd-order-received-note[\s\S]*Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn\./,'Order confirmation explains when production starts');
 assert.match(html,/\.checkout-drawer \[hidden\]\{display:none!important\}/,'Hidden checkout actions remain hidden after order submission');
 // The reviewed address belongs directly beneath the completed "Thông tin" step,
@@ -206,7 +210,7 @@ assert.doesNotMatch(html,/Lưu mã đơn bên dưới để tra cứu|Đã gửi
 assert.match(create,/sepayWriteIndex[\s\S]*sepay_payment_orders/,'Checkout persists a pending SePay payment order without writing a receipt');
 assert.match(create,/payment_terms_confirmed_by[\s\S]*customer_checkout/,'A confirmed catalog price and explicit customer choice define checkout terms');
 assert.match(create,/customerPaymentVerified:false/,'Creating a QR request must not mark money received');
-assert.match(html,/QR đúng số tiền sẽ hiện ngay trong khung này/,"Checkout keeps the dynamic SePay QR inside the order drawer");
+assert.match(html,/Quét QR và thanh toán đúng số tiền/,'Checkout keeps the dynamic SePay QR inside the order drawer before revealing the public order code');
 assert.match(create,/createSepayVietQr/,"The server builds an amount-specific VietQR using the server-priced order");
 assert.doesNotMatch(html,/paymentForm\.submit\(\)/,"The inline QR checkout does not navigate to SePay Hosted Checkout");
 assert.match(glass,/\.sd-checkout-qr-main\{display:flex;flex-direction:column/,"QR and copyable bank tiles must stack vertically");

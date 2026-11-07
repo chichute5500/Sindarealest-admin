@@ -19,7 +19,7 @@ export async function onRequestPost({request,env}) {
   if(!/^\d{1,64}$/.test(transactionId)||!amount)return fail("Thiếu mã giao dịch hoặc số tiền hợp lệ.",400,headers);
   if(String(payload.transferType||"").toLowerCase()!=="in")return accepted();
   const referenceText=(String(payload.code||"")+" "+String(payload.content||"")).toUpperCase();
-  const invoice=referenceText.match(/SD-[A-Z0-9]+-[A-Z0-9]{6}/)?.[0]||"";
+  const invoice=referenceText.match(/SP-[A-Z0-9]{16}/)?.[0]||"";
   if(!invoice)return accepted();
   try{
     const bank=loadSepayBankConfig(env);

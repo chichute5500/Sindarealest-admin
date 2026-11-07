@@ -14,6 +14,8 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  const origin=new URL(url).origin;
  const orderNumber='SD-PREVIEW-001';
  const accessToken='p'.repeat(64);
+ const transferReference='SP-0123456789ABCDEF';
+ let paymentChecks=0;
  const products=[{
   id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví QA SePay',category:'wallets',
   categoryLabel:'Ví nam',slug:'qa-wallet-sepay',skuVerified:true,
@@ -50,18 +52,19 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({
     ok:true,orderNumber,orderAccessToken:accessToken,status:'pending_confirmation',
     priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:true,
-    paymentProvider:'sepay',total:100000,selectedPaymentOption:body.paymentOption,
-    selectedPaymentAmount:amount,paymentInstructions:{status:'ready',provider:'sepay',amount,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount='+amount+'&des='+orderNumber,qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferContent:orderNumber},
+    paymentProvider:'sepay',total:100000,selectedPaymentOption:body.paymentOption,transferReference,
+    selectedPaymentAmount:amount,paymentInstructions:{status:'ready',provider:'sepay',amount,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount='+amount+'&des='+transferReference,qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferContent:transferReference},
     message:'QR SePay đã sẵn sàng trong khung đặt hàng.'
    })});return;
   }
   if(requestUrl.origin===origin&&path==='/api/order-payment'&&request.method()==='GET'){
+   paymentChecks++;
    await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},body:JSON.stringify({
     ok:true,orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',
     priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:false,
     paymentProvider:'sepay',gatewayStatus:'pending',
     paymentSummary:{paymentOption:'deposit',total:100000,requiredAmount:100000,
-      netReceivedAmount:0,shortfall:100000,codRemaining:0}
+      netReceivedAmount:paymentChecks>0?100000:0,shortfall:paymentChecks>0?0:100000,codRemaining:0}
    })});return;
   }
   if(requestUrl.origin===origin){
@@ -104,7 +107,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toBeVisible();
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();
- await expect(page.locator('#paymentInstructions .sd-sepay-intro')).toContainText('QR đúng số tiền');
+ await expect(page.locator('#paymentInstructions .sd-sepay-intro')).toContainText('Mã đơn sẽ hiện');
  await expect(page.locator('#paymentInstructions .sd-sepay-amount')).toContainText('100.000');
  await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
  await expect(page.locator('#sdCheckoutDone')).toContainText('Tạo đơn & hiện QR');
@@ -116,6 +119,10 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  expect(orderBodies[0].paymentOption).toBe('deposit');
  await expect(page).toHaveURL(url);
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).not.toBeVisible();
+ await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions')).toContainText(orderNumber);
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
  await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-inline-qr-mobile.png'});
