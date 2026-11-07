@@ -15,7 +15,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  const orderNumber='SD-PREVIEW-001',checkoutIntentId='preview-intent-00000000-0000-4000-8000-000000000001';
  const accessToken='p'.repeat(64);
  const transferReference='SP-0123456789ABCDEF';
- let paymentChecks=0,paymentReceived=false;
+ let paymentChecks=0,paidStatusChecks=0,paymentReceived=false;
  const products=[{
   id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví QA SePay',category:'wallets',
   categoryLabel:'Ví nam',slug:'qa-wallet-sepay',skuVerified:true,
@@ -58,7 +58,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
    })});return;
   }
   if(requestUrl.origin===origin&&path==='/api/sepay/checkout-status'&&request.method()==='GET'){
-   paymentChecks++;
+   paymentChecks++;if(paymentReceived)paidStatusChecks++;
    await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},body:JSON.stringify({
     ok:true,paid:paymentReceived,...(paymentReceived?{orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentReady:false}:{paymentProvider:'sepay',paymentReady:true,transferReference}),
     paymentSummary:{paymentOption:'deposit',total:100000,requiredAmount:100000,
@@ -123,7 +123,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).not.toBeVisible();
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
  paymentReceived=true;
- await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(1);
+ await expect.poll(()=>paidStatusChecks,{timeout:10000}).toBeGreaterThan(0);
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions')).toContainText(orderNumber);
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
