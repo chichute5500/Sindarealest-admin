@@ -26,8 +26,15 @@ export async function createSepayCheckout({env,origin,invoiceNumber,amount,descr
   if(!config||!Number.isSafeInteger(amount)||amount<=0||amount>2_000_000_000||!/^[A-Za-z0-9_-]{3,64}$/.test(String(invoiceNumber||"")))return null;
   let base;try{base=new URL(origin);if(base.protocol!=="https:"||base.origin!==origin)return null}catch{return null}
   const resultUrl=new URL("/payment-result.html",base);resultUrl.searchParams.set("order",invoiceNumber);resultUrl.searchParams.set("token",String(accessToken||""));
-  const fields={order_amount:String(amount),merchant:config.merchantId,currency:"VND",operation:"PURCHASE",order_description:String(description||"Thanh toan don hang SinDarealest").slice(0,255),order_invoice_number:invoiceNumber,payment_method:"BANK_TRANSFER",success_url:resultUrl.toString(),error_url:resultUrl.toString(),cancel_url:resultUrl.toString()};
+  // Keep the submitted input order aligned with SePay's signedFields
+  // contract: optional customer_id/payment_method precede the callback URLs.
+  const fields={order_amount:String(amount),merchant:config.merchantId,currency:"VND",operation:"PURCHASE",order_description:String(description||"Thanh toan don hang SinDarealest").slice(0,255),order_invoice_number:invoiceNumber};
   if(customerId)fields.customer_id=String(customerId).slice(0,100);
+  fields.payment_method="BANK_TRANSFER";
+  fields.success_url=resultUrl.toString();
+  fields.error_url=resultUrl.toString();
+  fields.cancel_url=resultUrl.toString();
+  fields.lang="vi";
   const signed=SIGNED_FIELDS.filter(name=>Object.hasOwn(fields,name)).map(name=>name+"="+fields[name]).join(",");
   const key=await crypto.subtle.importKey("raw",encoder.encode(config.merchantSecret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
   const signature=toBase64(new Uint8Array(await crypto.subtle.sign("HMAC",key,encoder.encode(signed))));
