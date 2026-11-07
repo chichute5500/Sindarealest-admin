@@ -149,6 +149,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
  oldPaid=true;releaseHeldStatus?.();
  await expect.poll(()=>releasedOldStatus,{timeout:5000}).toBe(true);
+ await page.waitForTimeout(250);
  await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toHaveCount(0);
  await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[0]);
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
