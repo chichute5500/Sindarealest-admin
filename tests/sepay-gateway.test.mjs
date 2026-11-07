@@ -9,6 +9,7 @@ const env={
 };
 assert.equal(sepayPaymentReady(env),true);
 assert.equal(sepayPaymentReady({...env,SEPAY_IPN_SECRET_KEY:""}),false);
+assert.equal(await createSepayCheckout({env:{...env,SEPAY_IPN_SECRET_KEY:""},origin:"https://shop.example",invoiceNumber:"SD-ABC-123456",amount:100000}),null,"Never create a hosted payment if IPN verification is not configured");
 assert.equal(parseVndAmount("100000.00"),100000);
 assert.equal(parseVndAmount("100000.50"),null);
 assert.equal(parseVndAmount("0"),null);
