@@ -43,7 +43,7 @@ jobs:
           node-version: '22'
 
       - name: Install repository dependencies
-        run: npm ci --no-fund
+        run: npm install --no-fund --no-package-lock
 
       - name: Validate source and migrations
         run: npm run check
