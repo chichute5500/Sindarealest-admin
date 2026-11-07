@@ -430,9 +430,14 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect.poll(()=>orderBodies.length).toBe(1);
  expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  await expect(page).toHaveURL(base+'/');
- await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\\.app\\/img.*amount=100000/);
+ await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
- await expect(page.locator('#paymentInstructions')).not.toContainText('SD-TEST-001');
+ paymentReceived=true;
+ await expect.poll(()=>paymentChecks,{timeout:25000}).toBeGreaterThan(2);
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:20000});
+ await expect(page.locator('#paymentInstructions')).toContainText('SD-TEST-001');
+ await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
+ await expect(page.locator('#paymentInstructions')).toContainText('Shop chỉ xác nhận tiền đã nhận');
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
  const savedAddress=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-shipping-address')||'null'));
