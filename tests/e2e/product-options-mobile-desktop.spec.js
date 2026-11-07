@@ -416,7 +416,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();
- await expect(page.locator('#paymentInstructions .sd-sepay-intro')).toContainText('QR đúng số tiền sẽ hiện ngay trong khung này');
+ await expect(page.locator('#paymentInstructions .sd-sepay-intro')).toContainText('Mã đơn sẽ hiện tại đây sau khi SePay xác nhận đã nhận tiền');
  await expect(page.locator('#paymentInstructions .sd-sepay-amount')).toContainText('100.000');
  await expect(page.locator('#sdCheckoutDone')).toBeVisible();
  await expect(page.locator('#sdCheckoutDone')).toContainText('Tạo đơn & hiện QR');
