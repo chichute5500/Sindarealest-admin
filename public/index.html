@@ -2529,6 +2529,14 @@ html.dark .service-strip .service-icon{background:var(--sd-3d-surface);border-co
     margin-top:auto;
     flex-shrink:0;
   }
+  /* Once payment is ready, place Close after the full QR/instructions content
+     so it cannot cover the transfer note at the bottom of the checkout. */
+  #checkoutDrawer.sd-checkout-success:has(#sdCheckoutDone:not([hidden]))>.sd-checkout-footer{
+    position:relative;top:auto;bottom:auto;margin-top:0;
+  }
+}
+.checkout-drawer.sd-checkout-success:has(#sdCheckoutDone:not([hidden])) .sd-checkout-actions #sdCheckoutDone{
+  justify-self:stretch;width:100%;min-width:0;max-width:none;
 }
 
 
