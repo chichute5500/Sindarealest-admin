@@ -110,7 +110,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();
  await expect.poll(()=>orderCalls).toBe(1);
- expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
+ expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',sizeOption:'',imageVariant:'',quantity:1}]);
  expect(orderBodies[0].paymentOption).toBe('deposit');
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
  await expect(page.locator('#sdCheckoutQrWarning')).toHaveText('QR đã điền sẵn số tiền và nội dung chuyển khoản. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN');
