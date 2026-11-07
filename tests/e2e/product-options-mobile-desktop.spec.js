@@ -428,8 +428,6 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutDone')).toContainText('Tạo đơn & thanh toán');
  await expect(page.locator('#sdCheckoutConfirmWrap')).toBeHidden();
  expect(orderBodies).toHaveLength(0);
- const savedAddress=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-shipping-address')||'null'));
- expect(savedAddress).toMatchObject({fullName:'Khách mua ngay',phone:'0900000000',province:'Thành phố Hồ Chí Minh',provinceCode:'79',ward:'Phường Bà Rịa',wardCode:'26560',streetAddress:'Địa chỉ kiểm thử'});
  expect(orderBodies).toHaveLength(0,'Preview of SePay does not create an order before explicit confirmation');
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
  expect(saved).toEqual({'qa-shoe::42':1,'qa-wallet':1});
@@ -443,6 +441,8 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#status')).toContainText('Đang chờ SePay xác nhận giao dịch.');
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+ const savedAddress=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-shipping-address')||'null'));
+ expect(savedAddress).toMatchObject({fullName:'Khách mua ngay',phone:'0900000000',province:'Thành phố Hồ Chí Minh',provinceCode:'79',ward:'Phường Bà Rịa',wardCode:'26560',streetAddress:'Địa chỉ kiểm thử'});
  paymentRefreshRequests=0;
  await page.locator('#mobileAccountNav').click();
  await expect(page.locator('#accountDrawer')).toHaveClass(/open/);
