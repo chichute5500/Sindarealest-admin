@@ -22,6 +22,12 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
   images:['images/brand-emblem.png'],description:'Preview fixture; no real purchase.',
   price:100000,sourcePriceConfirmed:true,fulfillmentType:'made_to_order',
   published:true,stock:5
+ },{
+  id:'qa-wallet-next',sku:'QA-WALLET-002',title:'Ví QA SePay tiếp theo',category:'wallets',
+  categoryLabel:'Ví nam',slug:'qa-wallet-sepay-next',skuVerified:true,
+  images:['images/brand-emblem.png'],description:'Preview fixture; no real purchase.',
+  price:100000,sourcePriceConfirmed:true,fulfillmentType:'made_to_order',
+  published:true,stock:5
  }];
  const quoteBodies=[],orderBodies=[];
  let orderCalls=0;
@@ -96,7 +102,11 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await page.locator('[data-open-product="qa-wallet"]').first().evaluate(node=>node.click());
  await page.locator('#detailAdd').click();
  await page.locator('#detailClose').click();
+ await page.locator('[data-open-product="qa-wallet-next"]').first().click({force:true});
+ await page.locator('#detailAdd').click({force:true});
+ await page.locator('#detailClose').click({force:true});
  await page.locator('#cartOpen').click();
+ await page.locator('[data-cart-pick="qa-wallet-next"]').uncheck();
  await page.locator('#cartCheckout').click();
  await page.locator('#checkoutForm input[name="fullName"]').fill('Khách QA Sandbox');
  await page.locator('#checkoutForm input[name="phone"]').fill('0900000000');
@@ -164,13 +174,8 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  // success-to-order transition timers could still be pending.
  await page.goBack();
  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
- await page.locator('#cartClose').click();
- await page.locator('[data-open-product="qa-wallet"]').first().click({force:true});
- await page.locator('#detailAdd').click({force:true});
- await page.locator('#detailClose').click({force:true});
- await page.locator('#cartOpen').click({force:true});
- await expect(page.locator('#cartCheckout')).toBeEnabled();
- await page.locator('#cartCheckout').click({force:true});
+ await page.locator('[data-cart-pick="qa-wallet-next"]').check();
+ await page.locator('#cartCheckout').click();
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await page.waitForTimeout(12200);
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
