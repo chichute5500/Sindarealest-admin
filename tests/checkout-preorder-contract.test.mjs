@@ -132,6 +132,7 @@ assert.match(create,/createSepayVietQr\(/,'Finalization creates a server-generat
 assert.doesNotMatch(create,/sepayCheckout|pay-sandbox\.sepay\.vn|paymentForm\.submit/,'Finalization renders the QR inline instead of submitting hosted checkout');
 assert.doesNotMatch(create,/payment_qr_active|paymentQrImageKey|requestedTransferReference|qrSnapshot/,'New checkout cannot accept or depend on a static QR snapshot');
 assert.match(html,/sdCheckoutStartPaymentPolling\(orderNumber,token\)/,'The checkout polls SePay until the payment is confirmed');
+assert.match(html,/dataset\.stage!=='order'\)sdCheckoutPaymentPollTimer=setTimeout\(poll,5000\)/,'Payment polling continues through pending drawer rerenders and stops only at the order-code stage');
 assert.match(html,/sdCheckoutConfirmRange'\)\.setAttribute\('aria-valuetext','0%'\)/,'Reopening checkout resets the slider accessibility value');
 assert.match(html,/sdCheckoutOrderCreated\)return/,'The code stage cannot appear before order creation succeeds');
 assert.match(html,/button\.dataset\.detailPaymentOption=choice\.value/,'Product detail renders selectable deposit and full payment choices');
