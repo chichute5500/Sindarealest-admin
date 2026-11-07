@@ -419,7 +419,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#paymentInstructions .sd-sepay-intro')).toContainText('Mã đơn sẽ hiện tại đây sau khi SePay xác nhận đã nhận tiền');
  await expect(page.locator('#paymentInstructions .sd-sepay-amount')).toContainText('100.000');
  await expect(page.locator('#sdCheckoutDone')).toBeVisible();
- await expect(page.locator('#sdCheckoutDone')).toContainText('Tạo đơn & hiện QR');
+ await expect(page.locator('#sdCheckoutDone')).toContainText('Tiếp tục đến QR');
  await expect(page.locator('#sdCheckoutConfirmWrap')).toBeHidden();
  expect(orderBodies).toHaveLength(0);
  expect(orderBodies).toHaveLength(0,'Preview of SePay does not create an order before explicit confirmation');
