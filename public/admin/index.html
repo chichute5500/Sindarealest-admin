@@ -2466,7 +2466,7 @@ function ordersPage(){
  });
  const cards=filteredOrders.map(o=>{
   const items=Array.isArray(o.items)?o.items:[],net=Number(o.received_amount||0)-Number(o.refunded_amount||0);
-  const paymentLabel=orderReceiptStateLabel(o.payment_summary);
+  const paymentLabel=orderPaymentStatusLabel(o.payment_status,o);
   return `<article class="sd-order-card" data-order-open="${esc(o.id)}" data-order-row="${esc(o.id)}" role="button" tabindex="0" aria-label="Mở đơn ${esc(o.order_number)} của ${esc(o.full_name)}">
    <div class="sd-order-card-top"><b>${esc(o.order_number)}</b><span>${esc(o.created_at||'')}</span></div>
    <div class="sd-order-card-main"><div class="sd-order-card-images">${items.slice(0,2).map(orderProductImageMarkup).join('')}</div><div class="sd-order-card-info"><strong>${esc(items[0]?.title||'Đơn hàng')}</strong><small>${items.length>1?'+'+(items.length-1)+' sản phẩm khác · ':''}${esc(o.full_name||'Khách hàng')} · ${esc(o.phone||'')}</small></div></div>
@@ -2490,7 +2490,7 @@ function orderStatusLabel(value,deliveryStatus=''){if(value==='shipped'&&deliver
 function orderDeliveryStatusLabel(value){return ({not_shipped:'Chờ gửi hàng',in_transit:'Đang giao',delivered:'Giao thành công',failed_returning:'Giao thất bại / Đang hoàn hàng',returned:'Đã hoàn hàng về Shop'})[value]||'Chưa có trạng thái giao hàng'}
 function orderReceiptState(summary){const rawRequired=summary?.requiredAmount;if(rawRequired===null||rawRequired===undefined||rawRequired==='')return 'unknown';const required=Number(rawRequired),received=Number(summary?.netReceivedAmount);if(!Number.isSafeInteger(required)||required<0)return 'unknown';if(!Number.isSafeInteger(received)||received<=0)return 'none';return received<required?'short':received===required?'exact':'over'}
 function orderReceiptStateLabel(summary){return ({none:'Chưa nhận',short:'Nhận thiếu',exact:'Nhận đủ',over:'Nhận dư',unknown:'Chưa xác định'})[orderReceiptState(summary)]}
-function orderPaymentStatusLabel(value,order){return order?.payment_summary?orderReceiptStateLabel(order.payment_summary):(value==='paid'?'Nhận đủ':value==='pending'?'Nhận thiếu':value==='refunded'?'Đã hoàn tiền':'Chưa nhận')}
+function orderPaymentStatusLabel(value,order){const summary=order?.payment_summary;if(summary){if(summary.paidInFull===true)return 'Đã nhận đủ';if(Number.isSafeInteger(summary.shortfall)&&summary.shortfall===0&&summary.paymentOption==='deposit')return 'Đã nhận cọc';return orderReceiptStateLabel(summary)}return value==='paid'?'Nhận đủ':value==='pending'?'Nhận thiếu':value==='refunded'?'Đã hoàn tiền':'Chưa nhận'}
 function updateOrderReceiptPreview(form){
  const preview=form?.querySelector('[data-receipt-preview]'),input=form?.querySelector('[data-transaction-amount]');if(!preview||!input)return;
  const required=Number(preview.dataset.required),current=Number(preview.dataset.current),codExpected=Number(preview.dataset.codExpected),option=preview.dataset.option;
