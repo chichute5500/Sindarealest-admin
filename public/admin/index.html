@@ -2526,6 +2526,11 @@ function orderDetailMarkup(order){
  const priceConfirmed=Number(order.price_confirmation_required)===0&&Boolean(order.payment_terms_confirmed_at)&&Number.isSafeInteger(Number(order.total));
  const selected=['deposit','full'].includes(order.customer_payment_option);
  const payment=order.payment_summary||{},expected=Number(payment.requiredAmount??order.customer_payment_amount),remainder=Number(order.customer_payment_remaining_amount);
+ const allInStock=items.length>0&&items.every(item=>item.fulfillmentType==='in_stock');
+ const totalForDeposit=Number(order.total);
+ const roundedCustomDeposit=Number.isSafeInteger(totalForDeposit)?Math.ceil((totalForDeposit*0.3)/100000)*100000:null;
+ const paymentMethodLabel=!selected?'Chưa chọn':order.customer_payment_option==='full'?'Thanh toán toàn bộ':allInStock&&totalForDeposit>=100000&&expected===100000?'Đặt cọc 100.000đ':totalForDeposit>=100000&&expected===roundedCustomDeposit?'Đặt cọc 30%':`Đặt cọc ${money(expected)}`;
+ const paymentReceiptStatus=!selected?'Chưa chọn':payment.paidInFull===true?'Đã nhận đủ':payment.shortfall===0?'Đã nhận cọc':'Chưa xác nhận tiền';
  const nextStatus=order.status==='shipped'&&['failed_returning','returned'].includes(order.delivery_status)?'':({pending_confirmation:'confirmed',confirmed:'processing',processing:'shipped',shipped:'completed'})[order.status]||'';
  const nextLabel=({confirmed:'Xác nhận đơn',processing:'Bắt đầu làm hàng',shipped:'Xác nhận đã gửi hàng',completed:'Hoàn tất đơn'})[nextStatus]||'';
  const requiredDeposit=selected&&Number.isSafeInteger(expected)&&expected>0?expected:0;
@@ -2567,7 +2572,8 @@ function orderDetailMarkup(order){
   ${order.customer_note?'<p class="sd-order-note">Khách ghi chú: '+esc(order.customer_note)+'</p>':''}
  </div></section>
  <section class="panel sd-order-payment"><div class="panelhead"><h3>Thanh toán</h3></div><div class="panelbody">
-  <div class="sd-order-payment-method"><span>Phương thức khách chọn</span><b>${selected?order.customer_payment_option==='full'?'Chuyển khoản toàn bộ':'Đặt cọc':'Chưa chọn'}</b></div>
+  <div class="sd-order-payment-method"><span>Phương thức khách chọn</span><b>${esc(paymentMethodLabel)}</b></div>
+  <div class="sd-order-payment-method"><span>Trạng thái thanh toán</span><b>${esc(paymentReceiptStatus)}</b></div>
   <div class="sd-order-payment-money"><small>Khách cần chuyển</small><strong>${selected&&Number.isSafeInteger(expected)&&expected>0?esc(money(expected)):'Cần xác nhận'}</strong></div>
   ${order.customer_payment_option==='full'?'<div class="sd-order-payment-method"><span>Ưu đãi 5% khi chuyển đủ</span><b>'+esc(money(order.customer_payment_discount_amount))+' + Freeship</b></div>':''}
   ${selected?'<div class="sd-order-reference"><small>Nội dung chuyển khoản của khách</small><code>'+esc(order.customer_transfer_reference||'Chưa có mã')+'</code></div>':''}

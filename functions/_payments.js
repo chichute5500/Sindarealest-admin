@@ -66,13 +66,11 @@ export function calculateCheckoutQuote(items) {
   const total=items.reduce((sum,item)=>sum+item.unitPrice*item.quantity,0);
   if(!Number.isSafeInteger(total)||total<=0||total>2_000_000_000)return {eligible:false,reason:"Tổng tiền chưa hợp lệ; cần Shop xác nhận."};
   if(total<MIN_CHECKOUT_TRANSFER_AMOUNT)return {eligible:false,reason:"Thanh toán qua ngân hàng cần từ 2.000đ trở lên; Shop sẽ tư vấn thủ công."};
-  // Fixed 100k for all-in-stock carts. Other cart types retain their
-  // current percentage policy pending a separate mixed-cart decision.
   const types=new Set(items.map(item=>item?.fulfillmentType));
   const fulfillmentType=types.size===1&&types.has("in_stock")?"in_stock":types.size===1&&types.has("made_to_order")?"made_to_order":"unclassified";
-  // Keep the usual 100k ready-stock deposit and 100k rounded custom deposit.
-  // For low-value test/sale items, use 30% with a 2k floor so the deposit
-  // remains valid without exceeding the item total.
+  // Keep the accepted deposit policy: ready-stock carts use 100k; custom and
+  // mixed/unclassified carts use 30% rounded up to the next 100k. Low-value
+  // carts keep a 2k floor without exceeding the cart total.
   const lowValueDeposit=total<100_000?Math.max(MIN_CHECKOUT_TRANSFER_AMOUNT,Math.ceil(total*0.3)):null;
   const deposit=lowValueDeposit??(fulfillmentType==="in_stock"?100000:Math.ceil((total*0.3)/100000)*100000);
   const fullAmount=discountedCheckoutFullAmount(total);

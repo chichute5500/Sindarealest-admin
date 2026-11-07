@@ -848,7 +848,7 @@ test('real Preview checkout: deposit/full amounts, all requested viewports and b
  const trackedCartFullOrder=page.locator('#sdTrackResults .sd-track-order');
  await expect(trackedCartFullOrder).toBeVisible();
  await expect(trackedCartFullOrder.locator('.sd-track-step')).toHaveCount(5);
- await expect(trackedCartFullOrder).toContainText('Nhận đủ tiền & xác nhận đơn');
+ await expect(trackedCartFullOrder).toContainText('Thanh toán toàn bộ & xác nhận đơn');
  await expect(trackedCartFullOrder).not.toContainText('Đã nhận thanh toán');
  await expect(trackedCartFullOrder.locator('.sd-track-order-head')).toContainText('Chờ thanh toán');
  expect(createdOrders).toHaveLength(2);
@@ -1141,7 +1141,7 @@ test('mobile account: partially verified transfer shows exact top-up QR, and ref
   localStorage.setItem('sd-local-order-history',JSON.stringify([{
    orderNumber,accessToken:'a'.repeat(64),createdAt:new Date().toISOString(),
    status:'confirmed',deliveryStatus:'not_shipped',priceConfirmationRequired:false,total:6800000,
-   items:[],paymentSummary:{total:6800000,paymentOption:'deposit',requiredAmount:2100000,
+   items:[],paymentSummary:{total:6800000,paymentOption:'deposit',requiredAmount:original,
     netReceivedAmount:1500000,shortfall:600000,codRemaining:4700000,eligibleToShip:false}
   }]));
  },number);
@@ -1202,7 +1202,7 @@ test('mobile account payment refresh: five server statuses, local/Cloud, reload 
  await page.setViewportSize({width:390,height:844});
  await page.clock.install({time:new Date('2026-11-03T05:40:00+07:00')});
  const numbers=['SD-QA-REFRESH-00','SD-QA-REFRESH-01','SD-QA-REFRESH-02','SD-QA-REFRESH-03','SD-QA-REFRESH-04'];
- const statuses=['Chưa xác nhận tiền','Chưa đủ tiền cọc','Đã nhận cọc + dư','Đã nhận đủ','Chưa cập nhật'];
+ const statuses=['Chưa xác nhận tiền','Đã nhận cọc','Đã nhận cọc + dư','Đã nhận đủ','Chưa cập nhật'];
  const amounts=[0,1000000,1600000,1400000,null],requiredAmount=1400000;
  await page.addInitScript((numbers)=>{
   localStorage.setItem('sd-local-order-history',JSON.stringify(numbers.map(orderNumber=>({

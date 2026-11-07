@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { calculateCheckoutQuote, summarizeOrderPayment } from '../functions/_payments.js';
 
 const quote=calculateCheckoutQuote([{unitPrice:4_500_000,quantity:1}]);
@@ -69,4 +70,11 @@ assert.equal(legacyCodDoesNotCountAsBankReceipt.eligibleToShip,false);
 assert.equal(state('deposit',1_400_000,0,false).eligibleToShip,false,'Shop must confirm terms before shipment');
 assert.equal(summarizeOrderPayment({total:4_500_000,paymentOption:'deposit',transactions:[],termsConfirmed:true,hasPendingRequest:true}).status,'waiting_shop_verification');
 assert.equal(summarizeOrderPayment({total:4_500_000,paymentOption:'deposit',transactions:[{direction:'received',amount:100_000}],termsConfirmed:true}).status,'additional_payment_required');
+const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
+assert.match(admin,/paymentMethodLabel[^\n]*'Đặt cọc 30%'/,'Admin clearly identifies the 30% choice');
+assert.match(admin,/paymentReceiptStatus[^\n]*'Đã nhận đủ'[^\n]*'Đã nhận cọc'/,'Admin distinguishes a deposit from full payment');
+const storefront=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+assert.match(storefront,/Đã nhận cọc & xác nhận đơn/);
+assert.match(storefront,/Đã nhận đủ & xác nhận đơn/);
+assert.doesNotMatch(storefront,/const SD_ORDER_REFRESH_LABELS=new Set\(\[[^\]]*Chưa đủ tiền cọc/,'the payment status list must not expose an underpaid-deposit state');
 console.log('PASS: deposit/full quote, rounding, short/exact/excess receipt, COD adjustment and settlement, and shipment eligibility.');

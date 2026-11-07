@@ -61,7 +61,9 @@ assert.match(html,/Number\(data\.paymentSummary\?\.shortfall\)===0\)window\.sdCh
 assert.match(create,/sepayReference=sepayReady\?\"SP\"\+crypto\.randomUUID\(\)\.replaceAll\(\"-\",\"\"\)\.slice\(0,16\)/,'SePay receives a private SP reference with 16 random characters, not the public order number');
 assert.ok(readFileSync(new URL('../functions/api/sepay/webhook.js',import.meta.url),'utf8').includes('REPLACE(transfer_reference'),'The bank webhook resolves the private transfer reference with or without the hyphen');
 assert.match(html,/sd-payment-transfer-stage[\s\S]*sd-payment-order-stage/,'QR transfer and order reference are separate customer-visible stages');
-assert.match(html,/Nhận cọc & xác nhận đơn/,'Order tracking combines deposit receipt and order confirmation into one milestone');
+assert.match(html,/Nhận cọc & xác nhận đơn/,'Pending deposit shows the combined payment and confirmation milestone');
+assert.match(html,/Đã nhận cọc & xác nhận đơn/,'A verified deposit marks the combined milestone complete');
+assert.match(html,/Đã nhận đủ & xác nhận đơn/,'Full payment uses its own completed status');
 assert.match(html,/data-account-orders-refresh/,'Linked order cards can reload server-confirmed payment state');
 assert.match(html,/data-account-payment-topup/,'Partially paid orders offer an explicit additional-transfer action');
 assert.match(html,/function accountShowPaymentTopup\(orderNumber,button\)/,'Additional transfer details are fetched on demand');

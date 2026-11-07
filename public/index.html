@@ -4209,7 +4209,7 @@ const FAVORITES_STORAGE_KEY='sd-favorites';
 const LOCAL_ORDER_HISTORY_KEY='sd-local-order-history';
 const SD_PENDING_SEPAY_INTENT_KEY='sd-pending-sepay-intent';
 const LOCAL_ADDRESS_KEY='sd-shipping-address';
-function paymentReceiptLabel(summary){if(!summary||typeof summary!=='object'||!Number.isSafeInteger(summary.requiredAmount))return 'Chờ Shop xác nhận số tiền';const received=Number.isSafeInteger(summary.netReceivedAmount)?summary.netReceivedAmount:0;if(received<=0)return 'Shop chưa xác nhận nhận tiền';if(Number(summary.overpaidAmount)>0)return 'Shop đã nhận dư';if(Number(summary.shortfall)>0)return 'Shop đã nhận thiếu';return 'Shop đã nhận đủ tiền'}
+function paymentReceiptLabel(summary){if(!summary||typeof summary!=='object'||!Number.isSafeInteger(summary.requiredAmount))return 'Chờ Shop xác nhận số tiền';const received=Number.isSafeInteger(summary.netReceivedAmount)?summary.netReceivedAmount:0;if(received<=0)return 'Chưa xác nhận tiền';if(summary.paidInFull===true)return 'Đã nhận đủ';if(Number(summary.shortfall)>0)return 'Chưa xác nhận tiền';if(summary.paymentOption==='deposit')return Number(summary.overpaidAmount)>0?'Đã nhận cọc + dư':'Đã nhận cọc';return 'Đã nhận đủ'}
 const deliveryStatusLabels={not_shipped:'Chờ gửi hàng',in_transit:'Đang giao',delivered:'Giao thành công',failed_returning:'Giao thất bại / Đang hoàn hàng',returned:'Đã hoàn hàng về Shop'};
 const deliveryStatusLabel=value=>deliveryStatusLabels[value]||'Chưa có trạng thái giao hàng';
 const categoryLabels={all:'Tất cả',sneakers:'Giày Thể Thao',loafers:'Giày lười','dress-shoes':'Giày tây',belts:'Thắt lưng','vi-nam-nu':'Ví nam & nữ','cap-tab-laptop':'Cặp – Tab – Laptop','tui-thoi-trang-golf':'Túi thời trang & golf',mu:'Mũ','tui-xach':'Túi xách',sandals:'Dép','watch-straps':'Dây đồng hồ','phone-cases':'Ốp điện thoại'};
@@ -5288,7 +5288,7 @@ function updateOrderHistoryCount(){const node=$('#accountOrderCount');if(node)no
 
 /* Isolated account-order refresh state. The checkout QR updater is intentionally unchanged. */
 const SD_ORDER_REFRESH_KEY='sd-order-payment-refresh-v1',SD_ORDER_REFRESH_MS=60000;
-const SD_ORDER_REFRESH_LABELS=new Set(['Chưa xác nhận tiền','Chưa đủ tiền cọc','Đã nhận cọc + dư','Đã nhận đủ','Chưa cập nhật']);
+const SD_ORDER_REFRESH_LABELS=new Set(['Chưa xác nhận tiền','Đã nhận cọc','Đã nhận cọc + dư','Đã nhận đủ','Chưa cập nhật']);
 const sdOrderRefreshes=new Map(),sdOrderRefreshInFlight=new Set();
 let sdOrderRefreshTimer=null;
 try{
@@ -5361,8 +5361,8 @@ function sdOrderRefreshResult(summary){
     !Number.isSafeInteger(shortfall)||!Number.isSafeInteger(extra)||
     shortfall!==Math.max(0,required-net)||extra!==Math.max(0,net-required))
   return 'Chưa cập nhật';
- if(shortfall>0)return 'Chưa đủ tiền cọc';
- if(summary.paymentOption==='deposit'&&extra>0)return 'Đã nhận cọc + dư';
+ if(shortfall>0)return 'Chưa xác nhận tiền';
+ if(summary.paymentOption==='deposit')return extra>0?'Đã nhận cọc + dư':'Đã nhận cọc';
  return 'Đã nhận đủ';
 }
 async function sdOrderRefreshPayment(number,{token='',cloud=false}={}){
@@ -5998,10 +5998,11 @@ function sdTrackRender(orders){
   if(order.status!=='cancelled'&&steps.length>=3){
    const confirmed=steps[1],payment=steps[2],completed=confirmed.state==='done'&&payment.state==='done';
    const laterDate=()=>{const values=[confirmed.completedAt,payment.completedAt].filter(Boolean);return values.sort((a,b)=>{const parse=x=>Date.parse(/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(x)?x.replace(' ','T')+'Z':x)||0;return parse(a)-parse(b)}).at(-1)||null};
-   const paymentStep={title:payment.title==='Đã nhận cọc'?'Nhận cọc & xác nhận đơn':'Nhận đủ tiền & xác nhận đơn',state:completed?'done':confirmed.state==='current'||payment.state==='current'?'current':'upcoming',paymentReceived:payment.state==='done',completedAt:completed?laterDate():null};
+   const deposit=payment.title==='Đã nhận cọc';
+   const paymentStep={title:completed?(deposit?'Đã nhận cọc & xác nhận đơn':'Đã nhận đủ & xác nhận đơn'):(deposit?'Nhận cọc & xác nhận đơn':'Thanh toán toàn bộ & xác nhận đơn'),state:completed?'done':confirmed.state==='current'||payment.state==='current'?'current':'upcoming',paymentReceived:payment.state==='done',completedAt:completed?laterDate():null};
    steps=[steps[0],paymentStep,...steps.slice(3)];
   }
-  const label=order.status==='cancelled'?'Đơn đã hủy':order.deliveryStatus==='not_shipped'&&steps[1]?.state!=='done'?(steps[1]?.paymentReceived?'Chờ Shop xác nhận đơn':steps[1]?.title.includes('cọc')?'Chờ nhận cọc':'Chờ thanh toán'):order.deliveryStatusLabel||deliveryStatusLabel(order.deliveryStatus);
+  const label=order.status==='cancelled'?'Đơn đã hủy':order.deliveryStatus==='not_shipped'&&steps[1]?.state!=='done'?(steps[1]?.paymentReceived?steps[1]?.title:steps[1]?.title.includes('cọc')?'Chờ nhận cọc':'Chờ thanh toán'):order.deliveryStatusLabel||deliveryStatusLabel(order.deliveryStatus);
   return '<article class="sd-track-order"><div class="sd-track-order-head"><strong>Đơn '+escapeHtml(order.orderNumber||'••••')+'</strong><span>'+escapeHtml(label)+'</span></div><ol class="sd-track-steps">'+steps.map((step,index)=>{
    const state=['done','current'].includes(step.state)?step.state:'upcoming',date=state==='done'?sdTrackDate(step.completedAt):'';
    return '<li class="sd-track-step is-'+state+'"><span class="sd-track-number" aria-hidden="true">'+(state==='done'?'✓':index+1)+'</span><div class="sd-track-step-copy"><b>'+escapeHtml(step.title||'')+'</b>'+(date?'<time>'+escapeHtml(date)+'</time>':'')+'</div><span class="sd-track-step-state">'+(state==='done'?'Xong':state==='current'?'Đang xử lý':'Sắp tới')+'</span></li>'
@@ -6129,7 +6130,8 @@ function renderPaymentInstructions(result,accessToken='',options={}){
   orderCard.addEventListener('click',async()=>{const copied=await sdCopyCheckoutText(orderNumber);hint.textContent=copied?'Đã sao chép mã đơn':'Không sao chép được. Hãy nhấn giữ mã đơn để sao chép.'});
  }
  if(deferOrderCode)add(orderStage,'p','sd-payment-stage-label','BƯỚC 2 / 2 · THEO DÕI ĐƠN');
- add(orderStage,'p','sd-order-received-note','Shop sẽ xác nhận đơn và cập nhật tiến độ xử lý tiếp theo.');
+ const autoConfirmed=result?.orderStatus==='confirmed'||result?.status==='confirmed'||result?.customerPaymentVerified===true;
+ add(orderStage,'p','sd-order-received-note',autoConfirmed?(summary.paymentOption==='deposit'?'Đã nhận cọc và xác nhận đơn.':'Đã nhận đủ tiền và xác nhận đơn.')+' Shop sẽ cập nhật tiến độ làm hàng và gửi hàng.':'Shop sẽ xác nhận đơn và cập nhật tiến độ xử lý tiếp theo.');
  const details=add(orderStage,'div','payment-data');
  const row=(label,value)=>{if(value===null||value===undefined||value==='')return;const line=document.createElement('div'),name=document.createElement('span'),val=document.createElement('strong');name.textContent=label;val.textContent=String(value);line.append(name,val);details.append(line)};
  if(Number.isSafeInteger(summary.total))row('Giá trị đơn',formatVnd(summary.total));

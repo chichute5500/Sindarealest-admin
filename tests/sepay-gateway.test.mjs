@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createSepayCheckout, createSepayVietQr, parseVndAmount, sepayCheckoutSchemaReady, sepayPaymentReady } from "../functions/sepay.js";
 import { onRequestPost as receiveIpn } from "../functions/api/sepay/ipn.js";
 
@@ -102,4 +103,10 @@ assert.equal(repeated.status,200);
 assert.equal((await repeated.json()).duplicate,true);
 const unauthorized=await receiveIpn({request:new Request("https://shop.example/api/sepay/ipn",{method:"POST",headers:{"Content-Type":"application/json","X-Secret-Key":"wrong"},body:JSON.stringify(payload)}),env:{...env,DB}});
 assert.equal(unauthorized.status,401);
+const bankWebhook=readFileSync(new URL("../functions/api/sepay/webhook.js",import.meta.url),"utf8");
+assert.match(bankWebhook,/INSERT INTO orders[^\n]*c\.id,'confirmed'/,"a verified direct SePay receipt creates an already-confirmed order");
+assert.match(bankWebhook,/paymentConfirmedAutomatically:true/,"direct SePay checkout records the automatic confirmation audit");
+const hostedIpn=readFileSync(new URL("../functions/api/sepay/ipn.js",import.meta.url),"utf8");
+assert.match(hostedIpn,/status=CASE WHEN status='pending_confirmation' THEN 'confirmed' ELSE status END/,"a verified hosted SePay IPN automatically confirms an existing order");
+assert.match(hostedIpn,/paymentConfirmedAutomatically:true/,"hosted SePay IPN records its automatic confirmation audit");
 console.log("PASS: SePay signing, VND validation, IPN authentication, receipt, and duplicate delivery.");

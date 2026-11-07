@@ -43,12 +43,12 @@ export async function onRequestPost({request,env}) {
     const note="SePay "+transactionId+" · "+String(payload.transaction?.transaction_date||"").slice(0,40);
     const transactionRowId=crypto.randomUUID();
     const orderPaymentStatusSql=
-      "UPDATE orders SET payment_status=CASE WHEN total IS NOT NULL AND total>=0 AND " +
+      "UPDATE orders SET status=CASE WHEN status='pending_confirmation' THEN 'confirmed' ELSE status END,payment_status=CASE WHEN total IS NOT NULL AND total>=0 AND " +
       "((SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN -amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)+(SELECT COALESCE(SUM(amount),0) FROM order_cod_settlements WHERE order_id=?))>=COALESCE((SELECT CASE WHEN json_extract(details_json,'$.selectedPaymentOption')='full' THEN CAST(json_extract(details_json,'$.selectedPaymentAmount') AS INTEGER) ELSE total END FROM audit_logs WHERE entity_type='order' AND entity_id=orders.id AND action='order_created' ORDER BY created_at DESC LIMIT 1),total) AND " +
       "(SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)>0 THEN 'paid' " +
       "WHEN (SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN -amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)<=0 AND EXISTS(SELECT 1 FROM order_payment_transactions WHERE order_id=? AND direction='refunded') THEN 'refunded' " +
       "WHEN (SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN -amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)>0 THEN 'pending' ELSE 'unpaid' END,updated_at=datetime('now') WHERE id=? AND EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)";
-    const results=await env.DB.batch([
+    const statements=[
       env.DB.prepare(
         "INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) " +
         "SELECT ?,?,NULL,'received',?,?,?,'sepay_ipn' WHERE EXISTS (SELECT 1 FROM sepay_payment_orders WHERE id=? AND status='pending' AND amount=?) " +
@@ -63,7 +63,13 @@ export async function onRequestPost({request,env}) {
         "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
         "SELECT ?,'sepay','sepay_payment_received','order',?,? WHERE EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)"
       ).bind(crypto.randomUUID(),checkout.order_id,JSON.stringify({invoiceNumber:invoice,transactionId,amount:transactionAmount}),transactionRowId)
-    ]);
+    ];
+    if(order.status==="pending_confirmation")statements.push(env.DB.prepare(
+      "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) " +
+      "SELECT ?,'sepay','order_updated','order',?,? WHERE EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?) " +
+      "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status='confirmed')"
+    ).bind(crypto.randomUUID(),checkout.order_id,JSON.stringify({from:"pending_confirmation",status:"confirmed",paymentConfirmedAutomatically:true}),transactionRowId,checkout.order_id));
+    const results=await env.DB.batch(statements);
     if(Number(results?.[0]?.meta?.changes||0)!==1) {
       const duplicate=await env.DB.prepare("SELECT order_id FROM order_payment_transactions WHERE transaction_reference=? LIMIT 1").bind(reference).first();
       if(duplicate?.order_id===checkout.order_id)return json({ok:true,duplicate:true},200,noStore);
