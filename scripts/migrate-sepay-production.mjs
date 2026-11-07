@@ -133,7 +133,7 @@ async function main(){
     assert.ok(statSync(backup).size>1024,"Private pre-migration D1 export is empty");
     console.log("PASS: Time Travel recovery bookmark and private runner-local backup captured; records omitted from logs.");
     try{
-      run(["migrations","apply","DB","--remote","--skip-confirmation"],"Apply only SePay migrations 0022/0023",240000);
+      run(["migrations","apply","DB","--remote"],"Apply only SePay migrations 0022/0023",240000);
     }catch(error){
       const state=await query("SELECT name FROM d1_migrations WHERE name IN ('"+targetMigrations.join("','")+"')");
       const names=new Set(state.map(row=>String(row.name)));
