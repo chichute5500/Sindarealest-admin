@@ -35,6 +35,8 @@ async function main(){
   assert.equal(process.env.GITHUB_EVENT_NAME,"workflow_dispatch","Production migration must be manually dispatched");
   assert.match(process.env.GITHUB_SHA||"",/^[0-9a-f]{40}$/i,"Invalid workflow source SHA");
   assert.equal(process.env.SEPAY_MIGRATION_CONFIRMATION,"APPLY-SEPAY-0022-0023-TO-sindarealest-db","Missing exact migration authorization phrase");
+  const operation=process.env.SEPAY_MIGRATION_OPERATION||"preflight";
+  assert.ok(["preflight","apply"].includes(operation),"Operation must be preflight or apply");
   const account=process.env.CLOUDFLARE_ACCOUNT_ID||"",token=process.env.CLOUDFLARE_API_TOKEN||"";
   assert.match(account,/^[a-f0-9]{32}$/i,"Cloudflare account is unavailable");
   assert.ok(token.length>=10,"Cloudflare API credential is unavailable");
@@ -82,6 +84,11 @@ async function main(){
   if(!has23)assert.equal(intents.length+transactions.length,0,"Untracked SePay checkout tables exist; refusing to alter schema");
   if(has22)assert.equal(gateways.length,1,"Recorded migration 0022 schema is incomplete");
   if(has23)assert.equal(intents.length+transactions.length,2,"Recorded migration 0023 schema is incomplete");
+  console.log("Production D1 preflight: prerequisite migrations 0018–0021 are recorded; SePay ledger state: 0022="+has22+", 0023="+has23+"; schema state: gateway="+Boolean(gateways.length)+", intent="+Boolean(intents.length)+", transactions="+Boolean(transactions.length)+".");
+  if(operation==="preflight"){
+    console.log("PASS: read-only Production migration preflight complete; no backup or D1 changes were made.");
+    return;
+  }
   if(has22&&has23){
     console.log("PASS: SePay migrations 0022/0023 and tables already exist; Production D1 unchanged.");
     return;
@@ -99,7 +106,7 @@ async function main(){
     writeFileSync(config,[
       'name = "sd-sepay-production-migration"','compatibility_date = "2026-10-12"',
       '[[d1_databases]]','binding = "DB"','database_name = '+JSON.stringify(target.name),
-      'database_id = '+JSON.stringify(target.id),'migrations_dir = "./migrations"'
+      'database_id = '+JSON.stringify(target.id),'migrations_dir = '+JSON.stringify(join(folder,"migrations"))
     ].join("\n")+"\n",{mode:0o600});
     const wrangler=resolve("node_modules/wrangler/bin/wrangler.js");
     function run(args,label,timeout=180000){
@@ -111,7 +118,17 @@ async function main(){
     run(["export",target.name,"--remote","--skip-confirmation","--output",backup],"Private pre-migration D1 export");
     assert.ok(statSync(backup).size>1024,"Private pre-migration D1 export is empty");
     console.log("PASS: Time Travel recovery bookmark and private runner-local backup captured; records omitted from logs.");
-    run(["migrations","apply","DB","--remote","--yes"],"Apply only SePay migrations 0022/0023",240000);
+    try{
+      run(["migrations","apply","DB","--remote","--yes"],"Apply only SePay migrations 0022/0023",240000);
+    }catch(error){
+      const state=await query("SELECT name FROM d1_migrations WHERE name IN ('"+targetMigrations.join("','")+"')");
+      const names=new Set(state.map(row=>String(row.name)));
+      const [gatewayNow,intentNow,transactionsNow]=await Promise.all([
+        tableNames(["sepay_payment_orders"]),tableNames(["sepay_checkout_intents"]),tableNames(["sepay_checkout_transactions"])
+      ]);
+      console.error("Post-failure read-only Production state: 0022="+names.has(targetMigrations[0])+", 0023="+names.has(targetMigrations[1])+", gateway="+Boolean(gatewayNow.length)+", intent="+Boolean(intentNow.length)+", transactions="+Boolean(transactionsNow.length)+". No customer/payment rows were queried.");
+      throw error;
+    }
   }finally{rmSync(folder,{recursive:true,force:true});}
 
   const applied=await query("SELECT name FROM d1_migrations WHERE name IN ('"+targetMigrations.join("','")+"')");
