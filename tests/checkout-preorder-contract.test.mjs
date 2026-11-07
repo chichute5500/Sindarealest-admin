@@ -115,6 +115,8 @@ assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
 assert.ok(html.includes("QR đã điền sẵn số tiền và nội dung chuyển khoản. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN"),'QR instructions warn customers not to change the encoded transfer details');
 assert.ok(html.indexOf('id="sdCheckoutQrImage"')<html.indexOf('id="sdCheckoutSaveQr"')&&html.indexOf('id="sdCheckoutSaveQr"')<html.indexOf('class="sd-checkout-transfer-notice"'),'Save QR action and transfer notice appear directly below the QR');
+assert.ok(html.includes('.checkout-drawer .sd-checkout-transfer-notice li:first-child{color:var(--ink);font-weight:400;overflow-wrap:anywhere}'),'The first transfer instruction stays in the normal text color');
+assert.ok(html.includes('.checkout-drawer .sd-checkout-transfer-notice li:first-child span{color:#c3212f;font-weight:850}'),'Only the dynamic transfer reference and amount are red');
 assert.ok(html.includes('id="sdCheckoutNoticeReference"')&&html.includes('id="sdCheckoutNoticeAmount"'),'Transfer notice exposes dynamic reference and amount fields');
 assert.ok(html.includes("amount.toLocaleString('en-US')+' VND'"),'The notice displays the exact current transfer amount in VND');
 assert.ok(html.includes('Mỗi mã QR chỉ được sử dụng một lần')&&html.includes('Vui lòng lưu lại biên lai chuyển khoản'),'The transfer notice includes single-use QR and receipt reminders');
