@@ -434,7 +434,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:20000});
  await expect(page.locator('#paymentInstructions')).toContainText('SD-TEST-001');
  await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
- await expect(page.locator('#paymentInstructions')).toContainText('Shop chỉ xác nhận tiền đã nhận');
+ await expect(page.locator('#paymentInstructions')).toContainText('Shop sẽ xác nhận đơn và cập nhật tiến độ xử lý tiếp theo.');
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
  const savedAddress=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-shipping-address')||'null'));
