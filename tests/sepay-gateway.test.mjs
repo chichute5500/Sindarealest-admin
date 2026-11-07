@@ -22,6 +22,10 @@ const checkout=await createSepayCheckout({
 assert.equal(checkout.url,"https://pay-sandbox.sepay.vn/v1/checkout/init");
 assert.equal(checkout.fields.payment_method,"BANK_TRANSFER");
 assert.equal(checkout.fields.order_amount,"100000");
+assert.deepEqual(Object.keys(checkout.fields),[
+  "order_amount","merchant","currency","operation","order_description","order_invoice_number",
+  "customer_id","payment_method","success_url","error_url","cancel_url","lang","signature"
+],"submitted form input order must match SePay's documented signed field order");
 assert.match(checkout.fields.success_url,/payment-result\.html/);
 assert.match(checkout.fields.success_url,/token=/);
 const signedFields=["order_amount","merchant","currency","operation","order_description","order_invoice_number","customer_id","payment_method","success_url","error_url","cancel_url"];
