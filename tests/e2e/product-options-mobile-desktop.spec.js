@@ -321,7 +321,8 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.route('**/test-qr.svg',route=>route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="white"/><path d="M8 8h20v20H8zm28 0h20v20H36zM8 36h20v20H8zm28 0h8v8h-8zm12 8h8v12H48z" fill="black"/></svg>'}));
  const accessToken='preview-access-token-1234567890123456789012345678901234567890';
  let gatewayFields={};
- await page.route('https://pay-sandbox.sepay.vn/v1/checkout/init',async route=>{
+ await page.route('**/v1/checkout/init*',async route=>{
+  expect(new URL(route.request().url()).hostname).toBe('pay-sandbox.sepay.vn');
   gatewayFields=Object.fromEntries(new URLSearchParams(route.request().postData()||'').entries());
   await route.fulfill({status:303,headers:{location:base+'/payment-result.html?order=SD-TEST-001&token='+accessToken}});
  });
