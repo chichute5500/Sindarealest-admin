@@ -70,8 +70,9 @@ async function main(){
   const ledgerRows=await query("SELECT name FROM d1_migrations");
   const ledger=new Set(ledgerRows.map(row=>String(row.name)));
   const allMigrations=readdirSync(resolve("migrations")).filter(name=>/^\d{4}_.+\.sql$/.test(name)).sort();
-  assert.ok(targetMigrations.every(name=>allMigrations.includes(name)),"Target SePay migration files are missing");
-  const unrelatedPending=allMigrations.filter(name=>!targetMigrations.includes(name)&&!ledger.has(name));
+  const wranglerMigrations=allMigrations.filter(name=>Number(name.slice(0,4))>=18);
+  assert.ok(targetMigrations.every(name=>wranglerMigrations.includes(name)),"Target SePay migration files are missing");
+  const unrelatedPending=wranglerMigrations.filter(name=>!targetMigrations.includes(name)&&!ledger.has(name));
   assert.deepEqual(unrelatedPending,[],"Production has unapplied non-SePay migrations; refusing to run them: "+unrelatedPending.join(", "));
   for(const migration of prerequisites)assert.ok(ledger.has(migration),"Required prior migration is not recorded: "+migration);
 
@@ -106,9 +107,9 @@ async function main(){
   const config=join(folder,"wrangler.toml"),backup=join(folder,"before-sepay.sql");
   try{
     mkdirSync(join(folder,"migrations"));
-    // Wrangler validates the local migration history against the remote ledger. Include the full
-    // history, but the guard above requires every non-target migration to already be recorded.
-    for(const name of allMigrations)copyFileSync(resolve("migrations",name),join(folder,"migrations",name));
+    // Production has a legacy schema baseline before 0018; its D1 ledger starts at 0018.
+    // Include the recorded 0018–0021 history so Wrangler can validate it, then only pending 0022/0023.
+    for(const name of wranglerMigrations)copyFileSync(resolve("migrations",name),join(folder,"migrations",name));
     writeFileSync(config,[
       'name = "sd-sepay-production-migration"','compatibility_date = "2026-10-12"',
       '[[d1_databases]]','binding = "DB"','database_name = '+JSON.stringify(target.name),
