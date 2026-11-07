@@ -51,4 +51,13 @@ assert.deepEqual(preview({ input: "1400000" }), { state: "exact", title: "Nhận
 assert.deepEqual(preview({ input: "1600000" }), { state: "over", title: "Nhận dư 200.000 đ", received: "1.600.000 đ", shortfall: "0 đ", cod: "2.900.000 đ", over: "200.000 đ", surplusHidden: false });
 assert.deepEqual(preview({ option: "full", required: 4_275_000, current: 3_000_000, codExpected: 0 }), { state: "short", title: "Nhận thiếu · còn thiếu 1.275.000 đ", received: "3.000.000 đ", shortfall: "1.275.000 đ", cod: "0 đ", over: "0 đ", surplusHidden: true });
 assert.equal(preview({ option: "full", required: 4_275_000, current: 3_000_000, codExpected: 0, input: "1275000" }).state, "exact");
-console.log("PASS: Admin live receipt preview covers no transfer, short, exact, excess, and discounted full payment.");
+
+const statusStart=html.indexOf("function orderReceiptStateLabel(summary){");
+const statusEnd=html.indexOf("\\nfunction updateOrderReceiptPreview",statusStart);
+assert.ok(statusStart>=0&&statusEnd>statusStart,"Payment-option-aware order status label is present");
+const paymentStatus=new Function(html.slice(statusStart,statusEnd)+"; return orderPaymentStatusLabel;")();
+assert.equal(paymentStatus("pending",{payment_summary:{paymentOption:"deposit",requiredAmount:100_000,shortfall:0,paidInFull:false}}),"Đã nhận cọc");
+assert.equal(paymentStatus("paid",{payment_summary:{paymentOption:"full",requiredAmount:950_000,shortfall:0,paidInFull:true}}),"Đã nhận đủ");
+assert.equal(paymentStatus("pending",{payment_summary:{paymentOption:"deposit",requiredAmount:100_000,shortfall:40_000,netReceivedAmount:60_000}}),"Nhận thiếu");
+assert.match(html,/const paymentLabel=orderPaymentStatusLabel\\(o\\.payment_status,o\\)/,"The order list labels payment in the context of the selected option");
+console.log("PASS: Admin receipt preview and order-list payment labels distinguish deposit, full payment, short, exact, and excess.");
