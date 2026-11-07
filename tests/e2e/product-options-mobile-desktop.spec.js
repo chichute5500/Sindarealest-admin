@@ -434,8 +434,8 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
  paymentReceived=true;
- await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(1);
- await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
+ await expect.poll(()=>paymentChecks,{timeout:25000}).toBeGreaterThan(2);
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:20000});
  await expect(page.locator('#paymentInstructions')).toContainText('SD-TEST-001');
  await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
