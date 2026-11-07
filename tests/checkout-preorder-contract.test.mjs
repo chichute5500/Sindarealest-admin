@@ -159,8 +159,8 @@ assert.match(html,/Thanh toán hết · giảm 5%/,'Product detail clearly displ
 assert.match(html,/openCheckout\(\{items:\[\{id,option,quantity:1\}\],paymentChoice:detailPaymentChoice\}\)/,'Buy now carries the payment choice into checkout');
 assert.match(html,/async function saveCheckoutAddressFromForm\(\)/,'A successfully placed order saves its address for the next order');
 assert.match(html,/function loadLocalShippingAddress\(\)\{if\(accountSyncMode==='cloud'\)/,'Local saved addresses remain available if account sync is guest, loading, or failed');
-assert.match(html,/Lưu mã đơn bên dưới để theo dõi tiến độ\. Shop sẽ cập nhật khi đã nhận thanh toán\./,'Paid view uses the requested progress message');
-assert.match(html,/sd-order-received-note[\s\S]*Shop sẽ xác nhận đơn và bắt đầu làm hàng sau khi nhận đủ khoản thanh toán đã chọn\./,'Order confirmation explains when production starts');
+assert.match(html,/Lưu mã đơn hàng để kiểm tra tiến độ đơn hàng/,'Paid view uses the requested progress message');
+assert.match(html,/sd-order-received-note[\s\S]*Shop sẽ xác nhận đơn và cập nhật tiến độ xử lý tiếp theo\./,'Order confirmation explains when production starts');
 assert.match(html,/\.checkout-drawer \[hidden\]\{display:none!important\}/,'Hidden checkout actions remain hidden after order submission');
 // The reviewed address belongs directly beneath the completed "Thông tin" step,
 // not between the product summary and the payment choices.
