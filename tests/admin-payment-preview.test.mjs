@@ -52,7 +52,7 @@ assert.deepEqual(preview({ input: "1600000" }), { state: "over", title: "Nhận 
 assert.deepEqual(preview({ option: "full", required: 4_275_000, current: 3_000_000, codExpected: 0 }), { state: "short", title: "Nhận thiếu · còn thiếu 1.275.000 đ", received: "3.000.000 đ", shortfall: "1.275.000 đ", cod: "0 đ", over: "0 đ", surplusHidden: true });
 assert.equal(preview({ option: "full", required: 4_275_000, current: 3_000_000, codExpected: 0, input: "1275000" }).state, "exact");
 
-const statusStart=html.indexOf("function orderReceiptStateLabel(summary){");
+const statusStart=stateStart;
 const statusEnd=html.indexOf("\nfunction updateOrderReceiptPreview",statusStart);
 assert.ok(statusStart>=0&&statusEnd>statusStart,"Payment-option-aware order status label is present");
 const paymentStatus=new Function(html.slice(statusStart,statusEnd)+"; return orderPaymentStatusLabel;")();
