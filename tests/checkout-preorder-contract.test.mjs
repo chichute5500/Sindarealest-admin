@@ -124,7 +124,8 @@ assert.match(html,/async function sdCheckoutFinalizeOrder\(\)[\s\S]*fetch\('\/ap
 const checkoutSubmit=html.match(/\$\('#checkoutForm'\)\.addEventListener\('submit',[\s\S]*?(?=\$\('#detailOrderLink')/)?.[0]||'';
 assert.match(checkoutSubmit,/sdCheckoutLoadPaymentInstructions/,'The payment step prepares a read-only QR quote');
 assert.doesNotMatch(checkoutSubmit,/fetch\('\/api\/orders'/,'Opening the QR does not create an order');
-assert.match(create,/requestedTransferReference&&\(!qrSnapshot/,'Finalization refuses a stale or changed QR snapshot');
+assert.match(create,/createSepayCheckout\(/,'Finalization creates a server-signed SePay checkout session');
+assert.doesNotMatch(create,/payment_qr_active|paymentQrImageKey|requestedTransferReference|qrSnapshot/,'New checkout cannot accept or depend on a static QR snapshot');
 assert.match(html,/progress>=100\?'Đang lấy mã đơn'/,'The slider changes to the requested loading label at completion');
 assert.match(html,/sdCheckoutConfirmRange'\)\.setAttribute\('aria-valuetext','0%'\)/,'Reopening checkout resets the slider accessibility value');
 assert.match(html,/sdCheckoutOrderCreated\)return/,'The code stage cannot appear before order creation succeeds');
