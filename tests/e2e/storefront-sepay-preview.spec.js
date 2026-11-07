@@ -126,7 +126,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  expect(await page.locator('#sdCheckoutSaveQr').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('.sd-checkout-transfer-notice'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
  expect(await page.locator('#sdCheckoutQrWarning').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('#sdCheckoutQrImage'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
  await expect(page.locator('#paymentInstructions')).not.toContainText('Tiếp tục đến QR');
- await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumber);
+ await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[0]);
  await expect(page.locator('#paymentInstructions')).toContainText('Số tiền cần chuyển');
  await expect(page.locator('#paymentInstructions .sd-sepay-loading')).toHaveCount(0);
  await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-inline-qr-pending-mobile.png'});
