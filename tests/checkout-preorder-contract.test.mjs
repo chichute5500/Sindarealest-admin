@@ -202,7 +202,7 @@ assert.match(html,/Số tiền thanh toán khi nhận hàng '\+formatVnd\(choice
 assert.match(html,/id="sdCheckoutDone"[^>]*>Lấy mã đơn/,'When QR is unavailable, order creation still happens only on explicit action');
 assert.match(html,/sd-checkout-success \.sd-checkout-actions\{grid-template-columns:minmax\(0,1fr\)\}/,'Success actions use the full footer width instead of the former narrow left column');
 assert.doesNotMatch(html,/Lưu mã đơn bên dưới để tra cứu|Đã gửi đơn\. Thông tin và mã đơn|Chọn phương thức hoặc gửi đơn không đồng nghĩa|COD còn phải thu/,'Old confusing confirmation copy is removed');
-assert.match(create,/paymentRequestWriteIndex[\s\S]*customer_checkout/,'Checkout creates a payment request from the Shop QR without writing a receipt');
+assert.match(create,/sepayWriteIndex[\s\S]*sepay_payment_orders/,'Checkout persists a pending SePay payment order without writing a receipt');
 assert.match(create,/payment_terms_confirmed_by[\s\S]*customer_checkout/,'A confirmed catalog price and explicit customer choice define checkout terms');
 assert.match(create,/customerPaymentVerified:false/,'Creating a QR request must not mark money received');
 assert.match(html,/sdCheckoutSubmitSepay|sepayCheckout/,"Checkout submits the signed SePay form to its hosted checkout");
