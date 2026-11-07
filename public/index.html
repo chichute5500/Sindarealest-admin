@@ -5082,8 +5082,8 @@ function sdCheckoutStartIntentPolling(intentId,token,items,fromCart){
    if(data.orderNumber&&data.paymentSummary){
     sdCheckoutOrderCreated=true;sdCheckoutClearPendingIntent();checkoutItemsOverride=null;
     const panel=$('#paymentInstructions');
-    renderPaymentInstructions({...data,paymentProvider:'sepay',paid:true},token,{deferOrderCode:true});
-    panel.dataset.paymentConfirmed='true';panel.dataset.stage='sepay-pending';sdCheckoutAdvanceToOrderCode(true);
+    window.sdRenderPaymentInstructions({...data,paymentProvider:'sepay',paid:true},token,{deferOrderCode:true});
+    panel.dataset.paymentConfirmed='true';panel.dataset.stage='sepay-pending';window.sdCheckoutAdvanceToOrderCode(true);
     const transferStage=panel.querySelector('.sd-payment-transfer-stage'),orderStage=panel.querySelector('.sd-payment-order-stage');
     if(orderStage){panel.dataset.stage='order';transferStage?.setAttribute('hidden','');orderStage.removeAttribute('hidden')}
     // Order visibility is authoritative as soon as the server returns its order
