@@ -22,7 +22,7 @@ export async function onRequestPost({request,env}) {
   const invoice=referenceText.match(/SD-[A-Z0-9]+-[A-Z0-9]{6}/)?.[0]||"";
   if(!invoice)return accepted();
   try{
-    const bank=await loadSepayBankConfig(env.DB);
+    const bank=loadSepayBankConfig(env);
     if(!bank||String(payload.accountNumber||"").replace(/\s+/g,"")!==bank.accountNumber)return accepted();
     const checkout=await env.DB.prepare(
       "SELECT id,order_id,amount,status FROM sepay_payment_orders WHERE order_invoice_number=? LIMIT 1"
