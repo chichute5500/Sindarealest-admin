@@ -5497,10 +5497,10 @@ function sdCheckoutShowPaymentSuccess(data,token,generation){
   stage.append(kicker,title,copy,next,progress);panel.append(stage);
   $('#sdCheckoutStepTitle').textContent='Thanh toán thành công';$('#sdCheckoutStepSubtitle').textContent='Đang chuyển đến mã đơn hàng…';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=true;
   setTimeout(()=>{
-   if(panel.dataset.stage!=='payment-success')return;
+   if(generation!==sdCheckoutFlowGeneration||!$('#checkoutDrawer')?.classList.contains('open')||panel.dataset.stage!=='payment-success')return;
    stage.classList.add('sd-payment-stage-exit');panel.dataset.stage='order-transition';
    setTimeout(()=>{
-    if(panel.dataset.stage!=='order-transition')return;
+    if(generation!==sdCheckoutFlowGeneration||!$('#checkoutDrawer')?.classList.contains('open')||panel.dataset.stage!=='order-transition')return;
     window.sdRenderPaymentInstructions({...data,paymentProvider:'sepay',paid:true},token,{deferOrderCode:true});
     panel.dataset.paymentConfirmed='true';panel.dataset.stage='sepay-pending';
     panel.querySelector('.sd-payment-order-stage')?.classList.add('sd-payment-stage-enter');
@@ -5800,7 +5800,7 @@ function openCheckout(options={}){
  panel.classList.remove('sd-checkout-success');panel.removeAttribute('inert');panel.classList.add('open');panel.setAttribute('aria-hidden','false');
  backdrop.classList.add('open');document.body.style.overflow='hidden';
  $('#sdCheckoutQrMount').append($('#sdCheckoutQrWrap'));$('#sdCheckoutQrWrap').hidden=true;$('#sdCheckoutBankFeedback').textContent='';
- sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--sd-confirm-fill','0px');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();
+ sdCheckoutQuote=null;sdCheckoutSuccess=false;sdCheckoutOrderCreated=false;sdCheckoutChoice='';$('#checkoutSubmit').type='submit';$('#checkoutSubmit').hidden=false;$('#checkoutSubmit').textContent=sdCheckoutSubmitLabel();$('#sdCheckoutDone').hidden=true;$('#sdCheckoutDone').disabled=false;$('#sdCheckoutDone').textContent='Đóng';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutConfirmRange').disabled=false;$('#sdCheckoutConfirmLabel').textContent='Xác nhận đã thanh toán';$('#sdCheckoutConfirmRange').value='0';$('#sdCheckoutConfirmRange').setAttribute('aria-valuetext','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--progress','0%');$('#sdCheckoutConfirmWrap').style.setProperty('--sd-confirm-fill','0px');$('#sdCheckoutPrev').hidden=false;$('#paymentInstructions').hidden=true;$('#paymentInstructions').replaceChildren();delete $('#paymentInstructions').dataset.stage;delete $('#paymentInstructions').dataset.paymentConfirmed;
  const savedAddress=loadLocalShippingAddress(),maySkipAddress=savedCheckoutAddressComplete(savedAddress);
  // Do not show a blank Payment address card before asynchronous saved-address hydration.
  // Keep the original address, quote, selection and order logic unchanged.
@@ -5826,6 +5826,7 @@ function closeCheckout(restoreFocus=true){
  clearTimeout(sdCheckoutPaymentPollTimer);sdCheckoutPaymentPollTimer=0;sdCheckoutFlowGeneration++;sdCheckoutActiveIntentId="";sdCheckoutClearChoicePrompt();
  const panel=$('#checkoutDrawer'),backdrop=$('#checkoutBackdrop');
  if(!panel)return;
+ $('#paymentInstructions').dataset.stage='closed';$('#paymentInstructions').dataset.paymentConfirmed='false';
  const wasOpen=panel.classList.contains('open');
  panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.setAttribute('inert','');
  backdrop.classList.remove('open');

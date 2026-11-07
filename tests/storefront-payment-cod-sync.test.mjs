@@ -77,4 +77,8 @@ const storefront=readFileSync(new URL('../public/index.html',import.meta.url),'u
 assert.match(storefront,/Đã nhận cọc & xác nhận đơn/);
 assert.match(storefront,/Đã nhận đủ & xác nhận đơn/);
 assert.doesNotMatch(storefront,/const SD_ORDER_REFRESH_LABELS=new Set\(\[[^\]]*Chưa đủ tiền cọc/,'the payment status list must not expose an underpaid-deposit state');
+const paymentSuccessFlow=storefront.slice(storefront.indexOf('function sdCheckoutShowPaymentSuccess'),storefront.indexOf('function sdCheckoutStartIntentPolling'));
+assert.equal((paymentSuccessFlow.match(/generation!==sdCheckoutFlowGeneration/g)||[]).length,3,'both delayed success-transition callbacks must reject a stale checkout generation');
+assert.match(storefront,/delete \$\('#paymentInstructions'\)\.dataset\.stage;delete \$\('#paymentInstructions'\)\.dataset\.paymentConfirmed/,'a newly opened checkout must discard the previous payment panel state');
+assert.match(storefront,/\$\('#paymentInstructions'\)\.dataset\.stage='closed'/,'closing checkout must invalidate pending payment-transition timers');
 console.log('PASS: deposit/full quote, rounding, short/exact/excess receipt, COD adjustment and settlement, and shipment eligibility.');

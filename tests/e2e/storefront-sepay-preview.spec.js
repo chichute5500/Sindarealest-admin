@@ -8,7 +8,7 @@ mkdirSync(output,{recursive:true});
 if(!url)throw Error('SD_PAYMENT_PREVIEW_URL is required for the deployed Preview browser test.');
 
 test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async({page})=>{
- test.setTimeout(60000);
+ test.setTimeout(90000);
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
  const origin=new URL(url).origin;
@@ -19,6 +19,12 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  const products=[{
   id:'qa-wallet',sku:'QA-WALLET-001',title:'Ví QA SePay',category:'wallets',
   categoryLabel:'Ví nam',slug:'qa-wallet-sepay',skuVerified:true,
+  images:['images/brand-emblem.png'],description:'Preview fixture; no real purchase.',
+  price:100000,sourcePriceConfirmed:true,fulfillmentType:'made_to_order',
+  published:true,stock:5
+ },{
+  id:'qa-wallet-next',sku:'QA-WALLET-002',title:'Ví QA SePay tiếp theo',category:'wallets',
+  categoryLabel:'Ví nam',slug:'qa-wallet-sepay-next',skuVerified:true,
   images:['images/brand-emblem.png'],description:'Preview fixture; no real purchase.',
   price:100000,sourcePriceConfirmed:true,fulfillmentType:'made_to_order',
   published:true,stock:5
@@ -96,7 +102,11 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await page.locator('[data-open-product="qa-wallet"]').first().evaluate(node=>node.click());
  await page.locator('#detailAdd').click();
  await page.locator('#detailClose').click();
+ await page.locator('[data-open-product="qa-wallet-next"]').first().click({force:true});
+ await page.locator('#detailAdd').click({force:true});
+ await page.locator('#detailClose').click({force:true});
  await page.locator('#cartOpen').click();
+ await page.locator('[data-cart-pick="qa-wallet-next"]').uncheck();
  await page.locator('#cartCheckout').click();
  await page.locator('#checkoutForm input[name="fullName"]').fill('Khách QA Sandbox');
  await page.locator('#checkoutForm input[name="phone"]').fill('0900000000');
@@ -153,18 +163,25 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toHaveCount(0);
  await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[0]);
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
+ // Stretch only the success-to-order animation timer so the next-checkout
+ // action can happen deterministically before the previous callback fires.
+ await page.evaluate(()=>{const nativeSetTimeout=window.setTimeout.bind(window);window.setTimeout=(callback,delay,...args)=>nativeSetTimeout(callback,delay===1320?12000:delay,...args)});
  newPaid=true;
  await expect.poll(()=>paidStatusChecks,{timeout:10000}).toBeGreaterThan(1);
  await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toContainText('Thanh toán thành công');
- await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
- await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
- await expect(page.locator('#paymentInstructions')).not.toContainText('Shop chỉ xác nhận tiền đã nhận sau khi đối chiếu sao kê');
- await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Đã nhận cọc và xác nhận đơn. Shop sẽ cập nhật tiến độ làm hàng và gửi hàng.');
- await expect(page.locator('#paymentInstructions')).toContainText(orderNumbers[1]);
- await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
- await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
- await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-inline-qr-mobile.png'});
+ // Return to the cart and immediately start a fresh checkout while the previous
+ // success-to-order transition timers could still be pending.
+ await page.goBack();
+ await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+ await page.locator('[data-cart-pick="qa-wallet-next"]').check();
+ await page.locator('#cartCheckout').click();
+ await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+ await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[1]);
+ await page.waitForTimeout(12200);
+ await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+ await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[1]);
+ await expect(page.locator('#sdCheckoutStepTitle')).not.toHaveText('Mã đơn hàng');
  expect(quoteBodies.some(body=>body.paymentOption==='deposit')).toBe(true);
  expect(orderCalls).toBe(2);
 });
