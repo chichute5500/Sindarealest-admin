@@ -321,7 +321,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.route('**/test-qr.svg',route=>route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="white"/><path d="M8 8h20v20H8zm28 0h20v20H36zM8 36h20v20H8zm28 0h8v8h-8zm12 8h8v12H48z" fill="black"/></svg>'}));
  const accessToken='preview-access-token-1234567890123456789012345678901234567890';
  let gatewayFields={};
- await page.route('https://sandbox.pay.sepay.vn/v1/checkout/init',async route=>{
+ await page.route('https://pay-sandbox.sepay.vn/v1/checkout/init',async route=>{
   gatewayFields=Object.fromEntries(new URLSearchParams(route.request().postData()||'').entries());
   await route.fulfill({status:303,headers:{location:base+'/payment-result.html?order=SD-TEST-001&token='+accessToken}});
  });
@@ -329,7 +329,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
   orderBodies.push(route.request().postDataJSON());
   await new Promise(resolve=>setTimeout(resolve,120));
   const resultUrl=base+'/payment-result.html?order=SD-TEST-001&token='+accessToken;
-  await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:accessToken,status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentSummary:{status:'shortfall',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false},paymentReady:true,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentInstructions:{status:'ready',provider:'sepay',amount:100000},sepayCheckout:{url:'https://sandbox.pay.sepay.vn/v1/checkout/init',fields:{order_amount:'100000',merchant:'MERCHANT_TEST',currency:'VND',operation:'PURCHASE',order_description:'SinDarealest SD-TEST-001',order_invoice_number:'SD-TEST-001',customer_id:'qa',payment_method:'BANK_TRANSFER',success_url:resultUrl,error_url:resultUrl,cancel_url:resultUrl,signature:'qa-signature'}},message:'Đang chuyển bạn đến SePay.'})});
+  await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:accessToken,status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentSummary:{status:'shortfall',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false},paymentReady:true,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentInstructions:{status:'ready',provider:'sepay',amount:100000},sepayCheckout:{url:'https://pay-sandbox.sepay.vn/v1/checkout/init',fields:{order_amount:'100000',merchant:'MERCHANT_TEST',currency:'VND',operation:'PURCHASE',order_description:'SinDarealest SD-TEST-001',order_invoice_number:'SD-TEST-001',customer_id:'qa',payment_method:'BANK_TRANSFER',success_url:resultUrl,error_url:resultUrl,cancel_url:resultUrl,signature:'qa-signature'}},message:'Đang chuyển bạn đến SePay.'})});
  });
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
