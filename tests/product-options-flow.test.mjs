@@ -59,7 +59,7 @@ assert.equal(productOptionLabel('belts','4.0'),'Bản dây 4.0 cm');
 
 const db=new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
-for(const name of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql'])
+for(const name of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql','0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql','0022_sepay_payment_gateway.sql','0023_sepay_checkout_intents.sql'])
  db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
 db.prepare("UPDATE settings SET value='1' WHERE key='show_prices'").run();
 
@@ -145,6 +145,24 @@ try {
  assert.equal(customItem.title,'Ví mẫu · 22 × 12 × 4 cm · Màu Đen');
  const selections=JSON.parse(db.prepare("SELECT details_json FROM audit_logs WHERE entity_type='order' ORDER BY rowid DESC LIMIT 1").get().details_json).itemSelections;
  assert.equal(selections[0].imageVariant,'images/wallet-black.webp','Order audit snapshot must retain the exact selected product image');
+
+ // SePay must retain the same main-branch size/image validation and snapshot,
+ // while leaving the order table untouched until a signed receipt arrives.
+ db.exec('DELETE FROM public_rate_limits');
+ const sepayEnv={...env,SEPAY_WEBHOOK_SECRET:'QA_WEBHOOK_SECRET_NONPRODUCTION_123456',SEPAY_QR_BANK_CODE:'VCB',SEPAY_QR_BANK_NAME:'Vietcombank',SEPAY_QR_BANK_ACCOUNT:'1234567890',SEPAY_QR_ACCOUNT_NAME:'QA TEST OWNER'};
+ const beforeSepayOrderCount=db.prepare('SELECT COUNT(*) AS n FROM orders').get().n;
+ const sepayResponse=await createOrder({env:sepayEnv,request:new Request(endpoint,{method:'POST',headers:{Origin:'https://qa.invalid','Content-Type':'application/json','CF-Connecting-IP':'203.0.113.88'},body:JSON.stringify({...body,items:[{id:'opt-custom',quantity:1,option:'',sizeOption:'22 × 12 × 4 cm',imageVariant:'images/wallet-black.webp'}],paymentOption:'deposit',quotedTotal:800000})})});
+ assert.equal(sepayResponse.status,201,await sepayResponse.clone().text());
+ const sepayIntent=await sepayResponse.json();
+ assert.equal(sepayIntent.paymentProvider,'sepay');
+ assert.equal(typeof sepayIntent.checkoutIntentId,'string');
+ assert.equal('orderNumber' in sepayIntent,false,'No public order code exists before payment verification');
+ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,beforeSepayOrderCount);
+ const intentSnapshot=JSON.parse(db.prepare('SELECT payload_json FROM sepay_checkout_intents WHERE id=?').get(sepayIntent.checkoutIntentId).payload_json);
+ assert.equal(intentSnapshot.items[0].shoeSize,'22 × 12 × 4 cm');
+ assert.equal(intentSnapshot.items[0].imageVariant,'images/wallet-black.webp');
+ const sepayAuditSource=readFileSync(new URL('../functions/api/sepay/webhook.js',import.meta.url),'utf8');
+ assert.match(sepayAuditSource,/itemSelections:snapshot\.items\.map\(item=>\(\{itemId:item\.id,imageVariant:item\.imageVariant\|\|""\}\)\)/,'Verified SePay order audit retains selected product image');
 
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
  const adminHtml=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');

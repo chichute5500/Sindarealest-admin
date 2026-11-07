@@ -1,5 +1,6 @@
 name: Storefront payment experiment — isolated Preview
 # This branch's marked candidate push runs one guarded Preview deploy and browser pass.
+# An explicit candidate comment-only commit can redeploy Pages after Preview binding or secret updates.
 # Candidate marker is required in the triggering commit subject.
 
 on:
@@ -11,6 +12,7 @@ on:
       - feat/storefront-payment-cod-sync-20261101
     paths:
       - 'public/index.html'
+      - 'public/payment-result.html'
       - 'public/cart-glass-optics.js'
       - 'public/checkout-glass-optics.js'
       - 'public/admin/index.html'
@@ -22,6 +24,8 @@ on:
       - 'public/logo.png'
       - 'public/images/brand-emblem.png'
       - 'tests/**'
+      - 'migrations/0022_sepay_payment_gateway.sql'
+      - 'migrations/0023_sepay_checkout_intents.sql'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/storefront-payment-experiment-preview.yml'
@@ -36,7 +40,7 @@ concurrency:
 
 jobs:
   deploy-preview:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -103,7 +107,7 @@ jobs:
           python3 -m http.server 4173 --directory public > /tmp/storefront-test-preview.log 2>&1 &
           for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
           SD_OPTIONS_BASE_URL=http://127.0.0.1:4173 npx playwright test tests/e2e/product-options-mobile-desktop.spec.js -g 'Sandals require size|Buy now and cart selection' --reporter=line
-          npx playwright test tests/e2e/storefront-payment-preview.spec.js --reporter=line
+          npx playwright test tests/e2e/storefront-sepay-preview.spec.js --reporter=line
       - name: Save real Preview screenshots and Playwright evidence
         if: always()
         uses: actions/upload-artifact@v4

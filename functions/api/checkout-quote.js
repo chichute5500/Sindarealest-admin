@@ -1,6 +1,7 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, parseProductOptions, readJsonBodyLimited } from "../_lib.js";
 import { calculateCheckoutQuote, validPublicQrImageKey, checkoutTransferSku, makeCheckoutTransferReference } from "../_payments.js";
 import { normalizeProductOption, normalizeProductSize, normalizeProductImageVariant } from "../_product-options.js";
+import { loadSepayBankConfig, sepayBankTransferReady, sepayCheckoutSchemaReady } from "../sepay.js";
 
 const NO_STORE={"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"};
 
@@ -45,18 +46,22 @@ export async function onRequestPost({request,env}) {
       return {fulfillmentType:normalizeFulfillmentType(p.fulfillment_type),quantity:requested.get(id),unitPrice};
     }));
     if(!quote.eligible)return json({ok:true,quoteReady:false,paymentReady:false,reason:quote.reason,fulfillmentType:quote.fulfillmentType||"unclassified",options:[]},200,NO_STORE);
-    const keys=await Promise.all(["payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name","payment_qr_instructions"].map(k=>getSetting(env.DB,k,"")));
-    const [active,key,bankName,accountNumber,accountName,instructions]=keys;
+    const keys=await Promise.all(["payment_qr_active","payment_qr_active_key","payment_qr_bank_name","payment_qr_account_number","payment_qr_account_name"].map(k=>getSetting(env.DB,k,"")));
+    const [active,key,bankName,accountNumber,accountName]=keys;
     const selectedOption=parsed.value?.paymentOption==="deposit"||parsed.value?.paymentOption==="full"?parsed.value.paymentOption:"";
     const selected=selectedOption?quote.options.find(option=>option.value===selectedOption):null;
     if(selectedOption&&(!selected||parsed.value?.quotedTotal!==quote.total))return fail("Giá trị hoặc cách thanh toán đã thay đổi. Vui lòng kiểm tra lại.",409);
-    const configured=Boolean(transferReference)&&active==="1"&&validPublicQrImageKey(key)&&!!bankName&&!!accountNumber&&!!accountName
+    const manualQrReady=Boolean(transferReference)&&active==="1"&&validPublicQrImageKey(key)&&!!bankName&&!!accountNumber&&!!accountName
       &&typeof env.IMAGES?.head==="function"&&Boolean(await env.IMAGES.head(key));
-    const paymentDetails=selectedOption&&configured?{status:"ready",qrImageUrl:"/payment-qr/"+key,qrIncludesAmount:false,amount:selected.amount,bankName,accountName,accountNumber,transferContent:transferReference}:null;
-    return json({ok:true,quoteReady:true,paymentReady:Boolean(configured),fulfillmentType:quote.fulfillmentType,total:quote.total,options:quote.options,
+    const bank=loadSepayBankConfig(env),sepayConfigured=sepayBankTransferReady(env,bank);
+    const sepayReady=sepayConfigured&&await sepayCheckoutSchemaReady(env.DB);
+    const configured=sepayReady||manualQrReady;
+    const paymentDetails=selectedOption&&sepayReady?{status:"ready",provider:"sepay",amount:selected.amount}
+      :selectedOption&&manualQrReady?{status:"ready",provider:"manual_qr",qrImageUrl:"/payment-qr/"+key,qrIncludesAmount:false,amount:selected.amount,bankName,accountName,accountNumber,transferContent:transferReference}:null;
+    return json({ok:true,quoteReady:true,paymentReady:Boolean(configured),paymentProvider:sepayReady?"sepay":manualQrReady?"manual_qr":"",fulfillmentType:quote.fulfillmentType,total:quote.total,options:quote.options,
       reason:configured?"":(!transferReference?"Cần số điện thoại hợp lệ và mã SKU trước khi hiện QR.":"QR ngân hàng chưa được Shop kích hoạt hoặc xác minh. Chưa chuyển khoản; vẫn có thể gửi yêu cầu đặt hàng."),
-      ...(selectedOption?{paymentOption:selectedOption,selectedPaymentAmount:selected.amount,paymentInstructions:paymentDetails,transferReference:configured?transferReference:"",paymentQrImageKey:configured?key:""}:{}),
-      transferReferenceAvailableAfterSubmit:false
+      ...(selectedOption?{paymentOption:selectedOption,selectedPaymentAmount:selected.amount,paymentInstructions:paymentDetails,transferReference:manualQrReady&&!sepayReady?transferReference:"",paymentQrImageKey:manualQrReady&&!sepayReady?key:""}:{}),
+      transferReferenceAvailableAfterSubmit:sepayReady
     },200,NO_STORE);
   }catch{return fail("Không kiểm tra được hình thức thanh toán. Vui lòng thử lại.",503)}
 }
