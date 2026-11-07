@@ -30,7 +30,7 @@ const DB={
       async all(){return {results:db.prepare(sql).all(...args)}},
       async run(){const result=db.prepare(sql).run(...args);return {success:true,meta:{changes:Number(result.changes)}}},
       execute(){
-        if(/^\\s*(?:SELECT|WITH|PRAGMA)\\b/i.test(sql))return {success:true,results:db.prepare(sql).all(...args),meta:{changes:0}};
+        if(/^\s*(?:SELECT|WITH|PRAGMA)\b/i.test(sql))return {success:true,results:db.prepare(sql).all(...args),meta:{changes:0}};
         const result=db.prepare(sql).run(...args);return {success:true,meta:{changes:Number(result.changes)}};
       }
     };
@@ -83,7 +83,7 @@ assert.ok(created.sepayCheckout.fields.signature);
 const order=db.prepare('SELECT id,public_access_token_hash FROM orders WHERE order_number=?').get(created.orderNumber);
 assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
 const gateway=db.prepare('SELECT order_invoice_number,amount,status FROM sepay_payment_orders WHERE order_id=?').get(order.id);
-assert.deepEqual(gateway,{order_invoice_number:created.orderNumber,amount:142500,status:'pending'});
+assert.equal(gateway.order_invoice_number,created.orderNumber);\nassert.equal(gateway.amount,142500);\nassert.equal(gateway.status,'pending');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0,
   'New checkout does not create a manual QR payment request');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?').get(order.id).n,0,
