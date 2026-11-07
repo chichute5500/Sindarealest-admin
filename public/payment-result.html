@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#f4f8f5">
+<title>Kiểm tra thanh toán · SinDarealest</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#eef4f1;color:#17221d}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:20px}
+main{width:min(100%,480px);padding:26px;border:1px solid #ffffffb0;border-radius:24px;background:#ffffffc9;box-shadow:0 18px 55px #173b2b1c;backdrop-filter:blur(22px)}
+h1{margin:0 0 10px;font-size:23px}p{line-height:1.6;color:#59655f}
+#status{font-weight:650;color:#1b5d42}a{display:inline-block;margin-top:12px;color:#176b48}
+@media(prefers-color-scheme:dark){:root{background:#121916;color:#f2f7f3}main{background:#202b25d9;border-color:#ffffff26}p{color:#c2cdc6}#status{color:#92e1b3}}
+</style>
+</head>
+<body>
+<main>
+<h1>Trạng thái thanh toán</h1>
+<p id="status" role="status" aria-live="polite">Đang kiểm tra với SePay…</p>
+<p id="detail">SePay sẽ gửi xác nhận thanh toán trực tiếp đến hệ thống SinDarealest. Màn hình quay về này chưa tự xác nhận tiền.</p>
+<a href="/">Quay về SinDarealest</a>
+</main>
+<script>
+(async()=>{
+ const status=document.getElementById("status"),detail=document.getElementById("detail");
+ const query=new URLSearchParams(location.search),order=query.get("order")||"",token=query.get("token")||"";
+ if(!order||token.length<40){status.textContent="Thiếu thông tin để tra cứu đơn hàng.";return}
+ const result=query.get("result")||"";
+ if(result==="error")detail.textContent="SePay báo giao dịch chưa hoàn tất. Bạn có thể kiểm tra lại đơn hàng hoặc liên hệ Shop.";
+ if(result==="cancel")detail.textContent="Bạn đã rời bước thanh toán. Đơn hàng vẫn được lưu để Shop hỗ trợ.";
+ let attempts=0;
+ async function check(){
+  attempts++;
+  try{
+   const response=await fetch("/api/order-payment?orderNumber="+encodeURIComponent(order)+"&token="+encodeURIComponent(token),{cache:"no-store",headers:{Accept:"application/json"}});
+   const data=await response.json();
+   if(!response.ok||data.ok!==true)throw new Error(data.error||"Không tra cứu được đơn hàng.");
+   const summary=data.paymentSummary||{};
+   const received=Number(summary.netReceivedAmount||0);
+   if(data.gatewayStatus==="paid"||received>0&&Number(summary.shortfall)===0){
+    status.textContent="SePay đã xác nhận thanh toán.";
+    detail.textContent="Shop đã nhận thông báo thanh toán. Mã đơn "+order+".";
+    return;
+   }
+   if(data.gatewayStatus==="void"||result==="error"||result==="cancel"){
+    status.textContent=result==="cancel"?"Bạn đã hủy bước thanh toán.":"Giao dịch chưa hoàn tất.";
+    return;
+   }
+   status.textContent="Đang chờ SePay xác nhận giao dịch.";
+   detail.textContent="Mã đơn "+order+". Trạng thái thanh toán sẽ tự cập nhật khi SePay xác nhận.";
+   if(attempts<23)setTimeout(check,4000);
+   else detail.textContent="Chưa nhận được xác nhận từ SePay. Vui lòng đợi một chút rồi kiểm tra lại đơn hàng.";
+  }catch(error){
+   status.textContent=error.message||"Chưa tra cứu được trạng thái.";
+   if(attempts<23)setTimeout(check,4000);
+  }
+ }
+ await check();
+})();
+</script>
+</body>
+</html>

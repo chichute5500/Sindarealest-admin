@@ -9,7 +9,12 @@ compatibility_date = "2026-10-12"
 # D1 Variable name: DB
 # R2 Variable name: IMAGES (public optimized product images and watermark logo)
 # R2 Variable name: ORIGINALS (private originals; separate non-public R2 bucket)
-# Secrets (Production): ADMIN_PASSWORD, SESSION_SECRET
+# Direct bank-transfer SePay requires secret SEPAY_WEBHOOK_SECRET plus plain
+# SEPAY_QR_BANK_CODE, SEPAY_QR_BANK_NAME, SEPAY_QR_BANK_ACCOUNT,
+# SEPAY_QR_ACCOUNT_NAME. Checkout fails closed until these and D1 migrations
+# 0022-0023 are ready. Never commit or print secret values.
+# Optional hosted SePay checkout/IPN uses SEPAY_ENV, SEPAY_MERCHANT_ID,
+# SEPAY_MERCHANT_SECRET_KEY, and a separate SEPAY_IPN_SECRET_KEY.
 # Optional Workers AI for admin copywriting: in Pages Dashboard > Settings > Bindings,
 # add Workers AI binding with Variable name AI in Production and Preview, then redeploy.
 # WORKERS_AI_MODEL is optional; ai-description.js uses the validated default model when absent.

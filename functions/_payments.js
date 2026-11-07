@@ -3,6 +3,8 @@ export function createOrderAccessToken() {
   return crypto.randomUUID().replaceAll("-", "") + crypto.randomUUID().replaceAll("-", "");
 }
 
+export const MIN_CHECKOUT_TRANSFER_AMOUNT = 2_000;
+
 export async function hashOrderAccessToken(token) {
   const bytes = new TextEncoder().encode(String(token || ""));
   const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
@@ -63,18 +65,23 @@ export function calculateCheckoutQuote(items) {
     return {eligible:false,reason:"Sản phẩm chưa có giá xác nhận. Shop sẽ liên hệ tư vấn."};
   const total=items.reduce((sum,item)=>sum+item.unitPrice*item.quantity,0);
   if(!Number.isSafeInteger(total)||total<=0||total>2_000_000_000)return {eligible:false,reason:"Tổng tiền chưa hợp lệ; cần Shop xác nhận."};
+  if(total<MIN_CHECKOUT_TRANSFER_AMOUNT)return {eligible:false,reason:"Thanh toán qua ngân hàng cần từ 2.000đ trở lên; Shop sẽ tư vấn thủ công."};
   // Fixed 100k for all-in-stock carts. Other cart types retain their
   // current percentage policy pending a separate mixed-cart decision.
   const types=new Set(items.map(item=>item?.fulfillmentType));
   const fulfillmentType=types.size===1&&types.has("in_stock")?"in_stock":types.size===1&&types.has("made_to_order")?"made_to_order":"unclassified";
-  const deposit=fulfillmentType==="in_stock"?100000:Math.ceil((total*0.3)/100000)*100000;
+  // Keep the usual 100k ready-stock deposit and 100k rounded custom deposit.
+  // For low-value test/sale items, use 30% with a 2k floor so the deposit
+  // remains valid without exceeding the item total.
+  const lowValueDeposit=total<100_000?Math.max(MIN_CHECKOUT_TRANSFER_AMOUNT,Math.ceil(total*0.3)):null;
+  const deposit=lowValueDeposit??(fulfillmentType==="in_stock"?100000:Math.ceil((total*0.3)/100000)*100000);
   const fullAmount=discountedCheckoutFullAmount(total);
-  if(!Number.isSafeInteger(deposit)||deposit<=0||deposit>total||!Number.isSafeInteger(fullAmount)||fullAmount<=0)
+  if(!Number.isSafeInteger(deposit)||deposit<MIN_CHECKOUT_TRANSFER_AMOUNT||deposit>total||!Number.isSafeInteger(fullAmount)||fullAmount<=0)
     return {eligible:false,reason:"Khoản cọc hoặc thanh toán không hợp lệ; Shop sẽ tư vấn thủ công."};
-  return {eligible:true,total,fulfillmentType,options:[
-    {value:"deposit",amount:deposit,requiredAmount:deposit,remainingAmount:total-deposit,codExpected:total-deposit,discountAmount:0,label:fulfillmentType==="in_stock"?"Đặt cọc 100.000đ":"Đặt cọc 30%",shippingBenefit:"standard_shipping"},
-    {value:"full",amount:fullAmount,requiredAmount:fullAmount,remainingAmount:0,codExpected:0,discountAmount:total-fullAmount,label:"Thanh toán toàn bộ · Giảm 5%",shippingBenefit:"free_shipping"}
-  ]};
+  const depositLabel=lowValueDeposit!==null?`Đặt cọc ${deposit.toLocaleString("vi-VN")}đ`:fulfillmentType==="in_stock"?"Đặt cọc 100.000đ":"Đặt cọc 30%";
+  const options=[{value:"deposit",amount:deposit,requiredAmount:deposit,remainingAmount:total-deposit,codExpected:total-deposit,discountAmount:0,label:depositLabel,shippingBenefit:"standard_shipping"}];
+  if(Number.isSafeInteger(fullAmount)&&fullAmount>=MIN_CHECKOUT_TRANSFER_AMOUNT)options.push({value:"full",amount:fullAmount,requiredAmount:fullAmount,remainingAmount:0,codExpected:0,discountAmount:total-fullAmount,label:"Thanh toán toàn bộ · Giảm 5%",shippingBenefit:"free_shipping"});
+  return {eligible:true,total,fulfillmentType,options};
 }
 
 // Canonical server-side view of verified order money. Only rows written by an

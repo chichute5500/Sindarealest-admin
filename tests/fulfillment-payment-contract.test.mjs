@@ -61,7 +61,7 @@ assert.match(paymentRequestApi, /Object\.hasOwn\(body, "amount"\)/, "client-supp
 assert.match(paymentRequestApi, /calculateCheckoutQuote\(items\.map\(/, "Admin must use item fulfillment type in deposit quotes");
 assert.match(paymentRequestApi, /selected\.selectedPaymentAmount/, "Admin must preserve customer-agreed amount on existing orders");
 assert.doesNotMatch(paymentRequestApi, /fulfillmentTypes\.size !== 1|fulfillmentType === "unclassified"/, "all products remain deliverable under the same two payment methods");
-assert.match(read("../functions/_payments.js"), /fulfillmentType==="in_stock"\?100000:Math\.ceil\(\(total\*0\.3\)\/100000\)\*100000/, "fixed in-stock 100k plus rounded 30% for other fulfillment types");
+assert.match(read("../functions/_payments.js"), /fulfillmentType==="in_stock"\?100000:Math\.ceil\(\(total\*0\.3\)\/100000\)\*100000/, "usual fixed in-stock 100k and rounded 30% policy must remain for regular orders");
 assert.match(paymentRequestApi, /shippingBenefit = "free_shipping"/, "full payment alone grants free shipping");
 assert.match(paymentRequestApi, /selectedTerms\?\.shortfall/, "supplemental amount must use the selected checkout terms and verified ledger");
 assert.doesNotMatch(read("../public/admin/index.html"), /data-payment-amount=/, "Admin must not send a client-controlled amount");

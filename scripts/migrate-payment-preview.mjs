@@ -1,4 +1,4 @@
-// Apply the additive delivery/COD schema to the isolated Admin Preview D1 only.
+// Apply the required payment schemas to the isolated Admin Preview D1 only.
 import assert from "node:assert/strict";
 import {spawnSync} from "node:child_process";
 import {mkdtempSync,mkdirSync,copyFileSync,writeFileSync,rmSync} from "node:fs";
@@ -41,20 +41,30 @@ async function query(sql){
   return response[0].results;
 }
 const ledgerTable=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='d1_migrations'");
-const migrationRecorded=ledgerTable.length===1
-  ?await query("SELECT name FROM d1_migrations WHERE name='0018_payment_delivery_settlement.sql'")
+const recorded=ledgerTable.length===1
+  ?await query("SELECT name FROM d1_migrations WHERE name IN ('0018_payment_delivery_settlement.sql','0022_sepay_payment_gateway.sql','0023_sepay_checkout_intents.sql','0019_sepay_payment_gateway.sql','0020_sepay_checkout_intents.sql')")
   :[];
-const existing=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='order_cod_settlements'");
-if(migrationRecorded.length){
-  const column=await query("SELECT name FROM pragma_table_info('orders') WHERE name='delivery_status'");
-  if(column.length!==1)throw Error("Partial payment/delivery schema detected; refusing to continue.");
-  console.log("PASS: Preview payment/delivery schema already exists; no migration write needed.");
-}else{
-  if(existing.length)throw Error("Preview has payment/delivery tables without migration 0018 history; refusing to alter schema.");
+const has0018=recorded.some(row=>row.name==="0018_payment_delivery_settlement.sql");
+const has0022=recorded.some(row=>row.name==="0022_sepay_payment_gateway.sql");
+const has0023=recorded.some(row=>row.name==="0023_sepay_checkout_intents.sql");
+const hasLegacyGateway=recorded.some(row=>row.name==="0019_sepay_payment_gateway.sql");
+const hasLegacyIntents=recorded.some(row=>row.name==="0020_sepay_checkout_intents.sql");
+const settlementTable=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='order_cod_settlements'");
+const deliveryColumn=await query("SELECT name FROM pragma_table_info('orders') WHERE name='delivery_status'");
+const sepayTable=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='sepay_payment_orders'");
+const intentTable=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='sepay_checkout_intents'");
+if(!has0018&&(settlementTable.length||deliveryColumn.length))throw Error("Preview has payment/delivery schema without migration 0018 history; refusing to alter schema.");
+if(has0018&&(!settlementTable.length||!deliveryColumn.length))throw Error("Partial migration 0018 schema detected; refusing to continue.");
+if(!has0022&&!hasLegacyGateway&&sepayTable.length)throw Error("Preview has SePay table without migration history; refusing to alter schema.");
+if((has0022||hasLegacyGateway)&&!sepayTable.length)throw Error("Partial SePay gateway migration schema detected; refusing to continue.");
+if(!has0023&&!hasLegacyIntents&&intentTable.length)throw Error("Preview has checkout-intent table without migration history; refusing to alter schema.");
+if((has0023||hasLegacyIntents)&&!intentTable.length)throw Error("Partial checkout-intent migration schema detected; refusing to continue.");
+if(!has0018||(!has0022&&!hasLegacyGateway)||(!has0023&&!hasLegacyIntents)){
   const folder=mkdtempSync(join(tmpdir(),"sd-payment-preview-migration-"));
   try{
     mkdirSync(join(folder,"migrations"));
-    copyFileSync(new URL("../migrations/0018_payment_delivery_settlement.sql",import.meta.url),join(folder,"migrations","0018_payment_delivery_settlement.sql"));
+    for(const name of ["0018_payment_delivery_settlement.sql","0022_sepay_payment_gateway.sql","0023_sepay_checkout_intents.sql"])
+      copyFileSync(new URL("../migrations/"+name,import.meta.url),join(folder,"migrations",name));
     writeFileSync(join(folder,"wrangler.toml"),[
       'name = "sd-payment-preview-migration"','compatibility_date = "2026-10-12"',
       '[[d1_databases]]','binding = "DB"','database_name = '+JSON.stringify(dbName),
@@ -65,8 +75,18 @@ if(migrationRecorded.length){
       {env:process.env,encoding:"utf8",timeout:120000});
     if(run.error||run.status!==0)throw Error("Preview-only migration failed: "+String(run.stderr||run.stdout||run.error?.message||"").slice(-800));
   }finally{rmSync(folder,{recursive:true,force:true});}
-  const verified=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='order_cod_settlements'");
-  const column=await query("SELECT name FROM pragma_table_info('orders') WHERE name='delivery_status'");
-  if(verified.length!==1||column.length!==1)throw Error("Preview payment/delivery migration verification failed.");
-  console.log("PASS: migration 0018 applied and verified on isolated Preview D1; Production D1 untouched.");
 }
+const applied=await query("SELECT name FROM d1_migrations WHERE name IN ('0018_payment_delivery_settlement.sql','0022_sepay_payment_gateway.sql','0023_sepay_checkout_intents.sql','0019_sepay_payment_gateway.sql','0020_sepay_checkout_intents.sql')");
+const verifiedNames=new Set(applied.map(row=>row.name));
+const verifiedSettlement=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='order_cod_settlements'");
+const verifiedDelivery=await query("SELECT name FROM pragma_table_info('orders') WHERE name='delivery_status'");
+const verifiedSepay=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='sepay_payment_orders'");
+const verifiedIntents=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='sepay_checkout_intents'");
+if(!verifiedNames.has("0018_payment_delivery_settlement.sql")||!verifiedSettlement.length||!verifiedDelivery.length)
+  throw Error("Preview payment/delivery migration verification failed.");
+const legacyNames=new Set(recorded.map(row=>row.name));
+if((!verifiedNames.has("0022_sepay_payment_gateway.sql")&&!legacyNames.has("0019_sepay_payment_gateway.sql"))||!verifiedSepay.length)
+  throw Error("Preview SePay migration verification failed.");
+if((!verifiedNames.has("0023_sepay_checkout_intents.sql")&&!legacyNames.has("0020_sepay_checkout_intents.sql"))||!verifiedIntents.length)
+  throw Error("Preview SePay checkout-intent migration verification failed.");
+console.log("PASS: Preview migrations 0018, 0022 and 0023 verified (legacy SePay migration names are accepted) on isolated Preview D1; Production D1 untouched.");
