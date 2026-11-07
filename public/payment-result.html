@@ -50,6 +50,7 @@ h1{margin:0 0 10px;font-size:23px}p{line-height:1.6;color:#59655f}
     return;
    }
    status.textContent="Đang chờ SePay xác nhận giao dịch.";
+   detail.textContent="Mã đơn "+order+". Trạng thái thanh toán sẽ tự cập nhật khi SePay xác nhận.";
    if(attempts<23)setTimeout(check,4000);
    else detail.textContent="Chưa nhận được xác nhận từ SePay. Vui lòng đợi một chút rồi kiểm tra lại đơn hàng.";
   }catch(error){
