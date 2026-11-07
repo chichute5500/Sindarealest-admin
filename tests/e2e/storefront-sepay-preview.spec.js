@@ -87,7 +87,7 @@ test('Preview checkout creates a hosted SePay payment and returns to IPN-wait st
     :[{code:79,name:'Thành phố Hồ Chí Minh'}];
    await route.fulfill({status:200,contentType:'application/json',headers:cors,body:JSON.stringify(body)});return;
   }
-  if(requestUrl.origin==='https://sandbox.pay.sepay.vn'&&path==='/v1/checkout/init'&&request.method()==='POST'){
+  if(requestUrl.origin==='https://pay-sandbox.sepay.vn'&&path==='/v1/checkout/init'&&request.method()==='POST'){
    formFields=Object.fromEntries(new URLSearchParams(request.postData()||'').entries());
    await route.fulfill({status:303,headers:{Location:resultUrl}});return;
   }
