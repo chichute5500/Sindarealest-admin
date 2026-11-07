@@ -8,7 +8,7 @@ mkdirSync(output,{recursive:true});
 if(!url)throw Error('SD_PAYMENT_PREVIEW_URL is required for the deployed Preview browser test.');
 
 test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async({page})=>{
- test.setTimeout(60000);
+ test.setTimeout(90000);
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
  const origin=new URL(url).origin;
@@ -155,7 +155,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
  // Stretch only the success-to-order animation timer so the next-checkout
  // action can happen deterministically before the previous callback fires.
- await page.evaluate(()=>{const nativeSetTimeout=window.setTimeout.bind(window);window.setTimeout=(callback,delay,...args)=>nativeSetTimeout(callback,delay===1320?7000:delay,...args)});
+ await page.evaluate(()=>{const nativeSetTimeout=window.setTimeout.bind(window);window.setTimeout=(callback,delay,...args)=>nativeSetTimeout(callback,delay===1320?12000:delay,...args)});
  newPaid=true;
  await expect.poll(()=>paidStatusChecks,{timeout:10000}).toBeGreaterThan(1);
  await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toBeVisible({timeout:10000});
@@ -165,12 +165,12 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await page.goBack();
  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
  await page.locator('#cartClose').click();
- await page.locator('[data-add="qa-wallet"]').first().click({force:true});
- await page.locator('#cartOpen').click({force:true});
- await expect(page.locator('#cartCheckout')).toBeEnabled();
- await page.locator('#cartCheckout').click({force:true});
+ await page.locator('[data-open-product="qa-wallet"]').first().click({force:true});
+ await expect(page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]')).toBeVisible();
+ await page.locator('#sdDetailPaymentQuote [data-detail-payment-option="deposit"]').click({force:true});
+ await page.locator('#detailBuyNow').click({force:true});
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
- await page.waitForTimeout(7200);
+ await page.waitForTimeout(12200);
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[1]);
  await expect(page.locator('#sdCheckoutStepTitle')).not.toHaveText('Mã đơn hàng');
