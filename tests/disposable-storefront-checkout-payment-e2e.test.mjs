@@ -87,6 +87,8 @@ assert.notEqual(created.transferReference,created.orderNumber,'bank memo is sepa
 assert.match(created.paymentInstructions.qrImageUrl,/vietqr\.app\/img/);
 assert.match(created.paymentInstructions.qrImageUrl,/amount=142500/);
 assert.match(created.paymentInstructions.qrImageUrl,/des=/);
+assert.equal(new URL(created.paymentInstructions.qrImageUrl).searchParams.get('showinfo'),'false',
+  'The QR image omits the printed account details while its payment payload stays intact');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,0,
   'Starting checkout creates no customer order before bank confirmation');
 const pending=await (await invoke(checkoutStatusGet,'/api/sepay/checkout-status?intentId='+created.checkoutIntentId+'&token='+created.orderAccessToken)).json();

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createSepayCheckout, parseVndAmount, sepayPaymentReady } from "../functions/sepay.js";
+import { createSepayCheckout, createSepayVietQr, parseVndAmount, sepayPaymentReady } from "../functions/sepay.js";
 import { onRequestPost as receiveIpn } from "../functions/api/sepay/ipn.js";
 
 const env={
@@ -14,6 +14,19 @@ assert.equal(parseVndAmount("100000.00"),100000);
 assert.equal(parseVndAmount("100000.50"),null);
 assert.equal(parseVndAmount("0"),null);
 assert.equal(parseVndAmount("1e5"),null);
+
+const qr=createSepayVietQr({
+  env:{SEPAY_WEBHOOK_SECRET:"QA_WEBHOOK_SECRET_NONPRODUCTION_123456"},
+  bank:{bankCode:"VCB",bankName:"Vietcombank",accountNumber:"1234567890",accountName:"QA TEST OWNER"},
+  amount:100000,reference:"SP-1234567890ABCDEF"
+});
+const qrUrl=new URL(qr.qrImageUrl);
+assert.equal(qr.qrIncludesAmount,true);
+assert.equal(qrUrl.searchParams.get("showinfo"),"false","QR image hides the repeated account details below the code");
+assert.equal(qrUrl.searchParams.get("amount"),"100000","The payment amount remains embedded in the QR payload");
+assert.equal(qrUrl.searchParams.get("des"),"SP-1234567890ABCDEF","The matching transfer reference remains embedded in the QR payload");
+assert.equal(qrUrl.searchParams.has("holder"),false);
+assert.equal(qrUrl.searchParams.has("store"),false);
 
 const checkout=await createSepayCheckout({
   env,origin:"https://shop.example",invoiceNumber:"SD-ABC-123456",amount:100000,

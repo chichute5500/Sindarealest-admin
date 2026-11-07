@@ -113,6 +113,8 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  expect(orderBodies[0].paymentOption).toBe('deposit');
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
+ await expect(page.locator('#sdCheckoutQrWarning')).toContainText('QR đã điền sẵn số tiền và nội dung chuyển khoản. Quét mã bằng ứng dụng ngân hàng; SePay sẽ tự xác nhận khi nhận được tiền.');
+ expect(await page.locator('#sdCheckoutQrWarning').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('#sdCheckoutQrImage'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
  await expect(page.locator('#paymentInstructions')).not.toContainText('Tiếp tục đến QR');
  await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumber);
  await expect(page.locator('#paymentInstructions')).toContainText('Số tiền cần chuyển');

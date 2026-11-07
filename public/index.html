@@ -3860,6 +3860,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 <div id="sdCheckoutQrMount"></div>
 <div class="sd-checkout-box sd-checkout-qr-wrap" id="sdCheckoutQrWrap" hidden>
 <div class="sd-checkout-qr-head"><span class="sd-payment-stage-label">BƯỚC 1 / 2 · THANH TOÁN</span><strong>Chuyển khoản ngân hàng</strong><small class="sd-payment-stage-subtitle">Chuyển khoản theo thông tin bên dưới</small></div>
+<p class="sd-checkout-qr-warning" id="sdCheckoutQrWarning">QR đã điền sẵn số tiền và nội dung chuyển khoản. Quét mã bằng ứng dụng ngân hàng; SePay sẽ tự xác nhận khi nhận được tiền.</p>
 <div class="sd-checkout-qr-main"><div class="sd-checkout-qr-art"><img id="sdCheckoutQrImage" alt="QR nhận chuyển khoản ngân hàng" referrerpolicy="no-referrer"></div><div class="sd-checkout-bank-lines">
 <button type="button" class="sd-checkout-copy" data-sd-copy="bank"><span>Ngân hàng</span><b id="sdCheckoutBankName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="accountName"><span>Chủ tài khoản</span><b id="sdCheckoutAccountName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
@@ -3868,7 +3869,6 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 <button type="button" class="sd-checkout-copy" data-sd-copy="reference"><span>Nội dung chuyển khoản</span><b id="sdCheckoutTransferContent"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 </div></div>
 <div class="sd-checkout-qr-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutSaveQr">⇩ Lưu ảnh QR</button></div>
-<p class="sd-checkout-qr-warning" id="sdCheckoutQrWarning">QR KHÔNG NHÚNG SỐ TIỀN. Vui lòng tự nhập chính xác số tiền và nội dung chuyển khoản hiển thị phía trên. Shop xác nhận sau khi đối chiếu tiền thực nhận.</p>
 <p id="sdCheckoutBankFeedback" class="sd-checkout-hint" role="status" aria-live="polite"></p>
 </div>
 <div class="sd-checkout-box"><strong>Số tiền của bạn</strong><div class="sd-checkout-summary-pair"><span>Giá trị đơn hàng</span><strong id="sdCheckoutGrossTotal"></strong></div><div class="sd-checkout-summary-pair"><span>Số tiền cần chuyển</span><strong id="sdCheckoutSelectedAmount"></strong></div>

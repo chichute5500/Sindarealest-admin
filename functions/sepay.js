@@ -48,9 +48,9 @@ export function createSepayVietQr({env,bank,amount,reference}) {
   url.searchParams.set("amount",String(amount));
   url.searchParams.set("des",String(reference));
   url.searchParams.set("template","compact");
-  url.searchParams.set("showinfo","true");
-  url.searchParams.set("holder",String(bank.accountName).trim());
-  url.searchParams.set("store","SinDarealest");
+  // Keep the QR artwork clean; transfer details remain available in the
+  // copyable checkout fields below it. The encoded payment payload is intact.
+  url.searchParams.set("showinfo","false");
   return {qrImageUrl:url.toString(),qrIncludesAmount:true,amount,bankName:String(bank.bankName).trim(),accountNumber:String(bank.accountNumber),accountName:String(bank.accountName).trim(),transferContent:String(reference)};
 }
 export async function verifySepayBankWebhook({env,timestamp,signature,rawBody,now=Date.now()}) {
