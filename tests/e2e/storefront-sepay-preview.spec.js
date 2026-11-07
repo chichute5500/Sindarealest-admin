@@ -125,10 +125,10 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).not.toBeVisible();
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
  await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(1);
- console.log('SEPAY_INLINE_STAGE_DEBUG',JSON.stringify(await page.locator('#paymentInstructions').evaluate(panel=>({stage:panel.dataset.stage,confirmed:panel.dataset.paymentConfirmed,pollResponse:panel.dataset.paymentPollResponse,pollError:panel.dataset.paymentPollError,orderHidden:panel.querySelector('.sd-payment-order-stage')?.hidden,transferHidden:panel.querySelector('.sd-payment-transfer-stage')?.hidden,content:panel.innerText.slice(-900)}))));
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions')).toContainText(orderNumber);
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
+ await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
  await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-inline-qr-mobile.png'});
  expect(quoteBodies.some(body=>body.paymentOption==='deposit')).toBe(true);
  expect(orderCalls).toBe(1);
