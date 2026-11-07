@@ -414,11 +414,11 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutReviewAddress')).toContainText('Khách mua ngay');
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toHaveAttribute('aria-checked','true');
  await expect(page.locator('#checkoutSubmit')).toHaveText('Tiến hành thanh toán →');
- expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
+ expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',sizeOption:'',imageVariant:'',quantity:1}]);
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();
  await expect.poll(()=>orderBodies.length).toBe(1);
- expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
+ expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',sizeOption:'',imageVariant:'',quantity:1}]);
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
  await expect(page.locator('#paymentInstructions')).not.toContainText('Tiếp tục đến QR');
  await expect(page.locator('#paymentInstructions')).not.toContainText('SD-TEST-001');
