@@ -177,6 +177,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await page.locator('[data-cart-pick="qa-wallet-next"]').check();
  await page.locator('#cartCheckout').click();
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+ await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[1]);
  await page.waitForTimeout(12200);
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[1]);
