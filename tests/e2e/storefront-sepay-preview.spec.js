@@ -60,7 +60,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
   if(requestUrl.origin===origin&&path==='/api/sepay/checkout-status'&&request.method()==='GET'){
    paymentChecks++;if(paymentReceived)paidStatusChecks++;
    await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},body:JSON.stringify({
-    ok:true,paid:paymentReceived,...(paymentReceived?{orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentReady:false}:{paymentProvider:'sepay',paymentReady:true,transferReference}),
+    ok:true,paid:paymentReceived,...(paymentReceived?{orderNumber,orderStatus:'confirmed',deliveryStatus:'not_shipped',priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentReady:false}:{paymentProvider:'sepay',paymentReady:true,transferReference}),
     paymentSummary:{paymentOption:'deposit',total:100000,requiredAmount:100000,
       netReceivedAmount:paymentReceived?100000:0,shortfall:paymentReceived?0:100000,codRemaining:0}
    })});return;
@@ -140,6 +140,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions')).not.toContainText('Shop chỉ xác nhận tiền đã nhận sau khi đối chiếu sao kê');
+ await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Đã nhận cọc và xác nhận đơn. Shop sẽ cập nhật tiến độ làm hàng và gửi hàng.');
  await expect(page.locator('#paymentInstructions')).toContainText(orderNumber);
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
  await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
