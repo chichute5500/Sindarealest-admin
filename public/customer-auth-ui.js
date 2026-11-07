@@ -105,9 +105,9 @@ if(root){
    await refresh();notify("Đã đăng xuất.","success");
   }catch{notify("Không thể đăng xuất. Vui lòng thử lại.");}
  });
- // Google session reconciliation remains automatic, but it should not
- // compete with the first visible Hero/CSS and product data request.
- // An early Account tap or OAuth return bypasses the idle delay.
+ // Reconcile the Google session only when the customer opens Account or
+ // returns from OAuth. A timed idle check creates a startup request chain
+ // even though nobody has opened Account yet.
  let initialSessionStarted=false;
  const ensureInitialSession=()=>{
   if(initialSessionStarted)return;
@@ -118,7 +118,4 @@ if(root){
   document.getElementById(id)?.addEventListener("click",ensureInitialSession,{once:true});
  }
  if(authReturn)ensureInitialSession();
- else if(typeof window.requestIdleCallback==="function")
-  window.requestIdleCallback(ensureInitialSession,{timeout:2000});
- else window.setTimeout(ensureInitialSession,1200);
 }
