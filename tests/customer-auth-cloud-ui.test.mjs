@@ -33,7 +33,7 @@ for(const [context,svg] of [["sign-in",googleSignInSvg],["signed-in welcome",goo
 }
 assert.ok(html.includes('id="accountOpen"'),"Desktop Account access missing");
 assert.ok(html.includes('id="mobileAccountNav"'),"Mobile Account access missing");
-assert.ok(html.includes('src="/customer-auth-ui.js?v=google-only-20261104"'),"Google-only auth script must be cache-busted");
+assert.ok(html.includes('src="/customer-auth-ui.js?v=google-session-on-demand-20261108"'),"Google-only auth script must be cache-busted");
 assert.ok(html.includes('<div class="account-guest glass" hidden>'),"Welcome must start hidden before checking login state");
 assert.ok(html.includes('<strong data-account-welcome-name>Chào mừng</strong>'),"Welcome title must be dynamic, not generic prelogin greeting");
 assert.ok(auth.includes('guest.hidden=!active')&&auth.includes('guestWelcome.textContent="Chào mừng "+customerName'),"Welcome appears only after authenticated session, with account name");
