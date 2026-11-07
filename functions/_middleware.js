@@ -224,7 +224,7 @@ export async function onRequest(context) {
     if (!response.ok || !(response.headers.get("content-type") || "").includes("text/html")) return response;
     // _redirects has an SPA fallback, so a nonexistent URL otherwise returns
     // homepage HTML with HTTP 200. Keep documented static/legal/admin pages.
-    const staticHtml = new Set(["/", "/index.html", "/data-deletion.html", "/privacy-policy.html", "/terms-of-service.html", "/admin", "/admin/", "/admin/index.html"]);
+    const staticHtml = new Set(["/", "/index.html", "/data-deletion.html", "/privacy-policy.html", "/terms-of-service.html", "/payment-result", "/payment-result.html", "/admin", "/admin/", "/admin/index.html"]);
     if (!staticHtml.has(url.pathname)) {
       return new Response("Không tìm thấy trang.", {
         status: 404,
