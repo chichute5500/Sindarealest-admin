@@ -20,6 +20,16 @@ const qr=createSepayVietQr({
   bank:{bankCode:"VCB",bankName:"Vietcombank",accountNumber:"1234567890",accountName:"QA TEST OWNER"},
   amount:100000,reference:"SP-1234567890ABCDEF"
 });
+assert.equal(createSepayVietQr({
+  env:{SEPAY_WEBHOOK_SECRET:"QA_WEBHOOK_SECRET_NONPRODUCTION_123456"},
+  bank:{bankCode:"VCB",bankName:"Vietcombank",accountNumber:"1234567890",accountName:"QA TEST OWNER"},
+  amount:1999,reference:"SP-1234567890ABCDEF"
+}),null,"QR generation must reject bank transfers below the 2k minimum");
+assert.equal(createSepayVietQr({
+  env:{SEPAY_WEBHOOK_SECRET:"QA_WEBHOOK_SECRET_NONPRODUCTION_123456"},
+  bank:{bankCode:"VCB",bankName:"Vietcombank",accountNumber:"1234567890",accountName:"QA TEST OWNER"},
+  amount:2000,reference:"SP-1234567890ABCDEF"
+}).amount,2000,"QR generation accepts the 2k test minimum");
 const qrUrl=new URL(qr.qrImageUrl);
 assert.equal(qr.qrIncludesAmount,true);
 assert.equal(qrUrl.searchParams.get("showinfo"),"false","QR image hides the repeated account details below the code");

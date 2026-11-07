@@ -1,3 +1,5 @@
+import { MIN_CHECKOUT_TRANSFER_AMOUNT } from "./_payments.js";
+
 const SIGNED_FIELDS = ["order_amount","merchant","currency","operation","order_description","order_invoice_number","customer_id","payment_method","success_url","error_url","cancel_url"];
 const encoder = new TextEncoder();
 function toBase64(bytes) { let binary=""; for(const byte of bytes) binary+=String.fromCharCode(byte); return btoa(binary); }
@@ -40,7 +42,7 @@ export function loadSepayBankConfig(env) {
   return /^[A-Za-z0-9.-]{2,30}$/.test(bank.bankCode)&&/^\d{6,19}$/.test(bank.accountNumber)&&bank.bankName.length>=2&&bank.accountName.length>=5?bank:null;
 }
 export function createSepayVietQr({env,bank,amount,reference}) {
-  if(!sepayBankTransferReady(env,bank)||!Number.isSafeInteger(amount)||amount<=0||amount>2_000_000_000
+  if(!sepayBankTransferReady(env,bank)||!Number.isSafeInteger(amount)||amount<MIN_CHECKOUT_TRANSFER_AMOUNT||amount>2_000_000_000
      ||!/^[A-Za-z0-9-]{6,64}$/.test(String(reference||"")))return null;
   const url=new URL("https://vietqr.app/img");
   url.searchParams.set("acc",String(bank.accountNumber));
