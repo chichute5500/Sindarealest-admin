@@ -131,7 +131,7 @@ test('Preview checkout creates a hosted SePay payment and returns to IPN-wait st
  expect(formFields.payment_method).toBe('BANK_TRANSFER');
  expect(formFields.order_amount).toBe('100000');
  expect(formFields.signature).toBe('preview-test-signature');
- await expect(page).toHaveURL(/payment-result\.html/);
+ await expect(page).toHaveURL(/\/payment-result(?:\.html)?(?:\?|$)/);
  await expect(page.locator('#status')).toContainText('Đang chờ SePay xác nhận giao dịch.');
  await expect(page.locator('#detail')).toContainText(orderNumber);
  await page.screenshot({path:output+'/sepay-ipn-pending-result.png',fullPage:true});
