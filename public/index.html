@@ -5623,7 +5623,7 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  const orderNumber=String(result?.orderNumber||''),summary=result?.paymentSummary||{},payment=result?.paymentInstructions,qrUrl=safePaymentQrUrl(payment?.qrImageUrl),amount=payment?.amount;
  const ready=result?.paymentReady===true&&result?.paymentTermsConfirmed===true&&payment?.status==='ready'&&typeof payment?.qrIncludesAmount==='boolean'&&Number.isSafeInteger(amount)&&amount>0&&amount<=2000000000&&!!qrUrl&&!!String(payment?.bankName||'').trim()&&!!String(payment?.accountName||'').trim()&&!!String(payment?.accountNumber||'').trim()&&!!String(payment?.transferContent||'').trim();
  const add=(parent,tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;parent.append(node);return node};
- const sepayReady=deferOrderCode&&!sdCheckoutOrderCreated&&result?.paymentProvider==="sepay"&&result?.paymentReady===true&&result?.paymentInstructions?.provider==="sepay";
+ const sepayReady=deferOrderCode&&!sdCheckoutOrderCreated&&!result?.checkoutIntentId&&result?.paymentProvider==="sepay"&&result?.paymentReady===true&&result?.paymentInstructions?.provider==="sepay";
  if(sepayReady){
   add(panel,"h3","","Thanh toán qua SePay");
   add(panel,"p","sd-sepay-intro","Quét QR và thanh toán đúng số tiền. Mã đơn sẽ hiện tại đây sau khi SePay xác nhận đã nhận tiền.");
