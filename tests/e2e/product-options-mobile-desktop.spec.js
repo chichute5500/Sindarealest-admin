@@ -316,14 +316,15 @@ test('Buy now and cart selection submit only the intended items',async({page,con
   const prepared=Boolean(body.paymentOption),amount=body.paymentOption==='full'?95000:100000;
   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,quoteReady:true,paymentReady:true,paymentProvider:'sepay',total:100000,options:[{value:'deposit',label:'Đặt cọc 30%',amount:100000,discountAmount:0,codExpected:0},{value:'full',label:'Thanh toán toàn bộ, giảm 5%',amount:95000,discountAmount:5000,codExpected:0}],...(prepared?{paymentOption:body.paymentOption,selectedPaymentAmount:amount,paymentInstructions:{status:'ready',provider:'sepay',amount}}:{})})});
  });
- let paymentRefreshRequests=0;
+ let paymentRefreshRequests=0,paymentReceived=false,paymentChecks=0;
  await page.route('**/api/order-payment?*',async route=>{paymentRefreshRequests++;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',paymentReady:false,paymentTermsConfirmed:true,priceConfirmationRequired:false,total:100000,paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false}})})});
+ await page.route('**/api/sepay/checkout-status?*',async route=>{paymentChecks++;const paid=paymentReceived;await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},body:JSON.stringify({ok:true,paid,...(paid?{orderNumber:'SD-TEST-001',orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentReady:false}:{paymentProvider:'sepay',paymentReady:true,transferReference:'SP-TEST-123'}),paymentSummary:{status:paid?'paid':'shortfall',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:paid?100000:0,refundedAmount:0,netReceivedAmount:paid?100000:0,shortfall:paid?0:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:paid,paidInFull:paid}})})});
  await page.route('**/test-qr.svg',route=>route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="white"/><path d="M8 8h20v20H8zm28 0h20v20H36zM8 36h20v20H8zm28 0h8v8h-8zm12 8h8v12H48z" fill="black"/></svg>'}));
  const accessToken='preview-access-token-1234567890123456789012345678901234567890';
  await page.route('**/api/orders',async route=>{
   orderBodies.push(route.request().postDataJSON());
   await new Promise(resolve=>setTimeout(resolve,120));
-  await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:accessToken,status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentSummary:{status:'shortfall',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false},paymentReady:true,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentInstructions:{status:'ready',provider:'sepay',amount:100000,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount=100000&des=SD-TEST-001',qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferContent:'SD-TEST-001'},message:'QR đã sẵn sàng.'})});
+  await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,checkoutIntentId:'11111111-1111-4111-8111-111111111111',orderAccessToken:accessToken,priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:true,paymentProvider:'sepay',total:100000,selectedPaymentOption:'deposit',selectedPaymentAmount:100000,transferReference:'SP-TEST-123',paymentSummary:{status:'shortfall',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false},paymentInstructions:{status:'ready',provider:'sepay',amount:100000,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount=100000&des=SP-TEST-123',qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferContent:'SP-TEST-123'},message:'QR đã sẵn sàng.'})});
  });
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
@@ -429,7 +430,14 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect.poll(()=>orderBodies.length).toBe(1);
  expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  await expect(page).toHaveURL(base+'/');
+ await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(0);
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
+ paymentReceived=true;
+ await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(1);
+ await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
+ await expect(page.locator('#paymentInstructions')).toContainText('SD-TEST-001');
+ await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
  const savedAddress=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-shipping-address')||'null'));
