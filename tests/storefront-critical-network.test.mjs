@@ -8,7 +8,7 @@ const lookup=readFileSync(new URL("../public/lookup-turnstile-ui.js",import.meta
 new vm.Script(auth);
 new vm.Script(lookup);
 
-async function testSessionStartsAfterIdleOrAccountTap(){
+async function testSessionStartsOnlyAfterAccountTap(){
  const clicks=new Map(),idles=[];
  let sessionRequests=0,authBridgeCalls=0;
  const google={disabled:false,addEventListener(){},querySelector:()=>({textContent:""})};
@@ -33,15 +33,38 @@ async function testSessionStartsAfterIdleOrAccountTap(){
  };
  vm.runInNewContext(auth,{document,window,fetch,URLSearchParams});
  assert.equal(sessionRequests,0,"Landing page must not fetch Google session on first paint");
- assert.equal(idles.length,1);
- assert.equal(idles[0].options.timeout,2000,"Idle session read must have a fallback timeout");
+ assert.equal(idles.length,0,"Landing page must not schedule a delayed Google session request");
  clicks.get("accountOpen")();
+ clicks.get("mobileAccountNav")();
  await new Promise(resolve=>setImmediate(resolve));
  assert.equal(sessionRequests,1,"Account tap must trigger immediate session verification");
- idles[0].cb();
- assert.equal(sessionRequests,1,"Idle and Account tap must not duplicate requests");
  await new Promise(resolve=>setImmediate(resolve));
  assert.equal(authBridgeCalls,1,"Verified login status still reaches account sync");
+}
+async function testOAuthReturnStillChecksSessionImmediately(){
+ let sessionRequests=0;
+ const label={textContent:""};
+ const google={disabled:false,addEventListener(){},querySelector:()=>label};
+ const authOptions={hidden:true};
+ const message={textContent:"",hidden:true,dataset:{}};
+ const signed={hidden:true,querySelector:()=>null};
+ const root={
+  hidden:true,parentElement:{querySelector:selector=>selector==="[data-auth-signed]"?signed:null},
+  querySelector:selector=>selector==="[data-auth-options]"?authOptions:
+   selector==="[data-auth-message]"?message:selector==="[data-auth-google]"?google:null
+ };
+ const document={getElementById:id=>id==="sdCustomerAuth"?root:null};
+ const window={
+  location:{search:"?customer_auth=success",pathname:"/",hash:""},
+  addEventListener(){},sdAccountBridge:{onAuth(){}}
+ };
+ const history={state:null,replaceState(){}};
+ const fetch=async url=>{
+  assert.equal(url,"/api/customer/session");sessionRequests++;
+  return {ok:true,json:async()=>({authenticated:true,providers:{google:true},user:{name:"Khách"}})};
+ };
+ vm.runInNewContext(auth,{document,window,history,fetch,URLSearchParams});
+ assert.equal(sessionRequests,1,"OAuth return must verify its session immediately");
 }
 async function testPhoneLookupOnlyFetchesConfigWhenNecessary(){
  const handlers=new Map();
@@ -79,6 +102,7 @@ async function testPhoneLookupOnlyFetchesConfigWhenNecessary(){
  assert.equal(configRequests,1,"Both lookup forms reuse one config request");
  assert.equal(window.sdPhoneLookupVerified("warranty_lookup"),false,"Phone lookup remains fail-closed");
 }
-await testSessionStartsAfterIdleOrAccountTap();
+await testSessionStartsOnlyAfterAccountTap();
+await testOAuthReturnStillChecksSessionImmediately();
 await testPhoneLookupOnlyFetchesConfigWhenNecessary();
-console.log("PASS: idle Google session, immediate Account refresh, on-demand Turnstile, no duplicate requests.");
+console.log("PASS: on-demand Google session, immediate OAuth return, on-demand Turnstile, no duplicate requests.");
