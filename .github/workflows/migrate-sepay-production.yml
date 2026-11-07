@@ -1,0 +1,46 @@
+name: Apply SePay migrations to Production D1
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type APPLY-SEPAY-0022-0023-TO-sindarealest-db to authorize this exact migration
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-d1-sepay-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: github.repository == 'chichute5500/Sindarealest-admin' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SEPAY_MIGRATION_CONFIRMATION: ${{ inputs.confirmation }}
+    steps:
+      - name: Check out exact main source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install locked dependencies
+        run: npm ci --no-fund
+
+      - name: Validate source and migrations
+        run: npm run check
+
+      - name: Run local test suite
+        run: npm test
+
+      - name: Guard Production target and apply exact SePay migrations
+        run: node scripts/migrate-sepay-production.mjs
