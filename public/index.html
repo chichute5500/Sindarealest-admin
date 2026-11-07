@@ -942,6 +942,12 @@ body.welcome-active{height:100dvh!important;min-height:100dvh!important;overflow
 .checkout-drawer .sd-checkout-qr-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
 .checkout-drawer .sd-checkout-qr-actions .pill-btn{min-height:38px;padding:7px;font-size:10px;white-space:normal}
 .checkout-drawer .sd-checkout-qr-warning{margin:0;color:#c3212f;font-size:10px;font-weight:750;line-height:1.55}
+.checkout-drawer .sd-checkout-transfer-notice{margin:0;padding:10px 11px;border:1px solid var(--sd-reference-edge,var(--line));border-radius:12px;background:var(--sd-reference-surface,var(--glass));box-shadow:inset 0 1px 0 rgba(255,255,255,.48);color:var(--ink);font-size:10px;line-height:1.55}
+.checkout-drawer .sd-checkout-transfer-notice strong{display:block;margin-bottom:5px;color:var(--ink);font-size:11px;letter-spacing:.035em}
+.checkout-drawer .sd-checkout-transfer-notice ol{margin:0;padding-left:18px;display:grid;gap:5px}
+.checkout-drawer .sd-checkout-transfer-notice li:first-child{color:#c3212f;font-weight:750;overflow-wrap:anywhere}
+.checkout-drawer .sd-checkout-transfer-notice li:first-child span{font-weight:850}
+html.dark .checkout-drawer .sd-checkout-transfer-notice li:first-child{color:#ff7d85}
 html.dark .checkout-drawer .sd-checkout-qr-warning{color:#ff7d85}
 .checkout-drawer .sd-order-received-note{margin:10px 0;color:#c3212f;font-size:14px;font-weight:800;line-height:1.55}
 html.dark .checkout-drawer .sd-order-received-note{color:#ff7d85}
@@ -3860,15 +3866,17 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 <div id="sdCheckoutQrMount"></div>
 <div class="sd-checkout-box sd-checkout-qr-wrap" id="sdCheckoutQrWrap" hidden>
 <div class="sd-checkout-qr-head"><span class="sd-payment-stage-label">BƯỚC 1 / 2 · THANH TOÁN</span><strong>Chuyển khoản ngân hàng</strong><small class="sd-payment-stage-subtitle">Chuyển khoản theo thông tin bên dưới</small></div>
-<p class="sd-checkout-qr-warning" id="sdCheckoutQrWarning">QR đã điền sẵn số tiền và nội dung chuyển khoản. Quét mã bằng ứng dụng ngân hàng; SePay sẽ tự xác nhận khi nhận được tiền.</p>
-<div class="sd-checkout-qr-main"><div class="sd-checkout-qr-art"><img id="sdCheckoutQrImage" alt="QR nhận chuyển khoản ngân hàng" referrerpolicy="no-referrer"></div><div class="sd-checkout-bank-lines">
+<p class="sd-checkout-qr-warning" id="sdCheckoutQrWarning">QR đã điền sẵn số tiền và nội dung chuyển khoản. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN</p>
+<div class="sd-checkout-qr-main"><div class="sd-checkout-qr-art"><img id="sdCheckoutQrImage" alt="QR nhận chuyển khoản ngân hàng" referrerpolicy="no-referrer"></div>
+<div class="sd-checkout-qr-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutSaveQr">⇩ Lưu ảnh QR</button></div>
+<section class="sd-checkout-transfer-notice" aria-label="Lưu ý chuyển khoản"><strong>XIN LƯU Ý</strong><ol><li>Khi chuyển khoản, vui lòng nhập chính xác nội dung chuyển khoản: <span id="sdCheckoutNoticeReference">—</span> và chuyển đúng số tiền <span id="sdCheckoutNoticeAmount">—</span>.</li><li>Mỗi mã QR chỉ được sử dụng một lần. Vui lòng không sử dụng lại mã QR cũ hoặc mã giao dịch đã dùng trước đó để chuyển khoản.</li><li>Vui lòng lưu lại biên lai chuyển khoản để đối chiếu khi cần thiết.</li></ol></section>
+<div class="sd-checkout-bank-lines">
 <button type="button" class="sd-checkout-copy" data-sd-copy="bank"><span>Ngân hàng</span><b id="sdCheckoutBankName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="accountName"><span>Chủ tài khoản</span><b id="sdCheckoutAccountName"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="account"><span>Số tài khoản</span><b id="sdCheckoutAccountNumber"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="amount"><span>Số tiền cần chuyển</span><b id="sdCheckoutAmount"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 <button type="button" class="sd-checkout-copy" data-sd-copy="reference"><span>Nội dung chuyển khoản</span><b id="sdCheckoutTransferContent"></b><span class="sd-copy-icon" aria-hidden="true"></span></button>
 </div></div>
-<div class="sd-checkout-qr-actions"><button type="button" class="pill-btn tap-target" id="sdCheckoutSaveQr">⇩ Lưu ảnh QR</button></div>
 <p id="sdCheckoutBankFeedback" class="sd-checkout-hint" role="status" aria-live="polite"></p>
 </div>
 <div class="sd-checkout-box"><strong>Số tiền của bạn</strong><div class="sd-checkout-summary-pair"><span>Giá trị đơn hàng</span><strong id="sdCheckoutGrossTotal"></strong></div><div class="sd-checkout-summary-pair"><span>Số tiền cần chuyển</span><strong id="sdCheckoutSelectedAmount"></strong></div>
@@ -5698,7 +5706,9 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  if(!sdCheckoutQuote?.quoteReady){const cod=Number.isSafeInteger(summary.codRemaining)?summary.codRemaining:0;sdCheckoutQuote={quoteReady:true,paymentReady:true,total:summary.total,options:[{value:sdCheckoutChoice,amount,discountAmount:summary.discountAmount||0,codExpected:cod}]}}else sdCheckoutQuote.paymentReady=true;
  Object.assign(sdCheckoutQuote,{bankName:payment.bankName,accountName:payment.accountName,accountNumber:payment.accountNumber,transferReference:payment.transferContent});
  $('#sdCheckoutBankName').textContent=payment.bankName;$('#sdCheckoutAccountName').textContent=payment.accountName;$('#sdCheckoutAccountNumber').textContent=payment.accountNumber;$('#sdCheckoutAmount').textContent=formatVnd(amount);$('#sdCheckoutTransferContent').textContent=payment.transferContent;image.alt='Mã QR chuyển khoản đã được Shop xác minh';
- $('#sdCheckoutQrWarning').textContent=payment.qrIncludesAmount?'QR đã điền sẵn số tiền và nội dung chuyển khoản. Quét mã bằng ứng dụng ngân hàng; SePay sẽ tự xác nhận khi nhận được tiền.':'QR không nhúng số tiền. Hãy nhập đúng số tiền và nội dung phía trên; Shop chỉ cập nhật sau khi đối chiếu tiền thực nhận.';
+ $('#sdCheckoutQrWarning').textContent=payment.qrIncludesAmount?'QR đã điền sẵn số tiền và nội dung chuyển khoản. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN':'QR chưa điền sẵn số tiền và nội dung. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN; hãy kiểm tra chính xác nội dung và số tiền trước khi chuyển.';
+ $('#sdCheckoutNoticeReference').textContent=payment.transferContent||'—';
+ $('#sdCheckoutNoticeAmount').textContent=Number.isSafeInteger(amount)?amount.toLocaleString('en-US')+' VND':'—';
  image.onerror=()=>{qrWrap.hidden=true;const error=add(transferStage,'p','payment-warning','Không tải được QR đã xác minh. Vui lòng chưa chuyển khoản và liên hệ Shop.');error.scrollIntoView?.({block:'nearest'})};
  image.src=qrUrl;qrWrap.hidden=false;transferStage.append(qrWrap);
  if(deferOrderCode){$('#sdCheckoutConfirmWrap').hidden=false;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=true;}

@@ -113,7 +113,14 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  expect(orderBodies[0].paymentOption).toBe('deposit');
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
- await expect(page.locator('#sdCheckoutQrWarning')).toContainText('QR đã điền sẵn số tiền và nội dung chuyển khoản. Quét mã bằng ứng dụng ngân hàng; SePay sẽ tự xác nhận khi nhận được tiền.');
+ await expect(page.locator('#sdCheckoutQrWarning')).toHaveText('QR đã điền sẵn số tiền và nội dung chuyển khoản. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN');
+ await expect(page.locator('#sdCheckoutNoticeReference')).toHaveText(transferReference);
+ await expect(page.locator('#sdCheckoutNoticeAmount')).toHaveText('100,000 VND');
+ await expect(page.locator('#sdCheckoutQrWrap')).toContainText('XIN LƯU Ý');
+ await expect(page.locator('#sdCheckoutQrWrap')).toContainText('Mỗi mã QR chỉ được sử dụng một lần.');
+ await expect(page.locator('#sdCheckoutQrWrap')).toContainText('Vui lòng lưu lại biên lai chuyển khoản');
+ expect(await page.locator('#sdCheckoutQrImage').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('#sdCheckoutSaveQr'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+ expect(await page.locator('#sdCheckoutSaveQr').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('.sd-checkout-transfer-notice'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
  expect(await page.locator('#sdCheckoutQrWarning').evaluate(node=>Boolean(node.compareDocumentPosition(document.querySelector('#sdCheckoutQrImage'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
  await expect(page.locator('#paymentInstructions')).not.toContainText('Tiếp tục đến QR');
  await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumber);
