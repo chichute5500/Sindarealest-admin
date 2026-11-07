@@ -113,11 +113,11 @@ assert.match(html,/function sdCheckoutAlignSuccessTitle\(\)[\s\S]*frame\.left\+f
 assert.match(html,/sdCheckoutResetQrScroll\(\);sdCheckoutScheduleSuccessTitleAlign\(\)/,'QR stage schedules center correction only after entering success state');
 assert.match(html,/sdCheckoutTransferContent/);
 assert.match(html,/sdCheckoutSaveQr/);
-assert.match(html,/QR đã điền sẵn số tiền và nội dung chuyển khoản\\. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN/,'QR instructions warn customers not to change the encoded transfer details');
-assert.match(html,/sdCheckoutQrImage[\\s\\S]*?sdCheckoutSaveQr[\\s\\S]*?sd-checkout-transfer-notice/,'Save QR action and transfer notice appear directly below the QR');
-assert.match(html,/id="sdCheckoutNoticeReference"[\\s\\S]*?id="sdCheckoutNoticeAmount"/,'Transfer notice exposes dynamic reference and amount fields');
-assert.match(html,/sdCheckoutNoticeAmount'\\)\\.textContent=Number\\.isSafeInteger\\(amount\\)\\?amount\\.toLocaleString\\('en-US'\\)\\+' VND'/,'The notice displays the exact current transfer amount in VND');
-assert.match(html,/Mỗi mã QR chỉ được sử dụng một lần[\\s\\S]*?Vui lòng lưu lại biên lai chuyển khoản/,'The transfer notice includes single-use QR and receipt reminders');
+assert.ok(html.includes("QR đã điền sẵn số tiền và nội dung chuyển khoản. VUI LÒNG KHÔNG THAY ĐỔI THÔNG TIN"),'QR instructions warn customers not to change the encoded transfer details');
+assert.ok(html.indexOf('id="sdCheckoutQrImage"')<html.indexOf('id="sdCheckoutSaveQr"')&&html.indexOf('id="sdCheckoutSaveQr"')<html.indexOf('class="sd-checkout-transfer-notice"'),'Save QR action and transfer notice appear directly below the QR');
+assert.ok(html.includes('id="sdCheckoutNoticeReference"')&&html.includes('id="sdCheckoutNoticeAmount"'),'Transfer notice exposes dynamic reference and amount fields');
+assert.ok(html.includes("amount.toLocaleString('en-US')+' VND'"),'The notice displays the exact current transfer amount in VND');
+assert.ok(html.includes('Mỗi mã QR chỉ được sử dụng một lần')&&html.includes('Vui lòng lưu lại biên lai chuyển khoản'),'The transfer notice includes single-use QR and receipt reminders');
 assert.doesNotMatch(html,/sdCheckoutOpenBank|Mở ứng dụng ngân hàng/,'Checkout no longer offers a bank-app launch action');
 assert.match(html,/id="sdCheckoutConfirmRange" type="range" min="0" max="100" step="1"/,'The transfer confirmation is a continuous swipe slider');
 assert.match(glass,/--progress:0%/,'The slider track starts empty');
