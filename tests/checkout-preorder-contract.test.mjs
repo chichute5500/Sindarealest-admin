@@ -125,6 +125,7 @@ const checkoutSubmit=html.match(/\$\('#checkoutForm'\)\.addEventListener\('submi
 assert.match(checkoutSubmit,/sdCheckoutLoadPaymentInstructions/,'The payment step prepares a read-only QR quote');
 assert.doesNotMatch(checkoutSubmit,/fetch\('\/api\/orders'/,'Opening the QR does not create an order');
 assert.match(create,/createSepayVietQr\(/,'Finalization creates a server-generated dynamic SePay VietQR');
+assert.doesNotMatch(create,/sepayCheckout|pay-sandbox\.sepay\.vn|paymentForm\.submit/,'Finalization renders the QR inline instead of submitting hosted checkout');
 assert.doesNotMatch(create,/payment_qr_active|paymentQrImageKey|requestedTransferReference|qrSnapshot/,'New checkout cannot accept or depend on a static QR snapshot');
 assert.match(html,/progress>=100\?'Đang lấy mã đơn'/,'The slider changes to the requested loading label at completion');
 assert.match(html,/sdCheckoutConfirmRange'\)\.setAttribute\('aria-valuetext','0%'\)/,'Reopening checkout resets the slider accessibility value');
