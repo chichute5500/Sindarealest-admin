@@ -11,6 +11,7 @@ on:
       - feat/storefront-payment-cod-sync-20261101
     paths:
       - 'public/index.html'
+      - 'public/payment-result.html'
       - 'public/cart-glass-optics.js'
       - 'public/checkout-glass-optics.js'
       - 'public/admin/index.html'
