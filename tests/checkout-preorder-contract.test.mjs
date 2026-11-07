@@ -59,7 +59,7 @@ assert.match(html,/sd-order-reference/,'Order number is prominent after QR');
 assert.match(html,/orderStage\.hidden=!paymentConfirmed/,'The public order number stage follows the server payment summary directly');
 assert.match(html,/Number\(data\.paymentSummary\?\.shortfall\)===0\)window\.sdCheckoutAdvanceToOrderCode\(true\)/,'The order number appears only when the server confirms the selected amount');
 assert.ok(create.includes('`SP-${crypto.randomUUID()'),'SePay receives a separate transfer reference, not the public order number');
-assert.match(readFileSync(new URL('../functions/api/sepay/webhook.js',import.meta.url),'utf8'),/SP-\[A-Z0-9\]\{16\}/,'The bank webhook resolves the private transfer reference');
+assert.ok(readFileSync(new URL('../functions/api/sepay/webhook.js',import.meta.url),'utf8').includes('SP-?([A-Z0-9]{16})'),'The bank webhook resolves the private transfer reference with or without the hyphen');
 assert.match(html,/sd-payment-transfer-stage[\s\S]*sd-payment-order-stage/,'QR transfer and order reference are separate customer-visible stages');
 assert.match(html,/Nhận cọc & xác nhận đơn/,'Order tracking combines deposit receipt and order confirmation into one milestone');
 assert.match(html,/data-account-orders-refresh/,'Linked order cards can reload server-confirmed payment state');
