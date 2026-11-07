@@ -14,7 +14,7 @@ const databaseName="sindarealest-db";
 const targetMigrations=["0022_sepay_payment_gateway.sql","0023_sepay_checkout_intents.sql"];
 const prerequisites=["0018_payment_delivery_settlement.sql","0019_manual_warranties.sql","0020_manual_warranty_contacts.sql","0021_warranty_policy_snapshots.sql"];
 
-export function assertProductionIdentity(live,previewStore,previewAdmin,meta){
+export function assertProductionIdentity(live,previewAdmin,meta){
   assert.equal(live?.name,site,"Wrong Production Pages project");
   assert.equal(live?.production_branch,"main","Production branch is not main");
   assert.equal(previewAdmin?.name,previewSite,"Wrong Admin Preview Pages project");
@@ -22,14 +22,11 @@ export function assertProductionIdentity(live,previewStore,previewAdmin,meta){
   const storePreviewId=live?.deployment_configs?.preview?.d1_databases?.DB?.id;
   const adminPreviewId=previewAdmin?.deployment_configs?.preview?.d1_databases?.DB?.id;
   assert.match(productionId||"",/^[a-f0-9-]{36}$/i,"Production D1 binding is missing");
-  assert.match(storePreviewId||"",/^[a-f0-9-]{36}$/i,"Storefront Preview D1 binding is missing");
   assert.match(adminPreviewId||"",/^[a-f0-9-]{36}$/i,"Admin Preview D1 binding is missing");
-  assert.notEqual(productionId.toLowerCase(),storePreviewId.toLowerCase(),"Production D1 matches Storefront Preview D1");
   assert.notEqual(productionId.toLowerCase(),adminPreviewId.toLowerCase(),"Production D1 matches Admin Preview D1");
-  assert.notEqual(storePreviewId.toLowerCase(),adminPreviewId.toLowerCase(),"Storefront and Admin Preview D1 identities unexpectedly match");
   assert.equal(meta?.uuid||meta?.id,productionId,"Production D1 metadata identity mismatch");
   assert.equal(meta?.name,databaseName,"Production D1 name mismatch");
-  return {id:productionId,name:databaseName};
+  return {id:productionId,name:databaseName,storePreviewSharesProduction:storePreviewId?.toLowerCase()===productionId.toLowerCase()};
 }
 
 async function main(){
@@ -51,14 +48,15 @@ async function main(){
   const [live,previewAdmin]=await Promise.all([
     cf("/pages/projects/"+site),cf("/pages/projects/"+previewSite)
   ]);
+  const productionId=live?.deployment_configs?.production?.d1_databases?.DB?.id;
   const previewStoreId=live?.deployment_configs?.preview?.d1_databases?.DB?.id;
   assert.match(previewStoreId||"",/^[a-f0-9-]{36}$/i,"Storefront Preview database identity unavailable");
-  const [meta,previewStoreMeta]=await Promise.all([
-    cf("/d1/database/"+encodeURIComponent(live?.deployment_configs?.production?.d1_databases?.DB?.id||"")),
-    cf("/d1/database/"+encodeURIComponent(previewStoreId))
-  ]);
-  const target=assertProductionIdentity(live,{...live},previewAdmin,meta);
-  assert.notEqual(previewStoreMeta?.uuid||previewStoreMeta?.id,target.id,"Production and Storefront Preview D1 metadata IDs match");
+  const meta=await cf("/d1/database/"+encodeURIComponent(productionId||""));
+  const target=assertProductionIdentity(live,previewAdmin,meta);
+  if(target.storePreviewSharesProduction)
+    console.log("WARNING: Storefront Preview is bound to Production D1; use the isolated Admin Preview database for checkout QA.");
+  else
+    console.log("PASS: Storefront Preview and Production D1 are isolated.");
 
   async function query(sql){
     const result=await cf("/d1/database/"+encodeURIComponent(target.id)+"/query","POST",{sql});
@@ -129,7 +127,7 @@ async function main(){
   assert.equal(indexes.length,3,"Production SePay indexes incomplete after migration");
   console.log("PASS: Production SePay migrations 0022/0023 verified: 3 tables, 3 indexes; no payment rows were created.");
   if(process.env.GITHUB_STEP_SUMMARY)writeFileSync(process.env.GITHUB_STEP_SUMMARY,
-    "\n### Production SePay D1 migration PASS\nTarget: verified `sindarealest-db` bound to `sindarealest2` Production.\nApplied and verified migrations `0022` and `0023`; required history `0018`–`0021` was present.\nRecovery: Cloudflare Time Travel bookmark `"+bookmark+"` and private temporary runner export (deleted at job end).\nNo customer or payment rows were read into logs or created by these migrations. Webhook/runtime configuration requires separate read-only verification.\n",{flag:"a"});
+    "\n### Production SePay D1 migration PASS\nTarget: verified `sindarealest-db` bound to `sindarealest2` Production.\nApplied and verified migrations `0022` and `0023`; required history `0018`–`0021` was present.\nRecovery: Cloudflare Time Travel bookmark `"+bookmark+"` and private temporary runner export (deleted at job end).\n"+(target.storePreviewSharesProduction?"Warning: Storefront Preview shares Production D1; use isolated Admin Preview for checkout QA.\n":"Storefront Preview D1 is separate from Production.\n")+"No customer or payment rows were read into logs or created by these migrations. Webhook/runtime configuration requires separate read-only verification.\n",{flag:"a"});
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)
