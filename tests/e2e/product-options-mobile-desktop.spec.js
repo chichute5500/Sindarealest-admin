@@ -426,7 +426,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
  await expect(page.locator('#sdCheckoutConfirmWrap')).toBeHidden();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
- expect(saved).toEqual({'qa-shoe::42':1,'qa-wallet':1});
+ expect(saved).toEqual({'qa-shoe::%5B%2242%22%2C%22%22%2C%22%22%5D':1,'qa-wallet':1});
  await expect(page).toHaveURL(base+'/');
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
  paymentReceived=true;
@@ -442,7 +442,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.locator('#mobileAccountNav').click();
  await expect(page.locator('#accountDrawer')).toHaveClass(/open/);
  await page.locator('#accountClose').click();await page.locator('#cartOpen').click();
- await page.locator('[data-cart-pick="qa-shoe::42"]').uncheck();
+ await page.locator('[data-cart-pick^="qa-shoe::"]').uncheck();
  await expect(page.locator('#cartCheckout')).toContainText('1 sản phẩm');
  await page.route('**/api/customer/profile',route=>route.fulfill({status:503,contentType:'application/json',body:'{"error":"Không tải được hồ sơ trên máy chủ."}'}));
  await page.evaluate(()=>window.sdAccountBridge?.onAuth(true));
@@ -460,7 +460,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await expect(page.locator('#sdCheckoutConfirmLabel')).toHaveText('Xác nhận đã thanh toán');
  await expect(page.locator('#sdCheckoutReviewAddressRow')).toBeVisible();
  await expect(page.locator('#sdCheckoutPaymentStep')).toBeVisible();await expect(page.locator('#sdCheckoutShippingStep')).toBeHidden();await expect.poll(()=>quoteBodies.length).toBeGreaterThan(quoteCountBeforeSavedAddressCheckout);await expect(page.locator('#checkoutDrawer input[name="fullName"]')).toHaveValue('Khách mua ngay');await expect(page.locator('#checkoutDrawer input[name="fullName"]')).not.toBeFocused();await expect(page.locator('#checkoutDrawer input[name="phone"]')).toHaveValue('0900000000');await expect(page.locator('#checkoutStreet')).toHaveValue('Địa chỉ kiểm thử');await expect(page.locator('#checkoutProvince')).toHaveValue('Thành phố Hồ Chí Minh');await expect(page.locator('#checkoutWard')).toHaveValue('Phường Bà Rịa');
- expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
+ expect(quoteBodies.at(-1).items).toEqual([{id:'qa-wallet',option:'',sizeOption:'',imageVariant:'',quantity:1}]);
  await assertCartCheckoutGlassParity(page);
  expect(errors).toEqual([]);
 });
