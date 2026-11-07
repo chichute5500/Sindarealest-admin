@@ -64,7 +64,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
     priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:false,
     paymentProvider:'sepay',gatewayStatus:'pending',
     paymentSummary:{paymentOption:'deposit',total:100000,requiredAmount:100000,
-      netReceivedAmount:paymentChecks>0?100000:0,shortfall:paymentChecks>0?0:100000,codRemaining:0}
+      netReceivedAmount:paymentChecks>1?100000:0,shortfall:paymentChecks>1?0:100000,codRemaining:0}
    })});return;
   }
   if(requestUrl.origin===origin){
