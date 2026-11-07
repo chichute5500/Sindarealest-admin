@@ -35,7 +35,7 @@ assert.equal(productOptionLabel('belts','4.0'),'Bản dây 4.0 cm');
 
 const db=new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
-for(const name of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql'])
+for(const name of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql','0019_sepay_payment_gateway.sql'])
  db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
 db.prepare("UPDATE settings SET value='1' WHERE key='show_prices'").run();
 
@@ -62,7 +62,7 @@ for(let i=0;i<categories.length;i++){
  db.prepare('INSERT INTO products(id,slug,sku,title,category,category_label,price,stock,published,source_price_confirmed,fulfillment_type) VALUES(?,?,?,?,?,?,100000,10,1,1,?)')
    .run('opt-'+i,'opt-'+i,'OPT-'+i,title,category,title,'made_to_order');
 }
-const env={DB,ADMIN_PASSWORD:'FAKE_QA_PASSWORD_NOT_REAL',SESSION_SECRET:'QA-NONPRODUCTION-ONLY-SESSION-SECRET-123456'};
+const env={DB,ADMIN_PASSWORD:'FAKE_QA_PASSWORD_NOT_REAL',SESSION_SECRET:'QA-NONPRODUCTION-ONLY-SESSION-SECRET-123456',SEPAY_ENV:'sandbox',SEPAY_MERCHANT_ID:'TEST',SEPAY_MERCHANT_SECRET_KEY:'TEST_SECRET',SEPAY_IPN_SECRET_KEY:'TEST_IPN'};
 const body={fullName:'KHACH HANG GIA LAP',phone:'0900000000',address:'Địa chỉ QA giả lập, không giao hàng',items:[]};
 const endpoint='https://qa.invalid/api/orders';
 const invoke=async items=>createOrder({env,request:new Request(endpoint,{method:'POST',headers:{Origin:'https://qa.invalid','Content-Type':'application/json','CF-Connecting-IP':'203.0.113.88'},body:JSON.stringify({...body,items,paymentOption:'deposit',quotedTotal:800000})})});
