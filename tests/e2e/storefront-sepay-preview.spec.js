@@ -165,6 +165,18 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
  await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
  await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-inline-qr-mobile.png'});
+ // Return to the cart and immediately start a fresh checkout while the previous
+ // success-to-order transition timers could still be pending.
+ await page.goBack();
+ await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
+ await page.evaluate(()=>{window.addToCart('qa-wallet');window.renderCart()});
+ await page.locator('#cartCheckout').click();
+ await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+ await page.waitForTimeout(1600);
+ await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
+ await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumbers[1]);
+ await expect(page.locator('#sdCheckoutStepTitle')).not.toHaveText('Mã đơn hàng');
+ await expect(page.locator('#checkoutSubmit')).toBeVisible();
  expect(quoteBodies.some(body=>body.paymentOption==='deposit')).toBe(true);
  expect(orderCalls).toBe(2);
 });
