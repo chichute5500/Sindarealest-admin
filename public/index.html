@@ -5636,7 +5636,7 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  }
  const transferStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-transfer-stage'):panel;
  const orderStage=deferOrderCode?add(panel,'section','sd-payment-stage sd-payment-order-stage'):panel;
- const serverConfirmed=deferOrderCode&&Number(summary.shortfall)===0;
+ const serverConfirmed=deferOrderCode&&(result?.paid===true||Number(summary.shortfall)===0);
  // Keep a server-confirmed payment visible for this checkout session if an older
  // in-flight poll response arrives afterward. A new order resets this latch below.
  if(serverConfirmed)panel.dataset.paymentConfirmed='true';
