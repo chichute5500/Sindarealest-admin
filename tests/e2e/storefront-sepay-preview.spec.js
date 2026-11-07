@@ -71,6 +71,9 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
     'CF-Access-Client-Secret':process.env.CF_ACCESS_CLIENT_SECRET||''}});
    return;
   }
+  if(requestUrl.hostname==='vietqr.app'&&requestUrl.pathname==='/img'){
+   await route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect width="128" height="128" fill="white"/><path d="M8 8h36v36H8zm8 8v20h20V16zm68-8h36v36H84zm8 8v20h20V16zM8 84h36v36H8zm8 8v20h20V92zm44-72h8v8h-8zm16 16h8v8h-8zm-16 16h8v8h-8zm16 16h8v8h-8zm-16 16h8v8h-8zm16 16h8v8h-8zm16 0h8v8h-8zm16 0h8v8h-8z" fill="black"/></svg>'});return;
+  }
   if(requestUrl.hostname==='provinces.open-api.vn'&&requestUrl.pathname.startsWith('/api/v2/p')){
    const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET, OPTIONS','Access-Control-Allow-Headers':'*','Access-Control-Max-Age':'86400'};
    if(request.method()==='OPTIONS'){await route.fulfill({status:204,headers:cors});return;}
@@ -106,16 +109,15 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]')).toBeVisible();
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();
- await expect(page.locator('#paymentInstructions .sd-sepay-intro')).toContainText('Mã đơn sẽ hiện');
- await expect(page.locator('#paymentInstructions .sd-sepay-amount')).toContainText('100.000');
- await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
- await expect(page.locator('#sdCheckoutDone')).toContainText('Tiếp tục đến QR');
- expect(orderCalls).toBe(0);
- await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-hosted-payment-mobile.png'});
- await page.locator('#sdCheckoutDone').click();
  await expect.poll(()=>orderCalls).toBe(1);
  expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  expect(orderBodies[0].paymentOption).toBe('deposit');
+ await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
+ await expect(page.locator('#paymentInstructions')).not.toContainText('Tiếp tục đến QR');
+ await expect(page.locator('#paymentInstructions')).not.toContainText(orderNumber);
+ await expect(page.locator('#paymentInstructions')).toContainText('Số tiền cần chuyển');
+ await expect(page.locator('#paymentInstructions .sd-sepay-loading')).toHaveCount(0);
+ await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-inline-qr-pending-mobile.png'});
  await expect(page).toHaveURL(previewUrl.toString());
  await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(0);
  await expect(page.locator('#paymentInstructions img')).toHaveAttribute('src',/vietqr\.app\/img.*amount=100000/);
