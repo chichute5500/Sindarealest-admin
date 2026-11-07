@@ -75,7 +75,7 @@ assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{\s*top:calc
 assert.match(html,/fetch\('\/api\/checkout-quote'/,"Checkout must quote with a real read-only API");
 assert.match(html,/sdCheckoutPaymentPayload\(\)/);
 assert.match(html,/getElementById|querySelector|#sdCheckoutQrImage/);
-assert.match(quote,/sepayPaymentReady\(env\)/,"Checkout readiness comes from server-side SePay configuration");
+assert.match(quote,/sepayBankTransferReady\(env,bank\)/,"Checkout readiness comes from server-side SePay webhook and bank configuration");
 assert.match(quote,/paymentProvider:"sepay"/,"The quote identifies SePay as the only checkout provider");
 assert.doesNotMatch(quote,/validPublicQrImageKey|payment_qr_active|paymentQrImageKey/,"Checkout quote no longer depends on the uploaded static QR");
 assert.match(quote,/transferReferenceAvailableAfterSubmit:false/,"A payment reference is created only after the server creates the order");
@@ -205,7 +205,9 @@ assert.doesNotMatch(html,/Lưu mã đơn bên dưới để tra cứu|Đã gửi
 assert.match(create,/sepayWriteIndex[\s\S]*sepay_payment_orders/,'Checkout persists a pending SePay payment order without writing a receipt');
 assert.match(create,/payment_terms_confirmed_by[\s\S]*customer_checkout/,'A confirmed catalog price and explicit customer choice define checkout terms');
 assert.match(create,/customerPaymentVerified:false/,'Creating a QR request must not mark money received');
-assert.match(html,/sdCheckoutSubmitSepay|sepayCheckout/,"Checkout submits the signed SePay form to its hosted checkout");
+assert.match(html,/QR đúng số tiền sẽ hiện ngay trong khung này/,"Checkout keeps the dynamic SePay QR inside the order drawer");
+assert.match(create,/createSepayVietQr/,"The server builds an amount-specific VietQR using the server-priced order");
+assert.doesNotMatch(html,/paymentForm\.submit\(\)/,"The inline QR checkout does not navigate to SePay Hosted Checkout");
 assert.match(glass,/\.sd-checkout-qr-main\{display:flex;flex-direction:column/,"QR and copyable bank tiles must stack vertically");
 assert.match(glass,/\.sd-checkout-qr-art\{[^}]*max-width:340px;aspect-ratio:1\/1/,"QR must be rendered large and square");
 assert.match(glass,/#sdCheckoutQrImage\{[^}]*object-fit:contain/,"Do not crop or distort the original QR");
@@ -226,7 +228,7 @@ assert.match(html,/\$\('#sdCheckoutConfirmRange'\)\.disabled=false/,'Every new c
 assert.match(html,/\$\('#sdCheckoutConfirmLabel'\)\.textContent='Xác nhận đã thanh toán'/,'Every new checkout resets the slider label');
 assert.match(html,/if\(sdCheckoutOrderCreating\)return;sdCheckoutOrderCreating=true/,'An in-flight order is protected against duplicate submit');
 assert.match(html,/finally\{sdCheckoutOrderCreating=false\}/,'A failed submission unlocks retry');
-console.log("PASS: owner-approved Liquid Glass checkout steps; server-authoritative pricing; SePay hosted payment and IPN-only receipt.");
+console.log("PASS: owner-approved Liquid Glass checkout steps; server-authoritative pricing; in-page dynamic SePay QR and signed bank webhook receipt.");
 
 
 // Checkout stage hierarchy: QR is one glass card, not a card inside a

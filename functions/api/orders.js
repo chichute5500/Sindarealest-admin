@@ -1,7 +1,7 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
 import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
-import { createSepayCheckout } from "../sepay.js";
+import { createSepayVietQr, loadSepayBankConfig } from "../sepay.js";
 import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
 
 const clean = (value, max = 240) => String(value ?? "").trim().slice(0, max);
@@ -101,11 +101,9 @@ export async function onRequestPost({ request, env }) {
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
     const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
     const transferReference = selectedPaymentOption ? orderNumber : "";
-    const sepayCheckout = selectedPaymentOption ? await createSepayCheckout({
-      env, origin:new URL(request.url).origin, invoiceNumber:orderNumber, amount:selectedAmount,
-      description:"SinDarealest " + orderNumber, customerId, accessToken:orderAccessToken
-    }) : null;
-    if(selectedPaymentOption&&!sepayCheckout)return fail("SePay chưa sẵn sàng để nhận thanh toán. Đơn hàng chưa được tạo.",503);
+    const sepayBank=selectedPaymentOption?loadSepayBankConfig(env):null;
+    const sepayPayment=selectedPaymentOption?createSepayVietQr({env,bank:sepayBank,amount:selectedAmount,reference:orderNumber}):null;
+    if(selectedPaymentOption&&!sepayPayment)return fail("QR SePay chưa sẵn sàng. Cần bật webhook bảo mật và xác minh tài khoản nhận tiền trong cấu hình QR trước khi tạo đơn.",503);
     const statements = [];
 
     // The customer row is a long-lived profile, not an order form. Never
@@ -147,7 +145,7 @@ export async function onRequestPost({ request, env }) {
     }
     statements.push(env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) VALUES(?, 'customer', 'order_created', 'order', ?, ?)").bind(crypto.randomUUID(),orderId,JSON.stringify({ orderNumber, itemCount: items.length, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, customerPaymentVerified:false })));
     let sepayWriteIndex=-1;
-    if(sepayCheckout){
+    if(sepayPayment){
       sepayWriteIndex=statements.length;
       statements.push(env.DB.prepare(
         "INSERT INTO sepay_payment_orders(id,order_id,order_invoice_number,installment_type,amount,status) VALUES(?,?,?,?,?,'pending')"
@@ -157,9 +155,9 @@ export async function onRequestPost({ request, env }) {
     const paymentReady=sepayWriteIndex>=0&&Number(writes?.[sepayWriteIndex]?.meta?.changes||0)===1;
     await sendAdminPush(env, { title: "Đơn hàng mới", body: orderNumber + " · " + items.length + " loại sản phẩm", url: "/admin/" });
     const paymentSummary=selectedPaymentOption&&priceKnown?summarizeOrderPayment({total:subtotal,paymentOption:selectedPaymentOption,agreedAmount:selectedAmount,transactions:[],termsConfirmed:paymentTermsConfirmed,hasPendingRequest:paymentReady}):null;
-    const paymentInstructions=paymentReady?{status:"ready",provider:"sepay",amount:selectedAmount}:null;
-    const message=paymentReady?"Đơn hàng đã được tạo. Đang chuyển bạn đến SePay để thanh toán; trạng thái sẽ tự cập nhật sau khi SePay xác nhận.":priceKnown?"Hãy liên hệ Shop để xác nhận đơn hàng.":"Shop đã tiếp nhận yêu cầu. Giá sẽ được xác nhận trước khi gửi hướng dẫn thanh toán.";
-    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", deliveryStatus:"not_shipped", priceConfirmationRequired: !priceKnown, paymentTermsConfirmed, paymentReady, paymentProvider:"sepay", total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, paymentSummary, paymentInstructions, sepayCheckout:paymentReady?{url:sepayCheckout.url,fields:sepayCheckout.fields}:null, message }, 201);
+    const paymentInstructions=paymentReady?{status:"ready",provider:"sepay",...sepayPayment}:null;
+    const message=paymentReady?"Đơn hàng đã được tạo. Quét QR ngay tại đây; SePay sẽ tự cập nhật khi xác nhận tiền vào tài khoản.":priceKnown?"Hãy liên hệ Shop để xác nhận đơn hàng.":"Shop đã tiếp nhận yêu cầu. Giá sẽ được xác nhận trước khi gửi hướng dẫn thanh toán.";
+    return json({ ok: true, orderNumber, orderAccessToken, status: "pending_confirmation", deliveryStatus:"not_shipped", priceConfirmationRequired: !priceKnown, paymentTermsConfirmed, paymentReady, paymentProvider:"sepay", total: subtotal, selectedPaymentOption, selectedPaymentAmount:selectedAmount, selectedRemainingAmount, selectedDiscountAmount, transferReference, paymentSummary, paymentInstructions, message }, 201);
   } catch { return fail("Chưa thể lưu đơn hàng. Vui lòng thử lại hoặc liên hệ SinDarealest qua Zalo.", 503); }
 }
 

@@ -62,7 +62,7 @@ for(let i=0;i<categories.length;i++){
  db.prepare('INSERT INTO products(id,slug,sku,title,category,category_label,price,stock,published,source_price_confirmed,fulfillment_type) VALUES(?,?,?,?,?,?,100000,10,1,1,?)')
    .run('opt-'+i,'opt-'+i,'OPT-'+i,title,category,title,'made_to_order');
 }
-const env={DB,ADMIN_PASSWORD:'FAKE_QA_PASSWORD_NOT_REAL',SESSION_SECRET:'QA-NONPRODUCTION-ONLY-SESSION-SECRET-123456',SEPAY_ENV:'sandbox',SEPAY_MERCHANT_ID:'TEST',SEPAY_MERCHANT_SECRET_KEY:'TEST_SECRET',SEPAY_IPN_SECRET_KEY:'TEST_IPN'};
+const env={DB,ADMIN_PASSWORD:'FAKE_QA_PASSWORD_NOT_REAL',SESSION_SECRET:'QA-NONPRODUCTION-ONLY-SESSION-SECRET-123456',SEPAY_WEBHOOK_SECRET:'QA_WEBHOOK_SECRET_NONPRODUCTION_123456',SEPAY_QR_BANK_CODE:'VCB',SEPAY_QR_BANK_NAME:'Vietcombank',SEPAY_QR_BANK_ACCOUNT:'1234567890',SEPAY_QR_ACCOUNT_NAME:'QA TEST OWNER'};
 const body={fullName:'KHACH HANG GIA LAP',phone:'0900000000',address:'Địa chỉ QA giả lập, không giao hàng',items:[]};
 const endpoint='https://qa.invalid/api/orders';
 const invoke=async items=>createOrder({env,request:new Request(endpoint,{method:'POST',headers:{Origin:'https://qa.invalid','Content-Type':'application/json','CF-Connecting-IP':'203.0.113.88'},body:JSON.stringify({...body,items,paymentOption:'deposit',quotedTotal:800000})})});

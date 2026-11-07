@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { onRequestPost as ordersPost } from '../functions/api/orders.js';
 import { onRequestPost as checkoutQuotePost } from '../functions/api/checkout-quote.js';
 import { onRequestGet as orderPaymentGet } from '../functions/api/order-payment.js';
-import { onRequestPost as receiveIpn } from '../functions/api/sepay/ipn.js';
+import { onRequestPost as receiveWebhook } from '../functions/api/sepay/webhook.js';
 import { hashOrderAccessToken } from '../functions/_payments.js';
 
 const db=new DatabaseSync(':memory:');
@@ -43,9 +43,9 @@ const DB={
 };
 const env={
   DB,SESSION_SECRET:'DISPOSABLE_TEST_SECRET_32_CHARS_LONG',
-  SEPAY_ENV:'sandbox',SEPAY_MERCHANT_ID:'MERCHANT_TEST',
-  SEPAY_MERCHANT_SECRET_KEY:'MERCHANT_SECRET_TEST',
-  SEPAY_IPN_SECRET_KEY:'IPN_SECRET_TEST'
+  SEPAY_WEBHOOK_SECRET:'DISPOSABLE_WEBHOOK_SECRET_VALUE_123456789',
+  SEPAY_QR_BANK_CODE:'VCB',SEPAY_QR_BANK_NAME:'Vietcombank',
+  SEPAY_QR_BANK_ACCOUNT:'1234567890',SEPAY_QR_ACCOUNT_NAME:'QA TEST OWNER'
 };
 const root='https://shop.example';
 const request=(path,method='GET',body,headers={})=>new Request(root+path,{
@@ -78,8 +78,10 @@ assert.equal(created.paymentProvider,'sepay');
 assert.equal(created.paymentReady,true);
 assert.equal(created.paymentInstructions.provider,'sepay');
 assert.equal(created.paymentInstructions.amount,142500);
-assert.equal(created.sepayCheckout.url,'https://pay-sandbox.sepay.vn/v1/checkout/init');
-assert.ok(created.sepayCheckout.fields.signature);
+assert.equal(created.paymentInstructions.qrIncludesAmount,true);
+assert.match(created.paymentInstructions.qrImageUrl,/vietqr\.app\/img/);
+assert.match(created.paymentInstructions.qrImageUrl,/amount=142500/);
+assert.match(created.paymentInstructions.qrImageUrl,/des=/);
 const order=db.prepare('SELECT id,public_access_token_hash FROM orders WHERE order_number=?').get(created.orderNumber);
 assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
 const gateway=db.prepare('SELECT order_invoice_number,amount,status FROM sepay_payment_orders WHERE order_id=?').get(order.id);
@@ -95,27 +97,28 @@ const tokenQuery='?orderNumber='+encodeURIComponent(created.orderNumber)+'&token
 const pending=await (await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery)).json();
 assert.equal(pending.paymentProvider,'sepay');
 assert.equal(pending.gatewayStatus,'pending');
-assert.equal(pending.paymentReady,false);
+assert.equal(pending.paymentReady,true);
+assert.equal(pending.qrIncludesAmount,true);
 
-const payload={
-  timestamp:1794000000,notification_type:'ORDER_PAID',
-  order:{id:'gateway-order-qa',order_status:'CAPTURED',order_currency:'VND',
-    order_amount:'142500.00',order_invoice_number:created.orderNumber},
-  transaction:{id:'gateway-transaction-qa',transaction_id:'TX-QA-001',
-    transaction_type:'PAYMENT',transaction_status:'APPROVED',
-    transaction_amount:'142500.00',transaction_currency:'VND',
-    transaction_date:'2026-11-07 00:00:00'}
+const payload={id:92704,gateway:'Vietcombank',transactionDate:'2026-11-07 00:00:00',accountNumber:env.SEPAY_QR_BANK_ACCOUNT,
+  subAccount:'',code:created.orderNumber,content:created.orderNumber+' chuyen tien',transferType:'in',description:'QA transfer',transferAmount:142500,accumulated:1000000,referenceCode:'FT-QA-001'};
+const webhookRequest=(override={})=>{
+  const raw=JSON.stringify(payload),timestamp=String(Math.floor(Date.now()/1000));
+  return crypto.subtle.importKey('raw',new TextEncoder().encode(env.SEPAY_WEBHOOK_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']).then(async key=>{
+    const bytes=new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(timestamp+'.'+raw)));
+    const signature='sha256='+[...bytes].map(value=>value.toString(16).padStart(2,'0')).join('');
+    return new Request(root+'/api/sepay/webhook',{method:'POST',headers:{'Content-Type':'application/json','X-SePay-Timestamp':timestamp,'X-SePay-Signature':signature,...override},body:raw});
+  });
 };
-const ipnRequest=()=>request('/api/sepay/ipn','POST',payload,{'X-Secret-Key':env.SEPAY_IPN_SECRET_KEY});
-const ipnEnv={...env,DB};
-const firstIpn=await receiveIpn({env:ipnEnv,request:ipnRequest()});
-assert.equal(firstIpn.status,200,await firstIpn.clone().text());
-assert.equal((await firstIpn.json()).received,true);
-const repeatedIpn=await receiveIpn({env:ipnEnv,request:ipnRequest()});
-assert.equal(repeatedIpn.status,200);
-assert.equal((await repeatedIpn.json()).duplicate,true);
-const rejectedIpn=await receiveIpn({env:ipnEnv,request:request('/api/sepay/ipn','POST',payload,{'X-Secret-Key':'wrong'})});
-assert.equal(rejectedIpn.status,401);
+const webhookEnv={...env,DB};
+const firstWebhook=await receiveWebhook({env:webhookEnv,request:await webhookRequest()});
+assert.equal(firstWebhook.status,200,await firstWebhook.clone().text());
+assert.equal((await firstWebhook.json()).success,true);
+const repeatedWebhook=await receiveWebhook({env:webhookEnv,request:await webhookRequest()});
+assert.equal(repeatedWebhook.status,200);
+assert.equal((await repeatedWebhook.json()).success,true);
+const rejectedWebhook=await receiveWebhook({env:webhookEnv,request:new Request(root+'/api/sepay/webhook',{method:'POST',headers:{'Content-Type':'application/json','X-SePay-Timestamp':String(Math.floor(Date.now()/1000)),'X-SePay-Signature':'sha256='+('0'.repeat(64))},body:JSON.stringify(payload)})});
+assert.equal(rejectedWebhook.status,401);
 
 const paid=await (await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery)).json();
 assert.equal(paid.gatewayStatus,'paid');
@@ -124,4 +127,4 @@ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WH
   'Repeated IPN delivery is idempotent');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0);
 assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
-console.log('PASS: sandbox checkout, SePay IPN settlement, duplicate delivery, and no static checkout QR.');
+console.log('PASS: inline VietQR order, signed SePay bank webhook settlement, duplicate delivery, and no static checkout QR.');

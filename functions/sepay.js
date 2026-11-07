@@ -21,6 +21,50 @@ export function parseVndAmount(value) {
   const raw=String(value??"").trim();if(!/^\d+(?:\.0+)?$/.test(raw))return null;
   const amount=Number(raw);return Number.isSafeInteger(amount)&&amount>0&&amount<=2_000_000_000?amount:null;
 }
+
+// Direct bank-transfer QR mode: the QR is rendered inside our checkout and
+// SePay's bank webhook confirms the actual incoming transfer. The bank
+// details come from the already admin-verified payment account settings.
+export function sepayWebhookSecret(env) {
+  const value=String(env?.SEPAY_WEBHOOK_SECRET||"");
+  return value.length>=24&&value.length<=500?value:"";
+}
+export function sepayBankTransferReady(env,bank) {
+  return Boolean(sepayWebhookSecret(env)
+    && /^\d{6,19}$/.test(String(bank?.accountNumber||""))
+    && String(bank?.bankName||"").trim().length>=2
+    && String(bank?.accountName||"").trim().length>=5);
+}
+export function loadSepayBankConfig(env) {
+  const bank={bankCode:String(env?.SEPAY_QR_BANK_CODE||"").trim(),bankName:String(env?.SEPAY_QR_BANK_NAME||"").trim(),accountNumber:String(env?.SEPAY_QR_BANK_ACCOUNT||"").replace(/\s+/g,""),accountName:String(env?.SEPAY_QR_ACCOUNT_NAME||"").trim()};
+  return /^[A-Za-z0-9.-]{2,30}$/.test(bank.bankCode)&&/^\d{6,19}$/.test(bank.accountNumber)&&bank.bankName.length>=2&&bank.accountName.length>=5?bank:null;
+}
+export function createSepayVietQr({env,bank,amount,reference}) {
+  if(!sepayBankTransferReady(env,bank)||!Number.isSafeInteger(amount)||amount<=0||amount>2_000_000_000
+     ||!/^[A-Za-z0-9-]{6,64}$/.test(String(reference||"")))return null;
+  const url=new URL("https://vietqr.app/img");
+  url.searchParams.set("acc",String(bank.accountNumber));
+  url.searchParams.set("bank",String(bank.bankCode).trim());
+  url.searchParams.set("amount",String(amount));
+  url.searchParams.set("des",String(reference));
+  url.searchParams.set("template","compact");
+  url.searchParams.set("showinfo","true");
+  url.searchParams.set("holder",String(bank.accountName).trim());
+  url.searchParams.set("store","SinDarealest");
+  return {qrImageUrl:url.toString(),qrIncludesAmount:true,amount,bankName:String(bank.bankName).trim(),accountNumber:String(bank.accountNumber),accountName:String(bank.accountName).trim(),transferContent:String(reference)};
+}
+export async function verifySepayBankWebhook({env,timestamp,signature,rawBody,now=Date.now()}) {
+  const secret=sepayWebhookSecret(env),stamp=String(timestamp||"");
+  if(!secret||!/^\d{10}$/.test(stamp)||!/^sha256=[a-f0-9]{64}$/i.test(String(signature||"")))return false;
+  const seconds=Number(stamp);
+  if(!Number.isSafeInteger(seconds)||Math.abs(Math.floor(now/1000)-seconds)>300)return false;
+  try {
+    const key=await crypto.subtle.importKey("raw",encoder.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+    const digest=new Uint8Array(await crypto.subtle.sign("HMAC",key,encoder.encode(stamp+"."+rawBody)));
+    const hex=[...digest].map(value=>value.toString(16).padStart(2,"0")).join("");
+    return constantTimeSecretMatch(String(signature).toLowerCase(),"sha256="+hex);
+  } catch { return false; }
+}
 export async function createSepayCheckout({env,origin,invoiceNumber,amount,description,customerId,accessToken}) {
   const config=getConfig(env);
   if(!config||!Number.isSafeInteger(amount)||amount<=0||amount>2_000_000_000||!/^[A-Za-z0-9_-]{3,64}$/.test(String(invoiceNumber||"")))return null;

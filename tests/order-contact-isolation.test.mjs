@@ -54,7 +54,7 @@ const response = await createOrder({
       note: "Giao giờ hành chính",
     }),
   }),
-  env: { DB, SEPAY_ENV:"sandbox", SEPAY_MERCHANT_ID:"TEST", SEPAY_MERCHANT_SECRET_KEY:"TEST_SECRET", SEPAY_IPN_SECRET_KEY:"TEST_IPN" },
+  env: { DB, SEPAY_WEBHOOK_SECRET:"QA_WEBHOOK_SECRET_NONPRODUCTION_123456", SEPAY_QR_BANK_CODE:"VCB", SEPAY_QR_BANK_NAME:"Vietcombank", SEPAY_QR_BANK_ACCOUNT:"1234567890", SEPAY_QR_ACCOUNT_NAME:"QA TEST OWNER" },
 });
 
 assert.equal(response.status, 201, "valid checkout should create the order");
@@ -149,7 +149,7 @@ async function runPriceCase({ price, confirmed, showPrices }) {
         note: "",
       }),
     }),
-    env: { DB: testDB, SEPAY_ENV:"sandbox", SEPAY_MERCHANT_ID:"TEST", SEPAY_MERCHANT_SECRET_KEY:"TEST_SECRET", SEPAY_IPN_SECRET_KEY:"TEST_IPN" },
+    env: { DB: testDB, SEPAY_WEBHOOK_SECRET:"QA_WEBHOOK_SECRET_NONPRODUCTION_123456", SEPAY_QR_BANK_CODE:"VCB", SEPAY_QR_BANK_NAME:"Vietcombank", SEPAY_QR_BANK_ACCOUNT:"1234567890", SEPAY_QR_ACCOUNT_NAME:"QA TEST OWNER" },
   });
   assert.equal(response.status, 201, "a valid order request can still be accepted pending price confirmation: "+await response.clone().text());
   const body = await response.json();

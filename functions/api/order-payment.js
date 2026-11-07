@@ -1,5 +1,6 @@
 import { dbOrFail, fail, json } from "../_lib.js";
 import { hashOrderAccessToken, summarizeOrderPayment, validPublicQrImageKey } from "../_payments.js";
+import { createSepayVietQr, loadSepayBankConfig } from "../sepay.js";
 
 const PRIVATE_PAYMENT_HEADERS = Object.freeze({
   "Cache-Control": "private, no-store",
@@ -46,17 +47,23 @@ export async function paymentDetailsForOrder(order,env){
       return json({ ok:true, ...base, paymentReady:false, message:"Đơn đang chờ SinDarealest xác nhận giá và điều kiện. Vui lòng chưa chuyển khoản." },200,PRIVATE_PAYMENT_HEADERS);
     }
     if(sepayRow){
-      const gatewayPaid=sepayRow.status==="paid";
+      const sepayPaid=sepayRow.status==="paid"||paymentSummary.shortfall===0;
+      const bank=loadSepayBankConfig(env);
+      const amount=Number.isSafeInteger(paymentSummary.shortfall)&&paymentSummary.shortfall>0?paymentSummary.shortfall:null;
+      const sepayQr=!sepayPaid&&amount?createSepayVietQr({env,bank,amount,reference:sepayRow.order_invoice_number}):null;
       const enoughForChoice=paymentSummary.shortfall===0;
       return json({
-        ok:true,...base,paymentReady:false,paymentProvider:"sepay",
-        installmentType:sepayRow.installment_type,amount:null,
-        gatewayStatus:sepayRow.status,transactionReference:gatewayPaid?sepayRow.transaction_reference:"",
+        ok:true,...base,paymentReady:Boolean(sepayQr),paymentProvider:"sepay",
+        installmentType:sepayRow.installment_type,amount:sepayQr?.amount??null,
+        qrImageUrl:sepayQr?.qrImageUrl||"",qrIncludesAmount:sepayQr?.qrIncludesAmount===true,
+        bankName:sepayQr?.bankName||"",accountNumber:sepayQr?.accountNumber||"",accountName:sepayQr?.accountName||"",
+        transferReference:sepayRow.order_invoice_number,
+        gatewayStatus:sepayRow.status,transactionReference:sepayPaid?sepayRow.transaction_reference:"",
         createdAt:sepayRow.created_at,
-        message:gatewayPaid||enoughForChoice
-          ?"SePay đã xác nhận khoản thanh toán. Trạng thái đơn đã được đồng bộ tự động."
+        message:sepayPaid||enoughForChoice
+          ?"Khoản thanh toán đã được xác nhận. Trạng thái đơn đã được đồng bộ tự động."
           :sepayRow.status==="pending"
-            ?"Đang chờ SePay xác nhận giao dịch. Trang này sẽ cập nhật khi Shop nhận được IPN."
+            ?"Quét QR và chuyển đúng số tiền cùng nội dung. SePay sẽ cập nhật khi tiền vào tài khoản."
             :"Yêu cầu thanh toán SePay đã kết thúc. Vui lòng liên hệ SinDarealest để được hỗ trợ."
       },200,PRIVATE_PAYMENT_HEADERS);
     }

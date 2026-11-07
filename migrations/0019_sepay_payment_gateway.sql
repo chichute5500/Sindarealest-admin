@@ -1,4 +1,4 @@
--- Hosted SePay orders are independent of legacy static QR requests.
+-- SePay checkout and direct bank-transfer QR orders are independent of legacy static QR requests.
 CREATE TABLE sepay_payment_orders (
   id TEXT PRIMARY KEY,
   order_id TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,

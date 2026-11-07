@@ -1,6 +1,6 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, readJsonBodyLimited } from "../_lib.js";
 import { calculateCheckoutQuote } from "../_payments.js";
-import { sepayPaymentReady } from "../sepay.js";
+import { loadSepayBankConfig, sepayBankTransferReady } from "../sepay.js";
 import { normalizeProductOption } from "../_product-options.js";
 
 const NO_STORE={"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"};
@@ -44,10 +44,11 @@ export async function onRequestPost({request,env}) {
     const selectedOption=parsed.value?.paymentOption==="deposit"||parsed.value?.paymentOption==="full"?parsed.value.paymentOption:"";
     const selected=selectedOption?quote.options.find(option=>option.value===selectedOption):null;
     if(selectedOption&&(!selected||parsed.value?.quotedTotal!==quote.total))return fail("Giá trị hoặc cách thanh toán đã thay đổi. Vui lòng kiểm tra lại.",409);
-    const configured=sepayPaymentReady(env);
+    const bank=loadSepayBankConfig(env);
+    const configured=sepayBankTransferReady(env,bank);
     const paymentDetails=selectedOption&&configured?{status:"ready",provider:"sepay",amount:selected.amount}:null;
     return json({ok:true,quoteReady:true,paymentReady:Boolean(configured),paymentProvider:"sepay",fulfillmentType:quote.fulfillmentType,total:quote.total,options:quote.options,
-      reason:configured?"":"Cổng thanh toán SePay chưa được cấu hình. Chưa thể tiến hành thanh toán.",
+      reason:configured?"":"QR SePay chưa được cấu hình đầy đủ. Chưa thể tiến hành thanh toán.",
       ...(selectedOption?{paymentOption:selectedOption,selectedPaymentAmount:selected.amount,paymentInstructions:paymentDetails}:{}),
       transferReferenceAvailableAfterSubmit:false
     },200,NO_STORE);
