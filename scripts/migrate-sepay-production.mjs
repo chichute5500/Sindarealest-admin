@@ -119,7 +119,14 @@ async function main(){
     function run(args,label,timeout=180000){
       const result=spawnSync(process.execPath,[wrangler,"d1",...args,"--config",config],{encoding:"utf8",timeout,maxBuffer:8*1024*1024,
         env:{...process.env,CLOUDFLARE_SEND_METRICS:"false"}});
-      if(result.error||result.status!==0)throw Error(label+" failed (exit "+String(result.status)+"); details redacted");
+      if(result.error||result.status!==0){
+        const raw=[result.stderr,result.stdout].filter(Boolean).join("\n").replace(/\u001b\[[0-9;]*m/g,"");
+        const detail=raw.split(/\r?\n/).map(line=>line.trim()).filter(line=>/\b(error|failed|denied|could not|cannot|unable|refused)\b|✘/i.test(line)).slice(0,3)
+          .map(line=>line.replace(/Bearer\s+\S+/gi,"Bearer [redacted]").replace(/\b[A-F0-9]{32,}\b/gi,"[redacted-id]")
+            .replace(/\b[A-Za-z0-9_-]{48,}\b/g,"[redacted-token]").replace(/https?:\/\/\S+/gi,"[url]").slice(0,240))
+          .join(" | ")||String(result.error?.code||"no safe Wrangler error line");
+        throw Error(label+" failed (exit "+String(result.status)+"); "+detail);
+      }
       return result.stdout;
     }
     run(["export",target.name,"--remote","--skip-confirmation","--output",backup],"Private pre-migration D1 export");
