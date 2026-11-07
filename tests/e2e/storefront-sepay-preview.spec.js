@@ -60,7 +60,7 @@ test('Preview checkout creates a hosted SePay payment and returns to IPN-wait st
     priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:true,
     paymentProvider:'sepay',total:100000,selectedPaymentOption:body.paymentOption,
     selectedPaymentAmount:amount,paymentInstructions:{status:'ready',provider:'sepay',amount},
-    sepayCheckout:{url:'https://sandbox.pay.sepay.vn/v1/checkout/init',fields},
+    sepayCheckout:{url:'https://pay-sandbox.sepay.vn/v1/checkout/init',fields},
     message:'Đang chuyển bạn đến SePay.'
    })});return;
   }
