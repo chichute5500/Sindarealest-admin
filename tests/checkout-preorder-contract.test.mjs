@@ -44,7 +44,7 @@ assert.ok(html.includes('id="sdCheckoutStepper"')&&html.includes('id="sdCheckout
 assert.ok(html.includes('id="sdCheckoutItemSummary"'),'Payment step shows the exact products and quantities before the order is sent');
 assert.doesNotMatch(html,/id="sdCheckoutReviewStep"/,'Checkout has no duplicate review page');
 assert.match(html,/sd-order-reference/,'Order number is prominent after QR');
-assert.match(html,/orderStage\.hidden=true/,'The public order number stage stays hidden before payment confirmation');
+assert.match(html,/orderStage\.hidden=!paymentConfirmed/,'The public order number stage follows the server payment summary directly');
 assert.match(html,/Number\(data\.paymentSummary\?\.shortfall\)===0\)sdCheckoutAdvanceToOrderCode\(true\)/,'The order number appears only when the server confirms the selected amount');
 assert.ok(create.includes('`SP-${crypto.randomUUID()'),'SePay receives a separate transfer reference, not the public order number');
 assert.match(readFileSync(new URL('../functions/api/sepay/webhook.js',import.meta.url),'utf8'),/SP-\[A-Z0-9\]\{16\}/,'The bank webhook resolves the private transfer reference');

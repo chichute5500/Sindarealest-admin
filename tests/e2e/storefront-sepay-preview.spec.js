@@ -123,6 +123,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).not.toBeVisible();
  await expect(page.locator('#paymentInstructions')).toContainText(transferReference);
+ await expect.poll(()=>paymentChecks,{timeout:10000}).toBeGreaterThan(1);
  await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions')).toContainText(orderNumber);
  await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
