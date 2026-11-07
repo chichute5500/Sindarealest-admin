@@ -83,7 +83,9 @@ assert.ok(created.sepayCheckout.fields.signature);
 const order=db.prepare('SELECT id,public_access_token_hash FROM orders WHERE order_number=?').get(created.orderNumber);
 assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
 const gateway=db.prepare('SELECT order_invoice_number,amount,status FROM sepay_payment_orders WHERE order_id=?').get(order.id);
-assert.equal(gateway.order_invoice_number,created.orderNumber);\nassert.equal(gateway.amount,142500);\nassert.equal(gateway.status,'pending');
+assert.equal(gateway.order_invoice_number,created.orderNumber);
+assert.equal(gateway.amount,142500);
+assert.equal(gateway.status,'pending');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0,
   'New checkout does not create a manual QR payment request');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?').get(order.id).n,0,
