@@ -10,7 +10,7 @@ function getConfig(env) {
   if(merchantId.length>100||merchantSecret.length>500||ipnSecret.length>500) return null;
   return {mode,merchantId,merchantSecret,ipnSecret};
 }
-xport function sepayPaymentReady(env) { return Boolean(getConfig(env)); }
+export function sepayPaymentReady(env) { return Boolean(getConfig(env)); }
 export function sepayIpnSecret(env) { return getConfig(env)?.ipnSecret||""; }
 export function constantTimeSecretMatch(actual,expected) {
   const a=encoder.encode(String(actual||"")),b=encoder.encode(String(expected||""));
