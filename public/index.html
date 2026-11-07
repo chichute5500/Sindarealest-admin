@@ -3291,7 +3291,7 @@ html.dark #productOverlay .detail-price:not([hidden]){color:#f4d5a4}
 #productOverlay .sd-detail-payment-quote strong{font-size:12px}
 #productOverlay .sd-detail-payment-quote p{margin:0;color:var(--ink)}
 #productOverlay .sd-detail-payment-quote small{color:var(--muted)}
-.sd-payment-success-stage{text-align:center;padding:24px 18px;border:1px solid rgba(255,255,255,.88);border-radius:20px;background:linear-gradient(150deg,rgba(250,253,255,.94),rgba(226,238,244,.88));box-shadow:0 12px 28px rgba(30,58,75,.12),inset 0 1px 0 rgba(255,255,255,.9);animation:sd-payment-success-in .35s ease-out both}
+.sd-payment-stage-exit{animation:sd-payment-stage-out .18s ease-in both!important;pointer-events:none}.sd-payment-stage-enter{animation:sd-payment-stage-in .28s cubic-bezier(.2,.8,.25,1) both}@keyframes sd-payment-stage-out{to{opacity:0;transform:translateY(-8px) scale(.985)}}@keyframes sd-payment-stage-in{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){.sd-payment-stage-exit,.sd-payment-stage-enter{animation-duration:.01ms!important}}.sd-payment-success-stage{text-align:center;padding:24px 18px;border:1px solid rgba(255,255,255,.88);border-radius:20px;background:linear-gradient(150deg,rgba(250,253,255,.94),rgba(226,238,244,.88));box-shadow:0 12px 28px rgba(30,58,75,.12),inset 0 1px 0 rgba(255,255,255,.9);animation:sd-payment-success-in .35s ease-out both}
 .sd-payment-success-icon{width:76px;height:76px;margin:0 auto 14px;filter:drop-shadow(0 5px 10px rgba(22,139,89,.2))}
 .sd-payment-success-icon .sd-success-ring{fill:#e6f8ef;stroke:#168b59;stroke-width:3;transform-origin:center;animation:sd-payment-ring .9s ease-out .1s both}
 .sd-payment-success-icon .sd-success-inner{fill:url(#sdCheckoutSuccessGreen)}
@@ -5098,23 +5098,38 @@ async function sdCheckoutRecoverPendingIntent(){let pending;try{pending=JSON.par
 function sdCheckoutStartPaymentPolling(orderNumber,token){clearTimeout(sdCheckoutPaymentPollTimer);const poll=async()=>{await refreshOrderPayment(orderNumber,token,null,{deferOrderCode:true,silent:true});if($('#checkoutDrawer')?.classList.contains('open')&&$('#paymentInstructions')?.dataset.stage!=='order')sdCheckoutPaymentPollTimer=setTimeout(poll,5000)};void poll()}
 function sdCheckoutShowPaymentSuccess(data,token){
  const panel=$('#paymentInstructions');if(!panel)return;
- panel.replaceChildren();panel.hidden=false;panel.dataset.stage='payment-success';panel.dataset.paymentConfirmed='true';
- const stage=document.createElement('section');stage.className='sd-payment-success-stage';stage.setAttribute('role','status');stage.setAttribute('aria-live','polite');
- const icon=document.createElement('div');icon.className='sd-payment-success-icon';icon.setAttribute('aria-hidden','true');
- const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 100 100');
- const defs=document.createElementNS(ns,'defs'),gradient=document.createElementNS(ns,'linearGradient');gradient.id='sdCheckoutSuccessGreen';gradient.setAttribute('x1','0');gradient.setAttribute('y1','0');gradient.setAttribute('x2','1');gradient.setAttribute('y2','1');
- const stopA=document.createElementNS(ns,'stop');stopA.setAttribute('stop-color','#43bd80');const stopB=document.createElementNS(ns,'stop');stopB.setAttribute('offset','1');stopB.setAttribute('stop-color','#138451');gradient.append(stopA,stopB);defs.append(gradient);
- const ring=document.createElementNS(ns,'circle');ring.setAttribute('class','sd-success-ring');ring.setAttribute('cx','50');ring.setAttribute('cy','50');ring.setAttribute('r','46');
- const inner=document.createElementNS(ns,'circle');inner.setAttribute('class','sd-success-inner');inner.setAttribute('cx','50');inner.setAttribute('cy','50');inner.setAttribute('r','36');
- const tick=document.createElementNS(ns,'path');tick.setAttribute('class','sd-success-tick');tick.setAttribute('d','m31 51 13 13 27-29');svg.append(defs,ring,inner,tick);icon.append(svg);stage.append(icon);
- const kicker=document.createElement('p');kicker.className='sd-payment-success-kicker';kicker.textContent='THANH TOÁN ĐÃ XÁC NHẬN';
- const title=document.createElement('h3');title.textContent='Thanh toán thành công';
- const copy=document.createElement('p');copy.className='sd-payment-success-copy';const received=Number(data?.paymentSummary?.netReceivedAmount);copy.textContent=Number.isSafeInteger(received)&&received>0?'Shop đã nhận '+formatVnd(received)+'.':'Khoản thanh toán của bạn đã được xác nhận.';
- const next=document.createElement('p');next.className='sd-payment-success-next';next.textContent='Đang chuyển đến mã đơn hàng…';
- const progress=document.createElement('div');progress.className='sd-payment-success-progress';progress.setAttribute('aria-hidden','true');const fill=document.createElement('i');progress.append(fill);
- stage.append(kicker,title,copy,next,progress);panel.append(stage);
- $('#sdCheckoutStepTitle').textContent='Thanh toán thành công';$('#sdCheckoutStepSubtitle').textContent='Đang chuyển đến mã đơn hàng…';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=true;
- setTimeout(()=>{if(panel.dataset.stage!=='payment-success')return;window.sdRenderPaymentInstructions({...data,paymentProvider:'sepay',paid:true},token,{deferOrderCode:true});panel.dataset.paymentConfirmed='true';panel.dataset.stage='sepay-pending';window.sdCheckoutAdvanceToOrderCode(true)},1500);
+ const showSuccess=()=>{
+  if(panel.dataset.stage!=='payment-transition')return;
+  panel.replaceChildren();panel.hidden=false;panel.dataset.stage='payment-success';panel.dataset.paymentConfirmed='true';
+  const stage=document.createElement('section');stage.className='sd-payment-success-stage';stage.setAttribute('role','status');stage.setAttribute('aria-live','polite');
+  const icon=document.createElement('div');icon.className='sd-payment-success-icon';icon.setAttribute('aria-hidden','true');
+  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 100 100');
+  const defs=document.createElementNS(ns,'defs'),gradient=document.createElementNS(ns,'linearGradient');gradient.id='sdCheckoutSuccessGreen';gradient.setAttribute('x1','0');gradient.setAttribute('y1','0');gradient.setAttribute('x2','1');gradient.setAttribute('y2','1');
+  const stopA=document.createElementNS(ns,'stop');stopA.setAttribute('stop-color','#43bd80');const stopB=document.createElementNS(ns,'stop');stopB.setAttribute('offset','1');stopB.setAttribute('stop-color','#138451');gradient.append(stopA,stopB);defs.append(gradient);
+  const ring=document.createElementNS(ns,'circle');ring.setAttribute('class','sd-success-ring');ring.setAttribute('cx','50');ring.setAttribute('cy','50');ring.setAttribute('r','46');
+  const inner=document.createElementNS(ns,'circle');inner.setAttribute('class','sd-success-inner');inner.setAttribute('cx','50');inner.setAttribute('cy','50');inner.setAttribute('r','36');
+  const tick=document.createElementNS(ns,'path');tick.setAttribute('class','sd-success-tick');tick.setAttribute('d','m31 51 13 13 27-29');svg.append(defs,ring,inner,tick);icon.append(svg);stage.append(icon);
+  const kicker=document.createElement('p');kicker.className='sd-payment-success-kicker';kicker.textContent='THANH TOÁN ĐÃ XÁC NHẬN';
+  const title=document.createElement('h3');title.textContent='Thanh toán thành công';
+  const copy=document.createElement('p');copy.className='sd-payment-success-copy';const received=Number(data?.paymentSummary?.netReceivedAmount);copy.textContent=Number.isSafeInteger(received)&&received>0?'Shop đã nhận '+formatVnd(received)+'.':'Khoản thanh toán của bạn đã được xác nhận.';
+  const next=document.createElement('p');next.className='sd-payment-success-next';next.textContent='Đang chuyển đến mã đơn hàng…';
+  const progress=document.createElement('div');progress.className='sd-payment-success-progress';progress.setAttribute('aria-hidden','true');const fill=document.createElement('i');progress.append(fill);
+  stage.append(kicker,title,copy,next,progress);panel.append(stage);
+  $('#sdCheckoutStepTitle').textContent='Thanh toán thành công';$('#sdCheckoutStepSubtitle').textContent='Đang chuyển đến mã đơn hàng…';$('#sdCheckoutConfirmWrap').hidden=true;$('#sdCheckoutConfirmNote').hidden=true;$('#sdCheckoutDone').hidden=true;
+  setTimeout(()=>{
+   if(panel.dataset.stage!=='payment-success')return;
+   stage.classList.add('sd-payment-stage-exit');panel.dataset.stage='order-transition';
+   setTimeout(()=>{
+    if(panel.dataset.stage!=='order-transition')return;
+    window.sdRenderPaymentInstructions({...data,paymentProvider:'sepay',paid:true},token,{deferOrderCode:true});
+    panel.dataset.paymentConfirmed='true';panel.dataset.stage='sepay-pending';
+    panel.querySelector('.sd-payment-order-stage')?.classList.add('sd-payment-stage-enter');
+    window.sdCheckoutAdvanceToOrderCode(true);
+   },180);
+  },1320);
+ };
+ const transferStage=panel.querySelector('.sd-payment-transfer-stage');
+ if(transferStage){panel.dataset.stage='payment-transition';transferStage.classList.add('sd-payment-stage-exit');setTimeout(showSuccess,180)}else{panel.dataset.stage='payment-transition';showSuccess()}
 }
 function sdCheckoutStartIntentPolling(intentId,token,items,fromCart){
  clearTimeout(sdCheckoutPaymentPollTimer);
@@ -5723,7 +5738,7 @@ function renderPaymentInstructions(result,accessToken='',options={}){
  if(Number.isSafeInteger(summary.overpaidAmount)&&summary.overpaidAmount>0)row('Tiền chuyển dư',formatVnd(summary.overpaidAmount));
  if(Number.isSafeInteger(summary.codRemaining))row('Số tiền thanh toán khi nhận hàng',formatVnd(summary.codRemaining));
  if(Number.isSafeInteger(summary.codReceivedAmount)&&summary.codReceivedAmount>0)row('Shop đã nhận COD',formatVnd(summary.codReceivedAmount));
- add(orderStage,'p','sd-payment-truth-note','Shop chỉ xác nhận tiền đã nhận sau khi đối chiếu sao kê. Xem mã đơn không có nghĩa Shop đã nhận được tiền.');
+ 
  if(!ready){
   const serverMessage=String(result?.message||'').trim();if(serverMessage&&!/Shop đã tiếp nhận đơn/i.test(serverMessage))add(transferStage,'p','payment-warning',serverMessage);
   if(deferOrderCode)$('#sdCheckoutDone').textContent='Lấy mã đơn →';
