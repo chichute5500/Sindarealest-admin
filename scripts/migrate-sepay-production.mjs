@@ -2,7 +2,7 @@
 // This script is intentionally gated to one manual GitHub Actions invocation.
 import assert from "node:assert/strict";
 import {spawnSync} from "node:child_process";
-import {copyFileSync,mkdirSync,mkdtempSync,rmSync,writeFileSync,statSync} from "node:fs";
+import {copyFileSync,mkdirSync,mkdtempSync,rmSync,writeFileSync,statSync,readdirSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join,resolve} from "node:path";
 import {pathToFileURL} from "node:url";
@@ -69,6 +69,10 @@ async function main(){
   assert.equal(ledgerExists.length,1,"Production migration ledger missing; refusing to infer schema history");
   const ledgerRows=await query("SELECT name FROM d1_migrations");
   const ledger=new Set(ledgerRows.map(row=>String(row.name)));
+  const allMigrations=readdirSync(resolve("migrations")).filter(name=>/^\\d{4}_.+\\.sql$/.test(name)).sort();
+  assert.ok(targetMigrations.every(name=>allMigrations.includes(name)),"Target SePay migration files are missing");
+  const unrelatedPending=allMigrations.filter(name=>!targetMigrations.includes(name)&&!ledger.has(name));
+  assert.deepEqual(unrelatedPending,[],"Production has unapplied non-SePay migrations; refusing to run them: "+unrelatedPending.join(", "));
   for(const migration of prerequisites)assert.ok(ledger.has(migration),"Required prior migration is not recorded: "+migration);
 
   const tableNames=async(names)=>query("SELECT name FROM sqlite_master WHERE type='table' AND name IN ("+names.map(name=>"'"+name+"'").join(",")+")");
@@ -102,7 +106,9 @@ async function main(){
   const config=join(folder,"wrangler.toml"),backup=join(folder,"before-sepay.sql");
   try{
     mkdirSync(join(folder,"migrations"));
-    for(const name of targetMigrations)copyFileSync(resolve("migrations",name),join(folder,"migrations",name));
+    // Wrangler validates the local migration history against the remote ledger. Include the full
+    // history, but the guard above requires every non-target migration to already be recorded.
+    for(const name of allMigrations)copyFileSync(resolve("migrations",name),join(folder,"migrations",name));
     writeFileSync(config,[
       'name = "sd-sepay-production-migration"','compatibility_date = "2026-10-12"',
       '[[d1_databases]]','binding = "DB"','database_name = '+JSON.stringify(target.name),
