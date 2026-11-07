@@ -1,5 +1,6 @@
 import { fail, json, readBodyBytesLimited } from "../../_lib.js";
 import { loadSepayBankConfig, parseVndAmount, verifySepayBankWebhook } from "../../sepay.js";
+import { sendAdminPush } from "../../_notifications.js";
 
 const headers={"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"};
 const accepted=()=>json({success:true},200,headers);
@@ -25,47 +26,57 @@ export async function onRequestPost({request,env}) {
     const bank=loadSepayBankConfig(env);
     if(!bank||String(payload.accountNumber||"").replace(/\s+/g,"")!==bank.accountNumber)return accepted();
     const checkout=await env.DB.prepare(
-      "SELECT id,order_id,amount,status FROM sepay_payment_orders WHERE order_invoice_number=? LIMIT 1"
+      "SELECT id,amount,status,payload_json FROM sepay_checkout_intents WHERE transfer_reference=? LIMIT 1"
     ).bind(invoice).first();
-    if(!checkout||checkout.status==="cancelled"||checkout.status==="void")return accepted();
-    const order=await env.DB.prepare(
-      "SELECT id,status,total,price_confirmation_required,payment_terms_confirmed_at FROM orders WHERE id=? LIMIT 1"
-    ).bind(checkout.order_id).first();
-    if(!order||order.status==="cancelled"||Number(order.price_confirmation_required)!==0||!order.payment_terms_confirmed_at)return accepted();
-
+    if(!checkout||checkout.status!=="pending")return accepted();
     const transactionReference="SEPAY-BANK:"+transactionId;
     const transactionRowId=crypto.randomUUID();
     const rawPayload=rawBody;
-    const note="SePay bank transfer "+transactionId+" · "+String(payload.transactionDate||"").slice(0,40);
-    const orderPaymentStatusSql=
-      "UPDATE orders SET payment_status=CASE WHEN total IS NOT NULL AND total>=0 AND "+
-      "((SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN -amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)+(SELECT COALESCE(SUM(amount),0) FROM order_cod_settlements WHERE order_id=?))>=COALESCE((SELECT CASE WHEN json_extract(details_json,'$.selectedPaymentOption')='full' THEN CAST(json_extract(details_json,'$.selectedPaymentAmount') AS INTEGER) ELSE total END FROM audit_logs WHERE entity_type='order' AND entity_id=orders.id AND action='order_created' ORDER BY created_at DESC LIMIT 1),total) AND "+
-      "(SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)>0 THEN 'paid' "+
-      "WHEN (SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN -amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)<=0 AND EXISTS(SELECT 1 FROM order_payment_transactions WHERE order_id=? AND direction='refunded') THEN 'refunded' "+
-      "WHEN (SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN -amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)>0 THEN 'pending' ELSE 'unpaid' END,updated_at=datetime('now') WHERE id=? AND EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)";
-    const writes=await env.DB.batch([
-      env.DB.prepare(
-        "INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) "+
-        "SELECT ?,?,NULL,'received',?,?,?,'sepay_webhook' WHERE EXISTS (SELECT 1 FROM sepay_payment_orders WHERE id=? AND status IN ('pending','paid')) "+
-        "AND EXISTS (SELECT 1 FROM orders WHERE id=? AND status<>'cancelled' AND price_confirmation_required=0 AND total IS NOT NULL AND payment_terms_confirmed_at IS NOT NULL) "+
-        "AND NOT EXISTS (SELECT 1 FROM order_payment_transactions WHERE transaction_reference=?)"
-      ).bind(transactionRowId,checkout.order_id,amount,transactionReference,note,checkout.id,checkout.order_id,transactionReference),
-      env.DB.prepare(
-        "UPDATE sepay_payment_orders SET status='paid',transaction_id=?,transaction_reference=?,ipn_payload_json=?,updated_at=datetime('now') "+
-        "WHERE id=? AND status='pending' AND (SELECT COALESCE(SUM(CASE WHEN direction='received' AND actor<>'admin_cod_completion' THEN amount WHEN direction='refunded' AND actor<>'admin_cod_completion' THEN -amount ELSE 0 END),0) FROM order_payment_transactions WHERE order_id=?)>=amount "+
-        "AND EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)"
-      ).bind(transactionId,transactionReference,rawPayload,checkout.id,checkout.order_id,transactionRowId),
-      env.DB.prepare(orderPaymentStatusSql).bind(checkout.order_id,checkout.order_id,checkout.order_id,checkout.order_id,checkout.order_id,checkout.order_id,checkout.order_id,transactionRowId),
-      env.DB.prepare(
-        "INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) "+
-        "SELECT ?,'sepay','sepay_bank_transfer_received','order',?,? WHERE EXISTS (SELECT 1 FROM order_payment_transactions WHERE id=?)"
-      ).bind(crypto.randomUUID(),checkout.order_id,JSON.stringify({transactionId,amount,invoiceNumber:invoice}),transactionRowId)
-    ]);
-    if(Number(writes?.[0]?.meta?.changes||0)!==1){
-      const duplicate=await env.DB.prepare("SELECT order_id FROM order_payment_transactions WHERE transaction_reference=? LIMIT 1").bind(transactionReference).first();
-      if(duplicate?.order_id===checkout.order_id)return accepted();
-      return fail("Giao dịch chưa được ghi nhận.",409,headers);
+    const writes=await env.DB.prepare(
+      "INSERT INTO sepay_checkout_transactions(id,intent_id,transaction_id,amount,transaction_reference,payload_json) "+
+      "SELECT ?,?,?,?,?,? FROM sepay_checkout_intents WHERE id=? AND status='pending' AND expires_at>datetime('now') "+
+      "AND NOT EXISTS(SELECT 1 FROM sepay_checkout_transactions WHERE transaction_id=? OR transaction_reference=?)"
+    ).bind(transactionRowId,checkout.id,transactionId,amount,transactionReference,"{}",checkout.id,transactionId,transactionReference).run();
+    if(Number(writes?.meta?.changes||0)!==1){
+      const duplicate=await env.DB.prepare("SELECT intent_id FROM sepay_checkout_transactions WHERE transaction_id=? OR transaction_reference=? LIMIT 1").bind(transactionId,transactionReference).first();
+      // A retry may be the first request to finish order creation after an
+      // earlier delivery saved the receipt but hit a transient D1 failure.
+      if(duplicate?.intent_id!==checkout.id)return accepted();
     }
+    const receipt=await env.DB.prepare(
+      "SELECT i.amount,i.payload_json,i.status,i.transfer_reference,COALESCE(SUM(t.amount),0) AS received FROM sepay_checkout_intents i LEFT JOIN sepay_checkout_transactions t ON t.intent_id=i.id WHERE i.id=? GROUP BY i.id"
+    ).bind(checkout.id).first();
+    if(!receipt||receipt.status!=="pending"||Number(receipt.received)<Number(receipt.amount))return accepted();
+    let snapshot;try{snapshot=JSON.parse(receipt.payload_json)}catch{return fail("Dữ liệu thanh toán cần được cửa hàng kiểm tra.",503,headers)}
+    if(!snapshot||!Array.isArray(snapshot.items)||!snapshot.items.length)return fail("Dữ liệu thanh toán cần được cửa hàng kiểm tra.",503,headers);
+
+    const orderId=crypto.randomUUID();
+    const orderNumber=`SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-","").slice(0,6).toUpperCase()}`;
+    const customerId=crypto.randomUUID();
+    const statements=[
+      env.DB.prepare("UPDATE sepay_checkout_intents SET status='paid',order_id=?,order_number=?,paid_at=datetime('now'),updated_at=datetime('now') WHERE id=? AND status='pending' AND expires_at>datetime('now') AND (SELECT COALESCE(SUM(amount),0) FROM sepay_checkout_transactions WHERE intent_id=?)>=amount").bind(orderId,orderNumber,checkout.id,checkout.id),
+      env.DB.prepare("INSERT INTO customers(id,full_name,phone,email,address) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?) ON CONFLICT(phone) DO NOTHING").bind(customerId,snapshot.fullName,snapshot.phone,snapshot.email,snapshot.address,checkout.id,orderId),
+      env.DB.prepare("INSERT INTO customer_address_details(customer_id,province_code,province,ward_code,ward,street_address,updated_at) SELECT c.id,?,?,?,?,?,datetime('now') FROM customers c WHERE c.phone=? AND c.id=? AND EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?) ON CONFLICT(customer_id) DO NOTHING").bind(snapshot.provinceCode,snapshot.province,snapshot.wardCode,snapshot.ward,snapshot.streetAddress,snapshot.phone,customerId,checkout.id,orderId),
+      env.DB.prepare("INSERT INTO orders(id,order_number,customer_id,status,subtotal,total,price_confirmation_required,customer_note,public_access_token_hash,payment_terms_confirmed_at,payment_terms_confirmed_by,payment_status) SELECT ?,?,c.id,'pending_confirmation',?,?,0,?,?,?,'customer_checkout',CASE WHEN ?='full' OR ?>=? THEN 'paid' ELSE 'pending' END FROM customers c WHERE c.phone=? AND EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(orderId,orderNumber,snapshot.subtotal,snapshot.subtotal,snapshot.customerNote,snapshot.orderAccessTokenHash,snapshot.paymentTermsConfirmedAt,snapshot.selectedPaymentOption,Number(receipt.received),snapshot.subtotal,snapshot.phone,checkout.id,orderId),
+      env.DB.prepare("INSERT INTO order_contact_details(order_id,full_name,phone,email,created_at) SELECT ?,?,?,?,datetime('now') WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(orderId,snapshot.fullName,snapshot.phone,snapshot.email,checkout.id,orderId),
+      env.DB.prepare("INSERT INTO order_shipping_addresses(order_id,province_code,province,ward_code,ward,street_address,full_address) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(orderId,snapshot.provinceCode,snapshot.province,snapshot.wardCode,snapshot.ward,snapshot.streetAddress,snapshot.address,checkout.id,orderId),
+      ...snapshot.items.map(item=>env.DB.prepare("INSERT INTO order_items(id,order_id,product_id,sku,sku_verified,title,quantity,unit_price,line_total,fulfillment_type) SELECT ?,?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(item.id,orderId,item.productId,item.sku,item.skuVerified?1:0,item.title,item.quantity,item.price,item.price===null?null:item.price*item.quantity,item.fulfillmentType,checkout.id,orderId)),
+      ...snapshot.items.filter(item=>item.shoeSize).map(item=>env.DB.prepare("INSERT INTO order_item_details(item_id,size) SELECT ?,? WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(item.id,item.shoeSize,checkout.id,orderId)),
+      env.DB.prepare("INSERT INTO sepay_payment_orders(id,order_id,order_invoice_number,installment_type,amount,status,transaction_id,transaction_reference,ipn_payload_json) SELECT ?,?,?,?,?, 'paid',?,?,? WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(crypto.randomUUID(),orderId,receipt.transfer_reference,snapshot.selectedPaymentOption,snapshot.selectedAmount,transactionId,transactionReference,rawPayload,checkout.id,orderId),
+      env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?,'customer','order_created','order',?,? WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(crypto.randomUUID(),orderId,JSON.stringify({orderNumber,itemCount:snapshot.items.length,selectedPaymentOption:snapshot.selectedPaymentOption,selectedPaymentAmount:snapshot.selectedAmount,selectedRemainingAmount:snapshot.selectedRemainingAmount,selectedDiscountAmount:snapshot.selectedDiscountAmount,transferReference:receipt.transfer_reference,customerPaymentVerified:true}),checkout.id,orderId),
+      env.DB.prepare("INSERT INTO audit_logs(id,actor,action,entity_type,entity_id,details_json) SELECT ?,'sepay','sepay_bank_transfer_received','order',?,? WHERE EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)").bind(crypto.randomUUID(),orderId,JSON.stringify({transactionId,amount,invoiceNumber:invoice}),checkout.id,orderId),
+      env.DB.prepare("UPDATE sepay_checkout_intents SET payload_json='{}',updated_at=datetime('now') WHERE id=? AND status='paid' AND order_id=?").bind(checkout.id,orderId)
+    ];
+    // Add every verified inbound receipt to the normal order ledger. The
+    // transaction reference remains globally idempotent at the database layer.
+    statements.push(env.DB.prepare(
+      "INSERT INTO order_payment_transactions(id,order_id,payment_request_id,direction,amount,transaction_reference,note,actor) "+
+      "SELECT lower(hex(randomblob(16))),?,NULL,'received',amount,transaction_reference,'SePay bank transfer '||transaction_id,'sepay_webhook' "+
+      "FROM sepay_checkout_transactions WHERE intent_id=? AND EXISTS(SELECT 1 FROM sepay_checkout_intents WHERE id=? AND status='paid' AND order_id=?)"
+    ).bind(orderId,checkout.id,checkout.id,orderId));
+    const finalized=await env.DB.batch(statements);
+    if(Number(finalized?.[0]?.meta?.changes||0)!==1)return accepted();
+    try{await sendAdminPush(env,{title:"Đơn hàng đã thanh toán",body:orderNumber+" · "+snapshot.items.length+" loại sản phẩm",url:"/admin/"})}catch{}
     return accepted();
   }catch{return fail("Không thể ghi nhận giao dịch SePay.",503,headers)}
 }

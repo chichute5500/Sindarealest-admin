@@ -12,7 +12,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await page.setViewportSize({width:390,height:844});
  await page.emulateMedia({colorScheme:'light',reducedMotion:'reduce'});
  const origin=new URL(url).origin;
- const orderNumber='SD-PREVIEW-001';
+ const orderNumber='SD-PREVIEW-001',checkoutIntentId='preview-intent-00000000-0000-4000-8000-000000000001';
  const accessToken='p'.repeat(64);
  const transferReference='SP-0123456789ABCDEF';
  let paymentChecks=0,paymentReceived=false;
@@ -50,20 +50,17 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
    const body=request.postDataJSON();orderBodies.push(body);orderCalls++;
    const amount=body.paymentOption==='full'?95000:100000;
    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({
-    ok:true,orderNumber,orderAccessToken:accessToken,status:'pending_confirmation',
+    ok:true,checkoutIntentId,orderAccessToken:accessToken,
     priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:true,
     paymentProvider:'sepay',total:100000,selectedPaymentOption:body.paymentOption,transferReference,
     selectedPaymentAmount:amount,paymentInstructions:{status:'ready',provider:'sepay',amount,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount='+amount+'&des='+transferReference,qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferContent:transferReference},
     message:'QR SePay đã sẵn sàng trong khung đặt hàng.'
    })});return;
   }
-  if(requestUrl.origin===origin&&path==='/api/order-payment'&&request.method()==='GET'){
+  if(requestUrl.origin===origin&&path==='/api/sepay/checkout-status'&&request.method()==='GET'){
    paymentChecks++;
    await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},body:JSON.stringify({
-    ok:true,orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',
-    priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:!paymentReceived,
-    paymentProvider:'sepay',gatewayStatus:paymentReceived?'paid':'pending',
-    ...(!paymentReceived?{amount:100000,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount=100000&des='+transferReference,qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferReference}:{}),
+    ok:true,paid:paymentReceived,...(paymentReceived?{orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentReady:false}:{paymentProvider:'sepay',paymentReady:true,transferReference}),
     paymentSummary:{paymentOption:'deposit',total:100000,requiredAmount:100000,
       netReceivedAmount:paymentReceived?100000:0,shortfall:paymentReceived?0:100000,codRemaining:0}
    })});return;
@@ -112,7 +109,7 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect(page.locator('#paymentInstructions .sd-sepay-intro')).toContainText('Mã đơn sẽ hiện');
  await expect(page.locator('#paymentInstructions .sd-sepay-amount')).toContainText('100.000');
  await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
- await expect(page.locator('#sdCheckoutDone')).toContainText('Tạo đơn & hiện QR');
+ await expect(page.locator('#sdCheckoutDone')).toContainText('Tiếp tục đến QR');
  expect(orderCalls).toBe(0);
  await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-hosted-payment-mobile.png'});
  await page.locator('#sdCheckoutDone').click();

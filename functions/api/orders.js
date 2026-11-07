@@ -96,10 +96,8 @@ export async function onRequestPost({ request, env }) {
     const paymentTermsConfirmed = Boolean(priceKnown && choice);
     const paymentTermsConfirmedAt = paymentTermsConfirmed ? new Date().toISOString() : null;
     if(selectedPaymentOption&&(!priceKnown||!paymentTermsConfirmed))return fail("Cần có giá đã xác nhận trước khi thanh toán qua SePay.",409);
-    const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
-    const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
     // Keep the bank memo separate from the public order code. Customers see
     // the public code only after SePay confirms the selected payment amount.
     const transferReference = selectedPaymentOption
@@ -108,6 +106,29 @@ export async function onRequestPost({ request, env }) {
     const sepayBank=selectedPaymentOption?loadSepayBankConfig(env):null;
     const sepayPayment=selectedPaymentOption?createSepayVietQr({env,bank:sepayBank,amount:selectedAmount,reference:transferReference}):null;
     if(selectedPaymentOption&&!sepayPayment)return fail("QR SePay chưa sẵn sàng. Cần bật webhook bảo mật và xác minh tài khoản nhận tiền trong cấu hình QR trước khi tạo đơn.",503);
+
+    // A SePay checkout is a temporary payment intent, not an order. Persist
+    // the authoritative server-priced snapshot and only create customers,
+    // orders and the public order number after SePay's signed bank webhook
+    // confirms the selected amount.
+    if(selectedPaymentOption){
+      const intentId=crypto.randomUUID();
+      const expiresAt=new Date(Date.now()+24*60*60*1000).toISOString();
+      const checkoutSnapshot={
+        fullName,phone,email,province,provinceCode,ward,wardCode,streetAddress,address,customerNote,
+        subtotal,priceKnown,items,selectedPaymentOption,selectedAmount,selectedRemainingAmount,
+        selectedDiscountAmount,paymentTermsConfirmed,paymentTermsConfirmedAt,orderAccessTokenHash
+      };
+      await env.DB.prepare("UPDATE sepay_checkout_intents SET status='expired',payload_json='{}',updated_at=datetime('now') WHERE status='pending' AND expires_at<=datetime('now')").run();
+      await env.DB.prepare(
+        "INSERT INTO sepay_checkout_intents(id,transfer_reference,payment_option,amount,payload_json,access_token_hash,expires_at) VALUES(?,?,?,?,?,?,?)"
+      ).bind(intentId,transferReference,selectedPaymentOption,selectedAmount,JSON.stringify(checkoutSnapshot),orderAccessTokenHash,expiresAt).run();
+      const paymentSummary=summarizeOrderPayment({total:subtotal,paymentOption:selectedPaymentOption,agreedAmount:selectedAmount,transactions:[],termsConfirmed:paymentTermsConfirmed,hasPendingRequest:true});
+      return json({ok:true,checkoutIntentId:intentId,orderAccessToken,paymentProvider:"sepay",paymentReady:true,paymentTermsConfirmed,priceConfirmationRequired:!priceKnown,total:subtotal,selectedPaymentOption,selectedPaymentAmount:selectedAmount,selectedRemainingAmount,selectedDiscountAmount,transferReference,paymentSummary,paymentInstructions:{status:"ready",provider:"sepay",...sepayPayment},message:"Quét QR và chuyển đúng số tiền. Mã đơn chỉ được tạo sau khi SePay xác nhận đã nhận đủ tiền."},201);
+    }
+
+    const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
+    const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
     const statements = [];
 
     // The customer row is a long-lived profile, not an order form. Never

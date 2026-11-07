@@ -23,6 +23,7 @@ on:
       - 'public/logo.png'
       - 'public/images/brand-emblem.png'
       - 'tests/**'
+      - 'migrations/0020_sepay_checkout_intents.sql'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/storefront-payment-experiment-preview.yml'

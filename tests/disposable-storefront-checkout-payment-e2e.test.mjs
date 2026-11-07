@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { onRequestPost as ordersPost } from '../functions/api/orders.js';
 import { onRequestPost as checkoutQuotePost } from '../functions/api/checkout-quote.js';
 import { onRequestGet as orderPaymentGet } from '../functions/api/order-payment.js';
+import { onRequestGet as checkoutStatusGet } from '../functions/api/sepay/checkout-status.js';
 import { onRequestPost as receiveWebhook } from '../functions/api/sepay/webhook.js';
 import { hashOrderAccessToken } from '../functions/_payments.js';
 
@@ -19,7 +20,7 @@ for(const migration of [
   '0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql',
   '0007_order_contact_details.sql','0008_product_sku_verification.sql',
   '0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql',
-  '0019_sepay_payment_gateway.sql'
+  '0019_sepay_payment_gateway.sql','0020_sepay_checkout_intents.sql'
 ]) db.exec(readFileSync(new URL('../migrations/'+migration,import.meta.url),'utf8'));
 const DB={
   prepare(sql){
@@ -75,6 +76,8 @@ const createdResponse=await invoke(ordersPost,'/api/orders','POST',checkout);
 assert.equal(createdResponse.status,201,await createdResponse.clone().text());
 const created=await createdResponse.json();
 assert.equal(created.paymentProvider,'sepay');
+assert.equal(typeof created.checkoutIntentId,'string');
+assert.equal('orderNumber' in created,false,'No public order number exists before confirmed payment');
 assert.equal(created.paymentReady,true);
 assert.equal(created.paymentInstructions.provider,'sepay');
 assert.equal(created.paymentInstructions.amount,142500);
@@ -84,26 +87,14 @@ assert.notEqual(created.transferReference,created.orderNumber,'bank memo is sepa
 assert.match(created.paymentInstructions.qrImageUrl,/vietqr\.app\/img/);
 assert.match(created.paymentInstructions.qrImageUrl,/amount=142500/);
 assert.match(created.paymentInstructions.qrImageUrl,/des=/);
-const order=db.prepare('SELECT id,public_access_token_hash FROM orders WHERE order_number=?').get(created.orderNumber);
-assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
-const gateway=db.prepare('SELECT order_invoice_number,amount,status FROM sepay_payment_orders WHERE order_id=?').get(order.id);
-assert.equal(gateway.order_invoice_number,created.transferReference);
-assert.equal(gateway.amount,142500);
-assert.equal(gateway.status,'pending');
-assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0,
-  'New checkout does not create a manual QR payment request');
-assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?').get(order.id).n,0,
-  'Creating checkout never records money received');
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,0,
+  'Starting checkout creates no customer order before bank confirmation');
+const pending=await (await invoke(checkoutStatusGet,'/api/sepay/checkout-status?intentId='+created.checkoutIntentId+'&token='+created.orderAccessToken)).json();
+assert.equal(pending.paid,false);
+assert.equal(pending.transferReference,created.transferReference);
 
-const tokenQuery='?orderNumber='+encodeURIComponent(created.orderNumber)+'&token='+created.orderAccessToken;
-const pending=await (await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery)).json();
-assert.equal(pending.paymentProvider,'sepay');
-assert.equal(pending.gatewayStatus,'pending');
-assert.equal(pending.paymentReady,true);
-assert.equal(pending.qrIncludesAmount,true);
-
-const payload={id:92704,gateway:'Vietcombank',transactionDate:'2026-11-07 00:00:00',accountNumber:env.SEPAY_QR_BANK_ACCOUNT,
-  subAccount:'',code:created.transferReference,content:created.transferReference+' chuyen tien',transferType:'in',description:'QA transfer',transferAmount:142500,accumulated:1000000,referenceCode:'FT-QA-001'};
+let payload={id:92704,gateway:'Vietcombank',transactionDate:'2026-11-07 00:00:00',accountNumber:env.SEPAY_QR_BANK_ACCOUNT,
+  subAccount:'',code:created.transferReference,content:created.transferReference+' chuyen tien',transferType:'in',description:'QA transfer',transferAmount:50000,accumulated:1000000,referenceCode:'FT-QA-001'};
 const webhookRequest=(override={})=>{
   const raw=JSON.stringify(payload),timestamp=String(Math.floor(Date.now()/1000));
   return crypto.subtle.importKey('raw',new TextEncoder().encode(env.SEPAY_WEBHOOK_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']).then(async key=>{
@@ -116,16 +107,39 @@ const webhookEnv={...env,DB};
 const firstWebhook=await receiveWebhook({env:webhookEnv,request:await webhookRequest()});
 assert.equal(firstWebhook.status,200,await firstWebhook.clone().text());
 assert.equal((await firstWebhook.json()).success,true);
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,0,
+  'A partial bank transfer is recorded but does not create an order');
+const afterPartial=await (await invoke(checkoutStatusGet,'/api/sepay/checkout-status?intentId='+created.checkoutIntentId+'&token='+created.orderAccessToken)).json();
+assert.equal(afterPartial.paid,false);
+payload={...payload,id:92705,transferAmount:92500,referenceCode:'FT-QA-002'};
 const repeatedWebhook=await receiveWebhook({env:webhookEnv,request:await webhookRequest()});
 assert.equal(repeatedWebhook.status,200);
 assert.equal((await repeatedWebhook.json()).success,true);
+const duplicateWebhook=await receiveWebhook({env:webhookEnv,request:await webhookRequest()});
+assert.equal(duplicateWebhook.status,200);
+assert.equal((await duplicateWebhook.json()).success,true);
+const orderCountBeforeRejected=db.prepare('SELECT COUNT(*) AS n FROM orders').get().n;
 const rejectedWebhook=await receiveWebhook({env:webhookEnv,request:new Request(root+'/api/sepay/webhook',{method:'POST',headers:{'Content-Type':'application/json','X-SePay-Timestamp':String(Math.floor(Date.now()/1000)),'X-SePay-Signature':'sha256='+('0'.repeat(64))},body:JSON.stringify(payload)})});
 assert.equal(rejectedWebhook.status,401);
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,orderCountBeforeRejected,
+  'An invalid signature cannot create the order or expose an order number');
 
+const status=await (await invoke(checkoutStatusGet,'/api/sepay/checkout-status?intentId='+created.checkoutIntentId+'&token='+created.orderAccessToken)).json();
+assert.equal(typeof status.orderNumber,'string','A public order number appears only after the signed webhook confirms payment');
+assert.equal(status.paymentSummary.netReceivedAmount,142500);
+const order=db.prepare('SELECT id,public_access_token_hash,payment_status FROM orders WHERE order_number=?').get(status.orderNumber);
+assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
+assert.equal(order.payment_status,'paid');
+const gateway=db.prepare('SELECT order_invoice_number,amount,status FROM sepay_payment_orders WHERE order_id=?').get(order.id);
+assert.equal(gateway.order_invoice_number,created.transferReference);
+assert.equal(gateway.amount,142500);
+assert.equal(gateway.status,'paid');
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0);
+const tokenQuery='?orderNumber='+encodeURIComponent(status.orderNumber)+'&token='+created.orderAccessToken;
 const paid=await (await invoke(orderPaymentGet,'/api/order-payment'+tokenQuery)).json();
 assert.equal(paid.gatewayStatus,'paid');
 assert.equal(paid.paymentSummary.netReceivedAmount,142500);
-assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?').get(order.id).n,1,
+assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_transactions WHERE order_id=?').get(order.id).n,2,
   'Repeated IPN delivery is idempotent');
 assert.equal(db.prepare('SELECT COUNT(*) AS n FROM order_payment_requests WHERE order_id=?').get(order.id).n,0);
 assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);

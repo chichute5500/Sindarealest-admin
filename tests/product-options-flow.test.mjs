@@ -35,7 +35,7 @@ assert.equal(productOptionLabel('belts','4.0'),'Bản dây 4.0 cm');
 
 const db=new DatabaseSync(':memory:');
 db.exec('PRAGMA foreign_keys=ON');
-for(const name of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql','0019_sepay_payment_gateway.sql'])
+for(const name of ['0001_schema.sql','0003_storefront_operations.sql','0004_admin_notifications.sql','0005_address_warranty_verification.sql','0006_remove_warranty_otp.sql','0007_order_contact_details.sql','0008_product_sku_verification.sql','0009_fulfillment_and_manual_payments.sql','0018_payment_delivery_settlement.sql','0019_sepay_payment_gateway.sql','0020_sepay_checkout_intents.sql'])
  db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
 db.prepare("UPDATE settings SET value='1' WHERE key='show_prices'").run();
 
@@ -85,8 +85,9 @@ try {
  db.exec('DELETE FROM public_rate_limits');
  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,0);
  const response=await invoke([item(0,1,'42'),item(0,2,'43'),item(0,1,'42'),item(3,1,'3.5'),item(4,1,'iPhone 16 Pro Max'),item(5,1,''),item(6,1,'41')]);
- assert.equal(response.status,201,await response.text());
- const saved=db.prepare('SELECT title,quantity,product_id FROM order_items ORDER BY rowid').all();
+ assert.equal(response.status,201,await response.clone().text());
+ const intent=await response.json();
+ const saved=JSON.parse(db.prepare('SELECT payload_json FROM sepay_checkout_intents WHERE id=?').get(intent.checkoutIntentId).payload_json).items;
  assert.equal(saved.length,6,'Different sizes must not be merged; same size must be grouped, including sandals');
  assert.equal(saved[0].title,'Giày sneaker · Size 42');
  assert.equal(saved[0].quantity,2);
@@ -96,12 +97,13 @@ try {
  assert.equal(saved[3].title,'Ốp điện thoại · Dòng điện thoại: iPhone 16 Pro Max');
  assert.equal(saved[4].title,'Ví');
  assert.equal(saved[5].title,'Dép da cá sấu · Size 41');
- assert.deepEqual(db.prepare('SELECT size FROM order_item_details ORDER BY size').all().map(x=>x.size),['41','42','43']);
+ assert.deepEqual(saved.filter(x=>x.shoeSize).map(x=>x.shoeSize).sort(),['41','42','43']);
+ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM orders').get().n,0,'Size-specific SePay checkout remains an intent until SePay confirms payment');
  const cookie=await createSession(env.SESSION_SECRET);
  const admin=await adminOrders({env,request:new Request('https://qa.invalid/api/admin/orders',{headers:{Origin:'https://qa.invalid','Sec-Fetch-Site':'same-origin',Cookie:'sd_admin_session='+cookie}})});
  if(admin.status!==200)throw Error('Admin read failed: '+admin.status+' '+await admin.text());
  const payload=await admin.json();
- assert.deepEqual(payload.orders[0].items.map(x=>x.title),saved.map(x=>x.title),'Admin receives the exact selected size / belt width / phone model');
+ assert.equal(payload.orders.length,0,'Admin does not see a bank-transfer order before payment confirmation');
  assert.equal(db.prepare('PRAGMA foreign_key_check').all().length,0);
 
  const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
