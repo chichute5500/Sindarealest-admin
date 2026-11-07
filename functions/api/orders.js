@@ -1,5 +1,5 @@
 import { dbOrFail, fail, getSetting, json, normalizeFulfillmentType, rateLimitPublicRequest, readJsonBodyLimited } from "../_lib.js";
-import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment, validPublicQrImageKey, checkoutTransferSku, checkoutTransferReferenceMatches } from "../_payments.js";
+import { createOrderAccessToken, hashOrderAccessToken, calculateCheckoutQuote, summarizeOrderPayment } from "../_payments.js";
 import { sendAdminPush } from "../_notifications.js";
 import { createSepayCheckout } from "../sepay.js";
 import { normalizeProductOption, productOptionKind, productOptionLabel } from "../_product-options.js";
