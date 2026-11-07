@@ -31,5 +31,5 @@ export async function createSepayCheckout({env,origin,invoiceNumber,amount,descr
   const signed=SIGNED_FIELDS.filter(name=>Object.hasOwn(fields,name)).map(name=>name+"="+fields[name]).join(",");
   const key=await crypto.subtle.importKey("raw",encoder.encode(config.merchantSecret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
   const signature=toBase64(new Uint8Array(await crypto.subtle.sign("HMAC",key,encoder.encode(signed))));
-  return {url:config.mode==="production"?"https://pay.sepay.vn/v1/checkout/init":"https://sandbox.pay.sepay.vn/v1/checkout/init",fields:{...fields,signature},mode:config.mode};
+  return {url:config.mode==="production"?"https://pay.sepay.vn/v1/checkout/init":"https://pay-sandbox.sepay.vn/v1/checkout/init",fields:{...fields,signature},mode:config.mode};
 }
