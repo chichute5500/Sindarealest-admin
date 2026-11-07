@@ -61,8 +61,9 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
    paymentChecks++;
    await route.fulfill({status:200,contentType:'application/json',headers:{'Cache-Control':'no-store'},body:JSON.stringify({
     ok:true,orderNumber,orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',
-    priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:false,
-    paymentProvider:'sepay',gatewayStatus:'pending',
+    priceConfirmationRequired:false,paymentTermsConfirmed:true,paymentReady:paymentChecks<=1,
+    paymentProvider:'sepay',gatewayStatus:paymentChecks>1?'paid':'pending',
+    ...(paymentChecks<=1?{amount:100000,qrImageUrl:'https://vietqr.app/img?acc=1234567890&bank=VCB&amount=100000&des='+transferReference,qrIncludesAmount:true,bankName:'Vietcombank',accountNumber:'1234567890',accountName:'QA TEST OWNER',transferReference}:{}),
     paymentSummary:{paymentOption:'deposit',total:100000,requiredAmount:100000,
       netReceivedAmount:paymentChecks>1?100000:0,shortfall:paymentChecks>1?0:100000,codRemaining:0}
    })});return;
