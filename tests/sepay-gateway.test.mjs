@@ -19,7 +19,7 @@ const checkout=await createSepayCheckout({
   env,origin:"https://shop.example",invoiceNumber:"SD-ABC-123456",amount:100000,
   description:"SinDarealest SD-ABC-123456",customerId:"customer-1",accessToken:"a".repeat(64)
 });
-assert.equal(checkout.url,"https://sandbox.pay.sepay.vn/v1/checkout/init");
+assert.equal(checkout.url,"https://pay-sandbox.sepay.vn/v1/checkout/init");
 assert.equal(checkout.fields.payment_method,"BANK_TRANSFER");
 assert.equal(checkout.fields.order_amount,"100000");
 assert.match(checkout.fields.success_url,/payment-result\.html/);
