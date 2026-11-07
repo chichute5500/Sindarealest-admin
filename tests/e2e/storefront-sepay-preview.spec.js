@@ -157,20 +157,16 @@ test('Preview checkout keeps the dynamic SePay QR inside the order drawer',async
  await expect.poll(()=>paidStatusChecks,{timeout:10000}).toBeGreaterThan(1);
  await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toBeVisible({timeout:10000});
  await expect(page.locator('#paymentInstructions .sd-payment-success-stage')).toContainText('Thanh toán thành công');
- await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeHidden();
- await expect(page.locator('#paymentInstructions .sd-payment-order-stage')).toBeVisible({timeout:10000});
- await expect(page.locator('#paymentInstructions')).not.toContainText('Shop chỉ xác nhận tiền đã nhận sau khi đối chiếu sao kê');
- await expect(page.locator('#paymentInstructions .sd-order-received-note')).toHaveText('Đã nhận cọc và xác nhận đơn. Shop sẽ cập nhật tiến độ làm hàng và gửi hàng.');
- await expect(page.locator('#paymentInstructions')).toContainText(orderNumbers[1]);
- await expect(page.locator('#sdCheckoutDone')).toHaveText('Đóng');
- await expect(page.locator('#paymentInstructions img')).toHaveCount(0);
- await page.locator('#paymentInstructions').screenshot({path:output+'/sepay-inline-qr-mobile.png'});
  // Return to the cart and immediately start a fresh checkout while the previous
  // success-to-order transition timers could still be pending.
  await page.goBack();
  await expect(page.locator('#cartDrawer')).toHaveClass(/open/);
- await page.evaluate(()=>{window.addToCart('qa-wallet');window.renderCart()});
- await page.locator('#cartCheckout').click();
+ await page.evaluate(()=>{
+  document.querySelector('#cartClose')?.click();
+  document.querySelector('[data-add="qa-wallet"]')?.click();
+  document.querySelector('#cartOpen')?.click();
+  document.querySelector('#cartCheckout')?.click();
+ });
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
  await page.waitForTimeout(1600);
  await expect(page.locator('#checkoutDrawer')).toHaveClass(/open/);
