@@ -439,7 +439,7 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  expect(gatewayFields.payment_method).toBe('BANK_TRANSFER');
  expect(gatewayFields.order_amount).toBe('100000');
- await expect(page).toHaveURL(/payment-result\\.html/);
+ await expect(page).toHaveURL(/payment-result\.html/);
  await expect(page.locator('#status')).toContainText('Đang chờ SePay xác nhận giao dịch.');
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
