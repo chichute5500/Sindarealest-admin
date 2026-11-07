@@ -78,7 +78,7 @@ assert.equal(created.paymentProvider,'sepay');
 assert.equal(created.paymentReady,true);
 assert.equal(created.paymentInstructions.provider,'sepay');
 assert.equal(created.paymentInstructions.amount,142500);
-assert.equal(created.sepayCheckout.url,'https://sandbox.pay.sepay.vn/v1/checkout/init');
+assert.equal(created.sepayCheckout.url,'https://pay-sandbox.sepay.vn/v1/checkout/init');
 assert.ok(created.sepayCheckout.fields.signature);
 const order=db.prepare('SELECT id,public_access_token_hash FROM orders WHERE order_number=?').get(created.orderNumber);
 assert.equal(order.public_access_token_hash,await hashOrderAccessToken(created.orderAccessToken));
