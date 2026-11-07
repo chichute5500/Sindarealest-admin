@@ -313,16 +313,23 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  });
  await page.route('**/api/checkout-quote',async route=>{
   const body=route.request().postDataJSON();quoteBodies.push(body);
-  const prepared=Boolean(body.paymentOption),ref='0000-QA-WALLET-001-ABCD';
-  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,quoteReady:true,paymentReady:prepared,total:100000,options:[{value:'deposit',label:'Đặt cọc 30%',amount:100000,discountAmount:0,codExpected:0},{value:'full',label:'Thanh toán toàn bộ, giảm 5%',amount:95000,discountAmount:5000,codExpected:0}],...(prepared?{paymentOption:body.paymentOption,selectedPaymentAmount:body.paymentOption==='full'?95000:100000,transferReference:ref,paymentInstructions:{status:'ready',qrImageUrl:'/test-qr.svg',amount:body.paymentOption==='full'?95000:100000,qrIncludesAmount:false,bankName:'VIB',accountName:'KHACH KIEM THU',accountNumber:'477884',transferContent:ref}}:{})})});
+  const prepared=Boolean(body.paymentOption),amount=body.paymentOption==='full'?95000:100000;
+  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,quoteReady:true,paymentReady:true,paymentProvider:'sepay',total:100000,options:[{value:'deposit',label:'Đặt cọc 30%',amount:100000,discountAmount:0,codExpected:0},{value:'full',label:'Thanh toán toàn bộ, giảm 5%',amount:95000,discountAmount:5000,codExpected:0}],...(prepared?{paymentOption:body.paymentOption,selectedPaymentAmount:amount,paymentInstructions:{status:'ready',provider:'sepay',amount}}:{})})});
  });
  let paymentRefreshRequests=0;
  await page.route('**/api/order-payment?*',async route=>{paymentRefreshRequests++;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderStatus:'pending_confirmation',deliveryStatus:'not_shipped',paymentReady:false,paymentTermsConfirmed:true,priceConfirmationRequired:false,total:100000,paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,receivedAmount:0,refundedAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false,paidInFull:false}})})});
  await page.route('**/test-qr.svg',route=>route.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="white"/><path d="M8 8h20v20H8zm28 0h20v20H36zM8 36h20v20H8zm28 0h8v8h-8zm12 8h8v12H48z" fill="black"/></svg>'}));
+ const accessToken='preview-access-token-1234567890123456789012345678901234567890';
+ let gatewayFields={};
+ await page.route('https://sandbox.pay.sepay.vn/v1/checkout/init',async route=>{
+  gatewayFields=Object.fromEntries(new URLSearchParams(route.request().postData()||'').entries());
+  await route.fulfill({status:303,headers:{location:base+'/payment-result.html?order=SD-TEST-001&token='+accessToken}});
+ });
  await page.route('**/api/orders',async route=>{
   orderBodies.push(route.request().postDataJSON());
-  await new Promise(resolve=>setTimeout(resolve,120)); // Expose duplicate in-flight change events.
-  await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:'preview-access-token-1234567890123456789012345678901234567890',status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentReady:true,paymentTermsConfirmed:true,paymentInstructions:{status:'ready',qrImageUrl:'/test-qr.svg',amount:100000,qrIncludesAmount:false,bankName:'VIB',accountName:'KHACH KIEM THU',accountNumber:'477884',transferContent:'0000-QA-WALLET-001-ABCD'},message:'Shop sẽ xác nhận đơn.',paymentSummary:{status:'waiting_shop_confirmation',total:100000,paymentOption:'deposit',requiredAmount:100000,discountAmount:0,netReceivedAmount:0,shortfall:100000,overpaidAmount:0,codExpected:0,codRemaining:0,codReceivedAmount:0,eligibleToShip:false}})});
+  await new Promise(resolve=>setTimeout(resolve,120));
+  const resultUrl=base+'/payment-result.html?order=SD-TEST-001&token='+accessToken;
+  await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({ok:true,orderNumber:'SD-TEST-001',orderAccessToken:accessToken,status:'pending_confirmation',priceConfirmationRequired:false,total:100000,paymentReady:true,paymentTermsConfirmed:true,paymentProvider:'sepay',paymentInstructions:{status:'ready',provider:'sepay',amount:100000},sepayCheckout:{url:'https://sandbox.pay.sepay.vn/v1/checkout/init',fields:{order_amount:'100000',merchant:'MERCHANT_TEST',currency:'VND',operation:'PURCHASE',order_description:'SinDarealest SD-TEST-001',order_invoice_number:'SD-TEST-001',customer_id:'qa',payment_method:'BANK_TRANSFER',success_url:resultUrl,error_url:resultUrl,cancel_url:resultUrl,signature:'qa-signature'}},message:'Đang chuyển bạn đến SePay.'})});
  });
  await page.goto(base+'/',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
@@ -416,13 +423,11 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  await page.locator('#sdCheckoutOptions [data-sd-payment-option="deposit"]').click();
  await page.locator('#checkoutSubmit').click();await expect(page.locator('#paymentInstructions .sd-order-reference')).toBeHidden();
  await expect(page.locator('#sdCheckoutReviewAddressRow')).toBeHidden();
- await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Chờ thanh toán');
+ await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Thanh toán qua SePay');
  await expect(page.locator('#sdCheckoutOpenBank')).toHaveCount(0);
- await expect(page.locator('#sdCheckoutConfirmRange')).toBeVisible();
- await expect(page.locator('#sdCheckoutConfirmNote')).toBeHidden();
+ await expect(page.locator('#sdCheckoutConfirmWrap')).toBeHidden();
+ await expect(page.locator('#sdCheckoutDone')).toContainText('Tạo đơn & thanh toán');
  expect(orderBodies).toHaveLength(0);
- await swipeToConfirmPayment(page);
- await page.locator('#sdCheckoutConfirmRange').evaluate(slider=>slider.dispatchEvent(new Event('change',{bubbles:true})));
  await expect.poll(()=>orderBodies.length).toBe(1);
  await expect(page.locator('#paymentInstructions .sd-order-reference')).toContainText('SD-TEST-001');
  await expect(page.locator('#sdCheckoutStepTitle')).toHaveText('Mã đơn hàng');
@@ -438,7 +443,16 @@ test('Buy now and cart selection submit only the intended items',async({page,con
  expect(orderBodies).toHaveLength(1);expect(orderBodies[0].items).toEqual([{id:'qa-wallet',option:'',quantity:1}]);
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('sd-cart')||'{}'));
  expect(saved).toEqual({'qa-shoe::42':1,'qa-wallet':1});
- await page.locator('#sdCheckoutDone').click();await expect(page.locator('#checkoutDrawer')).not.toHaveClass(/open/);
+ await page.locator('#sdCheckoutDone').click();
+ await expect.poll(()=>orderBodies.length).toBe(1);
+ await expect.poll(()=>gatewayFields.order_invoice_number).toBe('SD-TEST-001');
+ expect(gatewayFields.payment_method).toBe('BANK_TRANSFER');
+ expect(gatewayFields.order_amount).toBe('100000');
+ await expect(page).toHaveURL(/payment-result\\.html/);
+ await expect(page.locator('#status')).toContainText('Đang chờ SePay xác nhận giao dịch.');
+ await page.goto(base+'/',{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>window.__sdStorefrontReady===true,{timeout:12000});
+ paymentRefreshRequests=0;
  await page.locator('#mobileAccountNav').click();
  await expect(page.locator('#accountDrawer')).toHaveClass(/open/);
  await expect(page.locator('#accountOrdersAction')).toBeVisible();
