@@ -96,7 +96,7 @@ assert.equal(pending.paid,false);
 assert.equal(pending.transferReference,created.transferReference);
 
 let payload={id:92704,gateway:'Vietcombank',transactionDate:'2026-11-07 00:00:00',accountNumber:env.SEPAY_QR_BANK_ACCOUNT,
-  subAccount:'',code:created.transferReference,content:created.transferReference+' chuyen tien',transferType:'in',description:'QA transfer',transferAmount:50000,accumulated:1000000,referenceCode:'FT-QA-001'};
+  subAccount:'',code:'',content:created.transferReference.replace('-','')+' chuyen tien',transferType:'in',description:'QA transfer',transferAmount:50000,accumulated:1000000,referenceCode:'FT-QA-001'};
 const webhookRequest=(override={})=>{
   const raw=JSON.stringify(payload),timestamp=String(Math.floor(Date.now()/1000));
   return crypto.subtle.importKey('raw',new TextEncoder().encode(env.SEPAY_WEBHOOK_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']).then(async key=>{
