@@ -53,8 +53,8 @@ const ctx={
 };
 runInNewContext(shop.slice(filterStart,filterEnd)+'\nrenderFilters();',ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,'sneakers');
-assert.equal((html.innerHTML.match(/class="filter-pill/g)||[]).length,4,
- 'One All + 3 canonical categories, not two separate sneaker/wallet filters');
+assert.equal((html.innerHTML.match(/class="filter-pill/g)||[]).length,5,
+ 'One All + 3 canonical categories + the stock quick filter, not duplicate aliases');
 assert.match(html.innerHTML,/<a class="filter-pill tap-target active" href="\/sanpham\/sneaker" data-category="sneakers"[^>]*>Giày Thể Thao · 3<\/a>/);
 assert.match(html.innerHTML,/data-category="vi-nam-nu"[^>]*>Ví Nam &amp; Nữ · 2<\/a>/);
 assert.ok(!html.innerHTML.includes('data-category="giay-the-thao"'));
