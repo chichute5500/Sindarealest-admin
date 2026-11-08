@@ -3535,6 +3535,8 @@ html.dark #productOverlay .detail-price:not([hidden]){color:#f4d5a4}
 .product-card .sd-card-making-time{display:block;width:100%;margin:5px 0 0;color:#946527;font-size:10px;font-weight:700;line-height:1.35}
 .product-card .sd-card-stock-ready{color:var(--gold,#a9813d)!important}
 html.dark .product-card .sd-card-making-time,.product-card .sd-card-stock-ready{color:#f3d09a!important}
+.local-order-topup .local-order-topup-warning{font-weight:650;color:#b42336}
+html.dark .local-order-topup .local-order-topup-warning{color:#ff8b98}
 #productOverlay .sd-detail-production[hidden],.checkout-drawer .sd-order-production-caution[hidden],.checkout-drawer .sd-checkout-stepper[hidden]{display:none!important}
 #productOverlay .sd-detail-production{display:grid;gap:5px;margin:0 0 14px;padding:11px 13px;border:1px solid rgba(190,146,76,.38);border-radius:13px;background:linear-gradient(120deg,rgba(255,248,229,.64),rgba(245,223,172,.19));color:var(--ink)}
 #productOverlay .sd-detail-production strong{color:#895b20;font-size:12px;line-height:1.4}
@@ -4707,6 +4709,7 @@ function renderCatalogWithTransition(update){
   },120);
 }
 function renderFilters(){
+  const stockSelected=typeof inStockOnly==='boolean'&&inStockOnly;
   // Filter categories are driven by the public Admin/D1 catalog.
   // Keep old familiar order; show every new published category automatically.
   const counts=Object.create(null),labels=Object.create(null);
@@ -4746,11 +4749,11 @@ function renderFilters(){
     strip.innerHTML=visible.map(c=>{
       const active=selectedCategory===c;
       return '<a class="filter-pill tap-target'+(active?' active':'')+'" href="'+escapeHtml(c==='all'?'/sanpham':'/sanpham/'+routeSlug(c))+'" data-category="'+escapeHtml(c)+'"'+(active?' aria-current="page"':'')+'>'+escapeHtml(c==='all'?categoryLabels.all:displayProductName(labels[c]||categoryLabels[c]||c))+(c==='all'?'':' · '+(counts[c]||0))+'</a>';
-    }).join('')+'<button type="button" class="filter-pill tap-target'+(inStockOnly?' active':'')+'" data-stock-filter aria-pressed="'+inStockOnly+'">⚡ Hàng có sẵn</button>';
+    }).join('')+'<button type="button" class="filter-pill tap-target'+(stockSelected?' active':'')+'" data-stock-filter aria-pressed="'+stockSelected+'">⚡ Hàng có sẵn</button>';
     if(canUpdateInPlace)strip.dataset.filterSignature=signature;
   }
   if(canUpdateInPlace)strip.querySelectorAll('.filter-pill').forEach(link=>{
-    const active=link.hasAttribute('data-stock-filter')?inStockOnly:link.dataset.category===selectedCategory;
+    const active=link.hasAttribute('data-stock-filter')?stockSelected:link.dataset.category===selectedCategory;
     link.classList.toggle('active',active);
     if(link.hasAttribute('data-stock-filter'))link.setAttribute('aria-pressed',String(active));
     else if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
