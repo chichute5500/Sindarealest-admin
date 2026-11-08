@@ -40,7 +40,7 @@ assert.equal(ctx.selectedCategory,"all","The old selected category must reset af
 for(const c of ["sneakers","tui-thoi-trang-golf","vi-nam-nu","mu"])assert.ok(container.innerHTML.includes('data-category="'+c+'"'),"Merged D1 category missing: "+c);
 assert.ok(container.innerHTML.includes("Túi Thời Trang &amp; Golf · 3"),"Legacy bag categories count together");
 assert.ok(container.innerHTML.includes("Ví Nam &amp; Nữ · 2"),"Legacy wallet categories count together");
-assert.equal((container.innerHTML.match(/class="filter-pill/g)||[]).length,6,"Merged categories and remaining D1 groups plus All stay visible");
+assert.equal((container.innerHTML.match(/class="filter-pill/g)||[]).length,7,"Merged categories, phone cases and remaining D1 groups plus All stay visible");
 assert.ok(!container.innerHTML.includes("<img src=x"),"Untrusted D1 labels cannot inject markup");
 assert.ok(container.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"),"Escaped untrusted category labels remain readable, regardless of owner-approved title case");
 ctx.selectedCategory="tui-thoi-trang-golf";render();
