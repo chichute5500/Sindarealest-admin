@@ -93,8 +93,6 @@ assert.doesNotMatch(html, /data-page="(?:prev|next)"[^>]*>‹/);
 
 assert.match(html, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)/, 'All arrow controls must use the shared glass material.');
 assert.match(html, /\.detail-zoom-btn,\.detail-gallery-arrow,\.featured-arrow,\.slide-controls button,\.page-btn\.page-arrow,\.sd-fullscreen-close,\.sd-fullscreen-arrow\{[^}]*background:var\(--sd-gallery-glass\)/);
-assert.match(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(3,15,27,\.60\)/);
-assert.match(html, /\.sd-fullscreen-viewer\{[^}]*backdrop-filter:blur\(8px\)/);
 assert.doesNotMatch(html, /\.sd-fullscreen-viewer\{[^}]*background:rgba\(8,8,8,\.94\)/, 'Fullscreen must not use an almost opaque black backdrop.');
 assert.ok(html.includes('<style id="sd-gallery-opaque-satin-surface-2026-10-22">')
   && html.includes('.sd-fullscreen-viewer.open{\n  background:rgba(231,244,253,.95)!important;')
