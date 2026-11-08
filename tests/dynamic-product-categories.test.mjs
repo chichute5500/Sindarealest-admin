@@ -97,7 +97,7 @@ renderFeatured();
 `,productCtx,{timeout:1000});
 assert.equal(result.first.join('|'),result.second.join('|'),'Paging and rerendering must keep order stable within session');
 assert.equal(result.first.length,sampleCatalog.length);
-assert.deepEqual(result.first.slice(0,4),['sn-11','gt-1','tl-1','op-1'],'All starts with the newest sneaker, dress shoe, belt and phone case');
+assert.equal(JSON.stringify(result.first.slice(0,4)),JSON.stringify(['sn-11','gt-1','tl-1','op-1']),'All starts with the newest sneaker, dress shoe, belt and phone case');
 assert.notEqual(result.randomized.join('|'),sampleCatalog.map(p=>p.id).join('|'),
  'Shuffle must genuinely randomize order rather than retain raw D1 order');
 assert.equal((featuredBox.innerHTML.match(/data-featured-card/g)||[]).length,4,
