@@ -64,7 +64,7 @@ assert.equal(staticHrefs.length,13,"12 category links plus /sanpham");
 assert.deepEqual(staticHrefs.slice().sort(),['/sanpham',...canonicalCategories].sort());
 assert.equal(new Set(staticHrefs).size,staticHrefs.length, "Do not repeat legacy category URLs");
 assert.ok(front.includes('<a class="filter-pill tap-target'),"Dynamic category filters must use semantic links");
-assert.ok(front.includes("e.preventDefault();navigateCatalog(b.dataset.category)"),"Normal category clicks retain SPA transition");
+assert.ok(front.includes("e.preventDefault();inStockOnly=false;navigateCatalog(b.dataset.category)"),"Normal category clicks clear the stock-only filter and retain SPA transition");
 assert.ok(front.includes("e.ctrlKey||e.metaKey||e.shiftKey||e.altKey"),"Modified clicks retain native new-tab behavior");
 
 // Cards have real crawlable links, while normal clicks still open the SPA
