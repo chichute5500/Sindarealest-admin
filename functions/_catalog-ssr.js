@@ -39,7 +39,7 @@ function productCards(rows,origin,{eager=false,deferAll=false}={}){
      '<span class="product-photo">'+img+'<span class="photo-shade"></span></span>'+
      '<div class="product-info"><div class="sd-card-status-row"><span class="fulfillment-badge fulfillment-'+type+'" data-fulfillment-type="'+type+'">'+h(label)+'</span>'+
      '<span class="product-sku">Mã SKU: '+h(sku||"Chưa được cung cấp")+'</span></div>'+
-     (type==="made_to_order"?'<small class="sd-card-making-time">⏱ Làm hàng 5–20 ngày</small>':"")+
+     (type==="made_to_order"?'<small class="sd-card-making-time">⏱ Làm hàng 5–20 ngày</small>':type==="in_stock"?'<small class="sd-card-making-time sd-card-stock-ready">✓ Sẵn hàng · Giao ngay</small>':"")+
      '<h3 class="product-title">'+h(title)+'</h3></div></a>'+
      '<div class="product-card-footer" aria-hidden="true" style="visibility:hidden">'+
      '<div class="product-card-bottom"><span class="product-price"></span><span class="mini-add"></span></div></div>'+

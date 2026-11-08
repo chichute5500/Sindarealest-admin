@@ -70,7 +70,7 @@ if(root){
   const oauthResult=pendingAuthResult;pendingAuthResult=null;
   try{
    const res=await fetch("/api/customer/session",{credentials:"same-origin",cache:"no-store"});
-   if(!res.ok){root.hidden=false;if(guest)guest.hidden=true;notify("Máy chủ chưa đọc được phiên tài khoản (HTTP "+res.status+").");return;}
+   if(!res.ok){root.hidden=false;if(guest)guest.hidden=true;notify("Máy chủ chưa đọc được phiên tài khoản. Vui lòng thử lại sau.");return;}
    const data=await res.json(),active=!!data.authenticated;
    if(oauthResult==="success"&&!active)notify("Đăng nhập chưa được duy trì. Vui lòng thử lại trên cùng trình duyệt.","error");
    else if(oauthResult==="success"&&active)notify("Đăng nhập thành công qua Google. Tài khoản đã được xác nhận.","success");

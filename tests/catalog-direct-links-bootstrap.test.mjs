@@ -15,7 +15,7 @@ function runGuard(path){
  const classes=new Set();
  runInNewContext(guard,{
   location:{pathname:path},
-  document:{body:{classList:{add(c){classes.add(c)},contains(c){return classes.has(c)}}}}
+  document:{getElementById:()=>({content:{cloneNode:()=>({})}}),body:{classList:{add(c){classes.add(c)},contains(c){return classes.has(c)}},appendChild(){}}}
  });
  return classes.has('sd-not-found-route');
 }
