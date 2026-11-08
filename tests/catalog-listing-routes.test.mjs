@@ -123,7 +123,7 @@ const cases=[
 ];
 for(const [term,category,shouldMatch] of cases) {
  const context={
-   selectedCategory:'all',orderedSessionProducts:()=>[{
+   selectedCategory:'all',inStockOnly:false,productFulfillmentType:()=> 'made_to_order',orderedSessionProducts:()=>[{
       id:'sample-1',category,title:'Sản phẩm cá sấu',description:'Đẹp',categoryLabel:'Phụ kiện',
       createdAt:'2026-10-27 01:00:00'
    }],$:(x)=>x==='#catalogSearch'?{value:term}:null,
