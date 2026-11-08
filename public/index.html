@@ -5464,6 +5464,7 @@ async function accountShowPaymentTopup(orderNumber,button){
   }
   const panel=document.createElement('section');panel.className='local-order-payment local-order-topup';panel.setAttribute('aria-label','Chuyển bổ sung cho đơn '+orderNumber);
   const row=(label,value,key)=>'<button type="button" class="local-order-topup-copy" data-topup-copy="'+key+'" data-topup-value="'+escapeHtml(String(value))+'"><span>'+label+'</span><strong>'+escapeHtml(String(value))+'</strong><span aria-hidden="true">▢</span></button>';
+  const manualQrWarning=(data.paymentProvider==='sepay'||data.qrIncludesAmount===true)?'':'<p class="local-order-topup-warning">QR không nhúng số tiền. Hãy nhập chính xác số tiền và nội dung trên. Shop chỉ cập nhật sau khi kiểm tra tiền thực nhận.</p>';
   panel.innerHTML='<strong>Chuyển bổ sung '+escapeHtml(formatVnd(amount))+'</strong>'+
    '<p>Chuyển đúng số tiền còn thiếu cho đơn <b>'+escapeHtml(orderNumber)+'</b>. Đây không phải đơn mới.</p>'+
    '<img src="'+escapeHtml(qr)+'" alt="QR ngân hàng đã xác minh để chuyển phần tiền còn thiếu" referrerpolicy="no-referrer">'+
@@ -5472,7 +5473,7 @@ async function accountShowPaymentTopup(orderNumber,button){
    row('Số tài khoản',data.accountNumber,'account')+
    row('Số tiền chuyển thêm',formatVnd(amount),'amount')+
    row('Nội dung chuyển khoản',data.transferReference,'reference')+
-   ''+
+   manualQrWarning+
    '<button type="button" class="pill-btn tap-target" data-topup-save-qr>Lưu ảnh QR</button>'+
    '<button type="button" class="pill-btn tap-target" data-account-payment-topup="'+escapeHtml(orderNumber)+'">Kiểm tra lại sau khi chuyển</button>'+
    '<p role="status" class="local-order-sync-message" data-topup-feedback></p>';
