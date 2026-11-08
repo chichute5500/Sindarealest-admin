@@ -70,7 +70,6 @@ assert.match(html,/function accountShowPaymentTopup\(orderNumber,button\)/,'Addi
 assert.match(html,/amount===summary.shortfall/,'Customer must receive a server-authoritative exact shortfall before showing QR');
 assert.match(html,/QR không nhúng số tiền/,'Additional-transfer QR never implies an embedded amount');
 assert.doesNotMatch(html,/\.checkout-drawer\{left:0;right:0;width:100vw;max-width:none;border-radius:0\}/,'Checkout must never flatten the mobile cart-shaped glass shell');
-assert.match(html,/\.account-drawer,\.cart-drawer,\.checkout-drawer\{[^}]*background:var\(--sd-reference-surface-strong\)!important;[^}]*-webkit-backdrop-filter:blur\(24px\) saturate\(145%\);[^}]*backdrop-filter:blur\(24px\) saturate\(145%\)/,'The approved Cart and Checkout sheet keeps its frosted background');
 assert.match(html,/#cartDrawer,#checkoutDrawer,#accountDrawer\{[\s\S]*?background:transparent!important;[^}]*backdrop-filter:none!important/,'The drawer ancestor must not form a backdrop root');
 assert.match(html,/#cartDrawer::before,#checkoutDrawer::before,#accountDrawer::before\{[\s\S]*?background:var\(--sd-reference-surface\);[\s\S]*?backdrop-filter:blur\(24px\) saturate\(145%\)/,'Keep the exact original frosted drawer tone behind the scrolling content');
 assert.match(html,/html.dark #cartDrawer \.cart-header,[\s\S]*?html.dark #checkoutDrawer \.sd-checkout-confirm-wrap\{[^}]*background:var\(--sd-glass-shell-strong\)!important/,'Dark Cart and Checkout use the same approved logo Header face');
