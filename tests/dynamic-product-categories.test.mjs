@@ -59,11 +59,14 @@ assert.equal(ctx.selectedCategory,"all","Stale filter selection resets");
 assert.match(box.innerHTML,/data-category="new-2027"/,"Future categories need no code change");
 assert.ok(!box.innerHTML.includes("tui-golf"),"Stale categories must be removed");
 
-// Newest published products must lead the full catalog, regardless of category,
-// without changing their relative order while paging or filtering.
+// The requested footwear, belt and phone-case categories lead All, while the
+// remaining products keep their newest-first order and session order stays stable.
 const sampleCatalog=[
  ...Array.from({length:12},(_,i)=>({id:'sn-'+i,category:'sneakers',title:'Giày thể thao '+i})),
  ...Array.from({length:4},(_,i)=>({id:'lo-'+i,category:'loafers',title:'Giày lười '+i})),
+ {id:'gt-1',category:'dress-shoes',title:'Giày tây'},
+ {id:'tl-1',category:'belts',title:'Thắt lưng'},
+ {id:'op-1',category:'phone-cases',title:'Ốp điện thoại'},
  {id:'vi-1',category:'vi-nam',title:'Ví nam'},
  {id:'mu-1',category:'mu',title:'Mũ'}
 ];
@@ -79,7 +82,7 @@ const snippets=html.slice(shuffleStart,shuffleEnd)+"\n"+html.slice(filterStart,f
 const featuredBox={innerHTML:''},searchBox={value:''};
 const deterministicMath=Object.create(Math);deterministicMath.random=()=>0;
 const productCtx={
- products:sampleCatalog,categoryOrder:ctx.categoryOrder,canonicalCategoryKey:ctx.canonicalCategoryKey,
+ products:sampleCatalog,categoryOrder:ctx.categoryOrder,canonicalCategoryKey:ctx.canonicalCategoryKey,routeSlug:productCategoryRouteSlug,
  $:s=>s==='#catalogSearch'?searchBox:s==='#featuredGrid'?featuredBox:null,
  visibleSku:p=>p.sku||'',foldSearch:v=>String(v||'').toLocaleLowerCase('vi'),
  unbindReveal(){},bindReveal(){},setupFeaturedAutoplay(){},
@@ -94,8 +97,7 @@ renderFeatured();
 `,productCtx,{timeout:1000});
 assert.equal(result.first.join('|'),result.second.join('|'),'Paging and rerendering must keep order stable within session');
 assert.equal(result.first.length,sampleCatalog.length);
-assert.equal(result.first[0],'mu-1','Newest item from any category must lead All');
-assert.equal(result.first[1],'vi-1','Second-newest item must appear second');
+assert.deepEqual(result.first.slice(0,4),['sn-11','gt-1','tl-1','op-1'],'All starts with the newest sneaker, dress shoe, belt and phone case');
 assert.notEqual(result.randomized.join('|'),sampleCatalog.map(p=>p.id).join('|'),
  'Shuffle must genuinely randomize order rather than retain raw D1 order');
 assert.equal((featuredBox.innerHTML.match(/data-featured-card/g)||[]).length,4,
