@@ -44,14 +44,15 @@ assert.equal(ctx.selectedCategory,"all","Stale selection resets when catalog cha
 for(const c of ["sneakers","loafers","belts","tui-thoi-trang-golf","tui-xach","cap-tab-laptop","mu","vi-nam-nu"])
  assert.ok(box.innerHTML.includes('data-category="'+c+'"'),"Missing category: "+c);
 assert.match(box.innerHTML,/Túi Thời Trang &amp; Golf · 4/,"Legacy bag category counts combined");
-assert.equal((box.innerHTML.match(/class="filter-pill/g)||[]).length,10,"One all filter plus nine published groups including merged categories");
+assert.equal((box.innerHTML.match(/class="filter-pill/g)||[]).length,11,"One all filter, nine published groups and the stock quick filter");
+assert.match(box.innerHTML,/data-stock-filter[^>]*aria-pressed="false"/,"Quick stock filter exposes its state");
 assert.ok(!box.innerHTML.includes("<img src=x"),"Untrusted category labels must be escaped");
 assert.ok(box.innerHTML.toLowerCase().includes("&lt;img src=x onerror=alert(1)&gt;"));
 ctx.selectedCategory="vi-cam-tay";
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
 assert.ok(box.innerHTML.includes('class="filter-pill tap-target active" href="/sanpham/vinamnu" data-category="vi-nam-nu" aria-current="page"'),"Wallet category has its canonical link and page semantics");
 assert.match(box.innerHTML,/<a class="filter-pill tap-target" href="\/sanpham\/sneaker" data-category="sneakers"/,"Sneaker category is crawlable");
-assert.ok(!box.innerHTML.includes('aria-pressed='),"Links must use aria-current, not button-only aria-pressed");
+assert.ok(!/data-category="[^"]+"[^>]*aria-pressed=/.test(box.innerHTML),"Category links use aria-current, not button-only aria-pressed");
 ctx.products=[{category:"new-2027",categoryLabel:"Loại mới"}];
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,"all","Stale filter selection resets");
