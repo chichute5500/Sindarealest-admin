@@ -70,6 +70,14 @@ try {
   assert.equal(sitemapHead.headers.get("x-robots-tag"), null);
   assert.equal(await sitemapHead.text(), "");
 
+  const malformedSitemap = await fetch(new URL("/sitemap.xml.", origin), { redirect: "manual", signal: AbortSignal.timeout(2500) });
+  assert.equal(malformedSitemap.status, 301, "Trailing punctuation on the sitemap URL should redirect to the canonical sitemap");
+  assert.equal(malformedSitemap.headers.get("location"), origin + "/sitemap.xml");
+
+  const legacyListing = await fetch(new URL("/san-pham/", origin), { redirect: "manual", signal: AbortSignal.timeout(2500) });
+  assert.equal(legacyListing.status, 301, "The retired product listing route should redirect to the canonical catalog");
+  assert.equal(legacyListing.headers.get("location"), origin + "/sanpham");
+
   // Static sitemap is served by Pages assets rather than a D1-backed Function.
   const staticSitemapGet = await fetchWithTimeout("/sitemap-pages.xml");
   assert.equal(staticSitemapGet.status, 200, "Static sitemap must bypass function routing");
