@@ -3621,7 +3621,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 
 
 <style id="sd-product-tier-badges-preview">
-.sd-tier-badge{position:relative;display:inline-flex;align-items:center;justify-content:center;vertical-align:.11em;max-width:100%;margin:0 .48em .08em 0;padding:.24em .58em;border:1px solid currentColor;border-radius:2px;overflow:hidden;isolation:isolate;line-height:1.05;font-family:"SD Sans",Arial,sans-serif;font-size:.53em;font-weight:800;letter-spacing:.14em;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 4px rgba(18,27,30,.08)}
+.sd-tier-badge{position:relative;display:inline-flex;align-items:center;justify-content:center;vertical-align:.11em;max-width:100%;margin:0 .48em .08em 0;padding:.3em .62em;border:1px solid currentColor;border-radius:2px;overflow:hidden;isolation:isolate;line-height:1.05;font-family:"SD Sans",Arial,sans-serif;font-size:.72em;font-weight:800;letter-spacing:.1em;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 4px rgba(18,27,30,.08)}
 .sd-tier-label{position:relative;z-index:1}
 .sd-tier-classic{color:#5b674d;background:linear-gradient(145deg,rgba(240,239,224,.96),rgba(221,222,204,.9));border-color:rgba(105,115,83,.62);text-shadow:0 1px 0 rgba(255,255,255,.68)}
 .sd-tier-vip{color:#a7833d;background:linear-gradient(145deg,rgba(248,242,222,.95),rgba(233,221,186,.9));border-color:rgba(176,143,74,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.62),0 1px 5px rgba(113,83,29,.15)}
@@ -4448,17 +4448,11 @@ function productTierFor(product){
  return price>=7000000?'vvip':price>=3500000?'vip':'classic';
 }
 function productTitleWithVip(value,titleCase=true,product=null){
- const title=titleCase?displayProductName(value):String(value??'');
+ const raw=titleCase?displayProductName(value):String(value??'');
+ const title=raw.replace(/(^|\\s)VIP(?=\\s|$)/giu,' ').replace(/\\s+/gu,' ').trim();
  const tier=productTierFor(product);
  const badge=tier?'<span class="sd-tier-badge sd-tier-'+tier+'" aria-label="'+tier.toUpperCase()+'"><span class="sd-tier-label">'+tier.toUpperCase()+'</span></span>':'';
- const matches=title.matchAll(/vip/giu);let html='',start=0;
- for(const match of matches){
-  const pos=match.index,before=title.slice(pos-1,pos),after=title.slice(pos+match[0].length,pos+match[0].length+1);
-  if((before&&/[\p{L}\p{N}]/u.test(before))||(after&&/[\p{L}\p{N}]/u.test(after)))continue;
-  html+=escapeHtml(title.slice(start,pos))+'<span class="sd-vip-word">VIP</span>';
-  start=pos+match[0].length;
- }
- return badge+html+escapeHtml(title.slice(start));
+ return badge+escapeHtml(title);
 }
 function preferred(category){return products.find(p=>p.category===category)}
 function allImages(p){return Array.isArray(p.images)&&p.images.length?p.images:[p.image].filter(Boolean)}
