@@ -3623,7 +3623,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 <style id="sd-product-tier-badges-preview">
 .sd-tier-badge{position:relative;display:inline-flex;align-items:center;justify-content:center;vertical-align:.08em;max-width:100%;margin:0 .36em .04em 0;padding:.06em .32em;border:1px solid currentColor;border-radius:2px;overflow:hidden;isolation:isolate;line-height:.88;font-family:"SD Sans",Arial,sans-serif;font-size:clamp(9px,.7em,28px);font-weight:800;letter-spacing:.1em;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 4px rgba(18,27,30,.08)}
 .sd-tier-label{position:relative;z-index:1}
-.sd-tier-classic{color:#5b674d;background:linear-gradient(145deg,rgba(240,239,224,.96),rgba(221,222,204,.9));border-color:rgba(105,115,83,.62);text-shadow:0 1px 0 rgba(255,255,255,.68)}
+.sd-tier-core{color:#5b674d;background:linear-gradient(145deg,rgba(240,239,224,.96),rgba(221,222,204,.9));border-color:rgba(105,115,83,.62);text-shadow:0 1px 0 rgba(255,255,255,.68)}
 .sd-tier-vip{color:#a7833d;background:linear-gradient(145deg,rgba(248,242,222,.95),rgba(233,221,186,.9));border-color:rgba(176,143,74,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.62),0 1px 5px rgba(113,83,29,.15)}
 .sd-tier-vip .sd-tier-label{color:transparent;background-image:linear-gradient(105deg,#805c22 0%,#b28d47 36%,#fffbe8 48%,#d1b36f 54%,#87662a 66%,#805c22 100%);background-size:240% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sd-vip-text-flare 4.2s cubic-bezier(.4,0,.2,1) infinite}
 .sd-tier-vvip{color:#f2e5c1;background:linear-gradient(145deg,#11110f,#050505 62%,#171713);border-color:#8d7548;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 8px rgba(0,0,0,.22)}
@@ -4445,7 +4445,7 @@ function productTierFor(product){
  if(!product||!hasConfirmedPublicPrice(product))return '';
  const price=Number(product.price);
  if(!Number.isFinite(price))return '';
- return price>=7000000?'vvip':price>=3500000?'vip':'classic';
+ return price>=7000000?'vvip':price>=3500000?'vip':'core';
 }
 function productTitleWithVip(value,titleCase=true,product=null){
  const raw=titleCase?displayProductName(value):String(value??'');
