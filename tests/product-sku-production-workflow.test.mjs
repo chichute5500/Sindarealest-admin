@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+
+const workflow=readFileSync('.github/workflows/migrate-sku-production.yml','utf8');
+const script=readFileSync('scripts/migrate-sku-production.mjs','utf8');
+const migration=readFileSync('migrations/0024_correct_misclassified_sneaker_sku.sql','utf8');
+assert.match(workflow,/workflow_dispatch:/);
+assert.match(workflow,/refs\/heads\/main/);
+assert.match(workflow,/confirmation:/);
+assert.match(workflow,/preflight[\s\S]*apply/);
+assert.match(workflow,/concurrency:/);
+assert.match(workflow,/cancel-in-progress: false/);
+assert.match(script,/GITHUB_EVENT_NAME,"workflow_dispatch"/);
+assert.match(script,/APPLY-SKU-0024-TO-sindarealest-db/);
+assert.match(script,/time_travel\/bookmark/);
+assert.match(script,/before-sku-0024\.sql/);
+assert.match(script,/Storefront Preview/);
+assert.match(script,/LIMIT 2/);
+assert.match(migration,/SD-GL062/);
+assert.match(migration,/SD-SN113/);
+assert.match(migration,/title LIKE '%#113%'/);
+console.log('PASS: guarded one-row Production SKU migration workflow contract');
