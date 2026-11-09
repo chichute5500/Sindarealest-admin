@@ -3346,6 +3346,23 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
  transition:transform 245ms cubic-bezier(.16,.9,.23,1.045),box-shadow 260ms var(--sd-3d-ease);
 }
 #productOverlay .detail-actions .detail-buy-now{--sd-action-rgb:242,152,70;--sd-action-border-rgb:215,119,47}
+#productOverlay .detail-actions .detail-purchase-button::before{
+ content:"";position:absolute;z-index:0;top:1px;bottom:1px;left:1px;width:38%;
+ border-radius:inherit;pointer-events:none;opacity:0;
+ background:linear-gradient(108deg,transparent 0%,rgba(255,255,255,.20) 30%,rgba(255,255,255,.72) 52%,rgba(255,255,255,.18) 72%,transparent 100%);
+ transform:translateX(-160%) skewX(-18deg);
+ animation:sd-detail-cta-sheen 6.8s cubic-bezier(.2,.7,.25,1) infinite;
+}
+#productOverlay .detail-actions .detail-purchase-button>svg,
+#productOverlay .detail-actions .detail-purchase-button>span{position:relative;z-index:1}
+#detailBuyNow::before{animation-duration:5.6s;animation-delay:1.2s;background:linear-gradient(108deg,transparent 0%,rgba(255,255,255,.28) 30%,rgba(255,255,255,.88) 52%,rgba(255,255,255,.24) 72%,transparent 100%)}
+@keyframes sd-detail-cta-sheen{
+ 0%,4%{opacity:0;transform:translateX(-160%) skewX(-18deg)}
+ 10%{opacity:.9}
+ 23%,100%{opacity:0;transform:translateX(330%) skewX(-18deg)}
+}
+#productOverlay .detail-actions .detail-purchase-button:is(:hover,:focus-visible,:active)::before{animation-play-state:paused;opacity:0}
+@media(prefers-reduced-motion:reduce){#productOverlay .detail-actions .detail-purchase-button::before{animation:none;display:none}}
 @media(hover:hover) and (pointer:fine){
  #productOverlay .detail-actions .detail-purchase-button:hover{
   box-shadow:var(--sd-3d-shadow);filter:brightness(1.035)
