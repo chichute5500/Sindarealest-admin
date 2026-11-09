@@ -32,7 +32,7 @@ export async function onRequestPost({request,env}) {
       "SELECT id,amount,status,payload_json FROM sepay_checkout_intents WHERE REPLACE(transfer_reference,'-','')=? LIMIT 1"
     ).bind(invoice).first();
     if(!checkout||checkout.status!=="pending")return accepted();
-    const transactionReference="SEPAY-BANK:"+transactionId;
+    const transactionReference="SEPAYBANK:"+transactionId;
     const transactionRowId=crypto.randomUUID();
     const rawPayload=rawBody;
     const writes=await env.DB.prepare(
@@ -54,7 +54,7 @@ export async function onRequestPost({request,env}) {
     if(!snapshot||!Array.isArray(snapshot.items)||!snapshot.items.length)return fail("Dữ liệu thanh toán cần được cửa hàng kiểm tra.",503,headers);
 
     const orderId=crypto.randomUUID();
-    const orderNumber=`SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-","").slice(0,6).toUpperCase()}`;
+    const orderNumber=`SD${Date.now().toString(36).toUpperCase()}${crypto.randomUUID().replaceAll("-","").slice(0,6).toUpperCase()}`;
     const customerId=crypto.randomUUID();
     const statements=[
       env.DB.prepare("UPDATE sepay_checkout_intents SET status='paid',order_id=?,order_number=?,paid_at=datetime('now'),updated_at=datetime('now') WHERE id=? AND status='pending' AND expires_at>datetime('now') AND (SELECT COALESCE(SUM(amount),0) FROM sepay_checkout_transactions WHERE intent_id=?)>=amount").bind(orderId,orderNumber,checkout.id,checkout.id),

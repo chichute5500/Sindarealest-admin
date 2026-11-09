@@ -34,7 +34,7 @@ export async function onRequestPost(context) {
   if (!Object.hasOwn(EXT, file.type)) return fail("Chỉ chấp nhận ảnh PNG, JPEG hoặc WebP.");
   const bytes = new Uint8Array(await file.arrayBuffer());
   if (!signatureMatches(bytes, file.type)) return fail("Nội dung ảnh không khớp định dạng đã khai báo.");
-  const key = "qr-" + crypto.randomUUID() + "." + EXT[file.type];
+  const key = "qr" + crypto.randomUUID().replaceAll("-", "") + "." + EXT[file.type];
   if (!validPublicQrImageKey(key)) return fail("Không tạo được mã ảnh QR an toàn.", 500);
   let uploaded = false;
   try {

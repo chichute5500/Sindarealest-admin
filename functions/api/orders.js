@@ -153,7 +153,7 @@ export async function onRequestPost({ request, env }) {
     const customerId = crypto.randomUUID(), orderId = crypto.randomUUID();
     const orderAccessToken = createOrderAccessToken();
     const orderAccessTokenHash = await hashOrderAccessToken(orderAccessToken);
-    const orderNumber = `SD-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
+    const orderNumber = `SD${Date.now().toString(36).toUpperCase()}${crypto.randomUUID().replaceAll("-", "").slice(0, 6).toUpperCase()}`;
     // Keep the quote-issued transfer memo stable when the matching verified QR
     // snapshot is still active; without a prepared QR, fall back to the order code.
     const transferReference = selectedPaymentOption ? (requestedTransferReference||orderNumber) : "";

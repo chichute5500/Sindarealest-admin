@@ -67,7 +67,7 @@ try{
   assert.equal(upload.status,201,'Local R2 upload + D1 pending/audit must be atomic');
   const response=await upload.json();
   const key=response.pendingKey;
-  assert.match(key,/^qr-[a-f0-9-]+\.png$/);
+  assert.match(key,/^qr[a-f0-9]{32}\.png$/);
   assert.ok(await IMAGES.head(key),'R2 object must actually exist');
   assert.equal(await setting('payment_qr_pending_key'),key);
   assert.equal((await first("SELECT COUNT(*) AS n FROM audit_logs WHERE action='payment_qr_uploaded'")).n,1);

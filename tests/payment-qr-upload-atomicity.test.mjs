@@ -94,7 +94,7 @@ async function postUpload(f) {
   assert.equal(payload.active, false, "upload must never activate a QR by itself");
   assert.equal(f.state.get("payment_qr_active"), "1");
   assert.equal(f.state.get("payment_qr_active_key"), ACTIVE_KEY);
-  assert.match(f.state.get("payment_qr_pending_key"), /^qr-[0-9a-f-]{36}\.png$/);
+  assert.match(f.state.get("payment_qr_pending_key"), /^qr[0-9a-f]{32}\.png$/);
   assert.equal(f.writes.batchCalls.length, 1,
     "pending-key update and audit record must commit in one D1 batch");
   assert.equal(f.writes.batchCalls[0].length, 2,

@@ -102,7 +102,7 @@ try {
   assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,0,'method selection is required before creating a priced order');
   await expectStatus('Reject cross-origin checkout',await invoke(ordersPost,'/api/orders','POST',checkout,false,'https://evil.invalid'),403);
   const created=await (await expectStatus('Checkout POST -> D1 order',await invoke(ordersPost,'/api/orders','POST',checkout),201)).json();
-  assert.ok(created.orderNumber.startsWith('SD-'));
+  assert.match(created.orderNumber,/^SD[A-Z0-9]{8,48}$/);
   assert.match(created.orderAccessToken,/^[a-f0-9]{64}$/);
   assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,1);
   const record=one('SELECT id,public_access_token_hash FROM orders WHERE order_number=?',created.orderNumber);
@@ -163,7 +163,7 @@ try {
   }),200)).json();
   assert.equal(quoteBeforeOrder.paymentReady,true);
   assert.equal(quoteBeforeOrder.paymentInstructions.amount,142500);
-  assert.match(quoteBeforeOrder.transferReference,/^SD-[A-Z2-9]{8}$/);
+  assert.match(quoteBeforeOrder.transferReference,/^SD[A-Z2-9]{8}$/);
   assert.equal(one('SELECT COUNT(*) AS n FROM orders').n,ordersBeforeQr,'Showing the QR does not create an order');
   const selectedInstructions=quoteBeforeOrder.paymentInstructions;
   const checkoutWithPreparedQr={...checkoutWithActiveQr,transferReference:quoteBeforeOrder.transferReference,paymentQrImageKey:quoteBeforeOrder.paymentQrImageKey,

@@ -12,7 +12,7 @@ export async function hashOrderAccessToken(token) {
 }
 
 export function validPublicQrImageKey(value) {
-  return typeof value === "string" && /^qr-[0-9a-f-]{36}\.(?:png|jpe?g|webp)$/.test(value);
+  return typeof value === "string" && /^(?:qr[0-9a-f]{32}|qr-[0-9a-f-]{36})\.(?:png|jpe?g|webp)$/.test(value);
 }
 
 export function summarizePaymentRows(rows, total) {
@@ -53,11 +53,11 @@ export function makeCheckoutTransferReference(phone,sku) {
   if(digits.length<4||!/^[A-Z0-9-]{1,36}$/.test(cleanSku))return "";
   const abc="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const bytes=crypto.getRandomValues(new Uint8Array(8));
-  return "SD-"+Array.from(bytes,v=>abc[v%abc.length]).join("");
+  return "SD"+Array.from(bytes,v=>abc[v%abc.length]).join("");
 }
 export function checkoutTransferReferenceMatches(reference,phone,sku) {
   const digits=String(phone||"").replace(/\D/g,"");
-  return digits.length>=4&&/^[A-Z0-9-]{1,36}$/.test(String(sku||""))&&/^SD-[A-Z2-9]{8}$/.test(String(reference||""));
+  return digits.length>=4&&/^[A-Z0-9-]{1,36}$/.test(String(sku||""))&&/^(?:SD[A-Z2-9]{8}|SD-[A-Z2-9]{8})$/.test(String(reference||""));
 }
 export function calculateCheckoutQuote(items) {
   if (!Array.isArray(items) || !items.length || items.length > 50) return {eligible:false,reason:"Giỏ hàng không hợp lệ."};
