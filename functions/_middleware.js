@@ -56,6 +56,10 @@ function hardenStorefrontHtmlHeaders(headers) {
 }
 export async function onRequest(context) {
   const url = new URL(context.request.url);
+  // Repair two stale URLs reported by Google Search Console: a trailing-period
+  // sitemap typo and the retired product-listing root. Keep canonical URLs direct.
+  if (url.pathname === "/sitemap.xml.") return Response.redirect(new URL("/sitemap.xml", url.origin), 301);
+  if (url.pathname === "/san-pham" || url.pathname === "/san-pham/") return Response.redirect(new URL("/sanpham", url.origin), 301);
   if (url.pathname.startsWith('/api/admin/') && context.request.method !== 'OPTIONS') {
     const hadValidSession = await verifySession(context.request, context.env);
     const response = await context.next();
