@@ -58,5 +58,5 @@ export function defaultProductTitle(category,sku) {
   const raw=String(sku||'').trim().toUpperCase();
   const ordinal=raw.startsWith(prefix)?raw.slice(prefix.length):'';
   if(!/^\d{3,6}$/.test(ordinal)||Number(ordinal)<1)return '';
-  return DEFAULT_PRODUCT_CATEGORY_NAMES[key]+' VIP Da Cá Sấu Mẫu #'+ordinal;
+  return DEFAULT_PRODUCT_CATEGORY_NAMES[key]+' Da Cá Sấu Mẫu #'+ordinal;
 }
