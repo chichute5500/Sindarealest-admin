@@ -6,14 +6,14 @@ import {DEFAULT_PRODUCT_CATEGORY_NAMES,OFFICIAL_SKU_PREFIXES,defaultProductTitle
 
 assert.equal(Object.keys(DEFAULT_PRODUCT_CATEGORY_NAMES).length,12);
 assert.deepEqual(Object.keys(DEFAULT_PRODUCT_CATEGORY_NAMES).sort(),Object.keys(OFFICIAL_SKU_PREFIXES).sort());
-assert.equal(defaultProductTitle('Giày thể thao','SD-SN001'),'Giày Thể Thao VIP Da Cá Sấu Mẫu #001');
-assert.equal(defaultProductTitle('loafers','SD-GL025'),'Giày Lười VIP Da Cá Sấu Mẫu #025');
-assert.equal(defaultProductTitle('tui-xach','SD-TX1000'),'Túi Xách VIP Da Cá Sấu Mẫu #1000');
-assert.equal(defaultProductTitle('vi-cam-tay','SD-VI001'),'Ví Nam & Nữ VIP Da Cá Sấu Mẫu #001');
-assert.equal(defaultProductTitle('clutch','SD-TTG001'),'Túi Thời Trang & Golf VIP Da Cá Sấu Mẫu #001');
+assert.equal(defaultProductTitle('Giày thể thao','SD-SN001'),'Giày Thể Thao Da Cá Sấu Mẫu #001');
+assert.equal(defaultProductTitle('loafers','SD-GL025'),'Giày Lười Da Cá Sấu Mẫu #025');
+assert.equal(defaultProductTitle('tui-xach','SD-TX1000'),'Túi Xách Da Cá Sấu Mẫu #1000');
+assert.equal(defaultProductTitle('vi-cam-tay','SD-VI001'),'Ví Nam & Nữ Da Cá Sấu Mẫu #001');
+assert.equal(defaultProductTitle('clutch','SD-TTG001'),'Túi Thời Trang & Golf Da Cá Sấu Mẫu #001');
 for(const [category,prefix] of Object.entries(OFFICIAL_SKU_PREFIXES)){
- assert.equal(defaultProductTitle(category,prefix+'001'),DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' VIP Da Cá Sấu Mẫu #001');
- assert.equal(defaultProductTitle(category,prefix+'025'),DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' VIP Da Cá Sấu Mẫu #025');
+ assert.equal(defaultProductTitle(category,prefix+'001'),DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' Da Cá Sấu Mẫu #001');
+ assert.equal(defaultProductTitle(category,prefix+'025'),DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' Da Cá Sấu Mẫu #025');
  assert.equal(defaultProductTitle(category,'SD-UN025'),'','Incorrect-category SKU must not be used');
 }
 assert.equal(defaultProductTitle('unsupported','SD-SN001'),'');
@@ -60,7 +60,7 @@ for(const [category,prefix] of Object.entries(OFFICIAL_SKU_PREFIXES)){
  const result=await create(db,{category});
  assert.equal(result.status,201,category+' should save with a blank name');
  assert.equal(result.body.product.sku,prefix+'025');
- assert.equal(result.body.product.title,DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' VIP Da Cá Sấu Mẫu #025');
+ assert.equal(result.body.product.title,DEFAULT_PRODUCT_CATEGORY_NAMES[category]+' Da Cá Sấu Mẫu #025');
  assert.equal(db.inserted[0].description,'Dữ liệu mô tả không được thay đổi');
 }
 
@@ -68,7 +68,7 @@ let db=dbAdapter(['SD-SN024'],true);
 let result=await create(db,{title:''});
 assert.equal(result.status,201,'Concurrent SKU allocation must retry');
 assert.equal(result.body.product.sku,'SD-SN026');
-assert.equal(result.body.product.title,'Giày Thể Thao VIP Da Cá Sấu Mẫu #026');
+assert.equal(result.body.product.title,'Giày Thể Thao Da Cá Sấu Mẫu #026');
 assert.ok(result.body.product.slug.includes('mau-026'), 'Slug must track newly allocated default name');
 assert.equal(db.inserted.length,1,'One product only after conflict');
 
@@ -105,7 +105,7 @@ assert.ok(!admin.includes("$('#categoryOptions').innerHTML"),'No stale datalist 
 assert.ok(!admin.includes('list="categoryOptions"'),
  'Native datalist must not silently replace the required visible selection table');
 assert.match(admin,/function syncDefaultProductTitle\(\)\{/);
-assert.ok(admin.includes("input.placeholder=editing?'':'Tên Danh Mục VIP Da Cá Sấu Mẫu #…'"),
+assert.ok(admin.includes("input.placeholder=editing?'':'Tên Danh Mục Da Cá Sấu Mẫu #…'"),
  'Blank category on the Add Product screen must still show a faint sample name');
 assert.ok(admin.includes('#productPanelDetails #pTitle::placeholder{color:#708799;opacity:1'),
  'Light theme sample must be visible but muted');
@@ -113,7 +113,7 @@ assert.ok(admin.includes(':root[data-admin-theme="dark"] #productPanelDetails #p
  'Dark theme sample must remain visible');
 assert.match(admin,/if\(isNewOfficial\)\{/,'Only new official category products get a placeholder');
 assert.match(admin,/input\.required=!isNewOfficial/);
-assert.match(admin,/input\.placeholder=DEFAULT_PRODUCT_LABELS\[key\]\+' VIP Da Cá Sấu Mẫu #'\+suffix/);
+assert.match(admin,/input\.placeholder=DEFAULT_PRODUCT_LABELS\[key\]\+' Da Cá Sấu Mẫu #'\+suffix/);
 assert.ok(!admin.includes("input.value=generatedSneakerTitle"),'Never prefill title as a real value');
 assert.ok(!admin.includes('autoSneakerTitle:'),'Do not override a custom title by client flag');
 assert.ok(admin.includes("title:$('#pTitle').value.trim(),category:"),'Submit blank name; server determines final title');
