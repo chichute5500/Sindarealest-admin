@@ -103,7 +103,7 @@ const response=await middleware(ctx);
 assert.equal(response.status,200);
 assert.ok((await response.text()).includes('id="catalogGrid"><article'),'Middleware must compose SSR into catalog');
 const homeHtml=await (await middleware({...ctx,request:new Request(origin+'/')})).text();
-assert.ok(homeHtml.includes('"@type":"LocalBusiness"'),'Home JSON-LD publishes the known business address and contact');
+assert.ok(homeHtml.includes('"@type":["Organization","LocalBusiness"]'),'Home JSON-LD keeps Organization identity and publishes LocalBusiness details');
 assert.ok(homeHtml.includes('"streetAddress":"Hẻm 48 Võ Trường Toàn"'),'LocalBusiness address comes from the visible site address');
 const product={id:'shoe-113',slug:'shoe-113',sku:'SD-SN113',sku_verified:1,title:'Giày Thể Thao Da Cá Sấu Mẫu #113',category:'sneakers',category_label:'Giày thể thao',description:'Giày thể thao da cá sấu thật, chế tác theo yêu cầu.',price:9500000,source_price_confirmed:1,published:1,images_json:'["images/test-image.webp"]'};
 const productDb={prepare(sql){assert.ok(sql.startsWith('SELECT '),'Product route must remain read-only');return {bind(){return {first:async()=>product}}}}};

@@ -38,7 +38,7 @@ const websiteSchemas = siteSchemas.filter(schema=>schema["@type"]==="WebSite");
 assert.equal(websiteSchemas.length,1,"Exactly one WebSite site-name declaration");
 assert.equal(websiteSchemas[0].name,"SinDarealest");
 assert.equal(websiteSchemas[0].url,site+"/");
-assert.ok(siteSchemas.some(schema=>schema["@type"]==="Organization"),"Keep existing Organization identity");
+assert.ok(siteSchemas.some(schema=>Array.isArray(schema["@type"])&&schema["@type"].includes("Organization")&&schema["@type"].includes("LocalBusiness")),"Keep Organization identity while adding LocalBusiness details");
 const category=await (await middleware(context("/sanpham/sneaker",null))).text();
 assert.ok(category.includes('property="og:image" content="'+site+'/og-sindarealest-crisp-20261028.jpg"'));
 assert.ok(category.includes('name="twitter:image" content="'+site+'/og-sindarealest-crisp-20261028.jpg"'));
@@ -46,5 +46,6 @@ const item={id:"shoe-1",slug:"shoe-1",sku:"SD-SN001",sku_verified:1,published:1,
 const detail=await middleware(context("/sanpham/sneaker/SD-SN001",item));
 assert.equal(detail.status,200);
 const content=await detail.text();
-assert.ok(content.includes('property="og:image:type" content="image/webp"'));
+assert.ok(content.includes('property="og:image:type" content="image/jpeg"'));
+assert.ok(content.includes('property="og:image" content="'+site+'/og-sindarealest-crisp-20261028.jpg'));
 console.log("PASS: authentic SinDarealest logo, favicon/manifest assets and absolute social sharing previews.");

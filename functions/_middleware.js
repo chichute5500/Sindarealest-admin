@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 7794)
+Total output lines: 411
+
 import { createSession, sessionCookie, verifySession } from "./_lib.js";
 import { sendAdminPush } from "./_notifications.js";
 import { renderPublicCatalog } from "./_catalog-ssr.js";
@@ -154,134 +157,10 @@ export async function onRequest(context) {
       return new Response("Trang không hợp lệ.",{status:404,headers:{"X-Robots-Tag":"noindex, nofollow"}});
     const requestedPage=rawPage===null?1:Number(rawPage);
     // Each paginated listing has a distinct, stable canonical URL.
-    const canonicalCatalogUrl=url.origin+canonicalPath+(requestedPage>1?"?page="+requestedPage:"");
-    if(rawPage==="1")return Response.redirect(new URL(canonicalPath,url.origin),301);
-    if (url.pathname !== canonicalPath) return Response.redirect(new URL(canonicalPath + url.search, url.origin), 301);
-    if (categorySlug && !isKnownCatalogCategoryRoute(categorySlug)) {
-      if (!context.env?.DB) return new Response("Danh mục chưa sẵn sàng.", {status:503});
-      try {
-        const rows = await context.env.DB.prepare("SELECT DISTINCT category FROM products WHERE published=1").all();
-        if (!(rows.results || []).some(row => productCategoryRouteSlug(row.category) === categorySlug))
-          return new Response("Không tìm thấy danh mục.", {status:404,headers:{"X-Robots-Tag":"noindex, nofollow"}});
-      } catch { return new Response("Không thể tải danh mục.", {status:503}); }
-    }
-    const response = await context.next(new Request(new URL("/index.html",url.origin), {
-      method:context.request.method,headers:context.request.headers
-    }));
-    if (!response.ok || !(response.headers.get("content-type") || "").includes("text/html")) return response;
-    let html = await response.text();
-    const catalogLabels = {
-      sneaker: "Giày thể thao (Sneaker)", giayluoi: "Giày lười", giaytay: "Giày tây",
-      thatlung: "Thắt lưng", vinamnu: "Ví nam & nữ",
-      caplaptop: "Cặp – Tab – Laptop", "tuithoitrang-golf": "Túi thời trang & golf", mu: "Mũ",
-      tuixach: "Túi xách",
-      dep: "Dép", daydongho: "Dây đồng hồ", oplung: "Ốp điện thoại"
-    };
-    const categoryName = Object.hasOwn(catalogLabels,categorySlug)
-      ? catalogLabels[categorySlug] : categorySlug;
-    const seoProfile = catalogSeoProfile(html, categorySlug || "all");
-    const catalogTitleBase = seoProfile?.title || (categorySlug ? categoryName + " | SinDarealest" : "Tất cả sản phẩm | SinDarealest");
-    const catalogDescriptionBase = seoProfile?.description || (categorySlug
-      ? "Khám phá sản phẩm " + categoryName + " tại SinDarealest. Xem thiết kế và mã SKU chính thức."
-      : "Khám phá toàn bộ sản phẩm da cá sấu tại SinDarealest.");
-    const catalogTitle=requestedPage>1?catalogTitleBase+" – Trang "+requestedPage:catalogTitleBase;
-    const catalogDescription=requestedPage>1?catalogDescriptionBase+" Trang "+requestedPage+".":catalogDescriptionBase;
-    html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(catalogTitle) + "</title>");
-    // Give direct-link visitors and crawlers the correct category heading in
-    // the initial HTML, before /api/products completes on a slow connection.
-    if(categorySlug) html = html.replace(
-      '<h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2>',
-      '<h2 class="section-title" id="catalogHeading">' + escapeHtml(seoProfile?.heading || categoryName) + '</h2>'
-    );
-    if (seoProfile?.intro) html = html.replace(
-      /(<p class="section-note" id="catalogSeoNote">)[\s\S]*?(<\/p>)/,
-      (_, opening, closing) => opening + escapeHtml(seoProfile.intro) + closing
-    );
-    html = meta(html, "description", catalogDescription);
-    html = meta(html, "og:title", catalogTitle, true);
-    html = meta(html, "og:description", catalogDescription, true);
-    html = meta(html, "og:url", canonicalCatalogUrl, true);
-    // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
-    // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
-    html = meta(html, "og:image", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
-    html = meta(html, "og:image:alt", categorySlug ? "SinDarealest — " + categoryName : "SinDarealest — Toàn bộ sản phẩm da cá sấu", true);
-    html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
-    html = meta(html, "twitter:title", catalogTitle);
-    html = meta(html, "twitter:description", catalogDescription);
-    html = meta(html, "twitter:image", url.origin + "/og-sindarealest-crisp-20261028.jpg");
-    html = meta(html, "twitter:card", "summary_large_image");
-    const canonicalTag = '<link rel="canonical" href="' + escapeHtml(canonicalCatalogUrl) + '">';
-    html = /<link\s+rel=["']canonical["']/i.test(html)
-      ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
-      : html.replace("</head>", "  " + canonicalTag + "\n</head>");
-    html = appendBreadcrumbList(html, url.origin, [
-      { name: "Trang chủ", path: "/" },
-      { name: "Tất cả sản phẩm", path: "/sanpham" },
-      ...(categorySlug ? [{ name: categoryName, path: canonicalPath }] : [])
-    ]);
-    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug,page:requestedPage});
-    const headers = new Headers(response.headers);
-    headers.set("Content-Type","text/html; charset=utf-8");
-    headers.set("Cache-Control","public, max-age=60, s-maxage=300");
-    for (const key of ["Content-Length","Content-Encoding","ETag"]) headers.delete(key);
-    return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
-  }
-  // Serve the exact Google Search Console ownership file at its required root URL.
-  if (url.pathname === "/googleded292a3607df9dd.html" || url.pathname === "/googleded292a3607df9dd") {
-    return new Response("google-site-verification: googleded292a3607df9dd.html", {
-      status: 200,
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "public, max-age=300",
-        "X-Content-Type-Options": "nosniff"
+    con…2794 tokens truncated…        addressCountry: "VN"
       }
     });
-  }
-  const legacyMatch = url.pathname.match(/^\/san-pham\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
-  const modernMatch = url.pathname.match(/^\/sanpham\/([a-z0-9][a-z0-9-]{0,99})\/([a-z0-9][a-z0-9._-]{0,119})\/?$/i);
-  if (!legacyMatch && !modernMatch) {
-    const response = await context.next();
-    if (!response.ok || !(response.headers.get("content-type") || "").includes("text/html")) return response;
-    // _redirects has an SPA fallback, so a nonexistent URL otherwise returns
-    // homepage HTML with HTTP 200. Keep documented static/legal/admin pages.
-    const staticHtml = new Set(["/", "/index.html", "/data-deletion", "/data-deletion.html", "/privacy-policy", "/privacy-policy.html", "/terms-of-service", "/terms-of-service.html", "/payment-result", "/payment-result.html", "/admin", "/admin/", "/admin/index.html"]);
-    if (!staticHtml.has(url.pathname)) {
-      const html = "<!doctype html><html lang=\"vi\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\"><meta name=\"color-scheme\" content=\"light dark\"><title>Không tìm thấy trang | SinDarealest</title><style>\n*{box-sizing:border-box}\n:root{font-family:Inter,\"Segoe UI\",Arial,sans-serif;color:#173449;background:#eaf3fb}\nbody{min-height:100vh;margin:0;background:radial-gradient(ellipse at 16% 10%,rgba(255,255,255,.96),transparent 43%),radial-gradient(ellipse at 88% 82%,rgba(106,172,215,.25),transparent 42%),linear-gradient(145deg,#eaf3fb,#d9ebf8);display:grid;place-items:center;padding:24px}\nmain{width:min(100%,580px);padding:clamp(28px,6vw,58px);text-align:center;border:1px solid rgba(255,255,255,.9);border-radius:30px;background:rgba(246,251,255,.78);-webkit-backdrop-filter:blur(24px) saturate(145%);backdrop-filter:blur(24px) saturate(145%);box-shadow:0 24px 70px rgba(38,82,116,.16),inset 0 1px 0 rgba(255,255,255,.9)}\n.brand{margin:0 0 20px;color:#9a7445;font:600 12px/1.5 Georgia,serif;letter-spacing:.2em}\n.code{margin:0;color:#176fc5;font-size:clamp(64px,14vw,104px);font-weight:750;letter-spacing:-.08em;line-height:.95}\nh1{margin:20px 0 10px;font:600 clamp(24px,5vw,34px)/1.18 Georgia,serif}\np.message{margin:0 auto;max-width:390px;color:#526a7d;line-height:1.65}\n.actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:28px}\na{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:11px 19px;border:1px solid rgba(105,154,190,.42);border-radius:999px;color:#173449;text-decoration:none;font-weight:650;background:rgba(255,255,255,.58);transition:transform .16s ease,background-color .16s ease}\na.primary{color:white;background:linear-gradient(135deg,#238be0,#1264b8);border-color:transparent;box-shadow:0 8px 20px rgba(35,119,190,.2)}\na:hover{transform:translateY(-1px);background-color:rgba(255,255,255,.9)}\na:focus-visible{outline:3px solid #176fc5;outline-offset:3px}\n@media(prefers-color-scheme:dark){:root{color:#edf7ff;background:#061522}body{background:radial-gradient(ellipse at 16% 10%,rgba(61,103,134,.35),transparent 43%),radial-gradient(ellipse at 88% 82%,rgba(14,92,146,.28),transparent 42%),linear-gradient(145deg,#061522,#0b2740)}main{background:rgba(8,31,51,.84);border-color:rgba(175,211,237,.3);box-shadow:0 24px 70px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.1)}.brand{color:#d7b67d}p.message{color:#b5cde0}a{color:#edf7ff;background:rgba(24,54,77,.74);border-color:rgba(155,198,229,.38)}}\n@media(prefers-reduced-motion:reduce){a{transition:none}}\n</style></head><body><main><p class=\"brand\">SINDAREALEST · SIGNATURE</p><p class=\"code\" aria-hidden=\"true\">404</p><h1>Không tìm thấy trang</h1><p class=\"message\">Đường dẫn này không còn tồn tại hoặc đã được thay đổi. Bạn có thể quay về trang chủ hoặc tiếp tục khám phá sản phẩm.</p><nav class=\"actions\" aria-label=\"Điều hướng\"><a class=\"primary\" href=\"/\">Về trang chủ</a><a href=\"/sanpham\">Khám phá sản phẩm</a></nav></main></body></html>";
-      return new Response(html, {
-        status: 404,
-        headers: {
-          "Content-Type": "text/html; charset=utf-8",
-          "Cache-Control": "no-store",
-          "X-Robots-Tag": "noindex, nofollow",
-          "X-Content-Type-Options": "nosniff",
-          "X-Frame-Options": "DENY",
-          "Referrer-Policy": "strict-origin-when-cross-origin"
-        }
-      });
-    }
-    if (!["/", "/index.html"].includes(url.pathname)) return response;
-    let html = await response.text();
-    html = meta(html, "og:url", `${url.origin}/`, true);
-    html = meta(html, "og:image", `${url.origin}/og-sindarealest-crisp-20261028.jpg`, true);
-    html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest-crisp-20261028.jpg`, true);
-    html = meta(html, "twitter:image", `${url.origin}/og-sindarealest-crisp-20261028.jpg`);
-    // Structured organization identity is available to crawlers without JS.
-    const organizationSchema = JSON.stringify({
-      "@context": "https://schema.org", "@type": "LocalBusiness",
-      "@id": `${url.origin}/#business`,
-      name: "SinDarealest", url: `${url.origin}/`,
-      logo: `${url.origin}/images/brand-emblem.png`,
-      image: `${url.origin}/og-sindarealest-crisp-20261028.jpg`,
-      telephone: "+84827049192",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "Hẻm 48 Võ Trường Toàn",
-        addressLocality: "Đà Lạt",
-        addressRegion: "Lâm Đồng",
-        addressCountry: "VN"
-      }
-    });
-    if (!html.includes('"@type":"LocalBusiness"')) {
+    if (!html.includes('"@type":"LocalBusiness"') && !html.includes('"@type":["Organization","LocalBusiness"]')) {
       html = html.replace("</head>", `  <script type="application/ld+json">${organizationSchema}</script>\n</head>`);
     }
     // Google site-name: the canonical home root declares one WebSite identity.
