@@ -5615,7 +5615,7 @@ function sdDetailScrollToPaymentQuote(box){
  if(!modal||!box?.isConnected)return;
  const modalRect=modal.getBoundingClientRect(),boxRect=box.getBoundingClientRect();
  const top=modal.scrollTop+boxRect.top-modalRect.top-Math.max(18,(modal.clientHeight-boxRect.height)*.28);
- modal.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ modal.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
 }
 async function sdDetailLoadPaymentQuote(product){
  const box=$('#sdDetailPaymentQuote');if(!box)return;const request=++sdDetailQuoteRequest;
