@@ -3627,11 +3627,27 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 .sd-tier-vip{color:#a7833d;background:linear-gradient(145deg,rgba(248,242,222,.95),rgba(233,221,186,.9));border-color:rgba(176,143,74,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.62),0 1px 5px rgba(113,83,29,.15)}
 .sd-tier-vip .sd-tier-label{color:transparent;background-image:linear-gradient(105deg,#805c22 0%,#b28d47 36%,#fffbe8 48%,#d1b36f 54%,#87662a 66%,#805c22 100%);background-size:240% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sd-vip-text-flare 4.2s cubic-bezier(.4,0,.2,1) infinite}
 .sd-tier-vvip{color:#f2e5c1;background:linear-gradient(145deg,#11110f,#050505 62%,#171713);border-color:#8d7548;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 8px rgba(0,0,0,.22)}
-.sd-tier-vvip:after{content:"";position:absolute;z-index:0;inset:-20% auto -20% -125%;width:115%;transform:skewX(-21deg);background:linear-gradient(90deg,transparent 20%,rgba(255,255,255,.04) 38%,rgba(255,244,210,.2) 46%,rgba(255,255,255,.72) 50%,rgba(255,244,210,.2) 54%,rgba(255,255,255,.04) 62%,transparent 80%);filter:blur(1.1px);mix-blend-mode:screen;animation:sd-vvip-badge-flare 5.4s cubic-bezier(.48,0,.24,1) infinite}
-.sd-tier-vvip .sd-tier-label{color:#f4e7c8;text-shadow:0 0 7px rgba(244,220,168,.28)}
+.sd-tier-vvip .sd-vvip-sparkle-layer{position:absolute;z-index:2;inset:0;overflow:hidden;pointer-events:none;mix-blend-mode:screen}
+.sd-tier-vvip .sd-vvip-sparkle{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff9e8;box-shadow:0 0 3px 1px rgba(255,241,199,.72);opacity:.2;transform:scale(.72);animation:sd-vvip-twinkle 2.4s ease-in-out infinite alternate}
+.sd-tier-vvip .sd-vvip-sparkle:before,.sd-tier-vvip .sd-vvip-sparkle:after{content:"";position:absolute;left:50%;top:50%;border-radius:50%;background:linear-gradient(90deg,transparent,rgba(255,248,223,.92),transparent);transform:translate(-50%,-50%)}
+.sd-tier-vvip .sd-vvip-sparkle:before{width:1px;height:7px;background:linear-gradient(180deg,transparent,rgba(255,248,223,.92),transparent)}
+.sd-tier-vvip .sd-vvip-sparkle:after{width:7px;height:1px}
+.sd-vvip-sparkle-1{left:4%;top:24%;animation-delay:-.4s;animation-duration:2.7s}
+.sd-vvip-sparkle-2{left:13%;top:76%;animation-delay:-.9s;animation-duration:3.1s}
+.sd-vvip-sparkle-3{left:24%;top:18%;animation-delay:-1.4s;animation-duration:2.5s}
+.sd-vvip-sparkle-4{left:34%;top:83%;animation-delay:-.3s;animation-duration:3.3s}
+.sd-vvip-sparkle-5{left:44%;top:20%;animation-delay:-1.8s;animation-duration:2.8s}
+.sd-vvip-sparkle-6{left:55%;top:79%;animation-delay:-.7s;animation-duration:3.2s}
+.sd-vvip-sparkle-7{left:65%;top:16%;animation-delay:-1.1s;animation-duration:2.6s}
+.sd-vvip-sparkle-8{left:75%;top:84%;animation-delay:-2s;animation-duration:3.4s}
+.sd-vvip-sparkle-9{left:85%;top:25%;animation-delay:-.6s;animation-duration:2.9s}
+.sd-vvip-sparkle-10{left:95%;top:72%;animation-delay:-1.5s;animation-duration:3.1s}
+.sd-vvip-sparkle-11{left:29%;top:48%;animation-delay:-2.3s;animation-duration:3.3s}
+.sd-vvip-sparkle-12{left:70%;top:52%;animation-delay:-1.9s;animation-duration:2.5s}
+.sd-tier-vvip .sd-tier-label{z-index:3;color:#f4e7c8;text-shadow:0 0 7px rgba(244,220,168,.28)}
 @keyframes sd-vip-text-flare{0%,20%{background-position:100% 0}58%,78%{background-position:0 0}100%{background-position:100% 0}}
-@keyframes sd-vvip-badge-flare{0%,22%{left:-125%;opacity:0}27%{opacity:.9}52%{left:120%;opacity:.82}58%,100%{left:120%;opacity:0}}
-@media(prefers-reduced-motion:reduce){.sd-tier-vip .sd-tier-label,.sd-tier-vvip:after{animation:none}}
+@keyframes sd-vvip-twinkle{0%{opacity:.2;transform:scale(.68)}100%{opacity:.92;transform:scale(1.08)}}
+@media(prefers-reduced-motion:reduce){.sd-tier-vip .sd-tier-label,.sd-tier-vvip .sd-vvip-sparkle{animation:none}.sd-tier-vvip .sd-vvip-sparkle{opacity:.62;transform:scale(.82)}}
 </style>
 </head>
 <body class="welcome-active">
@@ -4451,7 +4467,8 @@ function productTitleWithVip(value,titleCase=true,product=null){
  const raw=titleCase?displayProductName(value):String(value??'');
  const title=raw.replace(/\bVIP\b/giu,' ').replace(/\s+/gu,' ').trim();
  const tier=productTierFor(product);
- const badge=tier?'<span class="sd-tier-badge sd-tier-'+tier+'" aria-label="'+tier.toUpperCase()+'"><span class="sd-tier-label">'+tier.toUpperCase()+'</span></span>':'';
+ const sparkles=tier==='vvip'?'<span class="sd-vvip-sparkle-layer" aria-hidden="true">'+Array.from({length:12},(_,i)=>'<i class="sd-vvip-sparkle sd-vvip-sparkle-'+(i+1)+'"></i>').join('')+'</span>':'';
+  const badge=tier?'<span class="sd-tier-badge sd-tier-'+tier+'" aria-label="'+tier.toUpperCase()+'"><span class="sd-tier-label">'+tier.toUpperCase()+'</span>'+sparkles+'</span>':'';
  return badge+escapeHtml(title);
 }
 function preferred(category){return products.find(p=>p.category===category)}
