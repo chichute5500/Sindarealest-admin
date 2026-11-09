@@ -4449,7 +4449,7 @@ function productTierFor(product){
 }
 function productTitleWithVip(value,titleCase=true,product=null){
  const raw=titleCase?displayProductName(value):String(value??'');
- const title=raw.replace(/(^|\\s)VIP(?=\\s|$)/giu,' ').replace(/\\s+/gu,' ').trim();
+ const title=raw.replace(/\bVIP\b/giu,' ').replace(/\s+/gu,' ').trim();
  const tier=productTierFor(product);
  const badge=tier?'<span class="sd-tier-badge sd-tier-'+tier+'" aria-label="'+tier.toUpperCase()+'"><span class="sd-tier-label">'+tier.toUpperCase()+'</span></span>':'';
  return badge+escapeHtml(title);
