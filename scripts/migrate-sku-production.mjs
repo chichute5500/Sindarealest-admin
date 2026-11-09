@@ -59,9 +59,13 @@ async function main(){
   assert.equal(ledger.length,1,"Production migration ledger missing; refusing to infer schema state");
   const appliedRows=await query("SELECT name FROM d1_migrations WHERE name IN ('0008_product_sku_verification.sql','0018_payment_delivery_settlement.sql','0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql','0022_sepay_payment_gateway.sql','0023_sepay_checkout_intents.sql','"+migration+"')");
   const applied=new Set(appliedRows.map(row=>String(row.name)));
-  for(const prerequisite of ["0008_product_sku_verification.sql","0018_payment_delivery_settlement.sql","0019_manual_warranties.sql","0020_manual_warranty_contacts.sql","0021_warranty_policy_snapshots.sql","0022_sepay_payment_gateway.sql","0023_sepay_checkout_intents.sql"])
+  for(const prerequisite of ["0018_payment_delivery_settlement.sql","0019_manual_warranties.sql","0020_manual_warranty_contacts.sql","0021_warranty_policy_snapshots.sql","0022_sepay_payment_gateway.sql","0023_sepay_checkout_intents.sql"])
     assert.ok(applied.has(prerequisite),"Required earlier migration is not recorded: "+prerequisite);
 
+  const productsTable=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='products'");
+  assert.equal(productsTable.length,1,"Production products table missing");
+  const skuColumn=await query("SELECT name FROM pragma_table_info('products') WHERE name='sku_verified'");
+  assert.equal(skuColumn.length,1,"Production sku_verified column missing; refusing migration");
   const duplicate=await query("SELECT id,sku,title,category FROM products WHERE upper(sku)='SD-SN113' LIMIT 2");
   assert.ok(duplicate.length<=1,"Duplicate SD-SN113 records detected");
   const candidates=await query("SELECT id,sku,title,category,sku_verified FROM products WHERE upper(sku)='SD-GL062' LIMIT 2");
