@@ -317,7 +317,7 @@ has('<form id="productForm" novalidate>', 'custom product validation can reveal 
 has('function syncProductIdentityValidity()', 'product editor rejects whitespace-only identity fields');
 has("title.setCustomValidity(title.value.trim()||(!title.required&&title.placeholder)?'':'Vui lòng nhập tên sản phẩm.')", 'title validation permits a blank value only for a new catalog product with a canonical default');
 has('input.required=!isNewOfficial', 'existing products and unknown categories still require a typed name');
-has("input.placeholder=DEFAULT_PRODUCT_LABELS[key]+' VIP Da Cá Sấu Mẫu #'+suffix", 'category-specific default is only a muted placeholder, never filled text');
+has("input.placeholder=DEFAULT_PRODUCT_LABELS[key]+' Da Cá Sấu Mẫu #'+suffix", 'category-specific default is only a muted placeholder, never filled text');
 has("category.setCustomValidity(category.value.trim()?'':'Vui lòng chọn hoặc nhập danh mục.')", 'category validation is based on trimmed content');
 has("const invalidInput=$('#productForm').querySelector(':invalid')", 'product editor preserves native required/min/step validity checks');
 has('setProductEditorTab(panel.dataset.productPanel)', 'invalid form fields reveal their owning tab before focus moves');
@@ -364,7 +364,7 @@ has('#main .product-table .product-mobile-inline-meta{display:grid;grid-template
 has('#main .product-table .product-mobile-inline-metric{display:flex;align-items:baseline;gap:3px;min-width:0;font-size:9px;line-height:1.1;white-space:nowrap}', 'mobile price label remains compact and readable');
 has('#main .product-table .prodname{font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}', 'long product titles truncate neatly without increasing mobile card height');
 has('#main .product-table .product-row-info .sku{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}', 'SKU/category context wraps to two lines on 320–360px phones instead of losing its visible tail');
-has('class="prodname" title="${esc(p.title)}"', 'full product titles remain available via a title attribute when visually truncated');
+has('class="prodname" title="${esc(adminCleanProductTitle(p.title))}"', 'full product titles remain available via a title attribute when visually truncated');
 has('#main:has(#searchBox) .toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"search search" "category fulfillment";gap:7px;padding:10px}', 'product search spans the full mobile toolbar row');
 has('.activity-log-filters .field:first-child{grid-column:1/-1}', 'activity-log search gets a full-width row on mobile');
 has('.activity-log-filters .field:nth-child(2){grid-column:1}', 'activity filter select remains usable on mobile');
