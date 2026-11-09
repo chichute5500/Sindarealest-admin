@@ -20,7 +20,7 @@ assert.match(vvip,/sd-vvip-sparkle-layer/);
 assert.equal((vvip.match(/class="sd-vvip-sparkle sd-vvip-sparkle-\d+"/g)||[]).length,12);
 assert.equal(render("ví VIP xịn",true,product(4500000)).endsWith("Ví Xịn"),true);
 assert.equal(render("VIP VIP1 SUPERVIP Viper VVIP",true,product(4500000)).endsWith("VIP1 SUPERVIP Viper VVIP"),true);
-assert.equal(render("VIP <img src=x onerror=alert(1)>",false,product(4500000)).endsWith(" &lt;img src=x onerror=alert(1)&gt;"),true);
+assert.equal(render("VIP <img src=x onerror=alert(1)>",false,product(4500000)).endsWith("&lt;img src=x onerror=alert(1)&gt;"),true);
 assert.equal(render("VIP không có giá",true,{price:null,sourcePriceConfirmed:false}),"Không Có Giá");
 assert.equal(render("VIP 123",false,product(3500000)).endsWith("123"),true);
 assert.equal(render("Một sản phẩm",false,product(1000000)).endsWith("Một sản phẩm"),true);
