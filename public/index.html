@@ -3333,12 +3333,19 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
 /* One purchase control with two identical liquid-glass treatments.
    The orange button differs ONLY in hue; geometry and effects stay identical. */
 #productOverlay .detail-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0 12px}
+#productOverlay .detail-copy>.detail-actions{
+ position:sticky;top:calc(env(safe-area-inset-top) + 52px);z-index:30;
+ margin:0 0 14px;padding:8px;border:1px solid rgba(117,157,185,.36);border-radius:18px;
+ background:linear-gradient(135deg,rgba(245,251,255,.88),rgba(226,239,248,.78));
+ -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+ box-shadow:0 10px 26px rgba(30,66,90,.14),inset 0 1px 0 rgba(255,255,255,.82);
+}
 #productOverlay .detail-actions .detail-purchase-button{
  --sd-action-rgb:126,177,215;--sd-action-border-rgb:116,171,211;
  display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:0;
  min-height:50px;padding:11px 12px;border-radius:999px;
  border:1.5px solid transparent;
- background:linear-gradient(145deg,rgba(232,247,255,.48),rgba(var(--sd-action-rgb),.21));
+ background:linear-gradient(145deg,rgba(232,247,255,.48),rgba(var(--sd-action-rgb),.252));
  -webkit-backdrop-filter:blur(6px) saturate(112%);backdrop-filter:blur(6px) saturate(112%);
  box-shadow:var(--sd-3d-shadow);
  color:var(--ink);font-size:clamp(10px,1vw,13px);font-weight:700;line-height:1.35;
@@ -3378,7 +3385,7 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
 }
 #productOverlay .detail-actions .detail-purchase-button span{min-width:0}
 html.dark #productOverlay .detail-actions .detail-purchase-button{
- background:linear-gradient(145deg,rgba(35,74,102,.57),rgba(var(--sd-action-rgb),.21));
+ background:linear-gradient(145deg,rgba(35,74,102,.57),rgba(var(--sd-action-rgb),.252));
  border-color:transparent;box-shadow:var(--sd-3d-shadow);color:var(--ink);
 }
 html.dark #productOverlay .detail-actions .detail-purchase-button:active:not(:disabled){
@@ -3390,6 +3397,10 @@ html.dark #productOverlay .detail-actions .detail-purchase-button:active:not(:di
  transition-duration:115ms!important;
 }
 /* Reserve a zero-height insertion point for future variant selectors. */
+#productOverlay .detail-variants,#productOverlay .sd-product-custom-variants,#productOverlay .sd-detail-payment-quote{scroll-margin-top:calc(env(safe-area-inset-top) + 96px)}
+#productOverlay .sd-detail-attention{outline:2px solid rgba(180,139,69,.28);outline-offset:3px;animation:sd-detail-focus-cue 1.15s cubic-bezier(.2,.8,.2,1) 2}
+@keyframes sd-detail-focus-cue{0%,100%{outline-color:rgba(180,139,69,.28);box-shadow:0 0 0 0 rgba(180,139,69,0)}50%{outline-color:rgba(180,139,69,.92);box-shadow:0 0 0 5px rgba(180,139,69,.18)}}
+@media(prefers-reduced-motion:reduce){#productOverlay .sd-detail-attention{animation:none;outline-color:rgba(180,139,69,.9);box-shadow:0 0 0 4px rgba(180,139,69,.16)}}
 #productOverlay .detail-variants[hidden]{display:none}
 #productOverlay .detail-variants:not([hidden]){display:grid;gap:8px;margin:14px 0 15px;padding:12px 14px;border:1px solid var(--line);border-radius:15px;background:var(--panel);min-width:0}
 #productOverlay .sd-product-option-label{display:block;font-weight:700;font-size:12px;color:var(--ink)}
@@ -5154,7 +5165,7 @@ function changeDetailImage(index,resetTimer=true,direction){
  scheduleDetailAutoplay();
 }
 let sdDetailReturnUrl='';
-function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fromUrl?null:document.activeElement;clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;detailPaymentChoice='';updateDetailFavoriteButton(p);document.title=displayProductName(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){sdDetailReturnUrl=location.pathname+location.search+location.hash;history.pushState({productId:p.id},'',`/sanpham/${routeSlug(p.category)}/${encodeURIComponent(p.skuVerified===true&&String(p.sku||'').trim()?(p.sku):(p.id||p.slug))}`)}else if(fromUrl){sdDetailReturnUrl=''}detailImages=allImages(p);detailIndex=0;const images=detailImages;for(const id of ['detailPrev','detailNext','sdFullscreenPrev','sdFullscreenNext','sdFullscreenCount']){const node=$('#'+id);if(node)node.hidden=images.length<=1}const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1');img.alt=productImageAlt(p);$('#detailSku').textContent='Mã SKU: '+(visibleSku(p)||'Chưa được cung cấp');$('#detailTitle').innerHTML=productTitleWithTier(p.title||'Sản phẩm tuyển chọn',true,p);const detailPrice=customerPriceLabel(p);$('#detailPrice').textContent=detailPrice?'Giá: '+detailPrice:'';$('#detailPrice').hidden=!detailPrice;const warrantyMonths=hasConfirmedPublicPrice(p)?(Number(p.price)<=3_000_000?6:12):null;$('#detailWarrantyTerm').textContent=warrantyMonths?'Bảo hành chế tác '+warrantyMonths+' tháng':'Bảo hành chế tác 6–12 tháng';$('#detailFulfillment').innerHTML=fulfillmentBadge(p,true);$('#sdDetailProduction').hidden=productFulfillmentType(p)!=='made_to_order';renderProductOptions(p);renderProductCustomOptions(p);sdDetailLoadPaymentQuote(p);$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(productImageAlt(p,i))}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailImageCount').hidden=images.length<=1;$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailBuyNow').dataset.buy=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').removeAttribute('inert');$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');window.__sdSyncProductDetailGlass?.();requestAnimationFrame(()=>window.__sdSyncProductDetailGlass?.());document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();$('#detailClose').focus({preventScroll:true})}
+function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fromUrl?null:document.activeElement;clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;detailPaymentChoice='';updateDetailFavoriteButton(p);document.title=displayProductName(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){sdDetailReturnUrl=location.pathname+location.search+location.hash;history.pushState({productId:p.id},'',`/sanpham/${routeSlug(p.category)}/${encodeURIComponent(p.skuVerified===true&&String(p.sku||'').trim()?(p.sku):(p.id||p.slug))}`)}else if(fromUrl){sdDetailReturnUrl=''}detailImages=allImages(p);detailIndex=0;const images=detailImages;for(const id of ['detailPrev','detailNext','sdFullscreenPrev','sdFullscreenNext','sdFullscreenCount']){const node=$('#'+id);if(node)node.hidden=images.length<=1}const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1');img.alt=productImageAlt(p);$('#detailSku').textContent='Mã SKU: '+(visibleSku(p)||'Chưa được cung cấp');$('#detailTitle').innerHTML=productTitleWithTier(p.title||'Sản phẩm tuyển chọn',true,p);const detailPrice=customerPriceLabel(p);$('#detailPrice').textContent=detailPrice?'Giá: '+detailPrice:'';$('#detailPrice').hidden=!detailPrice;const warrantyMonths=hasConfirmedPublicPrice(p)?(Number(p.price)<=3_000_000?6:12):null;$('#detailWarrantyTerm').textContent=warrantyMonths?'Bảo hành chế tác '+warrantyMonths+' tháng':'Bảo hành chế tác 6–12 tháng';$('#detailFulfillment').innerHTML=fulfillmentBadge(p,true);$('#sdDetailProduction').hidden=productFulfillmentType(p)!=='made_to_order';renderProductOptions(p);renderProductCustomOptions(p);const detailCopy=$('#productOverlay .detail-copy'),detailActions=detailCopy?.querySelector('.detail-actions');if(detailCopy&&detailActions&&detailCopy.firstElementChild!==detailActions)detailCopy.prepend(detailActions);sdDetailLoadPaymentQuote(p);$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(productImageAlt(p,i))}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailImageCount').hidden=images.length<=1;$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailBuyNow').dataset.buy=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;$('#productOverlay').removeAttribute('inert');$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');window.__sdSyncProductDetailGlass?.();requestAnimationFrame(()=>window.__sdSyncProductDetailGlass?.());document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();$('#detailClose').focus({preventScroll:true})}
 function closeDetail(fromUrl=false,restoreFocus=true){
  document.title='SinDarealest — Premium Crocodile Leather Fashion';
  clearTimeout(detailTimer);clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);
@@ -5627,12 +5638,33 @@ document.addEventListener('click',async e=>{
 function hasPublicPrice(value){if(value===null||value===undefined||(typeof value==='string'&&!value.trim()))return false;const n=Number(value);return Number.isSafeInteger(n)&&n>=0}
 function hasConfirmedPublicPrice(product){return !!product&&product.sourcePriceConfirmed===true&&hasPublicPrice(product.price)}
 let sdDetailQuoteRequest=0,sdDetailPaymentRevealRequested=false;
-function sdDetailScrollToPaymentQuote(box){
+function sdDetailScrollToTarget(target){
  const modal=$('#productOverlay .detail-modal');
- if(!modal||!box?.isConnected)return;
- const modalRect=modal.getBoundingClientRect(),boxRect=box.getBoundingClientRect();
- const top=modal.scrollTop+boxRect.top-modalRect.top-Math.max(18,(modal.clientHeight-boxRect.height)*.28);
+ if(!modal||!target?.isConnected)return;
+ const modalRect=modal.getBoundingClientRect(),targetRect=target.getBoundingClientRect();
+ const top=modal.scrollTop+targetRect.top-modalRect.top-Math.max(24,(modal.clientHeight-targetRect.height)*.28);
  modal.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
+function sdDetailScrollToPaymentQuote(box){sdDetailScrollToTarget(box)}
+function sdDetailRequiredSelectionTarget(product){
+ if(!product)return null;
+ if(productOptionKind(product)&&normalizeProductOption(product,$('#sdDetailOption')?.value)===null)return $('#detailVariants');
+ if(normalizeProductSize(product,$('#sdDetailSizeOption')?.value)===null)return $('#sdDetailCustomVariants .sd-product-option-choices:not(.sd-image-variant-choices)')||$('#sdDetailCustomVariants');
+ if(normalizeProductImageVariant(product,$('#sdDetailImageVariant')?.value)===null)return $('#sdDetailCustomVariants .sd-image-variant-choices')||$('#sdDetailCustomVariants');
+ return null;
+}
+function sdDetailGuideToRequiredSelection(target){
+ if(!target)return;
+ const payment=$('#sdDetailPaymentQuote'),cues=[...new Set([target,payment].filter(Boolean))];
+ cues.forEach(node=>{node.classList.remove('sd-detail-attention');requestAnimationFrame(()=>node.classList.add('sd-detail-attention'));setTimeout(()=>node.classList.remove('sd-detail-attention'),2450)});
+ showToast('Hãy chọn size/kích thước trước. Sau khi chọn, bảng thanh toán sẽ hiện.');
+ sdDetailScrollToTarget(target);
+}
+function sdDetailGuideToPaymentChoice(){
+ const box=$('#sdDetailPaymentQuote');if(!box)return;
+ box.classList.remove('sd-detail-attention');requestAnimationFrame(()=>box.classList.add('sd-detail-attention'));setTimeout(()=>box.classList.remove('sd-detail-attention'),2450);
+ showToast('Hãy chọn Cọc 30% hoặc Thanh toán hết để tiếp tục.');
+ sdDetailScrollToTarget(box);
 }
 async function sdDetailLoadPaymentQuote(product){
  const box=$('#sdDetailPaymentQuote');if(!box)return;const request=++sdDetailQuoteRequest;
@@ -6396,7 +6428,7 @@ $('#paymentInstructions').hidden=true;const items=sdCheckoutItems();if(!items.le
  $('#checkoutDrawer').scrollTop=0;form.scrollTop=0;
  const isSePay=quote.paymentProvider==='sepay';if(isSePay){const panel=$('#paymentInstructions');panel.replaceChildren();panel.hidden=false;panel.dataset.stage='transfer';const pending=document.createElement('p');pending.className='sd-sepay-loading';pending.setAttribute('role','status');pending.textContent='Đang chuẩn bị mã QR thanh toán…';panel.append(pending)}else renderPaymentInstructions(preview,'',{deferOrderCode:true});$('#sdCheckoutStepper').hidden=true;$('#sdCheckoutShippingStep').hidden=true;$('#sdCheckoutPaymentStep').hidden=true;$('#sdCheckoutStepTitle').textContent=isSePay?'Thanh toán qua SePay':quote.paymentReady?'Chờ thanh toán':'Thông tin đặt hàng';$('#sdCheckoutStepSubtitle').textContent=isSePay?'Mã đơn chỉ hiện sau khi SePay xác nhận thanh toán.':'Đơn hàng chỉ được tạo khi bạn tiếp tục.';$('#checkoutDrawer').classList.add('sd-checkout-success');$('#sdCheckoutReviewAddressRow').hidden=true;$('#checkoutSubmit').hidden=true;$('#sdCheckoutPrev').hidden=true;$('#sdCheckoutDone').hidden=!$('#sdCheckoutConfirmWrap').hidden;$('#sdCheckoutDone').textContent=isSePay?'Đang tạo QR…':'Lấy mã đơn →';sdCheckoutSuccess=true;sdCheckoutOrderCreated=false;sdCheckoutResetQrScroll();sdCheckoutScheduleSuccessTitleAlign();if(isSePay)void sdCheckoutFinalizeOrder();
 }catch(error){message.textContent=error.message||'Chưa thể chuẩn bị thông tin thanh toán.'}finally{button.disabled=false;if(!sdCheckoutSuccess)button.textContent=sdCheckoutSubmitLabel()}});
-$('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&!sdCheckoutOrderCreated&&panel?.dataset.stage==='transfer'){void sdCheckoutFinalizeOrder();return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>addToCartFromControl(e.currentTarget.dataset.add,e.currentTarget));$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,option=selectedDetailOption(currentProduct),sizeOption=selectedDetailSize(currentProduct),imageVariant=selectedDetailImage(currentProduct);if(!id||option===null||sizeOption===null||imageVariant===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){showToast('Chọn đặt cọc 30% hoặc thanh toán hết giảm 5% trước.');$('#sdDetailPaymentQuote')?.scrollIntoView({behavior:'smooth',block:'center'});return}closeDetail(false,false);openCheckout({items:[{id,option,sizeOption,imageVariant,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
+$('#sdCheckoutDone').addEventListener('click',()=>{const panel=$('#paymentInstructions');if(sdCheckoutSuccess&&!sdCheckoutOrderCreated&&panel?.dataset.stage==='transfer'){void sdCheckoutFinalizeOrder();return}closeCheckout()});$('#detailOrderLink').addEventListener('click',e=>{e.preventDefault();closeDetail();location.hash='order';setTimeout(()=>$('#order').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}),80)});$('#productOverlay').addEventListener('click',e=>{if(e.target===$('#productOverlay'))closeDetail()});$('#detailAdd').addEventListener('click',e=>{const button=e.currentTarget,product=findProductByKey(button.dataset.add),missing=sdDetailRequiredSelectionTarget(product);if(missing){sdDetailGuideToRequiredSelection(missing);return}addToCartFromControl(button.dataset.add,button)});$('#detailBuyNow').addEventListener('click',e=>{const id=e.currentTarget.dataset.buy,product=currentProduct,missing=sdDetailRequiredSelectionTarget(product);if(!id||!product)return;if(missing){sdDetailGuideToRequiredSelection(missing);return}const option=selectedDetailOption(product),sizeOption=selectedDetailSize(product),imageVariant=selectedDetailImage(product);if(option===null||sizeOption===null||imageVariant===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){sdDetailGuideToPaymentChoice();return}closeDetail(false,false);openCheckout({items:[{id,option,sizeOption,imageVariant,quantity:1}],paymentChoice:detailPaymentChoice})});$('#detailZalo').addEventListener('click',e=>consultProduct(e.currentTarget.dataset.zalo));document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(detailTimer);else scheduleDetailAutoplay()});$('#detailClose').addEventListener('click',()=>closeDetail());
 $('#detailZoom').addEventListener('click',openFullscreenImage);
 $('#detailPrev').addEventListener('click',()=>changeDetailImage(detailIndex-1,true,'right'));
 $('#detailNext').addEventListener('click',()=>changeDetailImage(detailIndex+1,true,'left'));
