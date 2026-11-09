@@ -67,6 +67,9 @@ async function main(){
   const skuColumn=await query("SELECT name FROM pragma_table_info('products') WHERE name='sku_verified'");
   assert.equal(skuColumn.length,1,"Production sku_verified column missing; refusing migration");
   const duplicate=await query("SELECT id,sku,title,category FROM products WHERE upper(sku)='SD-SN113' LIMIT 2");
+  if(duplicate.length){
+    console.log("SKU collision preflight details: "+JSON.stringify(duplicate.map(row=>({sku:String(row.sku||""),title:String(row.title||""),category:String(row.category||"")}))));
+  }
   assert.ok(duplicate.length<=1,"Duplicate SD-SN113 records detected");
   const candidates=await query("SELECT id,sku,title,category,sku_verified FROM products WHERE upper(sku)='SD-GL062' LIMIT 2");
   assert.ok(candidates.length<=1,"Multiple SD-GL062 rows detected");

@@ -16,6 +16,7 @@ assert.match(script,/time_travel\/bookmark/);
 assert.match(script,/before-sku-0024\.sql/);
 assert.match(script,/Storefront Preview/);
 assert.match(script,/LIMIT 2/);
+assert.match(script,/SKU collision preflight details/);
 assert.match(script,/pragma_table_info\('products'\)/);
 assert.doesNotMatch(script,/0008_product_sku_verification\.sql/);
 assert.match(migration,/SD-GL062/);
