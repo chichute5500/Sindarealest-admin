@@ -3333,12 +3333,17 @@ html.dark #productOverlay .detail-meta-row .fulfillment-badge{
 /* One purchase control with two identical liquid-glass treatments.
    The orange button differs ONLY in hue; geometry and effects stay identical. */
 #productOverlay .detail-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0 12px}
-#productOverlay .detail-copy>.detail-actions{
- position:sticky;top:calc(env(safe-area-inset-top) + 52px);z-index:30;
- margin:0 0 14px;padding:8px;border:1px solid rgba(117,157,185,.36);border-radius:18px;
- background:linear-gradient(135deg,rgba(245,251,255,.88),rgba(226,239,248,.78));
- -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
- box-shadow:0 10px 26px rgba(30,66,90,.14),inset 0 1px 0 rgba(255,255,255,.82);
+/* Desktop keeps the original in-flow action row; only the two buttons dock on mobile. */
+#productOverlay .detail-copy>.detail-actions{position:relative;margin:20px 0 12px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+@media(max-width:760px){
+ #productOverlay .detail-copy>.detail-actions{
+  position:fixed;left:calc(12px + env(safe-area-inset-left));right:calc(12px + env(safe-area-inset-right));
+  bottom:calc(env(safe-area-inset-bottom) + 10px);z-index:180;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;
+  width:auto;max-width:none;margin:0;padding:0;border:0;border-radius:0;
+  background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+ }
+ #productOverlay .detail-copy{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 }
 #productOverlay .detail-actions .detail-purchase-button{
  --sd-action-rgb:126,177,215;--sd-action-border-rgb:116,171,211;
