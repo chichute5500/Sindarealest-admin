@@ -57,7 +57,7 @@ async function main(){
   }
   const ledger=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='d1_migrations'");
   assert.equal(ledger.length,1,"Production migration ledger missing; refusing to infer schema state");
-  const appliedRows=await query("SELECT name FROM d1_migrations WHERE name IN ('0008_product_sku_verification.sql','0018_payment_delivery_settlement.sql','0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql','0022_sepay_payment_gateway.sql','0023_sepay_checkout_intents.sql','"+migration+"')");
+  const appliedRows=await query("SELECT name FROM d1_migrations WHERE name IN ('0018_payment_delivery_settlement.sql','0019_manual_warranties.sql','0020_manual_warranty_contacts.sql','0021_warranty_policy_snapshots.sql','0022_sepay_payment_gateway.sql','0023_sepay_checkout_intents.sql','"+migration+"')");
   const applied=new Set(appliedRows.map(row=>String(row.name)));
   for(const prerequisite of ["0018_payment_delivery_settlement.sql","0019_manual_warranties.sql","0020_manual_warranty_contacts.sql","0021_warranty_policy_snapshots.sql","0022_sepay_payment_gateway.sql","0023_sepay_checkout_intents.sql"])
     assert.ok(applied.has(prerequisite),"Required earlier migration is not recorded: "+prerequisite);
