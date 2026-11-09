@@ -223,7 +223,7 @@ assert.match(html,/\.checkout-drawer \.sd-checkout-footer\{[^}]*border-top:0;bac
 
 
 assert.match(html,/Nhấn vào đây để sao chép mã đơn/,'Order number explains how to copy it');
-assert.match(html,/Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng\./,'Deposit overpayment is explained in plain language');
+assert.doesNotMatch(html,/Nếu đặt cọc và chuyển dư, phần dư sẽ trừ vào số tiền thanh toán khi nhận hàng\./,'Removed deposit surplus note stays absent');
 assert.match(html,/Số tiền thanh toán khi nhận hàng '\+formatVnd\(choice\.codExpected\)/,'Payment choices use clear delivery-payment wording');
 assert.match(html,/id="sdCheckoutDone"[^>]*>Lấy mã đơn/,'When QR is unavailable, order creation still happens only on explicit action');
 assert.match(html,/sd-checkout-success \.sd-checkout-actions\{grid-template-columns:minmax\(0,1fr\)\}/,'Success actions use the full footer width instead of the former narrow left column');

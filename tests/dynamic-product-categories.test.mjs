@@ -146,7 +146,7 @@ assert.ok(detail.indexOf('id="detailVariants"')<detail.indexOf('id="detailAdd"')
 assert.ok(detail.indexOf('id="detailAdd"')<detail.indexOf('id="detailBuyNow"'));
 assert.ok(detail.indexOf('id="detailBuyNow"')<detail.indexOf('class="sd-detail-pledges"'));
 assert.ok(detail.indexOf('class="sd-detail-pledges"')<detail.indexOf('id="detailZalo"'));
-assert.equal((detail.match(/class="sd-detail-pledge"/g)||[]).length,2,'two customer-facing guarantee cards');
+assert.equal((detail.match(/class="sd-detail-pledge"/g)||[]).length,3,'three customer-facing material and warranty cards');
 assert.ok(!detail.includes('id="detailDescription"')&&!detail.includes('class="promise-tags"'),'remove only the redundant description and four chips');
 assert.match(detail, /id="detailAdd"[^>]*>[\\s\\S]*?<svg/);
 assert.match(detail, /id="detailBuyNow"[^>]*>[\\s\\S]*?<svg/);
