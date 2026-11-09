@@ -7,7 +7,7 @@ import {paymentDetailsForOrder} from "../order-payment.js";
 export async function onRequestGet({request,env}){
  const unavailable=dbOrFail(env);if(unavailable)return unavailable;
  const orderNumber=String(new URL(request.url).searchParams.get("orderNumber")||"").trim();
- if(!/^SD-[A-Z0-9-]{8,48}$/.test(orderNumber))return fail("Mã đơn không hợp lệ.",400);
+ if(!/^(?:SD[A-Z0-9]{8,48}|SD-[A-Z0-9-]{8,48})$/.test(orderNumber))return fail("Mã đơn không hợp lệ.",400);
  try {
   const account=await getAccount(env,request);
   if(!account)return fail("Cần đăng nhập để xem thanh toán đơn đã liên kết.",401);

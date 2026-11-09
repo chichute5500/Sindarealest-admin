@@ -27,7 +27,7 @@ export async function onRequestPost({request,env}){
   if(parsed.error||!parsed.value||typeof parsed.value!=="object")return fail("Dữ liệu không hợp lệ.");
   const number=String(parsed.value.orderNumber||"").trim();
   const token=String(parsed.value.orderAccessToken||"").trim();
-  if(!/^SD-[A-Z0-9-]{8,48}$/.test(number)||!/^[a-zA-Z0-9_-]{32,200}$/.test(token))return fail("Mã đơn hoặc mã xác thực không hợp lệ.");
+  if(!/^(?:SD[A-Z0-9]{8,48}|SD-[A-Z0-9-]{8,48})$/.test(number)||!/^[a-zA-Z0-9_-]{32,200}$/.test(token))return fail("Mã đơn hoặc mã xác thực không hợp lệ.");
   const hash=await hashOrderAccessToken(token);
   const order=await env.DB.prepare("SELECT id FROM orders WHERE order_number=? AND public_access_token_hash=?").bind(number,hash).first();
   if(!order?.id)return fail("Không xác thực được quyền sở hữu đơn hàng.",403);

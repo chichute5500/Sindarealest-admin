@@ -74,7 +74,7 @@ assert.equal((await post(stringMonths, { durationMonths: "12" })).status, 201,
 const successDB = makeDB(true);
 const success = await post(successDB);
 assert.equal(success.status, 201, "first warranty issue should succeed");
-assert.match((await success.json()).warrantyCode,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+assert.match((await success.json()).warrantyCode,/^SDW[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
 assert.equal(successDB.calls.batchCount, 1, "warranty insert and audit record must be one atomic batch");
 assert.match(successDB.calls.statements[0].sql, /INSERT INTO warranties[\s\S]*SELECT[\s\S]*WHERE NOT EXISTS \(SELECT 1 FROM warranties WHERE order_item_id=\?\)/,
   "the insert itself must atomically check for an existing warranty for this order item");
@@ -87,7 +87,7 @@ const collisionDB=makeDB(true,{collideFirstCode:true});
 const recovered=await post(collisionDB);
 assert.equal(recovered.status,201,'manual issue regenerates after a D1 code collision');
 assert.equal(collisionDB.calls.batchCount,2,'collision requires a second atomic batch');
-assert.match((await recovered.json()).warrantyCode,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+assert.match((await recovered.json()).warrantyCode,/^SDW[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
 
 const duplicateDB = makeDB(false);
 const duplicate = await post(duplicateDB);
@@ -162,7 +162,7 @@ const manualDB = makeManualDB();
 const manual = await postManual(manualDB);
 assert.equal(manual.status, 201, "manual warranty must be issuable without any order or SKU");
 const manualResult = await manual.json();
-assert.match(manualResult.warrantyCode, /^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+assert.match(manualResult.warrantyCode, /^SDW[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
 assert.equal(manualDB.calls.batchCount, 1, "manual warranty and audit record must be written atomically");
 assert.ok(manualDB.calls.preflightQueries[0].sql.includes("FROM warranties") && manualDB.calls.preflightQueries[0].sql.includes("FROM manual_warranties"),
   "new codes must be preflight-checked against both warranty namespaces");

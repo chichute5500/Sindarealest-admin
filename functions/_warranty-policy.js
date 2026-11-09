@@ -30,11 +30,11 @@ const WARRANTY_CODE_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 
 export function generateShortWarrantyCode() {
   const random = crypto.getRandomValues(new Uint8Array(4));
-  return "SDW-" + Array.from(random, byte => WARRANTY_CODE_ALPHABET[byte & 31]).join("");
+  return "SDW" + Array.from(random, byte => WARRANTY_CODE_ALPHABET[byte & 31]).join("");
 }
 
 export function isWarrantyCode(value) {
-  return /^SDW-(?:[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}|[A-Z0-9]{24})$/i.test(String(value || ""));
+  return /^(?:SDW[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}|SDW-(?:[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}|[A-Z0-9]{24}))$/i.test(String(value || "")) || /^SDW-[A-Z0-9]{24}$/i.test(String(value || ""));
 }
 
 export function isWarrantyCodeCollisionError(error) {

@@ -14,7 +14,7 @@ globalThis.fetch=async url=>{
 
 for (let i=0;i<512;i++){
  const code=generateShortWarrantyCode();
- assert.match(code,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+ assert.match(code,/^SDW[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
  assert.equal(isWarrantyCode(code),true);
 }
 assert.equal(isWarrantyCode('sdw-k7m2'),true,'lower-case user input is valid');

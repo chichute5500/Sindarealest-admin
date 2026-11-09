@@ -116,7 +116,7 @@ for(const [total,months] of [[1_999_999,6],[3_000_000,6],[6_000_000,6],[6_000_00
    assert.equal(w.starts_at,today,'warranty begins at completion date Vietnam');
    assert.equal(w.ends_at,addWarrantyCalendarMonths(today,months));
    assert.equal(w.status,'active');
-   assert.match(w.warranty_code,/^SDW-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
+   assert.match(w.warranty_code,/^SDW[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/);
    assert.equal(isWarrantyCode(w.warranty_code),true);
  }
  assert.equal(f.audits('warranty_issued').length,2);
