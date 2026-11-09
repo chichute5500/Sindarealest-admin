@@ -2449,7 +2449,8 @@ function productVisibilityToggle(p){
  return '<button type="button" class="product-visibility-toggle" data-toggle-published="'+esc(p.id)+'" role="switch" aria-checked="'+active+'" aria-label="'+(active?'Ẩn':'Hiện')+' sản phẩm: '+esc(p.title)+'" title="'+(active?'Đang hiển thị — nhấn để ẩn':'Đang ẩn — nhấn để hiện')+'"><span class="product-visibility-label">'+(active?'Hiện':'Ẩn')+'</span><span class="product-visibility-track" aria-hidden="true"><span class="product-visibility-knob"></span></span></button>';
 }
 function adminProductTier(product){
- const price=Number(product?.price);
+ if(product?.price===null||product?.price===undefined||String(product.price).trim()==='')return '';
+ const price=Number(product.price);
  if(!Number.isFinite(price)||price<0)return '';
  return price>=7000000?'vvip':price>=3500000?'vip':'core';
 }
