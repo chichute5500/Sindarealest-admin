@@ -3508,7 +3508,10 @@ html.dark #productOverlay .detail-price:not([hidden]){color:#f4d5a4}
 .cart-pick{display:grid;place-items:center;align-self:stretch;cursor:pointer}
 .cart-pick input{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
 @media(max-width:760px){.cart-row{grid-template-columns:20px 54px minmax(0,1fr) max-content!important;gap:7px;padding:7px}.cart-row img{width:54px;height:54px}.cart-pick input{width:17px;height:17px}}
-#productOverlay .sd-detail-payment-quote{display:grid;gap:5px;margin:4px 0 12px;padding:12px 14px;border:1px solid transparent;border-radius:14px;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow);font-size:11px;line-height:1.5}
+#productOverlay .sd-detail-payment-quote{display:grid;gap:5px;margin:4px 0 12px;padding:12px 14px;border:1px solid transparent;border-radius:14px;background:var(--sd-3d-surface);box-shadow:var(--sd-3d-shadow);font-size:11px;line-height:1.5;scroll-margin:22px;transform-origin:50% 0}
+#productOverlay .sd-detail-payment-quote.sd-detail-payment-enter{animation:sd-detail-payment-enter .62s cubic-bezier(.16,.9,.23,1) both}
+@keyframes sd-detail-payment-enter{from{opacity:0;transform:translate3d(0,16px,0) scale(.985);filter:blur(3px)}to{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){#productOverlay .sd-detail-payment-quote.sd-detail-payment-enter{animation:none}}
 #productOverlay .sd-detail-payment-quote strong{font-size:12px}
 #productOverlay .sd-detail-payment-quote p{margin:0;color:var(--ink)}
 #productOverlay .sd-detail-payment-quote small{color:var(--muted)}
@@ -4283,7 +4286,7 @@ function renderProductOptions(p){
   field.type='text';field.maxLength=80;field.placeholder=kind==='watch'?'Ví dụ: 20-18':'Ví dụ: iPhone 16 Pro Max';field.autocomplete='off';
   field.id='sdDetailOption';field.className='sd-product-option-control';field.required=true;
   label.htmlFor=field.id;
-  field.addEventListener('input',()=>{msg.textContent='';sdDetailLoadPaymentQuote(p)});
+  field.addEventListener('input',()=>{msg.textContent='';sdDetailPaymentRevealRequested=true;sdDetailLoadPaymentQuote(p)});
   wrap.append(label,field,msg);
   return;
  }
@@ -4302,6 +4305,7 @@ function renderProductOptions(p){
    button.classList.toggle('is-selected',selected);
   });
   msg.textContent='';
+  sdDetailPaymentRevealRequested=true;
   sdDetailLoadPaymentQuote(p);
  };
  values.forEach(value=>{
@@ -4338,7 +4342,7 @@ function renderProductCustomOptions(p){
   const button=document.createElement('button');button.type='button';button.className='sd-product-option-chip';button.dataset.optionValue=value;button.setAttribute('aria-pressed','false');
   if(imagePath){button.classList.add('sd-image-variant-chip');button.style.width='auto';button.style.maxWidth='140px';button.style.aspectRatio='auto';button.style.flex='0 1 132px';button.style.minHeight='58px';button.style.gap='6px';const image=document.createElement('img');image.src=imgPath(imagePath);image.alt='';image.style.width='34px';image.style.height='34px';image.style.objectFit='cover';image.style.borderRadius='6px';button.append(image)}
   const caption=document.createElement('span');caption.textContent=label;button.append(caption);
-  button.addEventListener('click',()=>{const target=imagePath?imageField:field;target.value=value;container.querySelectorAll('button').forEach(item=>{const selected=item.dataset.optionValue===value;item.setAttribute('aria-pressed',String(selected));item.classList.toggle('is-selected',selected)});if(imagePath){const index=allImages(p).indexOf(imagePath);if(index>=0)changeDetailImage(index,true,index>detailIndex?'left':'right')}const message=$('#sdDetailCustomMessage');if(message)message.textContent='';sdDetailLoadPaymentQuote(p)});
+  button.addEventListener('click',()=>{const target=imagePath?imageField:field;target.value=value;container.querySelectorAll('button').forEach(item=>{const selected=item.dataset.optionValue===value;item.setAttribute('aria-pressed',String(selected));item.classList.toggle('is-selected',selected)});if(imagePath){const index=allImages(p).indexOf(imagePath);if(index>=0)changeDetailImage(index,true,index>detailIndex?'left':'right')}else sdDetailPaymentRevealRequested=true;const message=$('#sdDetailCustomMessage');if(message)message.textContent='';sdDetailLoadPaymentQuote(p)});
   container.append(button);
  };
  if(sizes.length){
@@ -5605,7 +5609,14 @@ document.addEventListener('click',async e=>{
 });
 function hasPublicPrice(value){if(value===null||value===undefined||(typeof value==='string'&&!value.trim()))return false;const n=Number(value);return Number.isSafeInteger(n)&&n>=0}
 function hasConfirmedPublicPrice(product){return !!product&&product.sourcePriceConfirmed===true&&hasPublicPrice(product.price)}
-let sdDetailQuoteRequest=0;
+let sdDetailQuoteRequest=0,sdDetailPaymentRevealRequested=false;
+function sdDetailScrollToPaymentQuote(box){
+ const modal=$('#productOverlay .detail-modal');
+ if(!modal||!box?.isConnected)return;
+ const modalRect=modal.getBoundingClientRect(),boxRect=box.getBoundingClientRect();
+ const top=modal.scrollTop+boxRect.top-modalRect.top-Math.max(18,(modal.clientHeight-boxRect.height)*.28);
+ modal.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+}
 async function sdDetailLoadPaymentQuote(product){
  const box=$('#sdDetailPaymentQuote');if(!box)return;const request=++sdDetailQuoteRequest;
  const option=productOptionKind(product)?normalizeProductOption(product,$('#sdDetailOption')?.value):'';
@@ -5638,6 +5649,15 @@ async function sdDetailLoadPaymentQuote(product){
   }
   box.append(choices);
   sdDetailUpdatePaymentChoice();
+  box.classList.remove('sd-detail-payment-enter');
+  requestAnimationFrame(()=>{
+   if(!box.isConnected)return;
+   box.classList.add('sd-detail-payment-enter');
+   if(sdDetailPaymentRevealRequested){
+    sdDetailPaymentRevealRequested=false;
+    requestAnimationFrame(()=>sdDetailScrollToPaymentQuote(box));
+   }
+  });
  }catch{if(request===sdDetailQuoteRequest&&currentProduct===product)box.textContent='Chưa tính được số tiền. Hệ thống sẽ kiểm tra lại khi đặt hàng.'}
 }
 function sdDetailUpdatePaymentChoice(){
