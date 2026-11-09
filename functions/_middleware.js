@@ -267,11 +267,21 @@ export async function onRequest(context) {
     html = meta(html, "twitter:image", `${url.origin}/og-sindarealest-crisp-20261028.jpg`);
     // Structured organization identity is available to crawlers without JS.
     const organizationSchema = JSON.stringify({
-      "@context": "https://schema.org", "@type": "Organization",
+      "@context": "https://schema.org", "@type": ["Organization", "LocalBusiness"],
+      "@id": `${url.origin}/#business`,
       name: "SinDarealest", url: `${url.origin}/`,
-      logo: `${url.origin}/images/brand-emblem.png`
+      logo: `${url.origin}/images/brand-emblem.png`,
+      image: `${url.origin}/og-sindarealest-crisp-20261028.jpg`,
+      telephone: "+84827049192",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Hẻm 48 Võ Trường Toàn",
+        addressLocality: "Đà Lạt",
+        addressRegion: "Lâm Đồng",
+        addressCountry: "VN"
+      }
     });
-    if (!html.includes('"@type":"Organization"')) {
+    if (!html.includes('"@type":"LocalBusiness"') && !html.includes('"@type":["Organization","LocalBusiness"]')) {
       html = html.replace("</head>", `  <script type="application/ld+json">${organizationSchema}</script>\n</head>`);
     }
     // Google site-name: the canonical home root declares one WebSite identity.
@@ -295,6 +305,8 @@ export async function onRequest(context) {
       status: 405, headers: { "Allow": "GET, HEAD", "Cache-Control": "no-store" }
     });
   }
+  if (url.pathname.toLowerCase() === "/sanpham/sneaker/sd-gl062")
+    return Response.redirect(new URL("/sanpham/sneaker/SD-SN113", url.origin), 301);
   const slug = (modernMatch ? modernMatch[2] : legacyMatch[1]).toLowerCase();
   if (!context.env?.DB) return new Response("Dịch vụ dữ liệu chưa sẵn sàng.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
   let product;
@@ -306,12 +318,20 @@ export async function onRequest(context) {
   if (url.pathname !== canonicalPath) return Response.redirect(new URL(canonicalPath, url.origin), 301);
   let images = [];
   try { images = JSON.parse(product.images_json || "[]"); } catch {}
-  const candidateImage = Array.isArray(images) && typeof images[0] === "string" ? images[0] : "";
-  const imagePath = /^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(candidateImage) ? `/${candidateImage}` : /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(candidateImage) ? candidateImage : "/og-sindarealest-crisp-20261028.jpg";
+  const sourceImage = Array.isArray(images) ? images.find(value =>
+    typeof value === "string" && (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(value)
+      || /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(value))) : "";
+  const productImagePath = sourceImage ? (sourceImage.startsWith("/") ? sourceImage : `/${sourceImage}`) : "/images/theme-croc-dark.webp";
+  const imagePath = "/og-sindarealest-crisp-20261028.jpg";
   const canonical = `${url.origin}${canonicalPath}`;
-  let title = `${product.title} | SinDarealest`;
+  const verifiedSku = isVerifiedCommercialSku(product) ? String(product.sku).trim() : "";
+  let title = `${product.title}${verifiedSku ? ` – ${verifiedSku}` : ""} | SinDarealest`;
   const descriptionBase = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim();
-  let description = (isVerifiedCommercialSku(product) ? `${descriptionBase.slice(0, 250)} · SKU: ${product.sku}` : descriptionBase).slice(0, 300);
+  const productCategoryName = String(product.category_label || "Thời trang da cá sấu").trim();
+  const productPriceLine = Number(product.source_price_confirmed) === 1 && Number.isFinite(Number(product.price)) && Number(product.price) > 0
+    ? ` Giá ${new Intl.NumberFormat("vi-VN").format(Number(product.price))}đ.` : " Liên hệ Zalo để nhận báo giá.";
+  let description = `${product.title} – ${productCategoryName} da cá sấu thật.${productPriceLine} ${descriptionBase}`.slice(0, 300);
+  if (verifiedSku) description = `${description.slice(0, 250)} · Mã ${verifiedSku}`.slice(0,300);
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();
@@ -322,7 +342,7 @@ export async function onRequest(context) {
   if (productSeo?.heading && /da cá sấu/i.test(productSeo.heading)) {
     const productName = String(product.title || "").trim();
     if (productName.length <= 48 && !/cá sấu/i.test(productName))
-      title = productName + " – " + productSeo.heading + " | SinDarealest";
+      title = productName + " – " + productSeo.heading + (verifiedSku ? " – " + verifiedSku : "") + " | SinDarealest";
     if (description.length <= 145 && !/cá sấu/i.test(description))
       description = (description + " Khám phá " + productSeo.heading + " tại SinDarealest.").slice(0,270);
   }
@@ -335,11 +355,7 @@ export async function onRequest(context) {
   html = meta(html, "og:url", canonical, true);
   html = meta(html, "og:image", new URL(imagePath, url.origin).href, true);
   html = meta(html, "og:image:secure_url", new URL(imagePath, url.origin).href, true);
-  html = meta(html, "og:image:type", imagePath.toLowerCase().endsWith(".webp") ? "image/webp" : "image/jpeg", true);
-  if (imagePath.toLowerCase().endsWith(".webp")) {
-    // The product's original WebP dimensions are not the homepage OG dimensions.
-    html = html.replace(/<meta\\s+property=["']og:image:(?:width|height)["'][^>]*>\\s*/gi, "");
-  }
+  html = meta(html, "og:image:type", "image/jpeg", true);
   html = meta(html, "og:image:alt", product.title, true);
   html = meta(html, "twitter:card", "summary_large_image");
   html = meta(html, "twitter:title", title);
@@ -363,17 +379,31 @@ export async function onRequest(context) {
     { name: categoryLabels[categorySlug] || String(product.category || "Danh mục"), path: "/sanpham/" + categorySlug },
     { name: product.title, path: canonicalPath }
   ]);
-  // No publicly verified Offer, customer review, or aggregate rating is
-  // available here. Declaring Product without one of these causes a Google
-  // product-snippet error. Keep a truthful indexable WebPage schema instead
-  // of inventing a price, inventory status, rating or review.
-  const schema = JSON.stringify({
-    "@context": "https://schema.org", "@type": "WebPage",
-    name: title, description, url: canonical,
-    primaryImageOfPage: new URL(imagePath, url.origin).href,
-    publisher: { "@type": "Organization", name: "SinDarealest" }
-  }).replace(/<\//g, "<\\/");
+  const hasPublicOffer = Number(product.source_price_confirmed) === 1
+    && Number.isFinite(Number(product.price)) && Number(product.price) > 0;
+  const productSchema = {
+    "@context": "https://schema.org", "@type": "Product",
+    name: product.title,
+    description,
+    image: new URL(productImagePath, url.origin).href,
+    url: canonical,
+    category: product.category_label || String(product.category || ""),
+    brand: { "@type": "Brand", name: "SinDarealest" },
+    ...(verifiedSku ? { sku: verifiedSku } : {}),
+    ...(hasPublicOffer ? { offers: {
+      "@type": "Offer", url: canonical, priceCurrency: "VND",
+      price: Number(product.price),
+      seller: { "@id": `${url.origin}/#business` }
+    } } : {})
+  };
+  const schema = JSON.stringify(productSchema).replace(/</g, "\\u003c");
   html = html.replace("</head>", `  <script type="application/ld+json">${schema}</script>\n</head>`);
+  const noJsPrice = hasPublicOffer
+    ? `<p><strong>Giá:</strong> ${escapeHtml(new Intl.NumberFormat("vi-VN").format(Number(product.price)))}₫</p>` : "";
+  const noJsQuote = hasPublicOffer ? "" : '<p>Liên hệ Zalo để nhận báo giá.</p>';
+  const noJsImageAlt = `${product.category_label || product.category || "Sản phẩm"} da cá sấu thật${verifiedSku ? `, mã ${verifiedSku}` : ""}`;
+  const noJsSummary = `<noscript><main class="sd-product-nojs"><h1>${escapeHtml(product.title)}</h1><img src="${escapeHtml(productImagePath)}" alt="${escapeHtml(noJsImageAlt)}"><p><strong>Danh mục:</strong> ${escapeHtml(product.category_label || product.category || "Sản phẩm da cá sấu")}</p>${verifiedSku ? `<p><strong>Mã sản phẩm:</strong> ${escapeHtml(verifiedSku)}</p>` : ""}${noJsPrice}${noJsQuote}<p>${escapeHtml(product.description || description)}</p></main></noscript>`;
+  html = html.replace(/<body([^>]*)>/i, `$&${noJsSummary}`);
   const headers = new Headers(response.headers);
   headers.set("Content-Type", "text/html; charset=utf-8");
   headers.set("Cache-Control", "public, max-age=60, s-maxage=300"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");

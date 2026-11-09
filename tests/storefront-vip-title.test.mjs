@@ -33,5 +33,6 @@ assert.match(html,/@keyframes sd-vvip-twinkle/);
 assert.ok((html.match(/productTitleWithTier/g)||[]).length>=9,"Catalog, details, cart, favorites, checkout, and order history must render the tier helper");
 assert.doesNotMatch(html,/productTitleWithVip|sd-vip-word/,"Legacy red VIP rendering must be removed");
 assert.match(html,/document\.title=displayProductName/,"SEO title remains plain text");
-assert.match(html,/img\.alt=displayProductName/,"Image alt text remains plain text");
+assert.match(html,/function productImageAlt\(p,index=null\)/,"Product images use descriptive plain-text alt copy rather than repeating the adjacent product title");
+assert.match(html,/alt="\$\{escapeHtml\(productImageAlt\(p\)\)\}"/,"Product-card image alt text uses the descriptive image helper");
 console.log("PASS: CORE/VIP/VVIP price bands, title cleanup, VIP flare and full-badge VVIP sparkles.");

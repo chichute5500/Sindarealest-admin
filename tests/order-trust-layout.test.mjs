@@ -28,14 +28,14 @@ assert.match(grid, /hàng đặt riêng cọc <strong>30%<\/strong>/,
   'Made-to-order 30% deposit must remain visible.');
 assert.match(grid, /5–20 ngày/,
   'The estimated production time must remain visible.');
-assert.match(grid, /bảo hành <strong>6–12 tháng<\/strong>/, 'Order overview must not promise a fixed year of coverage.');
+assert.match(grid, /bảo hành <strong>6 tháng<\/strong> với sản phẩm giá đến 3 triệu đồng và <strong>12 tháng<\/strong> với sản phẩm trên 3 triệu đồng/, 'Order overview must show the exact warranty threshold.');
 assert.doesNotMatch(grid, /bảo hành <strong>1 năm<\/strong>/);
 assert.doesNotMatch(grid, /order-zalo-cta|zalo\.me\//,
   'Zalo must not be represented as a fifth process step.');
 
 assert.match(section, /class="order-assurance-footer glass"/,
   'A compact commitment and contact footer must follow the four-step grid.');
-assert.match(section, /Cam kết hậu mãi[\s\S]*?Bảo hành 6–12 tháng[\s\S]*?Bảo dưỡng trọn đời[\s\S]*?Hoàn thiện thủ công/,
+assert.match(section, /Cam kết hậu mãi[\s\S]*?Bảo hành 6 tháng đến 3 triệu đồng, 12 tháng trên 3 triệu đồng[\s\S]*?Bảo dưỡng trọn đời[\s\S]*?Hoàn thiện thủ công/,
   'The compact footer must retain the supplied brand commitments.');
 assert.match(section, /href="https:\/\/zalo\.me\/0827049192"[^>]*aria-label="Tư vấn hoặc đặt hàng qua Zalo"/,
   'The standalone Zalo CTA must use the confirmed contact URL and accessible label.');
@@ -49,7 +49,7 @@ assert.equal((productPledges.match(/class="sd-detail-pledge"/g)||[]).length,3,'t
 assert.match(productPledges,/Da cá sấu thật 100%/);
 assert.match(productPledges,/đền bù gấp 10 lần giá trị sản phẩm/);
 assert.match(productPledges,/Vân da độc bản/);
-assert.match(productPledges,/không có hai sản phẩm giống hệt 100%/);
+assert.match(productPledges,/mỗi sản phẩm có hoa văn riêng và không thể giống hệt sản phẩm khác/);
 assert.match(productPledges,/id="detailWarrantyTerm"/);
 assert.match(productPledges,/Được bảo hành:/);
 assert.match(productPledges,/Không được bảo hành:.*va đập/);

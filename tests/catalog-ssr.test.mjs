@@ -19,6 +19,8 @@ assert.ok(full.includes('id="catalogGrid"><article'),'Catalog visible with JS di
 assert.ok(full.includes('class="product-card-footer" aria-hidden="true"'),'SSR must reserve the same product-card footer height before catalog hydration');
 assert.ok(full.includes('class="product-card-bottom"'),'SSR footer must follow hydrated product-card layout');
 assert.ok(full.includes('class="photo-shade"'),'SSR photo should share hydrated image overlay geometry');
+assert.ok(full.includes('alt="giày thể thao da cá sấu thật, mã SD-SN001"'),
+  'Product image alt text describes its category and verified SKU without repeating the adjacent title');
 assert.match(full,/id="catalogGrid"><article[^]*?loading="lazy"/,
   "Homepage catalog below the fold must not eagerly fetch product photographs");
 
@@ -100,6 +102,32 @@ const ctx={
 const response=await middleware(ctx);
 assert.equal(response.status,200);
 assert.ok((await response.text()).includes('id="catalogGrid"><article'),'Middleware must compose SSR into catalog');
+const homeHtml=await (await middleware({...ctx,request:new Request(origin+'/')})).text();
+assert.ok(homeHtml.includes('"@type":["Organization","LocalBusiness"]'),'Home JSON-LD keeps Organization identity and publishes LocalBusiness details');
+assert.ok(homeHtml.includes('"streetAddress":"Hẻm 48 Võ Trường Toàn"'),'LocalBusiness address comes from the visible site address');
+const product={id:'shoe-113',slug:'shoe-113',sku:'SD-SN113',sku_verified:1,title:'Giày Thể Thao Da Cá Sấu Mẫu #113',category:'sneakers',category_label:'Giày thể thao',description:'Giày thể thao da cá sấu thật, chế tác theo yêu cầu.',price:9500000,source_price_confirmed:1,published:1,images_json:'["images/test-image.webp"]'};
+const productDb={prepare(sql){assert.ok(sql.startsWith('SELECT '),'Product route must remain read-only');return {bind(){return {first:async()=>product}}}}};
+const productResponse=await middleware({request:new Request(origin+'/sanpham/sneaker/SD-SN113'),env:{DB:productDb},next:async()=>new Response(shell,{headers:{'Content-Type':'text/html'}})});
+assert.equal(productResponse.status,200);
+const productHtml=await productResponse.text();
+assert.ok(productHtml.includes('<title>Giày Thể Thao Da Cá Sấu Mẫu #113 – SD-SN113 | SinDarealest</title>'));
+assert.ok(productHtml.includes('property="og:image:type" content="image/jpeg"'));
+assert.ok(productHtml.includes('property="og:image" content="https://shop.example/og-sindarealest-crisp-20261028.jpg"'));
+assert.ok(productHtml.includes('class="sd-product-nojs"'),'Direct product route contains an SSR description without JavaScript');
+assert.ok(productHtml.includes('alt="Giày thể thao da cá sấu thật, mã SD-SN113"'));
+const productJson=productHtml.match(/<script type="application\/ld\+json">([^<]+)<\/script>/g)?.at(-1)?.match(/>([^<]+)</)?.[1];
+const productLd=JSON.parse(productJson);
+assert.equal(productLd['@type'],'Product');
+assert.equal(productLd.sku,'SD-SN113');
+assert.equal(productLd.offers.price,9500000);
+assert.equal(productLd.offers.priceCurrency,'VND');
+const legacySkuResponse=await middleware({request:new Request(origin+'/sanpham/sneaker/SD-GL062'),env:{},next:async()=>{throw Error('Legacy SKU must redirect before reading D1')}});
+assert.equal(legacySkuResponse.status,301);
+assert.equal(legacySkuResponse.headers.get('Location'),origin+'/sanpham/sneaker/SD-SN113');
+const unpricedResponse=await middleware({request:new Request(origin+'/sanpham/sneaker/SD-SN113'),env:{DB:{prepare(){return {bind(){return {first:async()=>({...product,source_price_confirmed:0,price:null})}}}}}},next:async()=>new Response(shell,{headers:{'Content-Type':'text/html'}})});
+const unpricedHtml=await unpricedResponse.text();
+assert.ok(unpricedHtml.includes('Liên hệ Zalo để nhận báo giá.'),'Unpriced products expose a clear quote path without inventing a public price');
+assert.doesNotMatch(unpricedHtml,/<meta property="product:price:amount"/);
 // Protect the initial catalog hydration path against double render and
 // lost first-viewport SSR image nodes. Browser-level Lighthouse remains the
 // authority for LCP/CLS; these tests lock the source-level regression.

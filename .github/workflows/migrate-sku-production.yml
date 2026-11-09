@@ -1,0 +1,52 @@
+name: Correct sneaker SKU in Production D1
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type APPLY-SKU-0024-TO-sindarealest-db to authorize this exact correction
+        required: true
+        type: string
+      operation:
+        description: Run the read-only preflight first; apply only after it passes
+        required: true
+        type: choice
+        options:
+          - preflight
+          - apply
+        default: preflight
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-d1-sku-correction
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: github.repository == 'chichute5500/Sindarealest-admin' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SKU_MIGRATION_CONFIRMATION: ${{ inputs.confirmation }}
+      SKU_MIGRATION_OPERATION: ${{ inputs.operation }}
+    steps:
+      - name: Check out exact main source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install repository dependencies
+        run: npm install --no-fund --no-package-lock
+
+      - name: Validate source and migrations
+        run: npm run check
+
+      - name: Guard Production target and correct one SKU
+        run: node scripts/migrate-sku-production.mjs

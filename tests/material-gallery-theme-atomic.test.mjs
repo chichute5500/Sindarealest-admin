@@ -40,7 +40,8 @@ test('User-selected theme interstitial covers palette changes without redesignin
  assert.doesNotMatch(page,/sessionStorage\.getItem\('sd-theme-overlay-seen'\)/,'No single-use animation gate');
  assert.match(page,/if\(typeof window\.__sdCancelThemeStage==='function'\|\|now-sdLastManualThemeToggleAt<950\)return/,'Rapid toggles cannot interrupt the active scene or spam changes');
  assert.match(page,/id="sdThemeSwitchOverlay"/);
- assert.match(page,/Đang đổi giao diện/);
+ assert.match(page,/Đang chuyển giao diện/,'The theme interstitial uses natural Vietnamese copy.');
+ assert.doesNotMatch(page,/Đang đổi giao diện\s*[–—-]\s*Một trải nghiệm tinh tế hơn/,'The unfinished legacy theme slogan must stay removed.');
  assert.match(page,/const durationMs=200,minimumCoveredAfterCommitMs=0/);
  assert.match(page,/root\.classList\.remove\('sd-theme-repaint-isolated'\)/);
  assert.match(page,/if\(mobileThemeGuard\)root\.classList\.add\('sd-theme-repaint-isolated'\)/);
