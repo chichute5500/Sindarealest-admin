@@ -7,6 +7,7 @@ const validImage = x => typeof x === "string" &&
   (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) ||
    /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x));
 const typeLabels={in_stock:"Hàng có sẵn",made_to_order:"Hàng đặt riêng",unclassified:"Liên hệ tư vấn"};
+const categoryAltLabels={sneakers:"giày thể thao",loafers:"giày lười","dress-shoes":"giày tây",belts:"thắt lưng",sandals:"dép","watch-straps":"dây đồng hồ","phone-cases":"ốp điện thoại"};
 function imageFor(row){
   let items=[];
   try{items=JSON.parse(row.images_json||"[]")}catch{}
@@ -20,6 +21,7 @@ function productCards(rows,origin,{eager=false,deferAll=false}={}){
     const label=typeLabels[p.fulfillment_type]||typeLabels.unclassified;
     const image=imageFor(p),title=String(p.title).trim();
     const sku=Number(p.sku_verified)===1 ? String(p.sku||"") : "";
+    const imageAlt=`${categoryAltLabels[p.category]||p.category_label||p.category||"sản phẩm"} da cá sấu thật${sku?`, mã ${sku}`:""}`;
     const type=Object.hasOwn(typeLabels,p.fulfillment_type)?p.fulfillment_type:"unclassified";
     // Reserve the same media, information and 28px cart-footer geometry as
     // client productCard(). A shorter SSR-only layout causes a measurable
@@ -31,9 +33,9 @@ function productCards(rows,origin,{eager=false,deferAll=false}={}){
     // intersection observer, while no-JS visitors keep real image fallbacks.
     const defer=deferAll||(eager&&i>=2);
     const img=defer
-      ?'<img class="sd-ssr-deferred-img" data-src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async" style="visibility:hidden">'+
-       '<noscript><img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async"></noscript>'
-      :'<img src="'+h(image)+'" alt="'+h(title)+'" width="480" height="440" loading="'+(eager&&i<2?"eager":"lazy")+'" '+(i<2&&eager?'fetchpriority="high" ':'fetchpriority="low" ')+'decoding="async">';
+      ?'<img class="sd-ssr-deferred-img" data-src="'+h(image)+'" alt="'+h(imageAlt)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async" style="visibility:hidden">'+
+       '<noscript><img src="'+h(image)+'" alt="'+h(imageAlt)+'" width="480" height="440" loading="lazy" fetchpriority="low" decoding="async"></noscript>'
+      :'<img src="'+h(image)+'" alt="'+h(imageAlt)+'" width="480" height="440" loading="'+(eager&&i<2?"eager":"lazy")+'" '+(i<2&&eager?'fetchpriority="high" ':'fetchpriority="low" ')+'decoding="async">';
     return '<article class="product-card sd-server-rendered" data-ssr-product="'+h(p.id)+'">'+
      '<a class="product-open" href="'+h(href)+'" aria-label="Xem chi tiết '+h(title)+'">'+
      '<span class="product-photo">'+img+'<span class="photo-shade"></span></span>'+
@@ -65,7 +67,7 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
   if(categorySlug&&!validCategory.length)return html;
   try{
     const pageNumber=Number.isInteger(page)&&page>=1&&page<=250?page:1;
-    let sql="SELECT id,slug,sku,sku_verified,title,category,images_json,fulfillment_type FROM products WHERE published=1";
+    let sql="SELECT id,slug,sku,sku_verified,title,category,category_label,images_json,fulfillment_type FROM products WHERE published=1";
     const args=validCategory||[];
     if(categorySlug)sql+=" AND category IN ("+args.map(()=>"?").join(",")+")";
     // One bounded query per catalog page: eight cards plus one lookahead.

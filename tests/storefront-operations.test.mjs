@@ -85,11 +85,12 @@ assert.equal(legacyResponse.headers.get('Location'),'https://shop.example/sanpha
 response = await seoMiddleware({ request:new Request('https://shop.example/sanpham/sneaker/SD-SN001'), env:{DB:seoDB}, next:async (request)=>{assert.equal(new URL(request.url).pathname,'/index.html');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}})} });
 text = await response.text();
 assert.equal(response.status,200);
-assert.ok(text.includes('<title>Giày thử | SinDarealest</title>'));
-assert.ok(text.includes('og:title" content="Giày thử | SinDarealest'));
+assert.ok(text.includes('<title>Giày thử – SD-SN001 | SinDarealest</title>'));
+assert.ok(text.includes('og:title" content="Giày thử – SD-SN001 | SinDarealest'));
 assert.ok(text.includes('og:url" content="https://shop.example/sanpham/sneaker/SD-SN001'));
-assert.ok(text.includes('og:image" content="https://shop.example/images/example.webp'));
-assert.ok(text.includes('og:description" content="Mô tả giày · SKU: SD-SN001'), 'Product social preview should include the explicitly verified SKU even when descriptions are long');
+assert.ok(text.includes('og:image" content="https://shop.example/og-sindarealest-crisp-20261028.jpg'));
+assert.ok(text.includes('og:image:type" content="image/jpeg'));
+assert.ok(text.includes('og:description" content="Giày thử – Sneaker da cá sấu thật. Liên hệ Zalo để nhận báo giá. Mô tả giày · Mã SD-SN001'), 'Product social preview should use unique product copy and include its verified SKU');
 assert.match(text,/application\/ld\+json/);
 
 response = await createOrder({request:new Request('https://shop.example/api/orders',{method:'POST',headers:{Origin:'https://evil.example','Content-Type':'application/json'},body:'{}'}),env:{}});
