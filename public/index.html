@@ -5292,7 +5292,10 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  const target=activeCartFlightTarget();
  if(!target)return false;
  let sourceRect=sourceElement.getBoundingClientRect();
- const sourceVisible=sourceRect.top>=8&&sourceRect.left>=8&&sourceRect.bottom<=window.innerHeight-8&&sourceRect.right<=window.innerWidth-8;
+ const visibleWidth=Math.max(0,Math.min(sourceRect.right,window.innerWidth)-Math.max(sourceRect.left,0));
+ const visibleHeight=Math.max(0,Math.min(sourceRect.bottom,window.innerHeight)-Math.max(sourceRect.top,0));
+ const visibleRatio=sourceRect.width>0&&sourceRect.height>0?visibleWidth*visibleHeight/(sourceRect.width*sourceRect.height):0;
+ const sourceVisible=visibleRatio>=.55;
  if(!sourceVisible&&window.innerWidth<=760&&fallbackAnchor?.isConnected){
   const icon=fallbackAnchor.querySelector('svg'),anchorRect=(icon||fallbackAnchor).getBoundingClientRect();
   const size=Math.min(36,Math.max(28,anchorRect.height*1.45));
