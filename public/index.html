@@ -339,8 +339,8 @@ img{display:block;max-width:100%}button,input{font:inherit}button{color:inherit;
  box-sizing:border-box;display:block;width:100%;height:100%;
  margin:0!important;pointer-events:none!important;
  transform:none!important;transition:none!important;animation:none!important;
- backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-radius:16px!important;
- box-shadow:0 15px 34px rgba(7,28,47,.24),0 0 0 1px rgba(165,210,240,.38)!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-radius:14px!important;
+ box-shadow:0 9px 22px rgba(7,28,47,.20),0 0 0 1px rgba(165,210,240,.52),inset 0 1px 0 rgba(255,255,255,.38)!important;
 }
 .sd-fly-to-cart-snapshot *{pointer-events:none!important;transition:none!important;animation:none!important}
 @media(prefers-reduced-motion:reduce){.sd-fly-to-cart-clone{display:none!important}}
@@ -5235,6 +5235,9 @@ function cartFlightTargetRect(target){
  if(savedStyle===null)measureNode.removeAttribute('style');else measureNode.setAttribute('style',savedStyle);
  return rect;
 }
+function cartFlightDestinationRect(target){
+ return cartFlightTargetRect(target?.querySelector('svg')||target);
+}
 function selectedCartSourceImage(button){
  if(!button)return null;
  const fullscreen=button.closest('#sdFullscreenViewer');
@@ -5289,13 +5292,13 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  const target=activeCartFlightTarget();
  if(!target)return false;
  let sourceRect=sourceElement.getBoundingClientRect();
- const sourceVisible=sourceRect.bottom>8&&sourceRect.top<window.innerHeight-8&&sourceRect.right>8&&sourceRect.left<window.innerWidth-8;
+ const sourceVisible=sourceRect.top>=8&&sourceRect.left>=8&&sourceRect.bottom<=window.innerHeight-8&&sourceRect.right<=window.innerWidth-8;
  if(!sourceVisible&&window.innerWidth<=760&&fallbackAnchor?.isConnected){
   const icon=fallbackAnchor.querySelector('svg'),anchorRect=(icon||fallbackAnchor).getBoundingClientRect();
-  const size=Math.min(40,Math.max(32,anchorRect.height*1.7));
+  const size=Math.min(36,Math.max(28,anchorRect.height*1.45));
   sourceRect={left:anchorRect.left+anchorRect.width/2-size/2,top:anchorRect.top+anchorRect.height/2-size/2,width:size,height:size};
  }
- const destRect=cartFlightTargetRect(target);
+ const destRect=cartFlightDestinationRect(target);
  if(sourceRect.width<12||sourceRect.height<12||destRect.width<10||destRect.height<10)return false;
  if(activeCartFlight){activeCartFlight.cancel();activeCartFlight=null}
  const snapshot=sourceElement.cloneNode(true);
@@ -5325,7 +5328,7 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  clone.appendChild(snapshot);document.body.appendChild(clone);
  const centerX=sourceRect.left+sourceRect.width/2,centerY=sourceRect.top+sourceRect.height/2;
  const duration=1250,distance=Math.hypot(destRect.left+destRect.width/2-centerX,destRect.top+destRect.height/2-centerY);
- const arc=Math.min(72,Math.max(22,distance*.072)),targetScale=Math.max(.075,Math.min(.62,28/Math.max(sourceRect.width,sourceRect.height))),started=performance.now();
+ const arc=Math.min(72,Math.max(22,distance*.072)),targetScale=Math.max(.06,Math.min(.62,Math.min(destRect.width,destRect.height)*1.12/Math.max(sourceRect.width,sourceRect.height))),started=performance.now();
  let frame=0,done=false;
  const cleanup=confirm=>{
   if(done)return;done=true;if(frame)window.cancelAnimationFrame(frame);
@@ -5339,13 +5342,14 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
   if(cartMotionReduced()||document.hidden||!sourceElement.isConnected){cleanup(true);return}
   const live=activeCartFlightTarget();
   if(!live){cleanup(true);return}
-  const rect=cartFlightTargetRect(live),raw=Math.max(0,Math.min(1,(now-started)/duration));
+  const rect=cartFlightDestinationRect(live),raw=Math.max(0,Math.min(1,(now-started)/duration));
   const eased=raw*raw*(3-2*raw);
   const dx=(rect.left+rect.width/2-centerX)*eased;
   const dy=(rect.top+rect.height/2-centerY)*eased-Math.sin(Math.PI*raw)*arc;
   const scale=1-(1-targetScale)*eased,opacity=raw<.78?1:1-((raw-.78)/.22);
   clone.dataset.flightProgress=raw.toFixed(3);clone.dataset.cartTargetId=live.id;
-  clone.style.transform='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+scale.toFixed(3)+')';
+  const tilt=Math.sin(Math.PI*raw)*-2.8;
+  clone.style.transform='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) rotate('+tilt.toFixed(2)+'deg) scale('+scale.toFixed(3)+')';
   clone.style.opacity=opacity.toFixed(3);
   if(raw<1)frame=window.requestAnimationFrame(tick);else cleanup(true);
  };
