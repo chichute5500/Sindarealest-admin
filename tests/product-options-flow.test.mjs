@@ -170,7 +170,7 @@ try {
  assert.ok(html.includes('function sdCheckoutItems(){return checkoutItemsOverride?'));
  assert.ok(html.includes('selectedCartEntries().map'));
  assert.ok(html.includes('const items=sdCheckoutItems();if(!items.length)'));
- assert.ok(html.includes('selectedDetailOption(currentProduct)'));
+ assert.ok(html.includes('selectedDetailOption(product)'));
  assert.match(html,/data-cart-select/);
  assert.ok(html.includes('#productOverlay .detail-variants:not([hidden])'));
  assert.match(html,/#productOverlay \.sd-product-option-chip\.is-selected\{[^}]*border-color:rgba\(21,134,96,\.82\)/,'Selected size has visible green outline');
