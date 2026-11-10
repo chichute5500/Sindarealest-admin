@@ -5370,8 +5370,10 @@ function addToCartFromControl(id,button){
  const source=button?.closest('.product-card')||selectedCartSourceImage(button);
  const added=addToCart(id,option,sizeOption,imageVariant);
  if(!added)return false;
- try{if(!flyProductCardToCart(source,id,fromDetail?button:null))confirmCartTargets()}
+ let flightStarted=false;
+ try{flightStarted=flyProductCardToCart(source,id,fromDetail?button:null);if(!flightStarted)confirmCartTargets()}
  catch(error){confirmCartTargets()}
+ if(fromDetail&&flightStarted)dismissToast();
  if(fromDetail)closeDetailAfterCartAdd();
  return true;
 }
