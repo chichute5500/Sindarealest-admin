@@ -5225,13 +5225,14 @@ let cartFeedbackTimer=0;
 function cartMotionReduced(){return !!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}
 function cartFlightTargetRect(target){
  if(!target)return null;
- if(getComputedStyle(target).display!=='none')return target.getBoundingClientRect();
- const savedStyle=target.getAttribute('style');
- target.style.setProperty('display','grid','important');
- target.style.setProperty('visibility','hidden','important');
- target.style.setProperty('opacity','0','important');
+ const measureNode=target.closest('#mobileBottomNav')||target;
+ if(getComputedStyle(measureNode).display!=='none')return target.getBoundingClientRect();
+ const savedStyle=measureNode.getAttribute('style');
+ measureNode.style.setProperty('display','grid','important');
+ measureNode.style.setProperty('visibility','hidden','important');
+ measureNode.style.setProperty('opacity','0','important');
  const rect=target.getBoundingClientRect();
- if(savedStyle===null)target.removeAttribute('style');else target.setAttribute('style',savedStyle);
+ if(savedStyle===null)measureNode.removeAttribute('style');else measureNode.setAttribute('style',savedStyle);
  return rect;
 }
 function selectedCartSourceImage(button){
