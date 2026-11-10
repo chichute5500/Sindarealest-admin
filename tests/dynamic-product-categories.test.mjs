@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 3291)
-Total output lines: 166
-
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
@@ -83,7 +80,25 @@ const featuredEnd=html.indexOf("\nfunction changeFeaturedImage(",featuredStart);
 assert.ok(shuffleStart>=0&&shuffleEnd>shuffleStart&&filterStart>=0&&filterEnd>filterStart&&featuredStart>=0&&featuredEnd>featuredStart);
 const snippets=html.slice(shuffleStart,shuffleEnd)+"\n"+html.slice(filterStart,filterEnd)+"\n"+html.slice(featuredStart,featuredEnd);
 const featuredBox={innerHTML:''},searchBox={value:''};
-const deterministicMath=Object.create(Math);deterministicMath.random=()=…291 tokens truncated…eCatalog.map(p=>p.id).join('|'),
+const deterministicMath=Object.create(Math);deterministicMath.random=()=>0;
+const productCtx={
+ products:sampleCatalog,categoryOrder:ctx.categoryOrder,canonicalCategoryKey:ctx.canonicalCategoryKey,routeSlug:productCategoryRouteSlug,
+ $:s=>s==='#catalogSearch'?searchBox:s==='#featuredGrid'?featuredBox:null,
+ visibleSku:p=>p.sku||'',foldSearch:v=>String(v||'').toLocaleLowerCase('vi'),
+ unbindReveal(){},bindReveal(){},setupFeaturedAutoplay(){},
+ featuredProductCard:p=>'<article data-featured-card data-product="'+p.id+'"></article>',
+ Math:deterministicMath
+};
+const result=runInNewContext(snippets+`
+const first=getFiltered().map(p=>p.id);
+const second=getFiltered().map(p=>p.id);
+renderFeatured();
+({first,second,filtered:getFiltered().map(p=>p.id),randomized:orderedSessionProducts().map(p=>p.id)})
+`,productCtx,{timeout:1000});
+assert.equal(result.first.join('|'),result.second.join('|'),'Paging and rerendering must keep order stable within session');
+assert.equal(result.first.length,sampleCatalog.length);
+assert.equal(JSON.stringify(result.first.slice(0,4)),JSON.stringify(['sn-11','gt-1','tl-1','op-1']),'All starts with the newest sneaker, dress shoe, belt and phone case');
+assert.notEqual(result.randomized.join('|'),sampleCatalog.map(p=>p.id).join('|'),
  'Shuffle must genuinely randomize order rather than retain raw D1 order');
 assert.equal((featuredBox.innerHTML.match(/data-featured-card/g)||[]).length,4,
  'Featured section must have exactly four real products');
