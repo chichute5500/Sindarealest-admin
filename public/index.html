@@ -320,11 +320,11 @@ img{display:block;max-width:100%}button,input{font:inherit}button{color:inherit;
 /* Product detail modal and cart drawer */
 .overlay{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}.overlay.open{display:flex;animation:overlayIn .28s ease both}@keyframes overlayIn{from{opacity:0}to{opacity:1}}.detail-modal{position:relative;width:min(1000px,100%);max-height:min(90dvh,850px);overflow:auto;border-radius:24px;border:1px solid var(--line);background:var(--page);color:var(--ink);box-shadow:0 25px 100px rgba(0,0,0,.35)}.close-btn{position:sticky;top:10px;float:right;z-index:3;margin:10px 10px -44px 0;width:35px;height:35px;border-radius:50%;border:1px solid var(--line);background:var(--nav-bg);backdrop-filter:blur(15px);font-size:20px}.detail-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;padding:20px}.detail-gallery{min-width:0}.detail-main-image{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:17px;border:1px solid var(--line);background:var(--panel)}.detail-thumbs{display:flex;gap:7px;overflow:auto;padding:9px 0}.detail-thumb{width:62px;height:62px;flex-shrink:0;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:9px;background:var(--glass)}.detail-thumb.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(133,190,232,.25)}.detail-thumb img{width:100%;height:100%;object-fit:cover}.detail-copy{align-self:center;padding:12px 6px 12px 0}.detail-copy h2{font:400 clamp(26px,4vw,39px)/1.1 SD Serif,Georgia,serif;letter-spacing:-.04em;margin:9px 0 13px}.detail-desc{font-size:11px;line-height:1.9;color:var(--muted)}.detail-copy .promise-tags{grid-template-columns:repeat(2,minmax(0,1fr));margin:17px 0}.detail-copy .promise-tag{font-size:8px;min-height:37px}.detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:19px}.detail-actions .pill-btn{min-width:0;padding:10px 12px;font-size:9px}
 @media(max-width:760px){
- .overlay.sd-detail-cart-closing{animation:sd-detail-cart-overlay-out .64s cubic-bezier(.4,0,.2,1) both}
- #productOverlay.sd-detail-cart-closing .detail-modal{animation:sd-detail-cart-sheet-out .64s cubic-bezier(.4,0,.2,1) 80ms both;transform-origin:50% 52%;will-change:transform,opacity}
+ .overlay.sd-detail-cart-closing{animation:sd-detail-cart-overlay-out .72s cubic-bezier(.22,.61,.36,1) both}
+ #productOverlay.sd-detail-cart-closing .detail-modal{animation:sd-detail-cart-sheet-out .72s cubic-bezier(.22,.61,.36,1) both;transform-origin:50% 52%;will-change:transform,opacity}
 }
-@keyframes sd-detail-cart-overlay-out{0%,28%{opacity:1}100%{opacity:0}}
-@keyframes sd-detail-cart-sheet-out{0%,38%{opacity:1;transform:translate3d(0,0,0) scale(1)}100%{opacity:0;transform:translate3d(0,18px,0) scale(.992)}}
+@keyframes sd-detail-cart-overlay-out{0%,12%{opacity:1}100%{opacity:0}}
+@keyframes sd-detail-cart-sheet-out{0%,16%{opacity:1;transform:translate3d(0,0,0) scale(1)}100%{opacity:0;transform:translate3d(0,14px,0) scale(.994)}}
 .cart-drawer{position:fixed;z-index:180;top:0;right:0;bottom:0;width:min(440px,100%);padding:20px;display:flex;flex-direction:column;gap:14px;transform:translateX(105%);transition:transform .45s cubic-bezier(.22,.61,.36,1);background:var(--page);color:var(--ink);border-left:1px solid var(--line);box-shadow:-18px 0 50px rgba(0,0,0,.2)}.cart-drawer.open{transform:translateX(0)}.cart-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px}.cart-row{display:grid;grid-template-columns:68px 1fr auto;gap:11px;align-items:center;padding:9px;border:1px solid var(--line);border-radius:14px;background:var(--glass)}.cart-row img{width:68px;height:68px;object-fit:cover;border-radius:9px}.cart-row strong{display:block;font:400 13px SD Serif,Georgia,serif}.cart-row small{display:block;color:var(--gold);font-size:8px;margin-top:4px}.qty-controls{display:flex;align-items:center;gap:7px;margin-top:8px}.qty-controls button{width:24px;height:24px;border:1px solid var(--line);border-radius:50%;background:var(--panel);font-size:13px}.qty-controls span{font-size:10px}.remove-item{min-width:42px;min-height:32px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:var(--sd-glass-shell,var(--panel));color:var(--ink);font-size:11px;font-weight:700;white-space:nowrap}.cart-bottom{border-top:0;padding-top:14px;background:transparent}.cart-bottom p{font-size:10px;line-height:1.7;color:var(--muted)}.cart-bottom .pill-btn{width:100%;margin-top:8px}.empty-cart{margin:auto;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}.toast{position:fixed;z-index:1400;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,18px);opacity:0;pointer-events:none;max-width:calc(100% - 30px);padding:12px 17px;border-radius:999px;border:1px solid var(--line);background:var(--nav-bg);color:var(--ink);box-shadow:var(--shadow);backdrop-filter:blur(22px);font-size:10px;text-align:center;transition:opacity .28s,transform .28s}.toast.show{opacity:1;transform:translate(-50%,0)}.toast a{display:inline-block;margin-left:7px;text-decoration:underline;color:var(--gold);font-weight:700;pointer-events:auto}@media(max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom));}}
 
 .toast.toast-detail-context{bottom:calc(156px + env(safe-area-inset-bottom))}
@@ -5298,7 +5298,7 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  const sourceVisible=visibleRatio>=.55;
  if(!sourceVisible&&window.innerWidth<=760&&fallbackAnchor?.isConnected){
   const icon=fallbackAnchor.querySelector('svg'),anchorRect=(icon||fallbackAnchor).getBoundingClientRect();
-  const size=Math.min(36,Math.max(28,anchorRect.height*1.45));
+  const size=48;
   sourceRect={left:anchorRect.left+anchorRect.width/2-size/2,top:anchorRect.top+anchorRect.height/2-size/2,width:size,height:size};
  }
  const destRect=cartFlightDestinationRect(target);
@@ -5324,14 +5324,14 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  clone.className='sd-fly-to-cart-clone';clone.setAttribute('aria-hidden','true');clone.setAttribute('inert','');
  clone.dataset.productId=String(productId||'');
  clone.dataset.sourceType=sourceElement.classList.contains('product-card')?'product-card':'detail-image';
- clone.dataset.cartTargetId=target.id;clone.dataset.durationMs='1250';clone.dataset.flightProgress='0';
+ clone.dataset.cartTargetId=target.id;clone.dataset.durationMs='1350';clone.dataset.flightProgress='0';
  clone.style.left=sourceRect.left+'px';clone.style.top=sourceRect.top+'px';
  clone.style.width=sourceRect.width+'px';clone.style.height=sourceRect.height+'px';
  clone.style.opacity='1';clone.style.transform='translate3d(0,0,0) scale(1)';
  clone.appendChild(snapshot);document.body.appendChild(clone);
  const centerX=sourceRect.left+sourceRect.width/2,centerY=sourceRect.top+sourceRect.height/2;
- const duration=1250,distance=Math.hypot(destRect.left+destRect.width/2-centerX,destRect.top+destRect.height/2-centerY);
- const arc=Math.min(72,Math.max(22,distance*.072)),targetScale=Math.max(.06,Math.min(.62,Math.min(destRect.width,destRect.height)*1.12/Math.max(sourceRect.width,sourceRect.height))),started=performance.now();
+ const duration=1350,distance=Math.hypot(destRect.left+destRect.width/2-centerX,destRect.top+destRect.height/2-centerY);
+ const arc=Math.min(62,Math.max(22,distance*.06)),targetScale=Math.max(.06,Math.min(.62,Math.min(destRect.width,destRect.height)*1.12/Math.max(sourceRect.width,sourceRect.height))),started=performance.now();
  let frame=0,done=false;
  const cleanup=confirm=>{
   if(done)return;done=true;if(frame)window.cancelAnimationFrame(frame);
@@ -5346,10 +5346,10 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
   const live=activeCartFlightTarget();
   if(!live){cleanup(true);return}
   const rect=cartFlightDestinationRect(live),raw=Math.max(0,Math.min(1,(now-started)/duration));
-  const eased=raw*raw*(3-2*raw);
+  const eased=1-Math.pow(1-raw,2.15);
   const dx=(rect.left+rect.width/2-centerX)*eased;
   const dy=(rect.top+rect.height/2-centerY)*eased-Math.sin(Math.PI*raw)*arc;
-  const scale=1-(1-targetScale)*eased,opacity=raw<.78?1:1-((raw-.78)/.22);
+  const scale=1-(1-targetScale)*eased,opacity=raw<.84?1:1-((raw-.84)/.16);
   clone.dataset.flightProgress=raw.toFixed(3);clone.dataset.cartTargetId=live.id;
   const tilt=Math.sin(Math.PI*raw)*-2.8;
   clone.style.transform='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) rotate('+tilt.toFixed(2)+'deg) scale('+scale.toFixed(3)+')';
