@@ -5292,7 +5292,7 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  const sourceVisible=sourceRect.bottom>8&&sourceRect.top<window.innerHeight-8&&sourceRect.right>8&&sourceRect.left<window.innerWidth-8;
  if(!sourceVisible&&window.innerWidth<=760&&fallbackAnchor?.isConnected){
   const icon=fallbackAnchor.querySelector('svg'),anchorRect=(icon||fallbackAnchor).getBoundingClientRect();
-  const size=Math.min(54,Math.max(40,anchorRect.height*2.7));
+  const size=Math.min(40,Math.max(32,anchorRect.height*1.7));
   sourceRect={left:anchorRect.left+anchorRect.width/2-size/2,top:anchorRect.top+anchorRect.height/2-size/2,width:size,height:size};
  }
  const destRect=cartFlightTargetRect(target);
@@ -5325,7 +5325,7 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  clone.appendChild(snapshot);document.body.appendChild(clone);
  const centerX=sourceRect.left+sourceRect.width/2,centerY=sourceRect.top+sourceRect.height/2;
  const duration=1250,distance=Math.hypot(destRect.left+destRect.width/2-centerX,destRect.top+destRect.height/2-centerY);
- const arc=Math.min(72,Math.max(22,distance*.072)),started=performance.now();
+ const arc=Math.min(72,Math.max(22,distance*.072)),targetScale=Math.max(.075,Math.min(.62,28/Math.max(sourceRect.width,sourceRect.height))),started=performance.now();
  let frame=0,done=false;
  const cleanup=confirm=>{
   if(done)return;done=true;if(frame)window.cancelAnimationFrame(frame);
@@ -5343,7 +5343,7 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
   const eased=raw*raw*(3-2*raw);
   const dx=(rect.left+rect.width/2-centerX)*eased;
   const dy=(rect.top+rect.height/2-centerY)*eased-Math.sin(Math.PI*raw)*arc;
-  const scale=1-.72*eased,opacity=raw<.78?1:1-((raw-.78)/.22);
+  const scale=1-(1-targetScale)*eased,opacity=raw<.78?1:1-((raw-.78)/.22);
   clone.dataset.flightProgress=raw.toFixed(3);clone.dataset.cartTargetId=live.id;
   clone.style.transform='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+scale.toFixed(3)+')';
   clone.style.opacity=opacity.toFixed(3);
