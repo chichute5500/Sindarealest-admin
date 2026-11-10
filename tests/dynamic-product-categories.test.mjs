@@ -158,8 +158,8 @@ assert.match(html,/#productOverlay \.detail-purchase-button/,"Purchase controls 
 assert.match(html,/#productOverlay \.detail-purchase-button,/,"Purchase controls participate in masked shared prismatic refraction.");
 assert.match(html,/#productOverlay \.detail-actions \.detail-purchase-button:active\{/,"Purchase controls must still offer the tactile active state.");
 assert.ok(html.includes("$('#detailBuyNow').addEventListener('click'"));
-assert.ok(html.includes("option=selectedDetailOption(currentProduct)"),"Buy now must require the product-specific selection");
-assert.ok(html.includes("if(!id||option===null||sizeOption===null||imageVariant===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice)"),"Priced Buy now requires all product selections and an explicit payment choice");
+assert.ok(html.includes("const option=selectedDetailOption(product),sizeOption=selectedDetailSize(product),imageVariant=selectedDetailImage(product)"),"Buy now must require the product-specific selection");
+assert.ok(html.includes("if(missing){sdDetailGuideToRequiredSelection(missing);return}")&&html.includes("if(option===null||sizeOption===null||imageVariant===null)return;if(sdCheckoutQuote?.quoteReady===true&&!detailPaymentChoice){sdDetailGuideToPaymentChoice();return}"),"Priced Buy now guides missing selections and requires an explicit payment choice");
 assert.ok(html.includes("openCheckout({items:[{id,option,sizeOption,imageVariant,quantity:1}],paymentChoice:detailPaymentChoice})"),"Buy now submits the selected product, size, image, and payment option");
 assert.ok(!detail.includes('id="detailZalo"')||detail.indexOf('id="detailZalo"')>detail.indexOf('id="detailBuyNow"'));
 assert.match(html,/border:1px solid rgba\(205,167,93,\.60\)/);
