@@ -320,21 +320,15 @@ img{display:block;max-width:100%}button,input{font:inherit}button{color:inherit;
 /* Product detail modal and cart drawer */
 .overlay{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.56);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}.overlay.open{display:flex;animation:overlayIn .28s ease both}@keyframes overlayIn{from{opacity:0}to{opacity:1}}.detail-modal{position:relative;width:min(1000px,100%);max-height:min(90dvh,850px);overflow:auto;border-radius:24px;border:1px solid var(--line);background:var(--page);color:var(--ink);box-shadow:0 25px 100px rgba(0,0,0,.35)}.close-btn{position:sticky;top:10px;float:right;z-index:3;margin:10px 10px -44px 0;width:35px;height:35px;border-radius:50%;border:1px solid var(--line);background:var(--nav-bg);backdrop-filter:blur(15px);font-size:20px}.detail-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;padding:20px}.detail-gallery{min-width:0}.detail-main-image{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:17px;border:1px solid var(--line);background:var(--panel)}.detail-thumbs{display:flex;gap:7px;overflow:auto;padding:9px 0}.detail-thumb{width:62px;height:62px;flex-shrink:0;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:9px;background:var(--glass)}.detail-thumb.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(133,190,232,.25)}.detail-thumb img{width:100%;height:100%;object-fit:cover}.detail-copy{align-self:center;padding:12px 6px 12px 0}.detail-copy h2{font:400 clamp(26px,4vw,39px)/1.1 SD Serif,Georgia,serif;letter-spacing:-.04em;margin:9px 0 13px}.detail-desc{font-size:11px;line-height:1.9;color:var(--muted)}.detail-copy .promise-tags{grid-template-columns:repeat(2,minmax(0,1fr));margin:17px 0}.detail-copy .promise-tag{font-size:8px;min-height:37px}.detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:19px}.detail-actions .pill-btn{min-width:0;padding:10px 12px;font-size:9px}
 @media(max-width:760px){
- .overlay.sd-detail-cart-closing{animation:sd-detail-cart-overlay-out .72s cubic-bezier(.22,.61,.36,1) both}
- #productOverlay.sd-detail-cart-closing .detail-modal{animation:sd-detail-cart-sheet-out .72s cubic-bezier(.22,.61,.36,1) both;transform-origin:50% 52%;will-change:transform,opacity}
+ #productOverlay.sd-detail-cart-source-hidden{opacity:0!important;transition:opacity .24s ease!important;pointer-events:none!important}
+ #productOverlay.sd-cart-flight-page-clone{position:fixed!important;inset:0!important;z-index:2147483646!important;display:flex!important;align-items:stretch!important;justify-content:stretch!important;width:100vw!important;height:100dvh!important;padding:0!important;overflow:hidden!important;pointer-events:none!important;transform-origin:50% 50%;will-change:transform,opacity;contain:layout paint style}
+ #productOverlay.sd-cart-flight-page-clone .detail-modal{width:100vw!important;height:100dvh!important;max-width:none!important;max-height:100dvh!important;overflow:hidden!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+ #productOverlay.sd-cart-flight-page-clone .detail-modal::-webkit-scrollbar{display:none!important}
 }
-@keyframes sd-detail-cart-overlay-out{0%,12%{opacity:1}100%{opacity:0}}
-@keyframes sd-detail-cart-sheet-out{0%,16%{opacity:1;transform:translate3d(0,0,0) scale(1)}100%{opacity:0;transform:translate3d(0,16px,0) scale(.975)}}
 .cart-drawer{position:fixed;z-index:180;top:0;right:0;bottom:0;width:min(440px,100%);padding:20px;display:flex;flex-direction:column;gap:14px;transform:translateX(105%);transition:transform .45s cubic-bezier(.22,.61,.36,1);background:var(--page);color:var(--ink);border-left:1px solid var(--line);box-shadow:-18px 0 50px rgba(0,0,0,.2)}.cart-drawer.open{transform:translateX(0)}.cart-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px}.cart-row{display:grid;grid-template-columns:68px 1fr auto;gap:11px;align-items:center;padding:9px;border:1px solid var(--line);border-radius:14px;background:var(--glass)}.cart-row img{width:68px;height:68px;object-fit:cover;border-radius:9px}.cart-row strong{display:block;font:400 13px SD Serif,Georgia,serif}.cart-row small{display:block;color:var(--gold);font-size:8px;margin-top:4px}.qty-controls{display:flex;align-items:center;gap:7px;margin-top:8px}.qty-controls button{width:24px;height:24px;border:1px solid var(--line);border-radius:50%;background:var(--panel);font-size:13px}.qty-controls span{font-size:10px}.remove-item{min-width:42px;min-height:32px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:var(--sd-glass-shell,var(--panel));color:var(--ink);font-size:11px;font-weight:700;white-space:nowrap}.cart-bottom{border-top:0;padding-top:14px;background:transparent}.cart-bottom p{font-size:10px;line-height:1.7;color:var(--muted)}.cart-bottom .pill-btn{width:100%;margin-top:8px}.empty-cart{margin:auto;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}.toast{position:fixed;z-index:1400;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,18px);opacity:0;pointer-events:none;max-width:calc(100% - 30px);padding:12px 17px;border-radius:999px;border:1px solid var(--line);background:var(--nav-bg);color:var(--ink);box-shadow:var(--shadow);backdrop-filter:blur(22px);font-size:10px;text-align:center;transition:opacity .28s,transform .28s}.toast.show{opacity:1;transform:translate(-50%,0)}.toast a{display:inline-block;margin-left:7px;text-decoration:underline;color:var(--gold);font-weight:700;pointer-events:auto}@media(max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom));}}
 
 .toast.toast-detail-context{bottom:calc(156px + env(safe-area-inset-bottom))}
 @media(max-width:760px){.toast.toast-detail-context{bottom:calc(156px + env(safe-area-inset-bottom))}}
-#productOverlay #detailAdd .detail-add-preview{display:none}
-@media(max-width:760px){
- #productOverlay #detailAdd{gap:5px;padding:10px 8px}
- #productOverlay #detailAdd .detail-add-preview{display:block;width:26px;height:26px;flex:0 0 26px;object-fit:cover;border:1px solid rgba(255,255,255,.62);border-radius:7px;background:rgba(255,255,255,.12);box-shadow:0 2px 8px rgba(7,24,40,.2)}
- #productOverlay #detailAdd .sd-cart-action-icon{width:18px;height:18px;flex:0 0 18px}
-}
 /* Entire clicked product tile flies in a light frozen snapshot to its visible cart. */
 .sd-fly-to-cart-clone{
  position:fixed;display:block;z-index:2147483646;pointer-events:none!important;
@@ -4134,7 +4128,7 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
 })();
 </script>
 
-<div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal"><button class="close-btn tap-target" id="detailClose" aria-label="Đóng">×</button><div class="detail-layout"><div class="detail-gallery"><div class="detail-image-stage" id="detailImageStage"><img class="detail-main-image" id="detailMainImage" alt="" decoding="async"><button type="button" class="detail-favorite-btn tap-target" id="detailFavorite" aria-pressed="false" aria-label="Thêm sản phẩm vào yêu thích" title="Thêm sản phẩm vào yêu thích"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 11.1-8.8 11.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-zoom-btn tap-target" id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình" title="Xem toàn ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4H4v4M4 4l6 6M16 4h4v4m0-4-6 6M8 20H4v-4m0 4 6-6m10 6h-4m4 0v-4m0 4-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-prev tap-target" id="detailPrev" aria-label="Ảnh sản phẩm trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-next tap-target" id="detailNext" aria-label="Ảnh sản phẩm tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="detail-image-count" id="detailImageCount" aria-live="polite">01 / 01</span></div><div class="detail-thumbs" id="detailThumbs" aria-label="Các ảnh sản phẩm"></div></div><div class="detail-copy"><div class="detail-meta-row"><span class="fulfillment-detail" id="detailFulfillment"></span><span class="product-sku" id="detailSku"></span></div><h2 id="detailTitle"></h2><div class="detail-price" id="detailPrice" hidden></div><div class="sd-detail-production" id="sdDetailProduction" role="note" hidden><strong>⏱ Thời gian làm hàng: 5–20 ngày</strong><span>Sản phẩm được chế tác theo đơn đặt hàng. Thời gian này chưa bao gồm vận chuyển.</span></div><div class="detail-variants" id="detailVariants" hidden></div><div class="detail-variants sd-product-custom-variants" id="sdDetailCustomVariants" hidden></div><div id="sdDetailPaymentQuote" class="sd-detail-payment-quote" aria-live="polite"></div><div class="detail-actions" role="group" aria-label="Chọn cách mua sản phẩm"><button type="button" class="pill-btn primary detail-purchase-button tap-target" id="detailAdd"><img class="detail-add-preview" id="detailAddPreview" alt="" aria-hidden="true" decoding="async"><svg class="sd-cart-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.5 4.5h2.2l2.1 10.2h10.1l2.2-7.2H7"/><path class="sd-cart-basket" d="M7.2 7.5h12.2l-1.7 6.4H8.5z"/><g class="sd-cart-package"><path d="M8.8 1.2h6.7l1.5 1.5v4.5H8.8z"/><path d="M8.8 3.2H17m-4.1 0v4"/></g><circle cx="8.7" cy="18.6" r="1.25"/><circle cx="17.4" cy="18.6" r="1.25"/></svg><span>Thêm vào giỏ hàng</span></button><button type="button" class="pill-btn primary detail-purchase-button detail-buy-now tap-target" id="detailBuyNow"><svg class="sd-buy-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.5 8h13l-1 12h-11z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path class="sd-buy-arrow" d="M5.8 13h11m-3.2-3.2 3.2 3.2-3.2 3.2"/></svg><span>Đặt hàng ngay</span></button></div><a href="/#order" class="detail-order-link" id="detailOrderLink">Xem quy trình đặt hàng & thời gian dự kiến →</a><div class="detail-aftercare">
+<div class="overlay" id="productOverlay" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true" tabindex="-1" inert><div class="detail-modal"><button class="close-btn tap-target" id="detailClose" aria-label="Đóng">×</button><div class="detail-layout"><div class="detail-gallery"><div class="detail-image-stage" id="detailImageStage"><img class="detail-main-image" id="detailMainImage" alt="" decoding="async"><button type="button" class="detail-favorite-btn tap-target" id="detailFavorite" aria-pressed="false" aria-label="Thêm sản phẩm vào yêu thích" title="Thêm sản phẩm vào yêu thích"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5.2-8.8 11.1-8.8 11.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.3a4.7 4.7 0 0 1 8.8 2.4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-zoom-btn tap-target" id="detailZoom" aria-label="Xem toàn ảnh ở chế độ toàn màn hình" title="Xem toàn ảnh"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4H4v4M4 4l6 6M16 4h4v4m0-4-6 6M8 20H4v-4m0 4 6-6m10 6h-4m4 0v-4m0 4-6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-prev tap-target" id="detailPrev" aria-label="Ảnh sản phẩm trước"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m14.5 5.5-6.5 6.5 6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="detail-gallery-arrow detail-gallery-next tap-target" id="detailNext" aria-label="Ảnh sản phẩm tiếp theo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9.5 5.5 6.5 6.5-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="detail-image-count" id="detailImageCount" aria-live="polite">01 / 01</span></div><div class="detail-thumbs" id="detailThumbs" aria-label="Các ảnh sản phẩm"></div></div><div class="detail-copy"><div class="detail-meta-row"><span class="fulfillment-detail" id="detailFulfillment"></span><span class="product-sku" id="detailSku"></span></div><h2 id="detailTitle"></h2><div class="detail-price" id="detailPrice" hidden></div><div class="sd-detail-production" id="sdDetailProduction" role="note" hidden><strong>⏱ Thời gian làm hàng: 5–20 ngày</strong><span>Sản phẩm được chế tác theo đơn đặt hàng. Thời gian này chưa bao gồm vận chuyển.</span></div><div class="detail-variants" id="detailVariants" hidden></div><div class="detail-variants sd-product-custom-variants" id="sdDetailCustomVariants" hidden></div><div id="sdDetailPaymentQuote" class="sd-detail-payment-quote" aria-live="polite"></div><div class="detail-actions" role="group" aria-label="Chọn cách mua sản phẩm"><button type="button" class="pill-btn primary detail-purchase-button tap-target" id="detailAdd"><svg class="sd-cart-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.5 4.5h2.2l2.1 10.2h10.1l2.2-7.2H7"/><path class="sd-cart-basket" d="M7.2 7.5h12.2l-1.7 6.4H8.5z"/><g class="sd-cart-package"><path d="M8.8 1.2h6.7l1.5 1.5v4.5H8.8z"/><path d="M8.8 3.2H17m-4.1 0v4"/></g><circle cx="8.7" cy="18.6" r="1.25"/><circle cx="17.4" cy="18.6" r="1.25"/></svg><span>Thêm vào giỏ hàng</span></button><button type="button" class="pill-btn primary detail-purchase-button detail-buy-now tap-target" id="detailBuyNow"><svg class="sd-buy-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.5 8h13l-1 12h-11z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path class="sd-buy-arrow" d="M5.8 13h11m-3.2-3.2 3.2 3.2-3.2 3.2"/></svg><span>Đặt hàng ngay</span></button></div><a href="/#order" class="detail-order-link" id="detailOrderLink">Xem quy trình đặt hàng & thời gian dự kiến →</a><div class="detail-aftercare">
   <div class="sd-detail-pledges" role="group" aria-label="Cam kết chất liệu và bảo hành SinDarealest">
     <section class="sd-detail-pledge" aria-labelledby="sdLeatherPledgeHeading">
       <div class="sd-detail-pledge-title"><span class="sd-detail-pledge-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 7v5c0 4.5-3 7.6-8 9-5-1.4-8-4.5-8-9V7l8-4Z"/><path d="m8.4 12.3 2.3 2.3 4.8-5"/></svg></span><h3 id="sdLeatherPledgeHeading">Da cá sấu thật 100%</h3></div>
@@ -5151,7 +5145,7 @@ function changeDetailImage(index,resetTimer=true,direction){
  direction=direction||(nextIndex===previousIndex?'left':((nextIndex-previousIndex+detailImages.length)%detailImages.length<=detailImages.length/2?'left':'right'));
  detailIndex=nextIndex;
  const img=$('#detailMainImage'),next=imgPath(detailImages[detailIndex]),thumbs=$$('.detail-thumb');
- syncDetailAddPreview(next);
+
  const transitionId=++detailTransitionId;
  clearTimeout(detailAnimationTimer);
  img.onload=null;img.onerror=null;
@@ -5190,17 +5184,23 @@ function changeDetailImage(index,resetTimer=true,direction){
  if(preload.complete){if(preload.naturalWidth)preload.onload();else preload.onerror()}
  scheduleDetailAutoplay();
 }
-function syncDetailAddPreview(source){
- const preview=$('#detailAddPreview');
- if(!preview)return;
- const next=source||$('#detailMainImage')?.currentSrc||$('#detailMainImage')?.src||'';
- if(next&&preview.src!==next)preview.src=next;
-}
 let sdDetailReturnUrl='';
-function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fromUrl?null:document.activeElement;clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;detailPaymentChoice='';sdDetailPaymentRevealRequested=false;updateDetailFavoriteButton(p);document.title=displayProductName(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){sdDetailReturnUrl=location.pathname+location.search+location.hash;history.pushState({productId:p.id},'',`/sanpham/${routeSlug(p.category)}/${encodeURIComponent(p.skuVerified===true&&String(p.sku||'').trim()?(p.sku):(p.id||p.slug))}`)}else if(fromUrl){sdDetailReturnUrl=''}detailImages=allImages(p);detailIndex=0;const images=detailImages;for(const id of ['detailPrev','detailNext','sdFullscreenPrev','sdFullscreenNext','sdFullscreenCount']){const node=$('#'+id);if(node)node.hidden=images.length<=1}const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1');img.alt=productImageAlt(p);syncDetailAddPreview(img.src);$('#detailSku').textContent='Mã SKU: '+(visibleSku(p)||'Chưa được cung cấp');$('#detailTitle').innerHTML=productTitleWithTier(p.title||'Sản phẩm tuyển chọn',true,p);const detailPrice=customerPriceLabel(p);$('#detailPrice').textContent=detailPrice?'Giá: '+detailPrice:'';$('#detailPrice').hidden=!detailPrice;const warrantyMonths=hasConfirmedPublicPrice(p)?(Number(p.price)<=3_000_000?6:12):null;$('#detailWarrantyTerm').textContent=warrantyMonths?'Bảo hành chế tác '+warrantyMonths+' tháng':'Bảo hành chế tác 6–12 tháng';$('#detailFulfillment').innerHTML=fulfillmentBadge(p,true);$('#sdDetailProduction').hidden=productFulfillmentType(p)!=='made_to_order';renderProductOptions(p);renderProductCustomOptions(p);sdDetailLoadPaymentQuote(p);$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(productImageAlt(p,i))}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailImageCount').hidden=images.length<=1;$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailBuyNow').dataset.buy=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;const sdDetailScrollPanel=$('#productOverlay .detail-modal');if(sdDetailScrollPanel){sdDetailScrollPanel.scrollTop=0;sdDetailScrollPanel.scrollLeft=0}$('#productOverlay').scrollTop=0;$('#productOverlay').removeAttribute('inert');requestAnimationFrame(()=>requestAnimationFrame(()=>{const panel=$('#productOverlay .detail-modal');if(panel)panel.scrollTop=0;$('#productOverlay').scrollTop=0}));$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');window.__sdSyncProductDetailGlass?.();requestAnimationFrame(()=>window.__sdSyncProductDetailGlass?.());document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();$('#detailClose').focus({preventScroll:true})}
-let sdDetailCartCloseTimer=0;
+function openDetail(productId,fromUrl=false){dismissToast();detailReturnFocus=fromUrl?null:document.activeElement;clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);++detailTransitionId;++fullscreenTransitionId;const key=String(productId||'');const p=products.find(x=>String(x.id||'')===key||String(x.slug||'')===key)||products.find(x=>String(x.sku||'').toUpperCase()===key.toUpperCase());if(!p)return;clearTimeout(detailTimer);currentProduct=p;detailPaymentChoice='';sdDetailPaymentRevealRequested=false;updateDetailFavoriteButton(p);document.title=displayProductName(p.title||'Sản phẩm')+' | SinDarealest';if(!fromUrl&&p.id){sdDetailReturnUrl=location.pathname+location.search+location.hash;history.pushState({productId:p.id},'',`/sanpham/${routeSlug(p.category)}/${encodeURIComponent(p.skuVerified===true&&String(p.sku||'').trim()?(p.sku):(p.id||p.slug))}`)}else if(fromUrl){sdDetailReturnUrl=''}detailImages=allImages(p);detailIndex=0;const images=detailImages;for(const id of ['detailPrev','detailNext','sdFullscreenPrev','sdFullscreenNext','sdFullscreenCount']){const node=$('#'+id);if(node)node.hidden=images.length<=1}const img=$('#detailMainImage');img.onload=null;img.onerror=null;img.classList.remove('is-changing');img.src=imgPath(images[0]||'images/theme-croc-dark.webp?v=20261017-1');img.alt=productImageAlt(p);$('#detailSku').textContent='Mã SKU: '+(visibleSku(p)||'Chưa được cung cấp');$('#detailTitle').innerHTML=productTitleWithTier(p.title||'Sản phẩm tuyển chọn',true,p);const detailPrice=customerPriceLabel(p);$('#detailPrice').textContent=detailPrice?'Giá: '+detailPrice:'';$('#detailPrice').hidden=!detailPrice;const warrantyMonths=hasConfirmedPublicPrice(p)?(Number(p.price)<=3_000_000?6:12):null;$('#detailWarrantyTerm').textContent=warrantyMonths?'Bảo hành chế tác '+warrantyMonths+' tháng':'Bảo hành chế tác 6–12 tháng';$('#detailFulfillment').innerHTML=fulfillmentBadge(p,true);$('#sdDetailProduction').hidden=productFulfillmentType(p)!=='made_to_order';renderProductOptions(p);renderProductCustomOptions(p);sdDetailLoadPaymentQuote(p);$('#detailThumbs').innerHTML=images.map((src,i)=>`<button type="button" class="detail-thumb tap-target ${i===0?'active':''}" data-thumb="${i}" aria-label="Xem ảnh ${i+1}"><img src="${escapeHtml(imgPath(src))}" alt="${escapeHtml(productImageAlt(p,i))}" loading="lazy" decoding="async"></button>`).join('');$('#detailImageCount').textContent='01 / '+String(images.length).padStart(2,'0');$('#detailImageCount').hidden=images.length<=1;$('#detailPrev').hidden=images.length<2;$('#detailNext').hidden=images.length<2;$('#detailAdd').dataset.add=p.id||p.slug;$('#detailBuyNow').dataset.buy=p.id||p.slug;$('#detailZalo').dataset.zalo=p.id||p.slug;const sdDetailScrollPanel=$('#productOverlay .detail-modal');if(sdDetailScrollPanel){sdDetailScrollPanel.scrollTop=0;sdDetailScrollPanel.scrollLeft=0}$('#productOverlay').scrollTop=0;$('#productOverlay').removeAttribute('inert');requestAnimationFrame(()=>requestAnimationFrame(()=>{const panel=$('#productOverlay .detail-modal');if(panel)panel.scrollTop=0;$('#productOverlay').scrollTop=0}));$('#productOverlay').classList.add('open');$('#productOverlay').setAttribute('aria-hidden','false');window.__sdSyncProductDetailGlass?.();requestAnimationFrame(()=>window.__sdSyncProductDetailGlass?.());document.body.style.overflow='hidden';bindReveal($('#productOverlay'));scheduleDetailAutoplay();$('#detailClose').focus({preventScroll:true})}
+let sdDetailCartScrollToken=0,sdDetailCartPending=false;
+function restoreDetailAddButton(button){
+ if(!button)return;
+ const label=button.querySelector('span');
+ if(label&&button.dataset.sdPendingLabel!==undefined)label.textContent=button.dataset.sdPendingLabel;
+ if(button.dataset.sdPendingDisabled!==undefined)button.disabled=button.dataset.sdPendingDisabled==='true';
+ button.removeAttribute('aria-busy');
+ delete button.dataset.sdPendingLabel;delete button.dataset.sdPendingDisabled;
+ button.classList.remove('sd-detail-returning-top');
+}
+function cancelDetailAddScroll(){
+ ++sdDetailCartScrollToken;sdDetailCartPending=false;restoreDetailAddButton($('#detailAdd'));
+}
 function closeDetail(fromUrl=false,restoreFocus=true){
- clearTimeout(sdDetailCartCloseTimer);sdDetailCartCloseTimer=0;
+ cancelDetailAddScroll();
  document.title='SinDarealest — Premium Crocodile Leather Fashion';
  clearTimeout(detailTimer);clearTimeout(detailSwapTimer);clearTimeout(fullscreenSwapTimer);clearTimeout(detailAnimationTimer);clearTimeout(fullscreenAnimationTimer);
  detailTimer=detailSwapTimer=fullscreenSwapTimer=detailAnimationTimer=fullscreenAnimationTimer=null;
@@ -5208,21 +5208,79 @@ function closeDetail(fromUrl=false,restoreFocus=true){
  clearGalleryTransitionClasses($('#detailMainImage'));clearGalleryTransitionClasses($('#sdFullscreenImage'));
  $('#sdFullscreenViewer').classList.remove('open');$('#sdFullscreenViewer').setAttribute('aria-hidden','true');$('#sdFullscreenViewer').setAttribute('inert','');
  if(!fromUrl&&(location.pathname.startsWith('/san-pham/')||location.pathname.startsWith('/sanpham/')))history.replaceState({},'',sdDetailReturnUrl||('/sanpham/'+routeSlug(currentProduct?.category)));sdDetailReturnUrl='';
- const overlay=$('#productOverlay');overlay.classList.remove('open','sd-detail-cart-closing');overlay.setAttribute('aria-hidden','true');overlay.setAttribute('inert','');
+ const overlay=$('#productOverlay');overlay.classList.remove('open','sd-detail-cart-source-hidden');overlay.setAttribute('aria-hidden','true');overlay.setAttribute('inert','');
  if(!$('#cartDrawer').classList.contains('open')&&!$('#checkoutDrawer').classList.contains('open')&&!$('#accountDrawer').classList.contains('open'))document.body.style.overflow='';
  const target=detailReturnFocus;detailReturnFocus=null;
  if(restoreFocus)setTimeout(()=>{const owner=target&&target.closest('#cartDrawer,#checkoutDrawer,#accountDrawer,#productOverlay');const available=target&&target.isConnected&&!target.closest('[inert]')&&(!owner||owner.classList.contains('open'))&&getComputedStyle(target).visibility!=='hidden';(available?target:$('#searchJump')||$('#catalogSearch'))?.focus({preventScroll:true})},0);
 }
-function closeDetailAfterCartAdd(){
- const overlay=$('#productOverlay');
- if(window.innerWidth>760||cartMotionReduced()||!overlay?.classList.contains('open')){closeDetail();return}
- clearTimeout(sdDetailCartCloseTimer);
+function queueDetailAddUntilTop(id,button){
+ const overlay=$('#productOverlay'),panel=overlay?.querySelector('.detail-modal');
+ if(window.innerWidth>760||!panel||!overlay.classList.contains('open')||panel.scrollTop<=14)return false;
+ if(sdDetailCartPending)return true;
+ sdDetailCartPending=true;
+ const token=++sdDetailCartScrollToken,label=button.querySelector('span');
+ if(button.dataset.sdPendingLabel===undefined)button.dataset.sdPendingLabel=label?.textContent||'';
+ button.dataset.sdPendingDisabled=String(button.disabled);button.disabled=true;button.setAttribute('aria-busy','true');button.classList.add('sd-detail-returning-top');
+ if(label)label.textContent='Đang lên đầu trang…';
  clearTimeout(detailTimer);detailTimer=0;
- overlay.classList.remove('sd-detail-cart-closing');
- void overlay.offsetWidth;
- overlay.classList.add('sd-detail-cart-closing');
- overlay.setAttribute('aria-hidden','true');overlay.setAttribute('inert','');
- sdDetailCartCloseTimer=window.setTimeout(()=>{sdDetailCartCloseTimer=0;closeDetail()},720);
+ panel.scrollTo({top:0,behavior:cartMotionReduced()?'auto':'smooth'});overlay.scrollTo({top:0,behavior:cartMotionReduced()?'auto':'smooth'});
+ const started=performance.now();let stableFrames=0;
+ const waitForTop=()=>{
+  if(token!==sdDetailCartScrollToken||!overlay.isConnected||!overlay.classList.contains('open')){if(token===sdDetailCartScrollToken){sdDetailCartPending=false;restoreDetailAddButton(button)}return}
+  const atTop=panel.scrollTop<=2&&overlay.scrollTop<=2;stableFrames=atTop?stableFrames+1:0;
+  if(stableFrames>=3||performance.now()-started>2600){
+   if(panel.scrollTop>2)panel.scrollTop=0;if(overlay.scrollTop>2)overlay.scrollTop=0;
+   requestAnimationFrame(()=>{if(token!==sdDetailCartScrollToken)return;sdDetailCartPending=false;restoreDetailAddButton(button);addToCartFromControl(id,button,{skipTopScroll:true})});return;
+  }
+  requestAnimationFrame(waitForTop);
+ };
+ requestAnimationFrame(waitForTop);
+ return true;
+}
+function flyWholeDetailPageToCart(productId){
+ const overlay=$('#productOverlay'),panel=overlay?.querySelector('.detail-modal'),target=activeCartFlightTarget();
+ if(cartMotionReduced()||window.innerWidth>760||!overlay?.classList.contains('open')||!panel||!target)return false;
+ const destination=cartFlightDestinationRect(target),width=window.innerWidth,height=window.innerHeight;
+ if(destination.width<10||destination.height<10)return false;
+ if(activeCartFlight){activeCartFlight.cancel();activeCartFlight=null}
+ clearTimeout(detailTimer);detailTimer=0;
+ const clone=overlay.cloneNode(true),clonePanel=clone.querySelector('.detail-modal');
+ clone.classList.add('sd-cart-flight-page-clone');clone.setAttribute('aria-hidden','true');clone.setAttribute('inert','');
+ clone.dataset.productId=String(productId||'');clone.dataset.cartTargetId=target.id;clone.dataset.flightProgress='0';clone.id='productOverlay';
+ clone.style.left='0px';clone.style.top='0px';clone.style.width=width+'px';clone.style.height=height+'px';clone.style.transform='translate3d(0,0,0) scale(1)';clone.style.opacity='1';clone.style.animation='none';
+ clone.querySelectorAll('button,a,input,select,textarea,[tabindex]').forEach(node=>{node.tabIndex=-1;node.setAttribute('aria-hidden','true')});
+ if(clonePanel){clonePanel.scrollTop=0;clonePanel.scrollLeft=0}
+ clone.scrollTop=0;document.body.appendChild(clone);
+ overlay.classList.add('sd-detail-cart-source-hidden');overlay.setAttribute('aria-hidden','true');overlay.setAttribute('inert','');
+ const centerX=width/2,centerY=height/2,destX=destination.left+destination.width/2,destY=destination.top+destination.height/2;
+ const distance=Math.hypot(destX-centerX,destY-centerY),arc=Math.max(18,Math.min(58,distance*.045));
+ const targetScale=Math.max(.045,Math.min(.085,Math.min(destination.width,destination.height)*1.25/Math.max(width,height)));
+ const duration=1480,started=performance.now();let frame=0,done=false;
+ const cleanup=arrived=>{
+  if(done)return;done=true;if(frame)cancelAnimationFrame(frame);clone.remove();if(activeCartFlight?.cancel===cancel)activeCartFlight=null;
+  if(overlay.isConnected){overlay.classList.remove('sd-detail-cart-source-hidden');closeDetail(false,false)}
+  if(arrived)confirmCartTargets();
+ };
+ const cancel=()=>cleanup(false);activeCartFlight={cancel};
+ const tick=now=>{
+  if(done)return;
+  if(cartMotionReduced()||document.hidden){cleanup(true);return}
+  const live=activeCartFlightTarget();if(!live){cleanup(true);return}
+  const rect=cartFlightDestinationRect(live),raw=Math.max(0,Math.min(1,(now-started)/duration));
+  const eased=raw<.5?4*raw*raw*raw:1-Math.pow(-2*raw+2,3)/2;
+  const dx=(rect.left+rect.width/2-centerX)*eased,dy=(rect.top+rect.height/2-centerY)*eased-Math.sin(Math.PI*raw)*arc;
+  const scale=1-(1-targetScale)*eased,opacity=raw<.84?1:1-(raw-.84)/.16;
+  clone.dataset.flightProgress=raw.toFixed(3);clone.dataset.cartTargetId=live.id;
+  clone.style.transform='translate3d('+dx.toFixed(2)+'px,'+dy.toFixed(2)+'px,0) scale('+scale.toFixed(4)+')';clone.style.opacity=Math.max(0,opacity).toFixed(3);
+  if(raw<1)frame=requestAnimationFrame(tick);else cleanup(true);
+ };
+ frame=requestAnimationFrame(tick);return true;
+}
+function closeDetailAfterCartAdd(productId){
+ const overlay=$('#productOverlay');
+ if(!overlay?.classList.contains('open'))return false;
+ if(window.innerWidth<=760&&!cartMotionReduced())return flyWholeDetailPageToCart(productId);
+ closeDetail();return false;
 }
 function cartKey(id,option='',sizeOption='',imageVariant=''){return option||sizeOption||imageVariant?String(id)+'::'+encodeURIComponent(JSON.stringify([option,sizeOption,imageVariant])):String(id)}
 function cartKeyParts(key){const text=String(key),idx=text.indexOf('::');if(idx<0)return {id:text,option:'',sizeOption:'',imageVariant:''};try{const tail=decodeURIComponent(text.slice(idx+2));let parsed;try{parsed=JSON.parse(tail)}catch{}return Array.isArray(parsed)?{id:text.slice(0,idx),option:parsed[0]||'',sizeOption:parsed[1]||'',imageVariant:parsed[2]||''}:{id:text.slice(0,idx),option:tail,sizeOption:'',imageVariant:''}}catch{return {id:'',option:'',sizeOption:'',imageVariant:''}}}
@@ -5310,9 +5368,8 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  const visibleRatio=sourceRect.width>0&&sourceRect.height>0?visibleWidth*visibleHeight/(sourceRect.width*sourceRect.height):0;
  const sourceVisible=visibleRatio>=.55;
  if(!sourceVisible&&window.innerWidth<=760&&fallbackAnchor?.isConnected){
-  const preview=fallbackAnchor.querySelector('.detail-add-preview'),icon=fallbackAnchor.querySelector('svg');
-  const anchorRect=(preview||icon||fallbackAnchor).getBoundingClientRect();
-  const size=preview&&anchorRect.width>0?Math.max(anchorRect.width,anchorRect.height):48;
+  const icon=fallbackAnchor.querySelector('svg'),anchorRect=(icon||fallbackAnchor).getBoundingClientRect();
+  const size=Math.min(48,Math.max(28,anchorRect.height*1.45));
   sourceRect={left:anchorRect.left+anchorRect.width/2-size/2,top:anchorRect.top+anchorRect.height/2-size/2,width:size,height:size};
  }
  const destRect=cartFlightDestinationRect(target);
@@ -5373,9 +5430,10 @@ function flyProductCardToCart(sourceElement,productId,fallbackAnchor){
  frame=window.requestAnimationFrame(tick);
  return true;
 }
-function addToCartFromControl(id,button){
+function addToCartFromControl(id,button,flowOptions={}){
  const p=findProductByKey(id);if(!p)return false;
  const fromDetail=button?.id==='detailAdd';
+ if(fromDetail&&!flowOptions.skipTopScroll&&queueDetailAddUntilTop(id,button))return true;
  if(productHasSelections(p)&&button?.id!=='detailAdd'){openDetail(p.id||p.slug);focusDetailOption();return false}
  const option=button?.id==='detailAdd'?selectedDetailOption(p):'';
  const sizeOption=button?.id==='detailAdd'?selectedDetailSize(p):'';
@@ -5385,10 +5443,14 @@ function addToCartFromControl(id,button){
  const added=addToCart(id,option,sizeOption,imageVariant);
  if(!added)return false;
  let flightStarted=false;
- try{flightStarted=flyProductCardToCart(source,id,fromDetail?button:null);if(!flightStarted)confirmCartTargets()}
+ try{
+  if(fromDetail&&window.innerWidth<=760)flightStarted=closeDetailAfterCartAdd(id);
+  else{flightStarted=flyProductCardToCart(source,id,null);if(fromDetail)closeDetailAfterCartAdd(id)}
+  if(!flightStarted)confirmCartTargets();
+ }
  catch(error){confirmCartTargets()}
  if(fromDetail&&flightStarted)dismissToast();
- if(fromDetail)closeDetailAfterCartAdd();
+ else if(fromDetail&&window.innerWidth<=760&&$('#productOverlay').classList.contains('open'))closeDetail();
  return true;
 }
 function favoriteKey(product){return String(product&&(product.id||product.slug)||'')}
