@@ -27,7 +27,13 @@ export async function onRequestPost({request,env}) {
   if(!invoice)return accepted();
   try{
     const bank=loadSepayBankConfig(env);
-    if(!bank||String(payload.accountNumber||"").replace(/\s+/g,"")!==bank.accountNumber)return accepted();
+    const incomingAccountNumber=String(payload.accountNumber||"").replace(/\s+/g,"");
+    const incomingVirtualAccount=String(payload.subAccount||"").replace(/\s+/g,"").toUpperCase();
+    if(!bank||incomingAccountNumber!==bank.accountNumber)return accepted();
+    // With an official VA configured, only credit transfers tagged with that
+    // VA. SePay keeps the underlying main account in accountNumber and sends
+    // the receiving VA separately as subAccount.
+    if(bank.virtualAccountNumber&&incomingVirtualAccount!==bank.virtualAccountNumber)return accepted();
     const checkout=await env.DB.prepare(
       "SELECT id,amount,status,payload_json FROM sepay_checkout_intents WHERE REPLACE(transfer_reference,'-','')=? LIMIT 1"
     ).bind(invoice).first();
