@@ -1,17 +1,19 @@
 // Isolated customer authentication. Never accept or set sd_admin_session.
 const enc = new TextEncoder();
 export const ORIGIN = "https://sindarealest2.pages.dev";
+export const PRODUCTION_ORIGINS = new Set([ORIGIN,"https://casauvip.store"]);
 export const PREVIEW_ORIGIN = "https://feat-zalo-customer-login-202.sindarealest-admin-preview.pages.dev";
 export const CUSTOMER_COOKIE = "sd_customer_login";
 const FLOW_COOKIE = "sd_customer_oauth";
 const sessionSeconds = 7 * 86400;
 const flowSeconds = 600;
-// Only the storefront and the exact Cloudflare Pages branch PREVIEW alias can participate in auth.
+// Only the canonical production Pages URL, the verified production custom domain,
+// and the exact Cloudflare Pages branch PREVIEW alias can participate in auth.
 // Do not derive redirect URLs from untrusted request Host/X-Forwarded-Host headers.
 export function customerOrigin(request) {
   try {
     const origin=new URL(request.url).origin;
-    return origin===ORIGIN || origin===PREVIEW_ORIGIN ? origin : null;
+    return PRODUCTION_ORIGINS.has(origin) || origin===PREVIEW_ORIGIN ? origin : null;
   }catch{return null;}
 }
 export const callback = (provider,origin=ORIGIN) => origin + "/api/customer/auth/" + provider + "/callback";
