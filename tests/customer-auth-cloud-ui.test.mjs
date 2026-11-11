@@ -50,7 +50,7 @@ assert.ok(auth.includes("window.sdAccountBridge?.onAuth(active)"),"OAuth session
 assert.ok(html.includes("if(accountSyncMode==='cloud')"),"Cloud account branch is required");
 assert.ok(!html.includes("Đăng nhập không tự động liên kết đơn hàng cũ; Shop sẽ bổ sung"),"Outdated local-only notice must be removed");
 const accountCss=readFileSync(new URL("../public/customer-auth.css",import.meta.url),"utf8");
-assert.ok(html.includes('href="/customer-auth.css?v=google-only-20261104"'),"Account glass CSS must be cache-busted");
+assert.match(html,/href="\/customer-auth\.css\?v=[^"]+"/,"Account glass CSS must be cache-busted");
 assert.ok(accountCss.includes('html.dark #accountDrawer')&&accountCss.includes('#accountDrawer .account-action'),"Light/dark glass layers must be scoped to Account drawer");
 assert.ok(accountCss.includes('background:var(--sd-account-button)')&&accountCss.includes('--sd-account-button-edge'),"Google button must visibly separate from login card");
 assert.ok(accountCss.includes('#accountDrawer [hidden] {display:none!important}'),"Hidden cards/toasts must remain hidden against legacy display CSS");
