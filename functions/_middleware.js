@@ -170,6 +170,13 @@ export async function onRequest(context) {
     }));
     if (!response.ok || !(response.headers.get("content-type") || "").includes("text/html")) return response;
     let html = await response.text();
+    // The shared shell is also used for Home. On a direct catalog URL its
+    // Home hero is not the page heading; expose the visible catalog heading
+    // as the sole active H1 in the initial response.
+    html = html.replace('<h1 class="sdh-title" id="sdh-title">', '<h2 class="sdh-title" id="sdh-title">')
+      .replace('<span>từ da cá sấu</span></h1>', '<span>từ da cá sấu</span></h2>')
+      .replace('<h2 class="section-title" id="catalogHeading">', '<h1 class="section-title" id="catalogHeading">')
+      .replace(/(<h1 class="section-title" id="catalogHeading">[^<]*)<\/h2>/, '$1</h1>');
     const catalogLabels = {
       sneaker: "Giày thể thao (Sneaker)", giayluoi: "Giày lười", giaytay: "Giày tây",
       thatlung: "Thắt lưng", vinamnu: "Ví nam & nữ",
@@ -190,8 +197,8 @@ export async function onRequest(context) {
     // Give direct-link visitors and crawlers the correct category heading in
     // the initial HTML, before /api/products completes on a slow connection.
     if(categorySlug) html = html.replace(
-      '<h2 class="section-title" id="catalogHeading">Tất cả sản phẩm</h2>',
-      '<h2 class="section-title" id="catalogHeading">' + escapeHtml(seoProfile?.heading || categoryName) + '</h2>'
+      '<h1 class="section-title" id="catalogHeading">Tất cả sản phẩm</h1>',
+      '<h1 class="section-title" id="catalogHeading">' + escapeHtml(seoProfile?.heading || categoryName) + '</h1>'
     );
     if (seoProfile?.intro) html = html.replace(
       /(<p class="section-note" id="catalogSeoNote">)[\s\S]*?(<\/p>)/,
@@ -335,6 +342,11 @@ export async function onRequest(context) {
   const response = await context.next(new Request(new URL("/index.html", url.origin), { method: "GET", headers: context.request.headers }));
   if (!response.ok) return response;
   let html = await response.text();
+  // The direct product URL should have its own heading in rendered DOM and
+  // in the server response, while preserving the existing modal presentation.
+  html = html.replace('<h1 class="sdh-title" id="sdh-title">', '<h2 class="sdh-title" id="sdh-title">')
+    .replace('<span>từ da cá sấu</span></h1>', '<span>từ da cá sấu</span></h2>')
+    .replace('<h1 id="detailTitle"></h1>', '<h1 id="detailTitle">' + escapeHtml(product.title) + '</h1>');
   // Preserve real Admin titles/descriptions. For a short, generic product
   // title, add the matching category context only when absent and supported
   // by the public category route; never invent product prices or attributes.

@@ -41,7 +41,7 @@ const actualContext=()=>({
 });
 const sneakerHTML=await (await middleware(actualContext())).text();
 assert.ok(sneakerHTML.includes('Giày thể thao (Sneaker) | SinDarealest'));
-assert.ok(sneakerHTML.includes('id="catalogHeading">Giày thể thao (Sneaker)</h2>'));
+assert.ok(sneakerHTML.includes('id="catalogHeading">Giày thể thao (Sneaker)</h1>'));
 const unknown=await middleware(fakeContext('/sanpham/khong-ton-tai'));
 assert.equal(unknown.status,404);
 assert.equal(unknown.headers.get('X-Robots-Tag'),'noindex, nofollow');
