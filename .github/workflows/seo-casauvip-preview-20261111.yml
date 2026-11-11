@@ -110,7 +110,7 @@ jobs:
               if(response.status()!==200)throw Error(device+' '+path+' HTTP '+response.status());
               await page.getByRole('heading',{name:expected,level:1}).waitFor({state:'visible',timeout:15000});
               if(kind==='product')await page.locator('#detailTitle').waitFor({state:'visible',timeout:15000});
-              const data=await page.evaluate(() => ({
+              const data=await page.evaluate((kind) => ({
                 title:document.title,
                 visibleH1:[...document.querySelectorAll('h1')].filter(e=>!!e.getClientRects().length).map(e=>e.textContent.trim()),
                 canonical:document.querySelector('link[rel="canonical"]')?.href,
