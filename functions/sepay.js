@@ -34,8 +34,14 @@ export function sepayWebhookSecret(env) {
 export function sepayBankTransferReady(env,bank) {
   return Boolean(sepayWebhookSecret(env)
     && /^\d{6,19}$/.test(String(bank?.accountNumber||""))
+    && (!bank?.virtualAccountNumber||/^[A-Z0-9]{2,19}$/.test(String(bank.virtualAccountNumber)))
     && String(bank?.bankName||"").trim().length>=2
     && String(bank?.accountName||"").trim().length>=5);
+}
+export function sepayBankWebhookAccountMatches(payload,bank) {
+  if(!bank||String(payload?.accountNumber||"").replace(/\s+/g,"")!==bank.accountNumber)return false;
+  if(!bank.virtualAccountNumber)return true;
+  return String(payload?.subAccount||"").replace(/\s+/g,"").toUpperCase()===bank.virtualAccountNumber;
 }
 export async function sepayCheckoutSchemaReady(DB) {
   if(!DB||typeof DB.prepare!=="function")return false;
