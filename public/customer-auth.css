@@ -136,7 +136,9 @@ html.dark #accountDrawer {
 #accountDrawer .sd-account-logout:focus-visible,
 #accountDrawer #accountClose:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 #accountDrawer .sd-account-toast {
-  position:absolute;top:62px;left:18px;right:18px;z-index:5;
+  /* Keep the success/error notice in the drawer's flex flow. The prior
+     absolute position let it sit underneath the signed-in identity card. */
+  position:relative;inset:auto;z-index:1;align-self:stretch;
   width:auto;margin:0;padding:12px 14px;border-radius:14px;
   border:1px solid rgba(65,136,100,.55);
   background:rgba(228,249,237,.96);color:#176445;
@@ -191,7 +193,7 @@ html.dark #accountDrawer .sd-account-toast[data-kind="error"]{
   #accountDrawer{padding:13px 14px 16px;gap:5px}
   #accountDrawer .sd-account-header{min-height:38px;flex-basis:38px}
   #accountDrawer #sdCustomerAuth{padding:16px 14px}
-  #accountDrawer .sd-account-toast{top:55px;left:14px;right:14px}
+  #accountDrawer .sd-account-toast{inset:auto}
 }
 @media(prefers-reduced-motion:reduce){
   #accountDrawer .account-action{transition:none}
