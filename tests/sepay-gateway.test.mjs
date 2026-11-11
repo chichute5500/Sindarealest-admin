@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createSepayCheckout, createSepayVietQr, parseVndAmount, sepayCheckoutSchemaReady, sepayPaymentReady } from "../functions/sepay.js";
+import { createSepayCheckout, createSepayVietQr, loadSepayBankConfig, parseVndAmount, sepayBankWebhookAccountMatches, sepayCheckoutSchemaReady, sepayPaymentReady } from "../functions/sepay.js";
 import { onRequestPost as receiveIpn } from "../functions/api/sepay/ipn.js";
 
 const env={
@@ -40,6 +40,16 @@ assert.equal(qrUrl.searchParams.get("amount"),"100000","The payment amount remai
 assert.equal(qrUrl.searchParams.get("des"),"SP-1234567890ABCDEF","The matching transfer reference remains embedded in the QR payload");
 assert.equal(qrUrl.searchParams.has("holder"),false);
 assert.equal(qrUrl.searchParams.has("store"),false);
+
+const vaEnv={SEPAY_WEBHOOK_SECRET:"QA_WEBHOOK_SECRET_NONPRODUCTION_123456",SEPAY_QR_BANK_CODE:"MB",SEPAY_QR_BANK_NAME:"MBBank",SEPAY_QR_BANK_ACCOUNT:"1234567890",SEPAY_QR_BANK_VA:"VQRQANKID2744",SEPAY_QR_ACCOUNT_NAME:"QA TEST OWNER"};
+const vaBank=loadSepayBankConfig(vaEnv);
+assert.equal(vaBank.virtualAccountNumber,"VQRQANKID2744");
+const vaQr=createSepayVietQr({env:vaEnv,bank:vaBank,amount:2000,reference:"SP-1234567890ABCDEF"});
+assert.equal(new URL(vaQr.qrImageUrl).searchParams.get("acc"),"VQRQANKID2744","dynamic checkout QR must target the official VA");
+assert.equal(vaQr.accountNumber,"VQRQANKID2744","checkout details must show the VA instead of the main account");
+assert.equal(sepayBankWebhookAccountMatches({accountNumber:"1234567890",subAccount:"VQRQANKID2744"},vaBank),true);
+assert.equal(sepayBankWebhookAccountMatches({accountNumber:"1234567890",subAccount:"OTHER"},vaBank),false,"a transfer to another VA must not create or credit a checkout");
+assert.equal(sepayBankWebhookAccountMatches({accountNumber:"9999999999",subAccount:"VQRQANKID2744"},vaBank),false,"a transfer from another bank account must not create or credit a checkout");
 
 const checkout=await createSepayCheckout({
   env,origin:"https://shop.example",invoiceNumber:"SD-ABC-123456",amount:100000,
