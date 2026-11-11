@@ -34,8 +34,14 @@ export function sepayWebhookSecret(env) {
 export function sepayBankTransferReady(env,bank) {
   return Boolean(sepayWebhookSecret(env)
     && /^\d{6,19}$/.test(String(bank?.accountNumber||""))
+    && (!bank?.virtualAccountNumber||/^[A-Z0-9]{2,19}$/.test(String(bank.virtualAccountNumber)))
     && String(bank?.bankName||"").trim().length>=2
     && String(bank?.accountName||"").trim().length>=5);
+}
+export function sepayBankWebhookAccountMatches(payload,bank) {
+  if(!bank||String(payload?.accountNumber||"").replace(/\s+/g,"")!==bank.accountNumber)return false;
+  if(!bank.virtualAccountNumber)return true;
+  return String(payload?.subAccount||"").replace(/\s+/g,"").toUpperCase()===bank.virtualAccountNumber;
 }
 export async function sepayCheckoutSchemaReady(DB) {
   if(!DB||typeof DB.prepare!=="function")return false;
@@ -47,14 +53,16 @@ export async function sepayCheckoutSchemaReady(DB) {
   }catch{return false;}
 }
 export function loadSepayBankConfig(env) {
-  const bank={bankCode:String(env?.SEPAY_QR_BANK_CODE||"").trim(),bankName:String(env?.SEPAY_QR_BANK_NAME||"").trim(),accountNumber:String(env?.SEPAY_QR_BANK_ACCOUNT||"").replace(/\s+/g,""),accountName:String(env?.SEPAY_QR_ACCOUNT_NAME||"").trim()};
-  return /^[A-Za-z0-9.-]{2,30}$/.test(bank.bankCode)&&/^\d{6,19}$/.test(bank.accountNumber)&&bank.bankName.length>=2&&bank.accountName.length>=5?bank:null;
+  const bank={bankCode:String(env?.SEPAY_QR_BANK_CODE||"").trim(),bankName:String(env?.SEPAY_QR_BANK_NAME||"").trim(),accountNumber:String(env?.SEPAY_QR_BANK_ACCOUNT||"").replace(/\s+/g,""),virtualAccountNumber:String(env?.SEPAY_QR_BANK_VA||"").replace(/\s+/g,"").toUpperCase(),accountName:String(env?.SEPAY_QR_ACCOUNT_NAME||"").trim()};
+  const virtualAccountValid=!bank.virtualAccountNumber||/^[A-Z0-9]{2,19}$/.test(bank.virtualAccountNumber);
+  return /^[A-Za-z0-9.-]{2,30}$/.test(bank.bankCode)&&/^\d{6,19}$/.test(bank.accountNumber)&&virtualAccountValid&&bank.bankName.length>=2&&bank.accountName.length>=5?bank:null;
 }
 export function createSepayVietQr({env,bank,amount,reference}) {
   if(!sepayBankTransferReady(env,bank)||!Number.isSafeInteger(amount)||amount<MIN_CHECKOUT_TRANSFER_AMOUNT||amount>2_000_000_000
      ||!/^[A-Za-z0-9-]{6,64}$/.test(String(reference||"")))return null;
+  const qrAccountNumber=String(bank.virtualAccountNumber||bank.accountNumber);
   const url=new URL("https://vietqr.app/img");
-  url.searchParams.set("acc",String(bank.accountNumber));
+  url.searchParams.set("acc",qrAccountNumber);
   url.searchParams.set("bank",String(bank.bankCode).trim());
   url.searchParams.set("amount",String(amount));
   url.searchParams.set("des",String(reference));
@@ -62,7 +70,7 @@ export function createSepayVietQr({env,bank,amount,reference}) {
   // Keep the QR artwork clean; transfer details remain available in the
   // copyable checkout fields below it. The encoded payment payload is intact.
   url.searchParams.set("showinfo","false");
-  return {qrImageUrl:url.toString(),qrIncludesAmount:true,amount,bankName:String(bank.bankName).trim(),accountNumber:String(bank.accountNumber),accountName:String(bank.accountName).trim(),transferContent:String(reference)};
+  return {qrImageUrl:url.toString(),qrIncludesAmount:true,amount,bankName:String(bank.bankName).trim(),accountNumber:qrAccountNumber,accountName:String(bank.accountName).trim(),transferContent:String(reference)};
 }
 export async function verifySepayBankWebhook({env,timestamp,signature,rawBody,now=Date.now()}) {
   const secret=sepayWebhookSecret(env),stamp=String(timestamp||"");
