@@ -110,13 +110,15 @@ jobs:
               if(response.status()!==200)throw Error(device+' '+path+' HTTP '+response.status());
               if(kind==='product')await page.locator('#detailTitle').waitFor({state:'visible',timeout:20000});
               else await page.getByRole('heading',{name:expected,level:1}).waitFor({state:'visible',timeout:15000});
+              await page.waitForFunction(sel=>{const img=document.querySelector(sel);return img?.complete&&img.naturalWidth>0},kind==='product'?'#detailMainImage':'#catalogGrid img',{timeout:20000});
+              await page.waitForTimeout(600);
               const data=await page.evaluate((kind) => ({
                 title:document.title,
                 visibleH1:[...document.querySelectorAll('h1')].filter(e=>!!e.getClientRects().length).map(e=>e.textContent.trim()),
                 canonical:document.querySelector('link[rel="canonical"]')?.href,
                 viewport:innerWidth,
                 scrollWidth:document.documentElement.scrollWidth,
-                images:[...document.querySelectorAll(kind==='product'?'#detailModal img':'#catalogGrid img')].slice(0,4).map(i=>({alt:i.alt,loaded:i.complete&&i.naturalWidth>0}))
+                images:[...document.querySelectorAll(kind==='product'?'#productOverlay img':'#catalogGrid img')].slice(0,4).map(i=>({alt:i.alt,loaded:i.complete&&i.naturalWidth>0}))
               }),kind);
               await page.screenshot({path:'artifacts/seo-preview/'+device+'-'+kind+'.png'});
               if(data.visibleH1.length!==1)throw Error(device+' '+kind+' visible H1 count '+data.visibleH1.length);
