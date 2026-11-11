@@ -148,8 +148,8 @@ assert.ok(detail.indexOf('id="detailBuyNow"')<detail.indexOf('class="sd-detail-p
 assert.ok(detail.indexOf('class="sd-detail-pledges"')<detail.indexOf('id="detailZalo"'));
 assert.equal((detail.match(/class="sd-detail-pledge"/g)||[]).length,3,'three customer-facing material and warranty cards');
 assert.ok(!detail.includes('id="detailDescription"')&&!detail.includes('class="promise-tags"'),'remove only the redundant description and four chips');
-assert.match(detail, /id="detailAdd"[^>]*>[\\s\\S]*?<svg/);
-assert.match(detail, /id="detailBuyNow"[^>]*>[\\s\\S]*?<svg/);
+assert.match(detail, /id="detailAdd"[^>]*>[\s\S]*?<svg/);
+assert.match(detail, /id="detailBuyNow"[^>]*>[\s\S]*?<svg/);
 assert.equal((detail.match(/class="pill-btn primary detail-purchase-button/g)||[]).length,2);
 assert.match(html,/\.detail-buy-now\{--sd-action-rgb:242,152,70;--sd-action-border-rgb:215,119,47\}/);
 assert.match(html,/--sd-action-rgb:126,177,215/);
