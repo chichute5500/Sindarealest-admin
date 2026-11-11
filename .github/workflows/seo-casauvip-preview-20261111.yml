@@ -3,7 +3,7 @@ name: SEO exact candidate isolated Preview (no Production)
 on:
   push:
     branches: [seo-casauvip-20261111]
-    paths: [.github/workflows/seo-casauvip-preview-20261111.yml]
+    paths: [public/index.html, .github/workflows/seo-casauvip-preview-20261111.yml]
 
 permissions:
   contents: read
