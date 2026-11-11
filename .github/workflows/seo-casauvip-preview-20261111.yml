@@ -1,4 +1,5 @@
 name: SEO exact candidate isolated Preview (no Production)
+# Final candidate includes corrected canonical sitemap routing assertion.
 on:
   push:
     branches: [seo-casauvip-20261111]
