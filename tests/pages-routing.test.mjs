@@ -84,7 +84,7 @@ try {
   assert.match(staticSitemapGet.headers.get("content-type") || "", /application\/xml/i);
   assert.equal(staticSitemapGet.headers.get("x-robots-tag"), null);
   const staticXml = await staticSitemapGet.text();
-  assert.match(staticXml, /<loc>https:\/\/sindarealest2\.pages\.dev\/sanpham\/sneaker<\/loc>/);
+  assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/sanpham\/sneaker<\/loc>/);
   assert.equal((staticXml.match(/<url>/g) || []).length, 17);
 
   const staticSitemapHead = await fetch(new URL("/sitemap-pages.xml", origin), {

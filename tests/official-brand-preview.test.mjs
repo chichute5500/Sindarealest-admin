@@ -26,7 +26,7 @@ for(const [n,size] of [["favicon-16x16.png",16],["favicon-32x32.png",32],["favic
 assert.equal(pub("favicon.ico").readUInt16LE(2),1);
 assert.equal(JSON.parse(pub("site.webmanifest")).short_name,"SinDarealest");
 assert.match(html,/<link rel="icon" type="image\/x-icon" href="\/favicon\.ico/);
-assert.ok(html.includes('<meta property="og:image" content="https://sindarealest2.pages.dev/og-sindarealest-crisp-20261028.jpg">'));
+assert.ok(html.includes('<meta property="og:image" content="https://casauvip.store/og-sindarealest-crisp-20261028.jpg">'));
 assert.ok(html.includes('property="og:image:width" content="1200"'));
 assert.ok(html.includes('property="og:image:height" content="630"'));
 assert.ok(html.includes('SinDarealest — Da cá sấu thật · Phong cách sống thật'));
