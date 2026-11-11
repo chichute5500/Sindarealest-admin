@@ -72,3 +72,68 @@ jobs:
           NODE
           echo "Preview: https://seo-casauvip-20261111.sindarealest-admin-preview.pages.dev/" >> "$GITHUB_STEP_SUMMARY"
           echo "Candidate SHA: $CANDIDATE_SHA; Production deploy: none." >> "$GITHUB_STEP_SUMMARY"
+
+  browser-qa:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PREVIEW_URL: https://seo-casauvip-20261111.sindarealest-admin-preview.pages.dev
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install headless Chromium
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --with-deps --only-shell chromium
+      - name: Capture desktop and mobile category and product
+        shell: bash
+        run: |
+          mkdir -p artifacts/seo-preview
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          import { writeFileSync } from 'node:fs';
+          const browser=await chromium.launch({headless:true});
+          const report=[];
+          for(const [device,viewport] of [['desktop',{width:1365,height:900}],['mobile',{width:390,height:844}]]) {
+            const page=await browser.newPage({viewport,deviceScaleFactor:1,isMobile:device==='mobile',hasTouch:device==='mobile'});
+            for(const [kind,path,expected] of [
+              ['category','/sanpham/vinamnu','Ví da cá sấu nam và nữ'],
+              ['product','/sanpham/sneaker/SD-SN021','Giày Thể Thao VIP Da Cá Sấu Mẫu #021']
+            ]) {
+              const response=await page.goto(process.env.PREVIEW_URL+path,{waitUntil:'domcontentloaded',timeout:20000});
+              if(response.status()!==200)throw Error(device+' '+path+' HTTP '+response.status());
+              await page.getByRole('heading',{name:expected,level:1}).waitFor({state:'visible',timeout:15000});
+              if(kind==='product')await page.locator('#detailTitle').waitFor({state:'visible',timeout:15000});
+              const data=await page.evaluate(() => ({
+                title:document.title,
+                visibleH1:[...document.querySelectorAll('h1')].filter(e=>!!e.getClientRects().length).map(e=>e.textContent.trim()),
+                canonical:document.querySelector('link[rel="canonical"]')?.href,
+                viewport:innerWidth,
+                scrollWidth:document.documentElement.scrollWidth,
+                images:[...document.querySelectorAll(kind==='product'?'#detailModal img':'#catalogGrid img')].slice(0,4).map(i=>({alt:i.alt,loaded:i.complete&&i.naturalWidth>0}))
+              }),kind);
+              await page.screenshot({path:'artifacts/seo-preview/'+device+'-'+kind+'.png'});
+              if(data.visibleH1.length!==1)throw Error(device+' '+kind+' visible H1 count '+data.visibleH1.length);
+              if(kind==='category' && data.images.length<1)throw Error(device+' category has no product images');
+              report.push({device,kind,path,http:response.status(),...data});
+            }
+            await page.close();
+          }
+          await browser.close();
+          writeFileSync('artifacts/seo-preview/report.json',JSON.stringify({sha:process.env.GITHUB_SHA,report},null,2));
+          console.log(JSON.stringify(report,null,2));
+          NODE
+      - name: Upload SHA-bound visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-preview-visual-${{ github.sha }}
+          path: artifacts/seo-preview/
+          if-no-files-found: warn
+          retention-days: 14
