@@ -56,6 +56,18 @@ assert.match(productionHubHtml, /name="robots" content="index, follow"/);
 assert.equal((productionHubHtml.match(/<article class="card">/g) || []).length, 1,
   "Production hub must expose only the approved article");
 assert.doesNotMatch(productionHubHtml, /Đọc bản nháp|Tuần 2|Tuần 12/);
+assert.match(productionHubHtml, /Đồ da cá sấu theo từng danh mục/);
+for (const categoryPath of [
+  "/sanpham/sneaker", "/sanpham/giayluoi", "/sanpham/giaytay",
+  "/sanpham/thatlung", "/sanpham/vinamnu", "/sanpham/dep",
+  "/sanpham/daydongho", "/sanpham/oplung", "/sanpham/caplaptop",
+  "/sanpham/tuithoitrang-golf", "/sanpham/tuixach"
+]) {
+  assert.ok(productionHubHtml.includes('href="' + categoryPath + '"'),
+    "The public knowledge hub must link to product category " + categoryPath);
+}
+assert.doesNotMatch(productionHubHtml, /loài cá sấu|môi trường sống|thức ăn của cá sấu/i,
+  "The product-focused hub must not target animal/species search intent");
 
 const articleSlug = KNOWLEDGE_SLUGS[0];
 const article = await dispatch("/kien-thuc/" + articleSlug + "/");
