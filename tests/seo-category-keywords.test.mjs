@@ -135,10 +135,10 @@ const productSchemas=[...pricedProductBody.matchAll(/<script type="application\/
 const pricedSchema=productSchemas.find(schema=>schema["@type"]==="Product");
 assert.equal(pricedSchema?.offers?.availability,"https://schema.org/OnlineOnly",
   "Offers must state the verified online-only purchase channel");
-assert.equal(pricedSchema?.offers?.seller?.["@id"],origin+"/#business");
+assert.equal(pricedSchema?.offers?.seller?.["@id"],"https://casauvip.store/#business");
 assert.deepEqual(pricedSchema?.offers?.shippingDetails,{
   "@type":"OfferShippingDetails",
-  hasShippingService:{"@id":origin+"/terms-of-service#shipping-policy"}
+  hasShippingService:{"@id":"https://casauvip.store/terms-of-service#shipping-policy"}
 },"Product Offer must reference the public shipping policy without fabricating cost or transit time");
 assert.ok(!Object.hasOwn(pricedSchema.offers,"hasMerchantReturnPolicy"),
   "Do not map warranty terms to a return policy");
