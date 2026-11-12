@@ -44,7 +44,7 @@ const hub = await dispatch("/kien-thuc/");
 assert.equal(hub.response.status, 200);
 assert.equal(hub.assetPath, "/kien-thuc/index.html");
 const hubHtml = await hub.response.text();
-assert.match(hubHtml, /Kiến thức chọn và chăm sóc đồ da cá sấu/);
+assert.match(hubHtml, /Kiến thức và hướng dẫn chọn đồ da cá sấu/);
 assert.match(hub.response.headers.get("X-Robots-Tag") || "", /noindex, nofollow/);
 assert.equal((hubHtml.match(/<article class="card">/g) || []).length, 1,
   "The hub should list only the approved article");
