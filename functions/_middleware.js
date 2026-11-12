@@ -449,9 +449,11 @@ export async function onRequest(context) {
       // do not turn it into a universal zero-rate offer or invent transit days.
       shippingDetails: {
         "@type": "OfferShippingDetails",
-        hasShippingService: { "@id": `${url.origin}/terms-of-service#shipping-policy` }
+        // Stable production entity IDs keep Preview and Production references
+        // connected to the same public organization and shipping policy.
+        hasShippingService: { "@id": "https://casauvip.store/terms-of-service#shipping-policy" }
       },
-      seller: { "@id": `${url.origin}/#business` }
+      seller: { "@id": "https://casauvip.store/#business" }
     } } : {})
   };
   const schema = JSON.stringify(productSchema).replace(/</g, "\\u003c");
