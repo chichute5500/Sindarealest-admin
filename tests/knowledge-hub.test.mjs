@@ -144,7 +144,7 @@ assert.match(sitemap, /<loc>https:\/\/casauvip\.store\/kien-thuc\/phan-biet-da-c
 for (const publishedSlug of KNOWLEDGE_SLUGS) {
   const loc = "https://casauvip.store/kien-thuc/" + publishedSlug + "/";
   assert.ok(sitemap.includes("<loc>" + loc + "</loc>"), publishedSlug + " must be in page sitemap");
-  assert.equal((sitemap.match(new RegExp(loc.replace(/[.*+?^${}()|[\]\\]/g, "\\for (const draftSlug of KNOWLEDGE_SLUGS.slice(1)) assert.doesNotMatch(sitemap, new RegExp("/kien-thuc/" + draftSlug + "/"));"), "g")) || []).length, 1,
+  assert.equal(sitemap.split("<loc>" + loc + "</loc>").length - 1, 1,
     publishedSlug + " must have exactly one sitemap URL");
 }
 
@@ -155,7 +155,7 @@ for (const slug of KNOWLEDGE_SLUGS) {
   const description = html.match(/name="description" content="([^"]*)"/)?.[1] || "";
   assert.ok(title && title.length < 60, slug + " needs a concise title under 60 characters");
   assert.ok(description && description.length < 160, slug + " needs a description under 160 characters");
-  assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must remain a draft");
+  assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must retain private static robots metadata");
   assert.equal((html.match(/<h1\b/g) || []).length, 1, slug + " must have exactly one main heading");
   assert.match(html, /<script type="application\/ld\+json">.*?BreadcrumbList/, slug + " needs breadcrumb data");
   if (slug === articleSlug) {
