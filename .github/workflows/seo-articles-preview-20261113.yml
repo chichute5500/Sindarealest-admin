@@ -126,11 +126,30 @@ jobs:
                   .find(value=>value?.['@type']==='FAQPage');
                 return {
                   title:document.title,
+                  metaDescription:document.querySelector('meta[name="description"]')?.content?.trim()||'',
                   robots:document.querySelector('meta[name="robots"]')?.content||'',
                   canonical:document.querySelector('link[rel="canonical"]')?.href||'',
                   h1:document.querySelector('h1')?.textContent?.trim()||'',
+                  faqPairs:[...document.querySelectorAll('.faq h3')].map(question=>({
+                    question:question.innerText.trim(),
+                    answer:question.nextElementSibling?.innerText.trim()||''
+                  })),
+                  faqSchemaPairs:(schema?.mainEntity||[]).map(item=>({
+                    question:item.name,
+                    answer:item.acceptedAnswer?.text||''
+                  })),
                   faqCount:document.querySelectorAll('.faq h3').length,
                   faqSchemaCount:schema?.mainEntity?.length||0,
+                  faqMatches:JSON.stringify([...document.querySelectorAll('.faq h3')].map(question=>({
+                    question:question.innerText.trim(),
+                    answer:question.nextElementSibling?.innerText.trim()||''
+                  })))===JSON.stringify((schema?.mainEntity||[]).map(item=>({
+                    question:item.name,
+                    answer:item.acceptedAnswer?.text||''
+                  }))),
+                  internalLinks:[...new Set([...document.querySelectorAll('a[href]')]
+                    .map(link=>{const target=new URL(link.href);target.hash='';return target.href})
+                    .filter(url=>new URL(url).origin===location.origin))],
                   scrollWidth:document.documentElement.scrollWidth,
                   viewportWidth:window.innerWidth,
                   brokenImages:[...document.images].filter(img=>!img.complete||!img.naturalWidth).map(img=>img.src),
@@ -138,15 +157,24 @@ jobs:
                 };
               });
               const xRobots=response.headers()['x-robots-tag']||'';
+              const linkResponses=await Promise.all(result.internalLinks.map(async url=>{
+                try {
+                  const linkResponse=await page.request.get(url,{timeout:10000});
+                  return {url,status:linkResponse.status()};
+                } catch { return {url,status:0}; }
+              }));
+              const brokenLinks=linkResponses.filter(link=>link.status<200||link.status>=400);
+              if(!result.title||!result.metaDescription) throw Error(slug+' '+device+' missing title or meta description');
+              if(brokenLinks.length) throw Error(slug+' '+device+' broken internal links: '+JSON.stringify(brokenLinks));
               if(!/noindex\s*,\s*nofollow/i.test(result.robots)) throw Error(slug+' '+device+' meta robots not private: '+result.robots);
               if(!/noindex\s*,\s*nofollow/i.test(xRobots)) throw Error(slug+' '+device+' X-Robots-Tag not private: '+xRobots);
               if(!result.canonical.startsWith('https://casauvip.store/kien-thuc/'+slug+'/')) throw Error(slug+' canonical mismatch');
-              if(!result.h1||result.faqCount!==4||result.faqSchemaCount!==4) throw Error(slug+' '+device+' content/FAQ check failed');
+              if(!result.h1||result.faqCount!==4||result.faqSchemaCount!==4||!result.faqMatches) throw Error(slug+' '+device+' content/FAQ text-schema check failed');
               if(result.scrollWidth>result.viewportWidth+1) throw Error(slug+' '+device+' horizontal overflow');
               if(result.brokenImages.length) throw Error(slug+' '+device+' broken image: '+result.brokenImages.join(','));
               if(!/Bản nháp, chưa xuất bản/.test(result.draftLabel)) throw Error(slug+' '+device+' missing draft label');
               await page.screenshot({path:'artifacts/seo-articles-preview/'+slug+'-'+device+'.png',fullPage:true});
-              report.push({slug,device,status:response.status(),xRobots,...result});
+              report.push({slug,device,status:response.status(),xRobots,brokenLinks,...result});
               await page.close();
             }
           }
