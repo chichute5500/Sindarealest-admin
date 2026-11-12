@@ -1,7 +1,7 @@
 name: Admin Android APK — signed installable test build
 on:
   push:
-    branches: [feat/admin-android-apk-2026-10-28, integration/admin-android-fcm-on-main-2026-10-28]
+    branches: [main, feat/admin-android-apk-2026-10-28, integration/admin-android-fcm-on-main-2026-10-28]
     paths:
       - 'android-admin/**'
       - 'public/images/brand-emblem.png'
