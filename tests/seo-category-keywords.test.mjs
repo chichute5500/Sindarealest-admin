@@ -119,8 +119,9 @@ assert.ok(!productBody.includes('"@type":"Offer"'),"Do not invent verified price
 assert.ok(!productBody.includes('"@type":"AggregateRating"'),"Do not invent reviews");
 
 // The seller operates online only. Use the supported channel availability
-// value without claiming that inventory is physically in stock. Return and
-// shipping policies remain absent unless their exact terms are published.
+// value without claiming that inventory is physically in stock. Refer to the
+// published organization-level shipping policy; do not flatten conditional
+// free shipping into a universal zero-rate offer or invent transit days.
 const pricedProduct={...product,price:1230000,source_price_confirmed:1};
 const pricedProductResponse=await storefront({
   request:new Request(origin+"/sanpham/sneaker/SD-SN321"),
@@ -134,11 +135,26 @@ const productSchemas=[...pricedProductBody.matchAll(/<script type="application\/
 const pricedSchema=productSchemas.find(schema=>schema["@type"]==="Product");
 assert.equal(pricedSchema?.offers?.availability,"https://schema.org/OnlineOnly",
   "Offers must state the verified online-only purchase channel");
-assert.equal(pricedSchema?.offers?.seller?.["@id"],origin+"/#business");
-assert.ok(!Object.hasOwn(pricedSchema.offers,"shippingDetails"),
-  "Do not invent a general shipping cost or delivery window");
+assert.equal(pricedSchema?.offers?.seller?.["@id"],"https://casauvip.store/#business");
+assert.deepEqual(pricedSchema?.offers?.shippingDetails,{
+  "@type":"OfferShippingDetails",
+  hasShippingService:{"@id":"https://casauvip.store/terms-of-service#shipping-policy"}
+},"Product Offer must reference the public shipping policy without fabricating cost or transit time");
 assert.ok(!Object.hasOwn(pricedSchema.offers,"hasMerchantReturnPolicy"),
   "Do not map warranty terms to a return policy");
+const terms=readFileSync(new URL("../public/terms-of-service.html",import.meta.url),"utf8");
+assert.ok(terms.includes("thanh toán toàn bộ được giảm 5% và miễn phí giao hàng"));
+assert.ok(terms.includes("đặt cọc áp dụng phí giao hàng tiêu chuẩn, được xác nhận theo từng đơn hàng"));
+const shippingPolicy=[...terms.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+  .map(match=>JSON.parse(match[1])).find(schema=>schema["@type"]==="Organization")
+  ?.hasShippingService;
+assert.equal(shippingPolicy?.["@id"],"#shipping-policy");
+assert.equal(shippingPolicy?.shippingConditions?.shippingDestination?.addressCountry,"VN");
+assert.match(shippingPolicy?.description||"",/thanh toán toàn bộ.*miễn phí giao hàng/i);
+assert.ok(!Object.hasOwn(shippingPolicy?.shippingConditions||{},"shippingRate"),
+  "Do not invent a standard shipping charge or misrepresent conditional free shipping");
+assert.ok(!Object.hasOwn(shippingPolicy?.shippingConditions||{},"transitTime"),
+  "Do not treat production time as carrier transit time");
 
 // Pagination is crawlable without JavaScript: after eight cards a native
 // category link leads to eight more published products via distinct URL.
