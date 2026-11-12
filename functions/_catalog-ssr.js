@@ -80,6 +80,16 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     const hasNext=rawRows.length>8;
     const rows=rawRows.filter(p=>p&&validTitle(p.title)&&canonicalProductPath(p)).slice(0,8);
     if(!rows.length)return html; // Never output invented/stale products if D1 is unavailable.
+    if(!home){
+      const previewKey=rows[0]?.slug||rows[0]?.sku||rows[0]?.id;
+      if(previewKey){
+        const imageUrl=new URL("/og-image/"+encodeURIComponent(String(previewKey))+".jpg",origin).href;
+        html=html.replace(/<meta\\s+property=["']og:image["'][^>]*>/i,'<meta property="og:image" content="'+h(imageUrl)+'">');
+        html=html.replace(/<meta\\s+property=["']og:image:secure_url["'][^>]*>/i,'<meta property="og:image:secure_url" content="'+h(imageUrl)+'">');
+        html=html.replace(/<meta\\s+property=["']og:image:type["'][^>]*>/i,'<meta property="og:image:type" content="image/jpeg">');
+        html=html.replace(/<meta\\s+name=["']twitter:image["'][^>]*>/i,'<meta name="twitter:image" content="'+h(imageUrl)+'">');
+      }
+    }
     const cards=productCards(rows,origin,{eager:!home,deferAll:home});
     html=html.replace('<div class="catalog-grid" id="catalogGrid"></div>',
       '<div class="catalog-grid" id="catalogGrid">'+cards+'</div>');
