@@ -318,7 +318,7 @@ Các nguồn bảo tồn và sinh học cung cấp bối cảnh tổng quát; ch
 
 ---
 
-## SERP research and editorial update — 2026-11-13
+## SERP research and editorial update — 2026-11-12
 
 A current SERP review was performed for each remaining search intent. Queries were grouped by related buyer questions; results below record representative pages visible during the review, not a ranking promise or an endorsement of every claim on those pages. Commercial pages were used to understand intent and recurring questions, not copied. Where a third-party claim conflicts with verified SinDarealest information or an authoritative source, this draft avoids repeating it. No People Also Ask feature was asserted as observed.
 
