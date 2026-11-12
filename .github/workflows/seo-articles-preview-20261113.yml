@@ -42,9 +42,11 @@ jobs:
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_API_TOKEN"
           npm install --no-fund --no-audit
-          npm run check
           node tests/knowledge-hub.test.mjs
           node tests/sitemap-safety.test.mjs
+          node scripts/check-migrations.mjs
+          node scripts/audit-static-assets.mjs
+          node scripts/audit-css-cascade.mjs
           node scripts/qa-resource-guard.mjs
       - name: Verify Preview bindings differ from Production
         shell: bash

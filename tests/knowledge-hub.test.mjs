@@ -173,7 +173,7 @@ for (const slug of KNOWLEDGE_SLUGS) {
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.acceptedAnswer.text), answers, slug + " FAQ schema answers must match visible answers");
     assert.equal(questions.length, 4, slug + " needs four article-specific FAQs");
   }
-  for (const imageMatch of html.matchAll(/<img\\b[^>]*src="(\\/images\\/knowledge\\/[^"]+)"/g)) {
+  for (const imageMatch of html.matchAll(/<img\b[^>]*src="(\/images\/knowledge\/[^"]+)"/g)) {
     assert.ok(readFileSync(resolve(root, "public", imageMatch[1].slice(1))), slug + " includes an existing owner reference image");
   }
 }
