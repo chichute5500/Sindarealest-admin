@@ -95,23 +95,6 @@ export async function onRequest(context) {
     }
     return response;
   }
-  // Add a crawlable path to the knowledge hub in both storefront navigation
-  // menus without rewriting the large shared app shell asset.
-  if(url.pathname==="/"&&context.request.method==="GET"){
-    const response=await context.next();
-    if(!response.ok||!(response.headers.get("content-type")||"").includes("text/html"))return response;
-    let html=await response.text();
-    const productsLink='<a class="navlink tap-target" href="/sanpham" data-nav="products">Sản phẩm</a>';
-    const knowledgeLink='<a class="navlink tap-target" href="/kien-thuc/">Kiến thức</a>';
-    const occurrences=html.split(productsLink).length-1;
-    if(occurrences!==2)return response;
-    html=html.replaceAll(productsLink,productsLink+knowledgeLink);
-    const headers=new Headers(response.headers);
-    headers.set("Content-Type","text/html; charset=utf-8");
-    headers.set("Cache-Control","public, max-age=0, must-revalidate");
-    for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
-    return new Response(html,{status:response.status,headers:hardenStorefrontHtmlHeaders(headers)});
-  }
   // Independent public support pages reuse the storefront's verified lookup
   // forms. Serve real 200 HTML without DB reads or copied customer data.
   const supportMatch=url.pathname.match(/^\/(tra-cuu-don-hang|bao-hanh)\/?$/i);
@@ -342,6 +325,11 @@ export async function onRequest(context) {
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
     html = await renderPublicCatalog(html,context.env,url.origin,{home:true});
+    // Add a crawlable path to the knowledge hub in both storefront navigation
+    // menus without rewriting the large shared app shell asset.
+    const productsLink='<a class="navlink tap-target" href="/sanpham" data-nav="products">Sản phẩm</a>';
+    if(html.split(productsLink).length-1===2)
+      html=html.replaceAll(productsLink,productsLink+'<a class="navlink tap-target" href="/kien-thuc/">Kiến thức</a>');
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
     return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
   }
