@@ -54,7 +54,16 @@ const articleHtml = await article.response.text();
 assert.match(articleHtml, /<h1\b/);
 assert.match(articleHtml, /rel="canonical" href="https:\/\/casauvip\.store\/kien-thuc\//);
 assert.match(articleHtml, /name="robots" content="noindex,nofollow"/);
-assert.match(articleHtml, /id="checklist-mua-hang"/);
+assert.match(articleHtml, /id="checklist-cau-hoi-theo-sku"/);
+assert.match(articleHtml, /name="description" content="[^"]{1,155}"/);
+assert.match(articleHtml, /<h1>Phân biệt da cá sấu thật và da dập vân: cần kiểm tra gì\?<\/h1>/);
+assert.equal((articleHtml.match(/owner-(?:embossed-0[12]|real-belly-0[12]|real-back-parts)-20261112\.webp/g) || []).length, 10,
+  "Week 1 must show five owner reference images in HTML and Article schema");
+const jsonLd = [...articleHtml.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map(([, value]) => JSON.parse(value));
+assert.ok(jsonLd.some((schema) => schema["@type"] === "Article"));
+const faqSchema = jsonLd.find((schema) => schema["@type"] === "FAQPage");
+assert.equal(faqSchema?.mainEntity?.length, 5, "FAQ schema must match the five visible questions");
+for (const question of faqSchema.mainEntity) assert.ok(articleHtml.includes(question.name));
 assert.match(articleHtml, /src="\/images\/[a-f0-9]{16}\.webp"/);
 
 const normalized = await dispatch("/kien-thuc/" + articleSlug);

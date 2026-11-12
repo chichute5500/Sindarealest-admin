@@ -1,35 +1,29 @@
 # SinDarealest — bộ nháp nội dung SEO 12 tuần
 
-Ngày soạn: 11/11/2026. Tất cả nội dung dưới đây là **bản nháp chưa xuất bản**. Slug `/kien-thuc/` là đề xuất; hiện chưa xác nhận route trung tâm kiến thức trên website. Chưa gán tác giả/người kiểm tra vì chưa có tên và kinh nghiệm được doanh nghiệp xác nhận. Ảnh 1–5 do chủ doanh nghiệp cung cấp để minh họa bộ mẫu: 1–2 được chú thích là da dập vân, 3–4 là phần bụng da cá sấu thật, 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Ghi rõ nguồn chú thích; không xem ảnh là giám định độc lập. Các yêu cầu ảnh khác là ảnh gốc được doanh nghiệp duyệt. Không thêm tuyên bố về CITES, chứng nhận, nguồn gốc, tuổi thọ tuyệt đối hay chất liệu của SKU cụ thể.
+Ngày soạn: 11/11/2026. Tất cả nội dung dưới đây là **bản nháp chưa xuất bản**. Route `/kien-thuc/` và các bài đang ở Preview của PR #228; chưa xuất bản Production. Chưa gán tác giả/người kiểm tra vì chưa có tên và kinh nghiệm được doanh nghiệp xác nhận. Ảnh 1–5 do chủ doanh nghiệp cung cấp để minh họa bộ mẫu: 1–2 được chú thích là da dập vân, 3–4 là phần bụng da cá sấu thật, 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Ghi rõ nguồn chú thích; không xem ảnh là giám định độc lập. Các yêu cầu ảnh khác là ảnh gốc được doanh nghiệp duyệt. Không thêm tuyên bố về CITES, chứng nhận, nguồn gốc, tuổi thọ tuyệt đối hay chất liệu của SKU cụ thể.
 
 **Quy tắc xuất bản:** trước khi lên site cần có người thật được ghi nhận là tác giả hoặc người kiểm tra, ảnh gốc, rà thông tin sản phẩm và chính sách, kiểm tra đường dẫn nội bộ, title/meta và hiển thị trên điện thoại. Bài 1 và 11 cùng ý định tìm hiểu “da thật hay da dập vân”; tuần 11 được thiết kế thành bài cập nhật/checklist bổ sung bài 1, không tạo URL cạnh tranh nếu GSC chưa chứng minh có ý định tìm kiếm khác.
 
 ---
 
-## Tuần 1 — Da thật và da dập vân: giới hạn của việc nhận biết
+## Tuần 1 — Phân biệt da cá sấu thật và da dập vân
 
-- **Slug đề xuất:** `/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van`
-- **Từ khóa chính:** da cá sấu thật giả phân biệt
-- **Từ khóa phụ:** cách nhận biết ví da cá sấu thật; da dập vân; kiểm tra chất liệu
-- **Ý định:** tìm hiểu trước khi mua
-- **H1:** Cách phân biệt da cá sấu thật và da dập vân: điều gì có thể kiểm tra?
-- **Meta title:** Phân biệt da cá sấu thật và da dập vân | SinDarealest
-- **Meta description:** Ảnh và vân bề mặt không đủ xác nhận chất liệu. Xem những điều nên hỏi người bán trước khi chọn ví, giày hoặc phụ kiện.
-- **Ảnh/alt:** dùng ảnh 1–2 do chủ doanh nghiệp cung cấp, chú thích là da dập vân; ảnh 3–5 do chủ doanh nghiệp chú thích là da cá sấu thật (ảnh 3–4 phần bụng; ảnh 5 phần lưng). Alt mô tả mẫu/vùng theo đúng chú thích và nêu đây là ảnh do doanh nghiệp cung cấp; không tự nhận là giám định độc lập.
-- **Người viết/kiểm tra:** cần doanh nghiệp chỉ định người thật.
-
-### Vì sao ảnh không chứng minh được chất liệu
-Ảnh giúp quan sát hình dáng và cách sắp xếp vân trên bề mặt. Tuy vậy, ánh sáng, góc chụp, lớp hoàn thiện và độ phân giải có thể làm thay đổi cảm nhận. Một bức ảnh riêng lẻ không xác nhận được loài, nguồn nguyên liệu, quy trình xử lý hay chất liệu của phần khuất bên trong sản phẩm. Công cụ AI cũng chỉ mô tả hình ảnh; không thể thay hồ sơ sản phẩm hoặc xác nhận từ người bán.
-
-### Nên hỏi gì trước khi mua?
-Hỏi sản phẩm cụ thể được mô tả chất liệu ra sao; phần nào của sản phẩm dùng vật liệu đó; kích thước, lớp lót và chi tiết cấu tạo nào đang hiển thị; có tài liệu liên quan đến SKU không; chính sách bảo hành, đổi trả và điều kiện đặt hàng được áp dụng thế nào. Đề nghị xem ảnh đủ sáng ở nhiều góc và ảnh cận chi tiết. Câu trả lời nên gắn với đúng mẫu, không chỉ là lời giới thiệu chung.
-
-### Những cách thử tại nhà nên tránh
-Không cắt, đốt, nhỏ hóa chất, cào hoặc làm ướt sản phẩm để thử. Các cách này có thể làm hỏng hàng và không phải phép xác minh đáng tin cậy cho người mua thông thường. Khi thông tin chưa đủ, hãy tạm dừng quyết định hoặc yêu cầu tư vấn rõ hơn.
-
-**Liên kết nội bộ:** `/sanpham/vinamnu`, `/sanpham/sneaker`, `/bao-hanh`. **CTA:** “Gửi mã SKU để được cung cấp thông tin đúng mẫu trước khi đặt.”
-
----
+- **Slug:** `/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van/` (đã dựng trên Preview, chưa xuất bản)
+- **Từ khóa chính:** phân biệt da cá sấu thật và da dập vân
+- **Từ khóa phụ:** cách nhận biết da cá sấu; da bò dập vân cá sấu; ví da cá sấu thật; kiểm tra chất liệu theo SKU
+- **Ý định:** tìm hiểu và so sánh trước khi mua
+- **Độc giả:** người đang cân nhắc mua ví, giày, thắt lưng hoặc phụ kiện có vân cá sấu
+- **H1:** Phân biệt da cá sấu thật và da dập vân: cần kiểm tra gì?
+- **Title:** Phân biệt da cá sấu thật và da dập vân | SinDarealest
+- **Meta description:** Tìm hiểu dấu hiệu chỉ mang tính tham khảo, checklist câu hỏi theo SKU và cách chọn ví, giày, thắt lưng trước khi đặt tại SinDarealest.
+- **Góc nội dung:** SERP snapshot ngày 12/11/2026 có các bài hướng dẫn nhận biết theo vân, cảm giác bề mặt, đường may và mẹo thử tại nhà. Một số kết quả đưa khuyến nghị thử nước/lửa hoặc ngửi/sờ nhưng không thống nhất. Bài SinDarealest tập trung vào giới hạn của các dấu hiệu, câu hỏi gắn với đúng SKU, checklist trước mua và không khuyến khích phép thử có thể làm hỏng hàng.
+- **Kết quả rà SERP:** VCL — https://vcl.com.vn/tim-hieu-va-nhan-biet-do-da-ca-sau-that; VR360 — https://tuidacasau.vn/da-ca-sau-la-gi-dac-diem-phan-loai-cach-nhan-biet/; Thế Phạm — https://thepham.vn/nhan-biet-da-ca-sau-that/; VTV — https://vtv.vn/tieu-dung/cach-phan-biet-da-that-va-da-gia-20191016162152867.htm; Snowy Store — https://snowybag.com/da-ca-sau-la-gi/; SAGA Vietnam — https://sagavietnam.com/tu-dien-dong-ho/thuat-ngu/day-da-ca-sau-la-gi; FadoDa — https://fadoda.vn/tin-tuc/vi-da-ca-sau-that-nhan-biet-the-nao/; VTV — https://vtv.vn/tieu-dung/phan-biet-da-ca-sau-that-gia-2019032511071871.htm. Đây là snapshot kết quả tìm kiếm, không phải cam kết vị trí; hộp People Also Ask không được công cụ rà soát trả về nên FAQ được xây từ câu hỏi lặp lại trong SERP.
+- **FAQ:** da dập vân có phải luôn là giả da; nhìn vân có đủ kết luận không; ảnh cận có chứng minh chất liệu không; có nên thử nước/lửa không; nên hỏi gì trước khi mua ví/thắt lưng.
+- **Ảnh/alt:** ảnh 1–2 được chủ doanh nghiệp chú thích là da dập vân; ảnh 3–4 là phần bụng; ảnh 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Alt và caption giữ đúng chú thích người gửi; không tuyên bố đó là giám định độc lập.
+- **Internal link:** `/sanpham/vinamnu`, `/sanpham/thatlung`, `/sanpham/sneaker`, `/bao-hanh`, `/kien-thuc/`.
+- **Schema:** Article + FAQPage, cùng BreadcrumbList hiện có; FAQ phải trùng phần nội dung hiển thị. Không kỳ vọng FAQ rich result cho website thương mại thông thường.
+- **Người viết/kiểm tra:** cần doanh nghiệp chỉ định người thật trước khi xuất bản.
+- **Nguồn nội dung hoàn chỉnh:** `public/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van/index.html`.
 
 ## Tuần 2 — Bảo quản đồ da tại nhà
 
