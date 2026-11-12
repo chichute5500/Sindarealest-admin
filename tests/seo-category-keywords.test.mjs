@@ -9,8 +9,8 @@ const json=html.match(/<script id="sd-seo-category-copy" type="application\/json
 assert.ok(json,"Keyword copy must be available in initial HTML without client JavaScript");
 const profiles=JSON.parse(json[1]);
 const slugs=[...new Set(Object.values(PRODUCT_CATEGORY_ROUTE_SLUGS))];
-assert.equal(slugs.length,15,"15 official categories");
-assert.equal(Object.keys(profiles).length,16,"15 category profiles plus all-products");
+assert.equal(slugs.length,12,"12 consolidated category routes");
+assert.equal(Object.keys(profiles).length,13,"12 category profiles plus all-products");
 assert.deepEqual(Object.keys(profiles).sort(),["all",...slugs].sort(),"Only canonical category profiles");
 const titles=new Set();
 for(const slug of ["all",...slugs]){
@@ -25,11 +25,14 @@ for(const slug of ["all",...slugs]){
   titles.add(p.title);
   assert.ok(p.description.length<210,"Keep meta description concise");
 }
-for(const slug of ["sneaker","giayluoi","giaytay","thatlung","dep","vinam","vicamtay","tuinu"]){
+for(const slug of ["sneaker","giayluoi","giaytay","thatlung","dep","vinamnu","tuixach"]){
   assert.match(profiles[slug].title,/da cá sấu/i,"Commercial search term missing from "+slug);
 }
 assert.ok(html.includes('name="description" content="SinDarealest chuyên thời trang da cá sấu:'));
 assert.ok(html.includes('<title>SinDarealest | Giày, ví, túi và thời trang da cá sấu</title>'));
+assert.ok(html.includes('<h1 id="detailTitle"></h1>'),"Product modal has a semantic H1");
+assert.ok(html.includes('.detail-copy #detailTitle{font:'),"H1 preserves product title typography");
+assert.ok(!html.includes('.detail-copy h2{'),"No obsolete H2-only product title styling");
 
 const readBreadcrumbs = body => {
   const entries = [...body.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
@@ -48,11 +51,12 @@ const fetchPage=async pathname=>{
   assert.equal(response.status,200,pathname);
   return await response.text();
 };
-for(const slug of ["sneaker","giaytay","vinam","thatlung","tuinu","mu"]){
+for(const slug of ["sneaker","giaytay","vinamnu","thatlung","tuixach","mu"]){
   const p=profiles[slug],body=await fetchPage("/sanpham/"+slug);
   assert.ok(body.includes("<title>"+p.title+"</title>"),"Server title missing: "+slug);
   assert.ok(body.includes('name="description" content="'+p.description+'"'),"Server description missing: "+slug);
-  assert.ok(body.includes('id="catalogHeading">'+p.heading+"</h2>"),"Server heading missing: "+slug);
+  assert.ok(body.includes('id="catalogHeading">'+p.heading+"</h1>"),"Server H1 missing: "+slug);
+  assert.ok(body.includes('<h2 class="sdh-title" id="sdh-title">'),"Home hero must not be H1 on catalog route");
   assert.ok(body.includes('id="catalogSeoNote">'+p.intro+"</p>"),"Server visible SEO introduction missing: "+slug);
   assert.ok(body.includes('rel="canonical" href="'+origin+"/sanpham/"+slug+'"'),"Wrong canonical");
   assert.equal((body.match(/<meta name="description"/g)||[]).length,1,"Description must not be duplicated");
@@ -60,7 +64,7 @@ for(const slug of ["sneaker","giaytay","vinam","thatlung","tuinu","mu"]){
   assert.deepEqual(crumbs.map(item=>item.position),[1,2,3]);
   assert.deepEqual(crumbs.map(item=>item.item),[origin+"/",origin+"/sanpham",origin+"/sanpham/"+slug]);
   assert.deepEqual(crumbs.map(item=>item.name),["Trang chủ","Tất cả sản phẩm",
-    ({sneaker:"Giày thể thao",giaytay:"Giày tây",vinam:"Ví nam",thatlung:"Thắt lưng",tuinu:"Túi nữ",mu:"Mũ"})[slug]]);
+    ({sneaker:"Giày thể thao (Sneaker)",giaytay:"Giày tây",vinamnu:"Ví nam & nữ",thatlung:"Thắt lưng",tuixach:"Túi xách",mu:"Mũ"})[slug]]);
 
 }
 const all=await fetchPage("/sanpham");
@@ -76,6 +80,7 @@ const ctx={
   products:[{category:"sneakers",categoryLabel:"Giày thể thao"},{category:"vi-nam",categoryLabel:"Ví nam"}],
   categoryOrder:["all","sneakers","vi-nam"],categoryLabels:{all:"Tất cả",sneakers:"Giày thể thao","vi-nam":"Ví nam"},
   selectedCategory:"sneakers",routeSlug:productCategoryRouteSlug,
+  canonicalCategoryKey:value=>({sneakers:"sneakers","vi-nam":"vi-nam-nu"}[value]||value),
   displayProductName:s=>String(s),escapeHtml:s=>String(s),
   document:{
     getElementById:id=>id==="sd-seo-category-copy"?{textContent:json[1]}:null,
@@ -98,9 +103,11 @@ const productHtml=await storefront({
 });
 assert.equal(productHtml.status,200);
 const productBody=await productHtml.text();
-assert.ok(productBody.includes("<title>Giày mẫu SN321 – Giày thể thao da cá sấu | SinDarealest</title>"));
-assert.ok(productBody.includes('content="Mẫu thiết kế cá nhân · SKU: SD-SN321 Khám phá Giày thể thao da cá sấu tại SinDarealest."'));
+assert.match(productBody,/<title>Giày mẫu SN321[^<]*SinDarealest<\/title>/);
+assert.ok(productBody.includes('Mẫu thiết kế cá nhân'));
 assert.ok(productBody.includes('rel="canonical" href="'+origin+"/sanpham/sneaker/SD-SN321"+'"'));
+assert.ok(productBody.includes('<h1 id="detailTitle">Giày mẫu SN321</h1>'),"Direct product title must be H1 in the initial HTML");
+assert.ok(productBody.includes('<h2 class="sdh-title" id="sdh-title">'),"Home hero must not be H1 on product route");
 assert.deepEqual(readBreadcrumbs(productBody).map(x=>x.item),[
   origin+"/",origin+"/sanpham",origin+"/sanpham/sneaker",origin+"/sanpham/sneaker/SD-SN321"
 ]);
@@ -154,4 +161,4 @@ const rejectInvalid=await storefront({
 });
 assert.equal(rejectInvalid.status,404,"Out-of-bounds page URLs must not create crawl traps");
 
-console.log("PASS: 15 unique keyword category profiles, canonical URLs and verified category/product BreadcrumbList hierarchies.");
+console.log("PASS: 12 consolidated category profiles, canonical URLs and verified category/product BreadcrumbList hierarchies.");
