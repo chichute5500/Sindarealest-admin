@@ -157,7 +157,7 @@ assert.ok(!Object.hasOwn(shippingPolicy?.shippingConditions||{},"shippingRate"),
 assert.ok(!Object.hasOwn(shippingPolicy?.shippingConditions||{},"transitTime"),
   "Do not treat production time as carrier transit time");
 
-const returnPolicy=[...terms.matchAll(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/g)]
+const returnPolicy=[...terms.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
   .map(match=>JSON.parse(match[1])).find(schema=>schema["@type"]==="Organization")
   ?.hasMerchantReturnPolicy;
 assert.equal(returnPolicy?.["@id"],"#return-policy");
