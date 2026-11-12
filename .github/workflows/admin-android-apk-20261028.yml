@@ -40,7 +40,8 @@ jobs:
         run: |
           set -euo pipefail
           test -s public/images/brand-emblem.png
-          grep -Fq 'https://sindarealest2.pages.dev/admin/' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          grep -Fq 'https://casauvip.store/admin/' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
+          grep -Fq 'ALLOWED_HOST = "casauvip.store"' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
           grep -Fq 'MIXED_CONTENT_NEVER_ALLOW' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
           grep -Fq 'setWebContentsDebuggingEnabled(false)' android-admin/app/src/main/java/com/sindarealest/admin/MainActivity.java
           test -f android-admin/app/src/main/res/xml/file_paths.xml
@@ -60,7 +61,7 @@ jobs:
           grep -Fq "sdkVersion:'29'" /tmp/admin-apk-badging.txt
           ! "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$APK" | grep -E 'READ_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|CAMERA'
           mkdir -p artifacts
-          cp "$APK" artifacts/SinDarealest-Admin-v1.1.0-Android.apk
+          cp "$APK" artifacts/SinDarealest-Admin-v1.1.1-Android.apk
           sha256sum artifacts/SinDarealest-Admin-v1.1.0-Android.apk | tee artifacts/SHA256.txt
           test -s android-admin/app/google-services.json
           echo 'Firebase Android client config included. Cloudflare FCM sender and production delivery still require separate verification.' > artifacts/PUSH-STATUS.txt
