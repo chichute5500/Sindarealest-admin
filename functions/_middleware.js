@@ -365,7 +365,7 @@ export async function onRequest(context) {
     typeof value === "string" && (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(value)
       || /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(value))) : "";
   const productImagePath = sourceImage ? (sourceImage.startsWith("/") ? sourceImage : `/${sourceImage}`) : "/images/theme-croc-dark.webp";
-  const imagePath = "/og-sindarealest-casauvip-20261113.jpg";
+  const imagePath = productImagePath;
   const canonical = `${url.origin}${canonicalPath}`;
   const verifiedSku = isVerifiedCommercialSku(product) ? String(product.sku).trim() : "";
   let title = `${product.title}${verifiedSku ? ` – ${verifiedSku}` : ""} | SinDarealest`;
@@ -403,7 +403,7 @@ export async function onRequest(context) {
   html = meta(html, "og:url", canonical, true);
   html = meta(html, "og:image", new URL(imagePath, url.origin).href, true);
   html = meta(html, "og:image:secure_url", new URL(imagePath, url.origin).href, true);
-  html = meta(html, "og:image:type", "image/jpeg", true);
+  html = meta(html, "og:image:type", "image/webp", true);
   html = meta(html, "og:image:alt", product.title, true);
   html = meta(html, "twitter:card", "summary_large_image");
   html = meta(html, "twitter:title", title);
