@@ -142,11 +142,17 @@ for (const slug of KNOWLEDGE_SLUGS) {
   assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must remain a draft");
   assert.equal((html.match(/<h1\b/g) || []).length, 1, slug + " must have exactly one main heading");
   assert.match(html, /<script type="application\/ld\+json">.*?BreadcrumbList/, slug + " needs breadcrumb data");
-  const imageTag = html.match(/<figure class="cover"><img\b[^>]*>/)?.[0] || "";
-  const image = imageTag.match(/src="\/images\/([^"]+)"/)?.[1];
-  assert.ok(image, slug + " needs an existing product image");
+  const imageTag = html.match(/<figure class="cover"><img\\b[^>]*>/)?.[0] || "";
+  const imageSrc = imageTag.match(/src="([^"]+)"/)?.[1];
+  assert.ok(imageSrc, slug + " needs a product image");
   assert.match(imageTag, /alt="[^"]+"/, slug + " needs descriptive image alt text");
-  assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
+  if (slug === articleSlug) {
+    assert.equal(imageSrc, "/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp");
+  } else {
+    const image = imageSrc.match(/^\\/images\\/([^"]+)$/)?.[1];
+    assert.ok(image, slug + " needs an existing local product image");
+    assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
+  }
   assert.match(html, /href="\/(?:sanpham|bao-hanh|tra-cuu-don-hang)/, slug + " needs a crawlable internal link");
 }
 console.log("Knowledge hub routing and draft content contracts passed.");
