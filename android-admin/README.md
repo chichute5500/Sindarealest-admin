@@ -3,7 +3,7 @@
 Ứng dụng Android chính thức dành cho Owner: **tải Admin thật qua HTTPS**, không thay thế backend, không chép D1/R2 hoặc tạo cơ sở dữ liệu riêng. Giao diện và nghiệp vụ đã PASS trên Storefront/Admin vẫn do website phục vụ.
 
 ## Hành vi
-- Mở https://sindarealest2.pages.dev/admin/; JavaScript, DOM storage, cookie phiên đăng nhập bên thứ nhất.
+- Mở https://casauvip.store/admin/; JavaScript, DOM storage, cookie phiên đăng nhập bên thứ nhất.
 - Ảnh/logo lấy đúng \`public/images/brand-emblem.png\` trong repo.
 - Chọn nhiều ảnh/tệp bằng Android Files/Photos; chụp ảnh bằng Camera và FileProvider.
 - Giữ touch/zoom/drag của WebView; không thêm gesture refresh ghi đè kéo ảnh ở Admin.
