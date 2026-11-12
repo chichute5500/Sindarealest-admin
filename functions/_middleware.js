@@ -120,11 +120,11 @@ export async function onRequest(context) {
     html=meta(html,"og:title",title,true);
     html=meta(html,"og:description",description,true);
     html=meta(html,"og:url",url.origin+path,true);
-    html=meta(html,"og:image",url.origin+"/og-sindarealest-crisp-20261028.jpg",true);
-    html=meta(html,"og:image:secure_url",url.origin+"/og-sindarealest-crisp-20261028.jpg",true);
+    html=meta(html,"og:image",url.origin+"/og-sindarealest-casauvip-20261113.jpg",true);
+    html=meta(html,"og:image:secure_url",url.origin+"/og-sindarealest-casauvip-20261113.jpg",true);
     html=meta(html,"twitter:title",title);
     html=meta(html,"twitter:description",description);
-    html=meta(html,"twitter:image",url.origin+"/og-sindarealest-crisp-20261028.jpg");
+    html=meta(html,"twitter:image",url.origin+"/og-sindarealest-casauvip-20261113.jpg");
     const canonical='<link rel="canonical" href="'+escapeHtml(url.origin+path)+'">';
     html=/<link\s+rel=["']canonical["']/i.test(html)
       ?html.replace(/<link\s+rel=["']canonical["'][^>]*>/i,canonical)
@@ -241,12 +241,12 @@ export async function onRequest(context) {
     html = meta(html, "og:url", canonicalCatalogUrl, true);
     // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
     // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
-    html = meta(html, "og:image", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
+    html = meta(html, "og:image", url.origin + "/og-sindarealest-casauvip-20261113.jpg", true);
     html = meta(html, "og:image:alt", categorySlug ? "SinDarealest — " + categoryName : "SinDarealest — Toàn bộ sản phẩm da cá sấu", true);
-    html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest-crisp-20261028.jpg", true);
+    html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest-casauvip-20261113.jpg", true);
     html = meta(html, "twitter:title", catalogTitle);
     html = meta(html, "twitter:description", catalogDescription);
-    html = meta(html, "twitter:image", url.origin + "/og-sindarealest-crisp-20261028.jpg");
+    html = meta(html, "twitter:image", url.origin + "/og-sindarealest-casauvip-20261113.jpg");
     html = meta(html, "twitter:card", "summary_large_image");
     const canonicalTag = '<link rel="canonical" href="' + escapeHtml(canonicalCatalogUrl) + '">';
     html = /<link\s+rel=["']canonical["']/i.test(html)
@@ -300,16 +300,16 @@ export async function onRequest(context) {
     if (!["/", "/index.html"].includes(url.pathname)) return response;
     let html = await response.text();
     html = meta(html, "og:url", `${url.origin}/`, true);
-    html = meta(html, "og:image", `${url.origin}/og-sindarealest-crisp-20261028.jpg`, true);
-    html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest-crisp-20261028.jpg`, true);
-    html = meta(html, "twitter:image", `${url.origin}/og-sindarealest-crisp-20261028.jpg`);
+    html = meta(html, "og:image", `${url.origin}/og-sindarealest-casauvip-20261113.jpg`, true);
+    html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest-casauvip-20261113.jpg`, true);
+    html = meta(html, "twitter:image", `${url.origin}/og-sindarealest-casauvip-20261113.jpg`);
     // Structured organization identity is available to crawlers without JS.
     const organizationSchema = JSON.stringify({
       "@context": "https://schema.org", "@type": ["Organization", "LocalBusiness"],
       "@id": `${url.origin}/#business`,
       name: "SinDarealest", url: `${url.origin}/`,
       logo: `${url.origin}/images/brand-emblem.png`,
-      image: `${url.origin}/og-sindarealest-crisp-20261028.jpg`,
+      image: `${url.origin}/og-sindarealest-casauvip-20261113.jpg`,
       telephone: "+84827049192",
       address: {
         "@type": "PostalAddress",
@@ -365,7 +365,7 @@ export async function onRequest(context) {
     typeof value === "string" && (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(value)
       || /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(value))) : "";
   const productImagePath = sourceImage ? (sourceImage.startsWith("/") ? sourceImage : `/${sourceImage}`) : "/images/theme-croc-dark.webp";
-  const imagePath = "/og-sindarealest-crisp-20261028.jpg";
+  const imagePath = "/og-sindarealest-casauvip-20261113.jpg";
   const canonical = `${url.origin}${canonicalPath}`;
   const verifiedSku = isVerifiedCommercialSku(product) ? String(product.sku).trim() : "";
   let title = `${product.title}${verifiedSku ? ` – ${verifiedSku}` : ""} | SinDarealest`;
