@@ -2,6 +2,7 @@ import { createSession, sessionCookie, verifySession } from "./_lib.js";
 import { sendAdminPush } from "./_notifications.js";
 import { renderPublicCatalog } from "./_catalog-ssr.js";
 import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
+import { WARRANTY_OG_JPEG_BASE64 } from "./_warranty-og-image.js";
 import { KNOWLEDGE_SLUGS } from "./_knowledge-routes.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
@@ -59,6 +60,17 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   // Social link-preview crawlers do not all render WebP. Provide a cached JPEG
   // rendition for each product while keeping the storefront's source images intact.
+  if (url.pathname === "/og-image/warranty.jpg") {
+    if (context.request.method !== "GET" && context.request.method !== "HEAD")
+      return new Response("Method not allowed", { status: 405, headers: { "Allow": "GET, HEAD" } });
+    const encoded = atob(WARRANTY_OG_JPEG_BASE64);
+    const bytes = new Uint8Array(encoded.length);
+    for (let i = 0; i < encoded.length; i++) bytes[i] = encoded.charCodeAt(i);
+    return new Response(context.request.method === "HEAD" ? null : bytes, { status: 200, headers: {
+      "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable",
+      "X-Content-Type-Options": "nosniff"
+    } });
+  }
   const ogImageMatch = url.pathname.match(/^\/og-image\/([a-z0-9][a-z0-9._-]{0,119})\.jpg$/i);
   if (ogImageMatch) {
     if (context.request.method !== "GET" && context.request.method !== "HEAD")
@@ -151,11 +163,13 @@ export async function onRequest(context) {
     html=meta(html,"og:title",title,true);
     html=meta(html,"og:description",description,true);
     html=meta(html,"og:url",url.origin+path,true);
-    html=meta(html,"og:image",url.origin+"/og-sindarealest-casauvip-20261113.jpg",true);
-    html=meta(html,"og:image:secure_url",url.origin+"/og-sindarealest-casauvip-20261113.jpg",true);
+    const supportImageUrl=url.origin+(warranty?"/og-image/warranty.jpg":"/og-sindarealest-casauvip-20261113.jpg");
+    html=meta(html,"og:image",supportImageUrl,true);
+    html=meta(html,"og:image:type","image/jpeg",true);
+    html=meta(html,"og:image:secure_url",supportImageUrl,true);
     html=meta(html,"twitter:title",title);
     html=meta(html,"twitter:description",description);
-    html=meta(html,"twitter:image",url.origin+"/og-sindarealest-casauvip-20261113.jpg");
+    html=meta(html,"twitter:image",supportImageUrl);
     const canonical='<link rel="canonical" href="'+escapeHtml(url.origin+path)+'">';
     html=/<link\s+rel=["']canonical["']/i.test(html)
       ?html.replace(/<link\s+rel=["']canonical["'][^>]*>/i,canonical)
