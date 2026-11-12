@@ -3,6 +3,7 @@ import { sendAdminPush } from "./_notifications.js";
 import { renderPublicCatalog } from "./_catalog-ssr.js";
 import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
 import { WARRANTY_OG_JPEG_BASE64 } from "./_warranty-og-image.js";
+import { CATEGORY_OG_JPEG_BASE64 } from "./_category-og-images.js";
 import { KNOWLEDGE_SLUGS } from "./_knowledge-routes.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
@@ -66,6 +67,20 @@ export async function onRequest(context) {
     const encoded = atob(WARRANTY_OG_JPEG_BASE64);
     const bytes = new Uint8Array(encoded.length);
     for (let i = 0; i < encoded.length; i++) bytes[i] = encoded.charCodeAt(i);
+    return new Response(context.request.method === "HEAD" ? null : bytes, { status: 200, headers: {
+      "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable",
+      "X-Content-Type-Options": "nosniff"
+    } });
+  }
+  const categoryOgMatch = url.pathname.match(/^\/og-category\/([a-z0-9][a-z0-9-]{0,99})\.jpg$/i);
+  if (categoryOgMatch) {
+    if (context.request.method !== "GET" && context.request.method !== "HEAD")
+      return new Response("Method not allowed", { status: 405, headers: { "Allow": "GET, HEAD" } });
+    const encoded = CATEGORY_OG_JPEG_BASE64[categoryOgMatch[1].toLowerCase()];
+    if (!encoded) return new Response("Image unavailable", { status: 404 });
+    const binary = atob(encoded);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     return new Response(context.request.method === "HEAD" ? null : bytes, { status: 200, headers: {
       "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable",
       "X-Content-Type-Options": "nosniff"
@@ -284,14 +299,15 @@ export async function onRequest(context) {
     html = meta(html, "og:title", catalogTitle, true);
     html = meta(html, "og:description", catalogDescription, true);
     html = meta(html, "og:url", canonicalCatalogUrl, true);
-    // Image URLs MUST be absolute for Zalo/Facebook/Messenger and other
-    // link-preview crawlers. Use the real brand's existing 1200x630 JPEG.
-    html = meta(html, "og:image", url.origin + "/og-sindarealest-casauvip-20261113.jpg", true);
+    const catalogOgImage = categorySlug
+      ? url.origin + "/og-category/" + encodeURIComponent(categorySlug) + ".jpg"
+      : url.origin + "/og-sindarealest-casauvip-20261113.jpg";
+    html = meta(html, "og:image", catalogOgImage, true);
     html = meta(html, "og:image:alt", categorySlug ? "SinDarealest — " + categoryName : "SinDarealest — Toàn bộ sản phẩm da cá sấu", true);
-    html = meta(html, "og:image:secure_url", url.origin + "/og-sindarealest-casauvip-20261113.jpg", true);
+    html = meta(html, "og:image:secure_url", catalogOgImage, true);
     html = meta(html, "twitter:title", catalogTitle);
     html = meta(html, "twitter:description", catalogDescription);
-    html = meta(html, "twitter:image", url.origin + "/og-sindarealest-casauvip-20261113.jpg");
+    html = meta(html, "twitter:image", catalogOgImage);
     html = meta(html, "twitter:card", "summary_large_image");
     const canonicalTag = '<link rel="canonical" href="' + escapeHtml(canonicalCatalogUrl) + '">';
     html = /<link\s+rel=["']canonical["']/i.test(html)
