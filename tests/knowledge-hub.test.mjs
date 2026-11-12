@@ -80,6 +80,19 @@ assert.match(articleHtml, /name="robots" content="noindex,nofollow"/);
 assert.doesNotMatch(articleHtml, /Từ khóa chính:|Ý định:|Bản nháp, chưa xuất bản|TUẦN 1/);
 assert.match(articleHtml, /Người kiểm duyệt nội dung: Công Chí · 5 năm kinh nghiệm/);
 assert.match(articleHtml, /id="checklist-cau-hoi-theo-sku"/);
+assert.doesNotMatch(articleHtml, /AI cũng chỉ có thể mô tả|theo chú thích của chủ doanh nghiệp|do chủ doanh nghiệp cung cấp/i);
+assert.match(articleHtml, /Lưu ý:<\/strong> Ảnh trong bài chỉ giúp nhận biết ban đầu, không xác nhận chất liệu/);
+assert.match(articleHtml, /rãnh vân khá nông và đều/);
+assert.match(articleHtml, /nhịp lặp theo chu kỳ/);
+assert.match(articleHtml, /khuôn ép/);
+assert.match(articleHtml, /vảy vuông hoặc tròn/);
+assert.match(articleHtml, /rãnh khớp nối sâu/);
+assert.match(articleHtml, /ISO \(cơ quan cảm giác\)/);
+assert.match(articleHtml, /gờ gù và gai lưng nhô cao, phân bố bất đối xứng/);
+assert.match(articleHtml, /vảy chân nhỏ xếp lớp tự nhiên/);
+assert.match(articleHtml, /Không cắt, đốt, cào, nhỏ hóa chất hoặc thử nước/);
+assert.match(articleHtml, /lớp nền bên dưới có thể là da bò thật hoặc vật liệu tổng hợp/);
+
 assert.match(articleHtml, /name="description" content="[^"]{1,155}"/);
 assert.match(articleHtml, /<h1>Phân biệt da cá sấu thật và da dập vân: cần kiểm tra gì\?<\/h1>/);
 assert.equal((articleHtml.match(/owner-(?:embossed-0[12]|real-belly-0[12]|real-back-parts)-20261112\.webp/g) || []).length, 10,
