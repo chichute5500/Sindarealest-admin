@@ -1,7 +1,7 @@
-name: Shipping policy exact candidate Preview
+name: Merchant Listings exact candidate Preview
 on:
   push:
-    branches: [fix-shipping-policy-schema-20261112]
+    branches: [fix-shipping-policy-schema-20261112, fix-merchant-return-policy-20261112]
     paths:
       - 'functions/_middleware.js'
       - 'public/terms-of-service.html'
@@ -27,7 +27,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       PREVIEW_PROJECT: sindarealest-admin-preview
-      PREVIEW_BRANCH: fix-shipping-policy-schema-20261112
+      PREVIEW_BRANCH: ${{ github.head_ref || github.ref_name }}
       CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v7
@@ -43,13 +43,13 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
           if [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
-            test "$GITHUB_REF" = 'refs/heads/fix-shipping-policy-schema-20261112'
+            test "$GITHUB_REF" = "refs/heads/$PREVIEW_BRANCH"
           else
             test "$GITHUB_EVENT_NAME" = 'pull_request'
-            test "$GITHUB_HEAD_REF" = 'fix-shipping-policy-schema-20261112'
+            test "$GITHUB_HEAD_REF" = "$PREVIEW_BRANCH"
           fi
           test "$PREVIEW_PROJECT" = 'sindarealest-admin-preview'
-          test "$PREVIEW_BRANCH" = 'fix-shipping-policy-schema-20261112'
+          case "$PREVIEW_BRANCH" in fix-shipping-policy-schema-20261112|fix-merchant-return-policy-20261112) ;; *) echo "Unsupported Preview branch"; exit 1 ;; esac
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_API_TOKEN"
       - name: Install pinned Wrangler
