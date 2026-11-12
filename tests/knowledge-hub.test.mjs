@@ -159,5 +159,22 @@ for (const slug of KNOWLEDGE_SLUGS) {
     assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
   }
   assert.match(html, /href="\/(?:sanpham|bao-hanh|tra-cuu-don-hang)/, slug + " needs a crawlable internal link");
+  if (slug !== articleSlug) {
+    assert.match(html, /name="keywords" content="[^"]+"/, slug + " needs recorded secondary keyword coverage");
+    assert.match(html, /Từ khóa phụ:/, slug + " needs visible editorial keyword metadata while in draft");
+    const faqSection = html.match(/<section class="faq"[^]*?<\/section>/)?.[0] || "";
+    assert.ok(faqSection, slug + " needs a visible FAQ section");
+    const questions = [...faqSection.matchAll(/<h3>([^]*?)<\/h3>/g)].map(match => match[1].trim());
+    const answers = [...faqSection.matchAll(/<h3>[^]*?<\/h3>\s*<p>([^]*?)<\/p>/g)].map(match => match[1].trim());
+    const faqSchema = [...html.matchAll(/<script type="application\/ld\+json">([^]*?)<\/script>/g)]
+      .map(match => JSON.parse(match[1])).find(schema => schema["@type"] === "FAQPage");
+    assert.ok(faqSchema, slug + " needs FAQ schema when FAQ is visible");
+    assert.deepEqual(faqSchema.mainEntity.map(entity => entity.name), questions, slug + " FAQ schema questions must match visible questions");
+    assert.deepEqual(faqSchema.mainEntity.map(entity => entity.acceptedAnswer.text), answers, slug + " FAQ schema answers must match visible answers");
+    assert.equal(questions.length, 4, slug + " needs four article-specific FAQs");
+  }
+  for (const imageMatch of html.matchAll(/<img\\b[^>]*src="(\\/images\\/knowledge\\/[^"]+)"/g)) {
+    assert.ok(readFileSync(resolve(root, "public", imageMatch[1].slice(1))), slug + " includes an existing owner reference image");
+  }
 }
 console.log("Knowledge hub routing and draft content contracts passed.");
