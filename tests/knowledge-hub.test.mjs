@@ -148,9 +148,7 @@ for (const slug of KNOWLEDGE_SLUGS) {
     assert.ok(html.includes('alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024."'),
       slug + " needs descriptive cover alt text");
   } else {
-    const coverStart = html.indexOf('<figure class="cover"><img');
-    const coverEnd = html.indexOf(">", coverStart);
-    const imageTag = coverStart >= 0 && coverEnd >= 0 ? html.slice(coverStart, coverEnd + 1) : "";
+    const imageTag = html.match(/<figure class="cover"><img\b[^>]*>/)?.[0] || "";
     const imageSrc = imageTag.match(/src="([^"]+)"/)?.[1];
     assert.ok(imageSrc, slug + " needs a product image");
     assert.match(imageTag, /alt="[^"]+"/, slug + " needs descriptive image alt text");
