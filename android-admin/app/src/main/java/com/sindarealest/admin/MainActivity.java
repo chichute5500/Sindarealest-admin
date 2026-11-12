@@ -66,8 +66,8 @@ import java.util.Collections;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
-    private static final String ADMIN_URL = "https://sindarealest2.pages.dev/admin/";
-    private static final String ALLOWED_HOST = "sindarealest2.pages.dev";
+    private static final String ADMIN_URL = "https://casauvip.store/admin/";
+    private static final String ALLOWED_HOST = "casauvip.store";
     private static final int FILE_REQUEST = 201;
     private static final int NOTIFY_PERMISSION_REQUEST = 231;
     private static final String NATIVE_PREFS = "sd_android_owner";
