@@ -57,6 +57,37 @@ function hardenStorefrontHtmlHeaders(headers) {
 }
 export async function onRequest(context) {
   const url = new URL(context.request.url);
+  // Social link-preview crawlers do not all render WebP. Provide a cached JPEG
+  // rendition for each product while keeping the storefront's source images intact.
+  const ogImageMatch = url.pathname.match(/^\\/og-image\\/([a-z0-9][a-z0-9._-]{0,119})\\.jpg$/i);
+  if (ogImageMatch) {
+    if (context.request.method !== "GET" && context.request.method !== "HEAD")
+      return new Response("Method not allowed", { status: 405, headers: { "Allow": "GET, HEAD" } });
+    if (!context.env?.DB) return new Response("Image unavailable", { status: 404 });
+    let ogProduct;
+    try {
+      ogProduct = await context.env.DB.prepare("SELECT images_json FROM products WHERE (lower(slug)=? OR lower(id)=? OR upper(sku)=upper(?)) AND published=1 LIMIT 1")
+        .bind(ogImageMatch[1].toLowerCase(), ogImageMatch[1].toLowerCase(), ogImageMatch[1]).first();
+    } catch { return new Response("Image unavailable", { status: 404 }); }
+    let ogImages = [];
+    try { ogImages = JSON.parse(ogProduct?.images_json || "[]"); } catch {}
+    const ogSource = Array.isArray(ogImages) ? ogImages.find(value =>
+      typeof value === "string" && (/^images\\/[A-Za-z0-9_-]{1,120}\\.webp$/.test(value)
+        || /^\\/media\\/[A-Za-z0-9-]{30,40}\\.webp$/.test(value))) : "";
+    if (!ogSource) return new Response("Image unavailable", { status: 404 });
+    const sourceUrl = new URL(ogSource.startsWith("/") ? ogSource : `/${ogSource}`, url.origin);
+    let imageResponse;
+    try {
+      imageResponse = await fetch(sourceUrl.href, { cf: { image: { format: "jpeg", quality: 85 } } });
+    } catch { return new Response("Image conversion unavailable", { status: 502 }); }
+    if (!imageResponse.ok) return new Response("Image conversion unavailable", { status: 502 });
+    const imageHeaders = new Headers(imageResponse.headers);
+    imageHeaders.set("Content-Type", "image/jpeg");
+    imageHeaders.set("Cache-Control", "public, max-age=31536000, immutable");
+    imageHeaders.set("X-Content-Type-Options", "nosniff");
+    for (const key of ["Content-Length", "Content-Encoding", "ETag"]) imageHeaders.delete(key);
+    return new Response(context.request.method === "HEAD" ? null : imageResponse.body, { status: 200, headers: imageHeaders });
+  }
   // Repair two stale URLs reported by Google Search Console: a trailing-period
   // sitemap typo and the retired product-listing root. Keep canonical URLs direct.
   if (url.pathname === "/sitemap.xml.") return Response.redirect(new URL("/sitemap.xml", url.origin), 301);
@@ -365,7 +396,7 @@ export async function onRequest(context) {
     typeof value === "string" && (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(value)
       || /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(value))) : "";
   const productImagePath = sourceImage ? (sourceImage.startsWith("/") ? sourceImage : `/${sourceImage}`) : "/images/theme-croc-dark.webp";
-  const imagePath = productImagePath;
+  const imagePath = "/og-image/" + encodeURIComponent(slug) + ".jpg";
   const canonical = `${url.origin}${canonicalPath}`;
   const verifiedSku = isVerifiedCommercialSku(product) ? String(product.sku).trim() : "";
   let title = `${product.title}${verifiedSku ? ` – ${verifiedSku}` : ""} | SinDarealest`;
@@ -403,7 +434,7 @@ export async function onRequest(context) {
   html = meta(html, "og:url", canonical, true);
   html = meta(html, "og:image", new URL(imagePath, url.origin).href, true);
   html = meta(html, "og:image:secure_url", new URL(imagePath, url.origin).href, true);
-  html = meta(html, "og:image:type", "image/webp", true);
+  html = meta(html, "og:image:type", "image/jpeg", true);
   html = meta(html, "og:image:alt", product.title, true);
   html = meta(html, "twitter:card", "summary_large_image");
   html = meta(html, "twitter:title", title);
