@@ -1,0 +1,137 @@
+name: SEO Knowledge Hub exact candidate Preview
+on:
+  push:
+    branches: [seo-knowledge-hub-preview-20261112]
+    paths:
+      - 'functions/_middleware.js'
+      - 'functions/_knowledge-routes.js'
+      - 'public/index.html'
+      - 'public/kien-thuc/**'
+      - 'public/images/**'
+      - 'content/knowledge/**'
+      - 'tests/knowledge-hub.test.mjs'
+      - '.github/workflows/seo-knowledge-hub-preview-20261112.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: seo-knowledge-hub-preview-20261112
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PREVIEW_PROJECT: sindarealest-admin-preview
+      PREVIEW_BRANCH: seo-knowledge-hub-preview-20261112
+      CANDIDATE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Check branch, SHA, and target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/seo-knowledge-hub-preview-20261112'
+          test "$PREVIEW_PROJECT" = 'sindarealest-admin-preview'
+          test "$PREVIEW_BRANCH" = 'seo-knowledge-hub-preview-20261112'
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_API_TOKEN"
+      - name: Validate locally before deploy
+        run: |
+          npm install --no-fund --no-audit
+          npm run check
+          node tests/knowledge-hub.test.mjs
+          node scripts/qa-resource-guard.mjs
+      - name: Verify Preview bindings differ from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl -fsS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/${PREVIEW_PROJECT}" > "$RUNNER_TEMP/seo-preview.json"
+          curl -fsS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest2" > "$RUNNER_TEMP/seo-production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/seo-preview.json" "$RUNNER_TEMP/seo-production.json"
+      - name: Deploy exact candidate to Preview only
+        run: npx wrangler pages deploy public --project-name "$PREVIEW_PROJECT" --branch "$PREVIEW_BRANCH" --commit-hash "$CANDIDATE_SHA" --commit-message "SEO Knowledge Hub $CANDIDATE_SHA"
+      - name: Verify deployed alias and SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PREVIEW_PROJECT}/deployments"
+          curl -fsS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$url" > "$RUNNER_TEMP/seo-deployments.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const data=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/seo-deployments.json','utf8'));
+          const exact=(data.result||[]).some(d=>d.environment==='preview' &&
+            d.deployment_trigger?.metadata?.branch===process.env.PREVIEW_BRANCH &&
+            d.deployment_trigger?.metadata?.commit_hash===process.env.CANDIDATE_SHA);
+          if(!exact)throw Error('Preview does not report the exact candidate SHA.');
+          console.log('PASS: exact Preview SHA verified.');
+          NODE
+          echo "Preview: https://seo-knowledge-hub-preview-20261112.sindarealest-admin-preview.pages.dev/" >> "$GITHUB_STEP_SUMMARY"
+          echo "Candidate SHA: $CANDIDATE_SHA. Production deploy: none." >> "$GITHUB_STEP_SUMMARY"
+  browser-qa:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PREVIEW_URL: https://seo-knowledge-hub-preview-20261112.sindarealest-admin-preview.pages.dev
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install Chromium
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --only-shell chromium
+      - name: Check hub and sample articles on desktop and mobile
+        shell: bash
+        run: |
+          mkdir -p artifacts/knowledge-preview
+          node --input-type=module <<'NODE'
+          import {chromium} from 'playwright';
+          import {writeFileSync} from 'node:fs';
+          const paths=['/kien-thuc/','/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van/','/kien-thuc/cach-chon-vi-da-ca-sau-nam/','/kien-thuc/da-bung-da-lung-da-hong-ca-sau/'];
+          const browser=await chromium.launch({headless:true}),report=[];
+          for(const [device,viewport] of [['desktop',{width:1365,height:900}],['mobile',{width:390,height:844}]]) {
+            const page=await browser.newPage({viewport,deviceScaleFactor:1,isMobile:device==='mobile',hasTouch:device==='mobile'});
+            for(const path of paths) {
+              const response=await page.goto(process.env.PREVIEW_URL+path,{waitUntil:'domcontentloaded',timeout:20000});
+              if(response.status()!==200)throw Error(device+' '+path+' HTTP '+response.status());
+              await page.getByRole('heading',{level:1}).waitFor({state:'visible',timeout:10000});
+              await page.waitForFunction(()=>{const i=document.querySelector('main img');return i?.complete&&i.naturalWidth>0},{timeout:12000});
+              const result=await page.evaluate(()=>({title:document.title,h1:[...document.querySelectorAll('h1')].filter(e=>!!e.getClientRects().length).map(e=>e.textContent.trim()),robots:document.querySelector('meta[name=robots]')?.content,viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth,image:[...document.querySelectorAll('main img')].filter(i=>i.getClientRects().length).slice(0,3).map(i=>({alt:i.alt,loaded:i.complete&&i.naturalWidth>0}))}));
+              const name=device+'-'+(path.split('/').filter(Boolean).join('-')||'hub');
+              await page.screenshot({path:'artifacts/knowledge-preview/'+name+'.png',fullPage:true});
+              if(result.h1.length!==1)throw Error(device+' '+path+' visible H1 count '+result.h1.length);
+              if(result.scrollWidth>result.viewport)throw Error(device+' '+path+' horizontal overflow');
+              if(!result.robots?.includes('noindex'))throw Error(device+' '+path+' is not protected as a draft');
+              if(!result.image.length||result.image.some(i=>!i.loaded||!i.alt))throw Error(device+' '+path+' image missing/undescribed');
+              report.push({device,path,http:response.status(),...result});
+            }
+            await page.close();
+          }
+          await browser.close();
+          writeFileSync('artifacts/knowledge-preview/report.json',JSON.stringify({sha:process.env.GITHUB_SHA,report},null,2));
+          console.log(JSON.stringify(report,null,2));
+          NODE
+      - name: Store exact SHA visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-hub-preview-${{ github.sha }}
+          path: artifacts/knowledge-preview/
+          if-no-files-found: warn
+          retention-days: 14

@@ -2,6 +2,7 @@ import { createSession, sessionCookie, verifySession } from "./_lib.js";
 import { sendAdminPush } from "./_notifications.js";
 import { renderPublicCatalog } from "./_catalog-ssr.js";
 import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
+import { KNOWLEDGE_SLUGS } from "./_knowledge-routes.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
   const attr = property ? "property" : "name";
@@ -94,6 +95,23 @@ export async function onRequest(context) {
     }
     return response;
   }
+  // Add a crawlable path to the knowledge hub in both storefront navigation
+  // menus without rewriting the large shared app shell asset.
+  if(url.pathname==="/"&&context.request.method==="GET"){
+    const response=await context.next();
+    if(!response.ok||!(response.headers.get("content-type")||"").includes("text/html"))return response;
+    let html=await response.text();
+    const productsLink='<a class="navlink tap-target" href="/sanpham" data-nav="products">Sản phẩm</a>';
+    const knowledgeLink='<a class="navlink tap-target" href="/kien-thuc/">Kiến thức</a>';
+    const occurrences=html.split(productsLink).length-1;
+    if(occurrences!==2)return response;
+    html=html.replaceAll(productsLink,productsLink+knowledgeLink);
+    const headers=new Headers(response.headers);
+    headers.set("Content-Type","text/html; charset=utf-8");
+    headers.set("Cache-Control","public, max-age=0, must-revalidate");
+    for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
+    return new Response(html,{status:response.status,headers:hardenStorefrontHtmlHeaders(headers)});
+  }
   // Independent public support pages reuse the storefront's verified lookup
   // forms. Serve real 200 HTML without DB reads or copied customer data.
   const supportMatch=url.pathname.match(/^\/(tra-cuu-don-hang|bao-hanh)\/?$/i);
@@ -133,6 +151,28 @@ export async function onRequest(context) {
     headers.set("Cache-Control","public, max-age=0, must-revalidate");
     for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
     return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
+  }
+  if(url.pathname==="/kien-thuc"||url.pathname.startsWith("/kien-thuc/")){
+    if(context.request.method!=="GET"&&context.request.method!=="HEAD")
+      return new Response("Method not allowed",{status:405,headers:{"Allow":"GET, HEAD","Cache-Control":"no-store"}});
+    const match=url.pathname.match(/^\/kien-thuc(?:\/([a-z0-9-]+))?\/?$/);
+    if(!match)return new Response("Không tìm thấy trang.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
+    const slug=match[1]||"";
+    if(slug&&!KNOWLEDGE_SLUGS.includes(slug))
+      return new Response("Không tìm thấy bài viết.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
+    const canonicalPath=slug?"/kien-thuc/"+slug+"/":"/kien-thuc/";
+    if(url.pathname!==canonicalPath)return Response.redirect(new URL(canonicalPath+url.search,url.origin),301);
+    const assetPath=slug?canonicalPath+"index.html":"/kien-thuc/index.html";
+    const response=await context.next(new Request(new URL(assetPath,url.origin),{
+      method:context.request.method,headers:context.request.headers
+    }));
+    if(!response.ok||!(response.headers.get("content-type")||"").includes("text/html"))return response;
+    const headers=new Headers(response.headers);
+    headers.set("Content-Type","text/html; charset=utf-8");
+    headers.set("X-Robots-Tag","noindex, nofollow");
+    headers.set("Cache-Control","public, max-age=0, must-revalidate");
+    for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
+    return new Response(response.body,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
   }
   // Canonical catalog routes are real server-rendered entry points to the same
   // Storefront app. Never route them through product detail SQL or a blank 404.
