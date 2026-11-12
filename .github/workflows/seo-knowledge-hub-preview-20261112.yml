@@ -76,14 +76,14 @@ jobs:
           if(!exact)throw Error('Preview does not report the exact candidate SHA.');
           console.log('PASS: exact Preview SHA verified.');
           NODE
-          echo "Preview: https://seo-knowledge-hub-preview-20261112.sindarealest-admin-preview.pages.dev/" >> "$GITHUB_STEP_SUMMARY"
+          echo "Preview: https://seo-knowledge-hub-preview-20.sindarealest-admin-preview.pages.dev/" >> "$GITHUB_STEP_SUMMARY"
           echo "Candidate SHA: $CANDIDATE_SHA. Production deploy: none." >> "$GITHUB_STEP_SUMMARY"
   browser-qa:
     needs: deploy
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      PREVIEW_URL: https://seo-knowledge-hub-preview-20261112.sindarealest-admin-preview.pages.dev
+      PREVIEW_URL: https://seo-knowledge-hub-preview-20.sindarealest-admin-preview.pages.dev
     steps:
       - uses: actions/checkout@v7
         with:
