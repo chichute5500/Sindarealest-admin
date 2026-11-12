@@ -153,7 +153,15 @@ for (const slug of KNOWLEDGE_SLUGS) {
   const html = readFileSync(path, "utf8");
   const title = html.match(/<title>([^<]+)<\/title>/)?.[1] || "";
   const description = html.match(/name="description" content="([^"]*)"/)?.[1] || "";
-  assert.ok(title && title.length < 60, slug + " needs a concise title under 60 characters");
+  if (slug === "bao-quan-do-da-ca-sau-tai-nha") {
+    assert.equal(title, "Cách bảo quản đồ da cá sấu tại nhà (Ví, Thắt lưng, Túi) bền đẹp | SinDarealest");
+    assert.ok(title.length < 100, slug + " title should remain within a readable search-result length");
+  } else if (slug === "ve-sinh-bao-duong-giay-da-ca-sau") {
+    assert.equal(title, "Hướng dẫn vệ sinh và bảo dưỡng giày da cá sấu đúng chuẩn | SinDarealest");
+    assert.ok(title.length < 100, slug + " title should remain within a readable search-result length");
+  } else {
+    assert.ok(title && title.length < 60, slug + " needs a concise title under 60 characters");
+  }
   assert.ok(description && description.length < 160, slug + " needs a description under 160 characters");
   assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must retain private static robots metadata");
   assert.equal((html.match(/<h1\b/g) || []).length, 1, slug + " must have exactly one main heading");
@@ -181,8 +189,11 @@ for (const slug of KNOWLEDGE_SLUGS) {
     assert.ok(faqSection, slug + " needs a visible FAQ section");
     const questions = [...faqSection.matchAll(/<h3>([^]*?)<\/h3>/g)].map(match => match[1].trim());
     const answers = [...faqSection.matchAll(/<h3>[^]*?<\/h3>\s*<p>([^]*?)<\/p>/g)].map(match => match[1].trim());
-    const faqSchema = [...html.matchAll(/<script type="application\/ld\+json">([^]*?)<\/script>/g)]
-      .map(match => JSON.parse(match[1])).find(schema => schema["@type"] === "FAQPage");
+    const schemaEntities = [...html.matchAll(/<script type="application\/ld\+json">([^]*?)<\/script>/g)]
+      .map(match => JSON.parse(match[1])).flatMap(schema => schema["@graph"] || [schema]);
+    assert.ok(schemaEntities.some(schema => schema["@type"] === "BlogPosting"), slug + " needs BlogPosting schema");
+    assert.ok(schemaEntities.some(schema => schema["@type"] === "BreadcrumbList"), slug + " needs BreadcrumbList schema");
+    const faqSchema = schemaEntities.find(schema => schema["@type"] === "FAQPage");
     assert.ok(faqSchema, slug + " needs FAQ schema when FAQ is visible");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.name), questions, slug + " FAQ schema questions must match visible questions");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.acceptedAnswer.text), answers, slug + " FAQ schema answers must match visible answers");

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { onRequestGet as sitemap, onRequestHead as sitemapHead } from "../functions/sitemap.xml.js";
 import { onRequestGet as robotsTxt } from "../functions/robots.txt.js";
 import { onRequestGet as publicSettings } from "../functions/api/settings.js";
@@ -97,3 +98,18 @@ const settingsResponse = await publicSettings({
 });
 assert.equal(settingsResponse.status, 200);
 assert.equal(settingsResponse.headers.get("X-Robots-Tag"), "noindex");
+
+const staticPagesSitemap = readFileSync(new URL("../public/sitemap-pages.xml", import.meta.url), "utf8");
+assert.match(staticPagesSitemap, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
+assert.match(staticPagesSitemap, /<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/);
+assert.match(staticPagesSitemap, /<\/urlset>\s*$/);
+const staticPageLocs = [...staticPagesSitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(([, loc]) => loc);
+assert.ok(staticPageLocs.length > 0, "static sitemap must include URLs");
+assert.equal(new Set(staticPageLocs).size, staticPageLocs.length, "static sitemap URLs must be unique");
+for (const path of ["/kien-thuc/", ...["bao-quan-do-da-ca-sau-tai-nha","chon-giay-da-ca-sau-theo-phong-cach","cach-chon-vi-da-ca-sau-nam","chon-that-lung-da-ca-sau","da-bung-da-lung-da-hong-ca-sau","chon-size-giay-da-ca-sau-online","hang-co-san-va-hang-dat-rieng","qua-tang-da-ca-sau-cho-nam","da-ca-sau-that-co-ben-khong","ve-sinh-bao-duong-giay-da-ca-sau"].map((slug) => "/kien-thuc/" + slug + "/"), "/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van/", "/bao-hanh", "/tra-cuu-don-hang"]) {
+  assert.ok(staticPageLocs.includes("https://casauvip.store" + path), path + " must be in the static page sitemap");
+}
+assert.ok(!staticPageLocs.some((loc) => /\/(?:lien-he|gioi-thieu|tra-cuu)\/?$/.test(loc)), "sitemap must not list nonexistent placeholder routes");
+
+const staticHeaders = readFileSync(new URL("../public/_headers", import.meta.url), "utf8");
+assert.match(staticHeaders, /\/sitemap-pages\.xml\s+Content-Type: application\/xml; charset=utf-8/);
