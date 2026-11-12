@@ -85,7 +85,8 @@ try {
   assert.equal(staticSitemapGet.headers.get("x-robots-tag"), null);
   const staticXml = await staticSitemapGet.text();
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/sanpham\/sneaker<\/loc>/);
-  assert.equal((staticXml.match(/<url>/g) || []).length, 16);
+  assert.equal((staticXml.match(/<url>/g) || []).length, 26,
+    "Static sitemap includes 14 catalog/home URLs and 12 knowledge URLs");
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/sanpham\/vinamnu<\/loc>/);
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/kien-thuc\/<\/loc>/);
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/kien-thuc\/phan-biet-da-ca-sau-that-da-dap-van\/<\/loc>/);
