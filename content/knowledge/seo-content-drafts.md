@@ -1,6 +1,6 @@
 # SinDarealest — bộ nháp nội dung SEO 12 tuần
 
-Ngày soạn: 11/11/2026. Tất cả nội dung dưới đây là **bản nháp chưa xuất bản**. Slug `/kien-thuc/` là đề xuất; hiện chưa xác nhận route trung tâm kiến thức trên website. Chưa gán tác giả/người kiểm tra vì chưa có tên và kinh nghiệm được doanh nghiệp xác nhận. Mỗi ảnh yêu cầu là ảnh gốc doanh nghiệp tự chụp; alt mô tả ảnh dự kiến, không khẳng định ảnh đã tồn tại. Không thêm tuyên bố về CITES, chứng nhận, nguồn gốc, tuổi thọ tuyệt đối hay chất liệu của SKU cụ thể.
+Ngày soạn: 11/11/2026. Tất cả nội dung dưới đây là **bản nháp chưa xuất bản**. Slug `/kien-thuc/` là đề xuất; hiện chưa xác nhận route trung tâm kiến thức trên website. Chưa gán tác giả/người kiểm tra vì chưa có tên và kinh nghiệm được doanh nghiệp xác nhận. Ảnh 1–5 do chủ doanh nghiệp cung cấp để minh họa bộ mẫu: 1–2 được chú thích là da dập vân, 3–4 là phần bụng da cá sấu thật, 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Ghi rõ nguồn chú thích; không xem ảnh là giám định độc lập. Các yêu cầu ảnh khác là ảnh gốc được doanh nghiệp duyệt. Không thêm tuyên bố về CITES, chứng nhận, nguồn gốc, tuổi thọ tuyệt đối hay chất liệu của SKU cụ thể.
 
 **Quy tắc xuất bản:** trước khi lên site cần có người thật được ghi nhận là tác giả hoặc người kiểm tra, ảnh gốc, rà thông tin sản phẩm và chính sách, kiểm tra đường dẫn nội bộ, title/meta và hiển thị trên điện thoại. Bài 1 và 11 cùng ý định tìm hiểu “da thật hay da dập vân”; tuần 11 được thiết kế thành bài cập nhật/checklist bổ sung bài 1, không tạo URL cạnh tranh nếu GSC chưa chứng minh có ý định tìm kiếm khác.
 
@@ -15,7 +15,7 @@ Ngày soạn: 11/11/2026. Tất cả nội dung dưới đây là **bản nháp 
 - **H1:** Cách phân biệt da cá sấu thật và da dập vân: điều gì có thể kiểm tra?
 - **Meta title:** Phân biệt da cá sấu thật và da dập vân | SinDarealest
 - **Meta description:** Ảnh và vân bề mặt không đủ xác nhận chất liệu. Xem những điều nên hỏi người bán trước khi chọn ví, giày hoặc phụ kiện.
-- **Ảnh gốc/alt:** ảnh macro hai bề mặt có chú thích nguồn của từng mẫu; alt dự kiến: “Cận cảnh bề mặt hai mẫu vật liệu được chú thích riêng”.
+- **Ảnh/alt:** dùng ảnh 1–2 do chủ doanh nghiệp cung cấp, chú thích là da dập vân; ảnh 3–5 do chủ doanh nghiệp chú thích là da cá sấu thật (ảnh 3–4 phần bụng; ảnh 5 phần lưng). Alt mô tả mẫu/vùng theo đúng chú thích và nêu đây là ảnh do doanh nghiệp cung cấp; không tự nhận là giám định độc lập.
 - **Người viết/kiểm tra:** cần doanh nghiệp chỉ định người thật.
 
 ### Vì sao ảnh không chứng minh được chất liệu
@@ -140,11 +140,11 @@ Cụm từ “nguyên tấm” chỉ nên dùng khi cấu tạo của đúng s�
 - **H1:** Da bụng, da lưng và da hông cá sấu khác nhau thế nào?
 - **Meta title:** Da bụng, lưng và hông cá sấu khác gì? | SinDarealest
 - **Meta description:** Các vùng da có thể khác hình dạng vảy; ảnh thành phẩm không đủ xác định vùng da hoặc loài. Tìm hiểu cách hỏi người bán.
-- **Ảnh/alt:** sơ đồ tự vẽ từ nguồn khoa học được cấp quyền, kèm chú thích vùng; alt: “Sơ đồ minh họa các vùng da trên cơ thể cá sấu”.
+- **Ảnh/alt:** dùng ảnh 3–5 do chủ doanh nghiệp cung cấp: ảnh 3–4 được chú thích là phần bụng, ảnh 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Alt và chú thích phải quy nguồn nhận diện cho doanh nghiệp; không gọi đây là giám định độc lập.
 - **Người viết/kiểm tra:** cần người có chuyên môn được doanh nghiệp chỉ định.
 
 ### Vảy thay đổi theo vùng cơ thể
-Tài liệu của IUCN Crocodile Specialist Group mô tả da cá sấu gồm các vảy/scute có hình dạng khác nhau; bề mặt bụng thường có vảy phẳng, dạng gần vuông và vùng này được dùng phổ biến trong ngành da. Tài liệu FAO cũng phân biệt vảy lưng có gờ với các vùng da khác. Đây là mô tả tổng quát, không phải phép nhận diện loài hay xác minh một món hàng.
+Tài liệu của IUCN Crocodile Specialist Group mô tả da cá sấu gồm các vảy/scute có hình dạng khác nhau; bề mặt bụng thường có vảy phẳng, dạng gần vuông và vùng này được dùng phổ biến trong ngành da. Tài liệu FAO cũng phân biệt vảy lưng có gờ với các vùng da khác. Bộ ảnh do doanh nghiệp cung cấp minh họa các nhãn vị trí cụ thể: ảnh 3–4 là phần bụng; ảnh 5 là phần lưng có gù, gai lưng, vây đuôi và da chân. Đây là mô tả tổng quát kết hợp chú thích của doanh nghiệp, không phải phép nhận diện loài, xác minh nguồn gốc hay giám định độc lập.
 
 ### Vì sao không thể gán vùng da từ một món thành phẩm
 Sau khi cắt, ghép, hoàn thiện và tạo hình, một sản phẩm có thể chỉ còn một phần nhỏ của bề mặt ban đầu. Góc chụp, lớp phủ và cách đặt chi tiết cũng ảnh hưởng đến điều nhìn thấy. Vì vậy, AI có thể mô tả dạng vân trong ảnh nhưng không nên kết luận miếng da nằm ở bụng, lưng hay hông nếu thiếu hồ sơ cắt và đối chiếu từ người có chuyên môn.
