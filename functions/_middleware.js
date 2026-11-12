@@ -2,6 +2,7 @@ import { createSession, sessionCookie, verifySession } from "./_lib.js";
 import { sendAdminPush } from "./_notifications.js";
 import { renderPublicCatalog } from "./_catalog-ssr.js";
 import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug, isKnownCatalogCategoryRoute, catalogListingPath } from "./_storefront-route.js";
+import { KNOWLEDGE_SLUGS } from "./_knowledge-routes.js";
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
   const attr = property ? "property" : "name";
@@ -132,6 +133,36 @@ export async function onRequest(context) {
     headers.set("Content-Type","text/html; charset=utf-8");
     headers.set("Cache-Control","public, max-age=0, must-revalidate");
     for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
+    return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
+  }
+  if(url.pathname==="/kien-thuc"||url.pathname.startsWith("/kien-thuc/")){
+    if(context.request.method!=="GET"&&context.request.method!=="HEAD")
+      return new Response("Method not allowed",{status:405,headers:{"Allow":"GET, HEAD","Cache-Control":"no-store"}});
+    const match=url.pathname.match(/^\/kien-thuc(?:\/([a-z0-9-]+))?\/?$/);
+    if(!match)return new Response("Không tìm thấy trang.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
+    const slug=match[1]||"";
+    if(slug&&!KNOWLEDGE_SLUGS.includes(slug))
+      return new Response("Không tìm thấy bài viết.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
+    const isProductionHost=url.hostname.toLowerCase()==="casauvip.store";
+    const approvedArticleSlug="phan-biet-da-ca-sau-that-da-dap-van";
+    const publicKnowledgeRoute=isProductionHost&&(!slug||slug===approvedArticleSlug);
+    if(isProductionHost&&slug&&slug!==approvedArticleSlug)
+      return new Response("Bài viết chưa được phát hành.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
+    const canonicalPath=slug?"/kien-thuc/"+slug+"/":"/kien-thuc/";
+    if(url.pathname!==canonicalPath)return Response.redirect(new URL(canonicalPath+url.search,url.origin),301);
+    const assetPath=slug?canonicalPath+"index.html":"/kien-thuc/index.html";
+    const response=await context.next(new Request(new URL(assetPath,url.origin),{
+      method:context.request.method,headers:context.request.headers
+    }));
+    if(!response.ok||!(response.headers.get("content-type")||"").includes("text/html"))return response;
+    const headers=new Headers(response.headers);
+    headers.set("Content-Type","text/html; charset=utf-8");
+    const robots=publicKnowledgeRoute?"index, follow":"noindex, nofollow";
+    headers.set("X-Robots-Tag",robots);
+    headers.set("Cache-Control","public, max-age=0, must-revalidate");
+    for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
+    let html=await response.text();
+    if(publicKnowledgeRoute)html=html.replace(/<meta\s+name=["']robots["'][^>]*>/i,`<meta name="robots" content="${robots}">`);
     return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
   }
   // Canonical catalog routes are real server-rendered entry points to the same
@@ -302,6 +333,11 @@ export async function onRequest(context) {
     const canonicalTag = `<link rel="canonical" href="${escapeHtml(`${url.origin}/`)}">`;
     html = /<link\s+rel=["']canonical["']/i.test(html) ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag) : html.replace("</head>", `  ${canonicalTag}\n</head>`);
     html = await renderPublicCatalog(html,context.env,url.origin,{home:true});
+    // Add a crawlable path to the knowledge hub in both storefront navigation
+    // menus without rewriting the large shared app shell asset.
+    const productsLink='<a class="navlink tap-target" href="/sanpham" data-nav="products">Sản phẩm</a>';
+    if(html.split(productsLink).length-1===2)
+      html=html.replaceAll(productsLink,productsLink+'<a class="navlink tap-target" href="/kien-thuc/">Kiến thức</a>');
     const headers = new Headers(response.headers); headers.set("Content-Type", "text/html; charset=utf-8"); headers.delete("Content-Length"); headers.delete("Content-Encoding"); headers.delete("ETag");
     return new Response(html, { status: response.status, headers:hardenStorefrontHtmlHeaders(headers) });
   }
