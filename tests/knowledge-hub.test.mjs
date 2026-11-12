@@ -142,15 +142,18 @@ for (const slug of KNOWLEDGE_SLUGS) {
   assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must remain a draft");
   assert.equal((html.match(/<h1\b/g) || []).length, 1, slug + " must have exactly one main heading");
   assert.match(html, /<script type="application\/ld\+json">.*?BreadcrumbList/, slug + " needs breadcrumb data");
-  const coverStart = html.indexOf('<figure class="cover"><img');
-  const coverEnd = html.indexOf(">", coverStart);
-  const imageTag = coverStart >= 0 && coverEnd >= 0 ? html.slice(coverStart, coverEnd + 1) : "";
-  const imageSrc = imageTag.match(/src="([^"]+)"/)?.[1];
-  assert.ok(imageSrc, slug + " needs a product image");
-  assert.match(imageTag, /alt="[^"]+"/, slug + " needs descriptive image alt text");
   if (slug === articleSlug) {
-    assert.equal(imageSrc, "/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp");
+    assert.ok(html.includes('src="/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp"'),
+      slug + " must use the verified SD-VN024 cover image");
+    assert.ok(html.includes('alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024."'),
+      slug + " needs descriptive cover alt text");
   } else {
+    const coverStart = html.indexOf('<figure class="cover"><img');
+    const coverEnd = html.indexOf(">", coverStart);
+    const imageTag = coverStart >= 0 && coverEnd >= 0 ? html.slice(coverStart, coverEnd + 1) : "";
+    const imageSrc = imageTag.match(/src="([^"]+)"/)?.[1];
+    assert.ok(imageSrc, slug + " needs a product image");
+    assert.match(imageTag, /alt="[^"]+"/, slug + " needs descriptive image alt text");
     const image = imageSrc.startsWith("/images/") ? imageSrc.slice("/images/".length) : "";
     assert.ok(image, slug + " needs an existing local product image");
     assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
