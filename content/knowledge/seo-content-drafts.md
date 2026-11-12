@@ -342,5 +342,6 @@ A current SERP review was performed for each remaining search intent. Queries we
 - Draft keyword metadata records primary/secondary terms and search intent. This metadata appears only on clearly labeled draft pages and is not presented as a public hub listing.
 - Product category links use existing routes; policy claims are limited to current shop copy. Product-specific construction, size, price, stock, delivery date, material source and certificates are not inferred.
 - The owner-provided anatomy reference images are used only with captions/alt text that attribute the labels to the owner; the article states that these captions are not independent authentication.
-- All ten pages must retain noindex,nofollow, remain absent from sitemap-pages.xml and from the Production hub, and return 404 with X-Robots-Tag: noindex, nofollow on Production until each receives separate approval.
-- This content update does not approve publication. Preview review remains required before the owner reviews the drafts.
+- Owner approved publication of all ten distinct articles on 2026-11-13. They are included in the Production hub and `sitemap-pages.xml`; registered article routes return 200/index,follow on Production.
+- The Preview deployment remains isolated and serves every knowledge route with `noindex,nofollow`; static article HTML retains noindex and only the Production middleware rewrites the robots directive on the approved production hostname.
+- Week 11 remains integrated into Week 1 and has no competing URL.
