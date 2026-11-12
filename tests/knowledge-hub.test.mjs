@@ -142,7 +142,9 @@ for (const slug of KNOWLEDGE_SLUGS) {
   assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must remain a draft");
   assert.equal((html.match(/<h1\b/g) || []).length, 1, slug + " must have exactly one main heading");
   assert.match(html, /<script type="application\/ld\+json">.*?BreadcrumbList/, slug + " needs breadcrumb data");
-  const imageTag = html.match(/<figure class="cover"><img\\b[^>]*>/)?.[0] || "";
+  const coverStart = html.indexOf('<figure class="cover"><img');
+  const coverEnd = html.indexOf(">", coverStart);
+  const imageTag = coverStart >= 0 && coverEnd >= 0 ? html.slice(coverStart, coverEnd + 1) : "";
   const imageSrc = imageTag.match(/src="([^"]+)"/)?.[1];
   assert.ok(imageSrc, slug + " needs a product image");
   assert.match(imageTag, /alt="[^"]+"/, slug + " needs descriptive image alt text");
