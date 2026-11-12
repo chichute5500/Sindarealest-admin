@@ -1,6 +1,6 @@
 # SinDarealest — bộ nháp nội dung SEO 12 tuần
 
-Ngày soạn nội dung gốc: 11/11/2026; cập nhật SERP và bài tuần 1: 12/11/2026. Tất cả nội dung dưới đây là **bản nháp chưa xuất bản**. Route `/kien-thuc/` và các bài đang ở Preview của PR #228; chưa xuất bản Production. Chưa gán tác giả/người kiểm tra vì chưa có tên và kinh nghiệm được doanh nghiệp xác nhận. Ảnh 1–5 do chủ doanh nghiệp cung cấp để minh họa bộ mẫu: 1–2 được chú thích là da dập vân, 3–4 là phần bụng da cá sấu thật, 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Ghi rõ nguồn chú thích; không xem ảnh là giám định độc lập. Các yêu cầu ảnh khác là ảnh gốc được doanh nghiệp duyệt. Không thêm tuyên bố về CITES, chứng nhận, nguồn gốc, tuổi thọ tuyệt đối hay chất liệu của SKU cụ thể.
+Ngày soạn nội dung gốc: 11/11/2026; cập nhật SERP và bài tuần 1: 12/11/2026. Tất cả nội dung dưới đây là **bản nháp chưa xuất bản**. Route `/kien-thuc/` và các bài đang ở Preview của PR #228; chưa xuất bản Production. Chủ doanh nghiệp đã chỉ định Công Chí làm người kiểm duyệt, với 5 năm kinh nghiệm (thông tin do chủ cung cấp). Chưa ghi nhận nội dung đã được người này kiểm tra; bài vẫn là bản nháp và chờ chủ website duyệt. Ảnh 1–5 do chủ doanh nghiệp cung cấp để minh họa bộ mẫu: 1–2 được chú thích là da dập vân, 3–4 là phần bụng da cá sấu thật, 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Ghi rõ nguồn chú thích; không xem ảnh là giám định độc lập. Các yêu cầu ảnh khác là ảnh gốc được doanh nghiệp duyệt. Không thêm tuyên bố về CITES, chứng nhận, nguồn gốc, tuổi thọ tuyệt đối hay chất liệu của SKU cụ thể.
 
 **Quy tắc xuất bản:** trước khi lên site cần có người thật được ghi nhận là tác giả hoặc người kiểm tra, ảnh gốc, rà thông tin sản phẩm và chính sách, kiểm tra đường dẫn nội bộ, title/meta và hiển thị trên điện thoại. Bài 1 và 11 cùng ý định tìm hiểu “da thật hay da dập vân”; tuần 11 được thiết kế thành bài cập nhật/checklist bổ sung bài 1, không tạo URL cạnh tranh nếu GSC chưa chứng minh có ý định tìm kiếm khác.
 
@@ -22,7 +22,7 @@ Ngày soạn nội dung gốc: 11/11/2026; cập nhật SERP và bài tuần 1: 
 - **Ảnh/alt:** ảnh 1–2 được chủ doanh nghiệp chú thích là da dập vân; ảnh 3–4 là phần bụng; ảnh 5 là phần lưng gồm gù, gai lưng, vây đuôi và da chân. Alt và caption giữ đúng chú thích người gửi; không tuyên bố đó là giám định độc lập.
 - **Internal link:** `/sanpham/vinamnu`, `/sanpham/thatlung`, `/sanpham/sneaker`, `/bao-hanh`, `/kien-thuc/`.
 - **Schema:** Article + FAQPage, cùng BreadcrumbList hiện có; FAQ phải trùng phần nội dung hiển thị. Không kỳ vọng FAQ rich result cho website thương mại thông thường.
-- **Người viết/kiểm tra:** cần doanh nghiệp chỉ định người thật trước khi xuất bản.
+- **Người kiểm duyệt được chỉ định:** Công Chí — 5 năm kinh nghiệm (theo thông tin chủ doanh nghiệp cung cấp). Chưa ghi nhận kết quả kiểm duyệt; cần hoàn tất rà soát trước khi xuất bản.
 - **Nguồn nội dung hoàn chỉnh:** `public/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van/index.html`.
 
 ## Tuần 2 — Bảo quản đồ da tại nhà
