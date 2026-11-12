@@ -115,6 +115,11 @@ jobs:
               const response=await page.goto(process.env.PREVIEW_URL+'/kien-thuc/'+slug+'/',{waitUntil:'domcontentloaded'});
               if(response?.status()!==200) throw Error(slug+' '+device+' returned '+response?.status());
               await page.waitForLoadState('networkidle',{timeout:15000}).catch(()=>{});
+              await page.evaluate(async()=>{
+                const images=[...document.images];
+                for(const image of images) image.loading='eager';
+                await Promise.all(images.map(image=>image.decode().catch(()=>{})));
+              });
               const result=await page.evaluate(()=>{
                 const schema=[...document.querySelectorAll('script[type="application/ld+json"]')]
                   .map(el=>{try{return JSON.parse(el.textContent)}catch{return null}})
