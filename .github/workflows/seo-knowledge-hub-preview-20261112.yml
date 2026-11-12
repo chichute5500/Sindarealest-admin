@@ -111,8 +111,9 @@ jobs:
               const response=await page.goto(process.env.PREVIEW_URL+path,{waitUntil:'domcontentloaded',timeout:20000});
               if(response.status()!==200)throw Error(device+' '+path+' HTTP '+response.status());
               await page.getByRole('heading',{level:1}).waitFor({state:'visible',timeout:10000});
-              await page.waitForFunction(()=>{const i=document.querySelector('main img');return i?.complete&&i.naturalWidth>0},{timeout:12000});
-              const result=await page.evaluate(()=>({title:document.title,h1:[...document.querySelectorAll('h1')].filter(e=>!!e.getClientRects().length).map(e=>e.textContent.trim()),robots:document.querySelector('meta[name=robots]')?.content,viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth,image:[...document.querySelectorAll('main img')].filter(i=>i.getClientRects().length).slice(0,3).map(i=>({alt:i.alt,loaded:i.complete&&i.naturalWidth>0}))}));
+              await page.evaluate(()=>document.querySelectorAll('main img').forEach(image=>{image.loading='eager'}));
+              await page.waitForFunction(()=>{const images=[...document.querySelectorAll('main img')];return images.length>0&&images.every(image=>image.complete&&image.naturalWidth>0)},{timeout:20000});
+              const result=await page.evaluate(()=>({title:document.title,h1:[...document.querySelectorAll('h1')].filter(e=>!!e.getClientRects().length).map(e=>e.textContent.trim()),robots:document.querySelector('meta[name=robots]')?.content,viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth,image:[...document.querySelectorAll('main img')].filter(i=>i.getClientRects().length).map(i=>({alt:i.alt,loaded:i.complete&&i.naturalWidth>0}))}));
               const name=device+'-'+(path.split('/').filter(Boolean).join('-')||'hub');
               await page.screenshot({path:'artifacts/knowledge-preview/'+name+'.png',fullPage:true});
               if(result.h1.length!==1)throw Error(device+' '+path+' visible H1 count '+result.h1.length);
