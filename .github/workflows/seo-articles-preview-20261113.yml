@@ -7,6 +7,7 @@ on:
       - 'public/kien-thuc/**'
       - 'public/images/knowledge/**'
       - 'tests/knowledge-hub.test.mjs'
+      - 'tests/storefront-operations.test.mjs'
       - '.github/workflows/seo-articles-preview-20261113.yml'
 permissions:
   contents: read
