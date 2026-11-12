@@ -149,7 +149,7 @@ for (const slug of KNOWLEDGE_SLUGS) {
   if (slug === articleSlug) {
     assert.equal(imageSrc, "/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp");
   } else {
-    const image = imageSrc.match(/^\\/images\\/([^"]+)$/)?.[1];
+    const image = imageSrc.startsWith("/images/") ? imageSrc.slice("/images/".length) : "";
     assert.ok(image, slug + " needs an existing local product image");
     assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
   }
