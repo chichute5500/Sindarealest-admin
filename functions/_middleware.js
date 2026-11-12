@@ -204,10 +204,10 @@ export async function onRequest(context) {
     if(slug&&!KNOWLEDGE_SLUGS.includes(slug))
       return new Response("Không tìm thấy bài viết.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
     const isProductionHost=url.hostname.toLowerCase()==="casauvip.store";
-    const approvedArticleSlug="phan-biet-da-ca-sau-that-da-dap-van";
-    const publicKnowledgeRoute=isProductionHost&&(!slug||slug===approvedArticleSlug);
-    if(isProductionHost&&slug&&slug!==approvedArticleSlug)
-      return new Response("Bài viết chưa được phát hành.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
+    // Every registered knowledge route has now been approved for publication.
+    // Unknown slugs were rejected above; Production serves the hub and all
+    // registered articles as indexable pages.
+    const publicKnowledgeRoute=isProductionHost;
     const canonicalPath=slug?"/kien-thuc/"+slug+"/":"/kien-thuc/";
     if(url.pathname!==canonicalPath)return Response.redirect(new URL(canonicalPath+url.search,url.origin),301);
     const assetPath=slug?canonicalPath+"index.html":"/kien-thuc/index.html";

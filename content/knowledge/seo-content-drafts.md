@@ -314,3 +314,34 @@ Cất từng chiếc để tránh cọ xát, tránh nơi ẩm kéo dài và khô
 - FAO, *Crocodiles: Their Ecology, Management and Conservation*: mô tả các vùng da/vảy trong sinh học và ngành chế biến. https://www.fao.org/4/t0226e/t0226e03.htm
 
 Các nguồn bảo tồn và sinh học cung cấp bối cảnh tổng quát; chúng không xác nhận nguồn gốc, loài, chứng từ hoặc cấu tạo sản phẩm của SinDarealest. Không xuất bản nội dung cho đến khi người phụ trách thật kiểm tra tính đúng, ảnh gốc và chính sách hiện hành.
+
+
+---
+
+## SERP research and editorial update — 2026-11-12
+
+A current SERP review was performed for each remaining search intent. Queries were grouped by related buyer questions; results below record representative pages visible during the review, not a ranking promise or an endorsement of every claim on those pages. Commercial pages were used to understand intent and recurring questions, not copied. Where a third-party claim conflicts with verified SinDarealest information or an authoritative source, this draft avoids repeating it. No People Also Ask feature was asserted as observed.
+
+| Draft | Search intent observed | Representative SERP pages reviewed |
+| --- | --- | --- |
+| Tuần 2 — Bảo quản đồ da tại nhà | Practical care, humidity, cleaning and storage after purchase | [VR360 — bảo quản ví da cá sấu](https://tuidacasau.vn/vi-da-ca-sau-cach-bao-quan-va-lam-moi-vi-da-ca-sau/); [VR360 — xử lý đồ da mốc](https://tuidacasau.vn/cach-xu-ly-ve-sinh-do-da-ca-sau-bi-moc/); [Canadian Conservation Institute — leather care](https://www.canada.ca/en/conservation-institute/services/conservation-preservation-publications/canadian-conservation-institute-notes/care-alum-vegetable-mineral-leather.html) |
+| Tuần 3 — Chọn giày theo phong cách | Compare sneaker, loafer and dress-shoe use by outfit/occasion | [DAVITH — phối sneaker da cá sấu](https://davithleather.com/blogs/news/phoi-do-voi-giay-sneaker-da-ca-sau-nam-8-cong-thuc-tu-cong-so-den-cuoi-tuan); [Giày Thông Minh — chọn giày theo hoàn cảnh](https://giaythongminh.com/phong-cach-an-mac-cach-chon-giay-nam/) |
+| Tuần 4 — Chọn ví nam | Product comparison by shape, dimensions and carrying habits | [Cá Sấu Hoàng Long — kích thước ví nam](https://casauhoanglong.com/kich-thuoc-vi-nam/); [Lavatino — kích thước ví da nam](https://lavatino.com/2021/08/09/kich-thuoc-vi-da-nam/) |
+| Tuần 5 — Chọn thắt lưng | Buying guidance around length, width, buckle and fit | [DUVIS — chọn dây lưng nam](https://duvis.vn/blog/huong-dan-chon-day-lung-nam-da-ca-sau); [Dodavi — thắt lưng da cá sấu](https://dodavi.vn/blogs/news/that-lung-da-ca-sau-nam-chat-luong-tai-dodavi) |
+| Tuần 6 — Vùng da bụng/lưng/hông | Learn terminology and compare visible scale patterns | [VR360 — vùng da và phân loại](https://tuidacasau.vn/da-ca-sau-la-gi-dac-diem-phan-loai-cach-nhan-biet/); authoritative context: [IUCN Crocodile Specialist Group](https://www.iucncsg.org/pages/The-Crocodilian-Body.html) and [FAO](https://www.fao.org/4/t0226e/t0226e03.htm) |
+| Tuần 7 — Chọn size giày online | Measure feet, account for width/fit, check the brand's own size chart | [UNIQLO Vietnam — size giày](https://www.uniqlo.com/vn/vi/news/topics/2026041603/); [Biti's — size giày nam](https://bitis.com.vn/blogs/chon-size/size-giay-nam); [Decathlon Vietnam — bảng size](https://www.decathlon.vn/blog/bang-size-giay/) |
+| Tuần 8 — Hàng có sẵn và hàng đặt riêng | Understand confirmed stock, custom specifications, timing and payment | Query results mixed product listings and made-to-order pages; the article therefore uses the shop's verified policy text and tells customers to reconfirm stock/timing for the specific order. |
+| Tuần 9 — Quà tặng nam | Choose a useful item by recipient's habits, size, budget and gift date | [DAVITH — đồ da làm quà](https://davithleather.com/collections/qua-tang-cao-cap); [Decathlon Vietnam — quà cho sếp nam](https://www.decathlon.vn/blog/qua-tang-sinh-nhat-sep-nam/) |
+| Tuần 10 — Độ bền | Pre-purchase reassurance; SERP pages frequently state fixed multi-year lifetimes | [Cá Sấu Hoàng Long — da cá sấu có bền không](https://casauhoanglong.com/da-ca-sau-co-ben-khong/); [VietNam Custom Leather — chọn đồ da thật](https://vcl.com.vn/cach-chon-do-da-ca-sau-that). Draft intentionally avoids unsourced lifetime figures and explains use, construction, care and warranty as distinct factors. |
+| Tuần 12 — Vệ sinh giày | Cleaning and drying steps, including when to stop DIY treatment | [VR360 — care for leather goods](https://tuidacasau.vn/vi-da-ca-sau-cach-bao-quan-va-lam-moi-vi-da-ca-sau/); authoritative general preservation context: [Canadian Conservation Institute — care for leather, skin and fur](https://www.canada.ca/en/conservation-institute/services/preventive-conservation/guidelines-collections/caring-leather-skin-fur.html) |
+
+### Content and release status
+
+- The ten distinct draft URLs remain the ten URLs already defined above; no new URL was created. Week 11 remains integrated into the published-intent week 1 article.
+- The ten HTML drafts now include expanded practical sections, four visible FAQs each and matching FAQPage JSON-LD. The visible FAQ text is the schema source; automated checks compare question and answer strings.
+- Draft keyword metadata records primary/secondary terms and search intent. This metadata appears only on clearly labeled draft pages and is not presented as a public hub listing.
+- Product category links use existing routes; policy claims are limited to current shop copy. Product-specific construction, size, price, stock, delivery date, material source and certificates are not inferred.
+- The owner-provided anatomy reference images are used only with captions/alt text that attribute the labels to the owner; the article states that these captions are not independent authentication.
+- Owner approved publication of all ten distinct articles on 2026-11-13. They are included in the Production hub and `sitemap-pages.xml`; registered article routes return 200/index,follow on Production.
+- The Preview deployment remains isolated and serves every knowledge route with `noindex,nofollow`; static article HTML retains noindex and only the Production middleware rewrites the robots directive on the approved production hostname.
+- Week 11 remains integrated into Week 1 and has no competing URL.

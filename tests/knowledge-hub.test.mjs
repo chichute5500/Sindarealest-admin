@@ -46,18 +46,22 @@ assert.equal(hub.assetPath, "/kien-thuc/index.html");
 const hubHtml = await hub.response.text();
 assert.match(hubHtml, /Kiến thức và hướng dẫn chọn đồ da cá sấu/);
 assert.match(hub.response.headers.get("X-Robots-Tag") || "", /noindex, nofollow/);
-assert.equal((hubHtml.match(/<article class="card">/g) || []).length, 1,
-  "The hub should list only the approved article");
+assert.equal((hubHtml.match(/<article class="card">/g) || []).length, 11,
+  "Preview hub should expose the 11 approved, distinct article URLs");
 const productionHub = await dispatch("/kien-thuc/", "GET", "casauvip.store");
 assert.equal(productionHub.response.status, 200);
 assert.equal(productionHub.response.headers.get("X-Robots-Tag"), "index, follow");
 const productionHubHtml = await productionHub.response.text();
 assert.match(productionHubHtml, /name="robots" content="index, follow"/);
-assert.equal((productionHubHtml.match(/<article class="card">/g) || []).length, 1,
-  "Production hub must expose only the approved article");
+assert.equal((productionHubHtml.match(/<article class="card">/g) || []).length, 11,
+  "Production hub must expose all approved articles");
 assert.ok(productionHubHtml.includes('src="/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp" alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024."'),
   "The knowledge hub card must use the SD-VN024 product image.");
-assert.doesNotMatch(productionHubHtml, /Đọc bản nháp|Tuần 2|Tuần 12/);
+assert.doesNotMatch(productionHubHtml, /Đọc bản nháp|Bản nháp|Tuần 2|Tuần 12|Từ khóa chính:|Từ khóa phụ:|Người kiểm tra:/);
+for (const slug of KNOWLEDGE_SLUGS) {
+  assert.ok(productionHubHtml.includes('href="/kien-thuc/' + slug + '/"'),
+    "Production hub must link to approved article " + slug);
+}
 assert.match(productionHubHtml, /Đồ da cá sấu theo từng danh mục/);
 for (const categoryPath of [
   "/sanpham/sneaker", "/sanpham/giayluoi", "/sanpham/giaytay",
@@ -79,7 +83,8 @@ const articleHtml = await article.response.text();
 assert.match(articleHtml, /<h1\b/);
 assert.match(articleHtml, /rel="canonical" href="https:\/\/casauvip\.store\/kien-thuc\//);
 assert.match(articleHtml, /name="robots" content="noindex,nofollow"/);
-assert.doesNotMatch(articleHtml, /Từ khóa chính:|Ý định:|Bản nháp, chưa xuất bản|TUẦN 1/);
+assert.match(article.response.headers.get("X-Robots-Tag") || "", /noindex, nofollow/);
+assert.doesNotMatch(articleHtml, /Từ khóa chính:|Từ khóa phụ:|Ý định:|Bản nháp, chưa xuất bản|TUẦN 1/);
 assert.match(articleHtml, /Người kiểm duyệt nội dung: Công Chí · 5 năm kinh nghiệm/);
 assert.match(articleHtml, /id="checklist-cau-hoi-theo-sku"/);
 assert.doesNotMatch(articleHtml, /AI cũng chỉ có thể mô tả|theo chú thích của chủ doanh nghiệp|do chủ doanh nghiệp cung cấp/i);
@@ -115,10 +120,14 @@ const productionArticle = await dispatch("/kien-thuc/" + articleSlug + "/", "GET
 assert.equal(productionArticle.response.status, 200);
 assert.equal(productionArticle.response.headers.get("X-Robots-Tag"), "index, follow");
 assert.match(await productionArticle.response.text(), /name="robots" content="index, follow"/);
-for (const draftSlug of KNOWLEDGE_SLUGS.slice(1)) {
-  const unpublished = await dispatch("/kien-thuc/" + draftSlug + "/", "GET", "casauvip.store");
-  assert.equal(unpublished.response.status, 404, draftSlug + " must remain unpublished in Production");
-  assert.equal(unpublished.response.headers.get("X-Robots-Tag"), "noindex, nofollow");
+for (const publishedSlug of KNOWLEDGE_SLUGS) {
+  const published = await dispatch("/kien-thuc/" + publishedSlug + "/", "GET", "casauvip.store");
+  assert.equal(published.response.status, 200, publishedSlug + " must serve on Production");
+  assert.equal(published.response.headers.get("X-Robots-Tag"), "index, follow");
+  assert.match(await published.response.text(), /name="robots" content="index, follow"/);
+  const previewRoute = await dispatch("/kien-thuc/" + publishedSlug + "/");
+  assert.equal(previewRoute.response.status, 200, publishedSlug + " must remain available in Preview");
+  assert.equal(previewRoute.response.headers.get("X-Robots-Tag"), "noindex, nofollow");
 }
 
 const normalized = await dispatch("/kien-thuc/" + articleSlug);
@@ -132,7 +141,12 @@ assert.equal(unsupported.response.status, 405);
 const sitemap = readFileSync(resolve(root, "public/sitemap-pages.xml"), "utf8");
 assert.match(sitemap, /<loc>https:\/\/casauvip\.store\/kien-thuc\/<\/loc>/);
 assert.match(sitemap, /<loc>https:\/\/casauvip\.store\/kien-thuc\/phan-biet-da-ca-sau-that-da-dap-van\/<\/loc>/);
-for (const draftSlug of KNOWLEDGE_SLUGS.slice(1)) assert.doesNotMatch(sitemap, new RegExp("/kien-thuc/" + draftSlug + "/"));
+for (const publishedSlug of KNOWLEDGE_SLUGS) {
+  const loc = "https://casauvip.store/kien-thuc/" + publishedSlug + "/";
+  assert.ok(sitemap.includes("<loc>" + loc + "</loc>"), publishedSlug + " must be in page sitemap");
+  assert.equal(sitemap.split("<loc>" + loc + "</loc>").length - 1, 1,
+    publishedSlug + " must have exactly one sitemap URL");
+}
 
 for (const slug of KNOWLEDGE_SLUGS) {
   const path = resolve(root, "public/kien-thuc", slug, "index.html");
@@ -141,7 +155,7 @@ for (const slug of KNOWLEDGE_SLUGS) {
   const description = html.match(/name="description" content="([^"]*)"/)?.[1] || "";
   assert.ok(title && title.length < 60, slug + " needs a concise title under 60 characters");
   assert.ok(description && description.length < 160, slug + " needs a description under 160 characters");
-  assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must remain a draft");
+  assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must retain private static robots metadata");
   assert.equal((html.match(/<h1\b/g) || []).length, 1, slug + " must have exactly one main heading");
   assert.match(html, /<script type="application\/ld\+json">.*?BreadcrumbList/, slug + " needs breadcrumb data");
   if (slug === articleSlug) {
@@ -159,5 +173,23 @@ for (const slug of KNOWLEDGE_SLUGS) {
     assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
   }
   assert.match(html, /href="\/(?:sanpham|bao-hanh|tra-cuu-don-hang)/, slug + " needs a crawlable internal link");
+  if (slug !== articleSlug) {
+    assert.match(html, /name="keywords" content="[^"]+"/, slug + " needs recorded secondary keyword coverage");
+    assert.doesNotMatch(html, /Từ khóa chính:|Từ khóa phụ:|Ý định:|Người kiểm tra:|Bản nháp, chưa xuất bản/,
+      slug + " must not expose draft editorial labels after publication");
+    const faqSection = html.match(/<section class="faq"[^]*?<\/section>/)?.[0] || "";
+    assert.ok(faqSection, slug + " needs a visible FAQ section");
+    const questions = [...faqSection.matchAll(/<h3>([^]*?)<\/h3>/g)].map(match => match[1].trim());
+    const answers = [...faqSection.matchAll(/<h3>[^]*?<\/h3>\s*<p>([^]*?)<\/p>/g)].map(match => match[1].trim());
+    const faqSchema = [...html.matchAll(/<script type="application\/ld\+json">([^]*?)<\/script>/g)]
+      .map(match => JSON.parse(match[1])).find(schema => schema["@type"] === "FAQPage");
+    assert.ok(faqSchema, slug + " needs FAQ schema when FAQ is visible");
+    assert.deepEqual(faqSchema.mainEntity.map(entity => entity.name), questions, slug + " FAQ schema questions must match visible questions");
+    assert.deepEqual(faqSchema.mainEntity.map(entity => entity.acceptedAnswer.text), answers, slug + " FAQ schema answers must match visible answers");
+    assert.equal(questions.length, 4, slug + " needs four article-specific FAQs");
+  }
+  for (const imageMatch of html.matchAll(/<img\b[^>]*src="(\/images\/knowledge\/[^"]+)"/g)) {
+    assert.ok(readFileSync(resolve(root, "public", imageMatch[1].slice(1))), slug + " includes an existing owner reference image");
+  }
 }
-console.log("Knowledge hub routing and draft content contracts passed.");
+console.log("Knowledge hub routing, publication and content contracts passed.");

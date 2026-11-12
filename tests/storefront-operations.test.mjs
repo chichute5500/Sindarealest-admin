@@ -55,13 +55,13 @@ assert.ok(uploadSource.includes('form.get("claimToken")') && warrantyClaimSource
 const adminOrdersSource = readFileSync(new URL('../functions/api/admin/orders.js', import.meta.url), 'utf8');
 assert.ok(adminOrdersSource.includes('COALESCE(sa.full_address,c.address)') && adminOrdersSource.includes('LEFT JOIN order_shipping_addresses'), 'Admin orders must show the shipping address captured for that order');
 
-const html = '<!doctype html><html><head><meta name="description" content="Home"><meta property="og:title" content="Home"><meta property="og:image" content="/og-sindarealest-crisp-20261028.jpg"><meta name="twitter:image" content="/og-sindarealest-crisp-20261028.jpg"><link rel="canonical" href="/"><title>Home</title></head><body></body></html>';
+const html = '<!doctype html><html><head><meta name="description" content="Home"><meta property="og:title" content="Home"><meta property="og:image" content="/og-sindarealest-casauvip-20261113.jpg"><meta name="twitter:image" content="/og-sindarealest-casauvip-20261113.jpg"><link rel="canonical" href="/"><title>Home</title></head><body></body></html>';
 const homepageContext = { request: new Request('https://shop.example/'), env: {}, next: async () => new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}) };
 let response = await seoMiddleware(homepageContext);
 let text = await response.text();
 assert.equal(response.status,200);
 assert.match(text,/og:url" content="https:\/\/shop\.example\//);
-assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest-crisp-20261028\.jpg/);
+assert.match(text,/og:image" content="https:\/\/shop\.example\/og-sindarealest-casauvip-20261113\.jpg/);
 assert.match(text,/canonical" href="https:\/\/shop\.example\//);
 
 const seoDB = {
@@ -88,7 +88,7 @@ assert.equal(response.status,200);
 assert.ok(text.includes('<title>Giày thử – SD-SN001 | SinDarealest</title>'));
 assert.ok(text.includes('og:title" content="Giày thử – SD-SN001 | SinDarealest'));
 assert.ok(text.includes('og:url" content="https://shop.example/sanpham/sneaker/SD-SN001'));
-assert.ok(text.includes('og:image" content="https://shop.example/og-sindarealest-crisp-20261028.jpg'));
+assert.ok(text.includes('og:image" content="https://shop.example/og-image/sd-sn001.jpg'));
 assert.ok(text.includes('og:image:type" content="image/jpeg'));
 assert.ok(text.includes('og:description" content="Giày thử – Sneaker da cá sấu thật. Liên hệ Zalo để nhận báo giá. Mô tả giày · Mã SD-SN001'), 'Product social preview should use unique product copy and include its verified SKU');
 assert.match(text,/application\/ld\+json/);

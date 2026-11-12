@@ -112,7 +112,7 @@ assert.equal(productResponse.status,200);
 const productHtml=await productResponse.text();
 assert.ok(productHtml.includes('<title>Giày Thể Thao Da Cá Sấu Mẫu #113 – SD-SN113 | SinDarealest</title>'));
 assert.ok(productHtml.includes('property="og:image:type" content="image/jpeg"'));
-assert.ok(productHtml.includes('property="og:image" content="https://shop.example/og-sindarealest-crisp-20261028.jpg"'));
+assert.ok(productHtml.includes('property="og:image" content="https://shop.example/og-image/sd-sn113.jpg"'));
 assert.ok(productHtml.includes('class="sd-product-nojs"'),'Direct product route contains an SSR description without JavaScript');
 assert.ok(productHtml.includes('alt="Giày thể thao da cá sấu thật, mã SD-SN113"'));
 const productJson=productHtml.match(/<script type="application\/ld\+json">([^<]+)<\/script>/g)?.at(-1)?.match(/>([^<]+)</)?.[1];

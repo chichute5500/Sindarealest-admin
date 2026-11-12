@@ -1,0 +1,189 @@
+name: SEO article Preview privacy and visual QA
+on:
+  push:
+    branches: [fix-seo-knowledge-articles-20261113]
+    paths:
+      - 'content/knowledge/**'
+      - 'public/kien-thuc/**'
+      - 'public/images/knowledge/**'
+      - 'tests/**'
+      - '.github/workflows/seo-articles-preview-20261113.yml'
+permissions:
+  contents: read
+concurrency:
+  group: seo-articles-preview-20261113
+  cancel-in-progress: false
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PREVIEW_PROJECT: sindarealest-admin-preview
+      PREVIEW_BRANCH: seo-articles-20261113
+      CANDIDATE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Validate exact candidate and draft safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/fix-seo-knowledge-articles-20261113'
+          test "$PREVIEW_PROJECT" = 'sindarealest-admin-preview'
+          test "$PREVIEW_BRANCH" = 'seo-articles-20261113'
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_API_TOKEN"
+          npm install --no-fund --no-audit
+          node tests/knowledge-hub.test.mjs
+          node tests/sitemap-safety.test.mjs
+          node scripts/check-migrations.mjs
+          node scripts/audit-static-assets.mjs
+          node scripts/audit-css-cascade.mjs
+          node scripts/qa-resource-guard.mjs
+      - name: Verify Preview bindings differ from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl -fsS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/${PREVIEW_PROJECT}" > "$RUNNER_TEMP/seo-preview.json"
+          curl -fsS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$base/sindarealest2" > "$RUNNER_TEMP/seo-production.json"
+          node scripts/admin-preview-binding-safety.mjs "$RUNNER_TEMP/seo-preview.json" "$RUNNER_TEMP/seo-production.json"
+      - name: Deploy exact source to isolated Preview only
+        run: npx wrangler pages deploy public --project-name "$PREVIEW_PROJECT" --branch "$PREVIEW_BRANCH" --commit-hash "$CANDIDATE_SHA" --commit-message "SEO article drafts $CANDIDATE_SHA"
+      - name: Verify isolated Preview SHA and URL
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PREVIEW_PROJECT}/deployments"
+          curl -fsS --max-time 25 -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$url" > "$RUNNER_TEMP/seo-deployments.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const data=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/seo-deployments.json','utf8'));
+          const exact=(data.result||[]).some(d=>d.environment==='preview' &&
+            d.deployment_trigger?.metadata?.branch===process.env.PREVIEW_BRANCH &&
+            d.deployment_trigger?.metadata?.commit_hash===process.env.CANDIDATE_SHA);
+          if(!exact)throw Error('Cloudflare did not report the exact draft candidate on isolated Preview');
+          console.log('PASS: isolated Preview reports exact SEO article candidate SHA.');
+          NODE
+  browser-visual-qa:
+    needs: deploy-preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PREVIEW_URL: https://seo-articles-20261113.sindarealest-admin-preview.pages.dev
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install Chromium for visual verification
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
+          npx playwright install --only-shell chromium
+      - name: Check all ten private Preview routes and capture mobile and desktop evidence
+        shell: bash
+        run: |
+          mkdir -p artifacts/seo-articles-preview
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright';
+          import { writeFileSync } from 'node:fs';
+          const slugs = [
+            'bao-quan-do-da-ca-sau-tai-nha','cach-chon-vi-da-ca-sau-nam',
+            'chon-giay-da-ca-sau-theo-phong-cach','chon-size-giay-da-ca-sau-online',
+            'chon-that-lung-da-ca-sau','da-bung-da-lung-da-hong-ca-sau',
+            'da-ca-sau-that-co-ben-khong','hang-co-san-va-hang-dat-rieng',
+            'qua-tang-da-ca-sau-cho-nam','ve-sinh-bao-duong-giay-da-ca-sau'
+          ];
+          const browser=await chromium.launch({headless:true});
+          const report=[];
+          for(const slug of slugs) {
+            for(const [device,viewport] of [['desktop',{width:1365,height:900}],['mobile',{width:390,height:844}]]) {
+              const page=await browser.newPage({
+                viewport,deviceScaleFactor:1,isMobile:device==='mobile',hasTouch:device==='mobile'
+              });
+              const response=await page.goto(process.env.PREVIEW_URL+'/kien-thuc/'+slug+'/',{waitUntil:'domcontentloaded'});
+              if(response?.status()!==200) throw Error(slug+' '+device+' returned '+response?.status());
+              await page.waitForLoadState('networkidle',{timeout:15000}).catch(()=>{});
+              await page.evaluate(async()=>{
+                const images=[...document.images];
+                for(const image of images) image.loading='eager';
+                await Promise.all(images.map(image=>image.decode().catch(()=>{})));
+              });
+              const result=await page.evaluate(()=>{
+                const schema=[...document.querySelectorAll('script[type="application/ld+json"]')]
+                  .map(el=>{try{return JSON.parse(el.textContent)}catch{return null}})
+                  .find(value=>value?.['@type']==='FAQPage');
+                return {
+                  title:document.title,
+                  metaDescription:document.querySelector('meta[name="description"]')?.content?.trim()||'',
+                  robots:document.querySelector('meta[name="robots"]')?.content||'',
+                  canonical:document.querySelector('link[rel="canonical"]')?.href||'',
+                  h1:document.querySelector('h1')?.textContent?.trim()||'',
+                  faqPairs:[...document.querySelectorAll('.faq h3')].map(question=>({
+                    question:question.innerText.trim(),
+                    answer:question.nextElementSibling?.innerText.trim()||''
+                  })),
+                  faqSchemaPairs:(schema?.mainEntity||[]).map(item=>({
+                    question:item.name,
+                    answer:item.acceptedAnswer?.text||''
+                  })),
+                  faqCount:document.querySelectorAll('.faq h3').length,
+                  faqSchemaCount:schema?.mainEntity?.length||0,
+                  faqMatches:JSON.stringify([...document.querySelectorAll('.faq h3')].map(question=>({
+                    question:question.innerText.trim(),
+                    answer:question.nextElementSibling?.innerText.trim()||''
+                  })))===JSON.stringify((schema?.mainEntity||[]).map(item=>({
+                    question:item.name,
+                    answer:item.acceptedAnswer?.text||''
+                  }))),
+                  internalLinks:[...new Set([...document.querySelectorAll('a[href]')]
+                    .map(link=>{const target=new URL(link.href);target.hash='';return target.href})
+                    .filter(url=>new URL(url).origin===location.origin))],
+                  scrollWidth:document.documentElement.scrollWidth,
+                  viewportWidth:window.innerWidth,
+                  brokenImages:[...document.images].filter(img=>!img.complete||!img.naturalWidth).map(img=>img.src),
+                  editorMetadataVisible:/Từ khóa chính:|Từ khóa phụ:|Ý định:|Người kiểm tra:|Bản nháp, chưa xuất bản|KIẾN THỨC DA CÁ SẤU · TUẦN/.test(document.body.innerText)
+                };
+              });
+              const xRobots=response.headers()['x-robots-tag']||'';
+              const linkResponses=await Promise.all(result.internalLinks.map(async url=>{
+                try {
+                  const linkResponse=await page.request.get(url,{timeout:10000});
+                  return {url,status:linkResponse.status()};
+                } catch { return {url,status:0}; }
+              }));
+              const brokenLinks=linkResponses.filter(link=>link.status<200||link.status>=400);
+              if(!result.title||!result.metaDescription) throw Error(slug+' '+device+' missing title or meta description');
+              if(brokenLinks.length) throw Error(slug+' '+device+' broken internal links: '+JSON.stringify(brokenLinks));
+              if(!/noindex\s*,\s*nofollow/i.test(result.robots)) throw Error(slug+' '+device+' meta robots not private: '+result.robots);
+              if(!/noindex\s*,\s*nofollow/i.test(xRobots)) throw Error(slug+' '+device+' X-Robots-Tag not private: '+xRobots);
+              if(!result.canonical.startsWith('https://casauvip.store/kien-thuc/'+slug+'/')) throw Error(slug+' canonical mismatch');
+              if(!result.h1||result.faqCount!==4||result.faqSchemaCount!==4||!result.faqMatches) throw Error(slug+' '+device+' content/FAQ text-schema check failed');
+              if(result.scrollWidth>result.viewportWidth+1) throw Error(slug+' '+device+' horizontal overflow');
+              if(result.brokenImages.length) throw Error(slug+' '+device+' broken image: '+result.brokenImages.join(','));
+              if(result.editorMetadataVisible) throw Error(slug+' '+device+' exposes unpublished editorial metadata');
+              await page.screenshot({path:'artifacts/seo-articles-preview/'+slug+'-'+device+'.png',fullPage:true});
+              report.push({slug,device,status:response.status(),xRobots,brokenLinks,...result});
+              await page.close();
+            }
+          }
+          await browser.close();
+          writeFileSync('artifacts/seo-articles-preview/report.json',JSON.stringify(report,null,2));
+          console.log('PASS: 10 Preview routes remain noindex, are publication-ready, and passed desktop/mobile checks; 20 screenshots saved.');
+          NODE
+      - uses: actions/upload-artifact@v6
+        with:
+          name: seo-articles-preview-visual-evidence
+          path: artifacts/seo-articles-preview/
+          if-no-files-found: error
