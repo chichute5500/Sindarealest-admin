@@ -140,6 +140,9 @@ const unsupported = await dispatch("/kien-thuc/", "POST");
 assert.equal(unsupported.response.status, 405);
 const sitemap = readFileSync(resolve(root, "public/sitemap-pages.xml"), "utf8");
 assert.match(sitemap, /<loc>https:\/\/casauvip\.store\/kien-thuc\/<\/loc>/);
+const hubSitemapEntry = sitemap.match(/<url><loc>https:\/\/casauvip\.store\/kien-thuc\/<\/loc>.*?<\/url>/)?.[0] || "";
+assert.ok(hubSitemapEntry, "The hub must have a sitemap entry");
+assert.doesNotMatch(hubSitemapEntry, /<lastmod>/, "Do not advertise an unverified modification date for an unchanged hub");
 assert.match(sitemap, /<loc>https:\/\/casauvip\.store\/kien-thuc\/phan-biet-da-ca-sau-that-da-dap-van\/<\/loc>/);
 for (const publishedSlug of KNOWLEDGE_SLUGS) {
   const loc = "https://casauvip.store/kien-thuc/" + publishedSlug + "/";
@@ -193,10 +196,13 @@ for (const slug of KNOWLEDGE_SLUGS) {
       .map(match => JSON.parse(match[1])).flatMap(schema => schema["@graph"] || [schema]);
     assert.ok(schemaEntities.some(schema => schema["@type"] === "BlogPosting"), slug + " needs BlogPosting schema");
     assert.ok(schemaEntities.some(schema => schema["@type"] === "BreadcrumbList"), slug + " needs BreadcrumbList schema");
-    const faqSchema = schemaEntities.find(schema => schema["@type"] === "FAQPage");
+    const faqSchemas = schemaEntities.filter(schema => schema["@type"] === "FAQPage");
+    assert.equal(faqSchemas.length, 1, slug + " must have exactly one FAQPage schema entity");
+    const faqSchema = faqSchemas[0];
     assert.ok(faqSchema, slug + " needs FAQ schema when FAQ is visible");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.name), questions, slug + " FAQ schema questions must match visible questions");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.acceptedAnswer.text), answers, slug + " FAQ schema answers must match visible answers");
+    assert.match(html, /\.related ul\{display:flex/, slug + " related article links must use the responsive chip layout");
     assert.equal(questions.length, 4, slug + " needs four article-specific FAQs");
   }
   for (const imageMatch of html.matchAll(/<img\b[^>]*src="(\/images\/knowledge\/[^"]+)"/g)) {
