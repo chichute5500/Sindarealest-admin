@@ -453,6 +453,8 @@ export async function onRequest(context) {
         // connected to the same public organization and shipping policy.
         hasShippingService: { "@id": "https://casauvip.store/terms-of-service#shipping-policy" }
       },
+      // The public policy page documents deposit-specific exclusions and the video requirement.
+      hasMerchantReturnPolicy: { "@id": "https://casauvip.store/terms-of-service#return-policy" },
       seller: { "@id": "https://casauvip.store/#business" }
     } } : {})
   };

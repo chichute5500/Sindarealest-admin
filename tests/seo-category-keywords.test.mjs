@@ -140,8 +140,9 @@ assert.deepEqual(pricedSchema?.offers?.shippingDetails,{
   "@type":"OfferShippingDetails",
   hasShippingService:{"@id":"https://casauvip.store/terms-of-service#shipping-policy"}
 },"Product Offer must reference the public shipping policy without fabricating cost or transit time");
-assert.ok(!Object.hasOwn(pricedSchema.offers,"hasMerchantReturnPolicy"),
-  "Do not map warranty terms to a return policy");
+assert.deepEqual(pricedSchema?.offers?.hasMerchantReturnPolicy,
+  {"@id":"https://casauvip.store/terms-of-service#return-policy"},
+  "Product Offers must reference the published return policy without inventing a return window");
 const terms=readFileSync(new URL("../public/terms-of-service.html",import.meta.url),"utf8");
 assert.ok(terms.includes("thanh toán toàn bộ được giảm 5% và miễn phí giao hàng"));
 assert.ok(terms.includes("đặt cọc áp dụng phí giao hàng tiêu chuẩn, được xác nhận theo từng đơn hàng"));
@@ -155,6 +156,22 @@ assert.ok(!Object.hasOwn(shippingPolicy?.shippingConditions||{},"shippingRate"),
   "Do not invent a standard shipping charge or misrepresent conditional free shipping");
 assert.ok(!Object.hasOwn(shippingPolicy?.shippingConditions||{},"transitTime"),
   "Do not treat production time as carrier transit time");
+
+const returnPolicy=[...terms.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+  .map(match=>JSON.parse(match[1])).find(schema=>schema["@type"]==="Organization")
+  ?.hasMerchantReturnPolicy;
+assert.equal(returnPolicy?.["@id"],"#return-policy");
+assert.equal(returnPolicy?.merchantReturnLink,"https://casauvip.store/terms-of-service#return-policy");
+assert.ok(terms.includes('<h2 id="return-policy">5. Chính sách đổi trả</h2>'));
+assert.ok(terms.includes("không áp dụng đổi trả nếu khách thay đổi ý định hoặc không còn nhu cầu nhận sản phẩm"));
+assert.ok(terms.includes("không phải da thật, được giao không đúng mẫu đã đặt hoặc bị lỗi"));
+assert.ok(terms.includes("video rõ ràng ghi lại quá trình mở gói hàng và sản phẩm nhận được"));
+assert.ok(terms.includes("Shop không tiếp nhận yêu cầu đổi trả dưới bất kỳ hình thức nào"));
+assert.ok(terms.includes("tiền đặt cọc sẽ không được hoàn lại"));
+assert.ok(!Object.hasOwn(returnPolicy||{},"merchantReturnDays"),
+  "Do not invent a return window that the owner did not specify");
+assert.ok(!Object.hasOwn(returnPolicy||{},"returnPolicyCategory"),
+  "Link to the detailed policy instead of assigning an inaccurate blanket return category");
 
 // Pagination is crawlable without JavaScript: after eight cards a native
 // category link leads to eight more published products via distinct URL.
