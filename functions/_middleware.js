@@ -444,6 +444,13 @@ export async function onRequest(context) {
       // SinDarealest sells online only; this is a channel statement, not an
       // inventory claim. Do not infer stock status for made-to-order items.
       availability: "https://schema.org/OnlineOnly",
+      // Reference the public organization-level shipping policy. Its
+      // description preserves the full-payment free-shipping condition;
+      // do not turn it into a universal zero-rate offer or invent transit days.
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        hasShippingService: { "@id": `${url.origin}/terms-of-service#shipping-policy` }
+      },
       seller: { "@id": `${url.origin}/#business` }
     } } : {})
   };
