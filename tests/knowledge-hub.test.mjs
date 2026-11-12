@@ -55,6 +55,8 @@ const productionHubHtml = await productionHub.response.text();
 assert.match(productionHubHtml, /name="robots" content="index, follow"/);
 assert.equal((productionHubHtml.match(/<article class="card">/g) || []).length, 1,
   "Production hub must expose only the approved article");
+assert.ok(productionHubHtml.includes('src="/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp" alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024."'),
+  "The knowledge hub card must use the SD-VN024 product image.");
 assert.doesNotMatch(productionHubHtml, /Đọc bản nháp|Tuần 2|Tuần 12/);
 assert.match(productionHubHtml, /Đồ da cá sấu theo từng danh mục/);
 for (const categoryPath of [
@@ -80,8 +82,24 @@ assert.match(articleHtml, /name="robots" content="noindex,nofollow"/);
 assert.doesNotMatch(articleHtml, /Từ khóa chính:|Ý định:|Bản nháp, chưa xuất bản|TUẦN 1/);
 assert.match(articleHtml, /Người kiểm duyệt nội dung: Công Chí · 5 năm kinh nghiệm/);
 assert.match(articleHtml, /id="checklist-cau-hoi-theo-sku"/);
+assert.doesNotMatch(articleHtml, /AI cũng chỉ có thể mô tả|theo chú thích của chủ doanh nghiệp|do chủ doanh nghiệp cung cấp/i);
+assert.match(articleHtml, /Lưu ý:<\/strong> Ảnh trong bài chỉ giúp nhận biết ban đầu, không xác nhận chất liệu/i);
+assert.match(articleHtml, /rãnh vân khá nông và đều/i);
+assert.match(articleHtml, /nhịp lặp theo chu kỳ/i);
+assert.match(articleHtml, /khuôn ép/i);
+assert.match(articleHtml, /vảy vuông hoặc tròn/i);
+assert.match(articleHtml, /rãnh khớp nối sâu/i);
+assert.match(articleHtml, /ISO \(cơ quan cảm giác\)/i);
+assert.match(articleHtml, /gờ gù và gai lưng nhô cao, phân bố bất đối xứng/i);
+assert.match(articleHtml, /vảy chân nhỏ xếp lớp tự nhiên/i);
+assert.match(articleHtml, /Không cắt, đốt, cào, nhỏ hóa chất hoặc thử nước/i);
+assert.match(articleHtml, /lớp nền bên dưới có thể là da bò thật hoặc vật liệu tổng hợp/i);
+
 assert.match(articleHtml, /name="description" content="[^"]{1,155}"/);
 assert.match(articleHtml, /<h1>Phân biệt da cá sấu thật và da dập vân: cần kiểm tra gì\?<\/h1>/);
+
+assert.ok(articleHtml.includes('src="/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp" alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024."'));
+assert.ok(articleHtml.includes("<figcaption>Ví da cá sấu gù 8 đỉnh, mã SD-VN024.</figcaption>"));
 assert.equal((articleHtml.match(/owner-(?:embossed-0[12]|real-belly-0[12]|real-back-parts)-20261112\.webp/g) || []).length, 10,
   "Week 1 must show five owner reference images in HTML and Article schema");
 const jsonLd = [...articleHtml.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map(([, value]) => JSON.parse(value));
@@ -91,7 +109,7 @@ assert.equal(articleSchema.reviewedBy?.name, "Công Chí");
 const faqSchema = jsonLd.find((schema) => schema["@type"] === "FAQPage");
 assert.equal(faqSchema?.mainEntity?.length, 5, "FAQ schema must match the five visible questions");
 for (const question of faqSchema.mainEntity) assert.ok(articleHtml.includes(question.name));
-assert.match(articleHtml, /src="\/images\/[a-f0-9]{16}\.webp"/);
+assert.match(articleHtml, /src="\/media\/239f9df4-0112-495b-94e3-5f9412ec7f43\.webp"/);
 
 const productionArticle = await dispatch("/kien-thuc/" + articleSlug + "/", "GET", "casauvip.store");
 assert.equal(productionArticle.response.status, 200);
@@ -126,11 +144,20 @@ for (const slug of KNOWLEDGE_SLUGS) {
   assert.match(html, /name="robots" content="noindex,nofollow"/, slug + " must remain a draft");
   assert.equal((html.match(/<h1\b/g) || []).length, 1, slug + " must have exactly one main heading");
   assert.match(html, /<script type="application\/ld\+json">.*?BreadcrumbList/, slug + " needs breadcrumb data");
-  const imageTag = html.match(/<figure class="cover"><img\b[^>]*>/)?.[0] || "";
-  const image = imageTag.match(/src="\/images\/([^"]+)"/)?.[1];
-  assert.ok(image, slug + " needs an existing product image");
-  assert.match(imageTag, /alt="[^"]+"/, slug + " needs descriptive image alt text");
-  assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
+  if (slug === articleSlug) {
+    assert.ok(html.includes('src="/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp"'),
+      slug + " must use the verified SD-VN024 cover image");
+    assert.ok(html.includes('alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024."'),
+      slug + " needs descriptive cover alt text");
+  } else {
+    const imageTag = html.match(/<figure class="cover"><img\b[^>]*>/)?.[0] || "";
+    const imageSrc = imageTag.match(/src="([^"]+)"/)?.[1];
+    assert.ok(imageSrc, slug + " needs a product image");
+    assert.match(imageTag, /alt="[^"]+"/, slug + " needs descriptive image alt text");
+    const image = imageSrc.startsWith("/images/") ? imageSrc.slice("/images/".length) : "";
+    assert.ok(image, slug + " needs an existing local product image");
+    assert.ok(readFileSync(resolve(root, "public/images", image)), slug + " product image must exist");
+  }
   assert.match(html, /href="\/(?:sanpham|bao-hanh|tra-cuu-don-hang)/, slug + " needs a crawlable internal link");
 }
 console.log("Knowledge hub routing and draft content contracts passed.");
