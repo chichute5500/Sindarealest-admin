@@ -107,7 +107,7 @@ assert.equal(articleSchema.reviewedBy?.name, "Công Chí");
 const faqSchema = jsonLd.find((schema) => schema["@type"] === "FAQPage");
 assert.equal(faqSchema?.mainEntity?.length, 5, "FAQ schema must match the five visible questions");
 for (const question of faqSchema.mainEntity) assert.ok(articleHtml.includes(question.name));
-assert.match(articleHtml, /src="\/images\/[a-f0-9]{16}\.webp"/);
+assert.match(articleHtml, /src="\/media\/239f9df4-0112-495b-94e3-5f9412ec7f43\.webp"/);
 
 const productionArticle = await dispatch("/kien-thuc/" + articleSlug + "/", "GET", "casauvip.store");
 assert.equal(productionArticle.response.status, 200);
