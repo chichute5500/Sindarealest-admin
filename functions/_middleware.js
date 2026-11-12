@@ -143,6 +143,11 @@ export async function onRequest(context) {
     const slug=match[1]||"";
     if(slug&&!KNOWLEDGE_SLUGS.includes(slug))
       return new Response("Không tìm thấy bài viết.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
+    const isProductionHost=url.hostname.toLowerCase()==="casauvip.store";
+    const approvedArticleSlug="phan-biet-da-ca-sau-that-da-dap-van";
+    const publicKnowledgeRoute=isProductionHost&&(!slug||slug===approvedArticleSlug);
+    if(isProductionHost&&slug&&slug!==approvedArticleSlug)
+      return new Response("Bài viết chưa được phát hành.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
     const canonicalPath=slug?"/kien-thuc/"+slug+"/":"/kien-thuc/";
     if(url.pathname!==canonicalPath)return Response.redirect(new URL(canonicalPath+url.search,url.origin),301);
     const assetPath=slug?canonicalPath+"index.html":"/kien-thuc/index.html";
@@ -152,10 +157,13 @@ export async function onRequest(context) {
     if(!response.ok||!(response.headers.get("content-type")||"").includes("text/html"))return response;
     const headers=new Headers(response.headers);
     headers.set("Content-Type","text/html; charset=utf-8");
-    headers.set("X-Robots-Tag","noindex, nofollow");
+    const robots=publicKnowledgeRoute?"index, follow":"noindex, nofollow";
+    headers.set("X-Robots-Tag",robots);
     headers.set("Cache-Control","public, max-age=0, must-revalidate");
     for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
-    return new Response(response.body,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
+    let html=await response.text();
+    if(publicKnowledgeRoute)html=html.replace(/<meta\s+name=["']robots["'][^>]*>/i,`<meta name="robots" content="${robots}">`);
+    return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
   }
   // Canonical catalog routes are real server-rendered entry points to the same
   // Storefront app. Never route them through product detail SQL or a blank 404.
