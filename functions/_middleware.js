@@ -59,7 +59,7 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   // Social link-preview crawlers do not all render WebP. Provide a cached JPEG
   // rendition for each product while keeping the storefront's source images intact.
-  const ogImageMatch = url.pathname.match(/^\\/og-image\\/([a-z0-9][a-z0-9._-]{0,119})\\.jpg$/i);
+  const ogImageMatch = url.pathname.match(/^\/og-image\/([a-z0-9][a-z0-9._-]{0,119})\.jpg$/i);
   if (ogImageMatch) {
     if (context.request.method !== "GET" && context.request.method !== "HEAD")
       return new Response("Method not allowed", { status: 405, headers: { "Allow": "GET, HEAD" } });
@@ -72,8 +72,8 @@ export async function onRequest(context) {
     let ogImages = [];
     try { ogImages = JSON.parse(ogProduct?.images_json || "[]"); } catch {}
     const ogSource = Array.isArray(ogImages) ? ogImages.find(value =>
-      typeof value === "string" && (/^images\\/[A-Za-z0-9_-]{1,120}\\.webp$/.test(value)
-        || /^\\/media\\/[A-Za-z0-9-]{30,40}\\.webp$/.test(value))) : "";
+      typeof value === "string" && (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(value)
+        || /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(value))) : "";
     if (!ogSource) return new Response("Image unavailable", { status: 404 });
     const sourceUrl = new URL(ogSource.startsWith("/") ? ogSource : `/${ogSource}`, url.origin);
     let imageResponse;
