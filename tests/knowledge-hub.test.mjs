@@ -95,6 +95,9 @@ assert.match(articleHtml, /lớp nền bên dưới có thể là da bò thật 
 
 assert.match(articleHtml, /name="description" content="[^"]{1,155}"/);
 assert.match(articleHtml, /<h1>Phân biệt da cá sấu thật và da dập vân: cần kiểm tra gì\?<\/h1>/);
+
+assert.match(articleHtml, /<img src="\\/media\\/239f9df4-0112-495b-94e3-5f9412ec7f43\\.webp" alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024\\."/);
+assert.match(articleHtml, /<figcaption>Ví da cá sấu gù 8 đỉnh, mã SD-VN024\\.<\\/figcaption>/);
 assert.equal((articleHtml.match(/owner-(?:embossed-0[12]|real-belly-0[12]|real-back-parts)-20261112\.webp/g) || []).length, 10,
   "Week 1 must show five owner reference images in HTML and Article schema");
 const jsonLd = [...articleHtml.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map(([, value]) => JSON.parse(value));
