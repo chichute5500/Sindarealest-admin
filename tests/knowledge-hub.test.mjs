@@ -55,6 +55,8 @@ const productionHubHtml = await productionHub.response.text();
 assert.match(productionHubHtml, /name="robots" content="index, follow"/);
 assert.equal((productionHubHtml.match(/<article class="card">/g) || []).length, 1,
   "Production hub must expose only the approved article");
+assert.ok(productionHubHtml.includes('src="/media/239f9df4-0112-495b-94e3-5f9412ec7f43.webp" alt="Ví da cá sấu gù 8 đỉnh, mã SD-VN024."'),
+  "The knowledge hub card must use the SD-VN024 product image.");
 assert.doesNotMatch(productionHubHtml, /Đọc bản nháp|Tuần 2|Tuần 12/);
 assert.match(productionHubHtml, /Đồ da cá sấu theo từng danh mục/);
 for (const categoryPath of [
