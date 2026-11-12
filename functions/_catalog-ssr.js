@@ -84,10 +84,10 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
       const previewKey=rows[0]?.slug||rows[0]?.sku||rows[0]?.id;
       if(previewKey){
         const imageUrl=new URL("/og-image/"+encodeURIComponent(String(previewKey))+".jpg",origin).href;
-        html=html.replace(/<meta\\s+property=["']og:image["'][^>]*>/i,'<meta property="og:image" content="'+h(imageUrl)+'">');
-        html=html.replace(/<meta\\s+property=["']og:image:secure_url["'][^>]*>/i,'<meta property="og:image:secure_url" content="'+h(imageUrl)+'">');
-        html=html.replace(/<meta\\s+property=["']og:image:type["'][^>]*>/i,'<meta property="og:image:type" content="image/jpeg">');
-        html=html.replace(/<meta\\s+name=["']twitter:image["'][^>]*>/i,'<meta name="twitter:image" content="'+h(imageUrl)+'">');
+        html=html.replace(/<meta\s+property=["']og:image["'][^>]*>/i,'<meta property="og:image" content="'+h(imageUrl)+'">');
+        html=html.replace(/<meta\s+property=["']og:image:secure_url["'][^>]*>/i,'<meta property="og:image:secure_url" content="'+h(imageUrl)+'">');
+        html=html.replace(/<meta\s+property=["']og:image:type["'][^>]*>/i,'<meta property="og:image:type" content="image/jpeg">');
+        html=html.replace(/<meta\s+name=["']twitter:image["'][^>]*>/i,'<meta name="twitter:image" content="'+h(imageUrl)+'">');
       }
     }
     const cards=productCards(rows,origin,{eager:!home,deferAll:home});
