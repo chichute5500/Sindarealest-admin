@@ -88,7 +88,7 @@ assert.equal(response.status,200);
 assert.ok(text.includes('<title>Giày thử – SD-SN001 | SinDarealest</title>'));
 assert.ok(text.includes('og:title" content="Giày thử – SD-SN001 | SinDarealest'));
 assert.ok(text.includes('og:url" content="https://shop.example/sanpham/sneaker/SD-SN001'));
-assert.ok(text.includes('og:image" content="https://shop.example/og-sindarealest-casauvip-20261113.jpg'));
+assert.ok(text.includes('og:image" content="https://shop.example/og-image/test-sneaker.jpg'));
 assert.ok(text.includes('og:image:type" content="image/jpeg'));
 assert.ok(text.includes('og:description" content="Giày thử – Sneaker da cá sấu thật. Liên hệ Zalo để nhận báo giá. Mô tả giày · Mã SD-SN001'), 'Product social preview should use unique product copy and include its verified SKU');
 assert.match(text,/application\/ld\+json/);
