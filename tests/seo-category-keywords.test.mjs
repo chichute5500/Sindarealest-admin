@@ -118,6 +118,28 @@ assert.deepEqual(readBreadcrumbs(productBody).map(x=>x.name),[
 assert.ok(!productBody.includes('"@type":"Offer"'),"Do not invent verified prices");
 assert.ok(!productBody.includes('"@type":"AggregateRating"'),"Do not invent reviews");
 
+// The seller operates online only. Use the supported channel availability
+// value without claiming that inventory is physically in stock. Return and
+// shipping policies remain absent unless their exact terms are published.
+const pricedProduct={...product,price:1230000,source_price_confirmed:1};
+const pricedProductResponse=await storefront({
+  request:new Request(origin+"/sanpham/sneaker/SD-SN321"),
+  env:{DB:{prepare(){return {bind(){return {async first(){return pricedProduct}}}}}}},
+  next:async()=>new Response(html,{headers:{"Content-Type":"text/html; charset=utf-8"}})
+});
+assert.equal(pricedProductResponse.status,200);
+const pricedProductBody=await pricedProductResponse.text();
+const productSchemas=[...pricedProductBody.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+  .map(match=>JSON.parse(match[1]));
+const pricedSchema=productSchemas.find(schema=>schema["@type"]==="Product");
+assert.equal(pricedSchema?.offers?.availability,"https://schema.org/OnlineOnly",
+  "Offers must state the verified online-only purchase channel");
+assert.equal(pricedSchema?.offers?.seller?.["@id"],origin+"/#business");
+assert.ok(!Object.hasOwn(pricedSchema.offers,"shippingDetails"),
+  "Do not invent a general shipping cost or delivery window");
+assert.ok(!Object.hasOwn(pricedSchema.offers,"hasMerchantReturnPolicy"),
+  "Do not map warranty terms to a return policy");
+
 // Pagination is crawlable without JavaScript: after eight cards a native
 // category link leads to eight more published products via distinct URL.
 const makeCatalogProduct = n => ({
