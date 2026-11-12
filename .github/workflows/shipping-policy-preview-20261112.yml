@@ -7,6 +7,13 @@ on:
       - 'public/terms-of-service.html'
       - 'tests/seo-category-keywords.test.mjs'
       - '.github/workflows/shipping-policy-preview-20261112.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'functions/_middleware.js'
+      - 'public/terms-of-service.html'
+      - 'tests/seo-category-keywords.test.mjs'
+      - '.github/workflows/shipping-policy-preview-20261112.yml'
 permissions:
   contents: read
 concurrency:
@@ -21,7 +28,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       PREVIEW_PROJECT: sindarealest-admin-preview
       PREVIEW_BRANCH: fix-shipping-policy-schema-20261112
-      CANDIDATE_SHA: ${{ github.sha }}
+      CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -35,7 +42,12 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
-          test "$GITHUB_REF" = 'refs/heads/fix-shipping-policy-schema-20261112'
+          if [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
+            test "$GITHUB_REF" = 'refs/heads/fix-shipping-policy-schema-20261112'
+          else
+            test "$GITHUB_EVENT_NAME" = 'pull_request'
+            test "$GITHUB_HEAD_REF" = 'fix-shipping-policy-schema-20261112'
+          fi
           test "$PREVIEW_PROJECT" = 'sindarealest-admin-preview'
           test "$PREVIEW_BRANCH" = 'fix-shipping-policy-schema-20261112'
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
