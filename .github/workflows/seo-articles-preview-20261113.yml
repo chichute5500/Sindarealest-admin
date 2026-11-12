@@ -1,4 +1,4 @@
-name: SEO draft articles Preview and visual QA
+name: SEO article Preview privacy and visual QA
 on:
   push:
     branches: [fix-seo-knowledge-articles-20261113]
@@ -91,7 +91,7 @@ jobs:
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund playwright@1.56.1
           npx playwright install --only-shell chromium
-      - name: Check all ten draft routes and capture mobile and desktop evidence
+      - name: Check all ten private Preview routes and capture mobile and desktop evidence
         shell: bash
         run: |
           mkdir -p artifacts/seo-articles-preview
@@ -153,7 +153,7 @@ jobs:
                   scrollWidth:document.documentElement.scrollWidth,
                   viewportWidth:window.innerWidth,
                   brokenImages:[...document.images].filter(img=>!img.complete||!img.naturalWidth).map(img=>img.src),
-                  draftLabel:document.querySelector('.draft')?.innerText||''
+                  editorMetadataVisible:/Từ khóa chính:|Từ khóa phụ:|Ý định:|Người kiểm tra:|Bản nháp, chưa xuất bản|KIẾN THỨC DA CÁ SẤU · TUẦN/.test(document.body.innerText)
                 };
               });
               const xRobots=response.headers()['x-robots-tag']||'';
@@ -172,7 +172,7 @@ jobs:
               if(!result.h1||result.faqCount!==4||result.faqSchemaCount!==4||!result.faqMatches) throw Error(slug+' '+device+' content/FAQ text-schema check failed');
               if(result.scrollWidth>result.viewportWidth+1) throw Error(slug+' '+device+' horizontal overflow');
               if(result.brokenImages.length) throw Error(slug+' '+device+' broken image: '+result.brokenImages.join(','));
-              if(!/Bản nháp, chưa xuất bản/.test(result.draftLabel)) throw Error(slug+' '+device+' missing draft label');
+              if(result.editorMetadataVisible) throw Error(slug+' '+device+' exposes unpublished editorial metadata');
               await page.screenshot({path:'artifacts/seo-articles-preview/'+slug+'-'+device+'.png',fullPage:true});
               report.push({slug,device,status:response.status(),xRobots,brokenLinks,...result});
               await page.close();
@@ -180,7 +180,7 @@ jobs:
           }
           await browser.close();
           writeFileSync('artifacts/seo-articles-preview/report.json',JSON.stringify(report,null,2));
-          console.log('PASS: 10 draft routes checked on mobile and desktop; 20 screenshots saved.');
+          console.log('PASS: 10 Preview routes remain noindex, are publication-ready, and passed desktop/mobile checks; 20 screenshots saved.');
           NODE
       - uses: actions/upload-artifact@v6
         with:
