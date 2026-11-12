@@ -441,6 +441,9 @@ export async function onRequest(context) {
     ...(hasPublicOffer ? { offers: {
       "@type": "Offer", url: canonical, priceCurrency: "VND",
       price: Number(product.price),
+      // SinDarealest sells online only; this is a channel statement, not an
+      // inventory claim. Do not infer stock status for made-to-order items.
+      availability: "https://schema.org/OnlineOnly",
       seller: { "@id": `${url.origin}/#business` }
     } } : {})
   };
