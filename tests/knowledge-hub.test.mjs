@@ -91,15 +91,15 @@ assert.equal(hub.response.status, 200);
 assert.equal(hub.assetPath, "/kien-thuc/index.html");
 const hubHtml = await hub.response.text();
 assert.match(hubHtml, /Kiến thức và hướng dẫn chọn đồ da cá sấu/);
-assert.ok(hubHtml.includes('href="/kien-thuc/knowledge.css?v=20261113"'), "Hub must use the shared Liquid Glass stylesheet");
-assert.ok(hubHtml.includes('src="/kien-thuc/knowledge.js?v=20261113"'), "Hub must load the accessible menu and theme controls");
+assert.ok(hubHtml.includes('href="/kien-thuc/knowledge.css?v=20261113-2"'), "Hub must use the shared Liquid Glass stylesheet");
+assert.ok(hubHtml.includes('src="/kien-thuc/knowledge.js?v=20261113-2"'), "Hub must load the accessible menu and theme controls");
 assert.ok(hubHtml.includes('id="knowledgeMenuToggle"'), "Hub must expose the responsive menu control");
 assert.match(hub.response.headers.get("X-Robots-Tag") || "", /noindex, nofollow/);
 assert.equal((hubHtml.match(/<article class="card">/g) || []).length, 11,
   "Preview hub should expose the 11 approved, distinct article URLs");
 for (const [path, contentType, expectedContent] of [
-  ["/kien-thuc/knowledge.css?v=20261113", "text/css", ".site-head"],
-  ["/kien-thuc/knowledge.js?v=20261113", "application/javascript", "THEME_KEY"]
+  ["/kien-thuc/knowledge.css?v=20261113-2", "text/css", ".site-head"],
+  ["/kien-thuc/knowledge.js?v=20261113-2", "application/javascript", "THEME_KEY"]
 ]) {
   const asset = await dispatch(path);
   assert.equal(asset.response.status, 200, path + " must pass through the Knowledge page router to static assets");
@@ -172,7 +172,7 @@ assert.ok(articleSchema);
 assert.equal(articleSchema.reviewedBy?.name, "Công Chí");
 const relatedBlock = articleHtml.match(/<nav class="related" aria-label="Bài viết kiến thức liên quan">[^]*?<\/nav>/)?.[0] || "";
 assert.ok(relatedBlock, "The latest article must use the shared related-knowledge navigation pattern");
-assert.ok(articleHtml.includes('href="/kien-thuc/knowledge.css?v=20261113"'), "Article must use the shared Liquid Glass stylesheet");
+assert.ok(articleHtml.includes('href="/kien-thuc/knowledge.css?v=20261113-2"'), "Article must use the shared Liquid Glass stylesheet");
 assert.match(knowledgeCss, /\.related ul\s*\{[^}]*display:\s*flex/s, "The latest article related links must use a responsive chip layout");
 for (const [path,title] of [
   ["/kien-thuc/da-bung-da-lung-da-hong-ca-sau/", "Da bụng, da lưng và da hông cá sấu khác nhau thế nào?"],
@@ -283,8 +283,8 @@ for (const slug of KNOWLEDGE_SLUGS) {
     assert.ok(faqSchema, slug + " needs FAQ schema when FAQ is visible");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.name), questions, slug + " FAQ schema questions must match visible questions");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.acceptedAnswer.text), answers, slug + " FAQ schema answers must match visible answers");
-    assert.ok(html.includes('href="/kien-thuc/knowledge.css?v=20261113"'), slug + " must use the shared Liquid Glass stylesheet");
-    assert.ok(html.includes('src="/kien-thuc/knowledge.js?v=20261113"'), slug + " must load the accessible menu and theme controls");
+    assert.ok(html.includes('href="/kien-thuc/knowledge.css?v=20261113-2"'), slug + " must use the shared Liquid Glass stylesheet");
+    assert.ok(html.includes('src="/kien-thuc/knowledge.js?v=20261113-2"'), slug + " must load the accessible menu and theme controls");
     assert.equal(questions.length, 4, slug + " needs four article-specific FAQs");
   }
   for (const imageMatch of html.matchAll(/<img\b[^>]*src="(\/images\/knowledge\/[^"]+)"/g)) {
