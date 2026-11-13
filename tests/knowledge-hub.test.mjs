@@ -27,9 +27,12 @@ async function dispatch(path, method = "GET", host = "preview.example") {
       assetPath = requestedPath === "/" ? "/index.html" : requestedPath;
       const file = resolve(root, "public", assetPath.replace(/^\/+/, ""));
       try {
+        const contentType = assetPath.endsWith(".css") ? "text/css; charset=utf-8"
+          : assetPath.endsWith(".js") ? "application/javascript; charset=utf-8"
+          : assetPath.endsWith(".webp") ? "image/webp" : "text/html; charset=utf-8";
         return new Response(readFileSync(file), {
           status: 200,
-          headers: { "Content-Type": "text/html; charset=utf-8" }
+          headers: { "Content-Type": contentType }
         });
       } catch {
         return new Response("<html><body>SPA fallback</body></html>", {
@@ -94,6 +97,15 @@ assert.ok(hubHtml.includes('id="knowledgeMenuToggle"'), "Hub must expose the res
 assert.match(hub.response.headers.get("X-Robots-Tag") || "", /noindex, nofollow/);
 assert.equal((hubHtml.match(/<article class="card">/g) || []).length, 11,
   "Preview hub should expose the 11 approved, distinct article URLs");
+for (const [path, contentType, expectedContent] of [
+  ["/kien-thuc/knowledge.css?v=20261113", "text/css", ".site-head"],
+  ["/kien-thuc/knowledge.js?v=20261113", "application/javascript", "THEME_KEY"]
+]) {
+  const asset = await dispatch(path);
+  assert.equal(asset.response.status, 200, path + " must pass through the Knowledge page router to static assets");
+  assert.match(asset.response.headers.get("Content-Type") || "", new RegExp(contentType));
+  assert.ok((await asset.response.text()).includes(expectedContent), path + " must return the real asset body");
+}
 const productionHub = await dispatch("/kien-thuc/", "GET", "casauvip.store");
 assert.equal(productionHub.response.status, 200);
 assert.equal(productionHub.response.headers.get("X-Robots-Tag"), "index, follow");

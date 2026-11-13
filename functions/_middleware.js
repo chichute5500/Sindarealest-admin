@@ -213,12 +213,11 @@ export async function onRequest(context) {
     for(const key of ["Content-Length","Content-Encoding","ETag"])headers.delete(key);
     return new Response(html,{status:200,headers:hardenStorefrontHtmlHeaders(headers)});
   }
-  if(url.pathname==="/kien-thuc"||url.pathname.startsWith("/kien-thuc/")){
+  const knowledgeRouteMatch=url.pathname.match(/^\/kien-thuc(?:\/([a-z0-9-]+))?\/?$/);
+  if(knowledgeRouteMatch){
     if(context.request.method!=="GET"&&context.request.method!=="HEAD")
       return new Response("Method not allowed",{status:405,headers:{"Allow":"GET, HEAD","Cache-Control":"no-store"}});
-    const match=url.pathname.match(/^\/kien-thuc(?:\/([a-z0-9-]+))?\/?$/);
-    if(!match)return new Response("Không tìm thấy trang.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
-    const slug=match[1]||"";
+    const slug=knowledgeRouteMatch[1]||"";
     if(slug&&!KNOWLEDGE_SLUGS.includes(slug))
       return new Response("Không tìm thấy bài viết.",{status:404,headers:{"Content-Type":"text/plain; charset=utf-8","X-Robots-Tag":"noindex, nofollow"}});
     const isProductionHost=url.hostname.toLowerCase()==="casauvip.store";
