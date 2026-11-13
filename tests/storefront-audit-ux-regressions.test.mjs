@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+assert.match(html,/@media\(max-width:960px\) and \(min-width:761px\)/,'PC header must switch to the hamburger before its controls overflow');
+assert.match(html,/sdDesktopMenuQuery=window\.matchMedia\('\(min-width:961px\)'\)/,'An open hamburger menu must close when resizing back to wide PC');
+assert.match(html,/font-size:clamp\(9\.6px,3\.2vw,12\.8px\)/,'Footer brand caption must fit the narrowest supported phone width');
 assert.equal([...html.matchAll(/<main\b/g)].length,1,'Only one main landmark is present.');
 assert.match(html,/<div id="notFoundPage" class="not-found-page"/,'Retain 404 UX without a second main');
 assert.match(html,/id="orderDetailsPanel" class="order-details-panel">/,'Order guide is visible from initial HTML.');

@@ -1306,7 +1306,7 @@ html.dark .checkout-drawer .sd-order-received-note{color:#ff7d85}
   gap:5px;
  }
  #siteFooter .footer-story-heading-copy .footer-story-eyebrow{
-  font-size:clamp(11.5px,3.2vw,12.8px);
+  font-size:clamp(9.6px,3.2vw,12.8px);
   font-weight:750;
   letter-spacing:0;
   line-height:1.25;
@@ -1507,7 +1507,7 @@ html.dark .service-strip .service-icon{border-color:rgba(204,231,250,.38);backgr
 .theme-bg--dark::after{background:linear-gradient(118deg,rgba(3,20,36,.62),rgba(7,31,51,.58) 52%,rgba(3,17,30,.66))}
 .theme-watermark{opacity:.035}
 html.dark .theme-watermark{opacity:.045}
-@media(max-width:850px) and (min-width:761px){
+@media(max-width:960px) and (min-width:761px){
  .navlinks{display:none}
  .nav{position:relative;padding-left:48px!important}
  .menu-btn{display:grid;position:absolute!important;left:8px;top:50%;transform:translateY(-50%);z-index:2}
@@ -6345,7 +6345,7 @@ function setupArtSlideshow(){
  startAutoAdvance();
 }
 function setActiveNav(id){$$('[data-nav]').forEach(a=>{const yes=a.dataset.nav===id;a.classList.toggle('active',yes);if(yes)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
-function setMobileMenu(open){const menu=$('#mobileNav'),backdrop=$('#mobileNavBackdrop');menu.classList.toggle('open',open);backdrop.classList.toggle('open',open);$('#menuToggle').setAttribute('aria-expanded',String(open));$('#menuToggle').setAttribute('aria-label',open?'Đóng menu':'Mở menu')}function navClick(e){const a=e.target.closest('[data-nav]');if(!a)return;setActiveNav(a.dataset.nav);setMobileMenu(false);if(e.currentTarget.id==='mobileNav'){const target=document.getElementById(a.dataset.nav),heading=target&&(target.matches('h1,h2,h3,h4,[role="heading"]')?target:target.querySelector('h1,h2,h3,h4,[role="heading"]')||target);if(heading){if(!heading.hasAttribute('tabindex'))heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}}}
+function setMobileMenu(open){const menu=$('#mobileNav'),backdrop=$('#mobileNavBackdrop');menu.classList.toggle('open',open);backdrop.classList.toggle('open',open);$('#menuToggle').setAttribute('aria-expanded',String(open));$('#menuToggle').setAttribute('aria-label',open?'Đóng menu':'Mở menu')}const sdDesktopMenuQuery=window.matchMedia('(min-width:961px)');const closeMobileMenuOnDesktop=event=>{if(event.matches&&$('#mobileNav').classList.contains('open'))setMobileMenu(false)};if(sdDesktopMenuQuery.addEventListener)sdDesktopMenuQuery.addEventListener('change',closeMobileMenuOnDesktop);else sdDesktopMenuQuery.addListener(closeMobileMenuOnDesktop);function navClick(e){const a=e.target.closest('[data-nav]');if(!a)return;setActiveNav(a.dataset.nav);setMobileMenu(false);if(e.currentTarget.id==='mobileNav'){const target=document.getElementById(a.dataset.nav),heading=target&&(target.matches('h1,h2,h3,h4,[role="heading"]')?target:target.querySelector('h1,h2,h3,h4,[role="heading"]')||target);if(heading){if(!heading.hasAttribute('tabindex'))heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true})}}}
 function setupNavSpy(){const targets=$$('[data-nav]').map(a=>document.getElementById(a.dataset.nav)).filter(Boolean);if(!('IntersectionObserver'in window))return;const io=new IntersectionObserver(entries=>{const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];if(visible)setActiveNav(visible.target.id)},{rootMargin:'-25% 0px -60% 0px',threshold:[0,.1,.25,.5]});targets.forEach(s=>io.observe(s))}
 const ADMIN_DIVISIONS_API='https://provinces.open-api.vn/api/v2';
 const VIETNAM_PROVINCES_2026=[['01','Hà Nội'],['04','Cao Bằng'],['08','Tuyên Quang'],['11','Điện Biên'],['12','Lai Châu'],['14','Sơn La'],['15','Lào Cai'],['19','Thái Nguyên'],['20','Lạng Sơn'],['22','Quảng Ninh'],['24','Bắc Ninh'],['25','Phú Thọ'],['31','Hải Phòng'],['33','Hưng Yên'],['37','Ninh Bình'],['38','Thanh Hóa'],['40','Nghệ An'],['42','Hà Tĩnh'],['44','Quảng Trị'],['46','Huế'],['48','Đà Nẵng'],['51','Quảng Ngãi'],['52','Gia Lai'],['56','Khánh Hòa'],['66','Đắk Lắk'],['68','Lâm Đồng'],['75','Đồng Nai'],['79','Thành phố Hồ Chí Minh'],['80','Tây Ninh'],['82','Đồng Tháp'],['86','Vĩnh Long'],['91','An Giang'],['92','Cần Thơ'],['96','Cà Mau']].map(([code,name])=>({code,name}));

@@ -842,7 +842,7 @@ body:has(#loginView:not(.hidden)) .loginwrap{
   #welcomeSettingsForm #welcomeCopy{height:52px;min-height:52px}
   #welcomeSettingsForm,#watermarkSettingsForm{gap:6px!important}
   /* Match the approved mobile reference: one welcome title field plus the body; keep the second title editable on wider screens. */
-  .website-settings #welcomeSettingsForm .field:has(#welcomeLine2){display:flex}
+  .website-settings #welcomeSettingsForm .field:has(#welcomeLine2){display:none}
   .website-settings #welcomeSettingsForm{grid-template-columns:repeat(2,minmax(0,1fr))}
   .website-settings #welcomeSettingsForm>.switchrow,
   .website-settings #welcomeSettingsForm>#saveWelcomeSettings,
@@ -1316,7 +1316,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
 }
 /* Preserve usable controls at 320/360px; do not overflow the five-tab footer. */
 @media(max-width:390px) {
-  #main .activity-view-tabs .warranty-filter-button,#main .activity-category-chip{min-height:38px}
+  #main .activity-view-tabs .warranty-filter-button{min-height:38px}
   .topbar .brand-logo{width:40px;height:40px;flex-basis:40px}
   .topbar .brand h1{font-size:15px;letter-spacing:0}
   .topbar .brand p{font-size:8px;letter-spacing:.06em}
@@ -1626,6 +1626,7 @@ body:has(#loginView:not(.hidden)) .logincard>.tiny{text-align:center}
  #main .product-table .product-visibility-toggle{min-width:59px;padding:4px 0;min-height:60px}
  #main .product-table .product-visibility-label{font-size:10px}
 }
+@media(max-width:390px){#main .product-table .product-visibility-toggle{width:54px;min-width:54px;padding:4px 0}}
 @media(prefers-reduced-motion:reduce){#main .product-visibility-knob,#main .product-visibility-track{transition:none}}
 /* Category / fulfillment: equal-width mobile-friendly controls in Basic Info. */
 #productPanelDetails .product-category-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:10px;row-gap:6px;align-items:start;min-width:0}
@@ -2037,7 +2038,7 @@ body:has(#main .statgrid) #main .pagehead .btn.primary:disabled{opacity:.45;tran
  .mobiletabs .nav span:first-child svg{width:19px;height:19px}
  body:has(#appView:not(.hidden)) .mobiletabs .nav.active{background:var(--sd-admin-nav-active);color:var(--sd-admin-ink);box-shadow:var(--sd-admin-control-shadow),var(--sd-admin-selected-shadow)}
  .mobile-more-panel{bottom:calc(var(--sd-dock-height,61px) + var(--sd-dock-bottom,18px) + 8px + env(safe-area-inset-bottom))}
- #backdrop{bottom:calc(var(--sd-dock-height,61px) + var(--sd-dock-bottom,18px) + env(safe-area-inset-bottom))}
+ #backdrop{bottom:calc(var(--sd-dock-height,61px) + var(--sd-dock-bottom,18px) + 8px + env(safe-area-inset-bottom))}
 }
 @media(max-width:390px){
  body:has(#appView:not(.hidden)) .topbar .brand h1{font-size:15px}
@@ -3070,6 +3071,7 @@ window.addEventListener('popstate',event=>{
  const params=new URLSearchParams(location.search),v=params.get('view')||'dashboard',orderId=params.get('orderId')||'';
  if(!['dashboard','products','orders','order-detail','customers','warranties','settings','backup','activity'].includes(v)||(v==='order-detail'&&!orderId))return;
  if($('#appView').classList.contains('hidden'))return;
+ if(v===view&&(v!=='order-detail'||orderId===selectedOrderId))return;
  selectedOrderId=v==='order-detail'?orderId:'';
  setView(v,false,{type:'history'});
 });
@@ -3202,7 +3204,7 @@ document.addEventListener('click',e=>{
  const edit=e.target.closest('[data-inline-edit]');
  if(edit){e.preventDefault();beginProductQuickEdit(edit);return}
  const row=e.target.closest('#main .product-table tbody tr[data-product-row]');
- if(row&&!e.target.closest('button,a,input,select,textarea,label,form,[role="button"]'))openEditor(products.find(p=>String(p.id)===String(row.dataset.productRow)));
+ if(row&&!e.target.closest('button,a,input,select,textarea,label,form,[role="button"]')){row.focus({preventScroll:true});openEditor(products.find(p=>String(p.id)===String(row.dataset.productRow)))}
 });
 document.addEventListener('keydown',e=>{
  const row=e.target.closest?.('#main .product-table tbody tr[data-product-row]');

@@ -202,8 +202,10 @@ assert.ok(adminHtml.includes("b.textContent='Lưu';b.setAttribute('aria-label','
   'The save button should restore its compact visible label and full accessible name after completion');
 assert.match(adminHtml, /:root\[data-admin-theme="dark"\] \.btn\.danger\{[^}]*background:rgba\(165,67,67,\.18\)/,
   'Destructive controls should maintain readable dark-theme contrast');
-assert.match(baselineSpec, /chromeColors\.headerBg, 'Dark editor header should use the navy glass surface'\)\.toContain\('17, 34, 49'\)/,
-  'The screenshot matrix should assert dark editor header contrast');
+assert.match(baselineSpec, /chromeColors\.headerSurface, 'Dark editor header should use the navy glass gradient'\)\.toContain\('linear-gradient'\)/,
+  'The screenshot matrix should assert that dark editor chrome keeps its glass gradient');
+assert.match(baselineSpec, /chromeColors\.headerBlur, 'Dark editor header should preserve its glass blur'\)\.toContain\('blur'\)/,
+  'The screenshot matrix should assert that dark editor chrome keeps its glass blur');
 
 assert.match(adminHtml, /function galleryImageSrc\(value\)\s*\{/,
   'Gallery thumbnail URLs should be normalized by the dedicated helper');

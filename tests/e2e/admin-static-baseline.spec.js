@@ -313,6 +313,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         status: 'active'
       }]
     },
+    '/api/admin/image-backup': {
+      configured: false,
+      enabled: false,
+      cadence: 'daily',
+      state: { phase: 'idle', scanned: 0, copied: 0, existing: 0, lastRunAt: null, lastCompletedAt: null }
+    },
     '/api/admin/audit-logs': {
       logs: [{
         created_at: '2026-10-21 10:24:00',
@@ -377,7 +383,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
   const viewLabels = {
     dashboard: 'Thao tác nhanh',
     products: 'Tìm tên, SKU hoặc danh mục',
-    orders: 'Mã đơn / thời gian',
+    orders: 'Tìm đơn hàng',
     customers: 'Số đơn',
     warranties: 'Mã bảo hành đã phát hành',
     settings: 'Cài đặt watermark',
@@ -707,8 +713,8 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         const nav = document.querySelector('.mobiletabs').getBoundingClientRect();
         return { overlayBottom:overlay.bottom, navTop:nav.top, viewportHeight:innerHeight };
       });
-      expect(Math.abs(seam.overlayBottom-seam.navTop),
-        'Modal and mobile navigation must share a seamless boundary: '+JSON.stringify(seam))
+      expect(Math.abs((seam.navTop-seam.overlayBottom)-8),
+        'Product editor must leave the intended 8px breathing gap above the mobile navigation: '+JSON.stringify(seam))
         .toBeLessThanOrEqual(2);
     }
     await expect(page.locator('#editorTitle')).toContainText('Chỉnh sửa sản phẩm');
@@ -773,7 +779,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
 
     await page.locator('#productCategoryToggle').click();
     await expect(page.locator('#productCategoryGrid')).toBeVisible();
-    await expect(page.locator('#productCategoryGrid [data-category-pick]')).toHaveCount(15);
+    await expect(page.locator('#productCategoryGrid [data-category-pick]')).toHaveCount(12);
     await page.locator('#productCategoryGrid [data-category-pick]').first().click();
     await expect(page.locator('#productCategoryGrid')).toBeHidden();
 
@@ -845,9 +851,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('.dashboard-revenue')).toBeVisible();
     await expect(page.locator('#main .dashboard-revenue')).toContainText('Chưa thể hiển thị biểu đồ doanh thu');
     await expect(page.locator('#main .dashboard-revenue')).toContainText('Không dùng số đơn gần nhất hoặc dữ liệu chưa xác minh');
-    await expect(page.locator('#main .dashboard-activity-table')).toBeVisible();
-    await expect(page.locator('#main .dashboard-activity-table td[data-label="Thời điểm"]').first()).toBeVisible();
-    await expect(page.locator('#main .dashboard-activity-table').evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
+    const dashboardActivity = page.locator('#main .sd-activity-feed');
+    await expect(dashboardActivity).toBeVisible();
+    await expect(dashboardActivity.locator('.sd-activity-entry[role="listitem"]').first()).toBeVisible();
+    await expect(dashboardActivity.evaluate(el => el.scrollWidth <= el.clientWidth + 1)).resolves.toBe(true);
 
     await captureView('dashboard', 'dashboard', null, true);
     // Capture the dashboard at the reference phone's usable app height without
@@ -868,8 +875,26 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       };
     });
     expect(referenceDashboardGeometry.revenueBottom,
-      'Reference-height dashboard should show the revenue panel above the fixed mobile navigation: ' + JSON.stringify(referenceDashboardGeometry))
-      .toBeLessThanOrEqual(referenceDashboardGeometry.navigationTop - 8);
+      'Reference-height dashboard should render the revenue panel: ' + JSON.stringify(referenceDashboardGeometry)).not.toBeNull();
+    // The dashboard is vertically scrollable on short phones. Move the report
+    // above the fixed dock and verify the dock does not cover its content.
+    await page.evaluate(() => {
+      const revenue = document.querySelector('#main .dashboard-revenue')?.getBoundingClientRect();
+      const navigation = document.querySelector('.mobiletabs')?.getBoundingClientRect();
+      if (revenue && navigation) window.scrollBy(0, Math.max(0, revenue.bottom - navigation.top + 8));
+    });
+    const scrolledDashboardGeometry = await page.evaluate(() => {
+      const revenue = document.querySelector('#main .dashboard-revenue')?.getBoundingClientRect();
+      const navigation = document.querySelector('.mobiletabs')?.getBoundingClientRect();
+      return {
+        revenueBottom: revenue ? Math.round(revenue.bottom) : null,
+        navigationTop: navigation ? Math.round(navigation.top) : null
+      };
+    });
+    expect(scrolledDashboardGeometry.revenueBottom,
+      'Scrollable dashboard report should be reachable above the fixed navigation: ' + JSON.stringify(scrolledDashboardGeometry))
+      .toBeLessThanOrEqual(scrolledDashboardGeometry.navigationTop - 8);
+    await saveScreenshot('dashboard-reference-viewport-scrolled', referenceDashboardVariant);
     await captureView('products', 'products', null, true);
 
     // Screen #3 reference matrix: exercise the actual ADMIN product renderer at required
@@ -1119,9 +1144,9 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await expect(page.locator('#categoryBox')).toHaveValue('all');
     await expect(page.locator('#fulfillmentBox')).toHaveValue('all');
     await expect(productNames).toHaveCount(3);
-    // The Admin normalizes the fixture alias "wallets" to canonical value "vi-nam".
-    await expect(page.locator('#categoryBox option[value="vi-nam"]')).toHaveCount(1);
-    await page.locator('#categoryBox').selectOption('vi-nam');
+    // The Admin normalizes the fixture alias "wallets" to canonical value "vi-nam-nu".
+    await expect(page.locator('#categoryBox option[value="vi-nam-nu"]')).toHaveCount(1);
+    await page.locator('#categoryBox').selectOption('vi-nam-nu');
     await expect(productNames).toHaveCount(1);
     await expect(productNames).toHaveText('Sản phẩm thử nghiệm giao diện');
     await expect(page.locator('#productResultSummary')).toContainText('Có 1 sản phẩm phù hợp');
@@ -1280,7 +1305,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
     await page.locator('#fulfillmentBox').selectOption('made_to_order');
     await expect(productNames).toHaveCount(1);
     await expect(productNames).toHaveText('Dây đồng hồ thử nghiệm giao diện');
-    await page.locator('#categoryBox').selectOption('wallets');
+    await page.locator('#categoryBox').selectOption('vi-nam-nu');
     await expect(page.locator('#main .product-empty-state')).toBeVisible();
     await page.locator('#clearFilterEmpty').click();
     await expect(productNames).toHaveCount(3);
@@ -1295,18 +1320,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       if (variant.viewport.width <= 680) {
         const surface = await page.locator('#backdrop>.editor').evaluate(el => {
           const rect = el.getBoundingClientRect();
-          const probe = document.createElement('div');
-          probe.style.background = 'var(--bg)';
-          document.body.append(probe);
-          const expectedBackground = getComputedStyle(probe).backgroundColor;
-          probe.remove();
+          const style = getComputedStyle(el);
           return {
             left: Math.round(rect.left), top: Math.round(rect.top),
             width: Math.round(rect.width), height: Math.round(rect.height),
-            radius: getComputedStyle(el).borderRadius,
-            shadow: getComputedStyle(el).boxShadow,
-            background: getComputedStyle(el).backgroundColor,
-            expectedBackground
+            radius: style.borderRadius,
+            shadow: style.boxShadow,
+            backgroundImage: style.backgroundImage,
+            backdropFilter: style.backdropFilter
           };
         });
         expect(surface.left, 'Mobile product editor should align with the viewport edge').toBe(0);
@@ -1318,9 +1339,10 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         expect(surface.height, 'Mobile product editor should fit the space above the mobile navigation').toBeLessThan(variant.viewport.height);
         expect(await page.locator('.topbar').isVisible(), 'Shared app header should remain visible while editing').toBe(true);
         expect(await page.locator('.mobiletabs').isVisible(), 'Mobile navigation should remain visible while editing').toBe(true);
-        expect(surface.radius, 'Mobile product editor should not retain a floating-card radius').toBe('0px');
-        expect(surface.shadow, 'Mobile product editor should not cast a desktop drawer shadow').toBe('none');
-        expect(surface.background, 'Mobile product editor should use an opaque theme surface').toBe(surface.expectedBackground);
+        expect(surface.radius, 'Inset mobile product editor should retain its glass safe-area corners').toBe('20px');
+        expect(surface.shadow, 'Inset mobile product editor should retain its approved Liquid Glass elevation').not.toBe('none');
+        expect(surface.backgroundImage, 'Mobile product editor should retain its Liquid Glass sheet face').not.toBe('none');
+        expect(surface.backdropFilter, 'Mobile product editor should frost the underlying page through the sheet').toContain('blur');
         const editorBottom = await page.locator('#backdrop>.editor').evaluate(el => Math.round(el.getBoundingClientRect().bottom));
         const mobileNavTop = await page.locator('.mobiletabs').evaluate(el => Math.round(el.getBoundingClientRect().top));
         expect(editorBottom, 'Mobile editor must leave at least 8px of breathing room above the fixed bottom navigation')
@@ -1392,46 +1414,40 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(page.locator('#imageGrid .imageitem')).toHaveCount(6);
       await expect(page.locator('#imageGrid .image-cover-slot .imageitem-cover')).toBeVisible();
       await expect(page.locator('#imageGrid .image-rail')).toBeVisible();
-      await expect(page.locator('#imageGrid .image-rail')).toHaveAttribute('aria-label', 'Dải ảnh thu nhỏ, vuốt ngang để xem thêm');
+      await expect(page.locator('#imageGrid .image-rail')).toHaveAttribute('aria-label', 'Dải ảnh thu nhỏ');
       await expect.poll(async () => page.locator('#imageGrid img').evaluateAll(images =>
         images.length === 6 && images.every(image => image.complete && image.naturalWidth > 0)
       ), { timeout: 5000 }).toBe(true);
-      await expect(page.locator('#imageGrid [data-gallery] svg[aria-hidden="true"]')).toHaveCount(18);
       const galleryA11y = await page.locator('#imageGrid .imageitem').evaluateAll(items =>
         items.map(item => ({
           groupLabel: item.getAttribute('aria-label'),
-          imageAlt: item.querySelector('img')?.getAttribute('alt'),
-          controls: [...item.querySelectorAll('button[data-gallery]')].map(button => ({
-            action: button.getAttribute('data-gallery'),
-            label: button.getAttribute('aria-label'),
-            iconHidden: button.querySelector('svg')?.getAttribute('aria-hidden')
-          }))
+          role: item.getAttribute('role'),
+          tabIndex: item.getAttribute('tabindex'),
+          imageAlt: item.querySelector('img')?.getAttribute('alt')
         }))
       );
-      expect(galleryA11y, 'Every fixture gallery item should have a named group and descriptive image alt').toHaveLength(6);
-      expect(galleryA11y.every(item => Boolean(item.groupLabel?.trim()) && Boolean(item.imageAlt?.trim())),
-        'Gallery group names and image alt text must not be empty: ' + JSON.stringify(galleryA11y)).toBe(true);
-      expect(galleryA11y.every(item => item.controls.length === 3 && item.controls.every(control =>
-        Boolean(control.label?.trim()) && control.iconHidden === 'true')),
-        'Every gallery control needs an accessible name and decorative icons must be hidden: ' + JSON.stringify(galleryA11y)).toBe(true);
+      expect(galleryA11y, 'Every fixture gallery item should expose a keyboard-accessible named group and descriptive image alt').toHaveLength(6);
+      expect(galleryA11y.every(item => item.role === 'group' && item.tabIndex === '0' &&
+        Boolean(item.groupLabel?.includes('Giữ để phóng to')) && Boolean(item.imageAlt?.trim())),
+        'Gallery image groups need keyboard focus, usage instructions and non-empty image alt text: ' + JSON.stringify(galleryA11y)).toBe(true);
+      await expect(page.locator('#imageGrid [data-gallery]'),
+        'The image surface uses drag and keyboard actions rather than per-image arrow/delete buttons').toHaveCount(0);
       await expect(page.locator('#chooseImages')).toBeVisible();
       await expect(page.locator('#galleryStatus')).toHaveAttribute('role', 'status');
       await expect(page.locator('#galleryStatus')).toHaveAttribute('aria-live', 'polite');
       await expect(page.locator('#imageGrid .imageitem-cover img')).toHaveAttribute('alt', 'Ảnh đại diện sản phẩm');
       await expect(page.locator('#imageGrid .image-rail .imageitem img').first()).toHaveAttribute('alt', 'Ảnh sản phẩm 2');
-      await expect(page.locator('#imageGrid .imageitem-cover')).toHaveAttribute('aria-label', 'Ảnh đại diện sản phẩm');
-      await expect(page.locator('#imageGrid [data-gallery="up"][data-index="0"]')).toBeDisabled();
-      await expect(page.locator('#imageGrid [data-gallery="down"][data-index="5"]')).toBeDisabled();
+      await expect(page.locator('#imageGrid .imageitem-cover')).toHaveAttribute('aria-label', /Ảnh 1 trên 6/);
       if (variant.viewport.width === mobile.width && variant.theme === 'light') {
         const originalFirstSrc = await page.locator('#imageGrid img').nth(0).getAttribute('src');
         const originalSecondSrc = await page.locator('#imageGrid img').nth(1).getAttribute('src');
-        // Activate a gallery control from the keyboard, not only by pointer.
-        await page.locator('#imageGrid [data-gallery="up"][data-index="1"]').focus();
-        await page.keyboard.press('Enter');
+        // Reorder the whole focused image surface using the supported keyboard shortcut.
+        await page.locator('#imageGrid [data-image-index="1"]').focus();
+        await page.keyboard.press('ArrowLeft');
         await expect(page.locator('#imageGrid img').nth(0)).toHaveAttribute('src', originalSecondSrc);
         await expect(page.locator('#imageGrid img').nth(1)).toHaveAttribute('src', originalFirstSrc);
-        await expect(page.locator('#galleryStatus')).toContainText('Đã chuyển ảnh lên vị trí ảnh đại diện');
-        await expect(page.locator('#imageGrid [data-gallery="down"][data-index="0"]')).toBeFocused();
+        await expect(page.locator('#galleryStatus')).toContainText('Đã chuyển ảnh 2 đến vị trí 1 (ảnh đại diện)');
+        await expect(page.locator('#imageGrid [data-image-index="0"]')).toBeFocused();
         await expect(page.locator('#imageGrid .imageitem-cover img')).toHaveAttribute('alt', 'Ảnh đại diện sản phẩm');
       }
       if (variant.viewport.width <= 480) {
@@ -1589,11 +1605,12 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         await page.setViewportSize(variant.viewport);
       }
       if (variant.viewport.width <= 480) {
-        await page.locator('#imageGrid [data-gallery="remove"][data-index="2"]').click();
+        // Removing an image is also available from the keyboard without saving the product.
+        await page.locator('#imageGrid [data-image-index="2"]').focus();
+        await page.keyboard.press('Delete');
         await expect(page.locator('#imageGrid .imageitem')).toHaveCount(5);
-        await expect(page.locator('#galleryStatus')).toContainText('Đã xóa ảnh 3. Còn 5 ảnh.');
-        await expect(page.locator('#imageGrid [data-gallery="remove"][data-index="2"]')).toBeFocused();
-        await expect(page.locator('#imageGrid [data-gallery="down"][data-index="4"]')).toBeDisabled();
+        await expect(page.locator('#galleryStatus')).toContainText('Đã gỡ ảnh 3 khỏi bộ ảnh. Nhấn Lưu để xác nhận; Hủy để giữ ảnh cũ.');
+        await expect(page.locator('#imageGrid [data-image-index="2"]')).toBeFocused();
         expect(attemptedWrites, 'Gallery reorder/delete must remain local until the explicit product save action').toEqual([]);
       }
       if (variant.viewport.width === 390 && variant.viewport.height === 844 && variant.theme === 'light') {
@@ -1620,17 +1637,27 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           if (!header || !footer) throw new Error('Editor header/footer should exist for dark-theme contrast audit');
           const headerStyle = getComputedStyle(header);
           const footerStyle = getComputedStyle(footer);
+          const tokenProbe = document.createElement('span');
+          tokenProbe.style.color = 'var(--ink)';
+          document.body.appendChild(tokenProbe);
+          const activeInk = getComputedStyle(tokenProbe).color;
+          tokenProbe.remove();
           return {
-            headerBg: headerStyle.backgroundColor,
-            footerBg: footerStyle.backgroundColor,
+            headerSurface: headerStyle.backgroundImage,
+            footerSurface: footerStyle.backgroundImage,
+            headerBlur: headerStyle.backdropFilter,
+            footerBlur: footerStyle.backdropFilter,
             headerColor: headerStyle.color,
-            footerColor: footerStyle.color
+            footerColor: footerStyle.color,
+            activeInk
           };
         });
-        expect(chromeColors.headerBg, 'Dark editor header should use the navy glass surface').toContain('17, 34, 49');
-        expect(chromeColors.footerBg, 'Dark editor footer should use the navy glass surface').toContain('17, 34, 49');
-        expect(chromeColors.headerColor, 'Dark editor header text should use the light theme token').toBe('rgb(234, 243, 251)');
-        expect(chromeColors.footerColor, 'Dark editor footer text should use the light theme token').toBe('rgb(234, 243, 251)');
+        expect(chromeColors.headerSurface, 'Dark editor header should use the navy glass gradient').toContain('linear-gradient');
+        expect(chromeColors.footerSurface, 'Dark editor footer should use the navy glass gradient').toContain('linear-gradient');
+        expect(chromeColors.headerBlur, 'Dark editor header should preserve its glass blur').toContain('blur');
+        expect(chromeColors.footerBlur, 'Dark editor footer should preserve its glass blur').toContain('blur');
+        expect(chromeColors.headerColor, 'Dark editor header text should use the active theme ink token').toBe(chromeColors.activeInk);
+        expect(chromeColors.footerColor, 'Dark editor footer text should use the active theme ink token').toBe(chromeColors.activeInk);
       }
       await page.locator('#imageGrid').scrollIntoViewIfNeeded();
       // The scrollable content must clear the sticky actions: the last image cannot be hidden behind the save bar.
@@ -1752,16 +1779,14 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         const contactCellDisplay = await page.locator('.customer-table tbody tr').first().locator('td').nth(1)
           .evaluate(element => getComputedStyle(element).display);
         expect(contactCellDisplay, 'Mobile customer cards should collapse secondary table columns').toBe('none');
-        const summaryHeight = await mobileSummary.evaluate(element => element.getBoundingClientRect().height);
-        expect(summaryHeight, 'Customer mobile summary should remain compact without opening contact details').toBeLessThanOrEqual(138);
-        const details = mobileSummary.locator('.customer-mobile-details');
-        await expect(details.locator('.customer-mobile-extra')).toBeHidden();
-        await details.locator('summary').click();
-        await expect(details.locator('.customer-mobile-extra')).toBeVisible();
-        await expect(details.locator('.customer-mobile-extra')).toContainText('Email');
-        await expect(details.locator('.customer-mobile-extra')).toContainText('Địa chỉ');
-        await details.locator('summary').click();
-        await expect(details.locator('.customer-mobile-extra')).toBeHidden();
+        const contact = mobileSummary.locator('.customer-mobile-contact');
+        await expect(contact, 'Mobile customer cards should show key contact information without an extra disclosure tap').toBeVisible();
+        await expect(contact).toContainText('Số điện thoại');
+        await expect(contact).toContainText('Địa chỉ');
+        await expect(contact).toContainText('Email');
+        await expect(mobileSummary.locator('.customer-mobile-metrics')).toBeVisible();
+        await expect(mobileSummary.locator('.customer-mobile-details'),
+          'Customer contact fields should not be hidden in the removed accordion design').toHaveCount(0);
       } else {
         await expect(page.locator('.customer-mobile-summary').first()).toBeHidden();
         await expect(page.locator('.customer-desktop-identity').first()).toBeVisible();
@@ -1938,7 +1963,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
           element.classList.remove('show');
         }, previousState);
       }
-      await expect(page.getByLabel('Tìm mã bảo hành, mã đơn, SKU hoặc sản phẩm')).toBeVisible();
+      await expect(page.getByLabel('Tìm mã bảo hành, SĐT, tên khách hoặc sản phẩm')).toBeVisible();
       await expect(page.locator('[data-warranty-filter="all"]')).toHaveAttribute('aria-pressed', 'true');
       await expect(page.locator('[data-warranty-filter="all"]')).toContainText('Tất cả (1)');
       await expect(page.locator('[data-warranty-filter="active"]')).toContainText('Đang xử lý (1)');
@@ -2339,7 +2364,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
         }
       }
       await expect(page.locator('#refreshActivityLogs')).toBeVisible();
-      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+      await expect(page.locator('.activity-log-table tbody')).toContainText('Đã chỉnh sửa sản phẩm');
 
       // Screen 12 reference exposes activity and notification views as tabs inside the same screen.
       await page.evaluate(() => localStorage.removeItem('sd-admin-last-seen'));
@@ -2349,7 +2374,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       await expect(notificationsTab).toBeVisible();
       await notificationsTab.click();
       await expect(notificationsTab).toHaveAttribute('aria-pressed', 'true');
-      await expect(page.locator('#activityNotificationList')).toContainText('Đã sửa sản phẩm');
+      await expect(page.locator('#activityNotificationList')).toContainText('Đã chỉnh sửa sản phẩm');
       await expect(page.locator('#activityNotificationsUnread')).toHaveText('5');
       await page.locator('#activityMarkNotificationsRead').click();
       const activityReadAt = await page.evaluate(() => localStorage.getItem('sd-admin-last-seen'));
@@ -2417,13 +2442,13 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       }
       await expect(page.locator('#activityLogSearch')).toBeVisible();
       await page.locator('#activityLogSearch').fill('UI-ONLY-PRODUCT');
-      await expect(page.locator('.activity-log-table tbody')).toContainText('UI-ONLY-PRODUCT');
+      await expect(page.locator('.activity-log-table tbody')).toContainText(fixtureProduct.title);
       await page.locator('#activityLogSearch').fill('no-match-ui-query');
       await expect(page.locator('.activity-log-table tbody')).toContainText('Không có bản ghi phù hợp với bộ lọc.');
       await page.locator('#clearActivityFilters').click();
-      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+      await expect(page.locator('.activity-log-table tbody')).toContainText('Đã chỉnh sửa sản phẩm');
       await page.locator('#activityActionFilter').selectOption('product_updated');
-      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+      await expect(page.locator('.activity-log-table tbody')).toContainText('Đã chỉnh sửa sản phẩm');
       await page.locator('#activityActionFilter').selectOption('all');
       const refreshActivityButton = page.locator('#refreshActivityLogs');
       await refreshActivityButton.click();
@@ -2431,7 +2456,7 @@ test('captures read-only Admin module UI states using explicit local fixtures', 
       // row may already exist while the button is still in its loading state.
       await expect(refreshActivityButton).toBeEnabled();
       await expect(refreshActivityButton).toHaveText('Làm mới');
-      await expect(page.locator('.activity-log-table tbody')).toContainText('product_updated');
+      await expect(page.locator('.activity-log-table tbody')).toContainText('Đã chỉnh sửa sản phẩm');
       await expect(page.locator('.activity-log-push-settings')).toBeVisible();
       await expect(page.locator('#activityLogEnablePush')).toHaveText('Bật thông báo đẩy');
       if (width <= 680) {

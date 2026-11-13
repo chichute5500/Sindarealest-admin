@@ -5,8 +5,16 @@ import { onRequest } from "../functions/_middleware.js";
 import { KNOWLEDGE_SLUGS } from "../functions/_knowledge-routes.js";
 
 const root = process.cwd();
+const knowledgeCss = readFileSync(resolve(root, "public/kien-thuc/knowledge.css"), "utf8");
+const knowledgeJs = readFileSync(resolve(root, "public/kien-thuc/knowledge.js"), "utf8");
 assert.equal(KNOWLEDGE_SLUGS.length, 11, "Week 11 checklist is integrated into week 1, so only 11 distinct article URLs exist");
 assert.equal(new Set(KNOWLEDGE_SLUGS).size, KNOWLEDGE_SLUGS.length, "Article routes must be unique");
+assert.match(knowledgeCss, /\.related ul\s*\{[^}]*display:\s*flex/s, "Shared knowledge stylesheet must keep related article links in responsive chips");
+assert.match(knowledgeCss, /@media\s*\(max-width:\s*960px\)/, "Knowledge navigation must collapse before the header runs out of room");
+assert.match(knowledgeJs, /event\.key === "Escape"/, "Knowledge menu must close with Escape");
+assert.match(knowledgeJs, /backdrop\.addEventListener\("click"/, "Knowledge menu must close from its backdrop");
+assert.match(knowledgeJs, /aria-expanded/, "Knowledge menu must expose its open state to assistive technology");
+assert.match(knowledgeJs, /sessionStorage\.setItem\(THEME_KEY/, "Knowledge theme choice must persist for the browser session");
 
 async function dispatch(path, method = "GET", host = "preview.example") {
   let assetPath = "";
@@ -37,6 +45,10 @@ async function dispatch(path, method = "GET", host = "preview.example") {
 const home = await dispatch("/");
 assert.equal(home.response.status, 200);
 const homeHtml = await home.response.text();
+assert.match(homeHtml, /@media\(max-width:960px\) and \(min-width:761px\)/,
+  "Storefront navigation must collapse into a visible menu before its PC header overflows");
+assert.match(homeHtml, /matchMedia\('\(min-width:961px\)'\)[\s\S]{0,300}closeMobileMenuOnDesktop/,
+  "An open storefront menu must reset when the viewport returns to wide desktop");
 const homeTitle = "SinDarealest | Giày, Ví, Thắt Lưng & Phụ Kiện Da Cá Sấu Thật 100%";
 const homeDescription = "Thương hiệu đồ da cá sấu thủ công SinDarealest: Giày Sneaker, Giày lười, Giày tây, Ví nam nữ, Thắt lưng liền nguyên tấm & Phụ kiện da cá sấu thật 100%. Bảo hành 6–12 tháng, bảo dưỡng trọn đời.";
 const escapeAttribute = (value) => value.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
@@ -76,6 +88,9 @@ assert.equal(hub.response.status, 200);
 assert.equal(hub.assetPath, "/kien-thuc/index.html");
 const hubHtml = await hub.response.text();
 assert.match(hubHtml, /Kiến thức và hướng dẫn chọn đồ da cá sấu/);
+assert.ok(hubHtml.includes('href="/kien-thuc/knowledge.css?v=20261113"'), "Hub must use the shared Liquid Glass stylesheet");
+assert.ok(hubHtml.includes('src="/kien-thuc/knowledge.js?v=20261113"'), "Hub must load the accessible menu and theme controls");
+assert.ok(hubHtml.includes('id="knowledgeMenuToggle"'), "Hub must expose the responsive menu control");
 assert.match(hub.response.headers.get("X-Robots-Tag") || "", /noindex, nofollow/);
 assert.equal((hubHtml.match(/<article class="card">/g) || []).length, 11,
   "Preview hub should expose the 11 approved, distinct article URLs");
@@ -145,7 +160,8 @@ assert.ok(articleSchema);
 assert.equal(articleSchema.reviewedBy?.name, "Công Chí");
 const relatedBlock = articleHtml.match(/<nav class="related" aria-label="Bài viết kiến thức liên quan">[^]*?<\/nav>/)?.[0] || "";
 assert.ok(relatedBlock, "The latest article must use the shared related-knowledge navigation pattern");
-assert.match(articleHtml, /\.related ul\{display:flex/, "The latest article related links must use a responsive chip layout");
+assert.ok(articleHtml.includes('href="/kien-thuc/knowledge.css?v=20261113"'), "Article must use the shared Liquid Glass stylesheet");
+assert.match(knowledgeCss, /\.related ul\s*\{[^}]*display:\s*flex/s, "The latest article related links must use a responsive chip layout");
 for (const [path,title] of [
   ["/kien-thuc/da-bung-da-lung-da-hong-ca-sau/", "Da bụng, da lưng và da hông cá sấu khác nhau thế nào?"],
   ["/kien-thuc/da-ca-sau-that-co-ben-khong/", "Đồ da cá sấu thật có bền không?"],
@@ -255,7 +271,8 @@ for (const slug of KNOWLEDGE_SLUGS) {
     assert.ok(faqSchema, slug + " needs FAQ schema when FAQ is visible");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.name), questions, slug + " FAQ schema questions must match visible questions");
     assert.deepEqual(faqSchema.mainEntity.map(entity => entity.acceptedAnswer.text), answers, slug + " FAQ schema answers must match visible answers");
-    assert.match(html, /\.related ul\{display:flex/, slug + " related article links must use the responsive chip layout");
+    assert.ok(html.includes('href="/kien-thuc/knowledge.css?v=20261113"'), slug + " must use the shared Liquid Glass stylesheet");
+    assert.ok(html.includes('src="/kien-thuc/knowledge.js?v=20261113"'), slug + " must load the accessible menu and theme controls");
     assert.equal(questions.length, 4, slug + " needs four article-specific FAQs");
   }
   for (const imageMatch of html.matchAll(/<img\b[^>]*src="(\/images\/knowledge\/[^"]+)"/g)) {
