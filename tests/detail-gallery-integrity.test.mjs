@@ -20,8 +20,8 @@ const fullscreenA11yEnd = html.indexOf('function renderFullscreenThumbs(', fulls
 assert.ok(fullscreenA11yStart >= 0 && fullscreenA11yEnd > fullscreenA11yStart,
   'Fullscreen image accessibility state must be synchronized by the gallery image transition handler.');
 const fullscreenA11y = html.slice(fullscreenA11yStart, fullscreenA11yEnd);
-assert.match(fullscreenA11y, /const altText=.*currentProduct\?\.title/,
-  'The active fullscreen product image must receive a meaningful product-specific alternative text.');
+assert.match(fullscreenA11y, /const altText=productImageAlt\(currentProduct,imageIndex-1\)/,
+  'The active fullscreen product image must use the shared product name and SKU alternative text.');
 assert.match(fullscreenA11y, /if\(img===shown\)\{img\.removeAttribute\('aria-hidden'\);img\.alt=altText\}/,
   'The visible fullscreen image must be exposed to assistive technology and have meaningful alternative text.');
 assert.match(fullscreenA11y, /else\{img\.setAttribute\('aria-hidden','true'\);img\.alt=''\}/,

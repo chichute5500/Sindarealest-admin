@@ -21,6 +21,8 @@ const payload = '"><img src=x onerror=alert(1)>';
 vm.runInNewContext(`${helpers}\n${renderer}\nrenderFullscreenThumbs();`, {
   detailImages: [payload],
   detailIndex: 0,
+  currentProduct: {title:"fixture"},
+  productImageAlt: () => "fixture product image",
   $: () => tray,
 });
 assert.equal((tray.innerHTML.match(/<img/g) || []).length, 1, "untrusted image values must not inject additional HTML elements");

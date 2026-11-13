@@ -7,7 +7,6 @@ const validImage = x => typeof x === "string" &&
   (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(x) ||
    /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(x));
 const typeLabels={in_stock:"Hàng có sẵn",made_to_order:"Hàng đặt riêng",unclassified:"Liên hệ tư vấn"};
-const categoryAltLabels={sneakers:"giày thể thao",loafers:"giày lười","dress-shoes":"giày tây",belts:"thắt lưng",sandals:"dép","watch-straps":"dây đồng hồ","phone-cases":"ốp điện thoại"};
 function imageFor(row){
   let items=[];
   try{items=JSON.parse(row.images_json||"[]")}catch{}
@@ -21,7 +20,7 @@ function productCards(rows,origin,{eager=false,deferAll=false}={}){
     const label=typeLabels[p.fulfillment_type]||typeLabels.unclassified;
     const image=imageFor(p),title=String(p.title).trim();
     const sku=Number(p.sku_verified)===1 ? String(p.sku||"") : "";
-    const imageAlt=`${categoryAltLabels[p.category]||p.category_label||p.category||"sản phẩm"} da cá sấu thật${sku?`, mã ${sku}`:""}`;
+    const imageAlt=`${title}${sku?` - Mã ${sku}`:""} | Đồ da cá sấu thật SinDarealest`;
     const type=Object.hasOwn(typeLabels,p.fulfillment_type)?p.fulfillment_type:"unclassified";
     // Reserve the same media, information and 28px cart-footer geometry as
     // client productCard(). A shorter SSR-only layout causes a measurable
@@ -48,23 +47,41 @@ function productCards(rows,origin,{eager=false,deferAll=false}={}){
      '</article>';
   }).join("");
 }
-function catalogSchema(rows,origin){
-  // Catalog pages are lists, not individual merchant product pages.
-  // A nested Product without a public price/review makes Google's Product
-  // snippets report every previewed item as invalid. Link to each canonical
-  // detail URL instead; the page keeps the same eight SSR cards and images.
-  const list=rows.map((p,i)=>({
-    "@type":"ListItem",position:i+1,url:origin+canonicalProductPath(p)
+function catalogSchema(rows,origin,{categorySlug="",page=1,title="Sản phẩm SinDarealest",breadcrumbs=[]}={}){
+  const canonicalPath="/sanpham"+(categorySlug?"/"+categorySlug:"")+(page>1?"?page="+page:"");
+  const itemList={
+    "@type":"ItemList",
+    itemListElement:rows.map((p,i)=>({
+      "@type":"ListItem",position:i+1,url:new URL(canonicalProductPath(p),origin).href,
+      name:String(p.title||"").trim()
+    }))
+  };
+  const categoryNames={sneaker:"Giày thể thao",giayluoi:"Giày lười",giaytay:"Giày tây",thatlung:"Thắt lưng",vinamnu:"Ví nam & nữ",dep:"Dép",daydongho:"Dây đồng hồ",oplung:"Ốp điện thoại",caplaptop:"Cặp – Tab – Laptop",mu:"Mũ","tuithoitrang-golf":"Túi thời trang & golf",tuixach:"Túi xách"};
+  const breadcrumbEntries=breadcrumbs.length?breadcrumbs:[
+    {name:"Trang chủ",path:"/"},{name:"Sản phẩm",path:"/sanpham"},
+    ...(categorySlug?[{name:categoryNames[categorySlug]||categorySlug,path:"/sanpham/"+categorySlug}]:[])
+  ];
+  const list=breadcrumbEntries.map(({name,path},index)=>({
+    "@type":"ListItem",position:index+1,name:String(name||"").slice(0,200),item:new URL(path,origin).href
   }));
+  const graph=[
+    {"@type":"CollectionPage",url:new URL(canonicalPath,origin).href,name:title,mainEntity:itemList},
+    {"@type":"BreadcrumbList",itemListElement:list}
+  ];
   // Escape '<' and U+2028/U+2029 before embedding JSON into an inline script.
-  return JSON.stringify({"@context":"https://schema.org","@type":"ItemList",itemListElement:list})
+  return JSON.stringify({"@context":"https://schema.org","@graph":graph})
     .replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
 }
-export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=false,page=1}={}){
-  if(typeof html!=="string"||!html.includes('id="catalogGrid"')||!env?.DB)return html;
+export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=false,page=1,collectionTitle="Sản phẩm SinDarealest",breadcrumbs=[]}={}){
+  if(typeof html!=="string"||!html.includes('id="catalogGrid"'))return html;
   const validCategory=categorySlug && Object.entries(PRODUCT_CATEGORY_ROUTE_SLUGS)
     .filter(([,slug])=>slug===categorySlug).map(([key])=>key);
   if(categorySlug&&!validCategory.length)return html;
+  if(!env?.DB){
+    if(home)return html;
+    const schema=catalogSchema([],origin,{categorySlug,page,title:collectionTitle,breadcrumbs});
+    return html.replace("</head>",'<script type="application/ld+json" id="sd-page-structured-data">'+schema+'</script>\n</head>');
+  }
   try{
     const pageNumber=Number.isInteger(page)&&page>=1&&page<=250?page:1;
     let sql="SELECT id,slug,sku,sku_verified,title,category,category_label,images_json,fulfillment_type FROM products WHERE published=1";
@@ -79,7 +96,11 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     const rawRows=Array.isArray(result?.results)?result.results:[];
     const hasNext=rawRows.length>8;
     const rows=rawRows.filter(p=>p&&validTitle(p.title)&&canonicalProductPath(p)).slice(0,8);
-    if(!rows.length)return html; // Never output invented/stale products if D1 is unavailable.
+    if(!rows.length){
+      if(home)return html;
+      const schema=catalogSchema([],origin,{categorySlug,page,title:collectionTitle,breadcrumbs});
+      return html.replace("</head>",'<script type="application/ld+json" id="sd-page-structured-data">'+schema+'</script>\n</head>');
+    }
     if(!home){
       const previewKey=rows[0]?.slug||rows[0]?.sku||rows[0]?.id;
       if(previewKey){
@@ -117,8 +138,11 @@ export async function renderPublicCatalog(html,env,origin,{categorySlug="",home=
     // In no-JavaScript mode the image fallback replaces the hidden
     // placeholder, so the card displays one photo without layout shifts.
     const noJsFallback='<noscript><style>#catalogGrid .sd-ssr-deferred-img,#featuredGrid .sd-ssr-deferred-img{display:none!important}</style></noscript>\n';
+    const schema=home
+      ?JSON.stringify({"@context":"https://schema.org","@type":"ItemList",itemListElement:rows.map((p,i)=>({"@type":"ListItem",position:i+1,url:new URL(canonicalProductPath(p),origin).href,name:String(p.title||"").trim()}))}).replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029")
+      :catalogSchema(rows,origin,{categorySlug,page,title:collectionTitle,breadcrumbs});
     html=html.replace('</head>',noJsFallback+aboveFoldPreloads+
-      '<script type="application/ld+json">'+catalogSchema(rows,origin)+'</script>\n</head>');
+      '<script type="application/ld+json" id="sd-page-structured-data">'+schema+'</script>\n</head>');
     return html;
   }catch{return html} // D1 errors must not become a 500 or leak SQL details.
 }

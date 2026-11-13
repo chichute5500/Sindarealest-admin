@@ -19,8 +19,8 @@ assert.ok(full.includes('id="catalogGrid"><article'),'Catalog visible with JS di
 assert.ok(full.includes('class="product-card-footer" aria-hidden="true"'),'SSR must reserve the same product-card footer height before catalog hydration');
 assert.ok(full.includes('class="product-card-bottom"'),'SSR footer must follow hydrated product-card layout');
 assert.ok(full.includes('class="photo-shade"'),'SSR photo should share hydrated image overlay geometry');
-assert.ok(full.includes('alt="giày thể thao da cá sấu thật, mã SD-SN001"'),
-  'Product image alt text describes its category and verified SKU without repeating the adjacent title');
+assert.ok(full.includes('alt="Giày VIP &lt;img src=x onerror=alert(1)&gt; - Mã SD-SN001 | Đồ da cá sấu thật SinDarealest"'),
+  'Product image alt uses the product title and verified SKU directly on the image');
 assert.match(full,/id="catalogGrid"><article[^]*?loading="lazy"/,
   "Homepage catalog below the fold must not eagerly fetch product photographs");
 
@@ -28,7 +28,7 @@ assert.ok(!full.includes('data-add='),'SSR placeholder cannot pretend a cart but
 assert.ok(full.includes('"@type":"ItemList"'),'JSON-LD includes real product URLs');
 // Catalogs must expose real detail links without declaring eight incomplete
 // Product entries that Google rejects as rich product snippets.
-const catalogJson=full.split('<script type="application/ld+json">')[1]?.split('</script>')[0];
+const catalogJson=full.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(catalogJson,"Catalog ItemList JSON-LD must be present");
 const list=JSON.parse(catalogJson);
 assert.equal(list["@type"],"ItemList");
@@ -114,13 +114,18 @@ assert.ok(productHtml.includes('<title>Giày Thể Thao Da Cá Sấu Mẫu #113 
 assert.ok(productHtml.includes('property="og:image:type" content="image/jpeg"'));
 assert.ok(productHtml.includes('property="og:image" content="https://shop.example/og-image/sd-sn113.jpg"'));
 assert.ok(productHtml.includes('class="sd-product-nojs"'),'Direct product route contains an SSR description without JavaScript');
-assert.ok(productHtml.includes('alt="Giày thể thao da cá sấu thật, mã SD-SN113"'));
-const productJson=productHtml.match(/<script type="application\/ld\+json">([^<]+)<\/script>/g)?.at(-1)?.match(/>([^<]+)</)?.[1];
+assert.ok(productHtml.includes('alt="Giày Thể Thao Da Cá Sấu Mẫu #113 - Mã SD-SN113 | Đồ da cá sấu thật SinDarealest"'));
+const productJson=productHtml.match(/<script type="application\/ld\+json" id="sd-page-structured-data">([^<]+)<\/script>/)?.[1];
 const productLd=JSON.parse(productJson);
-assert.equal(productLd['@type'],'Product');
-assert.equal(productLd.sku,'SD-SN113');
-assert.equal(productLd.offers.price,9500000);
-assert.equal(productLd.offers.priceCurrency,'VND');
+const productGraph=productLd['@graph'];
+const productEntity=productGraph.find(entry=>entry['@type']==='Product');
+assert.ok(productGraph.some(entry=>entry['@type']==='BreadcrumbList'));
+assert.equal(productEntity.sku,'SD-SN113');
+assert.equal(productEntity.mpn,'SD-SN113');
+assert.equal(productEntity.offers.price,'9500000');
+assert.equal(productEntity.offers.priceCurrency,'VND');
+assert.deepEqual(productEntity.image,['https://shop.example/images/test-image.webp']);
+assert.equal(productEntity.offers.itemCondition,'https://schema.org/NewCondition');
 const legacySkuResponse=await middleware({request:new Request(origin+'/sanpham/sneaker/SD-GL062'),env:{},next:async()=>{throw Error('Legacy SKU must redirect before reading D1')}});
 assert.equal(legacySkuResponse.status,301);
 assert.equal(legacySkuResponse.headers.get('Location'),origin+'/sanpham/sneaker/SD-SN113');

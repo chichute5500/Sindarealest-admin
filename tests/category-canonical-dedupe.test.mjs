@@ -49,7 +49,8 @@ const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;
 const ctx={
  products:rows,selectedCategory:'giay-the-thao',categoryLabels:{all:'Tất cả',sneakers:'Giày Thể Thao','vi-nam-nu':'Ví Nam & Nữ',loafers:'Giày lười'},
  categoryOrder:['all','sneakers','vi-nam-nu','loafers'],canonicalCategoryKey,displayProductName:v=>String(v).replace(/\p{L}[\p{L}\p{M}\p{N}]*/gu,w=>w[0].toLocaleUpperCase('vi')+w.slice(1)),
- escapeHtml,routeSlug:productCategoryRouteSlug,$:selector=>selector==='#categoryFilters'?html:null
+ escapeHtml,routeSlug:productCategoryRouteSlug,sdUpdateCatalogBreadcrumbs(){},sdUpdateCategorySeoBlock(){},sdUpdateCatalogMetadata(){},
+ document:{documentElement:{classList:{contains:()=>false}}},$:selector=>selector==='#categoryFilters'?html:null
 };
 runInNewContext(shop.slice(filterStart,filterEnd)+'\nrenderFilters();',ctx,{timeout:1000});
 assert.equal(ctx.selectedCategory,'sneakers');
