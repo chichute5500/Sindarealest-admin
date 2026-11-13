@@ -3972,7 +3972,11 @@ html.sd-service-route #sdServiceMount .sd-track-intro,html.sd-service-route #sdS
       noteWelcomeTitlePaint();
     }
   },950);
-  fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
+  window.__sdSettingsPromise=fetch('/api/settings',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(c){
+    if(c&&typeof c==='object')window.__sdPublicSettings=c;
+    return c;
+  });
+  window.__sdSettingsPromise.then(function(c){
     if(!c)return;
     if(c.welcomeEnabled===false)dismiss();
     var a=document.getElementById('welcomeTitleLine1'),b=document.getElementById('welcomeTitleLine2'),p=document.getElementById('welcomeText');
