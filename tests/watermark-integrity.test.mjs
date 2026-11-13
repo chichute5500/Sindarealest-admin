@@ -57,6 +57,8 @@ assert.ok(!script.includes('.detail-thumb'));
 assert.ok(!home.includes('.product-photo .sd-viewer-watermark'));
 assert.ok(!home.includes('.detail-thumb .sd-viewer-watermark'));
 assert.ok(home.includes("window.__sdSettingsPromise||window.__sdPublicSettings"));
+assert.ok(home.includes("window.__sdSettingsPromise=fetch('/api/settings',{cache:'no-store'})"), 'Watermark must wait for the storefront public settings request');
+assert.ok(home.includes("if(c&&typeof c==='object')window.__sdPublicSettings=c"), 'Resolved public settings must be shared with the watermark overlay');
 assert.ok(home.includes("if(mark.getAttribute('src')!==logo)mark.src=logo;"), 'Observed watermark src must not be written repeatedly');
 const wmStart=script.indexOf('function styleWatermark(mark){'), wmEnd=script.indexOf('function imageNeedsOverlay(src){',wmStart);
 assert.ok(wmStart>=0&&wmEnd>wmStart);
