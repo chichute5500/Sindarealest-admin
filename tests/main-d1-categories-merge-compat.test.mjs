@@ -32,6 +32,8 @@ const ctx={
  categoryAliases:{wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"},canonicalCategoryKey:value=>({wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"}[value]||value),
  categoryLabels:{all:"Tất cả",sneakers:"Sneaker","vi-nam-nu":"Ví Nam & Nữ","tui-thoi-trang-golf":"Túi Thời Trang & Golf","tui-xach":"Túi Xách"},
  displayProductName,escapeHtml,routeSlug:productCategoryRouteSlug,selectedCategory:"stale-from-import",
+ sdUpdateCatalogBreadcrumbs(){},sdUpdateCategorySeoBlock(){},sdUpdateCatalogMetadata(){},
+ document:{documentElement:{classList:{contains:()=>false}}},
  $:selector=>selector==="#categoryFilters"?container:null
 };
 function render(){runInNewContext(html.slice(start,end)+"\nrenderFilters();",ctx,{timeout:1000})}

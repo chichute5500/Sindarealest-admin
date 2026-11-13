@@ -13,6 +13,15 @@ assert.equal(slugs.length,12,"12 consolidated category routes");
 assert.equal(Object.keys(profiles).length,13,"12 category profiles plus all-products");
 assert.deepEqual(Object.keys(profiles).sort(),["all",...slugs].sort(),"Only canonical category profiles");
 const titles=new Set();
+const requestedTitles={
+  all:"Sản phẩm đồ da cá sấu thật: Giày, Ví, Thắt lưng, Túi | SinDarealest",
+  thatlung:"Thắt lưng da cá sấu nam liền nguyên tấm, dây nịt thật 100% | SinDarealest",
+  sneaker:"Giày thể thao da cá sấu nam (Sneaker) thủ công cao cấp | SinDarealest",
+  vinamnu:"Ví da cá sấu nam nữ, bóp da & ví cầm tay Clutch thật 100% | SinDarealest",
+  giayluoi:"Giày lười da cá sấu nam (Loafer) êm chân, da thật 100% | SinDarealest",
+  giaytay:"Giày tây da cá sấu nam (Oxford & Derby) thủ công cao cấp | SinDarealest",
+  dep:"Dép da cá sấu nam cao cấp, dép kẹp & quai ngang da thật | SinDarealest"
+};
 for(const slug of ["all",...slugs]){
   const p=profiles[slug];
   assert.ok(p,"Missing SEO category "+slug);
@@ -21,6 +30,7 @@ for(const slug of ["all",...slugs]){
     assert.ok(!/[<>]/.test(p[name]),"No raw HTML allowed in SEO copy");
   }
   assert.ok(p.title.endsWith("SinDarealest"),"Title must include brand");
+  if(requestedTitles[slug])assert.equal(p.title,requestedTitles[slug],"Commercial title contract: "+slug);
   assert.ok(!titles.has(p.title),"Avoid duplicate titles: "+p.title);
   titles.add(p.title);
   assert.ok(p.description.length<210,"Keep meta description concise");
@@ -35,12 +45,15 @@ assert.ok(html.includes('.detail-copy #detailTitle{font:'),"H1 preserves product
 assert.ok(!html.includes('.detail-copy h2{'),"No obsolete H2-only product title styling");
 
 const readBreadcrumbs = body => {
-  const entries = [...body.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+  const entries = [...body.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
     .map(match => JSON.parse(match[1]))
+    .flatMap(schema => schema["@graph"]||[schema])
     .filter(schema => schema["@type"] === "BreadcrumbList");
   assert.equal(entries.length, 1, "Exactly one BreadcrumbList per catalog/product page");
   return entries[0].itemListElement;
 };
+const readGraph = body => [...body.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
+  .map(match=>JSON.parse(match[1])).flatMap(schema=>schema["@graph"]||[schema]);
 const origin="https://shop.example";
 const fetchPage=async pathname=>{
   const response=await storefront({
@@ -53,17 +66,24 @@ const fetchPage=async pathname=>{
 };
 for(const slug of ["sneaker","giaytay","vinamnu","thatlung","tuixach","mu"]){
   const p=profiles[slug],body=await fetchPage("/sanpham/"+slug);
-  assert.ok(body.includes("<title>"+p.title+"</title>"),"Server title missing: "+slug);
+  assert.ok(body.includes("<title>"+p.title.replace(/&/g,"&amp;")+"</title>"),"Server title missing: "+slug);
   assert.ok(body.includes('name="description" content="'+p.description+'"'),"Server description missing: "+slug);
   assert.ok(body.includes('id="catalogHeading">'+p.heading+"</h1>"),"Server H1 missing: "+slug);
   assert.ok(body.includes('<h2 class="sdh-title" id="sdh-title">'),"Home hero must not be H1 on catalog route");
   assert.ok(body.includes('id="catalogSeoNote">'+p.intro+"</p>"),"Server visible SEO introduction missing: "+slug);
+  assert.ok(body.includes('property="og:title" content="'+p.title.replace(/&/g,"&amp;")+'"'),"OG title missing: "+slug);
+  assert.ok(body.includes('id="catalogSeoBottomHeading">'+(p.seoHeading||p.heading).replace(/&/g,"&amp;")+"</h2>"),"Bottom SEO heading missing: "+slug);
+  for(const [,href] of p.seoLinks)assert.ok(body.includes('href="'+href+'"'),"Missing category guide link: "+slug+" "+href);
   assert.ok(body.includes('rel="canonical" href="'+origin+"/sanpham/"+slug+'"'),"Wrong canonical");
   assert.equal((body.match(/<meta name="description"/g)||[]).length,1,"Description must not be duplicated");
   const crumbs=readBreadcrumbs(body);
+  const graph=readGraph(body);
+  const collection=graph.find(schema=>schema["@type"]==="CollectionPage");
+  assert.ok(collection,"CollectionPage is included in the category @graph");
+  assert.equal(collection.mainEntity["@type"],"ItemList");
   assert.deepEqual(crumbs.map(item=>item.position),[1,2,3]);
   assert.deepEqual(crumbs.map(item=>item.item),[origin+"/",origin+"/sanpham",origin+"/sanpham/"+slug]);
-  assert.deepEqual(crumbs.map(item=>item.name),["Trang chủ","Tất cả sản phẩm",
+  assert.deepEqual(crumbs.map(item=>item.name),["Trang chủ","Sản phẩm",
     ({sneaker:"Giày thể thao (Sneaker)",giaytay:"Giày tây",vinamnu:"Ví nam & nữ",thatlung:"Thắt lưng",tuixach:"Túi xách",mu:"Mũ"})[slug]]);
 
 }
@@ -86,6 +106,7 @@ const ctx={
     getElementById:id=>id==="sd-seo-category-copy"?{textContent:json[1]}:null,
     documentElement:{classList:{contains(){return false}}}
   },
+  sdUpdateCatalogBreadcrumbs(){},sdUpdateCategorySeoBlock(){},sdUpdateCatalogMetadata(){},
   $:id=>id==="#categoryFilters"?box:id==="#catalogHeading"?heading:id==="#catalogSeoNote"?note:null
 };
 runInNewContext(html.slice(start,end)+"\nrenderFilters()",ctx,{timeout:1000});
@@ -108,21 +129,27 @@ assert.ok(productBody.includes('Mẫu thiết kế cá nhân'));
 assert.ok(productBody.includes('rel="canonical" href="'+origin+"/sanpham/sneaker/SD-SN321"+'"'));
 assert.ok(productBody.includes('<h1 id="detailTitle">Giày mẫu SN321</h1>'),"Direct product title must be H1 in the initial HTML");
 assert.ok(productBody.includes('<h2 class="sdh-title" id="sdh-title">'),"Home hero must not be H1 on product route");
+assert.ok(productBody.includes('id="detailMainImage" src="/images/theme-croc-dark.webp" alt="Giày mẫu SN321 - Mã SD-SN321 | Đồ da cá sấu thật SinDarealest"'),"SSR product gallery image has direct descriptive alt");
 assert.deepEqual(readBreadcrumbs(productBody).map(x=>x.item),[
   origin+"/",origin+"/sanpham",origin+"/sanpham/sneaker",origin+"/sanpham/sneaker/SD-SN321"
 ]);
 assert.deepEqual(readBreadcrumbs(productBody).map(x=>x.name),[
-  "Trang chủ","Tất cả sản phẩm","Giày thể thao","Giày mẫu SN321"
+  "Trang chủ","Sản phẩm","Giày thể thao","Giày mẫu SN321"
 ]);
+const unpricedProductSchema=readGraph(productBody).find(schema=>schema["@type"]==="Product");
+assert.equal(unpricedProductSchema?.sku,"SD-SN321");
+assert.equal(unpricedProductSchema?.mpn,"SD-SN321");
+assert.deepEqual(unpricedProductSchema?.image,[origin+"/images/theme-croc-dark.webp"]);
+assert.ok(unpricedProductSchema?.description.includes("da cá sấu thật 100%"));
 
-assert.ok(!productBody.includes('"@type":"Offer"'),"Do not invent verified prices");
-assert.ok(!productBody.includes('"@type":"AggregateRating"'),"Do not invent reviews");
+assert.ok(!Object.hasOwn(unpricedProductSchema||{},"offers"),"Do not invent verified prices");
+assert.ok(!Object.hasOwn(unpricedProductSchema||{},"aggregateRating"),"Do not invent reviews");
 
 // The seller operates online only. Use the supported channel availability
 // value without claiming that inventory is physically in stock. Refer to the
 // published organization-level shipping policy; do not flatten conditional
 // free shipping into a universal zero-rate offer or invent transit days.
-const pricedProduct={...product,price:1230000,source_price_confirmed:1};
+const pricedProduct={...product,price:1230000,source_price_confirmed:1,fulfillment_type:"in_stock"};
 const pricedProductResponse=await storefront({
   request:new Request(origin+"/sanpham/sneaker/SD-SN321"),
   env:{DB:{prepare(){return {bind(){return {async first(){return pricedProduct}}}}}}},
@@ -130,11 +157,14 @@ const pricedProductResponse=await storefront({
 });
 assert.equal(pricedProductResponse.status,200);
 const pricedProductBody=await pricedProductResponse.text();
-const productSchemas=[...pricedProductBody.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
-  .map(match=>JSON.parse(match[1]));
+const productSchemas=[...pricedProductBody.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)]
+  .map(match=>JSON.parse(match[1])).flatMap(schema=>schema["@graph"]||[schema]);
 const pricedSchema=productSchemas.find(schema=>schema["@type"]==="Product");
-assert.equal(pricedSchema?.offers?.availability,"https://schema.org/OnlineOnly",
-  "Offers must state the verified online-only purchase channel");
+assert.equal(pricedSchema?.offers?.price,"1230000","Offer price is a plain integer string");
+assert.equal(pricedSchema?.offers?.availability,"https://schema.org/InStock",
+  "An explicitly in-stock product publishes its verified availability");
+assert.equal(pricedSchema?.offers?.itemCondition,"https://schema.org/NewCondition");
+assert.deepEqual(pricedSchema?.offers?.seller,{"@type":"Organization","@id":"https://casauvip.store/#business",name:"SinDarealest"});
 assert.equal(pricedSchema?.offers?.seller?.["@id"],"https://casauvip.store/#business");
 assert.deepEqual(pricedSchema?.offers?.shippingDetails,{
   "@type":"OfferShippingDetails",

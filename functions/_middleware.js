@@ -28,22 +28,23 @@ function catalogSeoProfile(html, categorySlug) {
       && typeof profile.intro === "string" ? profile : null;
   } catch { return null; }
 }
-// The same visible catalog hierarchy is expressed as crawler-readable
-// BreadcrumbList JSON-LD. No new D1 read, no invented attributes, no UI changes.
-function appendBreadcrumbList(html, origin, entries) {
-  if (!Array.isArray(entries) || entries.length < 2) return html;
-  const itemListElement = entries.map(({ name, path }, index) => ({
-    "@type": "ListItem",
-    position: index + 1,
-    name: String(name || "").slice(0, 200),
-    item: new URL(path, origin).href
-  }));
-  const schema = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement
-  }).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
-  return html.replace("</head>", '  <script type="application/ld+json">' + schema + '</script>\n</head>');
+function catalogBreadcrumbMarkup(entries) {
+  if (!Array.isArray(entries) || entries.length < 2) return "";
+  return '<nav class="sd-catalog-breadcrumbs" id="catalogBreadcrumbs" aria-label="Breadcrumb">' +
+    entries.map(({name,path},index) => index===entries.length-1
+      ? '<span aria-current="page">'+escapeHtml(name)+'</span>'
+      : '<a href="'+escapeHtml(path)+'">'+escapeHtml(name)+'</a>').join('<span class="sd-breadcrumb-separator" aria-hidden="true">/</span>')+
+    '</nav>';
+}
+function catalogSeoBlock(profile) {
+  if (!profile || typeof profile.seoBody !== "string" || !Array.isArray(profile.seoLinks)) return "";
+  const heading=typeof profile.seoHeading==="string"?profile.seoHeading:profile.heading;
+  const linkTitle=typeof profile.seoLinksTitle==="string"?profile.seoLinksTitle:"Góc kiến thức da cá sấu";
+  const links=profile.seoLinks.map(item=>Array.isArray(item)?{title:item[0],href:item[1]}:item)
+    .filter(item=>item&&typeof item.title==="string"&&typeof item.href==="string"&&/^\/kien-thuc\//.test(item.href));
+  return '<h2 id="catalogSeoBottomHeading">'+escapeHtml(heading)+'</h2>'+
+    '<p>'+escapeHtml(profile.seoBody)+'</p><div class="sd-category-seo-guides"><h3>'+escapeHtml(linkTitle)+'</h3><ul>'+
+    links.map(item=>'<li><a href="'+escapeHtml(item.href)+'">'+escapeHtml(item.title)+'</a></li>').join('')+'</ul></div>';
 }
 // Functions-generated HTML bypasses static _headers on some Cloudflare paths.
 // Apply the same minimally restrictive document-level controls on all real
@@ -313,12 +314,19 @@ export async function onRequest(context) {
     html = /<link\s+rel=["']canonical["']/i.test(html)
       ? html.replace(/<link\s+rel=["']canonical["'][^>]*>/i, canonicalTag)
       : html.replace("</head>", "  " + canonicalTag + "\n</head>");
-    html = appendBreadcrumbList(html, url.origin, [
+    const catalogBreadcrumbs = [
       { name: "Trang chủ", path: "/" },
-      { name: "Tất cả sản phẩm", path: "/sanpham" },
+      { name: "Sản phẩm", path: "/sanpham" },
       ...(categorySlug ? [{ name: categoryName, path: canonicalPath }] : [])
-    ]);
-    html = await renderPublicCatalog(html,context.env,url.origin,{categorySlug,page:requestedPage});
+    ];
+    html = html.replace('<nav class="sd-catalog-breadcrumbs" id="catalogBreadcrumbs" aria-label="Breadcrumb" hidden></nav>',
+      catalogBreadcrumbMarkup(catalogBreadcrumbs));
+    const bottomSeoMarkup = catalogSeoBlock(seoProfile || catalogSeoProfile(html,"all"));
+    if (bottomSeoMarkup) html = html.replace('<section class="sd-category-seo-copy" id="catalogSeoBottom" aria-labelledby="catalogSeoBottomHeading" hidden></section>',
+      '<section class="sd-category-seo-copy" id="catalogSeoBottom" aria-labelledby="catalogSeoBottomHeading">'+bottomSeoMarkup+'</section>');
+    html = await renderPublicCatalog(html,context.env,url.origin,{
+      categorySlug,page:requestedPage,collectionTitle:catalogTitleBase,breadcrumbs:catalogBreadcrumbs
+    });
     const headers = new Headers(response.headers);
     headers.set("Content-Type","text/html; charset=utf-8");
     headers.set("Cache-Control","public, max-age=60, s-maxage=300");
@@ -432,6 +440,8 @@ export async function onRequest(context) {
   let title = `${product.title}${verifiedSku ? ` – ${verifiedSku}` : ""} | SinDarealest`;
   const descriptionBase = String(product.description || `${product.title} — ${product.category_label || "Thời trang da cá sấu cao cấp"}. Liên hệ SinDarealest để được tư vấn chi tiết.`).replace(/\s+/g, " ").trim();
   const productCategoryName = String(product.category_label || "Thời trang da cá sấu").trim();
+  const fulfillmentType = ["in_stock","made_to_order","unclassified"].includes(product.fulfillment_type)
+    ? product.fulfillment_type : "unclassified";
   const productPriceLine = Number(product.source_price_confirmed) === 1 && Number.isFinite(Number(product.price)) && Number(product.price) > 0
     ? ` Giá ${new Intl.NumberFormat("vi-VN").format(Number(product.price))}đ.` : " Liên hệ Zalo để nhận báo giá.";
   let description = `${product.title} – ${productCategoryName} da cá sấu thật.${productPriceLine} ${descriptionBase}`.slice(0, 300);
@@ -482,29 +492,37 @@ export async function onRequest(context) {
     tuideocheo: "Túi đeo chéo", tuigolf: "Túi golf", tuinu: "Túi nữ",
     dep: "Dép", daydongho: "Dây đồng hồ", oplung: "Ốp điện thoại"
   };
-  html = appendBreadcrumbList(html, url.origin, [
+  const productBreadcrumbs = [
     { name: "Trang chủ", path: "/" },
-    { name: "Tất cả sản phẩm", path: "/sanpham" },
+    { name: "Sản phẩm", path: "/sanpham" },
     { name: categoryLabels[categorySlug] || String(product.category || "Danh mục"), path: "/sanpham/" + categorySlug },
     { name: product.title, path: canonicalPath }
-  ]);
+  ];
   const hasPublicOffer = Number(product.source_price_confirmed) === 1
     && Number.isFinite(Number(product.price)) && Number(product.price) > 0;
+  const productImages = Array.isArray(images) ? images.filter(value =>
+    typeof value === "string" && (/^images\/[A-Za-z0-9_-]{1,120}\.webp$/.test(value)
+      || /^\/media\/[A-Za-z0-9-]{30,40}\.webp$/.test(value))) : [];
+  const absoluteProductImages = [...new Set((productImages.length ? productImages : [productImagePath])
+    .map(value => new URL(value.startsWith("/") ? value : "/" + value, url.origin).href))];
+  const schemaDescription = `${descriptionBase} Chất liệu da cá sấu thật 100%.${fulfillmentType === "made_to_order" ? " Thời gian chế tác dự kiến 5–20 ngày." : ""} Bảo hành 6–12 tháng và bảo dưỡng trọn đời tại SinDarealest.`.slice(0,1000);
+  const normalizedPrice = hasPublicOffer ? String(Math.trunc(Number(product.price))) : "";
+  const availability = fulfillmentType === "in_stock" ? "https://schema.org/InStock"
+    : fulfillmentType === "made_to_order" ? "https://schema.org/MadeToOrder" : "";
   const productSchema = {
-    "@context": "https://schema.org", "@type": "Product",
+    "@type": "Product",
     name: product.title,
-    description,
-    image: new URL(productImagePath, url.origin).href,
+    description: schemaDescription,
+    image: absoluteProductImages,
     url: canonical,
     category: product.category_label || String(product.category || ""),
     brand: { "@type": "Brand", name: "SinDarealest" },
-    ...(verifiedSku ? { sku: verifiedSku } : {}),
+    ...(verifiedSku ? { sku: verifiedSku, mpn: verifiedSku } : {}),
     ...(hasPublicOffer ? { offers: {
       "@type": "Offer", url: canonical, priceCurrency: "VND",
-      price: Number(product.price),
-      // SinDarealest sells online only; this is a channel statement, not an
-      // inventory claim. Do not infer stock status for made-to-order items.
-      availability: "https://schema.org/OnlineOnly",
+      price: normalizedPrice,
+      ...(availability ? { availability } : {}),
+      itemCondition: "https://schema.org/NewCondition",
       // Reference the public organization-level shipping policy. Its
       // description preserves the full-payment free-shipping condition;
       // do not turn it into a universal zero-rate offer or invent transit days.
@@ -516,16 +534,26 @@ export async function onRequest(context) {
       },
       // The public policy page documents deposit-specific exclusions and the video requirement.
       hasMerchantReturnPolicy: { "@id": "https://casauvip.store/terms-of-service#return-policy" },
-      seller: { "@id": "https://casauvip.store/#business" }
+      seller: { "@type": "Organization", "@id": "https://casauvip.store/#business", name: "SinDarealest" }
     } } : {})
   };
-  const schema = JSON.stringify(productSchema).replace(/</g, "\\u003c");
-  html = html.replace("</head>", `  <script type="application/ld+json">${schema}</script>\n</head>`);
+  const breadcrumbSchema = {
+    "@type": "BreadcrumbList",
+    itemListElement: productBreadcrumbs.map(({name,path},index) => ({
+      "@type": "ListItem", position: index+1, name: String(name||"").slice(0,200), item: new URL(path,url.origin).href
+    }))
+  };
+  const schema = JSON.stringify({"@context":"https://schema.org","@graph":[breadcrumbSchema,productSchema]})
+    .replace(/</g, "\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
+  html = html.replace("</head>", `  <script type="application/ld+json" id="sd-page-structured-data">${schema}</script>\n</head>`);
   const noJsPrice = hasPublicOffer
     ? `<p><strong>Giá:</strong> ${escapeHtml(new Intl.NumberFormat("vi-VN").format(Number(product.price)))}₫</p>` : "";
   const noJsQuote = hasPublicOffer ? "" : '<p>Liên hệ Zalo để nhận báo giá.</p>';
-  const noJsImageAlt = `${product.category_label || product.category || "Sản phẩm"} da cá sấu thật${verifiedSku ? `, mã ${verifiedSku}` : ""}`;
-  const noJsSummary = `<noscript><main class="sd-product-nojs"><h1>${escapeHtml(product.title)}</h1><img src="${escapeHtml(productImagePath)}" alt="${escapeHtml(noJsImageAlt)}"><p><strong>Danh mục:</strong> ${escapeHtml(product.category_label || product.category || "Sản phẩm da cá sấu")}</p>${verifiedSku ? `<p><strong>Mã sản phẩm:</strong> ${escapeHtml(verifiedSku)}</p>` : ""}${noJsPrice}${noJsQuote}<p>${escapeHtml(product.description || description)}</p></main></noscript>`;
+  const noJsImageAlt = `${product.title}${verifiedSku ? ` - Mã ${verifiedSku}` : ""} | Đồ da cá sấu thật SinDarealest`;
+  const detailImageMarkup = '<img class="detail-main-image" id="detailMainImage" alt="" decoding="async">';
+  const detailImage = '<img class="detail-main-image" id="detailMainImage" src="'+escapeHtml(productImagePath)+'" alt="'+escapeHtml(noJsImageAlt)+'" loading="eager" fetchpriority="high" decoding="async">';
+  html = html.replace(detailImageMarkup,detailImage);
+  const noJsSummary = `<noscript><main class="sd-product-nojs"><h1>${escapeHtml(product.title)}</h1><img src="${escapeHtml(productImagePath)}" alt="${escapeHtml(noJsImageAlt)}" loading="eager" decoding="async"><p><strong>Danh mục:</strong> ${escapeHtml(product.category_label || product.category || "Sản phẩm da cá sấu")}</p>${verifiedSku ? `<p><strong>Mã sản phẩm:</strong> ${escapeHtml(verifiedSku)}</p>` : ""}${noJsPrice}${noJsQuote}<p>${escapeHtml(product.description || description)}</p></main></noscript>`;
   html = html.replace(/<body([^>]*)>/i, `$&${noJsSummary}`);
   const headers = new Headers(response.headers);
   headers.set("Content-Type", "text/html; charset=utf-8");

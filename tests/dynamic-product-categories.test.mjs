@@ -37,6 +37,8 @@ const ctx={
  canonicalCategoryKey:value=>({wallets:"vi-nam-nu","vi-nam":"vi-nam-nu","vi-cam-tay":"vi-nam-nu",clutch:"tui-thoi-trang-golf","tui-deo-cheo":"tui-thoi-trang-golf","tui-golf":"tui-thoi-trang-golf","tui-nu":"tui-xach"}[String(value||"").toLowerCase()]||String(value||"").toLowerCase()),
  selectedCategory:"missing-from-new-upload",
  escapeHtml,routeSlug:productCategoryRouteSlug,
+ sdUpdateCatalogBreadcrumbs(){},sdUpdateCategorySeoBlock(){},sdUpdateCatalogMetadata(){},
+ document:{documentElement:{classList:{contains:()=>false}}},
  $:selector=>selector==="#categoryFilters"?box:null,
 };
 runInNewContext(source+"\nrenderFilters();",ctx,{timeout:1000});
