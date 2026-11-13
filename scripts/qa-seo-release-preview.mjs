@@ -14,6 +14,20 @@ const cards = [
   ['/kien-thuc/chon-that-lung-da-ca-sau/', 'Chọn thắt lưng da cá sấu: bản dây, khóa và cách đo size'],
   ['/kien-thuc/chon-size-giay-da-ca-sau-online/', 'Cách chọn size giày da cá sấu khi mua online']
 ];
+async function revealPageContent(page) {
+  await page.evaluate(async () => {
+    const items = [...document.querySelectorAll('main [data-reveal], main img')];
+    for (const item of items) {
+      if (!item.getClientRects().length) continue;
+      if (item instanceof HTMLImageElement) item.loading = 'eager';
+      item.scrollIntoView({ block: 'center', behavior: 'instant' });
+      if (item instanceof HTMLImageElement) await item.decode().catch(() => {});
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }
+    window.scrollTo(0, 0);
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+}
 const browser = await chromium.launch({ headless: true });
 const report = [];
 try {
@@ -31,6 +45,7 @@ try {
     const home = await page.goto(origin + '/', { waitUntil: 'domcontentloaded', timeout: 25000 });
     assert.equal(home?.status(), 200, `${device}: homepage should return 200`);
     await page.locator('#home-knowledge').waitFor({ state: 'visible', timeout: 15000 });
+    await revealPageContent(page);
     const homeResult = await page.evaluate(() => ({
       title: document.title,
       description: document.querySelector('meta[name="description"]')?.content,
@@ -55,11 +70,17 @@ try {
     const article = await page.goto(origin + cards[0][0], { waitUntil: 'domcontentloaded', timeout: 25000 });
     assert.equal(article?.status(), 200, `${device}: article should return 200`);
     await page.getByRole('heading', { name: cards[0][1], level: 1 }).waitFor({ state: 'visible', timeout: 15000 });
+    await revealPageContent(page);
     const related = await page.locator('nav.related').evaluate(nav => [...nav.querySelectorAll('a')].map(link => ({
       href: new URL(link.href).pathname,
       title: link.textContent.trim()
     })));
     assert.equal(related.length, 4, `${device}: related navigation should have four links`);
+    const relatedListStyle = await page.locator('nav.related ul').evaluate(list => ({
+      display: getComputedStyle(list).display,
+      listStyle: getComputedStyle(list).listStyleType
+    }));
+    assert.deepEqual(relatedListStyle, { display: 'flex', listStyle: 'none' }, `${device}: related navigation chip layout`);
     const articleLayout = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
       viewportWidth: innerWidth

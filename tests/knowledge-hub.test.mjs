@@ -145,6 +145,7 @@ assert.ok(articleSchema);
 assert.equal(articleSchema.reviewedBy?.name, "Công Chí");
 const relatedBlock = articleHtml.match(/<nav class="related" aria-label="Bài viết kiến thức liên quan">[^]*?<\/nav>/)?.[0] || "";
 assert.ok(relatedBlock, "The latest article must use the shared related-knowledge navigation pattern");
+assert.match(articleHtml, /\.related ul\{display:flex/, "The latest article related links must use a responsive chip layout");
 for (const [path,title] of [
   ["/kien-thuc/da-bung-da-lung-da-hong-ca-sau/", "Da bụng, da lưng và da hông cá sấu khác nhau thế nào?"],
   ["/kien-thuc/da-ca-sau-that-co-ben-khong/", "Đồ da cá sấu thật có bền không?"],
