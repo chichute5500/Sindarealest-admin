@@ -5,6 +5,14 @@ import { canonicalProductPath, isVerifiedCommercialSku, productCategoryRouteSlug
 import { WARRANTY_OG_JPEG_BASE64 } from "./_warranty-og-image.js";
 import { CATEGORY_OG_JPEG_BASE64 } from "./_category-og-images.js";
 import { KNOWLEDGE_SLUGS } from "./_knowledge-routes.js";
+const LEGACY_PAGE_REDIRECTS = new Map([
+  ["/tra-cuu", "/tra-cuu-don-hang"],
+  ["/tra-cuu/", "/tra-cuu-don-hang"],
+  ["/lien-he", "/#contact"],
+  ["/lien-he/", "/#contact"],
+  ["/gioi-thieu", "/#about"],
+  ["/gioi-thieu/", "/#about"]
+]);
 const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 function meta(html, name, content, property = false) {
   const attr = property ? "property" : "name";
@@ -120,6 +128,15 @@ export async function onRequest(context) {
   // sitemap typo and the retired product-listing root. Keep canonical URLs direct.
   if (url.pathname === "/sitemap.xml.") return Response.redirect(new URL("/sitemap.xml", url.origin), 301);
   if (url.pathname === "/san-pham" || url.pathname === "/san-pham/") return Response.redirect(new URL("/sanpham", url.origin), 301);
+  // Pages _redirects rules do not run for requests handled by Functions.
+  // Keep legacy storefront aliases in this router so both slash variants get
+  // a real 301 before the SPA fallback can render a 404 shell.
+  const legacyPageTarget = LEGACY_PAGE_REDIRECTS.get(url.pathname);
+  if (legacyPageTarget) {
+    const destination = new URL(legacyPageTarget, url.origin);
+    destination.search = url.search;
+    return Response.redirect(destination, 301);
+  }
   if (url.pathname.startsWith('/api/admin/') && context.request.method !== 'OPTIONS') {
     const hadValidSession = await verifySession(context.request, context.env);
     const response = await context.next();
@@ -368,6 +385,14 @@ export async function onRequest(context) {
     }
     if (!["/", "/index.html"].includes(url.pathname)) return response;
     let html = await response.text();
+    const homeTitle = "SinDarealest | Giày, Ví, Thắt Lưng & Phụ Kiện Da Cá Sấu Thật 100%";
+    const homeDescription = "Thương hiệu đồ da cá sấu thủ công SinDarealest: Giày Sneaker, Giày lười, Giày tây, Ví nam nữ, Thắt lưng liền nguyên tấm & Phụ kiện da cá sấu thật 100%. Bảo hành 6–12 tháng, bảo dưỡng trọn đời.";
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, "<title>" + escapeHtml(homeTitle) + "</title>");
+    html = meta(html, "description", homeDescription);
+    html = meta(html, "og:title", homeTitle, true);
+    html = meta(html, "og:description", homeDescription, true);
+    html = meta(html, "twitter:title", homeTitle);
+    html = meta(html, "twitter:description", homeDescription);
     html = meta(html, "og:url", `${url.origin}/`, true);
     html = meta(html, "og:image", `${url.origin}/og-sindarealest-casauvip-20261113.jpg`, true);
     html = meta(html, "og:image:secure_url", `${url.origin}/og-sindarealest-casauvip-20261113.jpg`, true);
@@ -379,6 +404,11 @@ export async function onRequest(context) {
       name: "SinDarealest", url: `${url.origin}/`,
       logo: `${url.origin}/images/brand-emblem.png`,
       image: `${url.origin}/og-sindarealest-casauvip-20261113.jpg`,
+      sameAs: [
+        "https://www.facebook.com/ThoiTrangDaCaSau",
+        "https://www.instagram.com/dacasau.sindarealest/",
+        "https://shopee.vn/dacasau.sindarealest"
+      ],
       telephone: "+84827049192",
       address: {
         "@type": "PostalAddress",

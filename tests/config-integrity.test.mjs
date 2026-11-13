@@ -112,8 +112,20 @@ assertUniqueStaticIds(adminSource, 'Admin');
 assert.ok(storefrontSource.includes('Tư vấn / đặt hàng qua Zalo'), 'Zalo CTA must use one owner-requested label across storefront surfaces');
 assert.ok(!storefrontSource.includes('Tư Vấn 24/7'), 'Do not claim 24/7 availability without confirmation');
 assert.ok(!storefrontSource.includes('Da tuyển chọn'), 'Do not claim an unverified leather selection process');
+const explicitHomeTitle = "SinDarealest | Giày, Ví, Thắt Lưng & Phụ Kiện Da Cá Sấu Thật 100%";
+const encodedHomeTitle = explicitHomeTitle.replaceAll("&", "&amp;");
+let storefrontCopyOutsideApprovedTitle = storefrontSource;
+for (const approvedTitleSurface of [
+  "<title>" + encodedHomeTitle + "</title>",
+  '<meta property="og:title" content="' + encodedHomeTitle + '">',
+  '<meta name="twitter:title" content="' + encodedHomeTitle + '">',
+  "const SD_HOME_TITLE='" + explicitHomeTitle + "';"
+]) {
+  assert.ok(storefrontCopyOutsideApprovedTitle.includes(approvedTitleSurface), "The requested home title must stay identical in static and client metadata");
+  storefrontCopyOutsideApprovedTitle = storefrontCopyOutsideApprovedTitle.replace(approvedTitleSurface, "");
+}
 for (const unsupportedClaim of ['Da Cá Sấu Thật', 'Thiết Kế Độc Quyền', 'Bảo Hành Uy Tín', 'Giao Hàng Toàn Quốc', 'Chính sách rõ ràng', 'Đẳng Cấp Thật', 'Từ Chất Liệu Thật', 'Cam kết chất lượng']) {
-  assert.ok(!storefrontSource.includes(unsupportedClaim), `Storefront must not assert an unverified claim: ${unsupportedClaim}`);
+  assert.ok(!storefrontCopyOutsideApprovedTitle.includes(unsupportedClaim), `Storefront must not assert an unverified claim outside the explicitly requested home title: ${unsupportedClaim}`);
 }
 assert.ok(!existsSync('public/catalog-fallback.json'), 'Stale static catalog fallback must not shadow D1 failures');
 

@@ -1,7 +1,7 @@
 name: SEO Knowledge Hub exact candidate Preview
 on:
   push:
-    branches: [seo-knowledge-hub-preview-20261112]
+    branches: [seo-knowledge-hub-preview-20261112, codex/seo-final-technical-fixes-20261113]
     paths:
       - 'functions/_middleware.js'
       - 'functions/_knowledge-routes.js'
@@ -9,7 +9,8 @@ on:
       - 'public/kien-thuc/**'
       - 'public/images/**'
       - 'content/knowledge/**'
-      - 'tests/knowledge-hub.test.mjs'
+      - 'tests/**'
+      - 'scripts/qa-seo-release-preview.mjs'
       - '.github/workflows/seo-knowledge-hub-preview-20261112.yml'
   workflow_dispatch:
 permissions:
@@ -25,7 +26,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       PREVIEW_PROJECT: sindarealest-admin-preview
-      PREVIEW_BRANCH: seo-knowledge-hub-preview-20261112
+      PREVIEW_BRANCH: ${{ github.ref_name == 'codex/seo-final-technical-fixes-20261113' && 'seo-final-candidate-20261113' || 'seo-knowledge-hub-preview-20261112' }}
       CANDIDATE_SHA: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v7
@@ -40,15 +41,23 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
-          test "$GITHUB_REF" = 'refs/heads/seo-knowledge-hub-preview-20261112'
+          case "$GITHUB_REF" in
+            refs/heads/seo-knowledge-hub-preview-20261112|refs/heads/codex/seo-final-technical-fixes-20261113) ;;
+            *) echo 'Unsupported SEO Preview candidate branch'; exit 1 ;;
+          esac
           test "$PREVIEW_PROJECT" = 'sindarealest-admin-preview'
-          test "$PREVIEW_BRANCH" = 'seo-knowledge-hub-preview-20261112'
+          if [[ "$GITHUB_REF" == 'refs/heads/codex/seo-final-technical-fixes-20261113' ]]; then
+            test "$PREVIEW_BRANCH" = 'seo-final-candidate-20261113'
+          else
+            test "$PREVIEW_BRANCH" = 'seo-knowledge-hub-preview-20261112'
+          fi
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_API_TOKEN"
       - name: Validate locally before deploy
         run: |
           npm install --no-fund --no-audit
           npm run check
+          npm test
           node tests/knowledge-hub.test.mjs
           node scripts/qa-resource-guard.mjs
       - name: Verify Preview bindings differ from Production
@@ -76,14 +85,14 @@ jobs:
           if(!exact)throw Error('Preview does not report the exact candidate SHA.');
           console.log('PASS: exact Preview SHA verified.');
           NODE
-          echo "Preview: https://seo-knowledge-hub-preview-20.sindarealest-admin-preview.pages.dev/" >> "$GITHUB_STEP_SUMMARY"
+          echo "Preview: https://${PREVIEW_BRANCH}.sindarealest-admin-preview.pages.dev/" >> "$GITHUB_STEP_SUMMARY"
           echo "Candidate SHA: $CANDIDATE_SHA. Production deploy: none." >> "$GITHUB_STEP_SUMMARY"
   browser-qa:
     needs: deploy
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      PREVIEW_URL: https://seo-knowledge-hub-preview-20.sindarealest-admin-preview.pages.dev
+      PREVIEW_URL: https://${{ github.ref_name == 'codex/seo-final-technical-fixes-20261113' && 'seo-final-candidate-20261113' || 'seo-knowledge-hub-preview-20' }}.sindarealest-admin-preview.pages.dev
     steps:
       - uses: actions/checkout@v7
         with:
@@ -138,6 +147,7 @@ jobs:
           writeFileSync('artifacts/knowledge-preview/report.json',JSON.stringify({sha:process.env.GITHUB_SHA,report},null,2));
           console.log(JSON.stringify(report,null,2));
           NODE
+          node scripts/qa-seo-release-preview.mjs
       - name: Store exact SHA visual evidence
         if: always()
         uses: actions/upload-artifact@v4
