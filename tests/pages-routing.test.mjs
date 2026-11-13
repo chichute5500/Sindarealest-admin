@@ -78,6 +78,21 @@ try {
   assert.equal(legacyListing.status, 301, "The retired product listing route should redirect to the canonical catalog");
   assert.equal(legacyListing.headers.get("location"), origin + "/sanpham");
 
+  for (const [path,destination] of [
+    ["/tra-cuu", "/tra-cuu-don-hang"],
+    ["/tra-cuu/", "/tra-cuu-don-hang"],
+    ["/lien-he", "/#contact"],
+    ["/lien-he/", "/#contact"],
+    ["/gioi-thieu", "/#about"],
+    ["/gioi-thieu/", "/#about"]
+  ]) {
+    const response = await fetch(new URL(path, origin), {
+      redirect: "manual", signal: AbortSignal.timeout(2500)
+    });
+    assert.equal(response.status, 301, path + " should permanently redirect");
+    assert.equal(response.headers.get("location"), origin + destination, path + " should point to its canonical destination");
+  }
+
   // Static sitemap is served by Pages assets rather than a D1-backed Function.
   const staticSitemapGet = await fetchWithTimeout("/sitemap-pages.xml");
   assert.equal(staticSitemapGet.status, 200, "Static sitemap must bypass function routing");
@@ -85,14 +100,26 @@ try {
   assert.equal(staticSitemapGet.headers.get("x-robots-tag"), null);
   const staticXml = await staticSitemapGet.text();
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/sanpham\/sneaker<\/loc>/);
-  assert.equal((staticXml.match(/<url>/g) || []).length, 28,
-    "Static sitemap includes catalog/home, knowledge, and two public support URLs");
+  assert.equal((staticXml.match(/<url>/g) || []).length, 31,
+    "Static sitemap includes catalog/home, knowledge, two support URLs, and three legal URLs");
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/sanpham\/vinamnu<\/loc>/);
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/kien-thuc\/<\/loc>/);
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/kien-thuc\/phan-biet-da-ca-sau-that-da-dap-van\/<\/loc>/);
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/bao-hanh<\/loc>/);
   assert.match(staticXml, /<loc>https:\/\/casauvip\.store\/tra-cuu-don-hang<\/loc>/);
+  for (const path of ["/privacy-policy", "/terms-of-service", "/data-deletion"])
+    assert.ok(staticXml.includes("<loc>https://casauvip.store" + path + "</loc>"), path + " must appear in the static sitemap");
   assert.doesNotMatch(staticXml, /<loc>https:\/\/casauvip\.store\/sanpham\/vinam<\/loc>/);
+
+  for (const [path,title] of [
+    ["/privacy-policy", "Chính sách quyền riêng tư"],
+    ["/terms-of-service", "Điều khoản sử dụng"],
+    ["/data-deletion", "Hướng dẫn xóa dữ liệu"]
+  ]) {
+    const response = await fetchWithTimeout(path);
+    assert.equal(response.status, 200, path + " must remain accessible");
+    assert.ok((await response.text()).includes(title), path + " must return the corresponding legal page");
+  }
 
   const staticSitemapHead = await fetch(new URL("/sitemap-pages.xml", origin), {
     method: "HEAD", signal: AbortSignal.timeout(2500)

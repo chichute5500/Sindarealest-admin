@@ -37,8 +37,39 @@ async function dispatch(path, method = "GET", host = "preview.example") {
 const home = await dispatch("/");
 assert.equal(home.response.status, 200);
 const homeHtml = await home.response.text();
-assert.equal((homeHtml.match(/href="\/kien-thuc\/"/g) || []).length, 2,
-  "The home page must expose the hub in both crawlable navigation menus");
+const homeTitle = "SinDarealest | Giày, Ví, Thắt Lưng & Phụ Kiện Da Cá Sấu Thật 100%";
+const homeDescription = "Thương hiệu đồ da cá sấu thủ công SinDarealest: Giày Sneaker, Giày lười, Giày tây, Ví nam nữ, Thắt lưng liền nguyên tấm & Phụ kiện da cá sấu thật 100%. Bảo hành 6–12 tháng, bảo dưỡng trọn đời.";
+const escapeAttribute = (value) => value.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+assert.ok(homeHtml.includes("<title>" + escapeAttribute(homeTitle) + "</title>"), "Server-rendered home title must use the approved storefront title");
+assert.ok(homeHtml.includes('<meta name="description" content="' + escapeAttribute(homeDescription) + '">'), "Server-rendered home description must use the approved storefront copy");
+assert.ok(homeHtml.includes("const SD_HOME_TITLE='" + homeTitle + "';"), "The client-side home title must match the server title");
+assert.ok(homeHtml.includes("const SD_HOME_DESCRIPTION='" + homeDescription + "';"), "The client-side home description must match the server description");
+assert.ok(homeHtml.includes("document.title=SD_HOME_TITLE;"), "Returning from a product detail must restore the canonical home title");
+assert.ok(homeHtml.includes("sdSetMeta('meta[name=\"description\"]',SD_HOME_DESCRIPTION)"), "Returning from a product detail must restore the canonical home description");
+assert.equal((homeHtml.match(/href="\/kien-thuc\/"/g) || []).length, 3,
+  "The home page must expose the hub in both navigation menus and the featured section");
+const featuredKnowledge = homeHtml.match(/<section class="section wrap sd-home-knowledge"[^]*?<\/section>/)?.[0] || "";
+assert.ok(featuredKnowledge, "Home page must include a featured knowledge section before the footer");
+assert.match(featuredKnowledge, /<h2[^>]*>Cẩm nang chọn &amp; chăm sóc đồ da cá sấu<\/h2>/);
+assert.equal((featuredKnowledge.match(/class="glass-soft sd-home-knowledge-card"/g) || []).length, 4,
+  "The homepage should feature four Liquid Glass knowledge cards");
+for (const [path,title] of [
+  ["/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van/", "Phân biệt da cá sấu thật và da dập vân: cần kiểm tra gì?"],
+  ["/kien-thuc/da-bung-da-lung-da-hong-ca-sau/", "Da bụng, da lưng và da hông cá sấu khác nhau thế nào?"],
+  ["/kien-thuc/chon-that-lung-da-ca-sau/", "Chọn thắt lưng da cá sấu: bản dây, khóa và cách đo size"],
+  ["/kien-thuc/chon-size-giay-da-ca-sau-online/", "Cách chọn size giày da cá sấu khi mua online"]
+]) {
+  assert.ok(featuredKnowledge.includes('href="' + path + '"'), "Featured knowledge section must link to " + path);
+  assert.ok(featuredKnowledge.includes("<h3>" + title + "</h3>"), "Featured knowledge title must match " + path);
+}
+assert.ok(featuredKnowledge.includes('href="/kien-thuc/">Xem tất cả 11 bài viết'), "The home page must link to all 11 knowledge articles");
+const homeSchemas = [...homeHtml.matchAll(/<script type="application\/ld\+json">([^]*?)<\/script>/g)].map(([, value]) => JSON.parse(value));
+const businessSchema = homeSchemas.find((schema) => Array.isArray(schema["@type"]) && schema["@type"].includes("LocalBusiness"));
+assert.deepEqual(businessSchema?.sameAs, [
+  "https://www.facebook.com/ThoiTrangDaCaSau",
+  "https://www.instagram.com/dacasau.sindarealest/",
+  "https://shopee.vn/dacasau.sindarealest"
+], "The home business schema must include official social and Shopee profiles");
 
 const hub = await dispatch("/kien-thuc/");
 assert.equal(hub.response.status, 200);
@@ -80,6 +111,7 @@ const article = await dispatch("/kien-thuc/" + articleSlug + "/");
 assert.equal(article.response.status, 200);
 assert.equal(article.assetPath, "/kien-thuc/" + articleSlug + "/index.html");
 const articleHtml = await article.response.text();
+assert.equal(articleSlug, "phan-biet-da-ca-sau-that-da-dap-van", "The eleventh article slug remains the first approved production route");
 assert.match(articleHtml, /<h1\b/);
 assert.match(articleHtml, /rel="canonical" href="https:\/\/casauvip\.store\/kien-thuc\//);
 assert.match(articleHtml, /name="robots" content="noindex,nofollow"/);
@@ -111,6 +143,18 @@ const jsonLd = [...articleHtml.matchAll(/<script type="application\/ld\+json">(.
 const articleSchema = jsonLd.find((schema) => schema["@type"] === "Article");
 assert.ok(articleSchema);
 assert.equal(articleSchema.reviewedBy?.name, "Công Chí");
+const relatedBlock = articleHtml.match(/<nav class="related" aria-label="Bài viết kiến thức liên quan">[^]*?<\/nav>/)?.[0] || "";
+assert.ok(relatedBlock, "The latest article must use the shared related-knowledge navigation pattern");
+for (const [path,title] of [
+  ["/kien-thuc/da-bung-da-lung-da-hong-ca-sau/", "Da bụng, da lưng và da hông cá sấu khác nhau thế nào?"],
+  ["/kien-thuc/da-ca-sau-that-co-ben-khong/", "Đồ da cá sấu thật có bền không?"],
+  ["/kien-thuc/cach-chon-vi-da-ca-sau-nam/", "Cách chọn ví da cá sấu nam theo nhu cầu sử dụng"],
+  ["/kien-thuc/chon-that-lung-da-ca-sau/", "Chọn thắt lưng da cá sấu: bản dây, khóa và cách đo size"]
+]) {
+  assert.ok(relatedBlock.includes('href="' + path + '"'), "The related block must link to " + path);
+  assert.ok(relatedBlock.includes(">" + title + "</a>"), "The related link title must match " + path);
+}
+assert.doesNotMatch(articleHtml, /Đọc tiếp và xem sản phẩm/, "The old product-tag block should be replaced by related knowledge links");
 const faqSchema = jsonLd.find((schema) => schema["@type"] === "FAQPage");
 assert.equal(faqSchema?.mainEntity?.length, 5, "FAQ schema must match the five visible questions");
 for (const question of faqSchema.mainEntity) assert.ok(articleHtml.includes(question.name));
@@ -124,7 +168,15 @@ for (const publishedSlug of KNOWLEDGE_SLUGS) {
   const published = await dispatch("/kien-thuc/" + publishedSlug + "/", "GET", "casauvip.store");
   assert.equal(published.response.status, 200, publishedSlug + " must serve on Production");
   assert.equal(published.response.headers.get("X-Robots-Tag"), "index, follow");
-  assert.match(await published.response.text(), /name="robots" content="index, follow"/);
+  const publishedHtml = await published.response.text();
+  assert.match(publishedHtml, /name="robots" content="index, follow"/);
+  assert.ok(publishedHtml.includes('rel="canonical" href="https://casauvip.store/kien-thuc/' + publishedSlug + '/"'),
+    publishedSlug + " must have the trailing-slash canonical listed in the sitemap");
+  assert.doesNotMatch(publishedHtml, /href=["']\/(?:tra-cuu|lien-he|gioi-thieu)\/?["']/,
+    publishedSlug + " must not link to a legacy short route");
+  const missingSlash = await dispatch("/kien-thuc/" + publishedSlug);
+  assert.equal(missingSlash.response.status, 301, publishedSlug + " without a trailing slash should canonicalize");
+  assert.equal(missingSlash.response.headers.get("Location"), "https://preview.example/kien-thuc/" + publishedSlug + "/");
   const previewRoute = await dispatch("/kien-thuc/" + publishedSlug + "/");
   assert.equal(previewRoute.response.status, 200, publishedSlug + " must remain available in Preview");
   assert.equal(previewRoute.response.headers.get("X-Robots-Tag"), "noindex, nofollow");

@@ -109,6 +109,10 @@ assert.equal(new Set(staticPageLocs).size, staticPageLocs.length, "static sitema
 for (const path of ["/kien-thuc/", ...["bao-quan-do-da-ca-sau-tai-nha","chon-giay-da-ca-sau-theo-phong-cach","cach-chon-vi-da-ca-sau-nam","chon-that-lung-da-ca-sau","da-bung-da-lung-da-hong-ca-sau","chon-size-giay-da-ca-sau-online","hang-co-san-va-hang-dat-rieng","qua-tang-da-ca-sau-cho-nam","da-ca-sau-that-co-ben-khong","ve-sinh-bao-duong-giay-da-ca-sau"].map((slug) => "/kien-thuc/" + slug + "/"), "/kien-thuc/phan-biet-da-ca-sau-that-da-dap-van/", "/bao-hanh", "/tra-cuu-don-hang"]) {
   assert.ok(staticPageLocs.includes("https://casauvip.store" + path), path + " must be in the static page sitemap");
 }
+for (const path of ["/privacy-policy", "/terms-of-service", "/data-deletion"]) {
+  assert.ok(staticPageLocs.includes("https://casauvip.store" + path), path + " must be in the static page sitemap");
+  assert.ok(!staticPageLocs.includes("https://casauvip.store" + path + "/"), path + " must match its no-slash canonical URL");
+}
 assert.ok(!staticPageLocs.some((loc) => /\/(?:lien-he|gioi-thieu|tra-cuu)\/?$/.test(loc)), "sitemap must not list nonexistent placeholder routes");
 
 const staticHeaders = readFileSync(new URL("../public/_headers", import.meta.url), "utf8");
