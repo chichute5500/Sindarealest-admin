@@ -537,7 +537,7 @@ export async function onRequest(context) {
   const schemaDescription = `${descriptionBase} Chất liệu da cá sấu thật 100%.${fulfillmentType === "made_to_order" ? " Thời gian chế tác dự kiến 5–20 ngày." : ""} Bảo hành 6–12 tháng và bảo dưỡng trọn đời tại SinDarealest.`.slice(0,1000);
   const normalizedPrice = hasPublicOffer ? String(Math.trunc(Number(product.price))) : "";
   const availability = fulfillmentType === "in_stock" ? "https://schema.org/InStock"
-    : fulfillmentType === "made_to_order" ? "https://schema.org/MadeToOrder" : "";
+    : fulfillmentType === "made_to_order" ? "https://schema.org/OnlineOnly" : "";
   const productSchema = {
     "@type": "Product",
     name: product.title,
