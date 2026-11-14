@@ -1,0 +1,103 @@
+name: Deploy watermark fix to isolated Preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: watermark-settings-preview
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy pinned watermark candidate (Preview only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PREVIEW_PROJECT: sindarealest-admin-preview
+      PREVIEW_BRANCH: watermark-settings-20261114
+      CANDIDATE_SHA: 394b2fa96cec3d33384f671fe189168d8db57d90
+    steps:
+      - name: Guard exact repository, dispatcher, project, branch, and SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'chichute5500/Sindarealest-admin'
+          test "$GITHUB_REF" = 'refs/heads/main'
+          test "$PREVIEW_PROJECT" = 'sindarealest-admin-preview'
+          test "$PREVIEW_BRANCH" = 'watermark-settings-20261114'
+          test "$CANDIDATE_SHA" = '394b2fa96cec3d33384f671fe189168d8db57d90'
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_API_TOKEN"
+
+      - name: Check out the exact watermark candidate
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          persist-credentials: false
+
+      - name: Confirm checked out SHA
+        shell: bash
+        run: test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-fund
+
+      - name: Validate exact candidate
+        run: |
+          npm run check
+          npm test
+
+      - name: Verify Preview project is isolated from Production
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          curl --fail --silent --show-error --max-time 25 \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$base/sindarealest-admin-preview" > "$RUNNER_TEMP/watermark-preview-project.json"
+          curl --fail --silent --show-error --max-time 25 \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "$base/sindarealest2" > "$RUNNER_TEMP/watermark-production-project.json"
+          jq -e '.success == true and .result.production_branch == "main"' "$RUNNER_TEMP/watermark-preview-project.json" >/dev/null
+          node scripts/admin-preview-binding-safety.mjs \
+            "$RUNNER_TEMP/watermark-preview-project.json" "$RUNNER_TEMP/watermark-production-project.json"
+
+      - name: Deploy candidate to isolated non-production branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler pages deploy public \
+            --project-name "$PREVIEW_PROJECT" \
+            --branch "$PREVIEW_BRANCH" \
+            --commit-hash "$CANDIDATE_SHA" \
+            --commit-message "Watermark settings Preview $CANDIDATE_SHA"
+
+      - name: Verify exact Preview branch and source SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PREVIEW_PROJECT}/deployments"
+          curl --fail --silent --show-error --max-time 25 \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "$url" > "$RUNNER_TEMP/watermark-deployments.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const data=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/watermark-deployments.json','utf8'));
+          const exact=(data.result||[]).some(d=>d.environment==='preview' &&
+            d.deployment_trigger?.metadata?.branch===process.env.PREVIEW_BRANCH &&
+            d.deployment_trigger?.metadata?.commit_hash===process.env.CANDIDATE_SHA);
+          if(!exact)throw Error('Cloudflare did not report the exact watermark SHA on the isolated Preview branch');
+          console.log('PASS: isolated Preview maps to the exact watermark candidate SHA.');
+          NODE
+          echo "Preview: https://watermark-settings-20261114.sindarealest-admin-preview.pages.dev/" >> "$GITHUB_STEP_SUMMARY"
+          echo "Candidate SHA: $CANDIDATE_SHA; Production deployment: none." >> "$GITHUB_STEP_SUMMARY"
